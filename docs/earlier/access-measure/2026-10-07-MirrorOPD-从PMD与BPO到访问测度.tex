@@ -569,6 +569,16 @@ h_k(s,a)
 =\E_{d_b,\pi_k}
 \left[h_k(s,a)-u_\theta(s,a)\right]g_\theta(s,a).
 \end{equation}
+对 batch $\{(s_i,a_i)\}_{i=1}^{B}$，其中 $s_i$ 来自 replay、$a_i\sim\pi_k(\cdot\mid s_i)$，对应的可执行估计量为
+\begin{equation}
+\label{eq:ch2-opd-part-empirical}
+\widehat{\mathcal L}_{k,\mathrm{Part}}
+=\frac{1}{2B}\sum_{i=1}^{B}(u_{\theta,i}-h_{k,i})^2,
+\qquad
+-\widehat{\nabla}\mathcal L_{k,\mathrm{Part}}
+=\frac1B\sum_{i=1}^{B}(h_{k,i}-u_{\theta,i})g_{\theta,i}.
+\end{equation}
+如果 replay 的 prefix 测度是 $d_b$ 而目标 outer 测度是 $d_{\pi_k}$，把每一项替换为 $W^{k}_{<t_i}(u_{\theta,i}-h_{k,i})^2$，其中 $W^{k}_{<t_i}=d_{\pi_k}(s_i)/d_b(s_i)$ 的轨迹乘积估计见式 \eqref{eq:ch2-mdpo-prefix-weight}。
 在 tabular、全 action 覆盖且使用真实 $Z_k$ 的情形，零损失等价于 $\pi_\theta=\pi_{k+1}^\star$。共享参数或 prefix 覆盖不足时，得到的是 replay 测度下的投影，不能把零训练误差解释成所有 prefix 上的教师拟合。
 
 \paragraph{PMD-Mean 的 OPD inner。}
@@ -593,6 +603,16 @@ h_k(s,a)
 \sum_a\pi_k(a\mid s)
 \frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}=1.
 \end{equation}
+在同一 prefix 采 $K$ 个 action 后，实际的 regression batch 为
+\begin{equation}
+\label{eq:ch2-opd-mean-empirical}
+\widehat{\bar r}_{k,i}=\frac1K\sum_{j=1}^{K}\log\frac{T(a_{ij}\mid s_i)}{\pi_k(a_{ij}\mid s_i)},
+\quad
+\widehat{\mathcal L}_{k,\mathrm{Mean}}
+=\frac{1}{2BK}\sum_{i,j}
+\left[u_{\theta,ij}-\eta\left(r_{k,ij}-\widehat{\bar r}_{k,i}\right)\right]^2.
+\end{equation}
+其梯度估计为 $-\widehat{\nabla}\mathcal L_{k,\mathrm{Mean}}=(BK)^{-1}\sum_{i,j}\left[\eta(r_{k,ij}-\widehat{\bar r}_{k,i})-u_{\theta,ij}\right]g_{\theta,ij}$，并对 $\widehat{\bar r}_{k,i}$ 停止梯度。若目标状态测度为 $d_{\pi_k}$，每个 prefix loss 和梯度项再乘 $W^k_{<t_i}$。
 约束是必要的：$u_\theta=\log(\pi_\theta/\pi_k)$ 必须满足
 \[
 \E_{\pi_k}[e^{u_\theta}\mid s]
@@ -625,6 +645,20 @@ BPO 不显式估计 $\log Z_k$，而在每个 prefix 上把 residual 投影到�
 \left[\delta_{k,\theta}(s,a)
 \left(g_\theta(s,a)-\bar g_\theta(s)\right)\right],
 \end{equation}
+给定每个 prefix 的 $K$ 个 action，令
+\[
+\widehat{\bar g}_{\theta,i}=\frac1K\sum_{j=1}^{K}g_{\theta,ij},\qquad
+\widehat{\delta}_{k,ij}=\eta r_{k,ij}-u_{\theta,ij}-\frac1K\sum_{\ell=1}^{K}(\eta r_{k,i\ell}-u_{\theta,i\ell}).
+\]
+则 BPO 的可执行 loss 和 ascent 估计量为
+\begin{equation}
+\label{eq:ch2-opd-bpo-empirical}
+\widehat{\mathcal L}_{k,\mathrm{BPO}}=\frac{1}{2\eta BK}\sum_{i,j}\widehat{\delta}_{k,ij}^{,2},
+\qquad
+-\eta\widehat{\nabla}\mathcal L_{k,\mathrm{BPO}}
+=\frac1{BK}\sum_{i,j}\widehat{\delta}_{k,ij}(g_{\theta,ij}-\widehat{\bar g}_{\theta,i}).
+\end{equation}
+若使用 replay prefix 测度近似 $d_{\pi_k}$，同样在每个 $i$ 的项前乘 $W^k_{<t_i}$；若 $K=1$，中心化 residual 和 centered score 都退化，不能从单个 action 无偏恢复 BPO 的行为条件中心化。
 其中方括号表示标量 residual 与向量 score 的乘积，
 \[
 \delta_{k,\theta}(s,a)
@@ -665,6 +699,76 @@ PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由�
 \]
 所以唯一最大点为 $\pi_\theta=\pi_{k+1}^{\star}$。若中心化 target 不可行或模型类受限，PMD-Mean 的解是约束集合上的投影，此时只能保证投影误差而不能保证精确 Gibbs 解。
 \end{proof}
+
+\subsection{MDPO 的 off-policy 权重阶梯}
+\label{sec:ch2-mdpo-offpolicy-weights}
+
+需要先区分 MDPO inner 的固定状态测度和完整 RL 目标的状态测度。第 $k$ 个 OPD inner 固定 anchor $q_k=\pi_k$，在每个 prefix 上优化
+\begin{equation}
+\label{eq:ch2-mdpo-fixed-state-objective}
+\mathcal J_k(\theta)
+=\sum_t\E_{s_t\sim d_{q_k}}
+\left[
+\E_{a\sim\pi_\theta(\cdot\mid s_t)}r_k(s_t,a)
+-\frac1\eta\KL(\pi_\theta(\cdot\mid s_t)\Vert q_k(\cdot\mid s_t))
+\right].
+\end{equation}
+这里的 $r_k(s,a)$ 是已经在当前 prefix--action 上定义好的 OPD token reward；它不是一条还要沿后缀重新采样的终端回报。设 replay 行为策略为 $b$，并令
+\[
+W^k_{<t}=\prod_{j<t}\frac{q_k(y_j\mid s_j)}{b(y_j\mid s_j)},
+\qquad
+\rho^{\theta/b}_t=\frac{\pi_\theta(y_t\mid s_t)}{b(y_t\mid s_t)}.
+\]
+则联合状态--动作测度满足
+\begin{equation}
+\label{eq:ch2-mdpo-prefix-weight}
+\frac{d_{q_k}(s_t)\pi_\theta(a\mid s_t)}{d_b(s_t)b(a\mid s_t)}
+=W^k_{<t}\rho^{\theta/b}_t.
+\end{equation}
+因此式 \eqref{eq:ch2-mdpo-fixed-state-objective} 的精确 off-policy 梯度估计量是
+\begin{equation}
+\label{eq:ch2-mdpo-offpolicy-gradient}
+\widehat G_{k,\mathrm{MDPO}}
+=\frac1B\sum_{i=1}^{B}
+W^k_{<t_i}\rho^{\theta/b}_{i}
+\left[
+ r_{k,i}-\frac1\eta\log\frac{\pi_\theta(y_{t_i}\mid s_{t_i})}{q_k(y_{t_i}\mid s_{t_i})}
+\right]g_{\theta,i}.
+\end{equation}
+
+\begin{proposition}[MDPO inner 的权重阶梯]
+\label{prop:ch2-mdpo-weight-choice}
+在式 \eqref{eq:ch2-mdpo-fixed-state-objective} 的固定 $d_{q_k}$ 目标下：
+\begin{enumerate}[label=(\roman*)]
+    \item 只用 $\rho_t^{\theta/b}$ 得到 $d_b$ 加权的镜像梯度，动作测度已修正但 prefix 访问测度仍有偏差；
+    \item 使用 $W^k_{<t}\rho_t^{\theta/b}$ 恰好得到 $d_{q_k}$ 加权、$\pi_\theta$ 动作测度的镜像梯度；
+    \item 再乘 $W_{>t}^{\theta/b}$ 会把局部 $r_k$ 的后缀测度改成候选策略 continuation，改变了目标，不再是式 \eqref{eq:ch2-mdpo-fixed-state-objective} 的估计量；
+    \item 使用完整 $W_{1:T}^{\theta/b}$ 只在 $r_k$ 被替换为基于终端 $R(y)$ 的 continuation return、且目标本身要求对整条 $\pi_\theta$ 轨迹取期望时才是正确的 sequence IS。
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+对任意只依赖 $(s_t,a_t)$ 的可积函数 $\varphi_t$，条件换测度给出
+\begin{align*}
+&\E_{y\sim b}\left[W^k_{<t}\rho_t^{\theta/b}\varphi_t(s_t,y_t)\right]\\
+&=\sum_{s_t}d_b(s_t)W^k_{<t}(s_t)
+  \sum_a b(a\mid s_t)\frac{\pi_\theta(a\mid s_t)}{b(a\mid s_t)}\varphi_t(s_t,a)\\
+&=\sum_{s_t}d_{q_k}(s_t)\sum_a\pi_\theta(a\mid s_t)\varphi_t(s_t,a).
+\end{align*}
+令 $\varphi_t=(r_k-\eta^{-1}\log(\pi_\theta/q_k))g_t$ 即得式 \eqref{eq:ch2-mdpo-offpolicy-gradient}。如果只乘当前比率，第一行中的 $d_b(s_t)$ 不会变成 $d_{q_k}(s_t)$，所以残留的是 prefix occupancy bias。若再乘后缀比率，条件期望变为对 $\pi_\theta$ continuation 的积分；这只有在被积信号包含后缀随机变量、并且目标定义确实要求该 continuation 时才是合法换测度。
+完整 $W_{1:T}^{\theta/b}$ 的合法性来自
+\[
+\E_b[W_{1:T}^{\theta/b}R(y)]=\E_{\pi_\theta}[R(y)],
+\]
+但它估计的是完整轨迹目标，而不是固定 $d_{q_k}$ 的局部 mirror inner。
+\end{proof}
+
+\paragraph{OPD 中的常用特例。}
+若 replay 正好由 anchor $b=q_k=\pi_k$ 生成，则 $W^k_{<t}=1$，而
+\[
+\rho_t^{\theta/b}=\frac{\pi_\theta(y_t\mid s_t)}{\pi_k(y_t\mid s_t)}.
+\]
+此时 MDPO 只需当前 action ratio；这就是代码中常见的 MDPO inner 形式。若 replay 来自更旧策略或混合策略，才需要显式 prefix ratio $W^k_{<t}$。这与序列策略梯度的 $W_{\le t}$ 不矛盾：$W_{\le t}$ 的当前因子是把动作分布从 $b$ 换到目标策略，而 MDPO 的状态 anchor 仍是 $q_k$，所以当前因子是 $\pi_\theta/b$，前缀因子是 $q_k/b$。
 
 \subsection{inner 求解与 outer 更新的区别}
 
@@ -733,7 +837,7 @@ OPD 的优势在于教师可以在学生访问到的 prefix 上提供稠密 toke
 \qquad
 W_{<t}(s)=\frac{d_{\pi_k}(s)}{d_b(s)}.
 \end{equation}
-PMD-Part、PMD-Mean 和 BPO 在 action 层都可用 $a\sim\pi_k(\cdot\mid s)$ 的样本完成回归，不需要额外 action-level IS；off-policy 的主要问题转移到 prefix 访问测度 $W_{<t}$。若把 $d_b$ 当作固定投影测度而不做 $W_{<t}$，得到的是 replay 加权的近似 mirror step，而非严格的 $d_{\pi_k}$ 加权 outer 目标。这正是 OPD 可以利用状态丰富性、同时需要报告访问测度偏差的地方。
+PMD-Part、PMD-Mean 和 BPO 在 action 层都可用 $a\sim\pi_k(\cdot\mid s)$ 的样本完成回归，不需要额外 action-level IS；MDPO 则需要把行为 action 测度换成候选策略测度，因此保留 action ratio。对四种方法，off-policy 的 state 访问测度修正都由 prefix 权重 $W_{<t}$ 单独承担。若把 $d_b$ 当作固定投影测度而不做 $W_{<t}$，得到的是 replay 加权的近似 mirror step，而非严格的 $d_{\pi_k}$ 加权 outer 目标。这正是 OPD 可以利用状态丰富性、同时需要报告访问测度偏差的地方。
 
 \section{共享零点、不同梯度的定理}
 \label{sec:ch2-theorems}
