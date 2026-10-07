@@ -629,19 +629,20 @@ $\log\pi_\theta$ 的梯度。完整词表下
 \begin{equation}
 \label{eq:ch2-opd-grad-ktheta}
 \mathcal K_k^\theta(s)
-=\sum_v\pi_k(v\mid s)
+=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \left[\operatorname{stopgrad}\!\left(\log\pi_k(v\mid s)\right)
 -\log\pi_\theta(v\mid s)\right],
-\qquad
+\\
 \nabla_\theta\mathcal K_k^\theta(s)
-=-\sum_v\pi_k(v\mid s)\nabla_\theta\log\pi_\theta(v\mid s).
+=-\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\nabla_\theta\log\pi_\theta(v\mid s)\right].
 \end{equation}
-记 $g_\theta(s,v)=\nabla_\theta\log\pi_\theta(v\mid s)$、
-$\bar g_\theta(s)=\sum_v\pi_k(v\mid s)g_\theta(s,v)$。对 PMD-Part，
-残差对 $\theta$ 的导数就是 $g_\theta$，故
+对 PMD-Part，残差对 $\theta$ 的导数就是
+$\nabla_\theta\log\pi_\theta(v\mid s)$，故
 \begin{align}
 \nabla_\theta\mathcal L_{\mathrm{Part}}(s)
-&=\sum_v\pi_k(v\mid s)A_{\mathrm{Part}}(s,v)g_\theta(s,v),\\
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[A_{\mathrm{Part}}(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right],\\
 A_{\mathrm{Part}}(s,v)
 &=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
 -\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\operatorname{stopgrad}(\log Z_k(s)).
@@ -654,30 +655,39 @@ score-function 更新。
 \begin{equation}
 \label{eq:ch2-opd-grad-mean-residual}
 \nabla_\theta A_{\mathrm{Mean}}(s,v)
-=g_\theta(s,v)-\bar g_\theta(s).
+=\nabla_\theta\log\pi_\theta(v\mid s)
+-\mathbb E_{u\sim\pi_k(\cdot\mid s)}
+\left[\nabla_\theta\log\pi_\theta(u\mid s)\right].
 \end{equation}
 于是
 \begin{align}
 \nabla_\theta\mathcal L_{\mathrm{Mean}}(s)
-&=\sum_v\pi_k(v\mid s)A_{\mathrm{Mean}}(s,v)
-\bigl[g_\theta(s,v)-\bar g_\theta(s)\bigr]\\
-&=\sum_v\pi_k(v\mid s)A_{\mathrm{Mean}}(s,v)g_\theta(s,v),
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}\Bigg[A_{\mathrm{Mean}}(s,v)\Bigg(
+\nabla_\theta\log\pi_\theta(v\mid s)
+-\mathbb E_{u\sim\pi_k(\cdot\mid s)}
+\left[\nabla_\theta\log\pi_\theta(u\mid s)\right]\Bigg)\Bigg]\\
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[A_{\mathrm{Mean}}(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right],
 \end{align}
 其中第二个等号使用了
-$\sum_v\pi_k(v\mid s)A_{\mathrm{Mean}}(s,v)=0$。这一步只有在
+$\mathbb E_{v\sim\pi_k}[A_{\mathrm{Mean}}(s,v)]=0$。这一步只有在
 $\mathcal K_k^\theta$ 保留梯度时才成立。
 
 因为 $D_\theta=-A_{\mathrm{Mean}}$，BPO 的梯度为
 \begin{align}
 \nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
-&=-\frac1\eta\sum_v\pi_k(v\mid s)D_\theta(s,v)
-\bigl[g_\theta(s,v)-\bar g_\theta(s)\bigr],\\
+&=-\frac1\eta\mathbb E_{v\sim\pi_k(\cdot\mid s)}\Bigg[D_\theta(s,v)\Bigg(
+\nabla_\theta\log\pi_\theta(v\mid s)
+-\mathbb E_{u\sim\pi_k(\cdot\mid s)}
+\left[\nabla_\theta\log\pi_\theta(u\mid s)\right]\Bigg)\Bigg],\\
 -\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
-&=\sum_v\pi_k(v\mid s)D_\theta(s,v)g_\theta(s,v).
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[D_\theta(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right].
 \end{align}
 这就是前面删除第二项后的严格 policy-gradient 形式；被删除的项是
-$\bar g_\theta(s)\sum_v\pi_k(v\mid s)D_\theta(s,v)=0$，而不是把
-$\bar g_\theta(s)$ 本身当成零。
+$\mathbb E_{u\sim\pi_k}[D_\theta(s,u)]
+\mathbb E_{v\sim\pi_k}[\nabla_\theta\log\pi_\theta(v\mid s)]=0$，而不是把
+后一个 score 期望本身当成零。
 
 最后考虑 MDPO。记
 \[
@@ -689,13 +699,14 @@ U_\theta(s,v)=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}.
 $\pi_\theta$，也要微分 $U_\theta$：
 \begin{align}
 \nabla_\theta\mathcal J_{\mathrm{MDPO}}(s)
-&=\sum_v\pi_\theta(v\mid s)
-\left[F_k(s,v)-\frac1\eta U_\theta(s,v)-\frac1\eta\right]
-g_\theta(s,v)\\
-&=\sum_v\pi_\theta(v\mid s)
-\left[F_k(s,v)-\frac1\eta U_\theta(s,v)\right]g_\theta(s,v),
+&=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
+\Bigg[\left(F_k(s,v)-\frac1\eta U_\theta(s,v)-\frac1\eta\right)
+\nabla_\theta\log\pi_\theta(v\mid s)\Bigg]\\
+&=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
+\left[\left(F_k(s,v)-\frac1\eta U_\theta(s,v)\right)
+\nabla_\theta\log\pi_\theta(v\mid s)\right],
 \end{align}
-因为 $\sum_v\pi_\theta(v\mid s)g_\theta(s,v)=0$。因此 MDPO 是以当前 student
+因为 $\mathbb E_{v\sim\pi_\theta}[\nabla_\theta\log\pi_\theta(v\mid s)]=0$。因此 MDPO 是以当前 student
 $\pi_\theta$ 为采样测度的 policy gradient，而 BPO/PMD-Mean 是以冻结 anchor
 $\pi_k$ 为测度、通过 centered residual 形成的 policy gradient。
 
