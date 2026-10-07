@@ -79,6 +79,26 @@ def write_csv(rows, path: Path):
         writer.writerows(rows)
 
 
+def find_crossings(rows):
+    """Linearly interpolate the first K where the two B=1 RMSE curves meet."""
+    crossings = []
+    for mass in sorted({row["mass_target"] for row in rows}):
+        cur = [row for row in rows if row["mass_target"] == mass]
+        diffs = [row["trunc_abs_relative_bias"] - row["corrected_relative_std"] for row in cur]
+        crossing = float(cur[-1]["top_k"])
+        for left, right, d_left, d_right in zip(cur, cur[1:], diffs, diffs[1:]):
+            if d_left == 0:
+                crossing = float(left["top_k"])
+                break
+            if d_left * d_right <= 0:
+                k_left = float(left["top_k"])
+                k_right = float(right["top_k"])
+                crossing = k_left - d_left * (k_right - k_left) / (d_right - d_left)
+                break
+        crossings.append({"mass_target": mass, "crossing_k": crossing})
+    return crossings
+
+
 def configure_axis(axis, xlabel, ylabel):
     axis.set_xlim(0, 32)
     axis.set_xlabel(xlabel)
@@ -170,6 +190,25 @@ def plot_single_token_summary(rows, out: Path):
     plt.close(fig)
 
 
+def plot_crossings(crossings, out: Path):
+    masses = [row["mass_target"] for row in crossings]
+    values = [row["crossing_k"] for row in crossings]
+    fig, axis = plt.subplots(figsize=(6, 4.5))
+    axis.plot(masses, values, "o-", color="tab:red", linewidth=2)
+    for mass, value in zip(masses, values):
+        axis.annotate(f"K={value:.2f}", (mass, value), xytext=(5, 7), textcoords="offset points")
+    axis.set_xlabel("$M_{32}(\\pi)$")
+    axis.set_ylabel("intersection $K^*$")
+    axis.set_title("Where one-token corrected RMSE meets truncation RMSE")
+    axis.set_xlim(min(masses) - 0.03, max(masses) + 0.03)
+    axis.set_ylim(bottom=0)
+    axis.grid(True, alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(out / "topk_value_rmse_crossings.png", dpi=220)
+    fig.savefig(out / "topk_value_rmse_crossings.pdf")
+    plt.close(fig)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
@@ -186,6 +225,9 @@ def main():
     plot_variance(rows, output)
     plot_rmse(rows, output)
     plot_single_token_summary(rows, output)
+    crossings = find_crossings(rows)
+    write_csv(crossings, output / "crossing_metrics.csv")
+    plot_crossings(crossings, output)
     (output / "value_analysis_metadata.json").write_text(json.dumps({"device": device, "torch": torch.__version__, "cuda": torch.cuda.get_device_name(0) if device == "cuda" else None, "estimators": ["Trunc-Top-K", "Top-K corrected with one sampled token"]}, indent=2))
 
 

@@ -116,6 +116,7 @@ $$
 - [标量 KL variance](k_analysis/topk_value_variance.png)：Trunc-Top-K 的零 Monte Carlo 方差与 Top-K corrected 的 tail variance。
 - [单 sampled-token 综合图](k_analysis/topk_value_single_token_summary.png)：$K=0,1,\ldots,32$ 时两种估计量的 bias、variance 和 RMSE。
 - [标量 KL RMSE](k_analysis/topk_value_rmse_vs_k.png)：固定一个 sampled token 时两种估计量的 RMSE。
+- [RMSE 交点曲线](k_analysis/topk_value_rmse_crossings.png)：对每个目标 $M_{32}$，线性插值两条 $B=1$ RMSE 曲线的首个交点 $K^*$；数值见 [crossing_metrics.csv](k_analysis/crossing_metrics.csv)。
 - [逐点数据](k_analysis/value_metrics.csv)：包含 KL 真值、head/tail 值、两种估计量的 bias、variance 和标准差。
 
 图中的结论是：Trunc-Top-K 在小 $K$ 时可能依靠零方差取得较小的单次 RMSE，但它始终带有 tail bias；Top-K corrected 在标量上无偏，增大 $K$ 通常会降低 single-token tail variance，但由于方差还包含尾部均值平方项，个别很小的 $K$ 区间可以出现非单调变化。在本次 $B=1$ 实验中，corrected estimator 的 RMSE 就是其 single-token 标准差。
