@@ -10,6 +10,42 @@
 \]
 每个方法从同一个初始策略开始，完整枚举 vocabulary，不使用 rollout，不使用 sequence-level reward。这样可以单独检查 token-level inner 的数学对象。PMD-Part 和 PMD-Mean 用 exact weighted squared residual；BPO 使用完整 categorical objective；MDPO 使用 exact categorical Fisher preconditioner。
 
+\subsection{画图实验的输入数据与三层数据集}
+
+本项目的图不能直接从一批混合的 rollout 日志中生成。每一张图都必须注明它使用的是哪一个策略、哪一个 prefix 测度以及哪一种词表访问方式。实验输入按由易到难分为三层。
+
+第一层是可枚举的 categorical oracle。固定一个 prefix $s$，直接生成 anchor、teacher 和 student 的完整 logits，并通过 softmax 得到 $\pi_k(\cdot\mid s)$、$\pi_T(\cdot\mid s)$ 和 $\pi_{k,n}(\cdot\mid s)$。anchor 可以用随机 logits 加温度生成，teacher 可以通过独立随机 logits 或与 anchor 具有指定 KL 的混合分布生成。每个 prefix 保存完整的概率向量、两个 log-prob 向量以及 exact
+\[
+K_k^T(s)=\operatorname{KL}(\pi_k\Vert\pi_T),\qquad K_{k,n}^\theta(s)=\operatorname{KL}(\pi_k\Vert\pi_{k,n}),
+\]
+和
+\[
+\log Z_k(s)=\log\sum_{v\in\mathcal V}\exp\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)\bigr).
+\]
+这一层不需要文本数据，也不运行模型 rollout；它提供所有估计量的 ground truth，专门用于画 bias、variance、均方误差和梯度误差曲线。
+
+第二层是真实模型产生的 prefix 数据，但仍然冻结 outer step。先选定一个不参与训练的 prompt 文件 $\mathcal X=\{x_i\}_{i=1}^{N_x}$，每个 prompt 只作为输入，不需要人工答案或 reward label。用当前 anchor $\pi_k$ 对每个 prompt 采样若干条 response，得到
+\[
+s_{i,t}=(x_i,y_{i,<t}),\qquad a_{i,t}=y_{i,t},\qquad a_{i,t}\sim\pi_k(\cdot\mid s_{i,t}).
+\]
+保存 prompt id、token ids、attention mask、response mask、prefix 长度、anchor 对采样 token 的 log-prob，以及 teacher 对同一 token 的 log-prob。KL 或 $\log Z_k$ 的估计不应把不同 prefix 混在一起：同一 prefix 的多个 next-token 样本才能用于估计条件期望；不同 prefix 只能在外层按照经验访问测度 $\widehat d_k$ 聚合。
+
+第三层才是完整的 OPD outer loop。第 $k$ 轮只使用 $\pi_k$ 生成 rollout，缓存该轮的 prefix 集合和 anchor/teacher 的 token-level log-prob；随后固定这些数据运行 $N$ 个 inner steps，得到 $\pi_{k,N}$，再执行 hard sync 或 soft sync 得到 $\pi_{k+1}$。同步后必须重新 rollout，不能把上一轮的 prefix 和旧 anchor log-prob 继续当作新一轮数据。这样得到的序列
+\[
+\{(\widehat d_k,\pi_k,\pi_{k,n},\pi_T): k=0,\ldots,K_{\mathrm{outer}}-1,\ n=0,\ldots,N\}
+\]
+才是 outer 动力学图的输入。
+
+为避免 top-$K$ 的整数与 KL 记号冲突，图中把保留的头部大小记为 $J$。对每个固定 prefix，同时记录 full-vocabulary oracle、sampled-token、top-$J$ 三条估计路径。建议先画以下三组图：
+
+\begin{enumerate}
+\item 在第一层 oracle 上，以 $J$ 或同 prefix 样本数 $m$ 为横轴，画 $K_k^T$、$K_{k,n}^\theta$ 和 $\log Z_k$ 的 bias、standard deviation、RMSE；
+\item 在第二层真实 prefix 上，以 inner step $n$ 为横轴，画 exact-oracle 可用部分的 KL、sampled estimator 的方差、anchor--student 的 $\chi^2$ 或有效样本量；
+\item 在第三层 outer loop 上，以 $k$ 为横轴，分别画 teacher KL、mirror-target KL、policy--anchor KL、token-level loss、rollout reward，以及 hard sync 与 soft sync 的差异。
+\end{enumerate}
+
+第一层的分布是唯一可以逐 prefix 得到无偏误差标签的地方，因此必须先完成。第二层用于回答估计量在真实语言模型的长尾词表上是否仍然稳定。第三层只在前两层通过后运行，否则一条性能曲线无法判断变化来自 OPD 本身、prefix 分布漂移、KL 估计偏差还是 inner 优化没有收敛。
+
 \section{结果}
 
 表~\ref{tab:toy-results} 报告 400 个 inner updates 后与 exact target 的 total variation 距离和 KL。BPO、MDPO 达到机器精度；PMD-Part、PMD-Mean 使用固定 learning rate，因此保留小的优化误差，降低 learning rate 或继续更新后继续下降。

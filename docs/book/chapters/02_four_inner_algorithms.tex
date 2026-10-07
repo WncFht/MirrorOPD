@@ -18,14 +18,14 @@ $\eta>0$，inner optimizer 的步长记为 $\alpha_{k,n}$，两者不能混用�
 \log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)},\\
 r_k(s,a)&\coloneqq
 \log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)},\\
-C_k^T(s)&\coloneqq
+K_k^T(s)&\coloneqq
 \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_T(\cdot\mid s)\right),\\
-C_{k,n}^\theta(s)&\coloneqq
+K_{k,n}^\theta(s)&\coloneqq
 \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_{k,n}(\cdot\mid s)\right).
 \end{align}
 因此
-$\mathbb E_{\pi_k}[r_k\mid s]=-C_k^T(s)$，而
-$\mathbb E_{\pi_k}[\Delta_{k,n}\mid s]=-C_{k,n}^\theta(s)$。
+$\mathbb E_{\pi_k}[r_k\mid s]=-K_k^T(s)$，而
+$\mathbb E_{\pi_k}[\Delta_{k,n}\mid s]=-K_{k,n}^\theta(s)$。
 这些等式解释了后文两个 KL 的方向：它们都是在冻结 anchor 的 action 测度下
 取均值，而不是 MDPO 中以 student 为左侧分布的 reverse KL。$d_k$ 表示由
 $\pi_k$ rollout 诱导的 prefix 访问测度；所有 inner 目标先对
@@ -248,23 +248,23 @@ D_{k,n}(s,a)
 D_{k,n}(s,a)=
 \eta\left(f(s,a)-\bar f_k(s)\right)
 -\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
--C_{k,n}^\theta(s).}
+-K_{k,n}^\theta(s).}
 \label{eq:ch2-bpo-expanded}
 \end{equation}
 因为
 \[
 \mathbb E_{\pi_k}\log\frac{\pi_{k,n}}{\pi_k}
-=-\operatorname{KL}(\pi_k\Vert\pi_{k,n})=-C_{k,n}^\theta,
+=-\operatorname{KL}(\pi_k\Vert\pi_{k,n})=-K_{k,n}^\theta,
 \]
 式 \eqref{eq:ch2-bpo-expanded} 中最后一项的符号是负号。在 OPD
-$f=r_k=\log(\pi_T/\pi_k)$ 时，$\bar f_k=-C_k^T$，于是
+$f=r_k=\log(\pi_T/\pi_k)$ 时，$\bar f_k=-K_k^T$，于是
 \begin{equation}
 D_{k,n}(s,a)=
 \eta\left[
-\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)}+C_k^T(s)
+\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)}+K_k^T(s)
 \right]
 -\left[
-\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}+C_{k,n}^\theta(s)
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}+K_{k,n}^\theta(s)
 \right].
 \label{eq:ch2-bpo-opd-expanded}
 \end{equation}
@@ -276,9 +276,9 @@ BPO 的平方损失为
 =\frac1{2\eta}\mathbb E_{d_k,\pi_k}[D_{k,n}(s,a)^2].
 \label{eq:ch2-bpo-loss-bridge}
 \end{equation}
-对 student 求导时，$C_{k,n}^\theta$ 也要微分：
+对 student 求导时，$K_{k,n}^\theta$ 也要微分：
 \begin{align}
-\nabla_\theta C_{k,n}^\theta(s)
+\nabla_\theta K_{k,n}^\theta(s)
 &=-\mathbb E_{v\sim\pi_k}
 \left[\nabla_\theta\log\pi_{k,n}(v\mid s)\right],\\
 \nabla_\theta D_{k,n}(s,a)
@@ -319,7 +319,7 @@ MDPO 不把式 \eqref{eq:ch2-logratio-equation} 改写成平方回归，而直�
 -\frac1\eta\operatorname{KL}\!\left(\pi_\theta(\cdot\mid s)\middle\Vert\pi_k^+(\cdot\mid s)\right).
 \label{eq:ch2-mdpo-kl-gap}
 \end{equation}
-MDPO 的 KL 方向与 PMD/BPO 中的 $C_{k,n}^\theta$ 不同：这里是
+MDPO 的 KL 方向与 PMD/BPO 中的 $K_{k,n}^\theta$ 不同：这里是
 $\operatorname{KL}(\pi_\theta\Vert\pi_k^+)$，而中心化 log-ratio 的均值是
 $\operatorname{KL}(\pi_k\Vert\pi_\theta)$。二者来自不同的积分测度，不能互换。
 
@@ -759,22 +759,22 @@ r_k(s,v)=\log\pi_T(v\mid s)-\log\pi_k(v\mid s),
 \]
 为了写出 PMD-Mean 和 BPO 的中心化形式，先把两个均值写成 KL 散度。定义
 \begin{align}
-C_k^T(s)
+K_k^T(s)
 &\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert \pi_T(\cdot\mid s)\right),\\
-C_{k,n}^\theta(s)
+K_{k,n}^\theta(s)
 &\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_{k,n}(\cdot\mid s)\right).
 \end{align}
 在 outer--inner 记号 $\theta_{k,n}$ 中，$k$ 是 outer step 编号，$n$
 是该 outer step 内的 inner optimizer step 编号。因此
-$C_{k,n}^\theta(s)$ 简写
+$K_{k,n}^\theta(s)$ 简写
 $\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$：
 左侧分布 $\pi_k$ 在整个 inner loop 固定，右侧 student 随 $n$ 改变，故每次
-inner 更新后都要用新参数重算这个量。相反，$C_k^T(s)$ 在固定 outer step
+inner 更新后都要用新参数重算这个量。相反，$K_k^T(s)$ 在固定 outer step
 内不随 $n$ 改变。
 于是
 \begin{align}
-\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}\right]&=-C_k^T(s),\\
-\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right]&=-C_{k,n}^\theta(s).
+\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}\right]&=-K_k^T(s),\\
+\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right]&=-K_{k,n}^\theta(s).
 \end{align}
 后续可以对这两个 KL 分别采用 full vocabulary、top-$K$ 或 sampled-token 估计，但不能混淆它们与 MDPO 中 $\operatorname{KL}(\pi_\theta\Vert\pi_k)$ 的方向。
 于是四个 loss 可直接化为
@@ -789,19 +789,19 @@ inner 更新后都要用新参数重算这个量。相反，$C_k^T(s)$ 在固定
 &=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \Bigg[
 \left(\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
-+C_{k,n}^\theta(s)\right)
++K_{k,n}^\theta(s)\right)
 \\[-2pt]
 &\hspace{35mm}
 -\eta\left(\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
-+C_k^T(s)\right)
++K_k^T(s)\right)
 \Bigg]^2,
 \label{eq:ch2-opd-full-mean-simplified}\\
 D_{k,n}(s,v)
 &=\eta\left(\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
-+C_k^T(s)\right)
++K_k^T(s)\right)
 \\[-2pt]
 &\quad-\left(\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
-+C_{k,n}^\theta(s)\right),
++K_{k,n}^\theta(s)\right),
 \label{eq:ch2-opd-full-bpo-residual}\\
 \mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_{k,n}(s,v)^2],
 \label{eq:ch2-opd-full-bpo-simplified}\\
@@ -824,12 +824,12 @@ D_{k,n}(s,v)
 为便于对照前面的推导，下面这一组梯度公式中的旧记号统一解释为
 \[
 \pi_\theta=\pi_{k,n},\qquad T=\pi_T,qquad
-\mathcal K_k^T=C_k^T,\qquad
-\mathcal K_{k,n}^\theta=C_{k,n}^\theta,\qquad
+\mathcal K_k^T=K_k^T,\qquad
+\mathcal K_{k,n}^\theta=K_{k,n}^\theta,\qquad
 D_\theta=D_{k,n}.
 \]
 这些只是同一 outer--inner 状态的记号映射；$k$ 和 $n$ 的冻结关系不变。后续新公式优先写成
-$\Delta_{k,n}$、$C_k^T$、$C_{k,n}^\theta$ 和 $D_{k,n}$，从而明确区分不同 KL 方向。
+$\Delta_{k,n}$、$K_k^T$、$K_{k,n}^\theta$ 和 $D_{k,n}$，从而明确区分不同 KL 方向。
 下面把式~\eqref{eq:ch2-opd-full-part-simplified}--\eqref{eq:ch2-opd-full-mdpo-simplified}
 写成可直接实现的 policy-gradient 形式。固定 outer step $k$ 时，$\pi_k$、$\pi_T$、
 $\log Z_k$ 和 $\mathcal K_k^T$ 都不依赖当前参数 $\theta$，实现中应使用
@@ -1185,7 +1185,7 @@ $\eta$ 处的值。令 $\kappa_j(r_k)$ 为 $r_k$ 的第 $j$ 阶 cumulant，则�
 其中 $R_3$ 收集三阶及以上 cumulant。因为
 $\mathbb E[r_k]=-\mathcal K_k^T$，二阶近似也可以写成
 \begin{equation}
-\log Z_k(s)\approx-\eta C_k^T(s)
+\log Z_k(s)\approx-\eta K_k^T(s)
  +\frac{\eta^2}{2}\operatorname{Var}_{a\sim\pi_k}[r_k(s,a)].
 \label{eq:ch2-opd-logz-kl-expansion}
 \end{equation}
@@ -1366,14 +1366,14 @@ PMD-Part 只在 $\eta=1$ 或已验证 $\log Z_k$ 误差足够小时启用，再�
     \For{$n=0,\ldots,N-1$}
         \State query $\log\pi_T(v\mid s)$, $\log\pi_k(v\mid s)$ and $\log\pi_{k,n}(v\mid s)$ for every occurrence $s\in\mathcal B_k$ and $v\in\mathcal V$
         \State $\log Z_k(s)\gets\log\left(\sum_{v\in\mathcal V}\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right)\right)$
-        \State $C_k^T(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert \pi_T(\cdot\mid s))$
-        \State $C_{k,n}^\theta(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$
+        \State $K_k^T(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert \pi_T(\cdot\mid s))$
+        \State $K_{k,n}^\theta(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$
         \If{$M=\mathrm{Part}$}
             \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}-\eta\log\frac{\pi_T}{\pi_k}+\log Z_k\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \ElsIf{$M=\mathrm{Mean}$}
-            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}+C_{k,n}^\theta-\eta\left(\log\frac{\pi_T}{\pi_k}+C_k^T\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
+            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}+K_{k,n}^\theta-\eta\left(\log\frac{\pi_T}{\pi_k}+K_k^T\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \ElsIf{$M=\mathrm{BPO}$}
-            \State $G_{k,n}\gets-\eta^{-1}\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\eta\left(\log\frac{\pi_T}{\pi_k}+C_k^T\right)-\left(\log\frac{\pi_{k,n}}{\pi_k}+C_{k,n}^\theta\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
+            \State $G_{k,n}\gets-\eta^{-1}\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\eta\left(\log\frac{\pi_T}{\pi_k}+K_k^T\right)-\left(\log\frac{\pi_{k,n}}{\pi_k}+K_{k,n}^\theta\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \ElsIf{$M=\mathrm{MDPO}$}
             \State $G_{k,n}\gets-\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_{k,n}}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_T}{\pi_k}-\eta^{-1}\log\frac{\pi_{k,n}}{\pi_k}\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \EndIf
