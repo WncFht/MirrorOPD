@@ -296,6 +296,80 @@ $$
 
 最小可验证实验是固定一个 teacher 和一批 prefix，分别运行五个 $\eta$ 值，每个 outer 用 residual stopping 而不是固定 $M$。如果理论正确，应观察到：exact-table 版本的 projective residual 斜率接近 $\log(1-\eta)$；参数版本的偏差由 $q^M$ 和 Fisher 近似误差主导；soft/delayed sync 的偏差随 anchor drift 增大。这个实验能把“同步策略的影响”和“teacher 质量、rollout 方差、模型容量”分离开。
 
+## 固定 $\eta$ 时的完整 pipeline
+
+固定 $\eta$ 只固定每个 outer prox 子问题中的 KL 系数。它不固定 value function、advantage、anchor policy、state occupancy 或 rollout 数据。标准迭代仍然是
+
+$$
+\pi_0\to\text{估计 }Q^{\pi_0}\to\pi_1
+\to\text{估计 }Q^{\pi_1}\to\pi_2\to\cdots.
+$$
+
+如果只用 $\pi_0$ 生成一批数据、做完 inner 后就停止，那只是完成了 $k=0$ 的一次 mirror/prox update；如果继续用这批数据和 $Q^{\pi_0}$ 更新很多 outer steps，得到的是固定 surrogate 上的重复优化，不是 PMD。
+
+### Exact PMD
+
+Lan 的 deterministic PMD 每轮直接执行
+
+$$
+\pi_{k+1}(\cdot\mid s)=
+\arg\min_{p\in\Delta(\mathcal A)}
+\left\{\eta_k\left[\langle Q^{\pi_k}(s,\cdot),p\rangle+h(p)\right]
+ +D_{\pi_k}(p)\right\}.
+$$
+
+因此它的逻辑是：先有当前策略 $\pi_k$，得到当前策略的 action-value $Q^{\pi_k}$，对每个状态解一次 prox map，得到 $\pi_{k+1}$，再进入下一轮。若 $Q^{\pi_k}$ 可精确计算，算法没有额外的 optimizer inner loop；所谓 inner 只出现在近似求解 prox map 或估计 $Q^{\pi_k}$ 时。PMD 的 stochastic 版本在每个 $k$ 使用针对 $\pi_k$ 的新随机估计量 $Q^{\pi_k,\xi_k}$，而不是把 $\pi_0$ 的估计永久复用。[^pmd]
+
+PMD 论文的 constant-step-size theorem 是 $\eta_k=\eta$，但 theorem 中的 $Q^{\pi_k}$ 和 reference $\pi_k$ 仍然随 $k$ 变化。固定的是系数，不是整个 objective。强凸 regularizer 下它可以得到线性收敛；一般凸 regularizer 下是相应的次线性结论。近似 subproblem 的误差会直接进入每一轮的误差项，因此“inner 解得不准”与“outer 没有刷新”是两个不同问题。
+
+### MDPO on-policy
+
+MDPO 把 PMD 的一轮写成可用神经网络执行的 inner 优化。第 $k$ 轮的 pipeline 是：
+
+1. 当前 student 是 $\pi_k=\pi_{\theta_k}$。从它采样一批 trajectories，得到访问状态和 advantage 估计 $\widehat A^{\pi_k}$。
+2. 保存并冻结 old policy $\pi_k$，同时固定这批 trajectories、advantage 和 state measure。
+3. 初始化 $\theta_k^{(0)}=\theta_k$，在同一个目标
+   $$
+   \Psi_k(\theta)=
+   \mathbb E_{s\sim\rho_{\pi_k},a\sim\pi_\theta}
+   \left[\widehat A^{\pi_k}(s,a)
+   -\frac1\eta\operatorname{KL}(\pi_\theta\Vert\pi_k)\right]
+   $$
+   上做 $m$ 个普通 SGD steps。
+4. 令 $\theta_{k+1}=\theta_k^{(m)}$，丢弃或标记这批 on-policy 数据过期，重新从 $\pi_{k+1}$ 采样下一轮。
+
+MDPO 论文中 $m=10$ 是其 on-policy 实验的经验选择；它不是 outer 迭代次数，也不是“固定数据训练到全局最优”的要求。$m$ 只是近似求解第 $k$ 个固定-reference 子问题的计算预算。论文还强调，$m=1$ 时 anchor KL 的一阶梯度在初始化点为零，更新退化成 vanilla policy gradient。[^mdpo]
+
+### MDPO off-policy
+
+off-policy MDPO 从 replay buffer 取状态和 transition，用 critic 估计当前 policy 的 $Q^{\pi_k}$ 或 advantage，再在固定 old-policy copy $\pi_k$ 下优化 actor objective。由于每个 environment step 都做 actor update，论文还讨论了让 old-policy copy 跨若干 gradient updates 保持不变，用较少的显式 outer refresh 模拟多 inner steps。这个版本不应与 on-policy 的“每轮一批完整 rollout”混同：它的 data measure 是 replay 分布，必须单独分析 state/action correction 和 policy lag。[^mdpo]
+
+### 你的 OPD
+
+你的 OPD 可以直接写成以下时间线：
+
+$$
+\begin{aligned}
+&\text{同步得到 }\pi_k;\\
+&\text{从 }\pi_k\text{ 采样 prompt--response rollouts，或从 replay 校正到 }d_{\pi_k};\\
+&\text{冻结 }\pi_k,T,\ r_k=\log T-\log\pi_k;\\
+&\text{固定 }r_k\text{ 和 anchor，在 inner 中优化 }M_k\text{ 次};\\
+&\text{结束后同步 student 为 }\pi_{k+1};\\
+&\text{用 }\pi_{k+1}\text{ 重新生成下一轮数据。}
+\end{aligned}
+$$
+
+在 exact token-level 情形，$r_k$ 依赖当前 anchor，所以每一轮的 target 都会移动：
+
+$$
+\pi_{k+1}^{\star}\propto
+\pi_k^{1-\eta}T^\eta.
+$$
+
+如果把 $\pi_0$ 的 rollout 永久保留并且仍使用 $r_0=\log T-\log\pi_0$，你优化的是固定 target $\pi_0^{1-\eta}T^\eta$ 的投影；这不是连续 OPD。只有在 off-policy 版本中显式估计 prefix occupancy ratio、action ratio 或使用完整词表 expectation，旧数据才可以作为下一轮 $\pi_k$ 目标的无偏或可控偏差估计。
+
+因此，对你的问题最直接的回答是：**固定 $\eta$ 时，每个 outer 都重新产生或重新校正数据；只在该 outer 内复用同一批数据做多个 inner steps。** 固定的是每一轮的镜像步长，不是 $\pi_0$、$Q^{\pi_0}$ 或 rollout batch。
+
 ### 参考文献
 
 [^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. _Mirror Descent Policy Optimization_. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
