@@ -546,6 +546,158 @@ BPO 相关推导里至少有两种中心化：
 第一句是式 \eqref{eq:K-identity} 的直接推论，第二句是命题 \ref{prop:bpo-score-centering}。最后两句分别由式 \eqref{eq:local-pg} 中的 ratio 和定理 \ref{thm:weight-invariance} 说明。
 \end{proof}
 
+
+\chapter{BPO 的 prefix 访问测度与 token-level PMD 构造}
+\label{ch:prefix-bpo}
+
+\section{BPO 为什么通常不需要 prefix importance sampling}
+\label{sec:bpo-no-prefix-is}
+
+令 $s$ 表示一个 prefix，$d_{\beh}(s)$ 表示行为轨迹对它的访问测度。BPO 的核心监督对象是固定 $s$ 后的条件最优性方程，而不是直接估计目标策略下的序列期望。以 token-level PMD 为例，若 action score $A(s,a)$ 已知，理想条件 target 为
+\begin{equation}
+\label{eq:bpo-statewise-target}
+ u^+(s,a)=\log\frac{\cand^+(a\mid s)}{\beh(a\mid s)}
+ =\frac{A(s,a)}{\tau}-\log Z_A(s),
+\qquad
+ Z_A(s)=\E_{a\sim\beh(\cdot\mid s)}\!\left[e^{A(s,a)/\tau}\right].
+\end{equation}
+考虑行为数据上的平方回归
+\begin{equation}
+\label{eq:bpo-statewise-regression}
+ \mathcal L_w(u)=\frac12\sum_s w(s)\E_{a\sim\beh(\cdot\mid s)}
+ \left[u(s,a)-u^+(s,a)\right]^2,
+ \qquad w(s)=d_{\beh}(s).
+\end{equation}
+对一个不受参数共享约束的条件函数 $u$，每个 $s$ 的一阶条件都是
+\[
+ u(s,a)=u^+(s,a)\quad\beh\text{-a.s.},
+\]
+只要 $w(s)>0$。因此把 $w(s)$ 换成 $d_{\cand}(s)$ 或任意严格正的权重不会改变 pointwise 解。prefix ratio
+\begin{equation}
+\label{eq:prefix-ratio}
+ W_{<t}=\prod_{k<t}\frac{\cand(a_k\mid s_k)}{\beh(a_k\mid s_k)}
+ =\frac{d_{\cand}(s_t)}{d_{\beh}(s_t)}
+\end{equation}
+在确定性 prefix tree 且同一初始上下文下成立；它只会把式 \eqref{eq:bpo-statewise-regression} 的 $w(s)$ 换成目标访问测度。因此，对条件 target 的识别没有必要额外乘 $W_{<t}$。
+
+这不是一般的 off-policy 无偏性结论。若目标是
+\[
+\E_{s\sim d_{\cand},a\sim\cand}[f(s,a)],
+\]
+而数据来自 $d_{\beh}\beh$，则无偏估计仍然需要 $W_{<t}\ratio_t$。BPO 省略 prefix IS 的逻辑是先把目标改写成行为测度下的逐状态回归，再利用条件最优解的 pointwise 唯一性。它要求 $d_{\beh}(s)>0$ 覆盖所有需要的 prefix，以及 $\beh(a\mid s)>0$ 覆盖 target 的动作。对共享参数 $u_\theta$，实际最小化的是
+\[
+ \argmin_\theta\sum_s d_{\beh}(s)\ell_s(\theta),
+\]
+当模型不能同时实现全部 $u^+(s,\cdot)$ 时，$d_{\beh}$ 会改变投影点；当某个 prefix 没有访问时，该 prefix 的 target 完全不可识别。
+
+\section{Prefix-level PMD-Part}
+\label{sec:prefix-pmd-part}
+
+由式 \eqref{eq:seq-as-token}，sequence PMD 在 prefix $s$ 上的精确 conditional target 使用 continuation soft advantage：
+\begin{equation}
+\label{eq:prefix-soft-target}
+ A_{\beh}^{\tau}(s,a)=\tau\log Z_{t+1}(sa)-\tau\log Z_t(s).
+\end{equation}
+令
+\[
+ u_\theta(s,a)=\log\frac{\cand_\theta(a\mid s)}{\beh(a\mid s)}.
+\]
+则可定义 token-level PMD-Part 损失
+\begin{equation}
+\label{eq:token-pmd-part-loss}
+ \mathcal L_{\mathrm{tok\text{-}Part}}(\theta)
+ =\frac12\E_{s\sim d_{\beh},a\sim\beh(\cdot\mid s)}
+ \left[u_\theta(s,a)-\frac{A_{\beh}^{\tau}(s,a)}{\tau}\right]^2.
+\end{equation}
+因为 $\E_{\beh}[\exp(A_{\beh}^{\tau}/\tau)\mid s]=1$，式 \eqref{eq:token-pmd-part-loss} 的 target 已经包含局部归一化常数。若使用任意未归一化的 action score $A$, 则等价写成
+\[
+ u^+_{\mathrm{Part}}(s,a)=\frac{A(s,a)}{\tau}-\log Z_A(s).
+\]
+在无限容量、满 support 和精确 $A_{\beh}^{\tau}$ 下，该回归逐 prefix 恢复 sequence PMD 的条件分布。加入 $W_{<t}$ 只改变 prefix 的训练权重；只有在希望优化目标 occupancy 下的加权投影、或直接估计目标策略期望时才有统计上的目的。
+
+\section{Prefix-level PMD-Mean 与 Lambert-$W$ 投影}
+\label{sec:prefix-pmd-mean}
+
+令
+\[
+ \Delta(s,a)=Q(s,a)-\E_{a'\sim\beh(\cdot\mid s)}[Q(s,a')],
+ \qquad g(s,a)=\frac{\Delta(s,a)}{\tau}.
+\]
+逐 prefix 的 PMD-Mean 可定义为
+\begin{equation}
+\label{eq:token-pmd-mean-loss}
+ \min_{u}\;\frac12\E_{s\sim d_{\beh},a\sim\beh(\cdot\mid s)}
+ \left[u(s,a)-g(s,a)\right]^2
+ \quad\text{s.t.}\quad
+ \E_{a\sim\beh(\cdot\mid s)}[e^{u(s,a)}]=1\quad\forall s.
+\end{equation}
+约束来自 $\cand(a\mid s)=\beh(a\mid s)e^{u(s,a)}$ 的归一化，不能直接令 $u=g$。对固定 $s$ 加入乘子 $\lambda(s)$，逐点 KKT 条件为
+\[
+ u(s,a)-g(s,a)+\lambda(s)e^{u(s,a)}=0.
+\]
+所以
+\begin{equation}
+\label{eq:token-pmd-mean-lambert}
+ u^+(s,a)=g(s,a)-W\!\left(\lambda(s)e^{g(s,a)}\right),
+\end{equation}
+其中 $\lambda(s)\geq0$ 由该 prefix 的归一化方程确定。这个构造与序列 PMD-Mean 的 Lambert-$W$ 投影逐状态对应。它不等于标准 KL mirror subproblem 的 Gibbs 解：PMD-Part 的修正是对所有 action 相同的 $\log Z_A(s)$，PMD-Mean 的修正随 $g(s,a)$ 变化。
+
+在模型容量无限且每个 prefix 被正权重访问时，$d_{\beh}(s)$ 仍不改变式 \eqref{eq:token-pmd-mean-lambert} 的逐状态解。有限模型、有限样本和稀有 prefix 下，行为测度会改变回归投影及其方差；此时 prefix IS 可以作为加权投影选择，但同时引入乘积 ratio 的重尾和 support 风险。
+
+\section{一个可操作的区分}
+\label{sec:prefix-distinction}
+
+因此，``BPO 不用 prefix IS'' 应理解为一个关于条件回归的命题：在固定 prefix 后，行为动作分布提供了估计局部 target 所需的积分测度，prefix 的外层权重只影响哪些状态被拟合。它不能推出三件更强的结论：不能推出行为 occupancy 等于学生 occupancy；不能推出目标策略下的序列回报估计无偏；也不能保证共享参数模型在有限训练预算下得到目标 occupancy 的最佳投影。
+
+\chapter{官方实现的 inner steps 与实际收敛证据}
+\label{ch:implementation-convergence}
+
+\section{判断标准}
+\label{sec:convergence-criterion}
+
+一个 outer step 是否使镜像子问题“收敛”，至少需要区分三个量：固定 rollout batch 上的子问题目标是否继续下降，最优性残差的范数是否接近零，以及 anchor 策略与拟合策略之间的 KL gap 是否达到预定容差。仅记录一次 loss 或执行固定次数的 Adam/SGD 更新，不能证明子问题已经达到闭式 PMD 解。下文把仓库中实际执行的梯度次数称为 inner budget，不把它称为 convergence steps。
+
+\section{OpenKimi/PMD 的实现}
+\label{sec:openkimi-audit}
+
+OpenKimi 的 PMD loss 明确选择 sequence aggregation（官方仓库列于文末）。官方实现先对一条 response 的所有 token 求和：
+\begin{equation}
+\label{eq:openkimi-logratio}
+ \log W_T=\sum_t\left(\log\cand_\theta(a_t\mid s_t)-\log\cand_{\mathrm{old}}(a_t\mid s_t)\right),
+\end{equation}
+然后把同一个 sequence log-ratio broadcast 到该 response 的每个 token。其平方残差实现为
+\[
+ \ell_t=\frac12\tau_t\left(\log W_T-\frac{A_t}{\tau_t}\right)^2,
+\]
+并可额外按 response length 缩放。因此该代码的反向传播在 token 参数上发生，但 PMD target 的 ratio 仍是 sequence-level；它不能作为逐 prefix PMD-Part 的实现。
+
+Qwen2.5-7B math recipe 将 \texttt{PPO\_EPOCHS=1}、\texttt{train\_batch\_size=512} 和 \texttt{actor.ppo\_mini\_batch\_size=32} 固定写入启动脚本。一个 global step 生成一批 rollout，随后调用一次 actor update；在静态 batch 的理想计数下，这是一个 actor epoch、约 $512/32=16$ 个 mini-batch 梯度更新。动态 token batch、序列并行和分布式切分会改变实际 mini-batch 数，但不会把它变成按残差阈值停止的 inner loop。脚本的 \texttt{trainer.total\_training\_steps=3000} 是 outer rollout/update 次数上限，\texttt{total\_epochs=15} 是数据迭代上限。
+
+仓库现有代码会记录 PMD ratio 范围、loss、KL 等训练指标，并把日志送到 console/WandB；公开 clone 中没有每个 outer step 的 inner residual 曲线、子问题 duality gap 或按容差停止记录。因此可以核实“每步做一轮固定预算的近似回归”，不能据此声称“每个 outer step 的 PMD 子问题已经收敛”。
+
+\section{经典 MDPO 的 on-policy 实现}
+\label{sec:mdpo-on-audit}
+
+经典 MDPO 仓库的 on-policy 代码（官方仓库列于文末）把 \texttt{sgd\_steps} 作为固定超参数。默认构造函数中 \texttt{sgd\_steps=5}；MuJoCo 运行脚本使用同一参数，README 推荐示例把它设为 10。每个 outer batch 先由 old policy 采样，随后对同一个 batch 执行
+\[
+ \texttt{for\ \_ in range(sgd\_steps):}\quad\text{一次 policy optimizer update}.
+\]
+值函数另有 \texttt{vf\_iters}（脚本常用 5），不应计入 policy mirror subproblem 的 inner steps。代码在循环结束后刷新 old/new anchor，但没有计算 PMD 子问题的残差容差、目标函数 gap 或自适应停止条件；\texttt{sgd\_steps=10} 是计算预算和经验超参数，不是理论收敛步数。
+
+\section{经典 MDPO 的 off-policy 实现}
+\label{sec:mdpo-off-audit}
+
+off-policy 版本需要特别区分 README 与当前源码。README 示例暴露 \texttt{--sgd\_steps=1000}，看起来像是每个 outer step 做 1000 步。然而训练循环中实际写成
+\[
+ \texttt{for grad\_step in range(1):}
+\]
+而原本的 \\texttt{int(self.gradient\_steps)} 被注释。因而每个满足 \\texttt{train\_freq} 且 replay buffer 可采样的 train event 实际只执行一次 actor/critic gradient update。\texttt{gradient\_steps} 在当前实现中主要控制 target/anchor policy 的同步周期，而不是 inner optimizer 的循环次数。仓库没有公开的、可复核的 inner residual 或 mirror-subproblem gap 日志，所以该实现同样不能被描述为每个 outer step 求解到收敛。
+
+\section{对实验设计的含义}
+\label{sec:convergence-implications}
+
+若要在 MirrorOPD 实验中声称“一个 outer step 近似求解了镜像子问题”，应至少保存固定 rollout batch 上的以下曲线：\(k\mapsto\mathcal L_{\mathrm{mirror}}^{(k)}\)、\(k\mapsto\|u_\theta-u^+\|_2\)（或可计算的 Bellman residual）、\(k\mapsto\KL(\cand_\theta\Vert\cand_{\mathrm{anchor}})\)，以及在停止时的 gradient norm。没有闭式 target 时，报告固定 inner budget 与这些诊断曲线，才能把“训练了一轮”与“子问题收敛”分开。对于稀有 prefix，还应同时报告 $d_{\beh}$ 的覆盖率和 prefix ratio 的有效样本量；否则增加 inner steps 只会更充分地拟合被行为测度看见的部分。
+
 \chapter{结论与后续 MirrorOPD 的边界}
 \label{ch:conclusion}
 
