@@ -554,49 +554,65 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 \]
 这时 PMD-Part 的 target、MDPO 的 reverse KL、以及 BPO/PMD-Mean 所需的 anchor conditional center 都可以在同一个 prefix 上精确计算。完整词表路径不需要 action-level importance sampling；唯一的随机性来自 prefix batch 和 optimizer。
 
-在写算法之前先把四个 inner 的计算量化简。对一个固定 prefix，记
-\[
-\ell_k(v)=\log\pi_k(v\mid s),\quad
-\ell_T(v)=\log T(v\mid s),\quad
-\ell_\theta(v)=\log\pi_\theta(v\mid s),
-\]
-并定义
+在写算法之前先把四个 inner 的计算量化简。对一个固定 prefix，teacher、anchor 和当前 student 的信息都直接写成 token log-probability。PMD 的归一化常数是
 \begin{equation}
-\label{eq:ch2-opd-full-basic-quantities}
-r(v)=\ell_T(v)-\ell_k(v),\qquad
-u_\theta(v)=\ell_\theta(v)-\ell_k(v),\qquad
-z(v)=\ell_k(v)+\eta r(v).
+\label{eq:ch2-opd-full-logz}
+\log Z_k(s)=\operatorname{LSE}_{v\in\mathcal V}
+\left[(1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right].
 \end{equation}
-一次 log-sum-exp 就给出
+因此 exact mirror target 为
 \[
-\log Z=\operatorname{LSE}_v z(v),\qquad h(v)=\eta r(v)-\log Z,
-\qquad p^+(v)=\exp(\ell_k(v)+h(v)).
+\pi_k^+(v\mid s)=
+\exp\!\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)-\log Z_k(s)\right).
 \]
-因此四个 loss 可直接化为
+为了写出 PMD-Mean 和 BPO 的中心化形式，定义两个可直接由完整词表求和得到的条件均值
+\begin{align}
+\overline{\log(T/\pi_k)}(s)
+&=\sum_{v\in\mathcal V}\pi_k(v\mid s)
+  \log\frac{T(v\mid s)}{\pi_k(v\mid s)},\\
+\overline{\log(\pi_\theta/\pi_k)}(s)
+&=\sum_{v\in\mathcal V}\pi_k(v\mid s)
+  \log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}.
+\end{align}
+于是四个 loss 可直接化为
 \begin{align}
 \mathcal L_{\mathrm{Part}}(s)
-&=\frac12\sum_v\pi_k(v\mid s)[u_\theta(v)-h(v)]^2,
+&=\frac12\sum_{v\in\mathcal V}\pi_k(v\mid s)
+\left[\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
+-\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
++\log Z_k(s)\right]^2,
 \label{eq:ch2-opd-full-part-simplified}\\
-\bar r&=\sum_v\pi_k(v\mid s)r(v),\qquad
-\bar u_\theta=\sum_v\pi_k(v\mid s)u_\theta(v),
-\label{eq:ch2-opd-full-centers}\\
 \mathcal L_{\mathrm{Mean}}(s)
-&=\frac12\sum_v\pi_k(v\mid s)
-\bigl[(u_\theta(v)-\bar u_\theta)-\eta(r(v)-\bar r)\bigr]^2,
+&=\frac12\sum_{v\in\mathcal V}\pi_k(v\mid s)
+\Bigg[
+\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
+-\overline{\log(\pi_\theta/\pi_k)}(s)\right)
+\\[-2pt]
+&\hspace{35mm}
+-\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
+-\overline{\log(T/\pi_k)}(s)\right)
+\Bigg]^2,
 \label{eq:ch2-opd-full-mean-simplified}\\
-D_\theta(v)&=\eta(r(v)-\bar r)-(u_\theta(v)-\bar u_\theta),
+D_\theta(s,v)
+&=\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
+-\overline{\log(T/\pi_k)}(s)\right)
+\\[-2pt]
+&\quad-\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
+-\overline{\log(\pi_\theta/\pi_k)}(s)\right),
 \label{eq:ch2-opd-full-bpo-residual}\\
-\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\sum_v\pi_k(v\mid s)D_\theta(v)^2,
+\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)^2,
 \label{eq:ch2-opd-full-bpo-simplified}\\
 \mathcal J_{\mathrm{MDPO}}(s)
-&=\sum_v\pi_\theta(v\mid s)r(v)-\frac1\eta\sum_v\pi_\theta(v\mid s)u_\theta(v).
+&=\sum_{v\in\mathcal V}\pi_\theta(v\mid s)
+\left[\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
+-\frac1\eta\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}\right].
 \label{eq:ch2-opd-full-mdpo-simplified}
 \end{align}
-由于 $\sum_v\pi_k(v\mid s)D_\theta(v)=0$，BPO 的完整词表梯度进一步化为
+由于 $\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)=0$，BPO 的完整词表梯度进一步化为
 \begin{equation}
 \label{eq:ch2-opd-full-bpo-gradient-simplified}
 -\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
-=\sum_v\pi_k(v\mid s)D_\theta(v)\nabla_\theta\log\pi_\theta(v\mid s).
+=\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)\nabla_\theta\log\pi_\theta(v\mid s).
 \end{equation}
 因此完整 vocabulary 路径无需显式计算 centered score 的第二项；它在精确求和中严格抵消。
 
@@ -606,20 +622,19 @@ D_\theta(v)&=\eta(r(v)-\bar r)-(u_\theta(v)-\bar u_\theta),
 \Require teacher $T$, frozen anchor $\pi_k$, prefix batch $\{s_i\}_{i=1}^B$, method $M$, $\eta$, inner steps $N$
 \Ensure updated student parameters $\theta$
 \For{$n=1,\ldots,N$}
-    \State query $\ell_T^i(v)=\log T(v\mid s_i)$, $\ell_k^i(v)=\log\pi_k(v\mid s_i)$ and $\ell_\theta^i(v)=\log\pi_\theta(v\mid s_i)$
-    \State $r_i(v)\gets\ell_T^i(v)-\ell_k^i(v)$, $u_i(v)\gets\ell_\theta^i(v)-\ell_k^i(v)$
-    \State $\log Z_i\gets\operatorname{logsumexp}_v[\ell_k^i(v)+\eta r_i(v)]$
-    \State $h_i(v)\gets\eta r_i(v)-\operatorname{stopgrad}(\log Z_i)$
-    \State $\bar r_i\gets\sum_v\pi_k(v\mid s_i)r_i(v)$, $\bar u_i\gets\sum_v\pi_k(v\mid s_i)u_i(v)$
+    \State query $\log T(v\mid s_i)$, $\log\pi_k(v\mid s_i)$ and $\log\pi_\theta(v\mid s_i)$ for all $v\in\mathcal V$
+    \State $\log Z_{k,i}\gets\operatorname{logsumexp}_v[(1-\eta)\log\pi_k(v\mid s_i)+\eta\log T(v\mid s_i)]$
+    \State $\overline{\log(T/\pi_k)}_i\gets\sum_v\pi_k(v\mid s_i)\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}$
+    \State $\overline{\log(\pi_\theta/\pi_k)}_i\gets\sum_v\pi_k(v\mid s_i)\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}$
     \If{$M=\mathrm{Part}$}
-        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)[u_i(v)-h_i(v)]^2$
+        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\log Z_{k,i}\right]^2$
     \ElsIf{$M=\mathrm{Mean}$}
-        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)[u_i(v)-\bar u_i-\eta(r_i(v)-\bar r_i)]^2$
+        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(\pi_\theta/\pi_k)}_i-\eta\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(T/\pi_k)}_i\right)\right]^2$
     \ElsIf{$M=\mathrm{BPO}$}
-        \State $D_i(v)\gets\eta[r_i(v)-\bar r_i]-[u_i(v)-\bar u_i]$
+        \State $D_i(v)\gets\eta\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(T/\pi_k)}_i\right]-\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(\pi_\theta/\pi_k)}_i\right]$
         \State $L\gets(2\eta B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)D_i(v)^2$
     \ElsIf{$M=\mathrm{MDPO}$}
-        \State $L\gets-B^{-1}\sum_i\{\sum_v\pi_\theta(v\mid s_i)r_i(v)-\eta^{-1}\sum_v\pi_\theta(v\mid s_i)u_i(v)\}$
+        \State $L\gets-B^{-1}\sum_i\sum_v\pi_\theta(v\mid s_i)\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta^{-1}\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}\right]$
     \EndIf
     \State $\theta\gets\operatorname{OptimizerStep}(\theta,\nabla_\theta L)$
 \EndFor
