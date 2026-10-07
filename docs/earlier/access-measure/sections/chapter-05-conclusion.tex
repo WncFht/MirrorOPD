@@ -1,0 +1,6 @@
+\chapter{结论与 MirrorOPD 的边界}
+\label{ch:conclusion}
+
+从同一个 token-level Gibbs 最优解出发，PMD-Part 是精确 log-ratio 回归，PMD-Mean 是中心化回归后的 Lambert-$W$ 投影，MDPO 是带 action IS 的直接 KL 正则化 policy gradient。BPO 的完整 reverse-KL 平方 residual 在未线性化时产生中心化 score 梯度；它与 PMD-Part 共享可实现时的最优点，但一般相差 $c_s\bar g$，因此不能把二者的梯度直接视为相同。线性化、二元 KL 化简和工程截断属于后续近似，本文件没有把它们作为理论等价的前提。
+
+本文件暂不推导 OPD 的完整 off-policy correction 或 KL 系数调度。后续 MirrorOPD 需要先选择局部即时 reward 目标还是完整加性回报目标，再决定是否引入 prefix IS、是否采用 Part/Mean 投影，以及如何用 Natural Gradient 控制学生策略与教师策略的距离。

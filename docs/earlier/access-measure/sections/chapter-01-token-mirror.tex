@@ -1,0 +1,85 @@
+\chapter{统一的 token-level 镜像子问题}
+\label{ch:unified-problem}
+
+\section{Prefix、行为策略与局部 reward}
+\label{sec:notation}
+
+固定一个 prefix $s=(x,a_{<t})$，词表动作为 $a$，行为策略为 $\beh(a\mid s)$，待更新学生策略为 $\cand_\theta(a\mid s)$。以下所有结论都在
+\[
+\cand_\theta(\cdot\mid s)\ll\beh(\cdot\mid s)
+\]
+的 support 条件下成立。记局部监督信号为 $f(s,a)$；它可以是即时 per-token reward、优势 $A^\beh(s,a)$，也可以是包含未来 reward 的 soft $Q$。
+
+设 $d_\beh(s)$ 是行为轨迹访问 prefix 的测度。若一个条件 target 在每个 prefix 上可以独立实现，则 $d_\beh(s)>0$ 只决定该 prefix 在总体训练损失中的权重；如果模型共享参数、数据有限或存在未覆盖 prefix，它会改变投影点和估计方差。
+
+\section{KL 镜像最优解}
+\label{sec:token-optimum}
+
+给定 Natural Gradient 学习率 $\eta>0$，token-level PMD 子问题为
+\begin{equation}
+\label{eq:token-subproblem}
+ \cand^+(\cdot\mid s)=\argmax_{p\ll\beh(\cdot\mid s)}
+ \left\{\E_{a\sim p}[f(s,a)]-\frac{1}{\eta}\KL(p\Vert\beh(\cdot\mid s))\right\}.
+\end{equation}
+令
+\[
+ Z_f(s)=\E_{a\sim\beh(\cdot\mid s)}\exp\left(\eta f(s,a)\right).
+\]
+
+\begin{theorem}[Token-level Gibbs 解]
+\label{thm:gibbs}
+若 $0<Z_f(s)<\infty$，式 \eqref{eq:token-subproblem} 的唯一解为
+\begin{equation}
+\label{eq:gibbs}
+ \cand^+(a\mid s)=\frac{\beh(a\mid s)\exp(\eta f(s,a))}{Z_f(s)}.
+\end{equation}
+等价地，$u^+(s,a)=\log(\cand^+/\beh)$ 满足
+\begin{equation}
+\label{eq:optimal-logratio}
+ u^+(s,a)=\eta f(s,a)-\log Z_f(s).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+先检查式 \eqref{eq:gibbs} 确实定义了概率分布。由于 $Z_f(s)$ 是有限正数，
+\[
+\sum_a\cand^+(a\mid s)
+=\frac{1}{Z_f(s)}\sum_a\beh(a\mid s)e^{\eta f(s,a)}=1.
+\]
+并且 $\cand^+(a\mid s)>0$ 只可能发生在 $\beh(a\mid s)>0$ 的 action 上，所以 $\cand^+\ll\beh$。
+对任意满足 $p\ll\beh$ 的候选分布，由定义逐项展开可得
+\begin{align*}
+\KL(p\Vert\cand^+)
+&=\E_p\left[\log\frac{p}{\cand^+}\right]\\
+&=\E_p\left[\log\frac{p}{\beh}
+      -\eta f+\log Z_f(s)\right]\\
+&=\KL(p\Vert\beh)-\frac1\eta\E_p[f]+\log Z_f(s).
+\end{align*}
+将等式两边乘以 $-1/\eta$ 并整理，得到目标恒等式
+\begin{equation*}
+\E_p[f]-\frac1\eta\KL(p\Vert\beh)
+=\frac1\eta\log Z_f(s)-\frac1\eta\KL(p\Vert\cand^+).
+\end{equation*}
+KL 散度满足 $\KL(p\Vert\cand^+)\geq0$，且等号当且仅当 $p=\cand^+$ 几乎处处成立。因此任意候选分布的目标值都不超过 $\frac1\eta\log Z_f(s)$，而 $p=\cand^+$ 达到该上界，故它是唯一最优解。
+\end{proof}
+
+\begin{corollary}[优势形式]
+若 $f=A^\beh$ 且 $\E_{\beh}[A^\beh(s,\cdot)\mid s]=0$，则
+\[
+\cand^+(a\mid s)=\beh(a\mid s)\exp(\eta A^\beh(s,a)) / Z_A(s).
+\]
+若 $A^\beh$ 是与序列 PMD 一致的 soft advantage，则 $Z_A(s)=1$；若它是硬 reward advantage，$Z_A(s)$ 一般不等于 $1$。
+\end{corollary}
+
+\section{即时 reward 与完整序列 reward}
+\label{sec:immediate-vs-return}
+
+若 $f(s,a)=r_t(s,a)$，式 \eqref{eq:token-subproblem} 是局部 token reward 的镜像更新。若完整目标是
+\[
+R(y)=\sum_{t=1}^{T}r_t(s_t,a_t),
+\]
+则与 sequence-level PMD 一致的 token score 必须是
+\[
+Q^\beh(s_t,a_t)=r_t(s_t,a_t)+\E_\beh\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\right],
+\]
+再取相应 soft advantage。直接把 $r_t$ 放进式 \eqref{eq:gibbs} 会得到局部目标，而不是完整序列目标。per-token reward 消除了终端奖励的稀疏性，却没有消除 future reward 对全局最优条件分布的作用。
