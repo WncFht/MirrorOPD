@@ -52,6 +52,10 @@ $$
 
 实现文件是 [`ema_topk_reproduction.py`](../ema_topk_reproduction.py)，结果包含 `metrics.csv`、`metadata.json`、PNG 和 PDF 图。
 
+进一步的 $K$ 扫描在 [`k_analysis_v2/topk_structural_sweep.png`](k_analysis_v2/topk_structural_sweep.png) 和 [`k_analysis_v2/topk_error_vs_k.png`](k_analysis_v2/topk_error_vs_k.png) 中。前一张图同时画出 head/tail mass、单个 prefix 单个 sampled token 的 RMSE，以及 bias floor；后一张图固定四个有效 Monte Carlo batch size，直接观察误差随 $K$ 的变化。
+
+这些图给出的单-token结论是：$K$ 增大首先减少 tail mass，从而降低单-token方差；但 $K$ 不是越大越有利，因为计算和显存开销随 $K$ 增加，而 literal masked-tail 梯度的结构偏差也不由 $K$ 自动消除。对于真实 OPD 训练，图中的 $B$ 应替换为一个 minibatch 内不同 prefix/token position 的平均数量，不能解释成同一个 prefix 的重复 rollout 次数。
+
 ## 结果
 
 ![Top-K KL bias-variance](topk_kl_bias_variance.png)
