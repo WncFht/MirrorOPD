@@ -466,19 +466,40 @@ u_k^\star(s,a)
 =\log\frac{\pi_{k+1}^\star(a\mid s)}{\pi_k(a\mid s)}
 =\eta r_k(s,a)-\log Z_k(s),
 \]
-其中 $Z_k$ 由式 \eqref{eq:ch2-opd-bridge-normalizer} 给出。下面三种方法的差异只在于如何用有限样本和参数化模型逼近这个同一个 $u_k^\star$。
+其中
+\[
+r_k(s,a)=\log\frac{T(a\mid s)}{\pi_k(a\mid s)},
+\qquad
+Z_k(s)=\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta.
+\]
+因此三个量都可以完全写成
+\begin{equation}
+\label{eq:ch2-opd-explicit-target}
+u_k^\star(s,a)
+=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
+-\log\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta,
+\qquad
+u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}.
+\end{equation}
+下面三种方法的差异只在于如何用有限样本和参数化模型逼近这个同一个 $u_k^\star$。
 
 \paragraph{PMD-Part 的 OPD inner。}
 若教师能够返回完整 token 分布，就可以直接计算
 \[
-h_k(s,a)=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}-\log Z_k(s).
+h_k(s,a)
+=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
+-\log\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta.
 \]
 在 replay prefix 上最小化
 \begin{equation}
 \label{eq:ch2-opd-part-inner}
 \mathcal L_{k,\mathrm{Part}}(\theta)
 =\frac12\E_{s\sim d_b,\,a\sim\pi_k}
-\left[\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}-h_k(s,a)\right]^2.
+\left[
+\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+-\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
++\log\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta
+\right]^2.
 \end{equation}
 停止 target 梯度后，
 \begin{equation}
@@ -493,15 +514,23 @@ h_k(s,a)=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}-\log Z_k(s).
 当 $Z_k(s)$ 不方便计算时，先构造行为测度下的中心化信号
 \[
 \widetilde r_k(s,a)
-=r_k(s,a)-\E_{a'\sim\pi_k}[r_k(s,a')\mid s].
+=\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
+-\sum_{a'}\pi_k(a'\mid s)
+\log\frac{T(a'\mid s)}{\pi_k(a'\mid s)}.
 \]
-再令 $\widetilde h_k=\eta\widetilde r_k$，求解
+再令 $\widetilde h_k(s,a)=\eta\widetilde r_k(s,a)$，求解
 \begin{equation}
 \label{eq:ch2-opd-mean-inner}
 \min_\theta\frac12\E_{d_b,\pi_k}
-\left[u_\theta(s,a)-\widetilde h_k(s,a)\right]^2
+\left[
+\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+-\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
++\eta\sum_{a'}\pi_k(a'\mid s)
+\log\frac{T(a'\mid s)}{\pi_k(a'\mid s)}
+\right]^2
 \quad\text{s.t.}\quad
-\E_{a\sim\pi_k}\!\left[e^{u_\theta(s,a)}\mid s\right]=1.
+\sum_a\pi_k(a\mid s)
+\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}=1.
 \end{equation}
 约束是必要的：$u_\theta=\log(\pi_\theta/\pi_k)$ 必须满足
 \[
@@ -512,13 +541,21 @@ h_k(s,a)=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}-\log Z_k(s).
 
 \paragraph{BPO 的 OPD inner。}
 BPO 不显式估计 $\log Z_k$，而在每个 prefix 上把 residual 投影到行为测度的零均值子空间：
-\begin{align}
+\begin{equation}
 \delta_{k,\theta}(s,a)
-&=\eta r_k(s,a)-u_\theta(s,a)
--\E_{\pi_k}\!\left[\eta r_k(s,\cdot)-u_\theta(s,\cdot)\mid s\right],\label{eq:ch2-opd-bpo-inner-residual}\\
+\;=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
+-\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+-\eta\sum_{a'}\pi_k(a'\mid s)
+\log\frac{T(a'\mid s)}{\pi_k(a'\mid s)}
++\sum_{a'}\pi_k(a'\mid s)
+\log\frac{\pi_\theta(a'\mid s)}{\pi_k(a'\mid s)}.
+\label{eq:ch2-opd-bpo-inner-residual}
+\end{equation}
+\begin{equation}
 \mathcal L_{k,\mathrm{BPO}}(\theta)
-&=\frac{1}{2\eta}\E_{d_b,\pi_k}\left[\delta_{k,\theta}(s,a)^2\right].\label{eq:ch2-opd-bpo-inner-loss}
-\end{align}
+=\frac{1}{2\eta}\E_{d_b,\pi_k}\left[\delta_{k,\theta}(s,a)^2\right].
+\label{eq:ch2-opd-bpo-inner-loss}
+\end{equation}
 对完整 reverse-KL 项求导得到
 \begin{equation}
 \label{eq:ch2-opd-bpo-inner-gradient}
@@ -615,71 +652,7 @@ PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由�
 \end{equation}
 由 $\E_T[\pi_k/T]=1$，$\Delta_k\to0$ 蕴含 $\pi_k\to T$。文中的 $L_1$ 递推应理解为在概率比有统一上下界时的推论；否则应优先使用式 \eqref{eq:ch2-opd-projective-contraction}。
 
-\subsection{为什么 inner 需要多步：局部曲率与 Natural Gradient}
-\label{sec:ch2-natural-gradient}
-
-把固定 outer step 的回归或镜像目标限制到参数化策略附近。令 $\Delta\theta$ 表示相对当前参数的增量，$J(s,a)$ 表示 logit 对参数的 Jacobian，$\Fisher(s)$ 表示当前策略的 Fisher 矩阵。对 KL 项作二阶展开，并把 reward 项作一阶展开，可以得到局部二次模型
-\begin{equation}
-\label{eq:ch2-local-quadratic}
-\mathcal Q(\Delta\theta)
-=\frac12\Delta\theta^{\mathsf T}A\Delta\theta-b^{\mathsf T}\Delta\theta+C,
-\qquad
-A=\E_{s,a}\!\left[J(s,a)^{\mathsf T}\Fisher(s)J(s,a)\right].
-\end{equation}
-这里 $b$ 是镜像目标在当前参数处的 score 方向，$A$ 是把策略空间 KL 曲率拉回参数空间后的矩阵。它解释了为什么“inner 做到收敛”与“做一次参数梯度”是两件不同的事。
-
-\begin{theorem}[局部二次模型下的 inner 梯度下降速度]
-\label{thm:ch2-local-gd}
-假设 $A$ 对称半正定，并在其正特征值子空间上正定。对
-\[
-\Delta\theta_{m+1}
-=\Delta\theta_m-\gamma\nabla\mathcal Q(\Delta\theta_m)
-=(I-\gamma A)\Delta\theta_m+\gamma b
-\]
-取 $0<\gamma<2/\lambda_{\max}(A)$。则在 $A$ 的正特征值子空间上，迭代收敛到 $\Delta\theta^\star=A^\dagger b$，并且误差满足
-\[
-\|\Delta\theta_m-\Delta\theta^\star\|_A
-\leq
-\left(\max_{\lambda_i(A)>0}|1-\gamma\lambda_i(A)|\right)^m
-\|\Delta\theta_0-\Delta\theta^\star\|_A.
-\]
-若 $\lambda_{\min}^+(A)$ 很小，则最慢方向的收缩率接近 $1-\gamma\lambda_{\min}^+(A)$；其步数由条件数 $\kappa(A)=\lambda_{\max}(A)/\lambda_{\min}^+(A)$ 控制。
-\end{theorem}
-
-\begin{proof}
-一阶条件为 $\nabla\mathcal Q(\Delta\theta)=A\Delta\theta-b$。由于 $A$ 对称，可取正交特征分解 $A=U\Lambda U^{\mathsf T}$。在正特征值子空间中，令 $e_m=\Delta\theta_m-\Delta\theta^\star$，则
-\[
-e_{m+1}=(I-\gamma A)e_m.
-\]
-在第 $i$ 个特征方向上，
-\[
-e_{m+1,i}=(1-\gamma\lambda_i)e_{m,i}.
-\]
-条件 $0<\gamma<2/\lambda_{\max}(A)$ 等价于所有正特征值满足 $|1-\gamma\lambda_i|<1$。因此
-\[
-\|e_m\|_A^2
-=\sum_{\lambda_i>0}\lambda_i(1-\gamma\lambda_i)^{2m}e_{0,i}^2
-\leq
-\left(\max_{\lambda_i>0}|1-\gamma\lambda_i|\right)^{2m}\|e_0\|_A^2.
-\]
-开平方即得结论。零特征值方向不由局部目标确定，使用 Moore--Penrose 逆得到最小范数代表元 $A^\dagger b$。
-\end{proof}
-
-Natural Gradient 用 Fisher 预条件器把更新写成
-\[
-\Delta\theta_{m+1}
-=\Delta\theta_m-\gamma\Fisher_\theta^\dagger
-\nabla_\theta\mathcal Q(\Delta\theta_m).
-\]
-当 $\Fisher_\theta$ 与 $A$ 的主要病态方向一致时，它会压平不同参数坐标的尺度；理想的 $A^\dagger$ 预条件器在二次模型上可一步到达 $\Delta\theta^\star$。实际 Natural Gradient 通常只使用 Fisher 的近似，因此得到的是改善条件数而不是普遍的一步收敛。AdamW 的逐坐标二阶矩也不等价于 Fisher 逆，因而没有同样的几何不变性保证。
-
-经典 MDPO 的关键实现结论正是这一点：若在 $\theta_k$ 处只做一次梯度步，$\KL(\pi_\theta\Vert\pi_k)$ 在 $\theta=\theta_k$ 的一阶梯度为零，该步退化为普通 policy gradient，尚未体现 trust-region 的曲率；固定旧策略并进行多次 inner 更新，才会真正逼近式 \eqref{eq:ch2-mirror} 的镜像解。因而本文的 outer step 定义为“固定 $\pi_k$ 后把 inner 子问题优化到给定误差”，而不是把一次 SGD 更新误称为一次收敛的 mirror step。
-
-\paragraph{几何中间分布与算术 proximal teacher 的区别。} 式 \eqref{eq:ch2-opd-geometric-bridge} 给出的 $\pi_k^{1-\eta}T^\eta/Z_k$ 是 KL 镜像子问题的精确解，因此在 log-probability 空间插值。TOP-D 中的算术 teacher
-\[
-\widetilde T_\eta=(1-\eta)\pi_k+\eta T
-\]
-是另一个用于控制 log-ratio 方差的 teacher operator。它同样产生 student 与 teacher 之间的中间分布，但不等价于 KL mirror 解；前者改变 target teacher，后者改变 proximal 优化问题的解。
+\input{sections/opd-natural-gradient.tex}
 
 \subsection{OPD 的 off-policy prefix 复用}
 
