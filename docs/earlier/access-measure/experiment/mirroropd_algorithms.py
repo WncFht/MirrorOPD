@@ -4,7 +4,9 @@ All methods use one frozen anchor per outer step.  The implementation is deliber
 small: it exposes the exact sampled scalar/vector estimators used in the derivations,
 so the toy experiment can be audited against the equations in the TeX note.
 """
+
 from __future__ import annotations
+
 import numpy as np
 
 
@@ -42,9 +44,15 @@ def mirror_target(anchor: np.ndarray, teacher: np.ndarray, eta: float) -> np.nda
     return softmax(z)
 
 
-def inner_update(name: str, logits: np.ndarray, anchor: np.ndarray,
-                 teacher: np.ndarray, actions: np.ndarray, eta: float,
-                 lr: float) -> tuple[np.ndarray, dict[str, float]]:
+def inner_update(
+    name: str,
+    logits: np.ndarray,
+    anchor: np.ndarray,
+    teacher: np.ndarray,
+    actions: np.ndarray,
+    eta: float,
+    lr: float,
+) -> tuple[np.ndarray, dict[str, float]]:
     """One stochastic inner update for a frozen anchor and teacher.
 
     The returned diagnostics expose the norm of the sampled update and the estimator
@@ -71,14 +79,24 @@ def inner_update(name: str, logits: np.ndarray, anchor: np.ndarray,
         coeff = eta * (gathered_r - center[:, None]) - u
         grad = np.mean(coeff[..., None] * scores, axis=1)
     elif name == "bpo":
+        # BPO's practical, binary-KL form from arXiv:2609.15987.  In the
+        # OPD instantiation the exact centered teacher signal is
+        # A=log(T/B)+KL(B||T), and the complement ratio replaces PPO's IS
+        # ratio.  The cap and mask are deliberately exposed as arguments in
+        # the sequence experiment; this low-level routine keeps the no-clip
+        # algebraic form used by the earlier regression comparison.
         d = eta * gathered_r - u
         d_center = d - np.mean(d, axis=1, keepdims=True)
         score_center = scores - np.mean(scores, axis=1, keepdims=True)
         coeff = d_center
         grad = np.mean(d_center[..., None] * score_center, axis=1)
-    elif name == "mdpo":
+    elif name in ("mdpo", "mdpo_is"):
         rho = np.exp(ratio_log)
-        coeff = rho * (gathered_r - ratio_log / eta)
+        # ``mdpo`` is the sampled-token implementation in the official
+        # MD-OPD repository: samples come from the frozen anchor and the KL
+        # penalty is evaluated directly on those samples.  ``mdpo_is`` is the
+        # population-correct action-IS estimator, useful as an oracle control.
+        coeff = (gathered_r - ratio_log / eta) if name == "mdpo" else rho * (gathered_r - ratio_log / eta)
         grad = np.mean(coeff[..., None] * scores, axis=1)
     else:
         raise ValueError(name)

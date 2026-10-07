@@ -1,0 +1,1413 @@
+{
+  "config": {
+    "vocab": 6,
+    "horizon": 5,
+    "trajectories": 256,
+    "outer_steps": 8,
+    "inner_steps": 24,
+    "eta": 0.35,
+    "lr": 0.18,
+    "seeds": [
+      20261007,
+      20261008,
+      20261009
+    ]
+  },
+  "methods": [
+    {
+      "method": "pmd_part",
+      "seed": 20261007,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.7133476894735674,
+          "token_kl_student_target_anchor_occ": 0.05227109875804088,
+          "token_kl_student_teacher_student_occ": 0.7154524891738138,
+          "occupancy_l1": 1.4367037373633784,
+          "inner_update_norm": 0.1425953185703664,
+          "inner_coefficient_var": 0.025317127501291708,
+          "visited_prefixes": 243.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.6096000189969346,
+          "token_kl_student_target_anchor_occ": 0.04733539117126235,
+          "token_kl_student_teacher_student_occ": 0.6107139357497423,
+          "occupancy_l1": 1.211918324775151,
+          "inner_update_norm": 0.1265642437039103,
+          "inner_coefficient_var": 0.01690838935795621,
+          "visited_prefixes": 276.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5481114232640186,
+          "token_kl_student_target_anchor_occ": 0.04488912461383219,
+          "token_kl_student_teacher_student_occ": 0.5508438225880655,
+          "occupancy_l1": 0.9017402967577454,
+          "inner_update_norm": 0.11354002747089938,
+          "inner_coefficient_var": 0.012877848577408379,
+          "visited_prefixes": 269.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.5051015925408052,
+          "token_kl_student_target_anchor_occ": 0.041975068609389064,
+          "token_kl_student_teacher_student_occ": 0.5076847870712126,
+          "occupancy_l1": 0.7195357718762223,
+          "inner_update_norm": 0.10119243050332881,
+          "inner_coefficient_var": 0.01009484279364524,
+          "visited_prefixes": 261.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.4718682792289883,
+          "token_kl_student_target_anchor_occ": 0.03933513250632121,
+          "token_kl_student_teacher_student_occ": 0.4724927734551274,
+          "occupancy_l1": 0.5609743191633222,
+          "inner_update_norm": 0.10637149566068994,
+          "inner_coefficient_var": 0.009767985278718232,
+          "visited_prefixes": 256.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.43968756691884936,
+          "token_kl_student_target_anchor_occ": 0.03650596688117564,
+          "token_kl_student_teacher_student_occ": 0.44171316852604475,
+          "occupancy_l1": 0.514791213981079,
+          "inner_update_norm": 0.09767406801301302,
+          "inner_coefficient_var": 0.00949295332510312,
+          "visited_prefixes": 255.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.41795039799797834,
+          "token_kl_student_target_anchor_occ": 0.035553946147482224,
+          "token_kl_student_teacher_student_occ": 0.42083056994433393,
+          "occupancy_l1": 0.45363855409120146,
+          "inner_update_norm": 0.08917488078820067,
+          "inner_coefficient_var": 0.006987420441299244,
+          "visited_prefixes": 261.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.39975012695707784,
+          "token_kl_student_target_anchor_occ": 0.033717099203281135,
+          "token_kl_student_teacher_student_occ": 0.40097883567482406,
+          "occupancy_l1": 0.37941457061456363,
+          "inner_update_norm": 0.08553984738433926,
+          "inner_coefficient_var": 0.00630859771572736,
+          "visited_prefixes": 249.0
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261007,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.7453733239949636,
+          "token_kl_student_target_anchor_occ": 0.058586994869049114,
+          "token_kl_student_teacher_student_occ": 0.7440933414911189,
+          "occupancy_l1": 1.2383310742698608,
+          "inner_update_norm": 0.10397181232525612,
+          "inner_coefficient_var": 0.026836033683529603,
+          "visited_prefixes": 243.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.6514203217974077,
+          "token_kl_student_target_anchor_occ": 0.052976605214925344,
+          "token_kl_student_teacher_student_occ": 0.6549226082825749,
+          "occupancy_l1": 1.0956509819256783,
+          "inner_update_norm": 0.08699727774143987,
+          "inner_coefficient_var": 0.018733380633073986,
+          "visited_prefixes": 272.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5993034544414254,
+          "token_kl_student_target_anchor_occ": 0.05131831434834553,
+          "token_kl_student_teacher_student_occ": 0.6029462773014468,
+          "occupancy_l1": 0.9005865583425041,
+          "inner_update_norm": 0.07371516851202861,
+          "inner_coefficient_var": 0.016999103451349123,
+          "visited_prefixes": 276.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.5622141555014923,
+          "token_kl_student_target_anchor_occ": 0.048454989983500084,
+          "token_kl_student_teacher_student_occ": 0.5644434275882673,
+          "occupancy_l1": 0.695534216621234,
+          "inner_update_norm": 0.08216831668885995,
+          "inner_coefficient_var": 0.012985984993675695,
+          "visited_prefixes": 266.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.5358796969793601,
+          "token_kl_student_target_anchor_occ": 0.047128792017721945,
+          "token_kl_student_teacher_student_occ": 0.5367424117806799,
+          "occupancy_l1": 0.5440222905567487,
+          "inner_update_norm": 0.07084909362061277,
+          "inner_coefficient_var": 0.008898456907336845,
+          "visited_prefixes": 266.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.5085194476053926,
+          "token_kl_student_target_anchor_occ": 0.04404232914114501,
+          "token_kl_student_teacher_student_occ": 0.5106920223489689,
+          "occupancy_l1": 0.48690501703965766,
+          "inner_update_norm": 0.07373399643717571,
+          "inner_coefficient_var": 0.010189952609054052,
+          "visited_prefixes": 259.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.4884713888334828,
+          "token_kl_student_target_anchor_occ": 0.04336160738366586,
+          "token_kl_student_teacher_student_occ": 0.4915374845678719,
+          "occupancy_l1": 0.41664610584618406,
+          "inner_update_norm": 0.07706282888979275,
+          "inner_coefficient_var": 0.00770578554233764,
+          "visited_prefixes": 270.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.47064599529319057,
+          "token_kl_student_target_anchor_occ": 0.0416652057259759,
+          "token_kl_student_teacher_student_occ": 0.4730116361479728,
+          "occupancy_l1": 0.3805788050173816,
+          "inner_update_norm": 0.07297505324527113,
+          "inner_coefficient_var": 0.010146921833987556,
+          "visited_prefixes": 260.0
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261007,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.6512552724849848,
+          "token_kl_student_target_anchor_occ": 0.06075030758557585,
+          "token_kl_student_teacher_student_occ": 0.6463362699589736,
+          "occupancy_l1": 2.5180576397171066,
+          "inner_update_norm": 0.4592300706796969,
+          "inner_coefficient_var": 0.21829619266394001,
+          "visited_prefixes": 243.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.5103149817947978,
+          "token_kl_student_target_anchor_occ": 0.0625682427884454,
+          "token_kl_student_teacher_student_occ": 0.5121716634500149,
+          "occupancy_l1": 2.4886218480059563,
+          "inner_update_norm": 1.0287613264430389,
+          "inner_coefficient_var": 0.17261124833374522,
+          "visited_prefixes": 278.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.4578123143560513,
+          "token_kl_student_target_anchor_occ": 0.04675450976791695,
+          "token_kl_student_teacher_student_occ": 0.4627148384909449,
+          "occupancy_l1": 1.2628292688641225,
+          "inner_update_norm": 0.5605615286366504,
+          "inner_coefficient_var": 0.08835007278653687,
+          "visited_prefixes": 262.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.4238162341377598,
+          "token_kl_student_target_anchor_occ": 0.04483427312673336,
+          "token_kl_student_teacher_student_occ": 0.4280256128392215,
+          "occupancy_l1": 0.9279389296649174,
+          "inner_update_norm": 0.7067501148647167,
+          "inner_coefficient_var": 0.07533507533505016,
+          "visited_prefixes": 249.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.39598248063249003,
+          "token_kl_student_target_anchor_occ": 0.039073471669944515,
+          "token_kl_student_teacher_student_occ": 0.3977642253602892,
+          "occupancy_l1": 0.6881606566284164,
+          "inner_update_norm": 0.5301478997527992,
+          "inner_coefficient_var": 0.03950021246064779,
+          "visited_prefixes": 252.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.3704365947579269,
+          "token_kl_student_target_anchor_occ": 0.04035323152635341,
+          "token_kl_student_teacher_student_occ": 0.3776663214009759,
+          "occupancy_l1": 0.66068897692046,
+          "inner_update_norm": 0.5834375638972716,
+          "inner_coefficient_var": 0.0765065907066658,
+          "visited_prefixes": 243.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.3586879047458291,
+          "token_kl_student_target_anchor_occ": 0.03634684020379242,
+          "token_kl_student_teacher_student_occ": 0.36404835310245937,
+          "occupancy_l1": 0.511868297610142,
+          "inner_update_norm": 0.6032191333483761,
+          "inner_coefficient_var": 0.04971026534476837,
+          "visited_prefixes": 234.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.3436001850136156,
+          "token_kl_student_target_anchor_occ": 0.03438930846716605,
+          "token_kl_student_teacher_student_occ": 0.34760717222331605,
+          "occupancy_l1": 0.44797425161481524,
+          "inner_update_norm": 0.7037727752063644,
+          "inner_coefficient_var": 0.03999578757010391,
+          "visited_prefixes": 246.0
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261007,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.6229012733864013,
+          "token_kl_student_target_anchor_occ": 0.05682265961601376,
+          "token_kl_student_teacher_student_occ": 0.645286005041308,
+          "occupancy_l1": 2.575119307941401,
+          "inner_update_norm": 0.26333876912831705,
+          "inner_coefficient_var": 0.19491353559241287,
+          "visited_prefixes": 243.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.5378714370163018,
+          "token_kl_student_target_anchor_occ": 0.051249897909855104,
+          "token_kl_student_teacher_student_occ": 0.5450169831853257,
+          "occupancy_l1": 1.6069644484486143,
+          "inner_update_norm": 0.240639916985179,
+          "inner_coefficient_var": 0.1381021484252582,
+          "visited_prefixes": 274.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.48740371786828823,
+          "token_kl_student_target_anchor_occ": 0.04840965051801954,
+          "token_kl_student_teacher_student_occ": 0.49598805059608847,
+          "occupancy_l1": 1.1822199082709577,
+          "inner_update_norm": 0.17078613501772769,
+          "inner_coefficient_var": 0.0931990037669667,
+          "visited_prefixes": 278.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.44026036629160364,
+          "token_kl_student_target_anchor_occ": 0.04199241285629812,
+          "token_kl_student_teacher_student_occ": 0.43638808678012664,
+          "occupancy_l1": 0.8926105307154014,
+          "inner_update_norm": 0.1766530050788304,
+          "inner_coefficient_var": 0.11771168278746828,
+          "visited_prefixes": 255.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.41499295551385995,
+          "token_kl_student_target_anchor_occ": 0.04098186383392985,
+          "token_kl_student_teacher_student_occ": 0.4268109758887879,
+          "occupancy_l1": 0.680573876111424,
+          "inner_update_norm": 0.11965841046425142,
+          "inner_coefficient_var": 0.05876551229004505,
+          "visited_prefixes": 256.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.39303009692676144,
+          "token_kl_student_target_anchor_occ": 0.03878940970299246,
+          "token_kl_student_teacher_student_occ": 0.39572876236246873,
+          "occupancy_l1": 0.6531141953710535,
+          "inner_update_norm": 0.12430579889690246,
+          "inner_coefficient_var": 0.05919418128585332,
+          "visited_prefixes": 261.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.3735264925131353,
+          "token_kl_student_target_anchor_occ": 0.037404105601321576,
+          "token_kl_student_teacher_student_occ": 0.37945357608179575,
+          "occupancy_l1": 0.543525369473292,
+          "inner_update_norm": 0.07498654209656984,
+          "inner_coefficient_var": 0.05585327113799295,
+          "visited_prefixes": 254.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.3594997431044672,
+          "token_kl_student_target_anchor_occ": 0.035829196812463875,
+          "token_kl_student_teacher_student_occ": 0.36131077339144063,
+          "occupancy_l1": 0.4751813540688222,
+          "inner_update_norm": 0.07216800400274301,
+          "inner_coefficient_var": 0.046382464439599994,
+          "visited_prefixes": 255.0
+        }
+      ]
+    },
+    {
+      "method": "mdpo_is",
+      "seed": 20261007,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.6476229309026823,
+          "token_kl_student_target_anchor_occ": 0.05282252851371569,
+          "token_kl_student_teacher_student_occ": 0.6656794521185765,
+          "occupancy_l1": 2.2621416734411874,
+          "inner_update_norm": 0.24192363609508194,
+          "inner_coefficient_var": 0.2711690650809121,
+          "visited_prefixes": 243.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.5514417793421854,
+          "token_kl_student_target_anchor_occ": 0.050753107831396686,
+          "token_kl_student_teacher_student_occ": 0.5563458024100647,
+          "occupancy_l1": 1.6315251488240339,
+          "inner_update_norm": 0.2156775644464387,
+          "inner_coefficient_var": 0.19676604041240806,
+          "visited_prefixes": 288.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.49068691743883686,
+          "token_kl_student_target_anchor_occ": 0.04771518143797546,
+          "token_kl_student_teacher_student_occ": 0.4976993062528896,
+          "occupancy_l1": 1.2167109471054773,
+          "inner_update_norm": 0.16067750323478888,
+          "inner_coefficient_var": 0.09159845492550481,
+          "visited_prefixes": 293.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.44613941565075504,
+          "token_kl_student_target_anchor_occ": 0.04298025686353185,
+          "token_kl_student_teacher_student_occ": 0.4491451741873769,
+          "occupancy_l1": 0.9138071530204165,
+          "inner_update_norm": 0.6829936827838964,
+          "inner_coefficient_var": 0.10574077042756691,
+          "visited_prefixes": 277.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.42136192454544075,
+          "token_kl_student_target_anchor_occ": 0.0419413426844602,
+          "token_kl_student_teacher_student_occ": 0.43135083354824816,
+          "occupancy_l1": 0.6900188057857052,
+          "inner_update_norm": 0.1210987457793917,
+          "inner_coefficient_var": 0.061191371210376475,
+          "visited_prefixes": 265.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.3961665789537441,
+          "token_kl_student_target_anchor_occ": 0.03903424079168253,
+          "token_kl_student_teacher_student_occ": 0.397975772000498,
+          "occupancy_l1": 0.6662895938954017,
+          "inner_update_norm": 0.11617314392450517,
+          "inner_coefficient_var": 0.05624803818498701,
+          "visited_prefixes": 269.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.3686902022867795,
+          "token_kl_student_target_anchor_occ": 0.03672933248395765,
+          "token_kl_student_teacher_student_occ": 0.3721812258025137,
+          "occupancy_l1": 0.5583250856364572,
+          "inner_update_norm": 0.22444951303112248,
+          "inner_coefficient_var": 0.035236861180630984,
+          "visited_prefixes": 265.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.3477329972193675,
+          "token_kl_student_target_anchor_occ": 0.03464460344808869,
+          "token_kl_student_teacher_student_occ": 0.34898418360480604,
+          "occupancy_l1": 0.49039204502150974,
+          "inner_update_norm": 0.11166164894170398,
+          "inner_coefficient_var": 0.047047411171490104,
+          "visited_prefixes": 261.0
+        }
+      ]
+    },
+    {
+      "method": "pmd_part",
+      "seed": 20261008,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 1.0011725090292207,
+          "token_kl_student_target_anchor_occ": 0.06911471334736517,
+          "token_kl_student_teacher_student_occ": 0.9932325598371037,
+          "occupancy_l1": 2.330101381665333,
+          "inner_update_norm": 0.1345860974962378,
+          "inner_coefficient_var": 0.046121983281910986,
+          "visited_prefixes": 217.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.8166032898456654,
+          "token_kl_student_target_anchor_occ": 0.05813908065208129,
+          "token_kl_student_teacher_student_occ": 0.8238226746023763,
+          "occupancy_l1": 1.7629657554614109,
+          "inner_update_norm": 0.13180408341345495,
+          "inner_coefficient_var": 0.04068425465981217,
+          "visited_prefixes": 256.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.6815260174593609,
+          "token_kl_student_target_anchor_occ": 0.0505538385969884,
+          "token_kl_student_teacher_student_occ": 0.7020557804204418,
+          "occupancy_l1": 1.5247402688557727,
+          "inner_update_norm": 0.118376444250574,
+          "inner_coefficient_var": 0.0323406872461666,
+          "visited_prefixes": 250.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.5890371166527258,
+          "token_kl_student_target_anchor_occ": 0.04560520389602391,
+          "token_kl_student_teacher_student_occ": 0.6160090340542825,
+          "occupancy_l1": 1.5385986892610384,
+          "inner_update_norm": 0.10573996816006383,
+          "inner_coefficient_var": 0.024142111893326997,
+          "visited_prefixes": 238.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.5400992817076308,
+          "token_kl_student_target_anchor_occ": 0.04359408016926868,
+          "token_kl_student_teacher_student_occ": 0.5620312703668738,
+          "occupancy_l1": 1.2740823408366106,
+          "inner_update_norm": 0.08851906472741547,
+          "inner_coefficient_var": 0.019347855023928908,
+          "visited_prefixes": 245.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.5116669894825735,
+          "token_kl_student_target_anchor_occ": 0.04201179450250575,
+          "token_kl_student_teacher_student_occ": 0.5251795539588316,
+          "occupancy_l1": 0.9433116635338289,
+          "inner_update_norm": 0.09661895240333811,
+          "inner_coefficient_var": 0.01628891762317215,
+          "visited_prefixes": 220.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.49431075762566873,
+          "token_kl_student_target_anchor_occ": 0.042131322677318984,
+          "token_kl_student_teacher_student_occ": 0.5024800361073554,
+          "occupancy_l1": 0.6459825718844989,
+          "inner_update_norm": 0.0787090810703443,
+          "inner_coefficient_var": 0.012232835076019527,
+          "visited_prefixes": 200.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.4742196587883591,
+          "token_kl_student_target_anchor_occ": 0.03935436778740939,
+          "token_kl_student_teacher_student_occ": 0.4773791215921456,
+          "occupancy_l1": 0.4710010390424626,
+          "inner_update_norm": 0.06824205691039575,
+          "inner_coefficient_var": 0.018148985283097326,
+          "visited_prefixes": 201.0
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261008,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 1.0334897956205131,
+          "token_kl_student_target_anchor_occ": 0.07474020769777491,
+          "token_kl_student_teacher_student_occ": 1.0263268853202006,
+          "occupancy_l1": 2.0493824636743883,
+          "inner_update_norm": 0.09737809444492403,
+          "inner_coefficient_var": 0.04682504842713431,
+          "visited_prefixes": 217.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.8656094014780811,
+          "token_kl_student_target_anchor_occ": 0.0646488710909326,
+          "token_kl_student_teacher_student_occ": 0.8721270767750136,
+          "occupancy_l1": 1.6492264012265314,
+          "inner_update_norm": 0.09396409987547641,
+          "inner_coefficient_var": 0.04129198938098005,
+          "visited_prefixes": 254.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.7409412831881997,
+          "token_kl_student_target_anchor_occ": 0.05794812632978724,
+          "token_kl_student_teacher_student_occ": 0.7598509908272112,
+          "occupancy_l1": 1.4381634736657587,
+          "inner_update_norm": 0.08428161151576924,
+          "inner_coefficient_var": 0.03406099226626938,
+          "visited_prefixes": 252.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.655935304787812,
+          "token_kl_student_target_anchor_occ": 0.05378604350879751,
+          "token_kl_student_teacher_student_occ": 0.679194262196806,
+          "occupancy_l1": 1.4755900987639885,
+          "inner_update_norm": 0.08921263990802496,
+          "inner_coefficient_var": 0.026767179450684,
+          "visited_prefixes": 245.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.6002087313488514,
+          "token_kl_student_target_anchor_occ": 0.04997329234225629,
+          "token_kl_student_teacher_student_occ": 0.6196809657522946,
+          "occupancy_l1": 1.2749558786734272,
+          "inner_update_norm": 0.06527007062784118,
+          "inner_coefficient_var": 0.019031612817724915,
+          "visited_prefixes": 244.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.5691880799958215,
+          "token_kl_student_target_anchor_occ": 0.04822161304782858,
+          "token_kl_student_teacher_student_occ": 0.580855391688076,
+          "occupancy_l1": 0.9758996344660273,
+          "inner_update_norm": 0.0644090868403484,
+          "inner_coefficient_var": 0.016964843342806773,
+          "visited_prefixes": 222.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.5519554148165532,
+          "token_kl_student_target_anchor_occ": 0.047983412244300284,
+          "token_kl_student_teacher_student_occ": 0.5592913262636958,
+          "occupancy_l1": 0.6575811186084476,
+          "inner_update_norm": 0.05033630893659289,
+          "inner_coefficient_var": 0.014326055152554942,
+          "visited_prefixes": 203.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.5302784061600346,
+          "token_kl_student_target_anchor_occ": 0.04474552054495154,
+          "token_kl_student_teacher_student_occ": 0.534252614909731,
+          "occupancy_l1": 0.5357278744753508,
+          "inner_update_norm": 0.058567345645563214,
+          "inner_coefficient_var": 0.01869354850804025,
+          "visited_prefixes": 204.0
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261008,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.884109119399575,
+          "token_kl_student_target_anchor_occ": 0.06745898616632866,
+          "token_kl_student_teacher_student_occ": 0.8812834716256702,
+          "occupancy_l1": 3.418717024101041,
+          "inner_update_norm": 0.7270108598612101,
+          "inner_coefficient_var": 0.4165641525457785,
+          "visited_prefixes": 217.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.6217017978647925,
+          "token_kl_student_target_anchor_occ": 0.05566043273847423,
+          "token_kl_student_teacher_student_occ": 0.6667754798732538,
+          "occupancy_l1": 3.257220798060255,
+          "inner_update_norm": 0.5077023898792369,
+          "inner_coefficient_var": 0.23385334292306034,
+          "visited_prefixes": 251.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5172960011392015,
+          "token_kl_student_target_anchor_occ": 0.05401056843021958,
+          "token_kl_student_teacher_student_occ": 0.562039046975047,
+          "occupancy_l1": 2.9863675136875756,
+          "inner_update_norm": 0.7307809903662749,
+          "inner_coefficient_var": 0.135386565319524,
+          "visited_prefixes": 220.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.49355402414793303,
+          "token_kl_student_target_anchor_occ": 0.04677696050889801,
+          "token_kl_student_teacher_student_occ": 0.5131433769470269,
+          "occupancy_l1": 1.5566997313878141,
+          "inner_update_norm": 0.5584126967041485,
+          "inner_coefficient_var": 0.12053538104660491,
+          "visited_prefixes": 199.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.4631318183002757,
+          "token_kl_student_target_anchor_occ": 0.040975763881913985,
+          "token_kl_student_teacher_student_occ": 0.4641160189809128,
+          "occupancy_l1": 0.7856265347148776,
+          "inner_update_norm": 0.4135724469147725,
+          "inner_coefficient_var": 0.07762006922388141,
+          "visited_prefixes": 188.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.42294378204879157,
+          "token_kl_student_target_anchor_occ": 0.03682245539630526,
+          "token_kl_student_teacher_student_occ": 0.41513366569213694,
+          "occupancy_l1": 0.6529123747525467,
+          "inner_update_norm": 0.29143874806596803,
+          "inner_coefficient_var": 0.07253089196147965,
+          "visited_prefixes": 171.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.38956506626227555,
+          "token_kl_student_target_anchor_occ": 0.034627987171100126,
+          "token_kl_student_teacher_student_occ": 0.39423481808295213,
+          "occupancy_l1": 0.5638165007380809,
+          "inner_update_norm": 0.5488020052093188,
+          "inner_coefficient_var": 0.06392879921430626,
+          "visited_prefixes": 164.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.36943797752415264,
+          "token_kl_student_target_anchor_occ": 0.031935222999218006,
+          "token_kl_student_teacher_student_occ": 0.3805877821497638,
+          "occupancy_l1": 0.6953126284718677,
+          "inner_update_norm": 0.3417921453997586,
+          "inner_coefficient_var": 0.060206412817193765,
+          "visited_prefixes": 179.0
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261008,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.795004494297027,
+          "token_kl_student_target_anchor_occ": 0.05967868362317368,
+          "token_kl_student_teacher_student_occ": 0.8318924862014839,
+          "occupancy_l1": 4.209626667190842,
+          "inner_update_norm": 0.25186200755041216,
+          "inner_coefficient_var": 0.6050589148327775,
+          "visited_prefixes": 217.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.5947731270652891,
+          "token_kl_student_target_anchor_occ": 0.05038523941572438,
+          "token_kl_student_teacher_student_occ": 0.6344331811558869,
+          "occupancy_l1": 2.935638926569336,
+          "inner_update_norm": 0.21001623517677093,
+          "inner_coefficient_var": 0.17337366418723862,
+          "visited_prefixes": 264.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5144665271760726,
+          "token_kl_student_target_anchor_occ": 0.0439166178237878,
+          "token_kl_student_teacher_student_occ": 0.540006839733664,
+          "occupancy_l1": 1.9217322425087857,
+          "inner_update_norm": 0.15076678537475346,
+          "inner_coefficient_var": 0.16059059386717883,
+          "visited_prefixes": 227.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.47269868341629584,
+          "token_kl_student_target_anchor_occ": 0.0414876903144822,
+          "token_kl_student_teacher_student_occ": 0.471654186352912,
+          "occupancy_l1": 1.1430073242004928,
+          "inner_update_norm": 0.23471374588594576,
+          "inner_coefficient_var": 0.17721287416393774,
+          "visited_prefixes": 215.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.42982242874893417,
+          "token_kl_student_target_anchor_occ": 0.03772011962530975,
+          "token_kl_student_teacher_student_occ": 0.4284048531098963,
+          "occupancy_l1": 0.7844304046806019,
+          "inner_update_norm": 0.08469956822189581,
+          "inner_coefficient_var": 0.14502888764054273,
+          "visited_prefixes": 212.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.39554338348343976,
+          "token_kl_student_target_anchor_occ": 0.03406268498167424,
+          "token_kl_student_teacher_student_occ": 0.3980289865372469,
+          "occupancy_l1": 0.6158143763785333,
+          "inner_update_norm": 0.09429158025673465,
+          "inner_coefficient_var": 0.11023790554527584,
+          "visited_prefixes": 216.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.37419569728194546,
+          "token_kl_student_target_anchor_occ": 0.03291770684674897,
+          "token_kl_student_teacher_student_occ": 0.37709827469508284,
+          "occupancy_l1": 0.5421685470815623,
+          "inner_update_norm": 0.06085953968655955,
+          "inner_coefficient_var": 0.1110959665691232,
+          "visited_prefixes": 180.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.34847086677615263,
+          "token_kl_student_target_anchor_occ": 0.03325570242818587,
+          "token_kl_student_teacher_student_occ": 0.3525610373430694,
+          "occupancy_l1": 0.6115498963041353,
+          "inner_update_norm": 0.09185236719683426,
+          "inner_coefficient_var": 0.09094683305111093,
+          "visited_prefixes": 201.0
+        }
+      ]
+    },
+    {
+      "method": "mdpo_is",
+      "seed": 20261008,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.8352292903775099,
+          "token_kl_student_target_anchor_occ": 0.04807897440720892,
+          "token_kl_student_teacher_student_occ": 0.8643396938131672,
+          "occupancy_l1": 3.4037151875004366,
+          "inner_update_norm": 0.2222886572123355,
+          "inner_coefficient_var": 0.6740430909702836,
+          "visited_prefixes": 217.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.6302759657999534,
+          "token_kl_student_target_anchor_occ": 0.0496711679452605,
+          "token_kl_student_teacher_student_occ": 0.6584501398190191,
+          "occupancy_l1": 2.613796221841042,
+          "inner_update_norm": 0.6741857632119178,
+          "inner_coefficient_var": 0.19539707309044255,
+          "visited_prefixes": 258.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5309074756693756,
+          "token_kl_student_target_anchor_occ": 0.0438228042003547,
+          "token_kl_student_teacher_student_occ": 0.5509615319365286,
+          "occupancy_l1": 1.8686169154021606,
+          "inner_update_norm": 0.14792968318014393,
+          "inner_coefficient_var": 0.15246707190490555,
+          "visited_prefixes": 237.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.47522607207763423,
+          "token_kl_student_target_anchor_occ": 0.0399130582515167,
+          "token_kl_student_teacher_student_occ": 0.4804819460407352,
+          "occupancy_l1": 1.2035304759315437,
+          "inner_update_norm": 0.1845049270705605,
+          "inner_coefficient_var": 0.20672921340531286,
+          "visited_prefixes": 233.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.43433232595775917,
+          "token_kl_student_target_anchor_occ": 0.037870676750625006,
+          "token_kl_student_teacher_student_occ": 0.4328440370589471,
+          "occupancy_l1": 0.840815067799487,
+          "inner_update_norm": 0.1367084720722858,
+          "inner_coefficient_var": 0.14370958582826804,
+          "visited_prefixes": 222.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.4002362357224451,
+          "token_kl_student_target_anchor_occ": 0.034476011663818085,
+          "token_kl_student_teacher_student_occ": 0.4016523264743339,
+          "occupancy_l1": 0.6219341945497863,
+          "inner_update_norm": 0.09232229599373683,
+          "inner_coefficient_var": 0.1177055113270149,
+          "visited_prefixes": 218.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.37752634838266025,
+          "token_kl_student_target_anchor_occ": 0.03324852502594323,
+          "token_kl_student_teacher_student_occ": 0.37944843642310283,
+          "occupancy_l1": 0.5050244610377447,
+          "inner_update_norm": 0.06010183490099215,
+          "inner_coefficient_var": 0.11499081892184085,
+          "visited_prefixes": 185.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.35620985328563226,
+          "token_kl_student_target_anchor_occ": 0.03135500838770133,
+          "token_kl_student_teacher_student_occ": 0.35842022753917047,
+          "occupancy_l1": 0.45101219472459364,
+          "inner_update_norm": 0.08682603626442663,
+          "inner_coefficient_var": 0.14912200380984825,
+          "visited_prefixes": 197.0
+        }
+      ]
+    },
+    {
+      "method": "pmd_part",
+      "seed": 20261009,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.9274660239333103,
+          "token_kl_student_target_anchor_occ": 0.06473010943495862,
+          "token_kl_student_teacher_student_occ": 0.9480525826048849,
+          "occupancy_l1": 2.057508799133167,
+          "inner_update_norm": 0.1299056815006108,
+          "inner_coefficient_var": 0.04816573842450188,
+          "visited_prefixes": 193.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.7636824760479285,
+          "token_kl_student_target_anchor_occ": 0.0550481243077705,
+          "token_kl_student_teacher_student_occ": 0.7847370783469206,
+          "occupancy_l1": 1.5947024483563939,
+          "inner_update_norm": 0.14013879313999236,
+          "inner_coefficient_var": 0.037041757235693216,
+          "visited_prefixes": 214.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.6792828052744249,
+          "token_kl_student_target_anchor_occ": 0.05081648080302323,
+          "token_kl_student_teacher_student_occ": 0.6986068792182305,
+          "occupancy_l1": 1.1946465512844089,
+          "inner_update_norm": 0.10553459557606205,
+          "inner_coefficient_var": 0.027950498284846415,
+          "visited_prefixes": 215.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.6339109709312181,
+          "token_kl_student_target_anchor_occ": 0.04885676025953392,
+          "token_kl_student_teacher_student_occ": 0.6532879705589288,
+          "occupancy_l1": 0.9140593051751139,
+          "inner_update_norm": 0.1227102232765381,
+          "inner_coefficient_var": 0.02907307950602277,
+          "visited_prefixes": 227.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.5898562350259858,
+          "token_kl_student_target_anchor_occ": 0.04541492571859117,
+          "token_kl_student_teacher_student_occ": 0.6031645641806712,
+          "occupancy_l1": 0.7946130529163145,
+          "inner_update_norm": 0.09375479289098118,
+          "inner_coefficient_var": 0.023510995640703927,
+          "visited_prefixes": 222.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.5310941343249217,
+          "token_kl_student_target_anchor_occ": 0.041628590458669894,
+          "token_kl_student_teacher_student_occ": 0.5456536054042503,
+          "occupancy_l1": 0.9075861680309197,
+          "inner_update_norm": 0.09461715919991312,
+          "inner_coefficient_var": 0.01898226059163039,
+          "visited_prefixes": 238.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.49852983173341464,
+          "token_kl_student_target_anchor_occ": 0.039786638868520796,
+          "token_kl_student_teacher_student_occ": 0.5057601778027802,
+          "occupancy_l1": 0.6730688377024104,
+          "inner_update_norm": 0.07896905036591867,
+          "inner_coefficient_var": 0.016610240115806463,
+          "visited_prefixes": 231.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.47018184961432624,
+          "token_kl_student_target_anchor_occ": 0.03743418647670428,
+          "token_kl_student_teacher_student_occ": 0.47763883760247833,
+          "occupancy_l1": 0.5704945716655511,
+          "inner_update_norm": 0.0826258394868067,
+          "inner_coefficient_var": 0.015119805101451875,
+          "visited_prefixes": 228.0
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261009,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.9716240301437452,
+          "token_kl_student_target_anchor_occ": 0.07226592763096974,
+          "token_kl_student_teacher_student_occ": 0.9920556664771704,
+          "occupancy_l1": 1.7947769996915615,
+          "inner_update_norm": 0.08800297654883106,
+          "inner_coefficient_var": 0.04979463128256741,
+          "visited_prefixes": 193.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.8328055081181813,
+          "token_kl_student_target_anchor_occ": 0.06533084111722164,
+          "token_kl_student_teacher_student_occ": 0.8550088732689017,
+          "occupancy_l1": 1.4509439886931936,
+          "inner_update_norm": 0.07352115733461369,
+          "inner_coefficient_var": 0.03731770353688789,
+          "visited_prefixes": 216.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.7561282958781047,
+          "token_kl_student_target_anchor_occ": 0.06085607971500442,
+          "token_kl_student_teacher_student_occ": 0.775830744406953,
+          "occupancy_l1": 1.170878617325741,
+          "inner_update_norm": 0.07629934596416417,
+          "inner_coefficient_var": 0.027393949965672414,
+          "visited_prefixes": 204.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.7018786590216716,
+          "token_kl_student_target_anchor_occ": 0.055489059069862325,
+          "token_kl_student_teacher_student_occ": 0.7214627076096322,
+          "occupancy_l1": 0.962387273072969,
+          "inner_update_norm": 0.07878014282925479,
+          "inner_coefficient_var": 0.028985241129104687,
+          "visited_prefixes": 219.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.6628332157972672,
+          "token_kl_student_target_anchor_occ": 0.05319868817613687,
+          "token_kl_student_teacher_student_occ": 0.6779550259029015,
+          "occupancy_l1": 0.764691294898928,
+          "inner_update_norm": 0.07591949203026202,
+          "inner_coefficient_var": 0.025603885108547476,
+          "visited_prefixes": 221.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.6092947892963684,
+          "token_kl_student_target_anchor_occ": 0.049009409632889356,
+          "token_kl_student_teacher_student_occ": 0.6278056316477054,
+          "occupancy_l1": 0.8299015905160474,
+          "inner_update_norm": 0.07566576824361852,
+          "inner_coefficient_var": 0.023919576604554786,
+          "visited_prefixes": 242.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.5737735221350873,
+          "token_kl_student_target_anchor_occ": 0.048387546362442156,
+          "token_kl_student_teacher_student_occ": 0.5847026596581634,
+          "occupancy_l1": 0.7151267885014954,
+          "inner_update_norm": 0.06957363401509424,
+          "inner_coefficient_var": 0.021639691587766553,
+          "visited_prefixes": 234.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.5463701854185963,
+          "token_kl_student_target_anchor_occ": 0.04652554828607557,
+          "token_kl_student_teacher_student_occ": 0.5574574166727956,
+          "occupancy_l1": 0.5494293559253375,
+          "inner_update_norm": 0.059102050791804875,
+          "inner_coefficient_var": 0.017026731346140793,
+          "visited_prefixes": 213.0
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261009,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.7946857643572164,
+          "token_kl_student_target_anchor_occ": 0.06256578132541026,
+          "token_kl_student_teacher_student_occ": 0.858095575817011,
+          "occupancy_l1": 3.404753900391475,
+          "inner_update_norm": 0.5594553867828931,
+          "inner_coefficient_var": 0.4402032813660964,
+          "visited_prefixes": 193.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.6469538461243022,
+          "token_kl_student_target_anchor_occ": 0.06401099607621515,
+          "token_kl_student_teacher_student_occ": 0.7168926011642799,
+          "occupancy_l1": 2.6859579203321315,
+          "inner_update_norm": 0.5384172911029818,
+          "inner_coefficient_var": 0.29028860802713335,
+          "visited_prefixes": 225.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5978171465712577,
+          "token_kl_student_target_anchor_occ": 0.05614677366309499,
+          "token_kl_student_teacher_student_occ": 0.63258572037441,
+          "occupancy_l1": 2.087861625922927,
+          "inner_update_norm": 0.544375690930491,
+          "inner_coefficient_var": 0.20971725552602286,
+          "visited_prefixes": 233.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.5263260444351494,
+          "token_kl_student_target_anchor_occ": 0.046955924579700485,
+          "token_kl_student_teacher_student_occ": 0.5597261498178853,
+          "occupancy_l1": 1.431978273352149,
+          "inner_update_norm": 0.39433030106358097,
+          "inner_coefficient_var": 0.15242754934279096,
+          "visited_prefixes": 212.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.4796883573335864,
+          "token_kl_student_target_anchor_occ": 0.04564728374487516,
+          "token_kl_student_teacher_student_occ": 0.49439702883215025,
+          "occupancy_l1": 1.3196068040961342,
+          "inner_update_norm": 0.5388164718378295,
+          "inner_coefficient_var": 0.12597043974158917,
+          "visited_prefixes": 230.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.4433270064282841,
+          "token_kl_student_target_anchor_occ": 0.044905269853080396,
+          "token_kl_student_teacher_student_occ": 0.44501555782367763,
+          "occupancy_l1": 1.0699320407251123,
+          "inner_update_norm": 0.5265089352528981,
+          "inner_coefficient_var": 0.08775653463254682,
+          "visited_prefixes": 248.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.4148987928645573,
+          "token_kl_student_target_anchor_occ": 0.0393529253869859,
+          "token_kl_student_teacher_student_occ": 0.4154583462956682,
+          "occupancy_l1": 0.7832998028947029,
+          "inner_update_norm": 0.4813150168520451,
+          "inner_coefficient_var": 0.06330238430603967,
+          "visited_prefixes": 211.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.3875745223624773,
+          "token_kl_student_target_anchor_occ": 0.037179664246607805,
+          "token_kl_student_teacher_student_occ": 0.38574185288603,
+          "occupancy_l1": 0.6275453780893229,
+          "inner_update_norm": 0.7967499767544364,
+          "inner_coefficient_var": 0.08890916962212918,
+          "visited_prefixes": 225.0
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261009,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.7176165653110876,
+          "token_kl_student_target_anchor_occ": 0.06280971967892789,
+          "token_kl_student_teacher_student_occ": 0.7947320286528561,
+          "occupancy_l1": 3.7544734435250104,
+          "inner_update_norm": 0.20776780102125814,
+          "inner_coefficient_var": 0.7046062980429383,
+          "visited_prefixes": 193.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.5842398517466566,
+          "token_kl_student_target_anchor_occ": 0.05450447356689988,
+          "token_kl_student_teacher_student_occ": 0.6230367078033067,
+          "occupancy_l1": 2.455610155987023,
+          "inner_update_norm": 0.29338012155773485,
+          "inner_coefficient_var": 0.1567609250287028,
+          "visited_prefixes": 236.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5115502590284301,
+          "token_kl_student_target_anchor_occ": 0.041379156463100274,
+          "token_kl_student_teacher_student_occ": 0.5299227050580193,
+          "occupancy_l1": 1.5651848853255665,
+          "inner_update_norm": 0.1641542665561134,
+          "inner_coefficient_var": 0.13826096201558047,
+          "visited_prefixes": 236.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.46401230001472776,
+          "token_kl_student_target_anchor_occ": 0.039596619114922973,
+          "token_kl_student_teacher_student_occ": 0.4787552720922652,
+          "occupancy_l1": 1.1193798117195701,
+          "inner_update_norm": 0.1747643730885435,
+          "inner_coefficient_var": 0.10392332964689036,
+          "visited_prefixes": 229.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.4335960400077456,
+          "token_kl_student_target_anchor_occ": 0.03616956712872723,
+          "token_kl_student_teacher_student_occ": 0.4458971405228212,
+          "occupancy_l1": 0.804512949636766,
+          "inner_update_norm": 0.08479136774981276,
+          "inner_coefficient_var": 0.1261299022697469,
+          "visited_prefixes": 215.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.41344170081742915,
+          "token_kl_student_target_anchor_occ": 0.03560655060656877,
+          "token_kl_student_teacher_student_occ": 0.4207558134865985,
+          "occupancy_l1": 0.6956654654676655,
+          "inner_update_norm": 0.11812314593343168,
+          "inner_coefficient_var": 0.0953418716167738,
+          "visited_prefixes": 233.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.3963974437129193,
+          "token_kl_student_target_anchor_occ": 0.03466164241758266,
+          "token_kl_student_teacher_student_occ": 0.4019249497209045,
+          "occupancy_l1": 0.5388077726363247,
+          "inner_update_norm": 0.07385075792361934,
+          "inner_coefficient_var": 0.08812009888192092,
+          "visited_prefixes": 235.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.38022360066052546,
+          "token_kl_student_target_anchor_occ": 0.03321536861388267,
+          "token_kl_student_teacher_student_occ": 0.3869413135726788,
+          "occupancy_l1": 0.43261655035292423,
+          "inner_update_norm": 0.07598686747720823,
+          "inner_coefficient_var": 0.06958330811505446,
+          "visited_prefixes": 217.0
+        }
+      ]
+    },
+    {
+      "method": "mdpo_is",
+      "seed": 20261009,
+      "vocab": 6,
+      "horizon": 5,
+      "trajectories": 256,
+      "outer_steps": 8,
+      "inner_steps": 24,
+      "eta": 0.35,
+      "lr": 0.18,
+      "history": [
+        {
+          "outer": 0,
+          "token_kl_student_teacher_anchor_occ": 0.7916209776289976,
+          "token_kl_student_target_anchor_occ": 0.05178614382463262,
+          "token_kl_student_teacher_student_occ": 0.8467370640887293,
+          "occupancy_l1": 2.9813370496962235,
+          "inner_update_norm": 0.1921210313577711,
+          "inner_coefficient_var": 1.0030141704968731,
+          "visited_prefixes": 193.0
+        },
+        {
+          "outer": 1,
+          "token_kl_student_teacher_anchor_occ": 0.6132702992174031,
+          "token_kl_student_target_anchor_occ": 0.05179875917166041,
+          "token_kl_student_teacher_student_occ": 0.656421486669943,
+          "occupancy_l1": 2.3729598649255,
+          "inner_update_norm": 0.2112598949995886,
+          "inner_coefficient_var": 0.16829659719186568,
+          "visited_prefixes": 241.0
+        },
+        {
+          "outer": 2,
+          "token_kl_student_teacher_anchor_occ": 0.5303355497059942,
+          "token_kl_student_target_anchor_occ": 0.04210983414739032,
+          "token_kl_student_teacher_student_occ": 0.554286663293622,
+          "occupancy_l1": 1.5123370579951265,
+          "inner_update_norm": 0.14365365792105655,
+          "inner_coefficient_var": 0.15219393353378702,
+          "visited_prefixes": 231.0
+        },
+        {
+          "outer": 3,
+          "token_kl_student_teacher_anchor_occ": 0.47500127678222887,
+          "token_kl_student_target_anchor_occ": 0.03901112543287971,
+          "token_kl_student_teacher_student_occ": 0.49302715242935197,
+          "occupancy_l1": 1.2422377068693937,
+          "inner_update_norm": 0.17074436871324658,
+          "inner_coefficient_var": 0.1638133420073032,
+          "visited_prefixes": 241.0
+        },
+        {
+          "outer": 4,
+          "token_kl_student_teacher_anchor_occ": 0.4452132855665176,
+          "token_kl_student_target_anchor_occ": 0.03825786201166125,
+          "token_kl_student_teacher_student_occ": 0.4596308820077491,
+          "occupancy_l1": 0.8917749233820369,
+          "inner_update_norm": 0.1127269463390017,
+          "inner_coefficient_var": 0.1263230713333657,
+          "visited_prefixes": 224.0
+        },
+        {
+          "outer": 5,
+          "token_kl_student_teacher_anchor_occ": 0.4214591263449951,
+          "token_kl_student_target_anchor_occ": 0.03614987633094663,
+          "token_kl_student_teacher_student_occ": 0.42782944230978615,
+          "occupancy_l1": 0.7362345002226247,
+          "inner_update_norm": 0.16577661828862,
+          "inner_coefficient_var": 0.09462333379105332,
+          "visited_prefixes": 247.0
+        },
+        {
+          "outer": 6,
+          "token_kl_student_teacher_anchor_occ": 0.4015596567718996,
+          "token_kl_student_target_anchor_occ": 0.03518469686686128,
+          "token_kl_student_teacher_student_occ": 0.4081069458342199,
+          "occupancy_l1": 0.5556604978597677,
+          "inner_update_norm": 0.12990759891324208,
+          "inner_coefficient_var": 0.08953969602838877,
+          "visited_prefixes": 226.0
+        },
+        {
+          "outer": 7,
+          "token_kl_student_teacher_anchor_occ": 0.38864944366225035,
+          "token_kl_student_target_anchor_occ": 0.03453964190054845,
+          "token_kl_student_teacher_student_occ": 0.3913432463138644,
+          "occupancy_l1": 0.42223851588404016,
+          "inner_update_norm": 0.0757796260874677,
+          "inner_coefficient_var": 0.09605130880877244,
+          "visited_prefixes": 225.0
+        }
+      ]
+    }
+  ]
+}

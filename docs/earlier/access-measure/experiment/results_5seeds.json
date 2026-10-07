@@ -1,58 +1,2400 @@
-[
-  {
-    "method": "pmd_part",
-    "teacher_kl_mean": 0.3088668599578507,
-    "teacher_kl_std": 0.06143137251429966,
-    "target_kl_mean": 0.01652541080996452,
-    "target_kl_std": 0.002550575807659541,
+{
+  "config": {
+    "states": 8,
+    "actions": 32,
+    "outer_steps": 12,
+    "inner_steps": 40,
+    "samples": 64,
+    "eta": 0.35,
+    "lr": 0.25,
     "seeds": [
-      0.31281364168308184,
-      0.30277328721177404,
-      0.25348647944915664,
-      0.26579427404086253,
-      0.40946661740437834
+      20261007,
+      20261008,
+      20261009,
+      20261010,
+      20261011
     ]
   },
-  {
-    "method": "pmd_mean",
-    "teacher_kl_mean": 0.31211499874115056,
-    "teacher_kl_std": 0.06768328074524646,
-    "target_kl_mean": 0.02361379500156113,
-    "target_kl_std": 0.004345472764553732,
-    "seeds": [
-      0.3065871197526889,
-      0.30505018698598196,
-      0.2551944303707162,
-      0.26753803119528585,
-      0.42620522540107963
-    ]
-  },
-  {
-    "method": "bpo",
-    "teacher_kl_mean": 0.32201402597756235,
-    "teacher_kl_std": 0.07036755984491816,
-    "target_kl_mean": 0.017046069691921663,
-    "target_kl_std": 0.0029206144714303125,
-    "seeds": [
-      0.32713631646208985,
-      0.31600731635389406,
-      0.2539860317913242,
-      0.2766523551138643,
-      0.43628811016663943
-    ]
-  },
-  {
-    "method": "mdpo",
-    "teacher_kl_mean": 0.17384192178727784,
-    "teacher_kl_std": 0.026911803372619666,
-    "target_kl_mean": 0.008524859750587182,
-    "target_kl_std": 0.0011477266728663056,
-    "seeds": [
-      0.18977647398845898,
-      0.15142207514292777,
-      0.14678112351490524,
-      0.17005451831679905,
-      0.21117541797329814
-    ]
-  }
-]
+  "records": [
+    {
+      "method": "pmd_part",
+      "seed": 20261007,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.9498576422311427,
+          "kl_student_anchor": 0.07846269862426428,
+          "kl_student_target": 0.044303898555473814,
+          "target_anchor_kl": 0.16236002008056577,
+          "inner_update_norm": 0.02974513128088873,
+          "inner_coefficient_var": 0.0350552559941669
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7339531708397604,
+          "kl_student_anchor": 0.03320232312885875,
+          "kl_student_target": 0.03596702202547688,
+          "target_anchor_kl": 0.10108422020102222,
+          "inner_update_norm": 0.029462732386156345,
+          "inner_coefficient_var": 0.04361027456192121
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.6212118426637833,
+          "kl_student_anchor": 0.01662770307613473,
+          "kl_student_target": 0.03463405072166195,
+          "target_anchor_kl": 0.07323773618863463,
+          "inner_update_norm": 0.025461079052589018,
+          "inner_coefficient_var": 0.03383850709348246
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5558559102890434,
+          "kl_student_anchor": 0.007827537158823944,
+          "kl_student_target": 0.03201590084363876,
+          "target_anchor_kl": 0.059172811940520806,
+          "inner_update_norm": 0.021991590377173013,
+          "inner_coefficient_var": 0.02956769820771587
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.505014108347956,
+          "kl_student_anchor": 0.004968323829600304,
+          "kl_student_target": 0.027705365198012394,
+          "target_anchor_kl": 0.05127078887206187,
+          "inner_update_norm": 0.02321850496704042,
+          "inner_coefficient_var": 0.036451225499396056
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.4581415340415623,
+          "kl_student_anchor": 0.0049194812319826985,
+          "kl_student_target": 0.024359132191758615,
+          "target_anchor_kl": 0.045898341513820426,
+          "inner_update_norm": 0.02420017160223843,
+          "inner_coefficient_var": 0.034952090047469395
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.4263450712694029,
+          "kl_student_anchor": 0.0030659825704470543,
+          "kl_student_target": 0.024531866949853983,
+          "target_anchor_kl": 0.041242227402874754,
+          "inner_update_norm": 0.017654288011917384,
+          "inner_coefficient_var": 0.019968642353191055
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3926063810990364,
+          "kl_student_anchor": 0.0035719929591416727,
+          "kl_student_target": 0.021210998077713115,
+          "target_anchor_kl": 0.037760405203523084,
+          "inner_update_norm": 0.01883883746275924,
+          "inner_coefficient_var": 0.024226929177204353
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.367693603314718,
+          "kl_student_anchor": 0.0025318285250266765,
+          "kl_student_target": 0.0208243137804314,
+          "target_anchor_kl": 0.0343561647143442,
+          "inner_update_norm": 0.01734812465754924,
+          "inner_coefficient_var": 0.02432929884418119
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.34919813684066014,
+          "kl_student_anchor": 0.001707353268983977,
+          "kl_student_target": 0.020226800445034172,
+          "target_anchor_kl": 0.03173122466273733,
+          "inner_update_norm": 0.015382420208441367,
+          "inner_coefficient_var": 0.017627613115550736
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.32993732141470167,
+          "kl_student_anchor": 0.0019257899288083696,
+          "kl_student_target": 0.01834306716718977,
+          "target_anchor_kl": 0.029752216203009944,
+          "inner_update_norm": 0.01785052030834572,
+          "inner_coefficient_var": 0.021919886884549728
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.31281364168308184,
+          "kl_student_anchor": 0.0014308329106391357,
+          "kl_student_target": 0.017046833818215874,
+          "target_anchor_kl": 0.027824384775479924,
+          "inner_update_norm": 0.01669933872854526,
+          "inner_coefficient_var": 0.02279592761758562
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261007,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.8773362789927095,
+          "kl_student_anchor": 0.31915850078261854,
+          "kl_student_target": 0.1753736928249525,
+          "target_anchor_kl": 0.16236002008056577,
+          "inner_update_norm": 0.07241940575194472,
+          "inner_coefficient_var": 0.25366798038304533
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.6714029340092742,
+          "kl_student_anchor": 0.1023224600389633,
+          "kl_student_target": 0.07416043652576586,
+          "target_anchor_kl": 0.09109821119733796,
+          "inner_update_norm": 0.06326830466853436,
+          "inner_coefficient_var": 0.11836710429145489
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.649635870281762,
+          "kl_student_anchor": 0.08792865143030765,
+          "kl_student_target": 0.10468830431580814,
+          "target_anchor_kl": 0.06486202824594776,
+          "inner_update_norm": 0.04910734048140391,
+          "inner_coefficient_var": 0.09802405814813414
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5296915451096558,
+          "kl_student_anchor": 0.09038807879722333,
+          "kl_student_target": 0.07066370053424195,
+          "target_anchor_kl": 0.06327177752683968,
+          "inner_update_norm": 0.04538814383918825,
+          "inner_coefficient_var": 0.11719146999804497
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.4883414725993108,
+          "kl_student_anchor": 0.04167844792188112,
+          "kl_student_target": 0.053668337963179914,
+          "target_anchor_kl": 0.0490764054485623,
+          "inner_update_norm": 0.04470533517455096,
+          "inner_coefficient_var": 0.07625524816713028
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.4452478516827719,
+          "kl_student_anchor": 0.023781069847988112,
+          "kl_student_target": 0.03791404618996301,
+          "target_anchor_kl": 0.044886830298269134,
+          "inner_update_norm": 0.0333713458408153,
+          "inner_coefficient_var": 0.06817318634795158
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.4216622718432469,
+          "kl_student_anchor": 0.039673938201346286,
+          "kl_student_target": 0.05065717595397948,
+          "target_anchor_kl": 0.03994682734418533,
+          "inner_update_norm": 0.04106132427896461,
+          "inner_coefficient_var": 0.06225107006816779
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3989190482892898,
+          "kl_student_anchor": 0.01352413427071023,
+          "kl_student_target": 0.03326766440051873,
+          "target_anchor_kl": 0.03829053145572124,
+          "inner_update_norm": 0.03114181157626042,
+          "inner_coefficient_var": 0.05524719483351673
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3647961671173797,
+          "kl_student_anchor": 0.009918356792293831,
+          "kl_student_target": 0.02442942507415285,
+          "target_anchor_kl": 0.03576622857721346,
+          "inner_update_norm": 0.029751908125532998,
+          "inner_coefficient_var": 0.050533370680957326
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.34132917677307417,
+          "kl_student_anchor": 0.015116952467072961,
+          "kl_student_target": 0.027829316972374778,
+          "target_anchor_kl": 0.03186803095192185,
+          "inner_update_norm": 0.032295152466348176,
+          "inner_coefficient_var": 0.04852355266277031
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.3224857138114225,
+          "kl_student_anchor": 0.010733058845799304,
+          "kl_student_target": 0.024182357711783748,
+          "target_anchor_kl": 0.029267865254619458,
+          "inner_update_norm": 0.031695595173618564,
+          "inner_coefficient_var": 0.04618342269481096
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.3065871197526889,
+          "kl_student_anchor": 0.012132103200514683,
+          "kl_student_target": 0.02445135495705051,
+          "target_anchor_kl": 0.027456123557039216,
+          "inner_update_norm": 0.03177993648309937,
+          "inner_coefficient_var": 0.035212885625198774
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261007,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.9749969424718528,
+          "kl_student_anchor": 0.06685331963262235,
+          "kl_student_target": 0.045556557295155134,
+          "target_anchor_kl": 0.16236002008056577,
+          "inner_update_norm": 0.028336862289027032,
+          "inner_coefficient_var": 0.034704318379395464
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7540938137799297,
+          "kl_student_anchor": 0.03177408165618609,
+          "kl_student_target": 0.03685510524326559,
+          "target_anchor_kl": 0.1046200420159201,
+          "inner_update_norm": 0.029442323701683,
+          "inner_coefficient_var": 0.04582600883066945
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.6363623567775911,
+          "kl_student_anchor": 0.01646142238752849,
+          "kl_student_target": 0.035445582967299626,
+          "target_anchor_kl": 0.07595388360679264,
+          "inner_update_norm": 0.024251192444545974,
+          "inner_coefficient_var": 0.0319430009621396
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5680671680202397,
+          "kl_student_anchor": 0.008162878055277543,
+          "kl_student_target": 0.03268837124876618,
+          "target_anchor_kl": 0.06089175313404182,
+          "inner_update_norm": 0.020997351430684156,
+          "inner_coefficient_var": 0.027102234535567607
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.517971894288705,
+          "kl_student_anchor": 0.004714263190682607,
+          "kl_student_target": 0.02872407706686792,
+          "target_anchor_kl": 0.052406304352843464,
+          "inner_update_norm": 0.02095017893287053,
+          "inner_coefficient_var": 0.027478632274904168
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.47052581172994684,
+          "kl_student_anchor": 0.005195785295775758,
+          "kl_student_target": 0.024905818405962975,
+          "target_anchor_kl": 0.04680141787545909,
+          "inner_update_norm": 0.02169040096603791,
+          "inner_coefficient_var": 0.02642483211833643
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.43784805172713837,
+          "kl_student_anchor": 0.0031207318270787153,
+          "kl_student_target": 0.02471055134947829,
+          "target_anchor_kl": 0.041954375556319,
+          "inner_update_norm": 0.018280736276183502,
+          "inner_coefficient_var": 0.022365688743613294
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.40435171579331497,
+          "kl_student_anchor": 0.003597416803349332,
+          "kl_student_target": 0.021631760697826966,
+          "target_anchor_kl": 0.03837547777392155,
+          "inner_update_norm": 0.018663950654503794,
+          "inner_coefficient_var": 0.023012312804586342
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.37889792084225027,
+          "kl_student_anchor": 0.0025557305507468977,
+          "kl_student_target": 0.02090249430046192,
+          "target_anchor_kl": 0.034929554746118925,
+          "inner_update_norm": 0.019331943353979995,
+          "inner_coefficient_var": 0.024236859637488214
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.3629429963279666,
+          "kl_student_anchor": 0.0013975617198903533,
+          "kl_student_target": 0.021111109819752595,
+          "target_anchor_kl": 0.032237635266506616,
+          "inner_update_norm": 0.012390020616765501,
+          "inner_coefficient_var": 0.010800322615316965
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.34463774132733943,
+          "kl_student_anchor": 0.0017294272519018084,
+          "kl_student_target": 0.018804335638483438,
+          "target_anchor_kl": 0.03037970416518323,
+          "inner_update_norm": 0.018935230628080165,
+          "inner_coefficient_var": 0.026785306149836655
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.32713631646208985,
+          "kl_student_anchor": 0.0015422609810745336,
+          "kl_student_target": 0.017532458238313207,
+          "target_anchor_kl": 0.02876199799014488,
+          "inner_update_norm": 0.0170792295386242,
+          "inner_coefficient_var": 0.023268700936458844
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261007,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.7354120548801594,
+          "kl_student_anchor": 0.21483184829430618,
+          "kl_student_target": 0.05788789026815692,
+          "target_anchor_kl": 0.16236002008056577,
+          "inner_update_norm": 0.07541207486453369,
+          "inner_coefficient_var": 0.36060747322104914
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.5425899477896057,
+          "kl_student_anchor": 0.05270886830415333,
+          "kl_student_target": 0.03147413558849952,
+          "target_anchor_kl": 0.07353887197781023,
+          "inner_update_norm": 0.04164258161980842,
+          "inner_coefficient_var": 0.17595050105036392
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.4474968271741341,
+          "kl_student_anchor": 0.021746849123777043,
+          "kl_student_target": 0.022571509158013654,
+          "target_anchor_kl": 0.050170115084816724,
+          "inner_update_norm": 0.037143509282399415,
+          "inner_coefficient_var": 0.12906394338000432
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.3775777698848275,
+          "kl_student_anchor": 0.01627540171047094,
+          "kl_student_target": 0.018595879061235956,
+          "target_anchor_kl": 0.039878032161501493,
+          "inner_update_norm": 0.031986586710109115,
+          "inner_coefficient_var": 0.1207088580883492
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.33638353917157604,
+          "kl_student_anchor": 0.010908480176657864,
+          "kl_student_target": 0.018476181942724886,
+          "target_anchor_kl": 0.032349166213036656,
+          "inner_update_norm": 0.02680730623573673,
+          "inner_coefficient_var": 0.08441553321442982
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.30393147291107564,
+          "kl_student_anchor": 0.007087968469569543,
+          "kl_student_target": 0.01598676342038672,
+          "target_anchor_kl": 0.02851938840706855,
+          "inner_update_norm": 0.02500697871675918,
+          "inner_coefficient_var": 0.0773866222364478
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.2778939595381384,
+          "kl_student_anchor": 0.0051218620238834955,
+          "kl_student_target": 0.013913842346057914,
+          "target_anchor_kl": 0.025093385426395054,
+          "inner_update_norm": 0.024958614786762465,
+          "inner_coefficient_var": 0.07291873438483228
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.2571100905903174,
+          "kl_student_anchor": 0.00417196284621507,
+          "kl_student_target": 0.013019507271316358,
+          "target_anchor_kl": 0.02259327930919376,
+          "inner_update_norm": 0.02668602918317564,
+          "inner_coefficient_var": 0.0873864031904867
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.2373686544160075,
+          "kl_student_anchor": 0.004081192497049782,
+          "kl_student_target": 0.011890209123851525,
+          "target_anchor_kl": 0.020786414471205807,
+          "inner_update_norm": 0.025527924966636858,
+          "inner_coefficient_var": 0.06964566287444515
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.22401826308493392,
+          "kl_student_anchor": 0.0029670629930622474,
+          "kl_student_target": 0.012084405371116732,
+          "target_anchor_kl": 0.01908074440196758,
+          "inner_update_norm": 0.02320324333147131,
+          "inner_coefficient_var": 0.07085399719484778
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.21033276689282582,
+          "kl_student_anchor": 0.002645170747502275,
+          "kl_student_target": 0.010618762343523717,
+          "target_anchor_kl": 0.017764798171111637,
+          "inner_update_norm": 0.021767162106800967,
+          "inner_coefficient_var": 0.05462691661102876
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.20045700631649804,
+          "kl_student_anchor": 0.0018808811295421032,
+          "kl_student_target": 0.010489207588750861,
+          "target_anchor_kl": 0.01656468811735206,
+          "inner_update_norm": 0.02156490591399217,
+          "inner_coefficient_var": 0.058811846614707244
+        }
+      ]
+    },
+    {
+      "method": "pmd_part",
+      "seed": 20261008,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.9740901684928173,
+          "kl_student_anchor": 0.07883518676548609,
+          "kl_student_target": 0.03964808430697632,
+          "target_anchor_kl": 0.15949625347308344,
+          "inner_update_norm": 0.030441011584306017,
+          "inner_coefficient_var": 0.03745465826906423
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7587902199515761,
+          "kl_student_anchor": 0.03410404306540075,
+          "kl_student_target": 0.03546199177921025,
+          "target_anchor_kl": 0.10218206744090363,
+          "inner_update_norm": 0.0284136228541911,
+          "inner_coefficient_var": 0.0385698197727871
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.6382883455381431,
+          "kl_student_anchor": 0.016681584283856386,
+          "kl_student_target": 0.032315633586497194,
+          "target_anchor_kl": 0.07520988969393312,
+          "inner_update_norm": 0.02434529969125606,
+          "inner_coefficient_var": 0.025960341606064627
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5495778821087351,
+          "kl_student_anchor": 0.011509765920585918,
+          "kl_student_target": 0.026951904294657596,
+          "target_anchor_kl": 0.06061379359063025,
+          "inner_update_norm": 0.026143691810493724,
+          "inner_coefficient_var": 0.036011860864072896
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.4966931585176071,
+          "kl_student_anchor": 0.006998754822121166,
+          "kl_student_target": 0.02772610067768721,
+          "target_anchor_kl": 0.05074954882787357,
+          "inner_update_norm": 0.018406984534928263,
+          "inner_coefficient_var": 0.022115806793613593
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.4532800510482682,
+          "kl_student_anchor": 0.005174675935457285,
+          "kl_student_target": 0.024130467876638324,
+          "target_anchor_kl": 0.04457310148294735,
+          "inner_update_norm": 0.021074123489310988,
+          "inner_coefficient_var": 0.02921019762327541
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.4226575477816093,
+          "kl_student_anchor": 0.002676405776642836,
+          "kl_student_target": 0.023175894375156336,
+          "target_anchor_kl": 0.04017075359863928,
+          "inner_update_norm": 0.01990756289667969,
+          "inner_coefficient_var": 0.028859289963821998
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.39242724881178886,
+          "kl_student_anchor": 0.0024098865912976024,
+          "kl_student_target": 0.02054895063948348,
+          "target_anchor_kl": 0.03713946546719056,
+          "inner_update_norm": 0.020359097793043974,
+          "inner_coefficient_var": 0.027408338648795633
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3659341277484186,
+          "kl_student_anchor": 0.0025881453336744267,
+          "kl_student_target": 0.0198125771017952,
+          "target_anchor_kl": 0.03441305926825004,
+          "inner_update_norm": 0.01897196400127188,
+          "inner_coefficient_var": 0.02199068797786497
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.3437112919985338,
+          "kl_student_anchor": 0.002153256353306547,
+          "kl_student_target": 0.0192825152159558,
+          "target_anchor_kl": 0.03205540372385485,
+          "inner_update_norm": 0.016288933054958363,
+          "inner_coefficient_var": 0.0174297563560381
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.32096471635434987,
+          "kl_student_anchor": 0.0019162413480828936,
+          "kl_student_target": 0.01725150325093168,
+          "target_anchor_kl": 0.029891159349385417,
+          "inner_update_norm": 0.01775135534447493,
+          "inner_coefficient_var": 0.018642050692076112
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.30277328721177404,
+          "kl_student_anchor": 0.0014871446715391938,
+          "kl_student_target": 0.016927804768303897,
+          "target_anchor_kl": 0.027779019035510596,
+          "inner_update_norm": 0.015411005243945331,
+          "inner_coefficient_var": 0.017108509644262162
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261008,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.9090209764557711,
+          "kl_student_anchor": 0.29830903460333424,
+          "kl_student_target": 0.15953186818861148,
+          "target_anchor_kl": 0.15949625347308344,
+          "inner_update_norm": 0.05170340302375921,
+          "inner_coefficient_var": 0.3498497205989876
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7390041833295569,
+          "kl_student_anchor": 0.2160510470114163,
+          "kl_student_target": 0.1537454649613714,
+          "target_anchor_kl": 0.08882519749545723,
+          "inner_update_norm": 0.08324182832676422,
+          "inner_coefficient_var": 0.16891469741617687
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.6152488627209178,
+          "kl_student_anchor": 0.06580100414292386,
+          "kl_student_target": 0.06556805236817004,
+          "target_anchor_kl": 0.07550012223649005,
+          "inner_update_norm": 0.05422374575053769,
+          "inner_coefficient_var": 0.11157970553689275
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5587300874569783,
+          "kl_student_anchor": 0.04261127576477304,
+          "kl_student_target": 0.06021366587029283,
+          "target_anchor_kl": 0.06027537041368393,
+          "inner_update_norm": 0.04430214747873981,
+          "inner_coefficient_var": 0.0969690435414102
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.48432921857003775,
+          "kl_student_anchor": 0.044649120128216466,
+          "kl_student_target": 0.04819179055167807,
+          "target_anchor_kl": 0.05325365881019423,
+          "inner_update_norm": 0.04220549447129061,
+          "inner_coefficient_var": 0.1083029295072501
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.4597912818414679,
+          "kl_student_anchor": 0.05930677796989796,
+          "kl_student_target": 0.06517129825946652,
+          "target_anchor_kl": 0.043490132289387626,
+          "inner_update_norm": 0.06786920398565402,
+          "inner_coefficient_var": 0.07562316771845182
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.4168537252639142,
+          "kl_student_anchor": 0.023442071129140922,
+          "kl_student_target": 0.036747048536889815,
+          "target_anchor_kl": 0.04314805100162932,
+          "inner_update_norm": 0.03903636221084,
+          "inner_coefficient_var": 0.06783327613526405
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3855743211552827,
+          "kl_student_anchor": 0.022370293378729204,
+          "kl_student_target": 0.03606095222610736,
+          "target_anchor_kl": 0.038575760249073145,
+          "inner_update_norm": 0.03958740807390483,
+          "inner_coefficient_var": 0.06628113992175974
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3627747372556222,
+          "kl_student_anchor": 0.018405245716107837,
+          "kl_student_target": 0.032583464045857644,
+          "target_anchor_kl": 0.03485528813738779,
+          "inner_update_norm": 0.03217648035915083,
+          "inner_coefficient_var": 0.06181498324539848
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.34511531177224575,
+          "kl_student_anchor": 0.015729804843370918,
+          "kl_student_target": 0.0312999607676407,
+          "target_anchor_kl": 0.032893699497296265,
+          "inner_update_norm": 0.035429548402802234,
+          "inner_coefficient_var": 0.04671042476261476
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.3328055485851402,
+          "kl_student_anchor": 0.008590160837020109,
+          "kl_student_target": 0.02766451533763978,
+          "target_anchor_kl": 0.03150711218410451,
+          "inner_update_norm": 0.028000683407231775,
+          "inner_coefficient_var": 0.04857363678892387
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.30505018698598196,
+          "kl_student_anchor": 0.01014042065706368,
+          "kl_student_target": 0.022253301025157768,
+          "target_anchor_kl": 0.03026923577184369,
+          "inner_update_norm": 0.030169081902468885,
+          "inner_coefficient_var": 0.047153234605113094
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261008,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.9949962653850506,
+          "kl_student_anchor": 0.06852362662881782,
+          "kl_student_target": 0.040262704130423654,
+          "target_anchor_kl": 0.15949625347308344,
+          "inner_update_norm": 0.03040388284919241,
+          "inner_coefficient_var": 0.03682298359479016
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7809187448319423,
+          "kl_student_anchor": 0.03154476880378273,
+          "kl_student_target": 0.03713803549430066,
+          "target_anchor_kl": 0.10515941626447266,
+          "inner_update_norm": 0.025483940704068453,
+          "inner_coefficient_var": 0.028957657788107494
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.6536080144048464,
+          "kl_student_anchor": 0.017219903293154214,
+          "kl_student_target": 0.03280303114844949,
+          "target_anchor_kl": 0.07783343229676282,
+          "inner_update_norm": 0.024799193652604648,
+          "inner_coefficient_var": 0.02866733960292156
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5613999415925374,
+          "kl_student_anchor": 0.011606348073373258,
+          "kl_student_target": 0.02735210227871112,
+          "target_anchor_kl": 0.06234720885102648,
+          "inner_update_norm": 0.026229893152507847,
+          "inner_coefficient_var": 0.03830470227495217
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.507772444191595,
+          "kl_student_anchor": 0.006641014325732676,
+          "kl_student_target": 0.028225874584628614,
+          "target_anchor_kl": 0.05196087215245555,
+          "inner_update_norm": 0.018464087152111824,
+          "inner_coefficient_var": 0.022434518217566802
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.46458782871515336,
+          "kl_student_anchor": 0.00513049443045994,
+          "kl_student_target": 0.025029234438931375,
+          "target_anchor_kl": 0.0456320804782159,
+          "inner_update_norm": 0.01989931158143779,
+          "inner_coefficient_var": 0.024125112442273094
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.4349460809323794,
+          "kl_student_anchor": 0.0026815881430273542,
+          "kl_student_target": 0.024183733547175595,
+          "target_anchor_kl": 0.04108530760324387,
+          "inner_update_norm": 0.017805246082458193,
+          "inner_coefficient_var": 0.020393512324514643
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.40393821586006196,
+          "kl_student_anchor": 0.002469906676855458,
+          "kl_student_target": 0.020623810775123853,
+          "target_anchor_kl": 0.03784354658934974,
+          "inner_update_norm": 0.022315548543608815,
+          "inner_coefficient_var": 0.03404873642584513
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.37886404349136493,
+          "kl_student_anchor": 0.002122227034662247,
+          "kl_student_target": 0.02036800568777128,
+          "target_anchor_kl": 0.035160683688443495,
+          "inner_update_norm": 0.01821887912505098,
+          "inner_coefficient_var": 0.021358596523420655
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.3576433752171341,
+          "kl_student_anchor": 0.0018247083617658033,
+          "kl_student_target": 0.019761993179446727,
+          "target_anchor_kl": 0.03286768787506135,
+          "inner_update_norm": 0.017829490484921415,
+          "inner_coefficient_var": 0.02132885192661106
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.3326378660671452,
+          "kl_student_anchor": 0.0025008998580725514,
+          "kl_student_target": 0.017370659281546155,
+          "target_anchor_kl": 0.030914802317154006,
+          "inner_update_norm": 0.019273918990920645,
+          "inner_coefficient_var": 0.022899310197550628
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.31600731635389406,
+          "kl_student_anchor": 0.001173302455282153,
+          "kl_student_target": 0.017933359644911405,
+          "target_anchor_kl": 0.02882837346690255,
+          "inner_update_norm": 0.015412299592668594,
+          "inner_coefficient_var": 0.019076491683056578
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261008,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.7725151744958376,
+          "kl_student_anchor": 0.19399100219911627,
+          "kl_student_target": 0.0439481164398931,
+          "target_anchor_kl": 0.15949625347308344,
+          "inner_update_norm": 0.06352975072968842,
+          "inner_coefficient_var": 0.42051572668114134
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.5637406478057706,
+          "kl_student_anchor": 0.06957185810153074,
+          "kl_student_target": 0.03856139955860878,
+          "target_anchor_kl": 0.07734158722798055,
+          "inner_update_norm": 0.04232049250143447,
+          "inner_coefficient_var": 0.18579403690890675
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.45524738621046046,
+          "kl_student_anchor": 0.03212014318381556,
+          "kl_student_target": 0.027731698326362686,
+          "target_anchor_kl": 0.05339214156562955,
+          "inner_update_norm": 0.04023244869857587,
+          "inner_coefficient_var": 0.19082590097782212
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.38259671961013153,
+          "kl_student_anchor": 0.013958820950676383,
+          "kl_student_target": 0.017197452910423943,
+          "target_anchor_kl": 0.04111175314683521,
+          "inner_update_norm": 0.03060043130118127,
+          "inner_coefficient_var": 0.14035397599330746
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.33445855816980596,
+          "kl_student_anchor": 0.009348541279685377,
+          "kl_student_target": 0.015951704476039982,
+          "target_anchor_kl": 0.03337916792681338,
+          "inner_update_norm": 0.0313775016558602,
+          "inner_coefficient_var": 0.12639871419442955
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.2928590931116466,
+          "kl_student_anchor": 0.00831783662406465,
+          "kl_student_target": 0.013911375546469682,
+          "target_anchor_kl": 0.02882128954000319,
+          "inner_update_norm": 0.029220142201263316,
+          "inner_coefficient_var": 0.08987542321190087
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.25982780316961523,
+          "kl_student_anchor": 0.005845234931258356,
+          "kl_student_target": 0.012192367561291642,
+          "target_anchor_kl": 0.024849354346627228,
+          "inner_update_norm": 0.02113769668670473,
+          "inner_coefficient_var": 0.057836623375331034
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.23143610437759762,
+          "kl_student_anchor": 0.005937231357927898,
+          "kl_student_target": 0.01083549843911035,
+          "target_anchor_kl": 0.02129579312090895,
+          "inner_update_norm": 0.023476047377008393,
+          "inner_coefficient_var": 0.06724928582930029
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.21074323827258712,
+          "kl_student_anchor": 0.0036659009539355006,
+          "kl_student_target": 0.009821155934830593,
+          "target_anchor_kl": 0.018616551563990016,
+          "inner_update_norm": 0.021221011164582988,
+          "inner_coefficient_var": 0.059386068380628806
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.1975223927079661,
+          "kl_student_anchor": 0.002498874238243536,
+          "kl_student_target": 0.009936429826083917,
+          "target_anchor_kl": 0.016607448661956604,
+          "inner_update_norm": 0.020540419538159695,
+          "inner_coefficient_var": 0.05018116189877672
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.18376301830244587,
+          "kl_student_anchor": 0.002244575038521348,
+          "kl_student_target": 0.008769675021689667,
+          "target_anchor_kl": 0.015551271301968586,
+          "inner_update_norm": 0.025307367094410147,
+          "inner_coefficient_var": 0.0733308566841657
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.171634230336785,
+          "kl_student_anchor": 0.0019350331690994968,
+          "kl_student_target": 0.00831908540848664,
+          "target_anchor_kl": 0.014475335968816934,
+          "inner_update_norm": 0.01970397343462648,
+          "inner_coefficient_var": 0.04417921108874376
+        }
+      ]
+    },
+    {
+      "method": "pmd_part",
+      "seed": 20261009,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.6798588627771573,
+          "kl_student_anchor": 0.02874947866793773,
+          "kl_student_target": 0.03153397233506039,
+          "target_anchor_kl": 0.08921418837394307,
+          "inner_update_norm": 0.02737753949422401,
+          "inner_coefficient_var": 0.03689109487768028
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.5782403728805634,
+          "kl_student_anchor": 0.014674383861214002,
+          "kl_student_target": 0.03014211743415398,
+          "target_anchor_kl": 0.0664241246517055,
+          "inner_update_norm": 0.024357427554860173,
+          "inner_coefficient_var": 0.03299252416465989
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.5104890696201296,
+          "kl_student_anchor": 0.008415425388835277,
+          "kl_student_target": 0.026914337797859827,
+          "target_anchor_kl": 0.05442423151979913,
+          "inner_update_norm": 0.02236833266742232,
+          "inner_coefficient_var": 0.026064104887937648
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.4642739899775542,
+          "kl_student_anchor": 0.0047386665928187514,
+          "kl_student_target": 0.025068162651008218,
+          "target_anchor_kl": 0.04676662152314136,
+          "inner_update_norm": 0.020536095548892463,
+          "inner_coefficient_var": 0.026362750875532352
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.42493099128632555,
+          "kl_student_anchor": 0.004174959107976075,
+          "kl_student_target": 0.023397059673227645,
+          "target_anchor_kl": 0.04227138334054432,
+          "inner_update_norm": 0.020085690297970592,
+          "inner_coefficient_var": 0.02442075423342793
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.3892196885710714,
+          "kl_student_anchor": 0.004003253169883163,
+          "kl_student_target": 0.02141289275368991,
+          "target_anchor_kl": 0.038390931248213814,
+          "inner_update_norm": 0.01993345291313677,
+          "inner_coefficient_var": 0.021547650129507316
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.3576426098577009,
+          "kl_student_anchor": 0.0034610593151675763,
+          "kl_student_target": 0.01995069477558095,
+          "target_anchor_kl": 0.035012461453064296,
+          "inner_update_norm": 0.01824165700744127,
+          "inner_coefficient_var": 0.02331698891913142
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3269816321173216,
+          "kl_student_anchor": 0.003612986134849696,
+          "kl_student_target": 0.017954293165787026,
+          "target_anchor_kl": 0.031892357049960685,
+          "inner_update_norm": 0.017491865557357104,
+          "inner_coefficient_var": 0.0187002456716533
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.30356967803581325,
+          "kl_student_anchor": 0.0020604404146550258,
+          "kl_student_target": 0.016925137690024607,
+          "target_anchor_kl": 0.028749405862754138,
+          "inner_update_norm": 0.016457174235302095,
+          "inner_coefficient_var": 0.0192073256668557
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.28372677422803283,
+          "kl_student_anchor": 0.0022347261293780823,
+          "kl_student_target": 0.01622700209054751,
+          "target_anchor_kl": 0.02629804247539685,
+          "inner_update_norm": 0.013550690881120375,
+          "inner_coefficient_var": 0.010981329647072217
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.26610779249076566,
+          "kl_student_anchor": 0.0016492111170199769,
+          "kl_student_target": 0.014566908910002667,
+          "target_anchor_kl": 0.024012024649607666,
+          "inner_update_norm": 0.017977649497761868,
+          "inner_coefficient_var": 0.024449598225335982
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.25348647944915664,
+          "kl_student_anchor": 0.0010899134164416998,
+          "kl_student_target": 0.014334263561441924,
+          "target_anchor_kl": 0.02221502108193997,
+          "inner_update_norm": 0.013975049458935747,
+          "inner_coefficient_var": 0.015434001275532261
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261009,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.6523487274628293,
+          "kl_student_anchor": 0.1432406289346555,
+          "kl_student_target": 0.09632467264841214,
+          "target_anchor_kl": 0.08921418837394307,
+          "inner_update_norm": 0.05961788934299842,
+          "inner_coefficient_var": 0.20334134939340037
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.654273428969919,
+          "kl_student_anchor": 0.04345132797102299,
+          "kl_student_target": 0.08246248953814891,
+          "target_anchor_kl": 0.06303205604196621,
+          "inner_update_norm": 0.048215863229516404,
+          "inner_coefficient_var": 0.15435871759690312
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.5192370309239844,
+          "kl_student_anchor": 0.07331705604894975,
+          "kl_student_target": 0.05900546713651999,
+          "target_anchor_kl": 0.06652451302362362,
+          "inner_update_norm": 0.06274552491519246,
+          "inner_coefficient_var": 0.11626533758720162
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5201016309395201,
+          "kl_student_anchor": 0.050489039973848224,
+          "kl_student_target": 0.07325073332501962,
+          "target_anchor_kl": 0.0483591144670555,
+          "inner_update_norm": 0.057438592766258144,
+          "inner_coefficient_var": 0.09083270989186112
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.43443768382336495,
+          "kl_student_anchor": 0.041854070273641644,
+          "kl_student_target": 0.04274334429385482,
+          "target_anchor_kl": 0.05142970238081748,
+          "inner_update_norm": 0.05301006266494074,
+          "inner_coefficient_var": 0.07560567615794958
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.38891138132283604,
+          "kl_student_anchor": 0.023907320246207918,
+          "kl_student_target": 0.03455698470477228,
+          "target_anchor_kl": 0.04065932541408176,
+          "inner_update_norm": 0.0438754327573264,
+          "inner_coefficient_var": 0.060006293043492635
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.3892292777835872,
+          "kl_student_anchor": 0.02643609975049288,
+          "kl_student_target": 0.04646145205991496,
+          "target_anchor_kl": 0.03513787954373313,
+          "inner_update_norm": 0.037935416842914786,
+          "inner_coefficient_var": 0.0664725060638697
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.34965258997975696,
+          "kl_student_anchor": 0.026674768131979436,
+          "kl_student_target": 0.035077238532425586,
+          "target_anchor_kl": 0.03657109714094281,
+          "inner_update_norm": 0.03879777702968291,
+          "inner_coefficient_var": 0.0651744213967712
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.31282860927777484,
+          "kl_student_anchor": 0.018962764504210878,
+          "kl_student_target": 0.027394075119823485,
+          "target_anchor_kl": 0.03234544886779446,
+          "inner_update_norm": 0.0407846671661512,
+          "inner_coefficient_var": 0.06103688235910423
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.2893954391118837,
+          "kl_student_anchor": 0.009767026966712495,
+          "kl_student_target": 0.021657454962933715,
+          "target_anchor_kl": 0.027917471611362377,
+          "inner_update_norm": 0.029469138430712635,
+          "inner_coefficient_var": 0.04872338637279838
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.2819129510875462,
+          "kl_student_anchor": 0.011543722856763666,
+          "kl_student_target": 0.025875036326543185,
+          "target_anchor_kl": 0.02514523118115591,
+          "inner_update_norm": 0.02940031911556063,
+          "inner_coefficient_var": 0.07592198075328434
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.2551944303707162,
+          "kl_student_anchor": 0.014856600230195739,
+          "kl_student_target": 0.02083212498219443,
+          "target_anchor_kl": 0.024443223199871182,
+          "inner_update_norm": 0.030986397539101495,
+          "inner_coefficient_var": 0.07919045283271872
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261009,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.6849674012637337,
+          "kl_student_anchor": 0.026524053758589343,
+          "kl_student_target": 0.03187543461428566,
+          "target_anchor_kl": 0.08921418837394307,
+          "inner_update_norm": 0.027062214893952073,
+          "inner_coefficient_var": 0.03627155422506703
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.5805207489481168,
+          "kl_student_anchor": 0.01351456219694017,
+          "kl_student_target": 0.028966027182512843,
+          "target_anchor_kl": 0.06705682672193203,
+          "inner_update_norm": 0.025376843546993298,
+          "inner_coefficient_var": 0.03637218489588285
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.5109545452331554,
+          "kl_student_anchor": 0.008367666664271994,
+          "kl_student_target": 0.026944192731806434,
+          "target_anchor_kl": 0.05499851906255065,
+          "inner_update_norm": 0.022942657587654902,
+          "inner_coefficient_var": 0.030144572073749598
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.4597378423491062,
+          "kl_student_anchor": 0.005434729166584631,
+          "kl_student_target": 0.024345449303182484,
+          "target_anchor_kl": 0.04718022290488436,
+          "inner_update_norm": 0.021312665616597566,
+          "inner_coefficient_var": 0.02555618909062886
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.4191651359514049,
+          "kl_student_anchor": 0.004081755526280858,
+          "kl_student_target": 0.022905311005810038,
+          "target_anchor_kl": 0.042040312357361775,
+          "inner_update_norm": 0.021271699649406187,
+          "inner_coefficient_var": 0.028977930323786323
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.38579758092598837,
+          "kl_student_anchor": 0.003358818712919537,
+          "kl_student_target": 0.021608086344057822,
+          "target_anchor_kl": 0.03797155827454962,
+          "inner_update_norm": 0.018479859535667085,
+          "inner_coefficient_var": 0.02048175212419993
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.35468514017102015,
+          "kl_student_anchor": 0.0039064570468429274,
+          "kl_student_target": 0.019999424086049586,
+          "target_anchor_kl": 0.03459614019838442,
+          "inner_update_norm": 0.018550055235248226,
+          "inner_coefficient_var": 0.022907491277049497
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3260659288606904,
+          "kl_student_anchor": 0.0033418638609137487,
+          "kl_student_target": 0.018192389793138673,
+          "target_anchor_kl": 0.03156907670602327,
+          "inner_update_norm": 0.015763803795012226,
+          "inner_coefficient_var": 0.01570662839984395
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.30361191059531945,
+          "kl_student_anchor": 0.0019552676284629138,
+          "kl_student_target": 0.01697484445042207,
+          "target_anchor_kl": 0.028542293907404776,
+          "inner_update_norm": 0.01557894619596198,
+          "inner_coefficient_var": 0.01609807879706816
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.28390525467071137,
+          "kl_student_anchor": 0.0021205596366834197,
+          "kl_student_target": 0.015932659257543474,
+          "target_anchor_kl": 0.02608315468437481,
+          "inner_update_norm": 0.015287303071326528,
+          "inner_coefficient_var": 0.01775546116681278
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.2671823089538168,
+          "kl_student_anchor": 0.0014559469975260202,
+          "kl_student_target": 0.01460045526157537,
+          "target_anchor_kl": 0.023910812045182153,
+          "inner_update_norm": 0.01702052639492683,
+          "inner_coefficient_var": 0.021387859736689527
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.2539860317913242,
+          "kl_student_anchor": 0.0011353099125160407,
+          "kl_student_target": 0.014125907393753218,
+          "target_anchor_kl": 0.022243044202345755,
+          "inner_update_norm": 0.015829065138618013,
+          "inner_coefficient_var": 0.020942829408571194
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261009,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.5705325610936716,
+          "kl_student_anchor": 0.07914503984863877,
+          "kl_student_target": 0.026026881513296025,
+          "target_anchor_kl": 0.08921418837394307,
+          "inner_update_norm": 0.05180734056109524,
+          "inner_coefficient_var": 0.244189226115834
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.4523751871300288,
+          "kl_student_anchor": 0.03740354888856531,
+          "kl_student_target": 0.028413519997894,
+          "target_anchor_kl": 0.05415266192472542,
+          "inner_update_norm": 0.03785756204901899,
+          "inner_coefficient_var": 0.10328205495471482
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.3765525211163669,
+          "kl_student_anchor": 0.014218869220252416,
+          "kl_student_target": 0.017008804830131338,
+          "target_anchor_kl": 0.041319297084340845,
+          "inner_update_norm": 0.03238947811304126,
+          "inner_coefficient_var": 0.11094411633562815
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.3225965976976927,
+          "kl_student_anchor": 0.011354371403146652,
+          "kl_student_target": 0.015962259640829632,
+          "target_anchor_kl": 0.03341016693006295,
+          "inner_update_norm": 0.029249876396641818,
+          "inner_coefficient_var": 0.08696588654908632
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.2783334604192353,
+          "kl_student_anchor": 0.008982092321140656,
+          "kl_student_target": 0.01413932578616555,
+          "target_anchor_kl": 0.02855431622326876,
+          "inner_update_norm": 0.02538401609700882,
+          "inner_coefficient_var": 0.06095403754776907
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.24529233551889806,
+          "kl_student_anchor": 0.006153108753373951,
+          "kl_student_target": 0.012428518514352106,
+          "target_anchor_kl": 0.023951627271987932,
+          "inner_update_norm": 0.023501890241776267,
+          "inner_coefficient_var": 0.053576990827068946
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.2229559134563937,
+          "kl_student_anchor": 0.004130371292985834,
+          "kl_student_target": 0.011377809808471188,
+          "target_anchor_kl": 0.02021278538985312,
+          "inner_update_norm": 0.02352553793348377,
+          "inner_coefficient_var": 0.060502794737744614
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.2101033517042924,
+          "kl_student_anchor": 0.0025511774162323628,
+          "kl_student_target": 0.01151021409978436,
+          "target_anchor_kl": 0.0178581013863951,
+          "inner_update_norm": 0.019546801632785608,
+          "inner_coefficient_var": 0.04761272881809185
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.19667955163305734,
+          "kl_student_anchor": 0.0021546080335211135,
+          "kl_student_target": 0.010020525551574407,
+          "target_anchor_kl": 0.016619463876524902,
+          "inner_update_norm": 0.020182912536733624,
+          "inner_coefficient_var": 0.04936937221536784
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.18508529226877324,
+          "kl_student_anchor": 0.0019408993612390253,
+          "kl_student_target": 0.009240985922797186,
+          "target_anchor_kl": 0.01521396076983991,
+          "inner_update_norm": 0.022031578659215303,
+          "inner_coefficient_var": 0.0561318513545817
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.1724048216550056,
+          "kl_student_anchor": 0.001837479576799399,
+          "kl_student_target": 0.00796917197636278,
+          "target_anchor_kl": 0.01421035401326268,
+          "inner_update_norm": 0.024661341519421804,
+          "inner_coefficient_var": 0.06886824173314873
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.16342674110750577,
+          "kl_student_anchor": 0.001358080367286076,
+          "kl_student_target": 0.008301217029267552,
+          "target_anchor_kl": 0.013350228387022826,
+          "inner_update_norm": 0.02106146626308607,
+          "inner_coefficient_var": 0.05540240483208942
+        }
+      ]
+    },
+    {
+      "method": "pmd_part",
+      "seed": 20261010,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.8543614766063641,
+          "kl_student_anchor": 0.033558165356570635,
+          "kl_student_target": 0.041914870179558,
+          "target_anchor_kl": 0.11665278887489983,
+          "inner_update_norm": 0.03089330953077202,
+          "inner_coefficient_var": 0.036101675311428334
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7100497964677357,
+          "kl_student_anchor": 0.018369008025252133,
+          "kl_student_target": 0.03669864624090364,
+          "target_anchor_kl": 0.08858536128997205,
+          "inner_update_norm": 0.029275324314891573,
+          "inner_coefficient_var": 0.034890613758901595
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.5859989892511283,
+          "kl_student_anchor": 0.017837644500009957,
+          "kl_student_target": 0.029697646868472424,
+          "target_anchor_kl": 0.07182896148983534,
+          "inner_update_norm": 0.026775254635077652,
+          "inner_coefficient_var": 0.032953022816593444
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.506102483234993,
+          "kl_student_anchor": 0.010596412221504203,
+          "kl_student_target": 0.027877720365937615,
+          "target_anchor_kl": 0.05715590459870331,
+          "inner_update_norm": 0.02301221551674137,
+          "inner_coefficient_var": 0.026928317223164765
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.4484822522789007,
+          "kl_student_anchor": 0.007765659244421167,
+          "kl_student_target": 0.025294964386204745,
+          "target_anchor_kl": 0.04761581851558325,
+          "inner_update_norm": 0.02214200485542068,
+          "inner_coefficient_var": 0.02727055714076064
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.40176445659839266,
+          "kl_student_anchor": 0.004886191321925167,
+          "kl_student_target": 0.021147070950036137,
+          "target_anchor_kl": 0.04089912700029031,
+          "inner_update_norm": 0.022160853681625167,
+          "inner_coefficient_var": 0.028347598253051644
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.36593268885443847,
+          "kl_student_anchor": 0.003578963710050797,
+          "kl_student_target": 0.019324292346788573,
+          "target_anchor_kl": 0.0355785533412782,
+          "inner_update_norm": 0.020420023705247953,
+          "inner_coefficient_var": 0.02931755938004046
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.33938688974234343,
+          "kl_student_anchor": 0.002497363948028347,
+          "kl_student_target": 0.018567817150894644,
+          "target_anchor_kl": 0.031777229938497645,
+          "inner_update_norm": 0.01696557761920437,
+          "inner_coefficient_var": 0.019798534770866943
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3180414636488605,
+          "kl_student_anchor": 0.001852671345286321,
+          "kl_student_target": 0.0173404549658071,
+          "target_anchor_kl": 0.028826961032420415,
+          "inner_update_norm": 0.017387264208665192,
+          "inner_coefficient_var": 0.023684373205917677
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.29881053883580755,
+          "kl_student_anchor": 0.0017922961062203533,
+          "kl_student_target": 0.016023779316796494,
+          "target_anchor_kl": 0.026590500687246124,
+          "inner_update_norm": 0.015207380129869856,
+          "inner_coefficient_var": 0.014190880000185715
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.2797962974033812,
+          "kl_student_anchor": 0.0019978489531794646,
+          "kl_student_target": 0.01446703839274089,
+          "target_anchor_kl": 0.024553352578143756,
+          "inner_update_norm": 0.015152172754985106,
+          "inner_coefficient_var": 0.015317015313678857
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.26579427404086253,
+          "kl_student_anchor": 0.0011883595625958865,
+          "kl_student_target": 0.013998082779095707,
+          "target_anchor_kl": 0.022603627560551263,
+          "inner_update_norm": 0.015640105774685734,
+          "inner_coefficient_var": 0.019628742073597275
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261010,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.8468056986033589,
+          "kl_student_anchor": 0.1097351444386826,
+          "kl_student_target": 0.08878538428187888,
+          "target_anchor_kl": 0.11665278887489983,
+          "inner_update_norm": 0.06903523066860381,
+          "inner_coefficient_var": 0.16168050626642647
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7292062455558279,
+          "kl_student_anchor": 0.10888545205059322,
+          "kl_student_target": 0.10303238647177199,
+          "target_anchor_kl": 0.08780502085577693,
+          "inner_update_norm": 0.07068183373096784,
+          "inner_coefficient_var": 0.09219829712860855
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.5447643890424996,
+          "kl_student_anchor": 0.05547974740309143,
+          "kl_student_target": 0.042494035327083346,
+          "target_anchor_kl": 0.07764901024986787,
+          "inner_update_norm": 0.04282539756736593,
+          "inner_coefficient_var": 0.0857160999124496
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.4881895986258458,
+          "kl_student_anchor": 0.028223853181408194,
+          "kl_student_target": 0.04452317738600679,
+          "target_anchor_kl": 0.05304165965248707,
+          "inner_update_norm": 0.036750342221973646,
+          "inner_coefficient_var": 0.06945254949152531
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.4320395935698444,
+          "kl_student_anchor": 0.029269052495893767,
+          "kl_student_target": 0.039687571955652354,
+          "target_anchor_kl": 0.0465396395655947,
+          "inner_update_norm": 0.040146969970153344,
+          "inner_coefficient_var": 0.07191822320497226
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.39524705301906604,
+          "kl_student_anchor": 0.012803639806720769,
+          "kl_student_target": 0.03004978332927792,
+          "target_anchor_kl": 0.040315763330005125,
+          "inner_update_norm": 0.03402015464695072,
+          "inner_coefficient_var": 0.06562011905387306
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.36881681321471593,
+          "kl_student_anchor": 0.016912222039624895,
+          "kl_student_target": 0.03335704999534538,
+          "target_anchor_kl": 0.036469431306055206,
+          "inner_update_norm": 0.03326166320709463,
+          "inner_coefficient_var": 0.05089436642712987
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3281486444483309,
+          "kl_student_anchor": 0.014098706151773588,
+          "kl_student_target": 0.02362438777100148,
+          "target_anchor_kl": 0.03347450125479502,
+          "inner_update_norm": 0.03132642932890808,
+          "inner_coefficient_var": 0.04919934699566601
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3102430068864439,
+          "kl_student_anchor": 0.01615586928751046,
+          "kl_student_target": 0.028010841139784175,
+          "target_anchor_kl": 0.02842499889531844,
+          "inner_update_norm": 0.034651894087632716,
+          "inner_coefficient_var": 0.04863190614614297
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.2877841860603634,
+          "kl_student_anchor": 0.014709053509604485,
+          "kl_student_target": 0.023687255844770348,
+          "target_anchor_kl": 0.026423463931202852,
+          "inner_update_norm": 0.028688056457234594,
+          "inner_coefficient_var": 0.041670278459635265
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.27529236060419204,
+          "kl_student_anchor": 0.004181965201787713,
+          "kl_student_target": 0.01812366745662917,
+          "target_anchor_kl": 0.02396570406171889,
+          "inner_update_norm": 0.022784642389661065,
+          "inner_coefficient_var": 0.046199060030806725
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.26753803119528585,
+          "kl_student_anchor": 0.006455693126990774,
+          "kl_student_target": 0.019798822032144024,
+          "target_anchor_kl": 0.022493962032873724,
+          "inner_update_norm": 0.02247679363839571,
+          "inner_coefficient_var": 0.04174085996109374
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261010,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.8638114827849819,
+          "kl_student_anchor": 0.02999522516627848,
+          "kl_student_target": 0.04290646121838426,
+          "target_anchor_kl": 0.11665278887489983,
+          "inner_update_norm": 0.029703214672711243,
+          "inner_coefficient_var": 0.03457639815276234
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.7261739864884617,
+          "kl_student_anchor": 0.017055722214705405,
+          "kl_student_target": 0.03933052340252469,
+          "target_anchor_kl": 0.08975124515088014,
+          "inner_update_norm": 0.025705934276427464,
+          "inner_coefficient_var": 0.030691794932091267
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.601721703553876,
+          "kl_student_anchor": 0.017017166488234717,
+          "kl_student_target": 0.030226724434190208,
+          "target_anchor_kl": 0.07348229214482793,
+          "inner_update_norm": 0.0263103217958156,
+          "inner_coefficient_var": 0.03425535009996426
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.5169137885698295,
+          "kl_student_anchor": 0.011229931692511437,
+          "kl_student_target": 0.028068449311999484,
+          "target_anchor_kl": 0.0589153097705294,
+          "inner_update_norm": 0.02315482239325391,
+          "inner_coefficient_var": 0.030237274532967137
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.45863659401585366,
+          "kl_student_anchor": 0.007554008144692802,
+          "kl_student_target": 0.02591097021741945,
+          "target_anchor_kl": 0.048815391815082196,
+          "inner_update_norm": 0.021212234917537192,
+          "inner_coefficient_var": 0.02432077338203189
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.4092199360326437,
+          "kl_student_anchor": 0.005410168690247132,
+          "kl_student_target": 0.021392349907140652,
+          "target_anchor_kl": 0.041935654240315104,
+          "inner_update_norm": 0.021443209999393475,
+          "inner_coefficient_var": 0.025071239963198415
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.3746275035629897,
+          "kl_student_anchor": 0.0038205095466204188,
+          "kl_student_target": 0.020329224239178444,
+          "target_anchor_kl": 0.03620138844719435,
+          "inner_update_norm": 0.017053640370700077,
+          "inner_coefficient_var": 0.015627655445682204
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.3475635028396476,
+          "kl_student_anchor": 0.0025851393727735796,
+          "kl_student_target": 0.018496073784074956,
+          "target_anchor_kl": 0.03217427619318556,
+          "inner_update_norm": 0.018017703568768705,
+          "inner_coefficient_var": 0.02139100944270739
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3274708764365359,
+          "kl_student_anchor": 0.001715871093566128,
+          "kl_student_target": 0.017995289727491016,
+          "target_anchor_kl": 0.02941705850750102,
+          "inner_update_norm": 0.01653358716740344,
+          "inner_coefficient_var": 0.02136684837550688
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.30961369805663785,
+          "kl_student_anchor": 0.001485060982691464,
+          "kl_student_target": 0.016811292628282164,
+          "target_anchor_kl": 0.02735074969076237,
+          "inner_update_norm": 0.01458808180204256,
+          "inner_coefficient_var": 0.012801694681045094
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.29208741291927975,
+          "kl_student_anchor": 0.0016181472110189683,
+          "kl_student_target": 0.0153351651584735,
+          "target_anchor_kl": 0.025442995727190824,
+          "inner_update_norm": 0.015671995859914984,
+          "inner_coefficient_var": 0.017917396322650395
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.2766523551138643,
+          "kl_student_anchor": 0.0013539694486311951,
+          "kl_student_target": 0.01440076333462971,
+          "target_anchor_kl": 0.02370937158522501,
+          "inner_update_norm": 0.016875568450240422,
+          "inner_coefficient_var": 0.021681061354519783
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261010,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.6994168400411025,
+          "kl_student_anchor": 0.1123777190410379,
+          "kl_student_target": 0.03891695727662014,
+          "target_anchor_kl": 0.11665278887489983,
+          "inner_update_norm": 0.0651217447166648,
+          "inner_coefficient_var": 0.26531272883627255
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.502870817716012,
+          "kl_student_anchor": 0.052044211197862074,
+          "kl_student_target": 0.0269738555598904,
+          "target_anchor_kl": 0.07154809710991736,
+          "inner_update_norm": 0.04267345222887293,
+          "inner_coefficient_var": 0.17598326791054925
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.38917141998278654,
+          "kl_student_anchor": 0.02226828622838454,
+          "kl_student_target": 0.017205094525188102,
+          "target_anchor_kl": 0.04873150192280215,
+          "inner_update_norm": 0.037065689776853164,
+          "inner_coefficient_var": 0.1463359314091285
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.3247252195245306,
+          "kl_student_anchor": 0.013522253237211311,
+          "kl_student_target": 0.016426542869073555,
+          "target_anchor_kl": 0.03541058356525098,
+          "inner_update_norm": 0.03342881517630078,
+          "inner_coefficient_var": 0.1392087723307685
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.27870127523242205,
+          "kl_student_anchor": 0.009124914683278952,
+          "kl_student_target": 0.013370056914556672,
+          "target_anchor_kl": 0.028225518724817832,
+          "inner_update_norm": 0.032570660698817824,
+          "inner_coefficient_var": 0.13802238291082697
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.25073471872984865,
+          "kl_student_anchor": 0.005417411668898813,
+          "kl_student_target": 0.013095958856766121,
+          "target_anchor_kl": 0.023511409237891204,
+          "inner_update_norm": 0.02514232737802505,
+          "inner_coefficient_var": 0.08867623408712746
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.2292427254045171,
+          "kl_student_anchor": 0.0055584503450614425,
+          "kl_student_target": 0.01283000566644856,
+          "target_anchor_kl": 0.020540232064235546,
+          "inner_update_norm": 0.025494440842372925,
+          "inner_coefficient_var": 0.08152778613790013
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.2104125686285946,
+          "kl_student_anchor": 0.0036890749500804953,
+          "kl_student_target": 0.0105217303412047,
+          "target_anchor_kl": 0.018403954273453947,
+          "inner_update_norm": 0.02339442892961539,
+          "inner_coefficient_var": 0.083213795450179
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.19728076140964193,
+          "kl_student_anchor": 0.0029769375932362143,
+          "kl_student_target": 0.010401274842521745,
+          "target_anchor_kl": 0.016585878804567557,
+          "inner_update_norm": 0.022052483278948168,
+          "inner_coefficient_var": 0.05993175971016591
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.18764555701213176,
+          "kl_student_anchor": 0.00200696437337746,
+          "kl_student_target": 0.009924701809291232,
+          "target_anchor_kl": 0.015337379158578038,
+          "inner_update_norm": 0.018518985892271144,
+          "inner_coefficient_var": 0.05548276735773154
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.17691318593116706,
+          "kl_student_anchor": 0.001500431739405726,
+          "kl_student_target": 0.008351336174055382,
+          "target_anchor_kl": 0.01435852531071796,
+          "inner_update_norm": 0.020817495967870258,
+          "inner_coefficient_var": 0.0651302152851197
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.17005220859807185,
+          "kl_student_anchor": 0.0014623869880971093,
+          "kl_student_target": 0.0088799792614189,
+          "target_anchor_kl": 0.013389504262856025,
+          "inner_update_norm": 0.017499438490788742,
+          "inner_coefficient_var": 0.04148232620521522
+        }
+      ]
+    },
+    {
+      "method": "pmd_part",
+      "seed": 20261011,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 1.2329703540365666,
+          "kl_student_anchor": 0.0635352407189895,
+          "kl_student_target": 0.05010656484567938,
+          "target_anchor_kl": 0.16850455504043566,
+          "inner_update_norm": 0.032279986446548295,
+          "inner_coefficient_var": 0.03826243342105429
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 1.0030703263980805,
+          "kl_student_anchor": 0.03676792083794113,
+          "kl_student_target": 0.04481884873982061,
+          "target_anchor_kl": 0.12446731363565819,
+          "inner_update_norm": 0.032650727273584305,
+          "inner_coefficient_var": 0.05402289732356294
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.8539568752170169,
+          "kl_student_anchor": 0.02211387644019354,
+          "kl_student_target": 0.04047226607669026,
+          "target_anchor_kl": 0.09698351016911698,
+          "inner_update_norm": 0.029522971259785563,
+          "inner_coefficient_var": 0.04895582871802866
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.756821783550475,
+          "kl_student_anchor": 0.011262988890063266,
+          "kl_student_target": 0.0371939747047548,
+          "target_anchor_kl": 0.07981771177145792,
+          "inner_update_norm": 0.028498912012209075,
+          "inner_coefficient_var": 0.045157030401647216
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.6779255702419396,
+          "kl_student_anchor": 0.009179325074552658,
+          "kl_student_target": 0.03307443103020474,
+          "target_anchor_kl": 0.06885757793256223,
+          "inner_update_norm": 0.026938261063649164,
+          "inner_coefficient_var": 0.038467615790794815
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.6227793448369405,
+          "kl_student_anchor": 0.005934647699489877,
+          "kl_student_target": 0.032830207691995905,
+          "target_anchor_kl": 0.06065122912265475,
+          "inner_update_norm": 0.02215836610891948,
+          "inner_coefficient_var": 0.027945396789400043
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.5693914295274308,
+          "kl_student_anchor": 0.0056502709872773525,
+          "kl_student_target": 0.028169367831183165,
+          "target_anchor_kl": 0.05453945536856901,
+          "inner_update_norm": 0.023656026152903797,
+          "inner_coefficient_var": 0.03147610380581915
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.5221628326264107,
+          "kl_student_anchor": 0.0046641530846975665,
+          "kl_student_target": 0.02521748665813932,
+          "target_anchor_kl": 0.04895228830097709,
+          "inner_update_norm": 0.023969369507209782,
+          "inner_coefficient_var": 0.03625571799429743
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.4884223520055809,
+          "kl_student_anchor": 0.0030985475724843053,
+          "kl_student_target": 0.025130481467212355,
+          "target_anchor_kl": 0.044291692822762026,
+          "inner_update_norm": 0.019572769736393613,
+          "inner_coefficient_var": 0.02680903678055161
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.4567487210271446,
+          "kl_student_anchor": 0.0028831652612300203,
+          "kl_student_target": 0.02259632252861564,
+          "target_anchor_kl": 0.04064401553787622,
+          "inner_update_norm": 0.02049626354819538,
+          "inner_coefficient_var": 0.029653982719607723
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.4334977278362965,
+          "kl_student_anchor": 0.001900121367210217,
+          "kl_student_target": 0.022404641463510344,
+          "target_anchor_kl": 0.037538554368493814,
+          "inner_update_norm": 0.01785919559135278,
+          "inner_coefficient_var": 0.02150275646103218
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.40946661740437834,
+          "kl_student_anchor": 0.001986664955647004,
+          "kl_student_target": 0.020320069122765183,
+          "target_anchor_kl": 0.03524250041732181,
+          "inner_update_norm": 0.01831528949486098,
+          "inner_coefficient_var": 0.02247793386220842
+        }
+      ]
+    },
+    {
+      "method": "pmd_mean",
+      "seed": 20261011,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 1.2407066231529418,
+          "kl_student_anchor": 0.3972708590996842,
+          "kl_student_target": 0.2697424109838622,
+          "target_anchor_kl": 0.16850455504043566,
+          "inner_update_norm": 0.084507679856218,
+          "inner_coefficient_var": 0.4642718419248474
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.9084713047749843,
+          "kl_student_anchor": 0.23883027135771198,
+          "kl_student_target": 0.1379197005560654,
+          "target_anchor_kl": 0.12357332105635216,
+          "inner_update_norm": 0.08458779774119345,
+          "inner_coefficient_var": 0.2921911830887856
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.8423497644308652,
+          "kl_student_anchor": 0.16004147876005306,
+          "kl_student_target": 0.1447986187209534,
+          "target_anchor_kl": 0.08161442332789437,
+          "inner_update_norm": 0.06697042972696238,
+          "inner_coefficient_var": 0.19361224795576498
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.7140940896677195,
+          "kl_student_anchor": 0.12828986930482472,
+          "kl_student_target": 0.10415312280951786,
+          "target_anchor_kl": 0.08034798613223215,
+          "inner_update_norm": 0.06024444699929416,
+          "inner_coefficient_var": 0.1494619584475253
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.654620862630137,
+          "kl_student_anchor": 0.032481717676904,
+          "kl_student_target": 0.049425564808976245,
+          "target_anchor_kl": 0.061937734983953184,
+          "inner_update_norm": 0.05025392548590148,
+          "inner_coefficient_var": 0.10512281653329486
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.5916992139831255,
+          "kl_student_anchor": 0.0299362372856879,
+          "kl_student_target": 0.04196270093810008,
+          "target_anchor_kl": 0.056381443751948576,
+          "inner_update_norm": 0.04854002300727948,
+          "inner_coefficient_var": 0.08612389096897861
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.563482667641599,
+          "kl_student_anchor": 0.026886508959995788,
+          "kl_student_target": 0.04709799201088823,
+          "target_anchor_kl": 0.05015355967109202,
+          "inner_update_norm": 0.04933620627689077,
+          "inner_coefficient_var": 0.06469986602107647
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.5203193055177036,
+          "kl_student_anchor": 0.021581717231714714,
+          "kl_student_target": 0.039171426982936706,
+          "target_anchor_kl": 0.0491423363356789,
+          "inner_update_norm": 0.03807953149464538,
+          "inner_coefficient_var": 0.06299224672312057
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.49489625373611545,
+          "kl_student_anchor": 0.012151430409004762,
+          "kl_student_target": 0.03363012317472089,
+          "target_anchor_kl": 0.04365264426443924,
+          "inner_update_norm": 0.03485608875401836,
+          "inner_coefficient_var": 0.058817067657612444
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.47641015829101957,
+          "kl_student_anchor": 0.019890199329093812,
+          "kl_student_target": 0.03901905599406084,
+          "target_anchor_kl": 0.04112536382752541,
+          "inner_update_norm": 0.03533595818887636,
+          "inner_coefficient_var": 0.051324717974962686
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.45083150708283365,
+          "kl_student_anchor": 0.016475205568189155,
+          "kl_student_target": 0.03320740695353286,
+          "target_anchor_kl": 0.039509680374209696,
+          "inner_update_norm": 0.034329065594697554,
+          "inner_coefficient_var": 0.0495268487743481
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.42620522540107963,
+          "kl_student_anchor": 0.01506316647225521,
+          "kl_student_target": 0.030733372011258905,
+          "target_anchor_kl": 0.037074016078192454,
+          "inner_update_norm": 0.03531085603008018,
+          "inner_coefficient_var": 0.05098693916503779
+        }
+      ]
+    },
+    {
+      "method": "bpo",
+      "seed": 20261011,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 1.2575785624940645,
+          "kl_student_anchor": 0.05369192070547056,
+          "kl_student_target": 0.05232127979701624,
+          "target_anchor_kl": 0.16850455504043566,
+          "inner_update_norm": 0.03018559958107152,
+          "inner_coefficient_var": 0.0362661970620596
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 1.035634547372411,
+          "kl_student_anchor": 0.03397178242604773,
+          "kl_student_target": 0.04853956029362545,
+          "target_anchor_kl": 0.1276891406141974,
+          "inner_update_norm": 0.02771859312141951,
+          "inner_coefficient_var": 0.038275012371707766
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.8878557841836813,
+          "kl_student_anchor": 0.02043844847683759,
+          "kl_student_target": 0.04252759512341401,
+          "target_anchor_kl": 0.10027422893263596,
+          "inner_update_norm": 0.0271928754672093,
+          "inner_coefficient_var": 0.035307534290795355
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.7905538463466659,
+          "kl_student_anchor": 0.011648305955409468,
+          "kl_student_target": 0.039635422739231645,
+          "target_anchor_kl": 0.08265842566269453,
+          "inner_update_norm": 0.025679896042466666,
+          "inner_coefficient_var": 0.031029933792316278
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.7112936694387638,
+          "kl_student_anchor": 0.008553932233273569,
+          "kl_student_target": 0.03405188992791283,
+          "target_anchor_kl": 0.07103319411627074,
+          "inner_update_norm": 0.02582192873619002,
+          "inner_coefficient_var": 0.037324896582215314
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.6594414528399728,
+          "kl_student_anchor": 0.00460481678234609,
+          "kl_student_target": 0.03421485061984328,
+          "target_anchor_kl": 0.06258572839609433,
+          "inner_update_norm": 0.021724502239398147,
+          "inner_coefficient_var": 0.03161298804677011
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.6064186401392669,
+          "kl_student_anchor": 0.005328059861465307,
+          "kl_student_target": 0.029636273941402863,
+          "target_anchor_kl": 0.05701188536823213,
+          "inner_update_norm": 0.022988204903945177,
+          "inner_coefficient_var": 0.03259717196449227
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.5586744081215076,
+          "kl_student_anchor": 0.004653980286266595,
+          "kl_student_target": 0.026443186675078518,
+          "target_anchor_kl": 0.051320011763927066,
+          "inner_update_norm": 0.022834846179185884,
+          "inner_coefficient_var": 0.02990496026523211
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.523461149235144,
+          "kl_student_anchor": 0.0028098830386805553,
+          "kl_student_target": 0.025856472665485422,
+          "target_anchor_kl": 0.04655678102155479,
+          "inner_update_norm": 0.019656310022376534,
+          "inner_coefficient_var": 0.02704157215465206
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.4890393409929592,
+          "kl_student_anchor": 0.003288785020551579,
+          "kl_student_target": 0.02361072463494855,
+          "target_anchor_kl": 0.04305069205930961,
+          "inner_update_norm": 0.020434897421636747,
+          "inner_coefficient_var": 0.030651489800770322
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.46232650870527314,
+          "kl_student_anchor": 0.0024172014995351263,
+          "kl_student_target": 0.023353625863372345,
+          "target_anchor_kl": 0.039927081349108544,
+          "inner_update_norm": 0.01799494792198247,
+          "inner_coefficient_var": 0.021043735999178935
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.43628811016663943,
+          "kl_student_anchor": 0.002300567527300231,
+          "kl_student_target": 0.021237859848000758,
+          "target_anchor_kl": 0.03711647782218866,
+          "inner_update_norm": 0.019293488717991775,
+          "inner_coefficient_var": 0.02842296463438405
+        }
+      ]
+    },
+    {
+      "method": "mdpo",
+      "seed": 20261011,
+      "eta": 0.35,
+      "lr": 0.25,
+      "outer_steps": 12,
+      "inner_steps": 40,
+      "samples_per_prefix": 64,
+      "history": [
+        {
+          "outer": 0,
+          "kl_student_teacher": 0.9911897323575092,
+          "kl_student_anchor": 0.2959010308001405,
+          "kl_student_target": 0.11652111081075743,
+          "target_anchor_kl": 0.16850455504043566,
+          "inner_update_norm": 0.06530176030804039,
+          "inner_coefficient_var": 0.8399425386496956
+        },
+        {
+          "outer": 1,
+          "kl_student_teacher": 0.746729826346468,
+          "kl_student_anchor": 0.0721237115118579,
+          "kl_student_target": 0.039224365622194154,
+          "target_anchor_kl": 0.09560015364716586,
+          "inner_update_norm": 0.05722718241429897,
+          "inner_coefficient_var": 0.3969229933323578
+        },
+        {
+          "outer": 2,
+          "kl_student_teacher": 0.6034482988723187,
+          "kl_student_anchor": 0.03805726357824754,
+          "kl_student_target": 0.028417030608901068,
+          "target_anchor_kl": 0.06698432065806362,
+          "inner_update_norm": 0.049736450171596426,
+          "inner_coefficient_var": 0.30623151164826545
+        },
+        {
+          "outer": 3,
+          "kl_student_teacher": 0.50851409846425,
+          "kl_student_anchor": 0.020390843109313876,
+          "kl_student_target": 0.021957130542426713,
+          "target_anchor_kl": 0.05220063595129467,
+          "inner_update_norm": 0.03869368603575703,
+          "inner_coefficient_var": 0.2323578488119425
+        },
+        {
+          "outer": 4,
+          "kl_student_teacher": 0.453094823381736,
+          "kl_student_anchor": 0.010730966279140499,
+          "kl_student_target": 0.020466901383082884,
+          "target_anchor_kl": 0.04181144379813197,
+          "inner_update_norm": 0.03614187791513395,
+          "inner_coefficient_var": 0.20976204659079645
+        },
+        {
+          "outer": 5,
+          "kl_student_teacher": 0.4085836180050883,
+          "kl_student_anchor": 0.012868963839329117,
+          "kl_student_target": 0.02137281035433396,
+          "target_anchor_kl": 0.036398844517074286,
+          "inner_update_norm": 0.03257207371615086,
+          "inner_coefficient_var": 0.13112868000521366
+        },
+        {
+          "outer": 6,
+          "kl_student_teacher": 0.365726352747555,
+          "kl_student_anchor": 0.01116581774429192,
+          "kl_student_target": 0.01740483821501895,
+          "target_anchor_kl": 0.03200806433851279,
+          "inner_update_norm": 0.032466013604912476,
+          "inner_coefficient_var": 0.10701212674702099
+        },
+        {
+          "outer": 7,
+          "kl_student_teacher": 0.33645962526684686,
+          "kl_student_anchor": 0.005499675789532324,
+          "kl_student_target": 0.014504769257080153,
+          "target_anchor_kl": 0.027474696761879105,
+          "inner_update_norm": 0.028719830281610136,
+          "inner_coefficient_var": 0.11907427801017065
+        },
+        {
+          "outer": 8,
+          "kl_student_teacher": 0.3075997691124517,
+          "kl_student_anchor": 0.004911657118367551,
+          "kl_student_target": 0.012099467428576857,
+          "target_anchor_kl": 0.024804266800197254,
+          "inner_update_norm": 0.03347223155695976,
+          "inner_coefficient_var": 0.15370918425266317
+        },
+        {
+          "outer": 9,
+          "kl_student_teacher": 0.2904045133875651,
+          "kl_student_anchor": 0.004893345208893107,
+          "kl_student_target": 0.01457337235935401,
+          "target_anchor_kl": 0.022922413969159373,
+          "inner_update_norm": 0.026358573860023066,
+          "inner_coefficient_var": 0.09105490403525159
+        },
+        {
+          "outer": 10,
+          "kl_student_teacher": 0.27135817025586734,
+          "kl_student_anchor": 0.004318980739706921,
+          "kl_student_target": 0.012161084519183081,
+          "target_anchor_kl": 0.021269902139784008,
+          "inner_update_norm": 0.024824871454624295,
+          "inner_coefficient_var": 0.07895552508963069
+        },
+        {
+          "outer": 11,
+          "kl_student_teacher": 0.2552174398735795,
+          "kl_student_anchor": 0.004196390639077202,
+          "kl_student_target": 0.011806597988777316,
+          "target_anchor_kl": 0.019599254461333617,
+          "inner_update_norm": 0.023909243051686076,
+          "inner_coefficient_var": 0.08149315912273183
+        }
+      ]
+    }
+  ]
+}

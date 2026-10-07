@@ -25,7 +25,9 @@ if config.mdpo_kl_loss:
     policy_loss += mdpo_kl_coef * mdpo_kl_loss
 ```
 
-这里 `old_log_prob` 是 rollout 行为策略在实际采样 token 上的 log-prob。因此这是 sampled-token KL surrogate；它没有对完整词表求和，也没有 prefix importance ratio。`mdpo_eta` 由 `opd_trainer_mixin.py:89-112` 的 constant/linear schedule 产生。
+这里 `old_log_prob` 是 rollout 行为策略在实际采样 token 上的 log-prob。因此这是 sampled-token KL surrogate；它没有对完整词表求和，也没有 prefix importance ratio。它也没有显式的 action-level `rho=pi/old`：KL 项是在行为样本上直接用 k1/k3 或配置的 sampled estimator 计算的。`mdpo_eta` 由 `opd_trainer_mixin.py:89-112` 的 constant/linear schedule 产生。
+
+这和理论上对 `E_pi[f] - KL(pi||b)/eta` 的无偏行为测度估计不同。后者需要在行为样本上乘 `rho=pi/b`；本目录 toy 中的 `mdpo_is` 分支才是这个 action-IS oracle，`mdpo` 分支才对应仓库的 sampled-KL 形态。两者必须分开报告。
 
 ## Plain OPD policy gradient
 
@@ -63,7 +65,7 @@ pg_loss = agg_loss(loss_mat=loss_mat, loss_mask=response_mask,
 
 ## BPO-shaped weighted SFT
 
-工作区没有独立的 BPO 仓库副本。`mopd_grpo` 是 BPO-shaped 的实现，来源：`opd_core_algos.py:414-499`。以下摘录省略 clip mask 和 floor，便于无 clip 的 toy experiment：
+原始 BPO 论文（arXiv:2609.15987）没有公开独立代码仓库，因此不能把某个本地实现称为“BPO 官方代码”。`mopd_grpo` 是 MD-OPD 作者实现的 BPO-shaped OPD 适配，来源：`opd_core_algos.py:414-499`。它保留了 BPO 的 complement-probability 权重，但把终局 advantage 换成 OPD 的 `log teacher - log anchor + KL(anchor||teacher)`。以下是该适配的核心：
 
 ```python
 adv = teacher_lp - anchor_lp + gap
@@ -81,7 +83,7 @@ omega = ((1 + eps - exp(anchor_lp)) /
 weight = omega.clamp_max(cap)
 ```
 
-并将 `loss_mat` 改为 `-2*eta*adv*keep*weight*log_prob`。本项目小实验应将 `keep=True`、`weight=1`，避免把 BPO clip 的影响和 mirror inner 的影响混在一起。
+并将 `loss_mat` 改为 `-2*eta*adv*keep*weight*log_prob`。sequence experiment 使用这一 practical 形式；independent-row toy 才使用 `weight=1` 的回归对照。
 
 ## PMD-Mean 的实现状态
 
@@ -123,7 +125,8 @@ return -kl * weights
 loss_pmd_part = 0.5 * ((log_pi - log_ref - h.detach()) ** 2).mean()
 loss_pmd_mean = -(f - (b * f).sum(-1, keepdim=True)).detach() * log_pi
 loss_bpo = -eta * delta.detach() * log_pi
-loss_mdpo = -(f * log_pi).mean() + eta_inv * kl_sampled
+loss_mdpo_sampled = -(f * log_pi).mean() + eta_inv * kl_sampled
+loss_mdpo_is = -(rho * f * log_pi).mean() + eta_inv * (rho * kl_sampled)
 ```
 
-所有 outer steps 都应重新冻结当前 student 作为 reference，重新生成 teacher target，并记录每个 inner update 的 target KL、teacher KL、loss、gradient norm 和 policy entropy。
+所有 outer steps 都应重新冻结当前 student 作为 reference，重新生成 teacher target，并记录每个 inner update 的 target KL、teacher KL、loss、gradient norm 和 policy entropy。需要把 `mdpo_sampled` 与 `mdpo_is` 分开，不能用前者的结果声称 MDPO 使用了 IS。
