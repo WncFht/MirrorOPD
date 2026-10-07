@@ -960,6 +960,145 @@ plug-in 估计，$\log Z_k$ 的误差会进入每个 token 的 residual；在完
 按 $1/m$ 下降；当外层有 $B$ 个相互独立 prefix 时，条件于 prefix 的这部分
 方差进一步按 $1/B$ 下降，但 prefix coverage 误差不随 $m$ 消失。
 
+\subsubsection*{$\log Z_k$ 的展开估计：从 $Z_k$ 的 plug-in 走向可控偏差}
+直接计算 $\log\widehat Z_k$ 是最简单的方案，但它把非线性的 log 放在 Monte
+Carlo 均值之后，必然产生 Jensen bias。对于 OPD，$Z_k$ 具有更特殊的结构：
+\begin{equation}
+Z_k(s)=\mathbb E_{a\sim\pi_k}\left[e^{\eta r_k(s,a)}\right],
+\qquad
+r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s).
+\label{eq:ch2-opd-z-cumulant-start}
+\end{equation}
+因此 $\log Z_k$ 是随机变量 $r_k$ 的 cumulant-generating function 在
+$\eta$ 处的值。令 $\kappa_j(r_k)$ 为 $r_k$ 的第 $j$ 阶 cumulant，则在
+矩母函数存在的邻域内
+\begin{equation}
+\log Z_k(s)=\sum_{j=1}^{\infty}\frac{\eta^j}{j!}\kappa_j(r_k).
+\label{eq:ch2-opd-logz-cumulant-series}
+\end{equation}
+前两项为
+\begin{equation}
+\log Z_k(s)=\eta\,\mathbb E[r_k]
+ +\frac{\eta^2}{2}\operatorname{Var}(r_k)
+ +R_3(s),
+\label{eq:ch2-opd-logz-second-order}
+\end{equation}
+其中 $R_3$ 收集三阶及以上 cumulant。因为
+$\mathbb E[r_k]=-\mathcal K_k^T$，二阶近似也可以写成
+\begin{equation}
+\log Z_k(s)\approx-eta\mathcal K_k^T(s)
+ +\frac{\eta^2}{2}\operatorname{Var}_{a\sim\pi_k}[r_k(s,a)].
+\label{eq:ch2-opd-logz-kl-expansion}
+\end{equation}
+这给出了比 $-\eta\widehat{\mathcal K}_k^T$ 更准确的近似：只使用均值会遗漏
+log-sum-exp 的二阶曲率项，而该项在 teacher 与 anchor 差异较大时不可忽略。
+
+若从同一个 prefix 取得 $m$ 个 auxiliary token，令 $\widehat\kappa_j$ 为
+对应的 unbiased $j$ 阶 k-statistic，并定义
+\begin{equation}
+\widehat L_{J,m}(s)=\sum_{j=1}^{J}\frac{\eta^j}{j!}\widehat\kappa_j(r_k).
+\label{eq:ch2-opd-logz-kstat-estimator}
+\end{equation}
+则
+\begin{theorem}[Cumulant 截断估计器的 bias 与方差]
+\label{thm:ch2-opd-logz-cumulant}
+若 $\mathbb E|r_k|^{J+1}<\infty$ 且 cumulant series 在 $\eta$ 处收敛，则
+\begin{equation}
+\mathbb E[\widehat L_{J,m}]-\log Z_k
+ =-\sum_{j=J+1}^{\infty}\frac{\eta^j}{j!}\kappa_j(r_k),
+\qquad
+\operatorname{Var}(\widehat L_{J,m})=O(m^{-1}).
+\end{equation}
+若 $|\eta r_k|\le c$ 几乎处处成立，则截断 bias 满足
+\begin{equation}
+\left|\mathbb E[\widehat L_{J,m}]-\log Z_k\right|
+\leq \frac{e^c|\eta|^{J+1}}{(J+1)!}
+\mathbb E\left[|r_k|^{J+1}\right].
+\end{equation}
+\end{theorem}
+\begin{proof}
+由 k-statistic 的无偏性，$\mathbb E[\widehat\kappa_j]=\kappa_j$。将其代入
+式~\eqref{eq:ch2-opd-logz-cumulant-series} 的前 $J$ 项，第一式立即成立。
+有限阶样本 cumulant 是有限个样本乘积的 U-statistic 线性组合；在相应矩存在
+时，其方差为 $O(m^{-1})$，不同阶之间的协方差也为 $O(m^{-1})$，所以
+$\operatorname{Var}(\widehat L_{J,m})=O(m^{-1})$。最后，对
+$e^{\eta r_k}$ 的 cumulant-generating function 在零点作 Taylor 展开，
+Taylor 余项的绝对值由 $e^c|\eta r_k|^{J+1}/(J+1)!$ 控制，取期望即得
+偏差上界。
+\end{proof}
+
+对 OPD 的常用二阶实现，$J=2$ 时可以直接使用样本均值和无偏样本方差：
+\begin{equation}
+\widehat L_{2,m}(s)=\eta\bar r_k(s)
+ +\frac{\eta^2}{2}\,\widehat{\operatorname{Var}}(r_k(s,\cdot)).
+\label{eq:ch2-opd-logz-second-estimator}
+\end{equation}
+它不再具有 log-of-mean 的 $O(m^{-1})$ Jensen bias；剩余 bias 是明确的
+cumulant truncation bias。代价是需要估计方差，并且当 $\eta|r_k|$ 较大时，
+三阶及以上 cumulant 不能忽略。因此它适合 teacher/anchor 接近、$r_k$ 集中
+的阶段，不适合重要性比率重尾的阶段。
+
+Top-$K$ 头部还可以进一步降低展开的尾部误差。令
+\begin{equation}
+Z_H=\sum_{v\in S_Z}\pi_k(v)^{1-\eta}T(v)^\eta,
+\qquad
+u(a)=\mathbf 1\{a\notin S_Z\}
+ \left(\frac{T(a)}{\pi_k(a)}\right)^\eta,
+\qquad \tau=\mathbb E_{\pi_k}[u(a)],
+\end{equation}
+则 $Z_k=Z_H+\tau$。当 $\rho=\tau/Z_H<1$ 时，
+\begin{equation}
+\log Z_k=\log Z_H+
+\sum_{\ell=1}^{\infty}\frac{(-1)^{\ell+1}}{\ell}\rho^\ell.
+\label{eq:ch2-opd-logz-tail-series}
+\end{equation}
+用 $m$ 个尾部样本构造
+\begin{equation}
+\widehat{\tau^\ell}=\binom{m}{\ell}^{-1}
+\sum_{1\le i_1<\cdots<i_\ell\le m}
+\prod_{q=1}^{\ell}u(a_{i_q}),
+\qquad a_i\overset{\mathrm{iid}}{\sim}\pi_k,
+\end{equation}
+这是 $\tau^\ell$ 的无偏 U-statistic。于是可定义
+\begin{equation}
+\widehat L_{K,J}(s)=\log Z_H+
+\sum_{\ell=1}^{J}\frac{(-1)^{\ell+1}}{\ell Z_H^\ell}
+\widehat{\tau^\ell}.
+\label{eq:ch2-opd-logz-tail-series-estimator}
+\end{equation}
+它的期望等于式~\eqref{eq:ch2-opd-logz-tail-series} 的前 $J$ 项，且截断余项满足
+\begin{equation}
+\left|\mathbb E[\widehat L_{K,J}]-\log Z_k\right|
+\leq \frac{\rho^{J+1}}{(J+1)(1-\rho)}.
+\label{eq:ch2-opd-logz-tail-remainder}
+\end{equation}
+这个估计器在 $K$ 增大时更有意义：$Z_H$ 增大、$\rho$ 减小，二阶或三阶
+展开就能达到很小的确定性 truncation bias；$K=0$ 时 $Z_H=0$，应退回
+cumulant 展开或直接使用正值的 $\log\widehat Z$ plug-in。实际实现中建议先用
+$J=2$，同时记录 $\widehat\rho$、plug-in 与展开估计的差异，用它判断是否进入
+重尾区域。
+
+2602.04417 的合成图可以作为本节偏差--方差实验的模板。论文固定
+$|\mathcal V|=32000$，令 reference logits 为 $\mathcal N(0,I)$，当前策略
+logits 为 $s\mathcal N(0,I)$，通过调整 $s$ 使
+$\sum_{j\in\operatorname{TopK}(\pi,32)}\pi(j)$ 接近
+$\{0.2,0.5,0.8,0.9\}$。对
+$K\in\{4,8,16,32,64,128,256\}$ 和
+$B\in\{1,2,4,\ldots,32768\}$，分别计算 sampled、纯截断和 tail-corrected
+Top-$K$ 的 token-logit 真梯度与估计梯度，并绘制
+\begin{equation}
+\operatorname{RelRMSE}
+ =\frac{\sqrt{\mathbb E\lVert\widehat g-g_{\mathrm{true}}\rVert_2^2}}
+ {\lVert g_{\mathrm{true}}\rVert_2}.
+\end{equation}
+交点就是论文所谓 critical sample size。官方仓库
+\url{https://github.com/LunjunZhang/ema-pg} 公开了
+\texttt{compute\_memory\_efficient\_kl}、K3$^{++}$/K4/K5 和 GPU top-$K$ benchmark，
+但没有公开生成 \texttt{simulated\_topk\_kl\_four\_masses\_v5.pdf} 的脚本；因此我们可以
+按上述协议在本项目中重建一份，并把 OPD 的 $\log Z_k$ plug-in、二阶 cumulant
+和 Top-$K$ 尾部展开作为额外曲线。图中应同时报告 value bias、gradient RelRMSE、
+尾部命中率和峰值显存，不能只画 KL 数值方差。
+
 \subsubsection*{偏差--方差定理：从 KL 数值到最终 policy gradient}
 对一个 prefix 的任意估计器 $\widehat q$，最终关心的是带 score 的量
 $\widehat g=\widehat q\,\nabla_\theta\log\pi_\theta$。其均方误差分解为
