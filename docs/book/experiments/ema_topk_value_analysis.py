@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze scalar reverse-KL estimators separately from their gradients."""
+"""Analyze scalar reverse-KL Top-K estimators only."""
 
 from __future__ import annotations
 
@@ -34,99 +34,133 @@ def make_rows(vocab: int, masses: list[float], ks: list[int], seed: int, device:
     for mass in masses:
         p = torch.softmax(calibrate(z, mass) * z, -1)
         q = torch.softmax(z_ref, -1)
-        lr = torch.log(p) - torch.log(q)
-        kl = (p * lr).sum()
+        log_ratio = torch.log(p) - torch.log(q)
+        kl = (p * log_ratio).sum()
         order = torch.argsort(p, descending=True)
-        k1_var = (p * lr.square()).sum() - kl.square()
-        k3pp = lr + torch.exp(-lr) - 1.0
-        k3pp_var = (p * k3pp.square()).sum() - kl.square()
         for k in ks:
             mask = torch.zeros_like(p, dtype=torch.bool)
             if k:
                 mask[order[:k]] = True
             tail = ~mask
-            head_value = (p[mask] * lr[mask]).sum()
-            tail_value = (p[tail] * lr[tail]).sum()
-            topk_second = (p[tail] * lr[tail].square()).sum()
-            topk_var = topk_second - tail_value.square()
+            head_value = (p[mask] * log_ratio[mask]).sum()
+            tail_value = (p[tail] * log_ratio[tail]).sum()
             trunc_bias = head_value - kl
-            rows.append({
-                "mass_target": mass,
-                "top_k": k,
-                "kl": float(kl),
-                "head_value": float(head_value),
-                "tail_value": float(tail_value),
-                "trunc_bias": float(trunc_bias),
-                "trunc_abs_relative_bias": float(trunc_bias.abs() / kl.abs()),
-                "sampled_k1_std": float(k1_var.clamp_min(0).sqrt()),
-                "topk_value_std": float(topk_var.clamp_min(0).sqrt()),
-                "k3pp_std": float(k3pp_var.clamp_min(0).sqrt()),
-                "sampled_k1_relative_std": float(k1_var.clamp_min(0).sqrt() / kl.abs()),
-                "topk_value_relative_std": float(topk_var.clamp_min(0).sqrt() / kl.abs()),
-                "k3pp_relative_std": float(k3pp_var.clamp_min(0).sqrt() / kl.abs()),
-            })
+
+            # One Y~p corrects the missing tail, hence this scalar estimator is
+            # unbiased on-policy. Only the tail contributes to its variance.
+            corrected_second = (p[tail] * log_ratio[tail].square()).sum()
+            corrected_variance = corrected_second - tail_value.square()
+            rows.append(
+                {
+                    "mass_target": mass,
+                    "top_k": k,
+                    "kl": float(kl),
+                    "head_value": float(head_value),
+                    "tail_value": float(tail_value),
+                    "trunc_bias": float(trunc_bias),
+                    "trunc_abs_relative_bias": float(trunc_bias.abs() / kl.abs()),
+                    "trunc_variance": 0.0,
+                    "corrected_bias": 0.0,
+                    "corrected_abs_relative_bias": 0.0,
+                    "corrected_variance": float(corrected_variance.clamp_min(0)),
+                    "corrected_std": float(corrected_variance.clamp_min(0).sqrt()),
+                    "corrected_relative_std": float(
+                        corrected_variance.clamp_min(0).sqrt() / kl.abs()
+                    ),
+                }
+            )
     return rows
 
 
 def write_csv(rows, path: Path):
     with path.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
+        writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
 
 
-def plot_bias_variance(rows, out: Path):
-    masses = sorted({r["mass_target"] for r in rows})
-    colors = plt.cm.viridis(np.linspace(.1, .9, len(masses)))
-    fig, ax = plt.subplots(1, 2, figsize=(12, 4.5))
-    for c, mass in zip(colors, masses):
-        cur = [r for r in rows if r["mass_target"] == mass]
-        x = [r["top_k"] for r in cur]
-        ax[0].plot(x, [max(r["trunc_abs_relative_bias"], 1e-12) for r in cur], "o-", color=c, label=f"M32={mass:g}")
-        ax[1].plot(x, [max(r["sampled_k1_relative_std"], 1e-12) for r in cur], "--", color=c, alpha=.7)
-        ax[1].plot(x, [max(r["topk_value_relative_std"], 1e-12) for r in cur], "o-", color=c, label=f"Top-K, M32={mass:g}")
-        ax[1].plot(x, [max(r["k3pp_relative_std"], 1e-12) for r in cur], ":", color=c, alpha=.8)
-    for a in ax:
-        a.set_xscale("symlog", linthresh=1); a.set_yscale("log"); a.grid(True, which="both", alpha=.25)
-        a.set_xlabel("Top-K (K=0 is sampled K1/K4)")
-    ax[0].set_title("Scalar KL bias")
-    ax[0].set_ylabel("absolute relative bias")
-    ax[0].legend(fontsize=8)
-    ax[1].set_title("Scalar KL one-token standard deviation")
-    ax[1].set_ylabel("relative standard deviation")
-    ax[1].legend(fontsize=7, ncol=2)
-    fig.suptitle("Scalar reverse-KL estimator: bias and variance\nsolid Top-K; dashed K1; dotted K3++")
-    fig.tight_layout(); fig.savefig(out / "topk_value_bias_variance.png", dpi=220); fig.savefig(out / "topk_value_bias_variance.pdf"); plt.close(fig)
+def configure_axis(axis, xlabel, ylabel):
+    axis.set_xscale("symlog", linthresh=1)
+    axis.set_xlabel(xlabel)
+    axis.set_ylabel(ylabel)
+    axis.grid(True, which="both", alpha=0.25)
+
+
+def plot_bias(rows, out: Path):
+    masses = sorted({row["mass_target"] for row in rows})
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
+    for axis, mass in zip(axes.flat, masses):
+        cur = [row for row in rows if row["mass_target"] == mass]
+        x = [row["top_k"] for row in cur]
+        axis.plot(x, [max(row["trunc_abs_relative_bias"], 1e-12) for row in cur], "o-", label="Trunc-Top-K")
+        axis.plot(x, [1e-12 for _ in cur], "--", label="Top-K corrected")
+        axis.set_title(f"M32(pi)={mass:g}")
+        configure_axis(axis, "Top-K (K=0 is sampled-token K1)", "absolute relative bias")
+    axes[0, 0].legend(fontsize=8)
+    fig.suptitle("Scalar KL bias: deterministic truncation versus sampled-token correction")
+    fig.tight_layout()
+    fig.savefig(out / "topk_value_bias.png", dpi=220)
+    fig.savefig(out / "topk_value_bias.pdf")
+    plt.close(fig)
+
+
+def plot_variance(rows, out: Path):
+    masses = sorted({row["mass_target"] for row in rows})
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
+    for axis, mass in zip(axes.flat, masses):
+        cur = [row for row in rows if row["mass_target"] == mass]
+        x = [row["top_k"] for row in cur]
+        axis.plot(x, [1e-12 for _ in cur], "--", color="tab:gray", label="Trunc-Top-K (zero variance)")
+        axis.plot(x, [max(row["corrected_relative_std"] ** 2, 1e-12) for row in cur], "o-", color="tab:blue", label="Top-K corrected")
+        axis.set_title(f"M32(pi)={mass:g}")
+        configure_axis(axis, "Top-K (K=0 is sampled-token K1)", "relative variance")
+    axes[0, 0].legend(fontsize=8)
+    fig.suptitle("Scalar KL variance: only the sampled tail contributes")
+    fig.tight_layout()
+    fig.savefig(out / "topk_value_variance.png", dpi=220)
+    fig.savefig(out / "topk_value_variance.pdf")
+    plt.close(fig)
 
 
 def plot_rmse(rows, out: Path):
-    masses = sorted({r["mass_target"] for r in rows})
-    bs = [1, 32, 512, 32768]
-    colors = plt.cm.plasma(np.linspace(.1, .9, len(bs)))
-    fig, ax = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
-    for a, mass in zip(ax.flat, masses):
-        cur = [r for r in rows if r["mass_target"] == mass]
-        for c, b in zip(colors, bs):
-            x = [r["top_k"] for r in cur]
-            # Value RMSE of a B-token average: sqrt(bias^2 + variance/B).
-            top = [np.sqrt(r["trunc_abs_relative_bias"] ** 2 + r["topk_value_relative_std"] ** 2 / b) for r in cur]
-            k1 = [r["sampled_k1_relative_std"] / np.sqrt(b) for r in cur]
-            a.plot(x, top, "o-", color=c, label=f"Top-K, B={b}")
-            if b in (1, 32768):
-                a.plot(x, k1, "--", color=c, alpha=.75, label=f"K1, B={b}")
-        a.set_title(f"M32(pi)={mass:g}"); a.set_xscale("symlog", linthresh=1); a.set_yscale("log"); a.grid(True, which="both", alpha=.25)
-    ax[0, 0].set_ylabel("relative scalar-KL RMSE"); ax[1, 0].set_ylabel("relative scalar-KL RMSE")
-    ax[1, 0].set_xlabel("Top-K (K=0: sampled K1/K4)"); ax[1, 1].set_xlabel("Top-K (K=0: sampled K1/K4)")
-    ax[0, 1].legend(fontsize=7, ncol=2)
-    fig.suptitle("Scalar KL RMSE versus Top-K and effective averaging size B")
-    fig.tight_layout(); fig.savefig(out / "topk_value_rmse_vs_k.png", dpi=220); fig.savefig(out / "topk_value_rmse_vs_k.pdf"); plt.close(fig)
+    masses = sorted({row["mass_target"] for row in rows})
+    batch_sizes = [1, 32, 512, 32768]
+    colors = plt.cm.plasma(np.linspace(0.1, 0.9, len(batch_sizes)))
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
+    for axis, mass in zip(axes.flat, masses):
+        cur = [row for row in rows if row["mass_target"] == mass]
+        x = [row["top_k"] for row in cur]
+        axis.plot(x, [max(row["trunc_abs_relative_bias"], 1e-12) for row in cur], "k--", label="Trunc-Top-K (all B)")
+        for color, batch_size in zip(colors, batch_sizes):
+            corrected_rmse = [max(row["corrected_relative_std"] / np.sqrt(batch_size), 1e-12) for row in cur]
+            axis.plot(x, corrected_rmse, "o-", color=color, label=f"Top-K corrected, B={batch_size}")
+        axis.set_title(f"M32(pi)={mass:g}")
+        configure_axis(axis, "Top-K (K=0 is sampled-token K1)", "relative scalar-KL RMSE")
+    axes[0, 0].legend(fontsize=7, ncol=2)
+    fig.suptitle("Scalar KL RMSE: truncation bias versus sampled-tail variance")
+    fig.tight_layout()
+    fig.savefig(out / "topk_value_rmse_vs_k.png", dpi=220)
+    fig.savefig(out / "topk_value_rmse_vs_k.pdf")
+    plt.close(fig)
 
 
 def main():
-    p = argparse.ArgumentParser(); p.add_argument("--output", required=True); p.add_argument("--vocab", type=int, default=32000); p.add_argument("--seed", type=int, default=20261008); p.add_argument("--cpu", action="store_true"); a = p.parse_args()
-    out = Path(a.output); out.mkdir(parents=True, exist_ok=True)
-    device = "cpu" if a.cpu or not torch.cuda.is_available() else "cuda"
-    rows = make_rows(a.vocab, [.2, .5, .8, .9], [0, 1, 4, 8, 16, 32, 64, 128, 256, 512], a.seed, device)
-    write_csv(rows, out / "value_metrics.csv"); plot_bias_variance(rows, out); plot_rmse(rows, out)
-    (out / "value_analysis_metadata.json").write_text(json.dumps({"device": device, "torch": torch.__version__, "cuda": torch.cuda.get_device_name(0) if device == "cuda" else None}, indent=2))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--vocab", type=int, default=32000)
+    parser.add_argument("--seed", type=int, default=20261008)
+    parser.add_argument("--cpu", action="store_true")
+    args = parser.parse_args()
+    output = Path(args.output)
+    output.mkdir(parents=True, exist_ok=True)
+    device = "cpu" if args.cpu or not torch.cuda.is_available() else "cuda"
+    rows = make_rows(args.vocab, [0.2, 0.5, 0.8, 0.9], [0, 1, 4, 8, 16, 32, 64, 128, 256, 512], args.seed, device)
+    write_csv(rows, output / "value_metrics.csv")
+    plot_bias(rows, output)
+    plot_variance(rows, output)
+    plot_rmse(rows, output)
+    (output / "value_analysis_metadata.json").write_text(json.dumps({"device": device, "torch": torch.__version__, "cuda": torch.cuda.get_device_name(0) if device == "cuda" else None, "estimators": ["Trunc-Top-K", "Top-K corrected with one sampled token"]}, indent=2))
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

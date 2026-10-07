@@ -1,5 +1,9 @@
 {
   "device": "cuda",
   "torch": "2.14.0+cu130",
-  "cuda": "NVIDIA GeForce RTX 4070 SUPER"
+  "cuda": "NVIDIA GeForce RTX 4070 SUPER",
+  "estimators": [
+    "Trunc-Top-K",
+    "Top-K corrected with one sampled token"
+  ]
 }
