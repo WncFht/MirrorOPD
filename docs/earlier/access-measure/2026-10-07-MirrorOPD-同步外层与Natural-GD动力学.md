@@ -152,6 +152,51 @@ $$
 
 在 $\eta=1$ 时，精确 target 每个历史都是 teacher，但有限参数和有限 inner 只保证接近 teacher；在这种情况下增大 inner budget 比继续增加 outer steps 更直接。对 $\eta<1$，outer 本身提供稳定的 teacher-student interpolation，也允许用较少 inner steps 逐步逼近。
 
+### 第一轮未收敛后重新 rollout 的动力学
+
+记第 $k$ 轮的精确 mirror 算子为
+
+$$
+G_\eta(\pi_k)(a|s)=
+\frac{\pi_k(a|s)^{1-\eta}T(a|s)^\eta}
+     {\sum_b \pi_k(b|s)^{1-\eta}T(b|s)^\eta}.
+$$
+
+inner 只运行 $M_k$ 步时，实际同步策略可写成 $\pi_{k+1}=G_\eta(\pi_k)+e_k$；这里 $e_k$ 用 projective log-ratio 振幅定义。下一轮保存当前的 $\pi_{k+1}$，重新 rollout 并用 $r_{k+1}=\log T-\log\pi_{k+1}$ 定义新的 target，然后求解 $G_\eta(\pi_{k+1})$。它不会继续优化旧的 $G_\eta(\pi_k)$。
+
+精确 tabular 情形给出
+
+$$
+\Delta_{k+1}(s)\le(1-\eta)\Delta_k(s)+\varepsilon_k(s),
+$$
+
+从而
+
+$$
+\Delta_K(s)\le(1-\eta)^K\Delta_0(s)+
+\sum_{j=0}^{K-1}(1-\eta)^{K-1-j}\varepsilon_j(s).
+$$
+
+因此 $0<\eta\le1$ 且 $\varepsilon_k(s)\le\bar\varepsilon(s)$ 时，重新 rollout 后仍收敛到半径 $\bar\varepsilon(s)/\eta$ 的 teacher 邻域；若 $\varepsilon_k\to0$，则 $\Delta_k\to0$。第一轮提前同步的影响正是递推中的 $\varepsilon_0$，而不是一个永久固定的旧 target。
+
+局部 Natural-GD 下，令第 $k$ 轮局部最优位移为 $\Delta\theta_k^\star=\eta A_k^\dagger b_k$。从同步点开始经过 $M_k$ 步 GD，有
+
+$$
+\|\Delta\theta_{k,M_k}-\Delta\theta_k^\star\|_{A_k}
+\le q_k^{M_k}\|\Delta\theta_k^\star\|_{A_k}.
+$$
+
+故下一轮的残差可分解为
+
+$$
+\varepsilon_{k+1}\le C_{\mathrm{proj}}q_{k+1}^{M_{k+1}}
+\|\Delta\theta_{k+1}^\star\|_{A_{k+1}}
++C_{\mathrm{nl}}\|\Delta\theta_{k+1}^\star\|^2
++C_{\mathrm{rollout}}\xi_{k+1}.
+$$
+
+三项分别来自 inner 未充分收敛、局部二次近似误差和新 rollout 的估计误差。增大 $M_k$ 只能降低第一项。实际 stopping rule 应检查当前策略到本轮固定 target 的 residual，达到阈值后同步并重新 rollout。$\eta=1$ 时每轮精确 target 都是 teacher，外层没有额外的 contraction slack；继续增加 outer 次数不能替代把 inner 解准。
+
 ## 访问测度与 OPD 的边界
 
 如果 loss integrand 只依赖当前 prefix $s_t=(x,y_{<t})$ 和当前 action $a_t$，目标是 $d_{\pi_k}(s_t)\pi_k(a_t\mid s_t)$，而数据来自行为测度 $\nu$，只需使用历史权重
