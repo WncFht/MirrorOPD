@@ -698,6 +698,132 @@ off-policy 版本需要特别区分 README 与当前源码。README 示例暴露
 
 若要在 MirrorOPD 实验中声称“一个 outer step 近似求解了镜像子问题”，应至少保存固定 rollout batch 上的以下曲线：\(k\mapsto\mathcal L_{\mathrm{mirror}}^{(k)}\)、\(k\mapsto\|u_\theta-u^+\|_2\)（或可计算的 Bellman residual）、\(k\mapsto\KL(\cand_\theta\Vert\cand_{\mathrm{anchor}})\)，以及在停止时的 gradient norm。没有闭式 target 时，报告固定 inner budget 与这些诊断曲线，才能把“训练了一轮”与“子问题收敛”分开。对于稀有 prefix，还应同时报告 $d_{\beh}$ 的覆盖率和 prefix ratio 的有效样本量；否则增加 inner steps 只会更充分地拟合被行为测度看见的部分。
 
+
+\chapter{直接 per-token 奖励时的 PMD 与 BPO}
+\label{ch:per-token-reward}
+
+\section{先区分两个不同的目标}
+\label{sec:per-token-objectives}
+
+“有 per-token reward”有两种数学含义。第一种是把每个 prefix 上的 $r_t(s_t,a_t)$ 当作一个独立的局部决策奖励；第二种是完整序列的加性回报
+\begin{equation}
+\label{eq:additive-token-return}
+ R(y)=\sum_{t=1}^{T}r_t(s_t,a_t).
+\end{equation}
+第一种目标可以逐 prefix 地求解，不需要 telescope。第二种目标若要求解序列分布上的单个 KL 镜像子问题，仍然需要 continuation value；当前 token 的即时奖励只是 $Q$ 的一部分。因为
+\[
+ Q^\mu(s_t,a_t)=r_t(s_t,a_t)+\E_{a_{t+1:T}\sim\mu}\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\right].
+\]
+所以“观测到每个 token 的 reward”不会自动把 sequence-level PMD 变成只使用即时 reward 的 token-level PMD；它只使 continuation value 可以通过 per-token reward 的后缀回报来估计。
+
+\section{局部 token PMD-Part：不做 telescope 的精确推导}
+\label{sec:local-token-part}
+
+固定 prefix $s$，令行为 action 分布为 $\mu(\cdot\mid s)$，即时奖励为 $r(s,a)$。如果我们定义的目标就是局部镜像子问题
+\begin{equation}
+\label{eq:local-immediate-pmd}
+ \pi^+(\cdot\mid s)=\argmax_{p\ll\mu(\cdot\mid s)}
+ \left\{\E_{a\sim p}[r(s,a)]-\frac{1}{\eta}\KL(p\Vert\mu(\cdot\mid s))\right\},
+\end{equation}
+则变分恒等式给出
+\begin{equation}
+\label{eq:local-immediate-gibbs}
+ \pi^+(a\mid s)=\frac{\mu(a\mid s)e^{\eta r(s,a)}}{Z_r(s)},
+ \qquad
+ Z_r(s)=\E_{a\sim\mu(\cdot\mid s)}[e^{\eta r(s,a)}].
+\end{equation}
+因此，令
+\[
+ u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\mu(a\mid s)},
+\]
+不经过任何 trajectory telescope，PMD-Part 的行为测度回归就是
+\begin{equation}
+\label{eq:local-part-regression}
+ \mathcal L_{\mathrm{Part}}(\theta)
+ =\frac12\E_{s\sim d_\mu,\,a\sim\mu}
+ \left[u_\theta(s,a)-\eta r(s,a)+\log Z_r(s)\right]^2.
+\end{equation}
+只要 $d_\mu(s)>0$ 且 $\mu(a\mid s)>0$ 覆盖目标动作，函数空间中的零点正是式 \eqref{eq:local-immediate-gibbs}。prefix 访问权重只改变不同 $s$ 的回归权重。
+
+这个结论回答了“不做 telescope 时能否构造 token-level PMD-Part”：可以，而且它是标准的逐状态 KL 镜像子问题。但它优化的是局部即时奖励目标。若将 $r$ 换成完整的 $Q^\mu$, 则
+\[
+ u^+(s,a)=\eta Q^\mu(s,a)-\log\E_{a'\sim\mu}[e^{\eta Q^\mu(s,a')}],
+\]
+这才与序列加性回报的 sequence PMD 条件分布一致；此时 telescope 只是证明或估计 $Q^\mu$ 的工具，而非 token PMD 本身的必要形式。
+
+\section{局部 token PMD-Mean：与 Part 不等价}
+\label{sec:local-token-mean}
+
+令
+\[
+ \bar r(s)=\E_{a\sim\mu(\cdot\mid s)}[r(s,a)],
+ \qquad
+ g(s,a)=\eta\bigl(r(s,a)-\bar r(s)\bigr).
+\]
+一个 token-level PMD-Mean 回归可以定义为
+\begin{equation}
+\label{eq:local-mean-regression}
+ \min_u\;\frac12\E_{s\sim d_\mu,\,a\sim\mu}
+ [u(s,a)-g(s,a)]^2
+ \quad\text{s.t.}\quad
+ \E_{a\sim\mu(\cdot\mid s)}[e^{u(s,a)}]=1\quad\forall s.
+\end{equation}
+固定 $s$ 后，KKT 条件为
+\[
+ u(s,a)-g(s,a)+\lambda(s)e^{u(s,a)}=0,
+\]
+从而
+\begin{equation}
+\label{eq:local-mean-lambert}
+ u^+_{\mathrm{Mean}}(s,a)=g(s,a)-W\!\left(\lambda(s)e^{g(s,a)}\right).
+\end{equation}
+相比之下，局部 PMD-Part 的 log-ratio 是
+\begin{equation}
+\label{eq:local-part-logratio}
+ u^+_{\mathrm{Part}}(s,a)=\eta r(s,a)-\log Z_r(s).
+\end{equation}
+两者一般不相等。Part 对所有 action 使用同一个 prefix 常数 $\log Z_r(s)$；Mean 的 Lambert-$W$ 修正依赖 action reward。只有在 reward 为常数、或把 $W(\lambda e^g)$ 额外近似成状态常数等退化情形下，二者才重合。
+
+因此，per-token reward 并不能推出“token-level PMD-Part = token-level PMD-Mean”。它们使用同一个行为 action 测度，却对应不同的投影问题：Part 是 KL 镜像子问题的 Gibbs 解，Mean 是中心化平方回归加策略归一化约束后的 Lambert-$W$ 投影。
+
+\section{与 BPO 的关系：理论回归，实际 policy-gradient surrogate}
+\label{sec:bpo-regression-to-pg}
+
+BPO 论文的理论路线可以按三个对象区分。首先，论文从逐状态 PMD 出发，使用终端奖励情形下的 Bellman identity，把 token advantage 的和写成轨迹级残差。其无评论员目标是
+\[
+ \mathcal L(\pi)=E_{x,y\sim\mu}\left[\phi(x)\frac{\delta(x,y;\pi,\mu)^2}{2\eta}\right].
+\]
+这一步确实是 regression objective；论文还证明其精确最优解在 $\mu$ 可达状态上与 PMD 解一致。
+
+其次，论文没有在每个 rollout batch 上把这个平方回归用 inner optimizer 求到零。作者在 $\pi=\mu$ 处把平方残差梯度线性化，用组内奖励均值和标准差估计 $V^\mu(x)$ 与 $\phi(x)$，得到
+\[
+ \nabla\mathcal L_{i,t}\approx-adv^i\nabla\left[\log\pi(y_t^i\mid s_t^i)+\KL(\mu(\cdot\mid s_t^i)\Vert\pi(\cdot\mid s_t^i))\right].
+\]
+再次以二元 KL 替换完整逆向 KL 后，论文使用恒等式
+\[
+ \nabla\left[\log\pi(y_t\mid s_t)+D_{\mathrm{KL}}^{\mathrm{bin}}(\mu\Vert\pi;y_t)\right]
+ =\frac{1-\mu(y_t\mid s_t)}{1-\pi(y_t\mid s_t)}\nabla\log\pi(y_t\mid s_t),
+\]
+并加上平滑和截断，得到最终的 per-token BPO 梯度 surrogate
+\begin{equation}
+\label{eq:bpo-final-pg-surrogate}
+ \nabla\mathcal L_{i,t}^{\mathrm{BPO}}
+ \approx -\adv^i M_t^i\min(\widetilde w_t^i,C)\nabla\log\pi(y_t^i\mid s_t^i).
+\end{equation}
+因此，对“BPO 最后是否变换成 policy gradient”的准确回答是：是。更严格地说，它先定义了一个平方残差回归目标，再用局部线性化和二元 KL 梯度恒等式，把该目标的近似梯度实现成带 mismatch weight 的 per-token policy-gradient loss。实际训练优化的是式 \eqref{eq:bpo-final-pg-surrogate} 对应的 surrogate，不是把原始平方回归残差在 inner loop 中求解到收敛。
+
+\section{BPO 论文报告的更新次数}
+\label{sec:bpo-paper-inner-steps}
+
+BPO 论文源码在主实验设置中明确写出：每个训练步骤包含一次 rollout batch，随后将 $4096=256\times16$ 条 response 划分为 $8$ 个、每个包含 $512$ 条 response 的 mini-batch，并执行八次 optimizer updates。主实验运行 $400$ 个训练步骤，即总计 $3200$ 次 optimizer updates。附录消融实验使用 $1000$ 个同样定义的训练步骤；每十个 rollout/training steps 做一次评估。
+
+这些八次更新是同一 rollout batch 上的固定 mini-batch 预算，不是 BPO 回归方程的 inner convergence steps。论文没有给出“每个 outer rollout 要把平方残差降到什么阈值”的停止条件，也没有报告每个 outer step 的 residual norm、subproblem gap 或 inner gradient convergence 曲线。因此论文支持的表述是“每个 outer step 对固定 batch 做八次 surrogate optimizer updates”，不支持“每个 outer step 已经收敛到 PMD 最优策略”。
+
+\section{对 OPD per-token reward 的直接启示}
+\label{sec:opd-token-reward-implication}
+
+如果 OPD 提供的 $r_t(s_t,a_t)$ 被定义为局部 token 决策的 reward，可以直接使用式 \eqref{eq:local-part-regression} 或式 \eqref{eq:local-mean-regression}，并明确选择 Part 或 Mean 的投影几何。如果研究目标仍是最大化完整 response 的总 reward，则应使用包含 future reward 的 $Q^\mu$ 或 soft continuation value；只把即时 $r_t$ 放进 Gibbs exponent 会得到另一个局部目标。BPO 的 terminal-reward telescope 在 per-token reward 场景下可以改写为一般 Bellman decomposition，但不能被省略后仍声称与完整 sequence objective 严格等价。
+
 \chapter{结论与后续 MirrorOPD 的边界}
 \label{ch:conclusion}
 
