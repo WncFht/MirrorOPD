@@ -5,7 +5,7 @@
   "n_examples": 1319,
   "n_prefixes": 350166,
   "temperature": 1.0,
-  "definition": "reverse KL KL(student||teacher), exact full-vocabulary reference; sampled token is the student rollout token",
+  "definition": "reverse KL KL(student||teacher), exact full-vocabulary reference of the NF4-scored Student/Teacher models; sampled token is the bf16-vLLM student rollout token",
   "scoring_quantization": "4bit",
   "topk": "student probability top-K; corrected estimator adds log student/teacher ratio only when sampled token is outside the head"
 }

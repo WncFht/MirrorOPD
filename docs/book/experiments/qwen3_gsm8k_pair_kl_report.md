@@ -21,7 +21,7 @@ $$
 \qquad Y\sim p.
 $$
 
-真实 rollout token 就是 $Y$。因此截断的 prefix bias 是 $widehat K_{\mathrm{trunc}}-K$，其方差为零；修正估计量的条件期望等于 $K$，条件方差为
+真实 rollout token 就是 $Y$。因此截断的 prefix bias 是 $\widehat K_{\mathrm{trunc}}-K$，其方差为零；修正估计量的条件期望等于 $K$，条件方差为
 
 $$
 \operatorname{Var}(\widehat K_{\mathrm{corr}}\mid p,q)
@@ -36,7 +36,7 @@ $$
 
 生成使用 archbox 上的 vLLM 0.29.0。该机没有 `nvcc`，因此关闭 vLLM 的 FlashInfer sampler，仍使用 vLLM 的批量调度和 KV cache；这只改变采样内核，不改变 $T=1.0$、$p$ 或 $q$ 的数学定义。完整 rollout 原始文件保存在 archbox 的 `~/src/md-opd-work/runs/qwen3_gsm8k_student_t1/rollouts.jsonl`，共 350,166 个生成 token。
 
-打分脚本使用 Transformers 的 `logits_to_keep`，只保留生成 token 对应的 logits。由于单张 RTX 4070 SUPER 只有 12 GiB，同时加载两个 bf16 模型会挤压激活和词表 logits，当前完整统计采用 bitsandbytes NF4 4-bit 权重、bf16 计算；`metadata.json` 明确记录这一点。两条 pilot 轨迹已经与完整词表公式逐项核对。正式结果在全量任务结束后写入 `kl_summary_by_k.csv`，图由 `plot_pair_kl.py` 生成。
+打分脚本使用 Transformers 的 `logits_to_keep`，只保留生成 token 对应的 logits。由于单张 RTX 4070 SUPER 只有 12 GiB，同时加载两个 bf16 模型会挤压激活和词表 logits，当前完整统计采用 bitsandbytes NF4 4-bit 权重、bf16 计算；因此这里的“真值”是量化后 Student/Teacher 分布的完整词表 KL，`metadata.json` 明确记录这一点。两条 pilot 轨迹已经与完整词表公式逐项核对。正式结果在全量任务结束后写入 `kl_summary_by_k.csv`，图由 `plot_pair_kl.py` 生成。
 
 ## 全量结果
 
