@@ -1,0 +1,50 @@
+\paragraph{MDPO 的 OPD inner。}
+MDPO 不回归 $u_k^\star$，而直接在冻结的 $\pi_k$ 上优化 mirror objective：
+\begin{equation}
+\label{eq:ch2-opd-mdpo-inner-full}
+\mathcal J_{k,\mathrm{MDPO}}(\theta)
+=
+\E_{s\sim d_b}\!\left[
+\E_{a\sim\pi_\theta(\cdot\mid s)}[r_k(s,a)]
+-\frac{1}{\eta}
+\KL\!\left(\pi_\theta(\cdot\mid s)\Vert\pi_k(\cdot\mid s)\right)
+\right].
+\end{equation}
+若能够访问完整 vocabulary logits，KL 可以逐 token 精确计算：
+\[
+\KL(\pi_\theta\Vert\pi_k)
+=\sum_a\pi_\theta(a\mid s)
+\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}.
+\]
+若只有 $a\sim\pi_k$ 的 replay action，则令
+\[
+\rho_\theta(s,a)=\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)},
+\]
+用 action importance sampling 得到可直接实现的估计量
+\begin{equation}
+\label{eq:ch2-opd-mdpo-inner-is-objective}
+\widehat{\mathcal J}_{k,\mathrm{MDPO}}(\theta)
+=\E_{s\sim d_b,\,a\sim\pi_k}\!\left[
+\rho_\theta(s,a)r_k(s,a)
+-\frac{1}{\eta}\rho_\theta(s,a)
+\log\rho_\theta(s,a)\right].
+\end{equation}
+停止 $r_k$、$\pi_k$ 和 replay 权重的梯度后，其 ascent 方向为
+\begin{equation}
+\label{eq:ch2-opd-mdpo-inner-gradient}
+\nabla_\theta\widehat{\mathcal J}_{k,\mathrm{MDPO}}
+=
+\E_{d_b,\pi_k}\!\left[
+\rho_\theta(s,a)
+\left(r_k(s,a)-\frac{1}{\eta}\log\rho_\theta(s,a)\right)
+g_\theta(s,a)\right].
+\end{equation}
+推导中额外出现的 $-\rho_\theta/\eta$ 项乘以 $g_\theta$ 后，利用
+\[
+\E_{\pi_\theta}[g_\theta\mid s]=0
+\]
+消失，因而式 \eqref{eq:ch2-opd-mdpo-inner-gradient} 是完整 reverse-KL 目标的梯度，而非把 KL 当作常数的近似。MDPO 的 inner 误差由 $\mathcal J_{k,\mathrm{MDPO}}(\theta)$ 的优化 gap 或
+\[
+\KL(\pi_\theta\Vert\pi_{k+1}^{\star})
+\]
+监控；它通常需要固定 $\pi_k$ 在同一 replay batch 上执行多次更新。

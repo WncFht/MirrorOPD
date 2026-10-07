@@ -584,17 +584,25 @@ c_k(s)=-\log Z_k(s),
 \]
 所以 BPO 的精确零点也是 $u_k^\star$。这说明 BPO 与 PMD-Part 的最优策略相同，但其有限步梯度仍因中心化 score 而不同。
 
-\begin{theorem}[三种 OPD inner 的精确零点]
+\input{sections/opd-mdpo-inner.tex}
+
+\begin{theorem}[四种 OPD inner 的精确零点]
 \label{thm:ch2-opd-inner-common-root}
-在有限 action space、$\pi_k(a\mid s)>0$ 且函数类能够表示任意 log-ratio 的条件下，PMD-Part、PMD-Mean 和未线性化 BPO 的精确零点都对应
+在有限 action space、$\pi_k(a\mid s)>0$ 且函数类能够表示任意 log-ratio 的条件下，PMD-Part、PMD-Mean、未线性化 BPO 和 MDPO 的精确零点都对应
 \[
 \pi_\theta(\cdot\mid s)=\pi_{k+1}^{\star}(\cdot\mid s).
 \]
-它们的有限样本或有限参数更新不同，来自投影测度、target 常数的处理和 score 是否中心化，而不是来自不同的 token-level mirror 最优解。
+它们的有限样本或有限参数更新不同，来自投影测度、target 常数的处理、score 是否中心化以及 MDPO 的 action ratio，而不是来自不同的 token-level mirror 最优解。
 \end{theorem}
 
 \begin{proof}
-PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由上面的 residual 方程给出；归一化唯一确定 $c_k=-\log Z_k$，从而 $u_\theta=u_k^\star$。PMD-Mean 的可行集包含所有满足 $\E_{\pi_k}[e^u\mid s]=1$ 的 log-ratio；当中心化 target 可实现且投影残差为零时，它也得到同一 $u_k^\star$。若中心化 target 不可行或模型类受限，PMD-Mean 的解是约束集合上的投影，此时只能保证投影误差而不能保证精确 Gibbs 解。
+PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由上面的 residual 方程给出；归一化唯一确定 $c_k=-\log Z_k$，从而 $u_\theta=u_k^\star$。PMD-Mean 的可行集包含所有满足 $\E_{\pi_k}[e^u\mid s]=1$ 的 log-ratio；当中心化 target 可实现且投影残差为零时，它也得到同一 $u_k^\star$。对 MDPO，式 \eqref{eq:ch2-opd-mdpo-inner-full} 正是式 \eqref{eq:ch2-opd-mirror-step} 的参数化版本，利用 KL 分解可写成
+\[
+\mathcal J_{k,\mathrm{MDPO}}(\theta)
+=\frac{1}{\eta}\log Z_k(s)
+-\frac{1}{\eta}\KL(\pi_\theta\Vert\pi_{k+1}^{\star}),
+\]
+所以唯一最大点为 $\pi_\theta=\pi_{k+1}^{\star}$。若中心化 target 不可行或模型类受限，PMD-Mean 的解是约束集合上的投影，此时只能保证投影误差而不能保证精确 Gibbs 解。
 \end{proof}
 
 \subsection{inner 求解与 outer 更新的区别}

@@ -125,6 +125,87 @@ v^{\mathsf T}A_kv
 由 $F_k\succeq0$ 成立。$F_k$ 的零空间正是常数向量方向，所以 $J_k(s)v$ 为常数时对应二次型为零。去除这些不改变策略的参数方向后，若最小特征值至少为 $m>0$，则二次项给出局部强凸性。
 \end{proof}
 
+\subsection*{Mirror Descent 与普通梯度的离散动力学}
+
+在 tabular prefix、教师分布固定且 inner 可以精确求解的情形，mirror outer 更新是
+\[
+\pi_{k+1}(a\mid s)
+=\frac{\pi_k(a\mid s)\exp(\eta f_k(s,a))}
+{\sum_{a'}\pi_k(a'\mid s)\exp(\eta f_k(s,a'))}.
+\]
+对任意固定的 $f_k$，当 $\eta\to0$ 时展开分子和分母：
+\begin{equation}
+\label{eq:ch2-md-first-order}
+\pi_{k+1}(a\mid s)
+=\pi_k(a\mid s)
+\left[1+\eta\left(f_k(s,a)-\E_{\pi_k}[f_k\mid s]\right)\right]
++O(\eta^2).
+\end{equation}
+右侧的一阶项
+\[
+\pi_k(a\mid s)
+\left(f_k(s,a)-\E_{\pi_k}[f_k\mid s]\right)
+\]
+正是 Fisher--Rao 度量下 $\E_{\pi}[f_k]$ 的 Natural Gradient。于是 mirror step 与 Natural Gradient 的关系是：Natural Gradient 是 mirror step 在 $\eta=0$ 处的一阶 Euler 近似；有限 $\eta$ 时，mirror step 还保留了指数归一化和正性约束，不能被普通加法更新完全替代。
+
+对 OPD 的 $f_k=\log(T/\pi_k)$，可以把这一关系写得更具体。定义
+\[
+\rho_k(a\mid s)=\log\frac{\pi_k(a\mid s)}{T(a\mid s)}.
+\]
+精确 mirror 更新满足
+\[
+\rho_{k+1}(a\mid s)
+=(1-\eta)\rho_k(a\mid s)-\log Z_k(s).
+\]
+因此任意两个 action 的 log-ratio 差满足
+\begin{equation}
+\label{eq:ch2-md-projective-dynamics}
+\rho_{k+1}(a\mid s)-\rho_{k+1}(a'\mid s)
+=(1-\eta)\left[\rho_k(a\mid s)-\rho_k(a'\mid s)\right].
+\end{equation}
+这给出精确的 projective 收缩率 $1-\eta$，不需要局部二次近似。
+
+相比之下，若直接在概率单纯形上使用未预条件的 Euclidean policy-gradient Euler 步，得到
+\begin{equation}
+\label{eq:ch2-euclidean-policy-dynamics}
+\pi_{k+1}^{\mathrm{E}}(a\mid s)
+=\pi_k(a\mid s)
+\left[
+1+\alpha\left(f_k(s,a)-\E_{\pi_k}[f_k\mid s]\right)
+\right].
+\end{equation}
+为了保持每个 action 的概率非负，必须额外满足
+\[
+1+\alpha\left(f_k(s,a)-\E_{\pi_k}[f_k\mid s]\right)\geq0
+\quad\text{对所有 }a.
+\]
+这个限制依赖当前 reward 的最大幅度；当 teacher/student ratio 很尖锐时，可行步长会变得很小。式 \eqref{eq:ch2-euclidean-policy-dynamics} 只有在 $\alpha=\eta$ 且忽略 $O(\eta^2)$ 项时才与式 \eqref{eq:ch2-md-first-order} 相同，有限步时没有式 \eqref{eq:ch2-md-projective-dynamics} 的精确收缩性质。
+
+\begin{theorem}[OPD 中 mirror outer 与 Natural Gradient 的等价边界]
+\label{thm:ch2-md-ng-equivalence}
+在固定 prefix、可表示的 tabular policy 和精确 Fisher 矩阵条件下，mirror outer step 与 Natural Gradient 满足：
+\begin{enumerate}
+\item 分布空间的一阶等价：式 \eqref{eq:ch2-md-first-order} 的一阶项等于 Fisher--Rao Natural Gradient；
+\item 参数空间的局部等价：若 $\pi_\theta$ 在 $\theta_k$ 附近可微，且使用 $A_k$ 的精确逆，则
+\[
+\theta_{k+1}^{\mathrm{NG}}
+=\theta_k+\eta A_k^\dagger b_k+O(\eta^2)
+\]
+与 mirror 解的参数表示一致到一阶；
+\item 有限步不等价：mirror 更新是指数族闭式解，Natural Gradient 是参数空间的线性步；除非策略族对该指数更新封闭，否则二者在 $O(\eta^2)$ 项开始不同。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+第一点由式 \eqref{eq:ch2-md-first-order} 直接得到。第二点中，局部目标的梯度为 $-b_k$，KL Hessian 为 $A_k/\eta$，因此局部最优位移满足 $\Delta\theta=\eta A_k^\dagger b_k$；这正是 Natural Gradient 的 Fisher 预条件方向。第三点来自指数更新的二阶项：
+\[
+\pi_{k+1}
+=\pi_k+\eta\,\operatorname{grad}_{\mathrm{FR}}\E_{\pi_k}[f_k]
++O(\eta^2),
+\]
+而参数 Natural Gradient 的 Euler 步只保留一阶项。一般神经网络策略族不对指数映射封闭，所以不能把有限步 Natural Gradient 视为精确 mirror step。
+\end{proof}
+
 \subsection*{有限 inner 步的收敛条件}
 
 定义局部主模型
