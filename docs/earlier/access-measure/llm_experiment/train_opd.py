@@ -6,6 +6,7 @@ all rollout tensors, anchor log-probs, teacher log-probs and eta are frozen
 within one outer step. Only after the inner budget is exhausted is the student
 weight state advanced to the next anchor.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,7 +36,11 @@ def masked_mean(x: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
 
 
 def token_logprob(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
-    return F.log_softmax(logits[:, :-1], dim=-1).gather(-1, labels[:, 1:, None]).squeeze(-1)
+    return (
+        F.log_softmax(logits[:, :-1], dim=-1)
+        .gather(-1, labels[:, 1:, None])
+        .squeeze(-1)
+    )
 
 
 def make_prompts(tokenizer, n: int, seed: int) -> list[str]:
@@ -45,13 +50,18 @@ def make_prompts(tokenizer, n: int, seed: int) -> list[str]:
     if not raw_path.exists():
         url = "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt"
         urllib.request.urlretrieve(url, raw_path)
-    texts = [line.strip() for line in raw_path.read_text(encoding="utf-8").splitlines()
-             if len(line.strip()) >= 80]
+    texts = [
+        line.strip()
+        for line in raw_path.read_text(encoding="utf-8").splitlines()
+        if len(line.strip()) >= 80
+    ]
     rng = random.Random(seed)
     rng.shuffle(texts)
     prompts = []
     for text in texts:
-        ids = tokenizer(text, truncation=True, max_length=48, add_special_tokens=False)["input_ids"]
+        ids = tokenizer(text, truncation=True, max_length=48, add_special_tokens=False)[
+            "input_ids"
+        ]
         if len(ids) >= 16:
             prompts.append(tokenizer.decode(ids[:16], skip_special_tokens=True))
         if len(prompts) >= n:
@@ -62,12 +72,25 @@ def make_prompts(tokenizer, n: int, seed: int) -> list[str]:
 
 
 @torch.no_grad()
-def rollout(student, teacher, tokenizer, prompts: list[str], max_new_tokens: int,
-            eta: float, device: torch.device):
-    enc = tokenizer(prompts, return_tensors="pt", padding=True, truncation=True, max_length=64).to(device)
+def rollout(
+    student,
+    teacher,
+    tokenizer,
+    prompts: list[str],
+    max_new_tokens: int,
+    eta: float,
+    device: torch.device,
+):
+    enc = tokenizer(
+        prompts, return_tensors="pt", padding=True, truncation=True, max_length=64
+    ).to(device)
     anchor_out = student.generate(
-        **enc, max_new_tokens=max_new_tokens, do_sample=True, temperature=1.0,
-        top_p=0.95, pad_token_id=tokenizer.eos_token_id,
+        **enc,
+        max_new_tokens=max_new_tokens,
+        do_sample=True,
+        temperature=1.0,
+        top_p=0.95,
+        pad_token_id=tokenizer.eos_token_id,
     )
     labels = anchor_out.clone()
     prompt_len = enc["input_ids"].shape[1]
@@ -82,17 +105,32 @@ def rollout(student, teacher, tokenizer, prompts: list[str], max_new_tokens: int
     log_anchor = all_anchor.gather(-1, labels[:, 1:, None]).squeeze(-1)
     log_teacher = all_teacher.gather(-1, labels[:, 1:, None]).squeeze(-1)
     # Exact categorical log-partition for q ∝ anchor^(1-eta) teacher^eta.
-    log_partition_all = torch.logsumexp((1.0 - eta) * all_anchor + eta * all_teacher, dim=-1)
+    log_partition_all = torch.logsumexp(
+        (1.0 - eta) * all_anchor + eta * all_teacher, dim=-1
+    )
     log_partition = log_partition_all
     mask = token_mask[:, 1:]
-    return (anchor_out, log_anchor.detach(), log_teacher.detach(),
-            log_partition.detach(), mask.detach(), prompt_len)
+    return (
+        anchor_out,
+        log_anchor.detach(),
+        log_teacher.detach(),
+        log_partition.detach(),
+        mask.detach(),
+        prompt_len,
+    )
 
 
-def inner_loss(method: str, student_logits: torch.Tensor, labels: torch.Tensor,
-               log_anchor: torch.Tensor, log_teacher: torch.Tensor,
-               log_partition: torch.Tensor, mask: torch.Tensor,
-               eta: float, vocab_chunk: int = 0) -> tuple[torch.Tensor, dict[str, float]]:
+def inner_loss(
+    method: str,
+    student_logits: torch.Tensor,
+    labels: torch.Tensor,
+    log_anchor: torch.Tensor,
+    log_teacher: torch.Tensor,
+    log_partition: torch.Tensor,
+    mask: torch.Tensor,
+    eta: float,
+    vocab_chunk: int = 0,
+) -> tuple[torch.Tensor, dict[str, float]]:
     log_student = token_logprob(student_logits, labels)
     reward = log_teacher - log_anchor
     ratio_log = log_student - log_anchor
@@ -123,8 +161,12 @@ def inner_loss(method: str, student_logits: torch.Tensor, labels: torch.Tensor,
             "inner_loss": float(loss.detach().cpu()),
             "reward_mean": float(masked_mean(reward, m).cpu()),
             "student_anchor_logratio": float(masked_mean(ratio_log, m).cpu()),
-            "residual_rms": float(torch.sqrt(masked_mean((ratio_log - eta * reward).square(), m)).cpu()),
-            "coefficient_var": float(torch.var(coeff[m.bool()]).cpu()) if bool(m.any()) else 0.0,
+            "residual_rms": float(
+                torch.sqrt(masked_mean((ratio_log - eta * reward).square(), m)).cpu()
+            ),
+            "coefficient_var": float(torch.var(coeff[m.bool()]).cpu())
+            if bool(m.any())
+            else 0.0,
         }
     return loss, diag
 
@@ -137,15 +179,24 @@ def evaluate(student, teacher, labels, log_anchor, log_teacher, mask):
         nll_teacher = -masked_mean(log_teacher, mask)
         kl_st_t = masked_mean(log_student - log_teacher, mask)
         reward = masked_mean(log_teacher - log_anchor, mask)
-    return {"student_nll": float(nll_student), "teacher_nll": float(nll_teacher),
-            "kl_student_teacher": float(kl_st_t), "opd_reward": float(reward)}
+    return {
+        "student_nll": float(nll_student),
+        "teacher_nll": float(nll_teacher),
+        "kl_student_teacher": float(kl_st_t),
+        "opd_reward": float(reward),
+    }
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--method", choices=METHODS, default="pmd_part")
-    ap.add_argument("--teacher", default="EleutherAI/pythia-160m-deduped")
-    ap.add_argument("--student", default="EleutherAI/pythia-70m-deduped")
+    # The default pair is deliberately asymmetric: a 14M student is cheap
+    # enough for many outer/inner ablations, while the 70M teacher remains in
+    # the same Pythia/GPT-NeoX/tokenizer family and supplies a nontrivial
+    # distillation signal.  The former 70M/160M pair is still selectable from
+    # the command line for a scale-up comparison.
+    ap.add_argument("--teacher", default="EleutherAI/pythia-70m-deduped")
+    ap.add_argument("--student", default="EleutherAI/pythia-14m")
     ap.add_argument("--outer-steps", type=int, default=8)
     ap.add_argument("--inner-steps", type=int, default=50)
     ap.add_argument("--prompts", type=int, default=32)
@@ -163,10 +214,16 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(args.student)
     tokenizer.padding_side = "left"
     tokenizer.pad_token = tokenizer.eos_token
-    teacher = AutoModelForCausalLM.from_pretrained(args.teacher, torch_dtype=torch.float16).to(device).eval()
-    # Keep the trainable 70M student in fp32 for stable tiny-batch updates;
-    # the frozen 160M teacher remains fp16 to reduce inference memory.
-    student = AutoModelForCausalLM.from_pretrained(args.student, torch_dtype=torch.float32).to(device)
+    teacher = (
+        AutoModelForCausalLM.from_pretrained(args.teacher, torch_dtype=torch.float16)
+        .to(device)
+        .eval()
+    )
+    # Keep the trainable tiny student in fp32 for stable tiny-batch updates;
+    # the frozen teacher remains fp16 to reduce inference memory.
+    student = AutoModelForCausalLM.from_pretrained(
+        args.student, torch_dtype=torch.float32
+    ).to(device)
     for p in teacher.parameters():
         p.requires_grad_(False)
     optimizer = torch.optim.AdamW(student.parameters(), lr=args.lr)
@@ -175,7 +232,12 @@ def main() -> None:
     metrics_path = args.output_dir / f"{run_name}.jsonl"
     with metrics_path.open("w", encoding="utf-8") as mf:
         for outer in range(args.outer_steps):
-            eta = args.eta if args.eta_final is None else args.eta + (args.eta_final - args.eta) * outer / max(1, args.outer_steps - 1)
+            eta = (
+                args.eta
+                if args.eta_final is None
+                else args.eta
+                + (args.eta_final - args.eta) * outer / max(1, args.outer_steps - 1)
+            )
             # Freeze anchor by snapshotting student weights and using the snapshot
             # for rollout/log-prob computation. The student itself is only updated
             # after this point, and no anchor tensors are recomputed in the inner loop.
@@ -183,8 +245,17 @@ def main() -> None:
             # anchor log-probs are computed before the first optimizer step; the
             # resulting tensors are detached and reused throughout this outer step.
             student.eval()
-            sequences, log_anchor, log_teacher, log_partition, mask, prompt_len = rollout(
-                student, teacher, tokenizer, prompts, args.max_new_tokens, eta, device)
+            sequences, log_anchor, log_teacher, log_partition, mask, prompt_len = (
+                rollout(
+                    student,
+                    teacher,
+                    tokenizer,
+                    prompts,
+                    args.max_new_tokens,
+                    eta,
+                    device,
+                )
+            )
             student.train()
             last = {}
             for inner in range(args.inner_steps):
@@ -192,16 +263,31 @@ def main() -> None:
                 loss_total = 0.0
                 for start in range(0, len(prompts), args.batch_size):
                     sl = slice(start, start + args.batch_size)
-                    loss, diag = inner_loss(args.method, student(sequences[sl]).logits,
-                                            sequences[sl], log_anchor[sl], log_teacher[sl],
-                                            log_partition[sl], mask[sl], eta)
-                    loss_total = loss_total + loss / math.ceil(len(prompts) / args.batch_size)
+                    loss, diag = inner_loss(
+                        args.method,
+                        student(sequences[sl]).logits,
+                        sequences[sl],
+                        log_anchor[sl],
+                        log_teacher[sl],
+                        log_partition[sl],
+                        mask[sl],
+                        eta,
+                    )
+                    loss_total = loss_total + loss / math.ceil(
+                        len(prompts) / args.batch_size
+                    )
                     last = diag
                 loss_total.backward()
                 torch.nn.utils.clip_grad_norm_(student.parameters(), 1.0)
                 optimizer.step()
             ev = evaluate(student, teacher, sequences, log_anchor, log_teacher, mask)
-            row = {"outer": outer, "eta": eta, "inner_steps": args.inner_steps, **last, **ev}
+            row = {
+                "outer": outer,
+                "eta": eta,
+                "inner_steps": args.inner_steps,
+                **last,
+                **ev,
+            }
             mf.write(json.dumps(row, ensure_ascii=False) + "\n")
             mf.flush()
             print(json.dumps(row, ensure_ascii=False))
