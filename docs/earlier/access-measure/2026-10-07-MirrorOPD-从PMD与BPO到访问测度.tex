@@ -60,15 +60,15 @@
 \section{KL 镜像最优解}
 \label{sec:token-optimum}
 
-给定温度 $\tau>0$，token-level PMD 子问题为
+给定 Natural Gradient 学习率 $\eta>0$，token-level PMD 子问题为
 \begin{equation}
 \label{eq:token-subproblem}
  \cand^+(\cdot\mid s)=\argmax_{p\ll\beh(\cdot\mid s)}
- \left\{\E_{a\sim p}[f(s,a)]-\tau\KL(p\Vert\beh(\cdot\mid s))\right\}.
+ \left\{\E_{a\sim p}[f(s,a)]-\frac{1}{\eta}\KL(p\Vert\beh(\cdot\mid s))\right\}.
 \end{equation}
 令
 \[
- Z_f(s)=\E_{a\sim\beh(\cdot\mid s)}\exp\left(\frac{f(s,a)}{\tau}\right).
+ Z_f(s)=\E_{a\sim\beh(\cdot\mid s)}\exp\left(\eta f(s,a)\right).
 \]
 
 \begin{theorem}[Token-level Gibbs 解]
@@ -76,12 +76,12 @@
 若 $0<Z_f(s)<\infty$，式 \eqref{eq:token-subproblem} 的唯一解为
 \begin{equation}
 \label{eq:gibbs}
- \cand^+(a\mid s)=\frac{\beh(a\mid s)\exp(f(s,a)/\tau)}{Z_f(s)}.
+ \cand^+(a\mid s)=\frac{\beh(a\mid s)\exp(\eta f(s,a))}{Z_f(s)}.
 \end{equation}
 等价地，$u^+(s,a)=\log(\cand^+/\beh)$ 满足
 \begin{equation}
 \label{eq:optimal-logratio}
- u^+(s,a)=\frac{f(s,a)}{\tau}-\log Z_f(s).
+ u^+(s,a)=\eta f(s,a)-\log Z_f(s).
 \end{equation}
 \end{theorem}
 
@@ -89,7 +89,7 @@
 先检查式 \eqref{eq:gibbs} 确实定义了概率分布。由于 $Z_f(s)$ 是有限正数，
 \[
 \sum_a\cand^+(a\mid s)
-=\frac{1}{Z_f(s)}\sum_a\beh(a\mid s)e^{f(s,a)/\tau}=1.
+=\frac{1}{Z_f(s)}\sum_a\beh(a\mid s)e^{\eta f(s,a)}=1.
 \]
 并且 $\cand^+(a\mid s)>0$ 只可能发生在 $\beh(a\mid s)>0$ 的 action 上，所以 $\cand^+\ll\beh$。
 对任意满足 $p\ll\beh$ 的候选分布，由定义逐项展开可得
@@ -97,21 +97,21 @@
 \KL(p\Vert\cand^+)
 &=\E_p\left[\log\frac{p}{\cand^+}\right]\\
 &=\E_p\left[\log\frac{p}{\beh}
-      -\frac{f}{\tau}+\log Z_f(s)\right]\\
-&=\KL(p\Vert\beh)-\frac1\tau\E_p[f]+\log Z_f(s).
+      -\eta f+\log Z_f(s)\right]\\
+&=\KL(p\Vert\beh)-\frac1\eta\E_p[f]+\log Z_f(s).
 \end{align*}
-将等式两边乘以 $-\tau$ 并整理，得到目标恒等式
+将等式两边乘以 $-1/\eta$ 并整理，得到目标恒等式
 \begin{equation*}
-\E_p[f]-\tau\KL(p\Vert\beh)
-=\tau\log Z_f(s)-\tau\KL(p\Vert\cand^+).
+\E_p[f]-\frac1\eta\KL(p\Vert\beh)
+=\frac1\eta\log Z_f(s)-\frac1\eta\KL(p\Vert\cand^+).
 \end{equation*}
-KL 散度满足 $\KL(p\Vert\cand^+)\geq0$，且等号当且仅当 $p=\cand^+$ 几乎处处成立。因此任意候选分布的目标值都不超过 $\tau\log Z_f(s)$，而 $p=\cand^+$ 达到该上界，故它是唯一最优解。
+KL 散度满足 $\KL(p\Vert\cand^+)\geq0$，且等号当且仅当 $p=\cand^+$ 几乎处处成立。因此任意候选分布的目标值都不超过 $\frac1\eta\log Z_f(s)$，而 $p=\cand^+$ 达到该上界，故它是唯一最优解。
 \end{proof}
 
 \begin{corollary}[优势形式]
 若 $f=A^\beh$ 且 $\E_{\beh}[A^\beh(s,\cdot)\mid s]=0$，则
 \[
-\cand^+(a\mid s)=\beh(a\mid s)\exp(A^\beh(s,a)/\tau) / Z_A(s).
+\cand^+(a\mid s)=\beh(a\mid s)\exp(\eta A^\beh(s,a)) / Z_A(s).
 \]
 若 $A^\beh$ 是与序列 PMD 一致的 soft advantage，则 $Z_A(s)=1$；若它是硬 reward advantage，$Z_A(s)$ 一般不等于 $1$。
 \end{corollary}
@@ -137,7 +137,7 @@ Q^\beh(s_t,a_t)=r_t(s_t,a_t)+\E_\beh\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\rig
 
 定义 $u_\theta(s,a)=\log\cand_\theta(a\mid s)/\beh(a\mid s)$，并令
 \[
-h(s,a)=f(s,a)/\tau-\log Z_f(s).
+h(s,a)=\eta f(s,a)-\log Z_f(s).
 \]
 PMD-Part 在行为测度下回归精确最优性方程：
 \begin{equation}
@@ -170,7 +170,7 @@ PMD-Part 的重要性质是目标中没有 ratio 权重；ratio 只出现在被�
 令
 \[
 \bar f(s)=\E_{a\sim\beh}[f(s,a)\mid s],
-\qquad g(s,a)=\frac{f(s,a)-\bar f(s)}{\tau}.
+\qquad g(s,a)=\eta\left(f(s,a)-\bar f(s)\right).
 \]
 PMD-Mean 不显式估计 $\log Z_f(s)$，而求解
 \begin{equation}
@@ -231,7 +231,7 @@ PMD-Part 的修正项 $\log Z_f(s)$ 对 action 是常数，PMD-Mean 的 Lambert-
 
 MDPO 直接对式 \eqref{eq:token-subproblem} 的目标做参数优化。令
 \[
-F_s(\theta)=\E_{a\sim\cand_\theta}[f(s,a)]-\tau\KL(\cand_\theta\Vert\beh).
+F_s(\theta)=\E_{a\sim\cand_\theta}[f(s,a)]-\frac1\eta\KL(\cand_\theta\Vert\beh).
 \]
 对 $\theta$ 求导时，先将 KL 写成
 \[
@@ -254,7 +254,7 @@ F_s(\theta)=\E_{a\sim\cand_\theta}[f(s,a)]-\tau\KL(\cand_\theta\Vert\beh).
 \label{eq:mdpo-onpolicy-gradient}
 \nabla F_s
 =\E_{a\sim\cand}\left[
-\left(f(s,a)-\tau\log\ratio_\theta(s,a)\right)g_\theta(s,a)
+\left(f(s,a)-\frac1\eta\log\ratio_\theta(s,a)\right)g_\theta(s,a)
 \right].
 \end{equation}
 其中 $\ratio_\theta=\cand_\theta/\beh$。若样本来自行为策略，则
@@ -262,7 +262,7 @@ F_s(\theta)=\E_{a\sim\cand_\theta}[f(s,a)]-\tau\KL(\cand_\theta\Vert\beh).
 \label{eq:mdpo-is-gradient}
 \nabla F_s
 =\E_{a\sim\beh}\left[
-\ratio_\theta(s,a)\left(f(s,a)-\tau\log\ratio_\theta(s,a)\right)g_\theta(s,a)
+\ratio_\theta(s,a)\left(f(s,a)-\frac1\eta\log\ratio_\theta(s,a)\right)g_\theta(s,a)
 \right].
 \end{equation}
 这就是 MDPO 中的 action-level IS。若状态也来自 replay 的 $d_\beh$，而目标是 $d_{\cand}$ 下的 occupancy 目标，还需要 prefix ratio；经典实现通常把状态测度固定为 replay/rollout 测度，因而没有完整解决 state-distribution mismatch。
@@ -273,7 +273,7 @@ MDPO 的梯度式 \eqref{eq:mdpo-is-gradient} 与 PMD-Part 梯度式 \eqref{eq:p
 \end{proposition}
 
 \begin{proof}
-在镜像解处，$\log\ratio=f/\tau-\log Z_f$，故式 \eqref{eq:mdpo-onpolicy-gradient} 为最优目标的驻点；PMD-Part 的 residual $h-u$ 逐点为零。离开镜像解时，MDPO 被积函数包含 $\ratio_\theta$ 和 $f-\tau\log\ratio_\theta$，PMD-Part 被积函数只有 $h-u_\theta$，两者测度和残差均不同。
+在镜像解处，$\log\ratio=\eta f-\log Z_f$，故式 \eqref{eq:mdpo-onpolicy-gradient} 为最优目标的驻点；PMD-Part 的 residual $h-u$ 逐点为零。离开镜像解时，MDPO 被积函数包含 $\ratio_\theta$ 和 $f-\frac1\eta\log\ratio_\theta$，PMD-Part 被积函数只有 $h-u_\theta$，两者测度和残差均不同。
 \end{proof}
 
 \section{BPO：从 token 最优性到实际 PG surrogate}
@@ -310,7 +310,7 @@ BPO 的 token-level PMD 起点与式 \eqref{eq:token-subproblem} 相同，使用
 
 \section{MDPO：无偏但承担 action-ratio 的二阶矩}
 
-令 $c(a)=f(s,a)-\tau u(a)$。MDPO 的单样本估计量为
+令 $c(a)=f(s,a)-\frac1\eta u(a)$。MDPO 的单样本估计量为
 \begin{equation}
 \widehat G_{\rm MDPO}=\rho(a)c(a)g(a),\qquad a\sim\beh(\cdot\mid s),
 \end{equation}
@@ -426,11 +426,11 @@ BPO 的逐 prefix 残差（取 $f=A^\beh$，故 $\E_\beh[f\mid s]=0$）写成
 \label{thm:bpo-part-equivalence}
 设 $f=A^\beh$ 满足 $\E_\beh[f\mid s]=0$，$\log Z_f$ 使用精确配分函数，target、$\beh$ 与访问测度均停止梯度。定义
 \begin{equation}
-h(a)=\eta f(a)-\log Z_f,qquad q(a)=h(a)-u(a).
+h(a)=\eta f(a)-\log Z_f,\qquad q(a)=h(a)-u(a).
 \end{equation}
 则
 \begin{equation}
-\delta(a)=q(a)+c_s,qquad c_s=\log Z_f+\E_\beh[u],
+\delta(a)=q(a)+c_s,\qquad c_s=\log Z_f+\E_\beh[u],
 \end{equation}
 且
 \begin{equation}
@@ -494,6 +494,41 @@ $-\nabla\mathcal L_{\rm Part}^{(\eta)}=\E_\beh[qg]$。代入即可得到式 \eqr
 \end{proof}
 
 二者只在 $c_s\bar g=0$ 时退化为相同梯度，例如锚点 $\cand=\beh$、可实现根处，或参数化恰好使 $\bar g=0$。一般离开锚点后，BPO 的 score centering 会留下 $c_s\bar g$ 这一额外项。若 $f$ 不是优势而有非零行为均值，必须先把 $f$ 中心化，否则 residual 与 PMD-Part 的 target 不再只差常数。若把 reverse KL 近似成二元项、停止其梯度、加入 clip 或使用不精确的 $Z_f$，式 \eqref{eq:bpo-part-exact} 也不再成立，只能视为近似 PG surrogate。
+\section{为什么同为 token-level 仍然不等价}
+\label{sec:bpo-part-intuition}
+
+token-level 只说明二者都在固定 prefix $s$ 上处理条件分布；它没有规定必须使用同一个参数空间度量。PMD-Part 回归的是带有确定常数项 $-\log Z_f(s)$ 的完整 log-ratio：
+\[
+q(a)=\underbrace{\eta f(a)-\log Z_f(s)}_{h(a)}-u(a).
+\]
+因此它的平方损失直接惩罚 action-independent 的常数误差，梯度为 $\E_\beh[qg]$。BPO 使用的是 reverse-KL 中心化后的 residual：
+\[
+\delta(a)=\eta f(a)-u(a)+\E_\beh[u]
+=q(a)+c_s,
+\qquad c_s=\log Z_f(s)+\E_\beh[u].
+\]
+BPO 的目标只关心 $u(a)-\eta f(a)$ 在行为 action 测度下的中心化部分，因而沿着所有 action 同时平移 $u$ 的方向不会产生同样的惩罚。
+
+真正产生梯度差异的是对 BPO reverse KL 的求导。逐点求导给出
+\[
+\nabla_\theta\delta(a)=-(g(a)-\bar g),
+\qquad \bar g=\E_\beh[g].
+\]
+代入平方损失后，残差的行为均值为零，于是
+\[
+-\eta\nabla \mathcal L_{\rm BPO}
+=\E_\beh[\delta(g-\bar g)]
+=\E_\beh[\delta g]
+=\E_\beh[qg]+c_s\bar g.
+\]
+PMD-Part 从一开始就把 $\log Z_f$ 当作固定 target 常数，不会产生 $c_s\bar g$ 这一项。换句话说，差异不是来自 token-level 与 sequence-level 的访问测度，也不是来自 clip 或线性化；它来自两个平方回归问题对 action-independent 方向的处理不同，以及 BPO 对 reverse KL 求导产生的行为 score centering。
+
+两者仍然共享同一个可实现根：在 $u=h$ 时，$q=0$、$c_s=0$ 且 $\delta=0$。共享根只说明最优解一致，不说明离开根以后向量场一致。以二动作 logit 参数化为例，若 $\beh(1)=m$、$\cand_\theta(1)=p$，则
+\[
+g(1)=1-p,\qquad g(0)=-p,qquad \bar g=m-p.
+\]
+只要 $p\neq m$ 且 $c_s\neq0$，就有 $c_s\bar g\neq0$，BPO 和 PMD-Part 的更新方向严格不同。这一差异即使在有限 action、精确配分函数和完整 reverse KL 下仍然存在。
+
 \section{PMD-Part 的投影偏差与 BPO 的中心化方差}
 
 设策略类受限为 $\Pi$。PMD-Part 的 population 解为
@@ -569,9 +604,9 @@ $\operatorname{Var}(\delta^2)\leq\E[\delta^4]$ 即得结论。
 \toprule
 方法 & 理论更新 & 梯度/权重 & 主要偏差方差来源 \\
 \midrule
-PMD-Part & 回归 $u^+=f/\tau-\log Z_f$ & 行为测度下 residual score，无外部 IS & 有限模型投影偏差；通常低于 IS 的 ratio 方差 \\
+PMD-Part & 回归 $u^+=\eta f-\log Z_f$ & 行为测度下 residual score，无外部 IS & 有限模型投影偏差；通常低于 IS 的 ratio 方差 \\
 PMD-Mean & 中心化平方回归加 $\E_\beh[e^u]=1$ & Lambert-$W$ 投影梯度 & 均值和投影近似偏差；无乘积 IS \\
-MDPO & 直接最大化 $\E_\pi[f]-\tau\KL(\pi\Vert\mu)$ & $\rho(f-\tau\log\rho)\nabla\log\pi$ & action IS 无偏但二阶矩随 $\E_\mu[\rho^2]$ 增长 \\
+MDPO & 直接最大化 $\E_\pi[f]-\frac1\eta\KL(\pi\Vert\mu)$ & $\rho(f-\frac1\eta\log\rho)\nabla\log\pi$ & action IS 无偏但二阶矩随 $\E_\mu[\rho^2]$ 增长 \\
 BPO & residual regression（本文件分析未线性化形式） & $\delta(g-\bar g)$，包含 score centering & $d_\beh$ 投影偏差与回归统计方差 \\
 \bottomrule
 \end{tabular}
