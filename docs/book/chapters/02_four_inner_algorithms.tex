@@ -557,8 +557,9 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 在写算法之前先把四个 inner 的计算量化简。对一个固定 prefix，teacher、anchor 和当前 student 的信息都直接写成 token log-probability。PMD 的归一化常数是
 \begin{equation}
 \label{eq:ch2-opd-full-logz}
-\log Z_k(s)=\operatorname{LSE}_{v\in\mathcal V}
-\left[(1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right].
+\log Z_k(s)=
+\log\left(\sum_{v\in\mathcal V}
+\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right)\right).
 \end{equation}
 因此 exact mirror target 为
 \[
@@ -581,13 +582,13 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 于是四个 loss 可直接化为
 \begin{align}
 \mathcal L_{\mathrm{Part}}(s)
-&=\frac12\sum_{v\in\mathcal V}\pi_k(v\mid s)
+&=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \left[\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
 -\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
 +\log Z_k(s)\right]^2,
 \label{eq:ch2-opd-full-part-simplified}\\
 \mathcal L_{\mathrm{Mean}}(s)
-&=\frac12\sum_{v\in\mathcal V}\pi_k(v\mid s)
+&=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \Bigg[
 \left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
 +\mathcal K_k^\theta(s)\right)
@@ -604,19 +605,20 @@ D_\theta(s,v)
 &\quad-\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
 +\mathcal K_k^\theta(s)\right),
 \label{eq:ch2-opd-full-bpo-residual}\\
-\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)^2,
+\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_\theta(s,v)^2],
 \label{eq:ch2-opd-full-bpo-simplified}\\
 \mathcal J_{\mathrm{MDPO}}(s)
-&=\sum_{v\in\mathcal V}\pi_\theta(v\mid s)
+&=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
 \left[\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
 -\frac1\eta\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}\right].
 \label{eq:ch2-opd-full-mdpo-simplified}
 \end{align}
-由于 $\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)=0$，BPO 的完整词表梯度进一步化为
+由于 $\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_\theta(s,v)]=0$，BPO 的完整词表梯度进一步化为
 \begin{equation}
 \label{eq:ch2-opd-full-bpo-gradient-simplified}
 -\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
-=\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)\nabla_\theta\log\pi_\theta(v\mid s).
+=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[D_\theta(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right].
 \end{equation}
 因此完整 vocabulary 路径无需显式计算 centered score 的第二项；它在精确求和中严格抵消。
 
@@ -626,17 +628,18 @@ D_\theta(s,v)
 $\log Z_k$ 和 $\mathcal K_k^T$ 都不依赖当前参数 $\theta$，实现中应使用
 $\operatorname{stopgrad}$。相反，$\mathcal K_k^\theta$ 必须保留对
 $\log\pi_\theta$ 的梯度。完整词表下
-\begin{equation}
+\begin{align}
 \label{eq:ch2-opd-grad-ktheta}
 \mathcal K_k^\theta(s)
-=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \left[\operatorname{stopgrad}\!\left(\log\pi_k(v\mid s)\right)
 -\log\pi_\theta(v\mid s)\right],
 \\
 \nabla_\theta\mathcal K_k^\theta(s)
+&
 =-\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \left[\nabla_\theta\log\pi_\theta(v\mid s)\right].
-\end{equation}
+\end{align}
 对 PMD-Part，残差对 $\theta$ 的导数就是
 $\nabla_\theta\log\pi_\theta(v\mid s)$，故
 \begin{align}
@@ -729,20 +732,22 @@ $\widehat{\mathcal K}_{k}^{\theta}$ 错误地 stop-gradient，PMD-Mean 和 BPO
 \Ensure updated student parameters $\theta$
 \For{$n=1,\ldots,N$}
     \State query $\log T(v\mid s_i)$, $\log\pi_k(v\mid s_i)$ and $\log\pi_\theta(v\mid s_i)$ for all $v\in\mathcal V$
-    \State $\log Z_{k,i}\gets\operatorname{logsumexp}_v[(1-\eta)\log\pi_k(v\mid s_i)+\eta\log T(v\mid s_i)]$
+    \State $\log Z_{k,i}\gets\log\left(\sum_{v\in\mathcal V}\exp\left((1-\eta)\log\pi_k(v\mid s_i)+\eta\log T(v\mid s_i)\right)\right)$
     \State $\mathcal K_{k,i}^T\gets\operatorname{KL}(\pi_k(\cdot\mid s_i)\Vert T(\cdot\mid s_i))$
     \State $\mathcal K_{k,i}^\theta\gets\operatorname{KL}(\pi_k(\cdot\mid s_i)\Vert\pi_\theta(\cdot\mid s_i))$
     \If{$M=\mathrm{Part}$}
-        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\log Z_{k,i}\right]^2$
+        \State $A_i(v)\gets\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\operatorname{stopgrad}(\log Z_{k,i})$
+        \State $G\gets B^{-1}\sum_i\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}\left[A_i(v)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
     \ElsIf{$M=\mathrm{Mean}$}
-        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta-\eta\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right)\right]^2$
+        \State $A_i(v)\gets\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta-\eta\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right)$
+        \State $G\gets B^{-1}\sum_i\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}\left[A_i(v)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
     \ElsIf{$M=\mathrm{BPO}$}
         \State $D_i(v)\gets\eta\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right]-\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta\right]$
-        \State $L\gets(2\eta B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)D_i(v)^2$
+        \State $G\gets-\eta^{-1}B^{-1}\sum_i\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}\left[D_i(v)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
     \ElsIf{$M=\mathrm{MDPO}$}
-        \State $L\gets-B^{-1}\sum_i\sum_v\pi_\theta(v\mid s_i)\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta^{-1}\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}\right]$
+        \State $G\gets-B^{-1}\sum_i\mathbb E_{v\sim\pi_\theta(\cdot\mid s_i)}\left[\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta^{-1}\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}\right)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
     \EndIf
-    \State $\theta\gets\operatorname{OptimizerStep}(\theta,\nabla_\theta L)$
+    \State $\theta\gets\operatorname{OptimizerStep}(\theta,G)$ \Comment{$G$ is a descent gradient; expectations become MC averages}
 \EndFor
 \State \Return $\theta$ \Comment{$\pi_k,T$ remain frozen for all $N$ steps}
 \end{algorithmic}
