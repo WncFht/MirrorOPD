@@ -58,6 +58,67 @@ $$
 
 这些图给出的单-token结论是：$K$ 增大首先减少 tail mass，从而降低单-token方差；但 $K$ 不是越大越有利，因为计算和显存开销随 $K$ 增加，而 literal masked-tail 梯度的结构偏差也不由 $K$ 自动消除。对于真实 OPD 训练，图中的 $B$ 应替换为一个 minibatch 内不同 prefix/token position 的平均数量，不能解释成同一个 prefix 的重复 rollout 次数。
 
+## 标量 KL 估计量与梯度估计量分开
+
+上面的实验测量的是对参数的向量梯度。标量 KL 需要单独定义估计量，不能从梯度 RMSE 反推。固定一个 prefix，记
+
+$$
+\ell(y)=\log\frac{\pi(y)}{\pi_{\rm ref}(y)},
+\qquad
+K=\operatorname{KL}(\pi\Vert\pi_{\rm ref})
+ =\mathbb E_{Y\sim\pi}[\ell(Y)].
+$$
+
+因此，单个 sampled token 的 K1 值估计量是 $\widehat K_1=\ell(Y)$，它对标量 KL 无偏。论文中的 K4 写成 $r(Y)\ell(Y)$，其中 $r(Y)=\pi(Y)/\operatorname{sg}(\pi(Y))$；在前向数值上 $r(Y)=1$，所以 K4 的标量值仍然等于 $\ell(Y)$。K4 与 K1 的差别出现在自动微分图，而不在前向标量值。
+
+给定由当前策略 logits 得到的 Top-$K$ 集合 $S_K$，只保留头部得到的截断值为
+
+$$
+K_{\rm trunc}(K)=\sum_{j\in S_K}\pi(j)\ell(j),
+\qquad
+\operatorname{Bias}[K_{\rm trunc}(K)]
+ =-\sum_{j\notin S_K}\pi(j)\ell(j).
+$$
+
+它没有 Monte Carlo 方差，但一般有 tail bias。把一个 rollout token $Y\sim\pi$ 用作尾部修正，则
+
+$$
+\widehat K_{\rm TopK}(K)
+ =\sum_{j\in S_K}\pi(j)\ell(j)
+  +\mathbf 1\{Y\notin S_K\}\ell(Y)
+$$
+
+满足
+
+$$
+\mathbb E[\widehat K_{\rm TopK}(K)]=K,
+\qquad
+\operatorname{Var}[\widehat K_{\rm TopK}(K)]
+ =\sum_{j\notin S_K}\pi(j)\ell(j)^2
+  -\left(\sum_{j\notin S_K}\pi(j)\ell(j)\right)^2.
+$$
+
+所以标量 Top-K 估计量在 on-policy 情况下保持无偏，$K$ 只改变尾部方差。对于 outer rollout 来自 $\pi_k$ 而当前 inner policy 是 $\pi_\theta$ 的情况，尾部项改为停止梯度的重要性修正
+
+$$
+\mathbf 1\{Y\notin S_K\}
+\operatorname{sg}\!\left(\frac{\pi_\theta(Y)}{\pi_k(Y)}\right)
+\log\frac{\pi_\theta(Y)}{\pi_{\rm ref}(Y)},
+\qquad Y\sim\pi_k,
+$$
+
+其前向期望仍然是当前策略下的 tail KL；权重的停止梯度只影响反向梯度，不改变标量值的无偏性。
+
+我们还记录了 K3++ 的标量值 $\widehat K_{3++}=\ell(Y)+\exp(-\ell(Y))-1$。由于 $\mathbb E_\pi[\exp(-\ell(Y))]=1$，它同样对标量 KL 无偏，但在本合成分布上的方差明显大于 K1/K4。标量实验输出在 [`k_analysis/value_metrics.csv`](k_analysis/value_metrics.csv)，偏差--方差图在 [`k_analysis/topk_value_bias_variance.png`](k_analysis/topk_value_bias_variance.png)，按有效平均数 $B$ 展开的 RMSE 在 [`k_analysis/topk_value_rmse_vs_k.png`](k_analysis/topk_value_rmse_vs_k.png)。这里的 RMSE 恒按
+
+$$
+\operatorname{MSE}=\operatorname{Bias}^2+\operatorname{Var},
+\qquad
+\operatorname{RMSE}=\sqrt{\operatorname{MSE}}
+$$
+
+计算；对 $B$ 个独立 token 平均时，方差项除以 $B$，截断 bias 不随 $B$ 消失。
+
 ## 结果
 
 ![Top-K KL bias-variance](topk_kl_bias_variance.png)
@@ -87,3 +148,5 @@ $$
 $$
 
 因此，按 literal 的 masked K4 stop-gradient 写法，值估计可以无偏，但受限 tail 的自动微分梯度一般会留下一个与 $B$ 无关的结构偏差；图中 Top-K 曲线在大 $B$ 时的非零平台正是这一项，而不是 Monte Carlo 误差。这个检查是后续 MirrorOPD 理论中区分“KL 值无偏”和“KL 梯度无偏”的必要基线。若要得到严格无偏的 restricted-tail 梯度，需要额外补偿该 tail score 项，或采用与论文实现不同的 stop-gradient 约定。
+
+标量结果不改变上述梯度结论：同一个 K1/K4 前向值可以对应不同的反向图；同一个截断标量也可以通过不同的停止梯度约定产生不同的参数梯度。因此 OPD 实现和理论证明应分别报告 scalar KL 的 bias/variance 与 gradient estimator 的 bias/variance，不能把二者合并成一个指标。
