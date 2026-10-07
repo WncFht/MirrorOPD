@@ -168,14 +168,150 @@ $$
 
 建议把 OPD 的证明分成三层。第一层在每个固定 prefix 上证明 Gibbs target 和 projective contraction；第二层在固定 reference 的参数空间证明 Natural-GD/普通 GD 的 inner 逼近误差；第三层再用 occupancy mismatch、teacher approximation 和采样误差把局部误差汇总到 sequence-level。第一层已经是精确结论，第二层需要 Fisher 非退化或阻尼后的谱界，第三层才需要 RL 特有的 concentrability 或 prefix-occupancy 假设。
 
-实现上，outer loop 应显式保存 `anchor_state_dict`，所有 inner steps 读取同一份 $pi_k$ 的 log-prob；inner 结束后再同步。记录以下三个量足以诊断动力学：当前策略到精确 mirror target 的 KL、projective log-ratio 振幅 $\Delta_k$、以及 inner 梯度预条件后的残差。只看 teacher KL 无法区分“target 本身在移动”和“inner 没有求解好”这两种情况。
+实现上，outer loop 应显式保存 `anchor_state_dict`，所有 inner steps 读取同一份 $\pi_k$ 的 log-prob；inner 结束后再同步。记录以下三个量足以诊断动力学：当前策略到精确 mirror target 的 KL、projective log-ratio 振幅 $\Delta_k$、以及 inner 梯度预条件后的残差。只看 teacher KL 无法区分“target 本身在移动”和“inner 没有求解好”这两种情况。
+
+## Outer 同步策略
+
+### Hard sync：OPD 的默认策略
+
+Hard sync 在 outer 边界执行
+
+$$
+\pi_k\leftarrow\pi_{\mathrm{student}},
+\qquad
+\text{freeze }\pi_k\text{ for }M_k\text{ inner updates}.
+$$
+
+它正好对应前面的固定-reference 镜像子问题，因而保留 Gibbs 闭式解、projective contraction 和 inexact recursion。MDPO 的 on-policy 算法也是一轮采样后固定旧策略并重复多个 SGD steps；原文实验发现 $m=1$ 不能让 KL proximity 生效，$m=10$ 在其 MuJoCo on-policy 设置中表现较好。这个数值不能直接搬到 LLM，但“同一 outer batch 内不刷新 reference”是可迁移的结构。[^mdpo]
+
+Hard sync 的同步周期不应由 wall-clock 或任意固定 epoch 决定，而应由 inner residual 决定。令 $e_{k,m}$ 为当前 student 到固定 mirror target 的残差，在局部二次模型中有
+
+$$
+\lVert e_{k,m}\rVert_{A_k}\le q_k^m\lVert e_{k,0}\rVert_{A_k}.
+$$
+
+选择最小的 $M_k$ 使得
+
+$$
+q_k^{M_k}\lVert e_{k,0}\rVert_{A_k}\le c\,\eta_k^2
+$$
+
+其中 $c$ 是允许的常数，就能把 outer 稳态误差 $\varepsilon_k/\eta_k$ 控制在 $O(\eta_k)$。如果只要求固定误差地板 $\bar\varepsilon$，右侧可改为 $c\eta_k$；但此时减小 $\eta_k$ 不会自动提高最终精度，因为误差项会被 $1/\eta_k$ 放大。
+
+TRPO 也在一批 rollout 内冻结 old policy，但它只做一次受 KL 约束的 natural-gradient/line-search 更新，然后用新 rollout 刷新 old policy；PPO 则在同一批 rollout 上做多 epoch，并用 old/new ratio clipping 近似限制漂移。[^trpo][^ppo] 这两种算法都支持“采样批次边界同步”，但 PPO 的 clip 约束不等于 OPD 的 KL mirror target，不能把 clip ratio 当成 $\eta$ 的直接替代品。
+
+### Delayed sync：把 reference 当作 lagged target
+
+若每个 outer batch 都刷新过于昂贵，可以让同一份 reference 跨 $L>1$ 个 batch 保持不变。此时第 $j$ 个 batch 实际求解的是以旧 anchor $\bar\pi$ 为中心的镜像问题，误差递推包含额外的 anchor drift：
+
+$$
+\varepsilon_{k+j}^{\mathrm{total}}
+\le \varepsilon_{k+j}^{\mathrm{inner}}
+ +\operatorname{osc}_a\log\frac{\pi_{k+j}(a\mid s)}{\bar\pi(a\mid s)}.
+$$
+
+因此 delayed sync 只有在每个 batch 的 policy drift 很小、或者 replay 数据本来就以同一行为策略生成时才有理论依据。对 OPD，teacher ratio 本身依赖当前 anchor；跨 batch 不刷新会让 $r=\log T-\log\bar\pi$ 变成 stale signal。建议把 delayed sync 作为吞吐优化，而不是默认算法。
+
+### Soft/Polyak sync：稳定但改变算法
+
+soft sync 形如
+
+$$
+\theta_k^{\mathrm{ref}}
+\leftarrow(1-\tau)\theta_{k-1}^{\mathrm{ref}}+\tau\theta_k^{\mathrm{student}},
+\qquad 0<\tau<1.
+$$
+
+它可以降低 reference 的批间噪声，却不再等价于 $\pi_k$ 的 hard PMD。参数空间线性插值也不等于策略分布的几何插值；即使 logits 线性插值，softmax 后的策略仍不是 $\pi_{k-1}^{1-\tau}\pi_k^\tau$ 的一般实现。若使用 soft sync，必须把 reference 作为独立状态并分析 two-timescale 动力学；不能继续使用 hard-sync 的 exact OPD theorem。对于当前 OPD，soft sync 适合在实验中作为 ablation，不适合作为主理论对象。
+
+### 每个 inner step 都 sync
+
+若每个 inner step 后令 reference 等于 student，KL gradient 在新的 reference 处反复归零，参数优化只剩下随时间变化的 teacher direction。tabular 中若每次都能精确求解，连续执行微小的 geometric teacher interpolation 仍可产生类似的总路径；神经网络中却会叠加 stale-gradient、optimizer momentum 和 Fisher 重估误差，已不是“固定 reference 的一次 PMD step”。因此实现上应把同步点放在 outer loop，而不是 optimizer step hook 中。
+
+## $\eta$ 的数学作用与选择
+
+### 精确 OPD 中的三种含义
+
+在 $p_\eta(a)\propto\pi_k(a)\exp(\eta r_k(a))$ 中，$\eta$ 同时决定三个量：teacher 插值比例、projective 收缩率和 KL 子问题曲率。对固定 teacher，$0<\eta\le1$ 时每个 outer 的 projective 收缩为 $1-\eta$；局部参数目标的 KL Hessian 是 $A_k/\eta$；若普通 GD 学习率是 $\gamma$，稳定条件是 $\gamma<2\eta/M_k$。所以减小 $\eta$ 会让单个 outer 更保守，同时让 inner 目标更硬，要求把参数学习率按 $\gamma\propto\eta$ 缩放。
+
+若使用精确 mirror outer 且 teacher 固定，常数 $\eta$ 的达到误差 $\epsilon$ 所需 outer steps 约为
+
+$$
+K\ge\frac{\log(\Delta_0/\epsilon)}{-\log(1-\eta)}
+\simeq\frac1\eta\log\frac{\Delta_0}{\epsilon}
+\quad(\eta\ll1).
+$$
+
+因此很小的 $\eta$ 不是免费的稳定性：它把计算从 inner 转移到更多 outer refreshes。另一方面，$\eta=1$ 虽然在 exact tabular 情形一步到 teacher，却要求 inner 求解、teacher logits、访问测度和参数表示都足够准确；在有限样本神经网络中通常会放大 projection error。
+
+### 用 KL budget 选择 $\eta$
+
+比直接固定 $\eta$ 更稳健的规则是指定 anchor KL budget $\delta_k$，在每个 prefix 解一维方程
+
+$$
+\operatorname{KL}(p_\eta(\cdot\mid s)\Vert\pi_k(\cdot\mid s))=\delta_k.
+$$
+
+该方程可解是因为
+
+$$
+\operatorname{KL}(p_\eta\Vert\pi_k)
+=\eta\,\mathbb E_{p_\eta}[r_k]-\log Z_k(\eta),
+$$
+
+且
+
+$$
+\frac{\mathrm d}{\mathrm d\eta}
+\operatorname{KL}(p_\eta\Vert\pi_k)
+=\eta\operatorname{Var}_{p_\eta}(r_k)\ge0.
+$$
+
+所以在 $0\le\eta\le1$ 上 KL 随 $\eta$ 单调增加，可以用 bisection 得到唯一的 $\eta_k$，再对所有 prefix 取分位数或保守最小值。小步长下
+
+$$
+\operatorname{KL}(p_\eta\Vert\pi_k)
+=\frac{\eta^2}{2}\operatorname{Var}_{\pi_k}(r_k)+O(\eta^3),
+$$
+
+给出无需逐点求根的初值
+
+$$
+\eta_k\approx
+\sqrt{\frac{2\delta_k}
+{\widehat{\operatorname{Var}}_{\pi_k}(r_k)+\epsilon_{\mathrm{var}}}}.
+$$
+
+这条规则自动对 teacher/student 分歧大的 prefix 减小步长，对分歧小的 prefix 放大步长；最后仍应截断到 $[\eta_{\min},1]$。如果只能用 sampled actions，必须对方差估计和 $\eta$ 加上 confidence margin，避免少数尖锐 ratio 造成过大的实际 KL。
+
+### 适合 OPD 的默认 schedule
+
+当前阶段建议把 hard sync 作为主算法，先固定 $\eta_k=\eta$ 做机制实验，再引入 KL-budget adaptation。初始 sweep 可以覆盖 $\eta\in\{0.1,0.3,0.5,0.7,1.0\}$，但选择标准应是三条曲线同时满足：anchor KL 不超过预算、projective residual 按预期衰减、inner residual 在同步前达到阈值。若 $\eta=1$ 的 inner residual 明显高于较小 $\eta$，应优先增加 $M_k$ 或降低参数学习率，而不是继续堆 outer steps。
+
+若需要随训练进度改变 $\eta_k$，应保持 $0\le\eta_k\le1$ 且 $\sum_k\eta_k=\infty$；否则即使每个 inner 都精确，$\prod_k(1-\eta_k)$ 也可能不趋于零。一个保守 schedule 是前期使用 KL-budget 控制的常数区间，后期在 residual 已小于阈值后再逐渐减小 $\eta_k$ 以降低噪声。MDPO 原文的 $t_k=1-k/K$ 是其有限 horizon 的理论启发式，不能直接作为 OPD 的通用 schedule，尤其不能在未知训练总步数时照搬。
+
+## 对 OPD 实验的具体落地
+
+每个 outer 记录 anchor 到 student 的实际 forward KL、精确或估计的 mirror-target KL、$\widehat{\operatorname{Var}}(r_k)$ 和 inner residual。用实际 target KL 校验训练代码是否真的执行了 hard sync；只看权重是否复制成功不够，因为 optimizer momentum、EMA 和 mixed-precision master weights 也可能保留旧状态。比较同步策略时至少做 hard sync、delayed sync 和 soft sync 三组，保持总 token/update 预算不变；否则更快的 wall-clock 可能只是少做了 inner updates。
+
+最小可验证实验是固定一个 teacher 和一批 prefix，分别运行五个 $\eta$ 值，每个 outer 用 residual stopping 而不是固定 $M$。如果理论正确，应观察到：exact-table 版本的 projective residual 斜率接近 $\log(1-\eta)$；参数版本的偏差由 $q^M$ 和 Fisher 近似误差主导；soft/delayed sync 的偏差随 anchor drift 增大。这个实验能把“同步策略的影响”和“teacher 质量、rollout 方差、模型容量”分离开。
 
 ### 参考文献
 
-[^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. *Mirror Descent Policy Optimization*. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
-[^mirror]: Amir Beck and Marc Teboulle. *Mirror Descent and Nonlinear Projected Subgradient Methods for Convex Optimization*. Operations Research Letters 31(3), 2003. [DOI](https://doi.org/10.1016/S0167-6377(02)00231-6)
-[^pmd]: Guanghui Lan. *Policy Mirror Descent for Reinforcement Learning: Linear Convergence, New Sampling Complexity, and Generalized Problem Classes*. arXiv 2102.00135, 2021. [论文](https://arxiv.org/abs/2102.00135)
-[^gpmd]: Wenhao Zhan, Shicong Cen, Baihe Huang, Yuxin Chen, Jason D. Lee, and Yuejie Chi. *Policy Mirror Descent for Regularized Reinforcement Learning: A Generalized Framework with Linear Convergence*. arXiv 2105.11066, 2021. [论文](https://arxiv.org/abs/2105.11066)
-[^bgpo]: Feihu Huang, Shangqian Gao, and Heng Huang. *Bregman Gradient Policy Optimization*. ICLR 2022. [论文](https://arxiv.org/abs/2106.12112)
-[^npg]: Sajad Khodadadian, Prakirt Raj Jhunjhunwala, Sushil Mahavir Varma, and Siva Theja Maguluri. *On the Linear Convergence of Natural Policy Gradient Algorithm*. arXiv 2105.01424, 2021. [论文](https://arxiv.org/abs/2105.01424)
-[^amari]: Shun-ichi Amari. *Natural Gradient Works Efficiently in Learning*. Neural Computation 10(2), 1998. [DOI](https://doi.org/10.1162/089976698300017746)
+[^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. _Mirror Descent Policy Optimization_. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
+
+[^mirror]: Amir Beck and Marc Teboulle. _Mirror Descent and Nonlinear Projected Subgradient Methods for Convex Optimization_. Operations Research Letters 31(3), 2003. [DOI](<https://doi.org/10.1016/S0167-6377(02)00231-6>)
+
+[^pmd]: Guanghui Lan. _Policy Mirror Descent for Reinforcement Learning: Linear Convergence, New Sampling Complexity, and Generalized Problem Classes_. arXiv 2102.00135, 2021. [论文](https://arxiv.org/abs/2102.00135)
+
+[^gpmd]: Wenhao Zhan, Shicong Cen, Baihe Huang, Yuxin Chen, Jason D. Lee, and Yuejie Chi. _Policy Mirror Descent for Regularized Reinforcement Learning: A Generalized Framework with Linear Convergence_. arXiv 2105.11066, 2021. [论文](https://arxiv.org/abs/2105.11066)
+
+[^bgpo]: Feihu Huang, Shangqian Gao, and Heng Huang. _Bregman Gradient Policy Optimization_. ICLR 2022. [论文](https://arxiv.org/abs/2106.12112)
+
+[^npg]: Sajad Khodadadian, Prakirt Raj Jhunjhunwala, Sushil Mahavir Varma, and Siva Theja Maguluri. _On the Linear Convergence of Natural Policy Gradient Algorithm_. arXiv 2105.01424, 2021. [论文](https://arxiv.org/abs/2105.01424)
+
+[^amari]: Shun-ichi Amari. _Natural Gradient Works Efficiently in Learning_. Neural Computation 10(2), 1998. [DOI](https://doi.org/10.1162/089976698300017746)
+
+[^trpo]: John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, and Pieter Abbeel. _Trust Region Policy Optimization_. arXiv 1502.05477, 2015. [论文](https://arxiv.org/abs/1502.05477)
+
+[^ppo]: John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. _Proximal Policy Optimization Algorithms_. arXiv 1707.06347, 2017. [论文](https://arxiv.org/abs/1707.06347)
