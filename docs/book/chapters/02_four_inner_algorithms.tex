@@ -742,7 +742,7 @@ $-\nabla_\theta\log\pi_\theta(a\mid s)$。若把整个
 $\widehat{\mathcal K}_{k}^{\theta}$ 错误地 stop-gradient，PMD-Mean 和 BPO
 都会退化成未中心化的梯度，且不再对应式~\eqref{eq:ch2-opd-grad-mean-residual}。
 
-\subsection{$\log Z_k$ 与 KL 中心的估计、缓存和显存}
+\subsection{有限词表与 sampled-token：KL 与 partition 估计}
 \label{sec:ch2-opd-z-kl-estimation}
 
 2602.04417 的 Top-$K$ 方法直接估计 KL：在 top-$K$ 头部计算精确项，在尾部用
@@ -818,6 +818,46 @@ $S_Z(s)$ 为 $((1-\eta)\log\pi_k+\eta\log T)$ 的 top-$K$ 索引，则
 $\eta=0$ 时同样如此。$0<\eta<1$ 时，若不需要 PMD-Part，PMD-Mean/BPO
 可以绕开这项 log-of-mean 偏差。
 
+\paragraph{偏差--方差应按最终梯度而不是只看 KL 数值比较。}
+对一个 prefix 的任意估计器 $\widehat q$，最终关心的是带 score 的量
+$\widehat g=\widehat q\,\nabla_\theta\log\pi_\theta$。其均方误差分解为
+\begin{equation}
+\mathbb E\lVert\widehat g-g\rVert^2
+=\lVert\mathbb E[\widehat g]-g\rVert^2
++\operatorname{tr}\operatorname{Cov}(\widehat g).
+\end{equation}
+因此，单独比较 $\widehat{\mathcal K}$ 的数值方差并不足够：一个有轻微
+截断偏差但尾部方差极低的估计器，可能比无偏但重尾的 sampled estimator
+产生更小的梯度 MSE。2602.04417 的 Top-$K$ 结论正是这个取舍：加入尾部校正
+保持无偏，代价是尾部采样方差；只保留头部则引入可控的截断偏差。
+
+对 OPD 的 PMD-Part，$\log Z_k$ 的误差直接进入 residual，而 residual 又
+乘以 score。若使用 $\widehat c_k=\log\widehat Z_k$，令
+$\delta_Z=\widehat c_k-\log Z_k$，则单 prefix 的梯度误差包含
+\begin{equation}
+\Delta g_Z
+=\delta_Z\,\mathbb E_{v\sim\pi_k}
+\left[\nabla_\theta\log\pi_\theta(v\mid s)\right]
+\end{equation}
+以及 $\delta_Z$ 与 sampled score 的协方差项。完整词表下 score 均值可以被
+精确求和，前一项严格为零；sampled-token 下它只是在期望上为零，有限 batch
+会把 $\log Z_k$ 的标量误差放大成随机梯度噪声。故 PMD-Part 对 partition
+估计的要求比 BPO/PMD-Mean 更严格。
+
+对同一 prefix 同时估计中心和 policy-gradient 权重时，还要考虑协方差：若
+$\widehat c$ 与 score 使用同一枚 token，$\mathbb E[\widehat c\,\widehat g]$
+一般不等于 $\mathbb E[\widehat c]\mathbb E[\widehat g]$。采用独立的 auxiliary
+next-token 样本估计中心，或使用 leave-one-out center，可以消除这类自耦合偏差；
+代价是额外的 token 抽样和少量 log-prob 存储。跨 prefix 聚合只能降低总体
+均值方差，不能把不同条件分布下的样本变成同一 conditional center。
+
+最后，prefix 覆盖误差与 token 估计误差应分开记录。即使 token-level estimator
+在给定 $s$ 上无偏，rollout 只访问由 $\pi_k$ 诱导的有限 prefix 多重集，仍有
+$\widehat d_k-d_k$ 的 outer 测度误差。增加 Top-$K$ 或 auxiliary samples 只
+降低条件 token 方差，不能修复 prefix coverage；增加 rollout 数量或重新采样
+outer batch 才能降低这一项。实验日志应至少分别保存：prefix 数量与重复率、
+KL/partition 的 batch 均值和方差、尾部采样次数、梯度范数与峰值显存。
+
 缓存上，CPU/NVMe 只需保存 token IDs、mask、response mask、anchor/teacher
 的 action log-prob 和可选的 top-$K$ 摘要；student log-prob 每个 inner step
 重算。保存完整 logits 的代价是 $O(BH|\mathcal V|)$，保存 top-$K$ 摘要是
@@ -879,8 +919,7 @@ $\widehat d_k$，使用新的 $\pi_{k+1}$ 重新 rollout，而不是继续复用
 rollout。若 inner loop 没有收敛，$\pi_{\theta_{k,N}}$ 只是当前固定
 mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射严格定义。
 
-\subsection{只有 sampled next token：无完整词表时的估计路径}
-\label{sec:ch2-opd-sampled-token}
+\paragraph{只有 sampled next token：无完整词表时的估计路径。}
 
 如果每个 prefix 只有 rollout 中的下一个 token $a\sim\pi_k(\cdot\mid s)$，仍然可以无偏观测 $r_k(s,a)$，但不能从一个样本无偏得到 $\log Z_k(s)$：先估计 $Z_k$ 再取对数会产生 plug-in bias。因此 sampled-token 路径不应把 PMD-Part 的 exact $\log Z_k$ 假装已知。可行选择如下。
 
