@@ -630,7 +630,7 @@ D_\theta(s,v)
 \end{equation}
 因此完整 vocabulary 路径无需显式计算 centered score 的第二项；它在精确求和中严格抵消。
 
-\paragraph{对应的梯度与 stop-gradient 约定。}
+\subsubsection*{对应的梯度与 stop-gradient 约定}
 下面把式~\eqref{eq:ch2-opd-full-part-simplified}--\eqref{eq:ch2-opd-full-mdpo-simplified}
 写成可直接实现的 policy-gradient 形式。固定 outer step $k$ 时，$\pi_k$、$T$、
 $\log Z_k$ 和 $\mathcal K_k^T$ 都不依赖当前参数 $\theta$，实现中应使用
@@ -784,8 +784,12 @@ Mean/BPO 平方损失时则必须保留其对 student 的导数。
 \label{eq:ch2-opd-topk-anchor-kl}
 \end{align}
 对固定 $S_k$，尾部项是精确尾部求和的无偏 Monte Carlo 估计，且其 autograd
-梯度的期望等于真实 KL 梯度。$K=0$ 是纯 sampled-token，$K=|\mathcal V|$
-是 exact KL。给定头部后，条件方差为
+梯度的期望等于真实 KL 梯度。这里的“梯度无偏”是指把该估计量直接放进
+原始 KL 损失并对 student 反向传播时的性质；本章的最终实现采用已经解析化的
+policy-gradient 形式，KL 估计值只作为数值权重，必须整体
+$\operatorname{stopgrad}$，因此不需要再对这个估计量执行 autograd。
+$K=0$ 是纯 sampled-token，$K=|\mathcal V|$ 是 exact KL；这两个端点是同一
+个 top-$K$ 族的插值端点，不单独构成一个算法分支。给定头部后，条件方差为
 \begin{equation}
 \operatorname{Var}(\widehat{\mathcal K}_{k,n}^{\theta}\mid S_k)
 =\frac1m\operatorname{Var}_{a\sim\pi_k}\left[
@@ -795,6 +799,95 @@ Mean/BPO 平方损失时则必须保留其对 student 的导数。
 增大 $K$ 通常降低尾部质量和方差，但实际大小取决于尾部 log-ratio 的二阶矩。
 对 $\mathcal K_k^T$ 可使用同样的头尾分解；由于它不需要反向传播，anchor
 样本均值往往已经足够。
+
+为了把 2602.04417 中“截断偏差换取采样方差”的结论直接用于 OPD，下面给出
+一个与 KL、score 加权梯度和 partition function 都兼容的统一形式。固定 prefix
+$s$，令 $p(v)$ 为 rollout 测度（本章中通常是 $p=\pi_k(\cdot\mid s)$），
+$h(v)$ 为待求期望的 integrand，定义
+\begin{equation}
+Q=\mathbb E_{v\sim p}[h(v)],\qquad
+Q_K^{\mathrm{head}}=\sum_{v\in S_K}p(v)h(v),\qquad
+\tau_K=\mathbb E_{v\sim p}[\mathbf 1\{v\notin S_K\}h(v)],
+\label{eq:ch2-opd-generic-tail}
+\end{equation}
+其中 $S_K$ 是固定的 top-$K$ 集合。用 $m$ 个独立的 auxiliary token
+$a_1,\ldots,a_m\sim p$ 做尾部校正时，定义
+\begin{equation}
+\widehat Q_{K,m}=Q_K^{\mathrm{head}}+
+\frac1m\sum_{j=1}^{m}\mathbf 1\{a_j\notin S_K\}h(a_j).
+\label{eq:ch2-opd-generic-topk}
+\end{equation}
+
+\begin{theorem}[Top-$K$ 截断与尾部校正的偏差--方差分解]
+\label{thm:ch2-opd-topk-bias-variance}
+在 $\mathbb E_p[h^2]<\infty$ 且 $S_K$ 与 auxiliary samples 独立时，纯头部估计
+$\widehat Q_K^{\mathrm{tr}}=Q_K^{\mathrm{head}}$ 与尾部校正估计
+$\widehat Q_{K,m}$ 分别满足
+\begin{align}
+\operatorname{Bias}(\widehat Q_K^{\mathrm{tr}})&=-\tau_K,&
+\operatorname{Var}(\widehat Q_K^{\mathrm{tr}})&=0,&
+\operatorname{MSE}(\widehat Q_K^{\mathrm{tr}})&=\tau_K^2,\\
+\operatorname{Bias}(\widehat Q_{K,m})&=0,&
+\operatorname{Var}(\widehat Q_{K,m})&=\frac{V_K}{m},&
+\operatorname{MSE}(\widehat Q_{K,m})&=\frac{V_K}{m},
+\end{align}
+其中
+\begin{equation}
+V_K=\mathbb E_p\left[\mathbf 1\{v\notin S_K\}h(v)^2\right]-\tau_K^2.
+\label{eq:ch2-opd-tail-variance}
+\end{equation}
+如果 $S_K\subseteq S_{K+1}$，则尾部二阶矩
+$A_K=\mathbb E_p[\mathbf 1\{v\notin S_K\}h(v)^2]$ 单调不增，且
+$V_K\le A_K$。尾部均值 $\tau_K$ 在 $h\ge0$ 时单调不增；对符号不定的
+$h$，它本身不必单调，但有
+\begin{equation}
+|\tau_K|\le \sqrt{p(S_K^c)A_K}.
+\label{eq:ch2-opd-tail-cauchy}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+记 $X_j=\mathbf 1\{a_j\notin S_K\}h(a_j)$。由 $a_j\sim p$，有
+$\mathbb E[X_j]=\tau_K$，且 $\operatorname{Var}(X_j)=V_K$。因此
+\begin{equation}
+\mathbb E[\widehat Q_{K,m}]
+ =Q_K^{\mathrm{head}}+\tau_K=Q,
+\qquad
+\operatorname{Var}(\widehat Q_{K,m})
+ =\operatorname{Var}\left(\frac1m\sum_{j=1}^mX_j\right)
+ =\frac{V_K}{m},
+\end{equation}
+其中最后一步使用了独立性。纯头部估计没有随机项，且
+$Q_K^{\mathrm{head}}-Q=-\tau_K$，从而得到前三个等式。若集合嵌套，
+$\mathbf 1\{v\notin S_{K+1}\}\le\mathbf 1\{v\notin S_K\}$，故对非负
+$h^2$ 有 $A_{K+1}\le A_K$。当 $h\ge0$ 时，尾部指示函数逐点下降，
+所以 $0\le\tau_{K+1}\le\tau_K$。一般情形下对尾部随机变量应用
+Cauchy--Schwarz 不等式即可得到式~\eqref{eq:ch2-opd-tail-cauchy}。
+\end{proof}
+
+定理~\ref{thm:ch2-opd-topk-bias-variance} 有两个直接含义。对
+$h_{\mathrm{KL}}(v)=\log\frac{\pi_k(v\mid s)}{\pi_{\theta}(v\mid s)}$
+或 $h_T(v)=\log\frac{\pi_k(v\mid s)}{T(v\mid s)}$，$h$ 可能正也可能负，
+因此不能声称“增大 $K$ 必然单调减小截断 bias”；能够保证的是尾部二阶矩和
+上界下降。对 $h_Z(v)=\exp(\eta r_k(s,v))\ge0$，尾部均值本身单调下降，
+所以纯截断的 $Z_k$ 估计具有严格的单侧负偏差，而且随 $K$ 减小。
+这正是 2602.04417 中 truncated KL 与 tail-corrected Top-$K$ KL 的数学区别。
+
+如果最终对象是 score 加权的 policy gradient，令
+$g_\theta(v)=\nabla_\theta\log\pi_\theta(v\mid s)$，把
+$h(v)$ 换成向量 $h(v)g_\theta(v)$，定理逐坐标成立，并得到
+\begin{equation}
+\operatorname{Bias}(\widehat G_K^{\mathrm{tr}})
+ =-\mathbb E_p[\mathbf 1\{v\notin S_K\}h(v)g_\theta(v)],
+\qquad
+\operatorname{Cov}(\widehat G_{K,m})
+ =\frac1m\operatorname{Cov}_p(\mathbf 1\{v\notin S_K\}h(v)g_\theta(v)).
+\label{eq:ch2-opd-gradient-topk-mse}
+\end{equation}
+这描述的是“估计最终梯度权重”的误差，而不是对 detached 估计量求导。
+本章 Algorithm~5 采用后者：先解析得到 score-function 公式，再把
+$\widehat h$ 整体 stop-gradient。因此实现不需要保存估计量的 autograd 图；
+只需控制式~\eqref{eq:ch2-opd-gradient-topk-mse} 中的数值 bias 和 variance。
 
 对 $Z_k$，头尾分解应先估计 $Z_k$ 再取对数。令
 $S_Z(s)$ 为 $((1-\eta)\log\pi_k+\eta\log T)$ 的 top-$K$ 索引，则
@@ -818,7 +911,56 @@ $S_Z(s)$ 为 $((1-\eta)\log\pi_k+\eta\log T)$ 的 top-$K$ 索引，则
 $\eta=0$ 时同样如此。$0<\eta<1$ 时，若不需要 PMD-Part，PMD-Mean/BPO
 可以绕开这项 log-of-mean 偏差。
 
-\paragraph{偏差--方差应按最终梯度而不是只看 KL 数值比较。}
+\begin{theorem}[Partition function 的 log-of-mean 偏差]
+\label{thm:ch2-opd-logz-delta}
+设 $\widehat Z_{K,m}$ 是式~\eqref{eq:ch2-opd-topk-z} 的尾部校正估计，
+$\mathbb E[\widehat Z_{K,m}]=Z_k>0$，且尾部三阶绝对矩有限。记
+$V_{K}=\operatorname{Var}(\mathbf 1\{a\notin S_Z\}
+(T(a\mid s)/\pi_k(a\mid s))^\eta)$。当 $m$ 足够大时，
+\begin{align}
+\mathbb E[\log\widehat Z_{K,m}]-\log Z_k
+&=-\frac{V_K}{2mZ_k^2}+O(m^{-3/2}),\\
+\operatorname{Var}(\log\widehat Z_{K,m})
+&=\frac{V_K}{mZ_k^2}+O(m^{-3/2}).
+\end{align}
+若改用纯头部估计 $Z_K^{\mathrm{tr}}=\sum_{v\in S_Z}
+\pi_k(v)^{1-\eta}T(v)^\eta$，则
+\begin{equation}
+Z_K^{\mathrm{tr}}-Z_k=-\tau_K^Z\le0,
+\qquad
+\log Z_K^{\mathrm{tr}}-\log Z_k\le0,
+\end{equation}
+其中 $\tau_K^Z\ge0$ 是式~\eqref{eq:ch2-opd-generic-tail} 对
+$h_Z$ 的尾部均值。因而纯截断的 log-partition bias 是确定性的单侧偏差，
+而尾部校正的 plug-in log 估计是由方差诱导的负偏差。
+\end{theorem}
+
+\begin{proof}
+令 $\Delta=\widehat Z_{K,m}-Z_k$。由无偏性，$\mathbb E[\Delta]=0$，且
+$\mathbb E[\Delta^2]=V_K/m$。在 $Z_k$ 邻域对
+$f(z)=\log z$ 作三阶 Taylor 展开：
+\begin{equation}
+\log(Z_k+\Delta)=\log Z_k+\frac{\Delta}{Z_k}
+ -\frac{\Delta^2}{2Z_k^2}+R_3,
+\end{equation}
+其中在三阶矩有界时 $\mathbb E|R_3|=O(m^{-3/2})$。取期望并使用
+$\mathbb E[\Delta]=0$ 得到第一式。对同一展开取方差，首阶随机项为
+$\Delta/Z_k$，故
+$\operatorname{Var}(\log\widehat Z_{K,m})=V_K/(mZ_k^2)+O(m^{-3/2})$。
+最后，$h_Z\ge0$ 给出 $\tau_K^Z\ge0$，所以
+$Z_K^{\mathrm{tr}}\le Z_k$；由于 log 单调递增，第二个不等式随之成立。
+\end{proof}
+
+定理~\ref{thm:ch2-opd-logz-delta} 说明了为什么不能把“无偏的
+$\widehat Z_k$”直接等同于“无偏的 $\log Z_k$”。在 PMD-Part 中，若使用
+plug-in 估计，$\log Z_k$ 的误差会进入每个 token 的 residual；在完整词表
+路径上 score 均值可精确消去该常数项，在 sampled-token 路径上只能依赖有限样本
+近似消去。因此 PMD-Part 对 $m$、$K$ 和尾部比率的要求严格于 PMD-Mean/BPO。
+当 $m$ 个样本独立且把同一 prefix 的梯度平均时，partition 诱导的梯度方差
+按 $1/m$ 下降；当外层有 $B$ 个相互独立 prefix 时，条件于 prefix 的这部分
+方差进一步按 $1/B$ 下降，但 prefix coverage 误差不随 $m$ 消失。
+
+\subsubsection*{偏差--方差定理：从 KL 数值到最终 policy gradient}
 对一个 prefix 的任意估计器 $\widehat q$，最终关心的是带 score 的量
 $\widehat g=\widehat q\,\nabla_\theta\log\pi_\theta$。其均方误差分解为
 \begin{equation}
@@ -919,7 +1061,7 @@ $\widehat d_k$，使用新的 $\pi_{k+1}$ 重新 rollout，而不是继续复用
 rollout。若 inner loop 没有收敛，$\pi_{\theta_{k,N}}$ 只是当前固定
 mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射严格定义。
 
-\paragraph{只有 sampled next token：无完整词表时的估计路径。}
+\subsubsection*{只有 sampled next token：无完整词表时的估计路径}
 
 如果每个 prefix 只有 rollout 中的下一个 token $a\sim\pi_k(\cdot\mid s)$，仍然可以无偏观测 $r_k(s,a)$，但不能从一个样本无偏得到 $\log Z_k(s)$：先估计 $Z_k$ 再取对数会产生 plug-in bias。因此 sampled-token 路径不应把 PMD-Part 的 exact $\log Z_k$ 假装已知。可行选择如下。
 
