@@ -1,5 +1,0 @@
-{
-  "device": "cuda",
-  "torch": "2.14.0+cu130",
-  "cuda": "NVIDIA GeForce RTX 4070 SUPER"
-}
