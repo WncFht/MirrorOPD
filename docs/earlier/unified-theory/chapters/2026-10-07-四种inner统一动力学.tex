@@ -1,7 +1,7 @@
 \chapter{MirrorOPD 的四种 inner 变体：统一动力学与误差递推}
 \label{chap:mirroropd-unified-inner}
 
-本章把 PMD-Part、PMD-Mean、BPO 与 MDPO 放在同一个 outer--inner 框架中。四种方法共享一个冻结的 anchor policy $\pi_k$，区别只在 inner 目标如何表示同一个 KL-proximal mirror target，以及有限样本和有限优化步如何产生误差。除非特别说明，策略具有完整支持，动作空间有限，teacher 分布记为 $T(\cdot\mid s)$，步长满足 $0<\eta\leq 1$。
+本章把 PMD-Part、PMD-Mean、BPO 与 MDPO 放在同一个 outer--inner 框架中。四种方法共享一个冻结的 anchor policy $\pi_k$，区别在于 inner 是否显式表示配分函数、是否使用中心化最优性残差，以及有限样本和有限优化步如何产生误差；PMD-Mean 还会引入总体 target bias。除非特别说明，策略具有完整支持，动作空间有限，teacher 分布记为 $T(\cdot\mid s)$，步长满足 $0<\eta\leq 1$。
 
 \section{统一的 outer 算法}
 \label{sec:unified-outer}
@@ -85,45 +85,114 @@ PMD-Part 直接回归式 \eqref{eq:common-fixed-point} 的完整 target：
 \end{algorithmic}
 \end{algorithm}
 
-\section{PMD-Mean：回归中心化 reward 与归一化约束}
+\section{PMD-Mean：均值近似与 Lambert-$W$ 固定点}
 \label{sec:pmd-mean-unified}
 
-定义 anchor 测度下的均值
+这里必须区分两种经常被混用的目标。精确 PMD residual 可以把
+$c_k(s)=\log Z_k(s)$ 作为可计算 target；PMD-Mean 则用 anchor 下的 reward
+均值代替这个 log-partition。后一替换改变了总体优化问题，即使样本数和 inner
+步数都趋于无穷，驻点也不必等于式~\eqref{eq:unified-mirror-target}。
+
+令
 \[
- \bar r_k(s)=\E_{\pi_k}[r_k(s,a)\mid s]=-\KL(\pi_k(\cdot\mid s)\Vert T(\cdot\mid s)).
+ \bar r_k(s)=\E_{\pi_k}[r_k(s,a)\mid s],\qquad
+ h_k(s,a)=r_k(s,a)-\bar r_k(s),\qquad \E_{\pi_k}h_k=0.
 \]
-PMD-Mean 回归中心化 target：
+论文意义下的 PMD-Mean 分布目标是在归一化约束下最小化
 \begin{equation}
 \label{eq:pmd-mean-objective}
- \mathcal L_{\mathrm{Mean},k}(\theta)
- =\frac12\E_{m_k}\!\left[
- u_{k,\theta}(s,a)-\eta\{r_k(s,a)-\bar r_k(s)\}
- \right]^2.
+ \mathcal L_{\mathrm{Mean},k}(q)
+ =\frac12\E_{a\sim\pi_k(\cdot\mid s)}
+ \left[\log\frac{q(a\mid s)}{\pi_k(a\mid s)}-\eta h_k(s,a)\right]^2,
+ \qquad \sum_aq(a\mid s)=1.
 \end{equation}
-该 target 只确定 action-dependent 部分。若不同时满足 $\E_{\pi_k}[e^{u_{k,\theta}}\mid s]=1$，则 log-ratio 可以任意偏移常数，不能保证得到归一化策略。精确解在施加归一化约束后恢复
+精确 target 的平方回归应当在方括号中使用
+$\eta r_k-\log Z_k$；PMD-Mean 删除了 action-dependent 的配分函数校正，不能
+用“再加一个归一化约束”把二者等同起来。
+
+\begin{theorem}[PMD-Mean 的 Lambert-$W$ 固定点]
+\label{thm:four-inner-pmdmean-lambert}
+对有限动作、$\pi_k(a\mid s)>0$ 的每个历史，令
+$A_k(s)=\E_{\pi_k}e^{\eta h_k}$、$B_k(s)=\E_{\pi_k}e^{2\eta h_k}$。
+式~\eqref{eq:pmd-mean-objective} 的唯一分布最优解为
+\begin{equation}
+\label{eq:four-inner-pmdmean-target}
+ q_{\mathrm{Mean},k}(a\mid s)
+ =\pi_k(a\mid s)
+ \exp\!\left\{\eta h_k(s,a)-W\!\left(\kappa_k(s)e^{\eta h_k(s,a)}\right)\right\},
+\end{equation}
+其中 $W$ 是主分支，唯一的 $\kappa_k(s)\ge0$ 由归一化决定，并且
 \[
- u_{k,\theta}^{\star}=\eta r_k-c_k,
- \quad c_k=\log\E_{\pi_k}e^{\eta r_k}.
+ \frac{A_k(A_k-1)}{B_k}\leq\kappa_k\leq\log A_k.
 \]
+当 $h_k$ 非常数时，$A_k>1$ 且 $\kappa_k>0$。精确 mirror target 与该解的
+projective 偏差为
+\begin{equation}
+\label{eq:pmdmean-target-bias}
+ \delta_{\mathrm{Mean},k}(s)
+ =\left\|W\!\left(\kappa_ke^{\eta h_k(s,\cdot)}\right)-\log A_k\right\|_{\mathrm{osc}}.
+\end{equation}
+因此 PMD-Mean 只有在 $h_k$ 为常数，或在小步长极限下该偏差趋于零时，才与
+精确 mirror target 重合。
+\end{theorem}
+
+\begin{proof}
+写 $u(a)=\log(q(a\mid s)/\pi_k(a\mid s))$，引入归一化乘子 $\kappa$，得到
+\[
+ \mathscr L(u,\kappa)=\frac12\sum_a\pi_k(a\mid s)[u(a)-\eta h_k(a)]^2
+ +\kappa\left(\sum_a\pi_k(a\mid s)e^{u(a)}-1\right).
+\]
+逐 action 求导并除以正的 anchor 概率，得到
+\[
+ u(a)-\eta h_k(a)+\kappa e^{u(a)}=0.
+\]
+令 $w_a=\eta h_k(a)-u(a)$，则
+$w_ae^{w_a}=\kappa e^{\eta h_k(a)}$，所以
+$w_a=W(\kappa e^{\eta h_k(a)})$，代回即得式~\eqref{eq:four-inner-pmdmean-target}。
+
+再定义
+\[
+ F(\kappa)=\E_{\pi_k}\exp\{\eta h_k-W(\kappa e^{\eta h_k})\}.
+\]
+函数 $F$ 连续严格递减，$F(0)=A_k\ge1$，且
+$F(\kappa)\to0$。故存在唯一根 $F(\kappa_k)=1$；非恒定 $h_k$
+时根严格为正。固定此乘子后，拉格朗日函数对 $u$ 的 Hessian 为
+\[
+ \operatorname{diag}\left(\pi_k(a\mid s)[1+\kappa_ke^{u(a)}]\right),
+\]
+严格正定，所以该可行驻点是唯一全局最优解。
+
+精确 mirror target 的 log-ratio 是 $\eta h_k-\log A_k$，而
+式~\eqref{eq:four-inner-pmdmean-target} 的 log-ratio 是
+$\eta h_k-W(\kappa_ke^{\eta h_k})$；两者相减为
+$\log A_k-W(\kappa_ke^{\eta h_k})$。去掉 action-independent 常数后，
+其振幅正是式~\eqref{eq:pmdmean-target-bias}。
+\end{proof}
+
+若代码使用
+$-\eta(h_k-\text{stopgrad})\log q$ 的 policy-gradient 线性化损失，
+它应标记为 ``centered-PG''，不能直接称为论文的总体 PMD-Mean；单个 sampled
+action 也不能无偏恢复 $\bar r_k(s)$。本书实验将这两种实现分开记录，避免把
+均值估计误差、Lambert-$W$ bias 与有限 inner 优化误差混在一起。
 
 \begin{algorithm}
-\caption{PMD-Mean inner update\\{\small\textit{Semantics: 根据中心化 PMD target 重构}}}
+\caption{PMD-Mean inner update\\{\small\textit{Semantics: 根据均值近似平方目标重构；不是 exact log-partition 回归}}}
 \begin{algorithmic}
-\STATE \textbf{Input:} 冻结 $\pi_k,T$；每个历史的独立 anchor actions $\{a_j\}_{j=1}^{L}$；步长 $\alpha$
+\STATE \textbf{Input:} 冻结 $\pi_k,T$；每个历史的 anchor actions $\{a_j\}_{j=1}^{L}$；步长 $\alpha$
 \STATE \textbf{Output:} 更新后的参数 $\theta^+$
 \FOR{每个历史 $s$}
     \STATE $\bar r\gets L^{-1}\sum_{j=1}^{L}[\log T(a_j\mid s)-\log\pi_k(a_j\mid s)]$
     \FOR{batch 中的 action $a$}
-        \STATE $e(s,a)\gets u_{k,\theta}(s,a)-\eta[r_k(s,a)-\bar r]$
+        \STATE $h(s,a)\gets \log T(a\mid s)-\log\pi_k(a\mid s)-\bar r$
+        \STATE $u(s,a)\gets \log\pi_\theta(a\mid s)-\log\pi_k(a\mid s)$
+        \STATE $e(s,a)\gets u(s,a)-\eta h(s,a)$
     \ENDFOR
 \ENDFOR
-\STATE $\theta^+\gets\theta-\alpha\nabla_\theta\frac{1}{2|\mathcal B|}\sum e(s,a)^2$
-\STATE 施加或检查 $\E_{\pi_k}[e^{u_{k,\theta^+}}\mid s]=1$
+\STATE $\theta^+\gets\theta-\alpha\nabla_\theta\frac{1}{2|\mathcal B|}\sum_{(s,a)\in\mathcal B}e(s,a)^2$
+\STATE \COMMENT{归一化由策略参数化实现；总体极限为 Lambert-$W$ 解}
 \STATE \textbf{Return:} $\theta^+$
 \end{algorithmic}
 \end{algorithm}
-
-共用 action 样本计算 $\bar r$ 与 score 会引入协方差偏差；leave-one-out 或独立样本可恢复条件无偏性。该偏差应并入 $\varepsilon_k$，不能误认为优化器未收敛。
 
 \section{BPO：中心化 score 的非线性回归}
 \label{sec:bpo-unified}
@@ -199,82 +268,112 @@ MDPO 不回归 log-ratio，而是最大化 KL 正则 surrogate：
 \section{四种 inner 的误差递推与比较定理}
 \label{sec:inner-error-comparison}
 
-定义第 $k$ 个 outer 的策略误差
+对每个变体 $v$，先定义其冻结 anchor 子问题的精确分布解
+$q_{v,k}$. 对 PMD-Part、BPO 和 MDPO，$q_{v,k}=\pi_{k+1}^{\star}$；对
+PMD-Mean，$q_{v,k}=q_{\mathrm{Mean},k}$，由定理
+\ref{thm:four-inner-pmdmean-lambert} 给出。令
 \[
- e_k(s)=\left\|\log\frac{\pi_{k+1}(\cdot\mid s)}{\pi_{k+1}^{\star}(\cdot\mid s)}\right\|_{\mathrm{osc}},
- \qquad \|v\|_{\mathrm{osc}}=\max_a v_a-\min_a v_a.
+ e_{v,k}(s)=\left\|\log\frac{\pi_{k+1}(\cdot\mid s)}{q_{v,k}(\cdot\mid s)}\right\|_{\mathrm{osc}},
+ \qquad
+ \delta_{v,k}(s)=\left\|\log\frac{q_{v,k}(\cdot\mid s)}{\pi_{k+1}^{\star}(\cdot\mid s)}\right\|_{\mathrm{osc}}.
 \]
-它忽略 action-independent 的 logit 平移，正好对应 PMD-Mean 与 BPO 的不变方向。假设每种 inner 的优化器在冻结目标下满足
+于是 $\delta_{v,k}=0$ 对应 exact mirror 的三种变体，而
+$\delta_{\mathrm{Mean},k}$ 正是式~\eqref{eq:pmdmean-target-bias}。
+
+假设冻结目标上的有限 inner 求解满足
 \begin{equation}
 \label{eq:inner-contraction-assumption}
- e_k(s)\leq q_{v,k}(s)e_{k,0}(s)+b_{v,k}(s),
- \qquad 0\leq q_{v,k}(s)<1,
+ e_{v,k}(s)\leq q_{v,k}^{\mathrm{opt}}(s)e_{v,k}^{0}(s)+b_{v,k}(s),
+ \qquad 0\leq q_{v,k}^{\mathrm{opt}}(s)<1,
 \end{equation}
-其中 $v\in\{\mathrm{Part},\mathrm{Mean},\mathrm{BPO},\mathrm{MDPO}\}$，$b_{v,k}$ 汇总采样、归一化和函数类投影误差。若 inner 从上一 outer 策略开始，精确 mirror target 的 projective 动力学为
-\[
- \Delta_{k+1}^{\star}(s)=(1-\eta)\Delta_k(s),
- \quad
- \Delta_k(s)=\left\|\log\frac{\pi_k}{T}\right\|_{\mathrm{osc}}.
-\]
+其中 $e_{v,k}^{0}$ 是 inner 初始策略到 $q_{v,k}$ 的 projective 距离，
+$b_{v,k}$ 汇总采样、测度、函数类投影和停止梯度误差。
 
 \begin{theorem}[四种 inner 的统一 outer 误差递推]
 \label{thm:four-inner-recursion}
-在完整支持、固定 anchor、目标可表示且式 \eqref{eq:inner-contraction-assumption} 成立时，四种方法均满足
+在完整支持、固定 anchor 和式~\eqref{eq:inner-contraction-assumption} 成立时，
+四种方法都满足
 \begin{equation}
 \label{eq:four-inner-recursion}
  \Delta_{k+1}(s)
- \leq (1-\eta)\Delta_k(s)
- +q_{v,k}(s)e_{k,0}(s)+b_{v,k}(s).
+ \leq (1-\eta)\Delta_k(s)+\delta_{v,k}(s)
+ +q_{v,k}^{\mathrm{opt}}(s)e_{v,k}^{0}(s)+b_{v,k}(s),
 \end{equation}
-若 $q_{v,k}\leq\bar q<1$、$b_{v,k}\leq\bar b$ 且 $e_{k,0}\leq\Delta_k$，则
+其中
+$\Delta_k(s)=\|\log(\pi_k(\cdot\mid s)/T(\cdot\mid s))\|_{\mathrm{osc}}$。
+若 $e_{v,k}^{0}\leq C_k\Delta_k$，且
+$q_{v,k}^{\mathrm{opt}}\leq\bar q$、$C_k\leq\bar C$、
+$b_{v,k}\leq\bar b$、$\delta_{v,k}\leq\bar\delta$，并满足
+$(1-\eta)+\bar q\bar C<1$，则
 \[
- \Delta_K(s)\leq[(1-\eta)+\bar q]^K\Delta_0(s)
- +\frac{\bar b}{1-(1-\eta)-\bar q},
+ \Delta_K(s)
+ \leq[(1-\eta)+\bar q\bar C]^K\Delta_0(s)
+ +\frac{\bar\delta+\bar b}{1-(1-\eta)-\bar q\bar C}.
 \]
-只要 $(1-\eta)+\bar q<1$。更一般地，对任意误差序列，
-\[
- \Delta_K\leq(1-\eta)^K\Delta_0
- +\sum_{j=0}^{K-1}(1-\eta)^{K-1-j}
- [q_{v,j}e_{j,0}+b_{v,j}].
-\]
+因此 PMD-Mean 的 Lambert-$W$ bias 与有限 inner 误差处在同一个
+outer 误差地板中；增加 inner steps 只能减小 $b_{v,k}$，不能消除
+$\delta_{\mathrm{Mean},k}$。
 \end{theorem}
 
 \begin{proof}
-精确 target 的 log-ratio 差满足
+精确 mirror target 满足
 \[
  \log\frac{\pi_{k+1}^{\star}(a\mid s)}{T(a\mid s)}
- =(1-\eta)\log\frac{\pi_k(a\mid s)}{T(a\mid s)}-c_k(s),
+ =(1-\eta)\log\frac{\pi_k(a\mid s)}{T(a\mid s)}-\log Z_k(s).
 \]
-因此去掉常数后振幅乘以 $1-\eta$。有限 inner 输出与精确 target 的振幅差由三角不等式和式 \eqref{eq:inner-contraction-assumption} 上界。反复代入得到有限 $K$ 展开；当系数统一有界时，使用等比数列求和得到第二个结论。
+去掉 action-independent 常数后，得到
+$\|\log(\pi_{k+1}^{\star}/T)\|_{\mathrm{osc}}=(1-\eta)\Delta_k$。
+另一方面，振幅范数满足三角不等式：
+\[
+ \Delta_{k+1}
+ \leq \left\|\log\frac{\pi_{k+1}^{\star}}T\right\|_{\mathrm{osc}}
+ +\left\|\log\frac{q_{v,k}}{\pi_{k+1}^{\star}}\right\|_{\mathrm{osc}}
+ +\left\|\log\frac{\pi_{k+1}}{q_{v,k}}\right\|_{\mathrm{osc}}.
+\]
+代入 $\delta_{v,k}$ 和式~\eqref{eq:inner-contraction-assumption} 即得
+式~\eqref{eq:four-inner-recursion}。若再用 $e_{v,k}^{0}\leq C_k\Delta_k$，
+便得到标量递推
+$\Delta_{k+1}\leq[(1-\eta)+\bar q\bar C]\Delta_k+\bar\delta+\bar b$。
+反复代入并求等比数列，得到所述地板界。
 \end{proof}
 
-\begin{theorem}[四种 inner 的 fixed-point 等价与有限步差异]
+\begin{theorem}[四种 inner 的 fixed-point 分类]
 \label{thm:four-inner-fixed-point}
-在每个历史上均可表示策略、$Z_k$ 精确、访问测度覆盖所有 action 且优化达到全局最优的条件下，PMD-Part、PMD-Mean、BPO 和 MDPO 的 fixed point 都唯一等于式 \eqref{eq:unified-mirror-target}。有限 inner 步时：
+在完整分布参数化、全 action coverage、精确 teacher log-prob 和全局优化条件下：
 \begin{enumerate}
-    \item PMD-Part 的误差主要由完整 target 回归和 $\log Z_k$ 估计决定；
-    \item PMD-Mean 还需要归一化约束，使用共享样本估计中心会产生协方差偏差；
-    \item BPO 的 centered score 改变有限步 Hessian，但不改变零点；
-    \item MDPO 的误差是 KL surrogate 的优化误差，且 action-level importance sampling 另外引入测度方差。
+    \item PMD-Part 的唯一 fixed point 是 $\pi_{k+1}^{\star}$；
+    \item BPO 的中心化最优性残差在归一化后唯一恢复 $\pi_{k+1}^{\star}$；
+    \item MDPO 的 KL surrogate 唯一最大化于 $\pi_{k+1}^{\star}$；
+    \item 论文意义下的 PMD-Mean 的唯一 fixed point 是
+    $q_{\mathrm{Mean},k}$，一般不等于 $\pi_{k+1}^{\star}$，差异由
+    $\delta_{\mathrm{Mean},k}$ 精确刻画。
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
-PMD-Part 的零残差直接给出式 \eqref{eq:common-fixed-point}。PMD-Mean 和 BPO 的零残差只确定相差 action-independent 常数的 log-ratio；代入 $\E_{\pi_k}e^{u}=1$ 唯一确定该常数为 $-c_k$。MDPO 由式 \eqref{eq:mdpo-kl-decomposition} 可知，目标函数等于常数减 reverse KL，故其唯一极值分布为 $\pi_{k+1}^{\star}$。四点的有限步误差来源分别来自相应目标的估计与优化过程。
+PMD-Part 的零残差直接给出
+$u=\eta r_k-\log Z_k$。BPO 的零残差要求
+$d_{k,\theta}(s,a)$ 对 action 为常数；代入
+$\E_{\pi_k}e^{u}=1$ 后，该常数被唯一确定为 $\log Z_k$，因此恢复
+$u=\eta r_k-\log Z_k$。MDPO 由式~\eqref{eq:mdpo-kl-decomposition} 等于
+常数减 $\eta^{-1}\KL(\pi_\theta\Vert\pi_{k+1}^{\star})$，故唯一极值分布是
+$\pi_{k+1}^{\star}$。PMD-Mean 的结论则由定理
+\ref{thm:four-inner-pmdmean-lambert} 的严格凸拉格朗日问题直接给出；
+其 target bias 在 $h_k$ 非常数时通常严格为正。
 \end{proof}
 
 \begin{table}[H]
 \centering
 \caption{四种 inner 的统一比较}
 \label{tab:four-inner-comparison}
-\begin{tabular}{p{0.17\textwidth}p{0.23\textwidth}p{0.24\textwidth}p{0.24\textwidth}}
+\begin{tabular}{p{0.17\textwidth}p{0.25\textwidth}p{0.22\textwidth}p{0.24\textwidth}}
 \toprule
 变体 & inner 目标 & 精确 fixed point & 主要误差源 \\
 \midrule
 PMD-Part & 完整 log-ratio 平方回归 & $\pi_k^{1-\eta}T^\eta/Z_k$ & $\log Z_k$ plug-in、投影、回归未收敛 \\
-PMD-Mean & 中心化 reward 回归 + 归一化 & 同上 & center 协方差、归一化漂移、测度偏差 \\
-BPO & 中心化 student score 的非线性回归 & 同上 & 当前 student 中心的估计噪声、非线性优化 \\
-MDPO & reward $-$ reverse KL/$\eta$ & 同上 & surrogate 优化误差、IS 方差、critic/teacher 误差 \\
+PMD-Mean & 均值近似平方回归 & Lambert-$W$ 分布 $q_{\mathrm{Mean},k}$ & 固有 target bias、均值估计、投影与未收敛 \\
+BPO & 中心化 student score 的非线性回归 & $\pi_k^{1-\eta}T^\eta/Z_k$ & 当前 student 中心估计、Bellman/teacher 误差 \\
+MDPO & reward $-$ reverse KL$/\eta$ & $\pi_k^{1-\eta}T^\eta/Z_k$ & surrogate 优化误差、IS 方差、critic/teacher 误差 \\
 \bottomrule
 \end{tabular}
 \end{table}

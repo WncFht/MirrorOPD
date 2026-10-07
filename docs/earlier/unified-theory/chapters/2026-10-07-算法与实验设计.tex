@@ -128,6 +128,11 @@ uv run --with numpy --with matplotlib python \\
 记录了 seed、预算和最终数值。图~\ref{fig:finite-outer-audit} 展示 reward、
 策略到当轮 target 的 KL，以及单轮 reward gain。
 
+实现层面的 PMD-Mean 使用 rollout batch 的中心化 reward 均值作为估计量，因此它是
+定理~\ref{thm:four-inner-pmdmean-lambert} 中总体 PMD-Mean 目标的有限样本近似；代码
+没有在每个历史上显式求解 Lambert-$W$ 归一化方程。实验中的 PMD-Mean 曲线应同时包含
+均值估计误差和该总体 target bias，不能把它解释为 exact mirror target 的纯优化误差。
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{../MirrorOPD/experiment/outer_dynamics_qa/finite_horizon_outer_dynamics.pdf}
