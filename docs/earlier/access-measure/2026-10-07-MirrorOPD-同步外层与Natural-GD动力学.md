@@ -195,7 +195,7 @@ $$
 +C_{\mathrm{rollout}}\xi_{k+1}.
 $$
 
-三项分别来自 inner 未充分收敛、局部二次近似误差和新 rollout 的估计误差。增大 $M_k$ 只能降低第一项。实际 stopping rule 应检查当前策略到本轮固定 target 的 residual，达到阈值后同步并重新 rollout。$\eta=1$ 时每轮精确 target 都是 teacher，外层没有额外的 contraction slack；继续增加 outer 次数不能替代把 inner 解准。
+三项分别来自 inner 未充分收敛、局部二次近似误差和新 rollout 的估计误差。增大 $M_k$ 只能降低第一项。实际 stopping rule 应检查当前策略到本轮固定 target 的 residual，达到阈值后同步并重新 rollout。$\eta=1$ 时每轮精确 target 都是同一个 teacher，外层本身没有额外的 mirror contraction；但若 inner 求解器对 teacher 的误差满足 $\varepsilon_{k+1}^{\mathrm{inner}}\le q^{M}\Delta_k$，则分散到多轮的 inner 仍给出 $\Delta_{k+1}\le q^M\Delta_k$。这只是把连续的 inner steps 分批执行，不能消除 rollout 噪声、参数投影误差或 optimizer 状态变化。
 
 ## 访问测度与 OPD 的边界
 
