@@ -103,22 +103,28 @@ def main():
             head = 0.0
             head_second = 0.0
             mass = 0.0
+            teacher_head_mass = 0.0
             for k in range(33):
                 if k:
                     idx = int(top_indices[k - 1])
                     head += float(pt[idx] * lt[idx])
                     head_second += float(pt[idx] * lt[idx] * lt[idx])
                     mass += float(pt[idx])
+                    teacher_head_mass += float(q_log[t, idx].exp())
                 tail_mean = true_kl - head
                 tail_second = total_second - head_second
                 variance = max(0.0, tail_second - tail_mean * tail_mean)
                 correction = float(lt[tok]) if rank > k else 0.0
                 corrected_observed = head + correction
-                sums[k].append((head, true_kl, variance, corrected_observed, mass))
+                # The normalized Top-K objective renormalizes both policies on
+                # the same student-defined support S_K.  It is undefined at K=0.
+                normalized = (head / mass + np.log(teacher_head_mass / mass)) if k else float("nan")
+                sums[k].append((head, true_kl, variance, corrected_observed, mass, normalized))
                 row_base[f"m{k}"] = mass
                 row_base[f"trunc_bias{k}"] = head - true_kl
                 row_base[f"corr_observed_error{k}"] = corrected_observed - true_kl
                 row_base[f"corr_variance{k}"] = variance
+                row_base[f"normalized_kl{k}"] = normalized
             # Store only a compact audit sample of token rows.
             if prefix_count < 2000:
                 example_rows.append(row_base)
@@ -130,10 +136,17 @@ def main():
     summary = []
     for k in range(33):
         arr = np.asarray(sums[k], dtype=np.float64)
-        head, true, variance, corrected, mass = arr.T
+        head, true, variance, corrected, mass, normalized = arr.T
         trunc_error = head - true
         # Conditional MSE averages over prefixes; correction is unbiased
         # conditionally, while the observed one-token error is retained too.
+        normalized_error = normalized - true
+        if k == 0:
+            mean_normalized = bias_normalized = rmse_normalized = float("nan")
+        else:
+            mean_normalized = float(np.mean(normalized))
+            bias_normalized = float(np.mean(normalized_error))
+            rmse_normalized = float(np.sqrt(np.mean(normalized_error ** 2)))
         summary.append({"top_k": k, "prefixes": len(arr),
             "mean_topk_mass": float(mass.mean()),
             "mean_true_kl": float(true.mean()),
@@ -145,6 +158,10 @@ def main():
             "rmse_corrected_theory": float(np.sqrt(np.mean(variance))),
             "bias_corrected_observed": float((corrected - true).mean()),
             "rmse_corrected_observed": float(np.sqrt(np.mean((corrected - true) ** 2))),
+            "mean_normalized_kl": mean_normalized,
+            "bias_normalized": bias_normalized,
+            "variance_normalized": 0.0,
+            "rmse_normalized": rmse_normalized,
         })
     write_rows(out / "kl_summary_by_k.csv", summary)
     write_rows(out / "prefix_audit_sample.csv", example_rows)
@@ -154,7 +171,7 @@ def main():
         "n_prefixes": prefix_count, "temperature": 1.0,
         "definition": "reverse KL KL(student||teacher), exact full-vocabulary reference; sampled token is the student rollout token",
         "scoring_quantization": args.quantization,
-        "topk": "student probability top-K; corrected estimator adds log student/teacher ratio only when sampled token is outside the head",
+        "topk": "student probability top-K; corrected estimator adds log student/teacher ratio only when sampled token is outside the head; normalized estimator renormalizes both policies on the same student-defined support",
     }, indent=2))
     print(json.dumps({"n_examples": len(examples), "n_prefixes": prefix_count}, indent=2))
 

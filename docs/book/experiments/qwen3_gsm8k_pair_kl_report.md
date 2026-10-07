@@ -44,6 +44,47 @@ $$
 
 真实 rollout token 的修正误差还受生成阶段 bf16 vLLM 与打分阶段 NF4 量化 Student 的轻微分布不一致影响；例如 $K=32$ 的观测平均误差为 $-2.76\times10^{-4}$，远小于其 0.0519 的观测 RMSE。理论 bias 仍按打分分布严格为零，观测 bias 不应被解读为修正估计量的条件 bias。完整数值见 [kl_summary_by_k.csv](qwen3_gsm8k_pair_kl/kl_summary_by_k.csv)，图见 [pair_kl_topk_metrics.png](qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png)。
 
+## 同一支持集上的归一化 Top-$K$ KL
+
+截图中的 Top-$K$ OPD 使用的不是未归一化截断项，而是先把两个分布限制在 Student 的 Top-$K$ 支持集 $S_K$，再分别归一化。记
+
+$$
+P_K=\sum_{v\in S_K}p(v),\qquad Q_K=\sum_{v\in S_K}q(v),
+$$
+
+则
+
+$$
+\bar p_K(v)=\frac{p(v)\mathbf 1\{v\in S_K\}}{P_K},\qquad
+\bar q_K(v)=\frac{q(v)\mathbf 1\{v\in S_K\}}{Q_K}.
+$$
+
+归一化 Top-$K$ KL 的精确计算式为
+
+$$
+K_K^{\mathrm{norm}}
+=\operatorname{KL}(\bar p_K\Vert\bar q_K)
+=\frac{1}{P_K}\sum_{v\in S_K}p(v)\log\frac{p(v)}{q(v)}
+ +\log\frac{Q_K}{P_K}.
+$$
+
+因此它不是完整词表 KL 的另一个无偏估计量，而是一个改变了目标分布的确定性近似。对固定 prefix，$K_K^{\mathrm{norm}}$ 没有 sampled-token 随机性，所以本实验中 `variance_normalized=0`；这里的 variance 指估计量条件于该 prefix 的采样方差，不是不同 prefix 之间归一化 KL 数值的方差。后者若用于 reward 归一化，应另行报告。
+
+全量结果如下。bias 和 RMSE 都相对于完整词表 $K(p,q)$ 计算，$K=0$ 的归一化分布未定义，因此留空。
+
+| $K$ | mean normalized KL | bias | variance | RMSE |
+|---:|---:|---:|---:|---:|
+| 1 | $5.1\times10^{-11}$ | $-0.26932$ | $0$ | $1.03968$ |
+| 2 | $0.18540$ | $-0.08392$ | $0$ | $0.54660$ |
+| 4 | $0.24304$ | $-0.02629$ | $0$ | $0.28804$ |
+| 8 | $0.26058$ | $-0.00874$ | $0$ | $0.15007$ |
+| 16 | $0.26622$ | $-0.00310$ | $0$ | $0.08367$ |
+| 32 | $0.26805$ | $-0.00127$ | $0$ | $0.05438$ |
+
+在这个实验中，归一化 Top-$K$ 的 bias 与 RMSE 随 $K$ 单调下降，但在 $K=32$ 仍大于未归一化截断的 RMSE $0.00217$。原因是归一化会把头部质量重新放大到总质量一，$log(Q_K/P_K)$ 只校正头部总质量差异，无法恢复尾部的 token-wise KL；它消除了“质量不足”的尺度误差，却没有消除“尾部结构”误差。$K=1$ 时两个归一化分布都是 point mass，KL 恒为零，这正是该定义相对于完整 KL 的极端偏差。
+
+原图 [pair_kl_topk_metrics.png](qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png) 已加入归一化 Top-$K$ 的绝对 bias、RMSE 和条件 variance 曲线；逐 $K$ 的全部列（`mean_normalized_kl`、`bias_normalized`、`variance_normalized`、`rmse_normalized`）见 [kl_summary_by_k.csv](qwen3_gsm8k_pair_kl/kl_summary_by_k.csv)。
+
 ## Top-$K$ KL reward 的有效样本数
 
 若把每个 prefix 视为一个 sample，并把一个非负的 top-$K$ KL 标量 $R_i$ 当作样本权重，可以使用标准的权重有效样本数
