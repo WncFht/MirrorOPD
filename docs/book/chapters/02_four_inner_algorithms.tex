@@ -1,7 +1,35 @@
 \chapter{统一的 token-level Mirror Descent 与 OPD 实例化}
 \label{ch:four-methods}
 
-本章只使用一套序列建模符号。给定 prompt $x$，student 生成 rollout $y_{1:H}$；第 $t$ 个 token 的历史为 $s_t=(x,y_{<t})$。固定第 $k$ 个 outer step 的 anchor policy $\pi_k$，候选 student policy 记为 $\pi_\theta$，teacher policy 记为 $T$，镜像正则的温度参数记为 $\eta>0$。$\eta$ 决定 mirror target 离 anchor 和 teacher 的位置；MDPO 的参数更新步长另记为 $\alpha$。$s_t$ 只表示 rollout 的条件历史，训练样本始终是一条完整的 prompt--rollout；四种 inner 的区别只来自求解同一个 mirror 子问题的方式。
+本章固定一套与 outer--inner 动力学一致的记号。给定 prompt $x$，rollout 为
+$y_{1:H}$，第 $t$ 个 token 之前的历史为 $s_t=(x,y_{<t})$，词表为
+$\mathcal V$。第 $k$ 个 outer step 的冻结 anchor policy 记为 $\pi_k$，该轮
+第 $n$ 个 inner step 的 student policy 记为
+\begin{equation}
+\pi_{k,n}(a\mid s)\coloneqq\pi_{\theta_{k,n}}(a\mid s),
+\qquad \pi_{k,0}=\pi_k .
+\end{equation}
+teacher policy 记为 $\pi_T$；它在一个 outer step 内始终冻结。镜像系数记为
+$\eta>0$，inner optimizer 的步长记为 $\alpha_{k,n}$，两者不能混用。
+
+为避免把不同方向的 KL 和 top-$K$ 中的整数 $K$ 混在一起，本章使用
+\begin{align}
+\Delta_{k,n}(s,a)&\coloneqq
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)},\\
+r_k(s,a)&\coloneqq
+\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)},\\
+C_k^T(s)&\coloneqq
+\operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_T(\cdot\mid s)\right),\\
+C_{k,n}^\theta(s)&\coloneqq
+\operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_{k,n}(\cdot\mid s)\right).
+\end{align}
+因此
+$\mathbb E_{\pi_k}[r_k\mid s]=-C_k^T(s)$，而
+$\mathbb E_{\pi_k}[\Delta_{k,n}\mid s]=-C_{k,n}^\theta(s)$。
+这些等式解释了后文两个 KL 的方向：它们都是在冻结 anchor 的 action 测度下
+取均值，而不是 MDPO 中以 student 为左侧分布的 reverse KL。$d_k$ 表示由
+$\pi_k$ rollout 诱导的 prefix 访问测度；所有 inner 目标先对
+$s\sim d_k$、再对 $a\sim\pi_k(\cdot\mid s)$ 取期望。
 
 \section{共同的 mirror 子问题与精确解}
 \label{sec:ch2-common}
@@ -103,78 +131,228 @@ $V^{\pi_k}(s)=\mathbb E_{a\sim\pi_k}[Q^{\pi_k}(s,a)\mid s]$，有
 \section{从镜像最优性方程到四种可训练目标}
 \label{sec:ch2-objective-derivation}
 
-定理 \ref{thm:ch2-gibbs} 给出的不是一个抽象的分布结论，而是一个可以被监督学习近似的逐 token 方程。把式 \eqref{eq:ch2-optimal-policy} 移项，得到
+定理 \ref{thm:ch2-gibbs} 给出的不是孤立的分布结论，而是一条可以被 inner
+optimizer 直接拟合的逐 token 方程。下面先把这条方程、平方损失和 BPO 的
+中心化残差逐步写出，再进入四种算法的实现。
+
+\subsection{镜像最优性方程与训练测度}
+\label{subsec:ch2-optimality-bridge}
+
+把式 \eqref{eq:ch2-optimal-policy} 移项，得到
 \begin{equation}
 \label{eq:ch2-logratio-equation}
-\log\pi_k^+(a\mid s)-\log\pi_k(a\mid s)
+\log\frac{\pi_k^+(a\mid s)}{\pi_k(a\mid s)}
 =\eta f(s,a)-\log Z_f(s).
 \end{equation}
-左侧是 candidate student 相对于冻结 anchor 的 log-ratio，右侧只由冻结的 token signal 和归一化常数决定。
+在参数化 inner 中，左侧由 $\pi_{k,n}$ 近似。因此定义镜像方程残差
+\begin{equation}
+\mathscr E_{k,n}(s,a)
+\coloneqq
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\eta f(s,a)+\log Z_f(s).
+\label{eq:ch2-mirror-equation-residual}
+\end{equation}
+精确 mirror 解的条件是 $\mathscr E_{k,n}(s,a)=0$ 对所有有正概率的
+$(s,a)$ 成立。
 
-\begin{definition}[Mirror log-ratio target]
-\label{def:ch2-logratio-target}
-定义候选 student 相对于冻结 anchor 的 log-ratio 与 Gibbs target 为
-\[
-U_\theta(s,a)=\log\pi_\theta(a\mid s)-\log\pi_k(a\mid s),
-\qquad
-H_k(s,a)=\eta f(s,a)-\log Z_f(s).
-\]
-式 \eqref{eq:ch2-optimal-policy} 等价于 $U_\theta=H_k$；因此 $H_k$ 是参数化 inner 所要实现的逐 token 最优性方程。
-\end{definition}
+为什么训练测度是 $\pi_k$ 而不是 $\pi_{k,n}$？在第 $k$ 个 outer step，
+rollout 已由冻结的 $\pi_k$ 产生；我们要解决的是固定 anchor 的 mirror
+子问题，而不是在 inner 过程中不断改变积分测度。于是参数化投影定义为
+\begin{equation}
+\lVert \mathscr E_{k,n}\rVert_k^2
+\coloneqq
+\mathbb E_{s\sim d_k}\mathbb E_{a\sim\pi_k(\cdot\mid s)}
+\left[\mathscr E_{k,n}(s,a)^2\right].
+\label{eq:ch2-anchor-projection-norm}
+\end{equation}
+这也是 on-policy rollout 下可直接估计的投影几何。若改用行为测度 $\beta_k$
+采样，必须乘以冻结的 importance weight
+$\pi_k(a\mid s)/\beta_k(a\mid s)$，否则求解的是 $L_2(d_k\beta_k)$ 投影。
 
-由这个定义，求解 mirror 子问题在参数化策略类中的直接替代，就是在训练测度下让 $U_\theta$ 拟合 $H_k$：
+\subsection{PMD-Part 与 PMD-Mean：从方程到平方损失}
+\label{subsec:ch2-pmd-loss-derivation}
+
+PMD-Part 直接最小化式 \eqref{eq:ch2-mirror-equation-residual} 的平方。将
+student log-ratio 和冻结 target 展开，得到
 \begin{equation}
 \label{eq:ch2-regression-from-mirror}
-\min_\theta\ \mathbb E\left[(U_\theta-H_k)^2\right].
+\mathcal L_{\mathrm{Part}}(\theta)
+=\frac12\mathbb E_{s\sim d_k,a\sim\pi_k}
+\left[
+\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+-\eta f(s,a)+\operatorname{sg}\!\left(\log Z_f(s)\right)
+\right]^2.
 \end{equation}
-因此 PMD-Part 的平方损失不是额外假设，而是把镜像最优性方程变成参数化模型可优化的投影问题。对式 \eqref{eq:ch2-regression-from-mirror} 求导，使用
+其中 $\operatorname{sg}$ 表示停止梯度；$\pi_k$、$f$ 和 $Z_f$ 在本轮
+inner 中都冻结。因为
 \[
-\nabla_\theta U_\theta(s,a)=\nabla_\theta\log\pi_\theta(a\mid s),
+\nabla_\theta\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+=\nabla_\theta\log\pi_\theta(a\mid s),
 \]
-立即得到式 \eqref{eq:ch2-part-gradient}。
-
-PMD-Mean 来自同一个方程的中心化。由于 $\log Z_f(s)$ 只依赖 $s$，对 anchor action 取条件均值时
-\[
-\mathbb E_{\pi_k}[H_k(s,a)\mid s]
-=\eta\mathbb E_{\pi_k}[f(s,a)\mid s]-\log Z_f(s).
-\]
-减去该均值后，未知的 $\log Z_f$ 消失，得到
+其梯度为
 \begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{Part}}
+=\mathbb E_{d_k,\pi_k}
+\left[\operatorname{sg}\!\left(
+\log\frac{\pi_\theta}{\pi_k}-\eta f+\log Z_f
+\right)\nabla_\theta\log\pi_\theta(a\mid s)\right].
+\label{eq:ch2-part-gradient-bridge}
+\end{equation}
+这说明 PMD-Part 是 anchor 测度下对完整 mirror log-ratio 的 $L_2$ 投影，
+而不是把一个 teacher label 当作普通的 supervised token label。
+
+PMD-Mean 来自同一个方程的条件中心化。对 $a\sim\pi_k(\cdot\mid s)$
+取均值并相减，得到
+\[
+\left(\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+-\mathbb E_{v\sim\pi_k}\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}\right)
+=\eta\left(f(s,a)-\mathbb E_{v\sim\pi_k}[f(s,v)\mid s]\right).
+\]
+其中
+\begin{equation}
+\mathbb E_{v\sim\pi_k}\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
+=-\operatorname{KL}(\pi_k\Vert\pi_\theta),
+\qquad
+\mathbb E_{v\sim\pi_k}[f(s,v)\mid s]=\bar f_k(s).
 \label{eq:ch2-centered-logratio-equation}
-H_k(s,a)-\mathbb E_{\pi_k}[H_k(s,\cdot)\mid s]
-=\eta\widetilde f_k(s,a).
 \end{equation}
-这解释了 PMD-Mean 的 target 来源。它不能只回归中心化 target，还必须保留 $U_\theta=\log(\pi_\theta/\pi_k)$ 的概率归一化约束；否则相差一个依赖历史的常数的所有 log-ratio 都会被视为同一个解。
-
-BPO 再对式 \eqref{eq:ch2-logratio-equation} 两边作同样的中心化，但中心化的是 residual：
-\begin{align}
-D_\theta(s,a)
-&=\bigl[\eta f(s,a)-U_\theta(s,a)\bigr]
--\mathbb E_{\pi_k}\bigl[\eta f(s,\cdot)-U_\theta(s,\cdot)\mid s\bigr].
-\label{eq:ch2-bpo-from-optimality}
-\end{align}
-当 $D_\theta=0$ 时，只能先推出 $U_\theta=\eta f-C(s)$；概率归一化再唯一确定 $C(s)=\log Z_f(s)$。这就是 BPO 与 PMD-Part 共享精确零点、但有限参数更新不同的原因。BPO 的 score centering 并非预先加入的 baseline，而是对 $\mathbb E_{\pi_k}[U_\theta]$ 求导后必然产生的项。
-
-MDPO 则不把式 \eqref{eq:ch2-logratio-equation} 改写成回归，而直接对原始 mirror objective 求最大化。由式 \eqref{eq:ch2-kl-decomp}，对任意参数化 student 有
+因此 PMD-Mean 的显式损失是
 \begin{equation}
-\label{eq:ch2-mdpo-kl-gap}
+\mathcal L_{\mathrm{Mean}}(\theta)
+=\frac12\mathbb E_{d_k,\pi_k}
+\left[
+\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
++\operatorname{KL}(\pi_k\Vert\pi_\theta)
+-\eta\left(f(s,a)-\bar f_k(s)\right)
+\right]^2.
+\label{eq:ch2-mean-loss-bridge}
+\end{equation}
+这个 KL 是对数比值在 anchor 测度下的均值恒等式，不是另加的正则项；它
+必须保留对 student 的导数，否则就失去归一化约束对应的 centered-score 项。
+
+\subsection{BPO：完整展开的中心化最优性残差}
+\label{subsec:ch2-bpo-loss-derivation}
+
+BPO 对式 \eqref{eq:ch2-logratio-equation} 的 residual 做条件中心化。定义
+\begin{align}
+\label{eq:ch2-bpo-from-optimality}
+D_{k,n}(s,a)
+&\coloneqq\eta f(s,a)
+-\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}\\
+&\quad-\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\eta f(s,v)-\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right].
+\end{align}
+将两个条件均值分别写成 KL，得到
+\begin{equation}
+\boxed{
+D_{k,n}(s,a)=
+\eta\left(f(s,a)-\bar f_k(s)\right)
+-\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-C_{k,n}^\theta(s).}
+\label{eq:ch2-bpo-expanded}
+\end{equation}
+因为
+\[
+\mathbb E_{\pi_k}\log\frac{\pi_{k,n}}{\pi_k}
+=-\operatorname{KL}(\pi_k\Vert\pi_{k,n})=-C_{k,n}^\theta,
+\]
+式 \eqref{eq:ch2-bpo-expanded} 中最后一项的符号是负号。在 OPD
+$f=r_k=\log(\pi_T/\pi_k)$ 时，$\bar f_k=-C_k^T$，于是
+\begin{equation}
+D_{k,n}(s,a)=
+\eta\left[
+\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)}+C_k^T(s)
+\right]
+-\left[
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}+C_{k,n}^\theta(s)
+\right].
+\label{eq:ch2-bpo-opd-expanded}
+\end{equation}
+这就是后文使用的 BPO 权重，不再把它藏在 $f_k$ 或 $U_\theta$ 中。
+
+BPO 的平方损失为
+\begin{equation}
+\mathcal L_{\mathrm{BPO}}(\theta)
+=\frac1{2\eta}\mathbb E_{d_k,\pi_k}[D_{k,n}(s,a)^2].
+\label{eq:ch2-bpo-loss-bridge}
+\end{equation}
+对 student 求导时，$C_{k,n}^\theta$ 也要微分：
+\begin{align}
+\nabla_\theta C_{k,n}^\theta(s)
+&=-\mathbb E_{v\sim\pi_k}
+\left[\nabla_\theta\log\pi_{k,n}(v\mid s)\right],\\
+\nabla_\theta D_{k,n}(s,a)
+&=-\nabla_\theta\log\pi_{k,n}(a\mid s)
++\mathbb E_{v\sim\pi_k}
+\left[\nabla_\theta\log\pi_{k,n}(v\mid s)\right].
+\end{align}
+因此
+\begin{equation}
+-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}
+=\mathbb E_{d_k,\pi_k}
+\left[D_{k,n}(s,a)\left(
+\nabla_\theta\log\pi_{k,n}(a\mid s)
+-\mathbb E_{v\sim\pi_k}\nabla_\theta\log\pi_{k,n}(v\mid s)
+\right)\right].
+\label{eq:ch2-bpo-gradient-bridge}
+\end{equation}
+由于 $\mathbb E_{\pi_k}[D_{k,n}\mid s]=0$，第二项在完整词表求和时严格为
+零；有限 sampled-token batch 中不能把
+$\mathbb E_{\pi_k}[\nabla\log\pi_{k,n}]$ 直接当作零。
+
+\subsection{MDPO：直接最大化原始 mirror objective}
+\label{subsec:ch2-mdpo-loss-derivation}
+
+MDPO 不把式 \eqref{eq:ch2-logratio-equation} 改写成平方回归，而直接最大化
+\begin{equation}
 \mathcal J_{\mathrm{MDPO}}(\theta)
+=\mathbb E_{s\sim d_k}\left[
+\mathbb E_{a\sim\pi_\theta(\cdot\mid s)}f(s,a)
+-\frac1\eta\operatorname{KL}\!\left(\pi_\theta(\cdot\mid s)\middle\Vert\pi_k(\cdot\mid s)\right)
+\right].
+\label{eq:ch2-mdpo-objective-bridge}
+\end{equation}
+逐历史地使用式 \eqref{eq:ch2-kl-decomp}，有
+\begin{equation}
+\mathcal J_{\mathrm{MDPO}}(\theta\mid s)
 =\frac1\eta\log Z_f(s)
 -\frac1\eta\operatorname{KL}\!\left(\pi_\theta(\cdot\mid s)\middle\Vert\pi_k^+(\cdot\mid s)\right).
+\label{eq:ch2-mdpo-kl-gap}
 \end{equation}
-所以 MDPO 的 inner 是在直接最小化 student 与 Gibbs target 的 reverse KL gap；PMD-Part、PMD-Mean 和 BPO 则是在不同坐标和不同投影测度下最小化该最优性方程的平方残差。
+MDPO 的 KL 方向与 PMD/BPO 中的 $C_{k,n}^\theta$ 不同：这里是
+$\operatorname{KL}(\pi_\theta\Vert\pi_k^+)$，而中心化 log-ratio 的均值是
+$\operatorname{KL}(\pi_k\Vert\pi_\theta)$。二者来自不同的积分测度，不能互换。
+
+对式 \eqref{eq:ch2-mdpo-objective-bridge} 做 score-function 求导，得到
+\begin{equation}
+\nabla_\theta\mathcal J_{\mathrm{MDPO}}
+=\mathbb E_{d_k,a\sim\pi_\theta}
+\left[\operatorname{sg}\!\left(
+f(s,a)-\frac1\eta\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+\right)\nabla_\theta\log\pi_\theta(a\mid s)\right].
+\label{eq:ch2-mdpo-gradient-bridge}
+\end{equation}
+推导中的 $-1/\eta$ 常数项乘以
+$\mathbb E_{\pi_\theta}[\nabla\log\pi_\theta]=0$，所以最终式不需要引入
+额外的 ratio 记号。
 
 \begin{proposition}[平方回归的投影含义]
 \label{prop:ch2-regression-projection}
-若 student 函数类不能表示 $H_k$，PMD-Part 的精确 inner 解是 $H_k$ 在函数类诱导的 $L_2(d_{\pi_k}\pi_k)$ 几何下的投影；若训练样本的历史访问测度改为 $m$，投影也相应变为 $L_2(m\pi_k)$。因此 inner loss 为零只在 target 可表示且训练测度覆盖目标测度时才意味着精确 mirror 解。
+若 student 函数类不能表示式 \eqref{eq:ch2-logratio-equation} 的右侧，
+PMD-Part 的精确 inner 解是镜像方程在函数类诱导的 $L_2(d_k\pi_k)$ 几何下的
+投影；若训练样本的历史访问测度改为 $m$，投影也相应变为 $L_2(m\pi_k)$。
+因此 inner loss 为零只在 target 可表示且训练测度覆盖目标测度时才意味着精确
+mirror 解。
 \end{proposition}
 
 \begin{proof}
-平方损失是 Hilbert 空间中的正交投影问题。对任意可行扰动 $v$，最优点 $U^\star$ 满足
+平方损失是 Hilbert 空间中的正交投影问题。对任意可行扰动 $v$，最优残差
+$\mathscr E^\star$ 满足
 \[
-\mathbb E_{m,\pi_k}[(U^\star-H_k)v]=0.
+\mathbb E_{m,\pi_k}[\mathscr E^\star v]=0.
 \]
-这正是 $H_k$ 到可行函数集合的正交投影条件。若 $H_k$ 属于该集合，投影残差为零；否则残差由函数类和测度共同决定。
+这正是镜像方程右侧到可行函数集合的正交投影条件。若 target 属于该集合，
+投影残差为零；否则残差由函数类和测度共同决定。
 \end{proof}
 
 \section{四种 inner 的统一推导}
@@ -182,44 +360,43 @@ MDPO 则不把式 \eqref{eq:ch2-logratio-equation} 改写成回归，而直接�
 
 下面固定一个历史，令
 \[
-\ell^T(a)=\log T(a\mid s),\qquad
-\ell^k(a)=\log\pi_k(a\mid s),\qquad
-\ell^\theta(a)=\log\pi_\theta(a\mid s).
+\ell_T(a)=\log\pi_T(a\mid s),\qquad
+\ell_k(a)=\log\pi_k(a\mid s),\qquad
+\ell_{k,n}(a)=\log\pi_{k,n}(a\mid s).
 \]
-训练时只对 $\ell^\theta$ 反向传播；teacher、anchor、目标常数和所有估计的 KL 都停止梯度。
+训练时只对 $\ell_{k,n}$ 反向传播；teacher、anchor、目标常数和已经解析到
+policy-gradient 权重中的 KL 都停止梯度。
 
 \subsection{PMD-Part：回归完整 Gibbs log-ratio}
 \label{sec:ch2-pmd-part}
 
-定义显式 target
-\[
-H_k(s,a)=\eta f(s,a)-\log Z_f(s),
-\qquad
-U_\theta(s,a)=\log\pi_\theta(a\mid s)-\log\pi_k(a\mid s).
-\]
 PMD-Part 在 anchor 测度下最小化
 \begin{equation}
 \label{eq:ch2-part-loss}
 \mathcal L_{\mathrm{Part}}(\theta)
 =\frac12\mathbb E_{s\sim d_k,\,a\sim\pi_k}
-\left[U_\theta(s,a)-H_k(s,a)\right]^2.
+\left[
+\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+-\eta f(s,a)+\log Z_f(s)
+\right]^2.
 \end{equation}
 对 target 停止梯度，链式法则给出
 \begin{equation}
 \label{eq:ch2-part-gradient}
 -\nabla_\theta\mathcal L_{\mathrm{Part}}
 =\mathbb E_{d_k,\pi_k}
-\left[H_k(s,a)-U_\theta(s,a)\right]
+\left[\eta f(s,a)-\log Z_f(s)
+-\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}\right]
 \nabla_\theta\log\pi_\theta(a\mid s).
 \end{equation}
 这一步是普通的 log-ratio regression；它没有把 KL 视为常数，也没有使用 action-level importance ratio。
 
-固定 history 后令 $q_\theta(a)=U_\theta(s,a)-H_k(s,a)$。由于 anchor 测度与 target 都冻结，逐步求导得到
+固定 history 后令 $q_{k,n}(a)=\Delta_{k,n}(s,a)-H_k(s,a)$。由于 anchor 测度与 target 都冻结，逐步求导得到
 \begin{align}
 \nabla_\theta\mathcal L_{\mathrm{Part}}(s)
-&=\frac12\nabla_\theta\sum_a\pi_k(a\mid s)q_\theta(a)^2\\
-&=\sum_a\pi_k(a\mid s)q_\theta(a)\nabla_\theta U_\theta(s,a)\\
-&=\E_{a\sim\pi_k}[q_\theta(a)\nabla_\theta\log\pi_\theta(a\mid s)\mid s].
+&=\frac12\nabla_\theta\sum_a\pi_k(a\mid s)q_{k,n}(a)^2\\
+&=\sum_a\pi_k(a\mid s)q_{k,n}(a)\nabla_\theta\Delta_{k,n}(s,a)\\
+&=\E_{a\sim\pi_k}[q_{k,n}(a)\nabla_\theta\log\pi_{k,n}(a\mid s)\mid s].
 \end{align}
 若实际 rollout 来自行为测度 $\beta_k$，而目标仍是 $L_2(\pi_k)$ 投影，则每个 sampled residual 乘以冻结权重 $\operatorname{sg}(\pi_k(a\mid s)/\beta_k(a\mid s))$。不加这个权重时，算法仍然有清晰含义，但求解的是 $L_2(\beta_k)$ 投影。
 
@@ -333,41 +510,41 @@ U_a^\star-\eta\widetilde f_k(s,a)=\eta\bar f_k(s)-\log Z_f(s),
 BPO 不显式回归 $\log Z_f$，而将同一个最优性方程的 action-independent 部分消去。定义
 \begin{equation}
 \label{eq:ch2-bpo-residual}
-D_\theta(s,a)
-=\eta f(s,a)-U_\theta(s,a)
--\mathbb E_{v\sim\pi_k}[\eta f(s,v)-U_\theta(s,v)\mid s].
+D_{k,n}(s,a)
+=\eta f(s,a)-\Delta_{k,n}(s,a)
+-\mathbb E_{v\sim\pi_k}[\eta f(s,v)-\Delta_{k,n}(s,v)\mid s].
 \end{equation}
 直接展开可得
 \[
-D_\theta(s,a)
-=\eta\widetilde f_k(s,a)-U_\theta(s,a)
-+\mathbb E_{v\sim\pi_k}[U_\theta(s,v)\mid s].
+D_{k,n}(s,a)
+=\eta\widetilde f_k(s,a)-\Delta_{k,n}(s,a)
++\mathbb E_{v\sim\pi_k}[\Delta_{k,n}(s,v)\mid s].
 \]
 未线性化 BPO 的损失为
 \begin{equation}
 \label{eq:ch2-bpo-loss}
 \mathcal L_{\mathrm{BPO}}(\theta)
-=\frac1{2\eta}\mathbb E_{d_k,\pi_k}[D_\theta(s,a)^2].
+=\frac1{2\eta}\mathbb E_{d_k,\pi_k}[D_{k,n}(s,a)^2].
 \end{equation}
 由于
 \[
-\nabla_\theta\mathbb E_{v\sim\pi_k}[U_\theta(s,v)]
-=\mathbb E_{v\sim\pi_k}[\nabla_\theta\log\pi_\theta(v\mid s)],
+\nabla_\theta\mathbb E_{v\sim\pi_k}[\Delta_{k,n}(s,v)]
+=\mathbb E_{v\sim\pi_k}[\nabla_\theta\log\pi_{k,n}(v\mid s)],
 \]
 所以
 \begin{equation}
 \label{eq:ch2-bpo-gradient}
 -\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}
-=\mathbb E_{d_k,\pi_k}\left[D_\theta(s,a)
-\left(\nabla_\theta\log\pi_\theta(a\mid s)
--\mathbb E_{v\sim\pi_k}[\nabla_\theta\log\pi_\theta(v\mid s)\mid s]\right)\right].
+=\mathbb E_{d_k,\pi_k}\left[D_{k,n}(s,a)
+\left(\nabla_\theta\log\pi_{k,n}(a\mid s)
+ -\mathbb E_{v\sim\pi_k}[\nabla_\theta\log\pi_{k,n}(v\mid s)\mid s]\right)\right].
 \end{equation}
 BPO 的 score centering 来自对当前 student--anchor KL 的精确求导；它不是因为先对 reward 做了一个近似。
 
-令 $G_\theta(s)=\E_{\pi_k}[\eta f(s,v)-U_\theta(s,v)\mid s]$，则
+令 $G_{k,n}(s)=\E_{\pi_k}[\eta f(s,v)-\Delta_{k,n}(s,v)\mid s]$，则
 \[
-\nabla_\theta D_\theta(s,a)=-\nabla_\theta U_\theta(s,a)+\nabla_\theta\E_{\pi_k}[U_\theta(s,v)\mid s]
-=-g_\theta(s,a)+\bar g_\theta(s).
+\nabla_\theta D_{k,n}(s,a)=-\nabla_\theta\Delta_{k,n}(s,a)+\nabla_\theta\E_{\pi_k}[\Delta_{k,n}(s,v)\mid s]
+=-\nabla_\theta\log\pi_{k,n}(a\mid s)+\bar g_{k,n}(s).
 \]
 所以 centered score 是对 center 本身求导的结果，而不是把 reward 任意减去 baseline。无偏的 Monte Carlo 实现最好为每个 history 使用独立的 action $a_i$ 计算 residual，再使用独立集合 $\{b_{i\ell}\}$ 估计 $G_\theta(s_i)$；若复用样本，必须用 leave-one-out center。
 
@@ -406,26 +583,40 @@ MDPO 直接最大化式 \eqref{eq:ch2-mirror} 的参数化版本：
 =\sum_a\pi_\theta(a\mid s)
 \left[\log\pi_\theta(a\mid s)-\log\pi_k(a\mid s)\right].
 \end{equation}
-若 action 从 anchor 采样，定义 $R_\theta(s,a)=\exp(\ell^\theta(a)-\ell^k(a))$，则 action-level IS 形式为
+若 action 从 anchor 采样，则只需把 student 期望改写为显式的
+指数权重，不能把它另记成一个容易与 reward 混淆的 $R_\theta$：
 \begin{equation}
 \label{eq:ch2-mdpo-sample-integrand}
 \widehat{\mathcal J}_{\mathrm{MDPO}}
-=\mathbb E_{a\sim\pi_k}\left[R_\theta(s,a)f(s,a)-\frac1\eta R_\theta(s,a)\log R_\theta(s,a)\right].
+=\mathbb E_{a\sim\pi_k}\left[
+\exp\!\left(\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}\right)
+\left(f(s,a)-\frac1\eta\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}\right)
+\right].
 \end{equation}
 其 ascent direction 为
 \begin{equation}
 \label{eq:ch2-mdpo-generic-gradient}
 \nabla_\theta\mathcal J_{\mathrm{MDPO}}
-=\mathbb E_{\pi_k}\left[R_\theta(s,a)\left(f(s,a)-\frac1\eta\log R_\theta(s,a)\right)\nabla_\theta\log\pi_\theta(a\mid s)\right].
+=\mathbb E_{\pi_k}\left[
+\exp\!\left(\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}\right)
+\left(f(s,a)-\frac1\eta\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}\right)
+\nabla_\theta\log\pi_\theta(a\mid s)\right].
 \end{equation}
-额外的 $-R_\theta/\eta$ 项乘以 score 后，在完整 action 求和中因 $\mathbb E_{\pi_\theta}[\nabla\log\pi_\theta]=0$ 消失。MDPO 因而直接优化 mirror objective，其他三种方法优化的是由同一最优性方程构造的 regression objective。
+额外的 $-1/\eta$ 项乘以 score 后，在完整 action 求和中因
+$\mathbb E_{\pi_\theta}[\nabla\log\pi_\theta]=0$ 消失。MDPO 因而直接优化
+mirror objective，其他三种方法优化的是由同一最优性方程构造的 regression objective。
 
 MDPO 的自然梯度只改变更新几何，不改变上面的 token target。令 $g=\nabla_\theta\mathcal J_{\mathrm{MDPO}}$，并令
 \[
 F_\theta=\E_{a\sim\pi_\theta}[g_\theta(a)g_\theta(a)^\top],\qquad
 g_\theta(a)=\nabla_\theta\log\pi_\theta(a\mid s).
 \]
-若从 anchor 采样，用 $\operatorname{sg}(R_\theta)$ 进行测度校正。由于 categorical Fisher 的零空间是 logits 的常数方向，$F_\theta^\dagger g$ 位于 simplex 切空间；神经网络参数化下则需用阻尼逆 $(F+\lambda I)^{-1}$ 或 KL trust region，不能把自然步长与 mirror 温度 $\eta$ 混用。
+若从 anchor 采样，用
+$\operatorname{sg}\!\left(\exp(\log\pi_\theta-\log\pi_k)\right)$ 进行测度校正。
+由于 categorical Fisher 的零空间是 logits 的常数方向，$F_\theta^\dagger g$
+位于 simplex 切空间；神经网络参数化下则需用阻尼逆
+$(F+\lambda I)^{-1}$ 或 KL trust region，不能把自然步长与 mirror 温度 $\eta$
+混用。
 
 \begin{algorithm}[ht]
 \caption{MDPO natural-gradient inner update\\{\small\textit{Semantics: 直接优化固定 history 的 mirror objective}}}
@@ -434,12 +625,12 @@ g_\theta(a)=\nabla_\theta\log\pi_\theta(a\mid s).
 \Ensure updated parameters $\theta$
 \For{each history $s_i$}
     \State sample $a_i\sim\pi_k(\cdot\mid s_i)$
-    \State $R_i\gets\exp(\log\pi_\theta(a_i\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_i\mid s_i)))$
-    \State $j_i\gets R_i f(s_i,a_i)-\eta^{-1}R_i\log R_i$ \Comment{保留 $R_i$ 对 student 的梯度}
+    \State $w_i\gets\exp(\log\pi_\theta(a_i\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_i\mid s_i)))$
+    \State $j_i\gets w_i\left[f(s_i,a_i)-\eta^{-1}\log w_i\right]$ \Comment{保留 $w_i$ 对 student 的梯度}
 \EndFor
 \State $g\gets\nabla_\theta(B^{-1}\sum_i j_i)$
 \State $g_i^{\mathrm{score}}\gets\nabla_\theta\log\pi_\theta(a_i\mid s_i)$
-\State $F\gets B^{-1}\sum_i\operatorname{stopgrad}(R_i)g_i^{\mathrm{score}}(g_i^{\mathrm{score}})^\top$
+\State $F\gets B^{-1}\sum_i\operatorname{stopgrad}(w_i)g_i^{\mathrm{score}}(g_i^{\mathrm{score}})^\top$
 \State $\theta\gets\theta+\alpha(F+\lambda I)^\dagger g$
 \State \Return $\theta$
 \end{algorithmic}
@@ -518,11 +709,11 @@ $\mathbb E_{\pi_k}[\nabla_\theta\log\pi_\theta]=0$
 $s_t=(x,y_{<t})$ 和实际 sampled token $a_t=y_t$，最直接的局部 teacher reward 是
 \begin{equation}
 \label{eq:ch2-opd-raw-reward}
-r_k(s_t,a_t)=\log T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
+r_k(s_t,a_t)=\log\pi_T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
 \end{equation}
 它满足序列分解
 \[
-\sum_{t=1}^H r_k(s_t,a_t)=\log T(y\mid x)-\log\pi_k(y\mid x).
+\sum_{t=1}^H r_k(s_t,a_t)=\log\pi_T(y\mid x)-\log\pi_k(y\mid x).
 \]
 因此在共同 mirror 子问题中应取 $f=r_k$；不能把整条序列的 log-ratio 当作每一个 prefix 的同一个 reward，否则会重复计算后缀差异。
 
@@ -543,14 +734,14 @@ f_k^{\mathrm{std}}=(r_k-b_k)/\sigma_k
 
 如果 teacher 和 anchor 都能在 prefix $s$ 返回完整词表 logits，则对每个 $v\in\mathcal V$ 计算
 \[
-r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
+r_k(s,v)=\log\pi_T(v\mid s)-\log\pi_k(v\mid s),
 \qquad
 \log Z_k(s)=\operatorname{logsumexp}_{v\in\mathcal V}
-\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\bigr).
+\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)\bigr).
 \]
 于是 exact target 为
 \[
-\pi_k^+(v\mid s)=\exp\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)-\log Z_k(s)\bigr).
+\pi_k^+(v\mid s)=\exp\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)-\log Z_k(s)\bigr).
 \]
 这时 PMD-Part 的 target、MDPO 的 reverse KL、以及 BPO/PMD-Mean 所需的 anchor conditional center 都可以在同一个 prefix 上精确计算。完整词表路径不需要 action-level importance sampling；唯一的随机性来自 prefix batch 和 optimizer。
 
@@ -559,80 +750,88 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 \label{eq:ch2-opd-full-logz}
 \log Z_k(s)=
 \log\left(\sum_{v\in\mathcal V}
-\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right)\right).
+\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)\right)\right).
 \end{equation}
 因此 exact mirror target 为
 \[
 \pi_k^+(v\mid s)=
-\exp\!\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)-\log Z_k(s)\right).
+\exp\!\left((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)-\log Z_k(s)\right).
 \]
 为了写出 PMD-Mean 和 BPO 的中心化形式，先把两个均值写成 KL 散度。定义
 \begin{align}
-\mathcal K_k^T(s)
-&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert T(\cdot\mid s)\right),\\
-\mathcal K_k^\theta(s)
-&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_\theta(\cdot\mid s)\right).
+C_k^T(s)
+&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert \pi_T(\cdot\mid s)\right),\\
+C_{k,n}^\theta(s)
+&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_{k,n}(\cdot\mid s)\right).
 \end{align}
 在 outer--inner 记号 $\theta_{k,n}$ 中，$k$ 是 outer step 编号，$n$
 是该 outer step 内的 inner optimizer step 编号。因此
-$\mathcal K_{k,n}^\theta(s)$ 简写
-$\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{\theta_{k,n}}(\cdot\mid s))$：
+$C_{k,n}^\theta(s)$ 简写
+$\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$：
 左侧分布 $\pi_k$ 在整个 inner loop 固定，右侧 student 随 $n$ 改变，故每次
-inner 更新后都要用新参数重算这个量。相反，$\mathcal K_k^T(s)$ 在固定
-outer step 内不随 $n$ 改变。这里的 $\mathcal K$ 表示 KL 散度；它和
-Top-$K$ 估计器中的整数 $K$ 不是同一个对象。
+inner 更新后都要用新参数重算这个量。相反，$C_k^T(s)$ 在固定 outer step
+内不随 $n$ 改变。
 于是
 \begin{align}
-\overline{\log(T/\pi_k)}(s)&=-\mathcal K_k^T(s),\\
-\overline{\log(\pi_\theta/\pi_k)}(s)&=-\mathcal K_k^\theta(s).
+\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}\right]&=-C_k^T(s),\\
+\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right]&=-C_{k,n}^\theta(s).
 \end{align}
 后续可以对这两个 KL 分别采用 full vocabulary、top-$K$ 或 sampled-token 估计，但不能混淆它们与 MDPO 中 $\operatorname{KL}(\pi_\theta\Vert\pi_k)$ 的方向。
 于是四个 loss 可直接化为
 \begin{align}
 \mathcal L_{\mathrm{Part}}(s)
 &=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
-\left[\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
--\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
+\left[\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
+-\eta\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
 +\log Z_k(s)\right]^2,
 \label{eq:ch2-opd-full-part-simplified}\\
 \mathcal L_{\mathrm{Mean}}(s)
 &=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \Bigg[
-\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
-+\mathcal K_k^\theta(s)\right)
+\left(\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
++C_{k,n}^\theta(s)\right)
 \\[-2pt]
 &\hspace{35mm}
--\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
-+\mathcal K_k^T(s)\right)
+-\eta\left(\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
++C_k^T(s)\right)
 \Bigg]^2,
 \label{eq:ch2-opd-full-mean-simplified}\\
-D_\theta(s,v)
-&=\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
-+\mathcal K_k^T(s)\right)
+D_{k,n}(s,v)
+&=\eta\left(\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
++C_k^T(s)\right)
 \\[-2pt]
-&\quad-\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
-+\mathcal K_k^\theta(s)\right),
+&\quad-\left(\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
++C_{k,n}^\theta(s)\right),
 \label{eq:ch2-opd-full-bpo-residual}\\
-\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_\theta(s,v)^2],
+\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_{k,n}(s,v)^2],
 \label{eq:ch2-opd-full-bpo-simplified}\\
 \mathcal J_{\mathrm{MDPO}}(s)
-&=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
-\left[\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
--\frac1\eta\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}\right].
+&=\mathbb E_{v\sim\pi_{k,n}(\cdot\mid s)}
+\left[\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
+-\frac1\eta\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right].
 \label{eq:ch2-opd-full-mdpo-simplified}
 \end{align}
-由于 $\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_\theta(s,v)]=0$，BPO 的完整词表梯度进一步化为
+由于 $\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_{k,n}(s,v)]=0$，BPO 的完整词表梯度进一步化为
 \begin{equation}
 \label{eq:ch2-opd-full-bpo-gradient-simplified}
 -\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
 =\mathbb E_{v\sim\pi_k(\cdot\mid s)}
-\left[D_\theta(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right].
+\left[D_{k,n}(s,v)\nabla_\theta\log\pi_{k,n}(v\mid s)\right].
 \end{equation}
 因此完整 vocabulary 路径无需显式计算 centered score 的第二项；它在精确求和中严格抵消。
 
 \subsubsection*{对应的梯度与 stop-gradient 约定}
+为便于对照前面的推导，下面这一组梯度公式中的旧记号统一解释为
+\[
+\pi_\theta=\pi_{k,n},\qquad T=\pi_T,qquad
+\mathcal K_k^T=C_k^T,\qquad
+\mathcal K_{k,n}^\theta=C_{k,n}^\theta,\qquad
+D_\theta=D_{k,n}.
+\]
+这些只是同一 outer--inner 状态的记号映射；$k$ 和 $n$ 的冻结关系不变。后续新公式优先写成
+$\Delta_{k,n}$、$C_k^T$、$C_{k,n}^\theta$ 和 $D_{k,n}$，从而明确区分不同 KL 方向。
 下面把式~\eqref{eq:ch2-opd-full-part-simplified}--\eqref{eq:ch2-opd-full-mdpo-simplified}
-写成可直接实现的 policy-gradient 形式。固定 outer step $k$ 时，$\pi_k$、$T$、
+写成可直接实现的 policy-gradient 形式。固定 outer step $k$ 时，$\pi_k$、$\pi_T$、
 $\log Z_k$ 和 $\mathcal K_k^T$ 都不依赖当前参数 $\theta$，实现中应使用
 $\operatorname{stopgrad}$。相反，$\mathcal K_k^\theta$ 必须保留对
 $\log\pi_\theta$ 的梯度。完整词表下
@@ -711,20 +910,20 @@ $\mathbb E_{u\sim\pi_k}[D_\theta(s,u)]
 
 最后考虑 MDPO。记
 \[
-F_k(s,v)=\log\frac{T(v\mid s)}{\pi_k(v\mid s)},
+ r_k(s,v)=\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)},
 \qquad
-U_\theta(s,v)=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}.
+\Delta_{k,n}(s,v)=\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}.
 \]
 对式~\eqref{eq:ch2-opd-full-mdpo-simplified} 求导时，既要微分外层测度
 $\pi_\theta$，也要微分 $U_\theta$：
 \begin{align}
 \nabla_\theta\mathcal J_{\mathrm{MDPO}}(s)
-&=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
-\Bigg[\left(F_k(s,v)-\frac1\eta U_\theta(s,v)-\frac1\eta\right)
-\nabla_\theta\log\pi_\theta(v\mid s)\Bigg]\\
-&=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
-\left[\operatorname{stopgrad}\!\left(F_k(s,v)-\frac1\eta U_\theta(s,v)\right)
-\nabla_\theta\log\pi_\theta(v\mid s)\right],
+&=\mathbb E_{v\sim\pi_{k,n}(\cdot\mid s)}
+\Bigg[\left(r_k(s,v)-\frac1\eta \Delta_{k,n}(s,v)-\frac1\eta\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\Bigg]\\
+&=\mathbb E_{v\sim\pi_{k,n}(\cdot\mid s)}
+\left[\operatorname{stopgrad}\!\left(r_k(s,v)-\frac1\eta \Delta_{k,n}(s,v)\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\right],
 \end{align}
 因为 $\mathbb E_{v\sim\pi_\theta}[\nabla_\theta\log\pi_\theta(v\mid s)]=0$。因此 MDPO 是以当前 student
 $\pi_\theta$ 为采样测度的 policy gradient，而 BPO/PMD-Mean 是以冻结 anchor
@@ -986,7 +1185,7 @@ $\eta$ 处的值。令 $\kappa_j(r_k)$ 为 $r_k$ 的第 $j$ 阶 cumulant，则�
 其中 $R_3$ 收集三阶及以上 cumulant。因为
 $\mathbb E[r_k]=-\mathcal K_k^T$，二阶近似也可以写成
 \begin{equation}
-\log Z_k(s)\approx-eta\mathcal K_k^T(s)
+\log Z_k(s)\approx-\eta C_k^T(s)
  +\frac{\eta^2}{2}\operatorname{Var}_{a\sim\pi_k}[r_k(s,a)].
 \label{eq:ch2-opd-logz-kl-expansion}
 \end{equation}
@@ -1153,7 +1352,7 @@ PMD-Part 只在 $\eta=1$ 或已验证 $\log Z_k$ 误差足够小时启用，再�
 \begin{algorithm}[ht]
 \caption{OPD full-vocabulary outer--inner optimization\\{\small\textit{Semantics: 每个 outer step 用 $\pi_k$ rollout，固定 anchor 做 $N$ 个 inner policy-gradient step，再同步得到 $\pi_{k+1}$}}}
 \begin{algorithmic}[1]
-\Require prompt distribution $\mathcal D$, teacher $T$, initial student $\pi_0=\pi_{\theta_{0,0}}$, outer steps $K$, rollout batch size $B$, horizon $H$, method $M$, $\eta$, inner steps $N$, inner learning rate schedule $\{\alpha_{k,n}\}$, sync mode $\mathrm{Sync}\in\{\mathrm{hard},\mathrm{soft}\}$, soft-sync weight $\rho\in(0,1]$
+\Require prompt distribution $\mathcal D$, teacher $\pi_T$, initial student $\pi_0=\pi_{\theta_{0,0}}$, outer steps $K$, rollout batch size $B$, horizon $H$, method $M$, $\eta$, inner steps $N$, inner learning rate schedule $\{\alpha_{k,n}\}$, sync mode $\mathrm{Sync}\in\{\mathrm{hard},\mathrm{soft}\}$, soft-sync weight $\rho\in(0,1]$
 \Ensure final policy $\pi_K$ and parameters $\theta_K$
 \For{$k=0,\ldots,K-1$}
     \State $\mathcal B_k\gets\varnothing$ \Comment{$\mathcal B_k$ is a multiset; repeated prefixes keep their multiplicity}
@@ -1165,18 +1364,18 @@ PMD-Part 只在 $\eta=1$ 或已验证 $\log Z_k$ 误差足够小时启用，再�
     \State define $\widehat d_k$ as the empirical distribution assigning each occurrence in $\mathcal B_k$ equal mass
     \State $\theta_{k,0}\gets\theta_k$ \Comment{initialize the inner student from the current outer policy}
     \For{$n=0,\ldots,N-1$}
-        \State query $\log T(v\mid s)$, $\log\pi_k(v\mid s)$ and $\log\pi_{\theta_{k,n}}(v\mid s)$ for every occurrence $s\in\mathcal B_k$ and $v\in\mathcal V$
+        \State query $\log\pi_T(v\mid s)$, $\log\pi_k(v\mid s)$ and $\log\pi_{k,n}(v\mid s)$ for every occurrence $s\in\mathcal B_k$ and $v\in\mathcal V$
         \State $\log Z_k(s)\gets\log\left(\sum_{v\in\mathcal V}\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right)\right)$
-        \State $\mathcal K_k^T(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert T(\cdot\mid s))$
-        \State $\mathcal K_{k,n}^\theta(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{\theta_{k,n}}(\cdot\mid s))$
+        \State $C_k^T(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert \pi_T(\cdot\mid s))$
+        \State $C_{k,n}^\theta(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$
         \If{$M=\mathrm{Part}$}
-            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{\theta_{k,n}}}{\pi_k}-\eta\log\frac{T}{\pi_k}+\log Z_k\right)\nabla_{\theta_{k,n}}\log\pi_{\theta_{k,n}}\right]$
+            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}-\eta\log\frac{\pi_T}{\pi_k}+\log Z_k\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \ElsIf{$M=\mathrm{Mean}$}
-            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{\theta_{k,n}}}{\pi_k}+\mathcal K_{k,n}^\theta-\eta\left(\log\frac{T}{\pi_k}+\mathcal K_k^T\right)\right)\nabla_{\theta_{k,n}}\log\pi_{\theta_{k,n}}\right]$
+            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}+C_{k,n}^\theta-\eta\left(\log\frac{\pi_T}{\pi_k}+C_k^T\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \ElsIf{$M=\mathrm{BPO}$}
-            \State $G_{k,n}\gets-\eta^{-1}\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\eta\left(\log\frac{T}{\pi_k}+\mathcal K_k^T\right)-\left(\log\frac{\pi_{\theta_{k,n}}}{\pi_k}+\mathcal K_{k,n}^\theta\right)\right)\nabla_{\theta_{k,n}}\log\pi_{\theta_{k,n}}\right]$
+            \State $G_{k,n}\gets-\eta^{-1}\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\eta\left(\log\frac{\pi_T}{\pi_k}+C_k^T\right)-\left(\log\frac{\pi_{k,n}}{\pi_k}+C_{k,n}^\theta\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \ElsIf{$M=\mathrm{MDPO}$}
-            \State $G_{k,n}\gets-\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_{\theta_{k,n}}}\left[\operatorname{stopgrad}\!\left(\log\frac{T}{\pi_k}-\eta^{-1}\log\frac{\pi_{\theta_{k,n}}}{\pi_k}\right)\nabla_{\theta_{k,n}}\log\pi_{\theta_{k,n}}\right]$
+            \State $G_{k,n}\gets-\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_{k,n}}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_T}{\pi_k}-\eta^{-1}\log\frac{\pi_{k,n}}{\pi_k}\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
         \EndIf
         \State $\theta_{k,n+1}\gets\operatorname{OptimizerStep}(\theta_{k,n},G_{k,n};\alpha_{k,n})$ \Comment{expectations are implemented by exact sums or MC averages}
     \EndFor
