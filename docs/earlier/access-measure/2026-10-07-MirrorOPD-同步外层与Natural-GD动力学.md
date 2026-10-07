@@ -634,6 +634,8 @@ $$
 
 本笔记中的比较结论对应的逐步证明单独整理在[TOP-D 与 Mirror OPD 定理证明](../2026-10-07-TOP-D与MirrorOPD定理证明.md)。该文档逐项重述 TOP-D 的有界方差、算术近端收敛和性能下界，并给出 projective 收缩、Gibbs 闭式解、support-floor 方差界以及固定 anchor 性能下界的证明。
 
+EMA anchor 版本的双状态动力学、Fisher 局部稳定性和延迟同步推导见[EMA 锚点与 OPD 动力学](../2026-10-07-EMA锚点与OPD动力学.md)。
+
 ### 参考文献
 
 [^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. _Mirror Descent Policy Optimization_. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
