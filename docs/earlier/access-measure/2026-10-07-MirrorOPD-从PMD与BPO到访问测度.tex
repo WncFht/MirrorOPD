@@ -1,0 +1,592 @@
+% !TeX program = xelatex
+% 编译：TEXINPUTS='.:../../../.agents/skills/book-translation/templates/latex//:' xelatex ./2026-10-07-MirrorOPD-从PMD与BPO到访问测度.tex
+\documentclass[lang=cn,scheme=chinese,thmcnt=chapter,device=normal]{elegantbook}
+
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{nicefrac}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{float}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Fisher}{\mathcal{F}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\policy}{\pi}
+\newcommand{\beh}{\mu}
+\newcommand{\cand}{\pi}
+\newcommand{\ratio}{\rho}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\diag}{diag}
+
+\hypersetup{pdftitle={从 PMD 与 BPO 到 MirrorOPD：访问测度、回归投影与策略梯度}}
+\setcounter{tocdepth}{2}
+
+\begin{document}
+
+\frontmatter
+\begin{center}
+{\bfseries\LARGE 从 PMD 与 BPO 到 MirrorOPD：访问测度、回归投影与策略梯度}\\[1.5ex]
+{\large 对 token-level 与 sequence-level 镜像更新的统一推导}
+\end{center}
+\vspace{2ex}
+
+\chapter*{摘要}
+\addcontentsline{toc}{chapter}{摘要}
+本文固定一个有限时域自回归生成问题，系统推导 sequence-level Policy Mirror Descent（PMD）、token-level PMD/Bellman Policy Optimization（BPO）以及 score centering 之间的关系。核心结论有三点。第一，token-level 与 sequence-level 的差异首先是访问测度和软价值定义的差异；只有使用与序列配分函数一致的软 $Q$，两者的精确闭式解才一致。第二，直接对 KL 正则化目标做策略梯度与通过最优性残差回归寻找镜像目标，通常不是同一个离开当前策略点的更新；它们在精确镜像解处共享零点，在 on-policy 积分且忽略采样测度导数等特殊条件下才可能呈现相同的一阶形式。第三，BPO 残差中的反向 KL 项确实产生了 score centering，但这是一种由最优性方程导出的中心化，不等于恢复被去掉的 importance sampling ratio。本文暂不推导 OPD 的 off-policy 修正算法，只把后续 MirrorOPD 的数学边界写清楚。
+
+\tableofcontents
+
+\mainmatter
+
+\chapter{问题、记号与两个镜像子问题}
+\label{ch:setup}
+
+\section{有限时域自回归生成模型}
+\label{sec:setup}
+
+给定上下文 $x$，模型生成长度为 $T$ 的序列 $y=(a_1,\ldots,a_T)$。第 $t$ 步的 prefix 为
+\[
+s_t=(x,a_{<t}),\qquad a_t\sim\policy(\cdot\mid s_t).
+\]
+为简化记号，以下将完整序列概率写成
+\[
+\policy(y\mid x)=\prod_{t=1}^{T}\policy(a_t\mid s_t).
+\]
+行为策略记作 $\beh$，候选学生策略记作 $\cand$，并定义 token ratio
+\[
+\ratio_t=\frac{\cand(a_t\mid s_t)}{\beh(a_t\mid s_t)},
+\qquad
+W_T(y)=\frac{\cand(y\mid x)}{\beh(y\mid x)}=\prod_{t=1}^{T}\ratio_t.
+\]
+所有 KL 和 ratio 都要求在相应的绝对连续性条件下定义。若 $\beh(a\mid s)=0$ 而 $\cand(a\mid s)>0$，则 sequence-level ratio 不存在；这不是数值问题，而是 support 条件失败。
+
+令 $R(y)$ 为完整响应的回报。为了把序列级和逐 token 目标放在同一尺度，定义
+\[
+J(\cand)=\E_{y\sim\cand}[R(y)].
+\]
+在上下文固定时，状态分布 $d_\policy(s)$ 表示在策略 $\policy$ 下访问 prefix $s$ 的期望次数；有限时域下它可以是未归一化的 occupancy，满足 $\sum_s d_\policy(s)=T$。
+
+\section{序列级 PMD}
+\label{sec:sequence-pmd}
+
+从行为策略 $\beh$ 出发的 KL 镜像子问题为
+\begin{equation}
+\label{eq:seq-objective}
+\cand_{\mathrm{seq}}^+
+=\argmax_{\cand\ll\beh}
+\left\{
+J(\cand)-\tau\KL(\cand\Vert\beh)
+\right\},
+\qquad \tau>0.
+\end{equation}
+这里的 KL 是完整响应分布的 KL：
+\[
+\KL(\cand\Vert\beh)=\E_{y\sim\cand}\left[\log\frac{\cand(y\mid x)}{\beh(y\mid x)}\right].
+\]
+
+\begin{lemma}[序列级 Gibbs 解]
+\label{lem:seq-gibbs}
+令
+\[
+Z_0(x)=\E_{y\sim\beh}\left[\exp\left(\frac{R(y)}{\tau}\right)\right].
+\]
+若 $0<Z_0(x)<\infty$，则式 \eqref{eq:seq-objective} 的唯一解为
+\begin{equation}
+\label{eq:seq-gibbs}
+\cand_{\mathrm{seq}}^+(y\mid x)
+=\frac{\beh(y\mid x)\exp(R(y)/\tau)}{Z_0(x)}.
+\end{equation}
+并且对任意 $\cand\ll\beh$，有
+\begin{equation}
+\label{eq:seq-variational}
+J(\cand)-\tau\KL(\cand\Vert\beh)
+=\tau\log Z_0(x)-\tau\KL(\cand\Vert\cand_{\mathrm{seq}}^+).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+由式 \eqref{eq:seq-gibbs}，
+\[
+\log\cand_{\mathrm{seq}}^+(y\mid x)=\log\beh(y\mid x)+\frac{R(y)}{\tau}-\log Z_0(x).
+\]
+将其代入 $\KL(\cand\Vert\cand_{\mathrm{seq}}^+)$，得到
+\begin{align*}
+\KL(\cand\Vert\cand_{\mathrm{seq}}^+)
+&=\E_{\cand}\left[\log\frac{\cand}{\beh}-\frac{R}{\tau}+\log Z_0\right]\\
+&=\KL(\cand\Vert\beh)-\frac{J(\cand)}{\tau}+\log Z_0.
+\end{align*}
+移项即得式 \eqref{eq:seq-variational}。KL 非负且仅在 $\cand=\cand_{\mathrm{seq}}^+$ 时取零，因此唯一性成立。
+\end{proof}
+
+\section{token-level PMD 与 BPO 子问题}
+\label{sec:token-pmd}
+
+对每个 prefix $s$，给定一个相对于行为策略中心化的 action score $A(s,a)$，满足
+\begin{equation}
+\label{eq:centered-A}
+\E_{a\sim\beh(\cdot\mid s)}[A(s,a)]=0.
+\end{equation}
+逐状态 KL 镜像子问题为
+\begin{equation}
+\label{eq:token-objective}
+\cand_{\mathrm{tok}}^+(\cdot\mid s)
+=\argmax_{p\ll\beh(\cdot\mid s)}
+\left\{
+\E_{a\sim p}[A(s,a)]-\frac{1}{\eta}\KL(p\Vert\beh(\cdot\mid s))
+\right\}.
+\end{equation}
+其中 $\eta>0$ 是 inverse temperature。其闭式解为
+\begin{equation}
+\label{eq:token-gibbs}
+\cand_{\mathrm{tok}}^+(a\mid s)
+=\frac{\beh(a\mid s)\exp(\eta A(s,a))}{Z_A(s)},
+\qquad
+Z_A(s)=\E_{\beh(\cdot\mid s)}[e^{\eta A(s,\cdot)}].
+\end{equation}
+
+BPO 可以理解为：把式 \eqref{eq:token-objective} 的逐状态最优性条件沿行为轨迹写成一个轨迹残差，再用平方损失拟合该残差为零。这里的 ``token-level'' 指镜像子问题按条件分布 $p(\cdot\mid s)$ 解耦；它不意味着完整生成目标一定只包含当前 token 的回报。
+
+\chapter{访问测度：为什么 token-level 与 sequence-level 不应直接混称}
+\label{ch:measure}
+
+\section{序列解的条件分解}
+\label{sec:seq-conditionals}
+
+定义从 prefix $s_t$ 出发的条件软配分函数
+\begin{equation}
+\label{eq:conditional-Z}
+Z_t(s_t)=\E_{y_{t:T}\sim\beh(\cdot\mid s_t)}
+\left[\exp\left(\frac{R(y)}{\tau}\right)\middle\vert s_t\right],
+\end{equation}
+其中 $Z_1(x)=Z_0(x)$。对任意合法 transition $s_{t+1}=s_t a_t$，条件化式 \eqref{eq:seq-gibbs} 可得
+\begin{equation}
+\label{eq:seq-conditional}
+\cand_{\mathrm{seq}}^+(a_t\mid s_t)
+=\beh(a_t\mid s_t)\frac{Z_{t+1}(s_{t+1})}{Z_t(s_t)}.
+\end{equation}
+因此定义软 $Q$ 和软 $V$：
+\begin{align}
+Q_{\beh}^{\tau}(s_t,a_t)&=\tau\log Z_{t+1}(s_{t+1}),\\
+V_{\beh}^{\tau}(s_t)&=\tau\log Z_t(s_t),\\
+A_{\beh}^{\tau}(s_t,a_t)&=Q_{\beh}^{\tau}(s_t,a_t)-V_{\beh}^{\tau}(s_t).
+\end{align}
+则式 \eqref{eq:seq-conditional} 等价于
+\begin{equation}
+\label{eq:seq-as-token}
+\cand_{\mathrm{seq}}^+(a_t\mid s_t)
+=\beh(a_t\mid s_t)\exp\left(\frac{A_{\beh}^{\tau}(s_t,a_t)}{\tau}\right).
+\end{equation}
+这里 $\E_{\beh}[\exp(A_{\beh}^{\tau}/\tau)\mid s_t]=1$，所以不需要再写一个局部归一化常数。
+
+\begin{proposition}[精确等价的必要条件]
+\label{prop:exact-equivalence}
+在无限容量、精确软 $Q$、确定性 prefix tree 和相同终止边界下，sequence-level PMD 的闭式解与逐状态 PMD 的闭式解相同。若 token-level 方法使用普通硬优势 $A^{\beh}$，或者使用独立的局部 reward-to-go 而没有软 continuation value，则一般只有在特殊条件下相同。
+\end{proposition}
+
+\begin{proof}
+用 $A=A_{\beh}^{\tau}$ 和 $\eta=1/\tau$ 代入式 \eqref{eq:token-gibbs}，由 $Z_A(s)=1$ 得到式 \eqref{eq:seq-as-token}。这说明逐状态解正好是序列解的条件分布。
+
+反之，若采用任意 $\widetilde A$，则逐状态解的条件 ratio 为
+\[
+\frac{\cand_{\mathrm{tok}}^+(a\mid s)}{\beh(a\mid s)}
+=\frac{e^{\eta\widetilde A(s,a)}}{\E_{\beh}[e^{\eta\widetilde A(s,\cdot)}\mid s]}.
+\]
+它与式 \eqref{eq:seq-conditional} 相同，当且仅当 $\eta\widetilde A(s,a)$ 与 $A_{\beh}^{\tau}(s,a)/\tau$ 只相差一个与 $a$ 无关的状态常数。普通硬优势没有包含 $\log Z_{t+1}(sa)$ 的 continuation term，因此通常不满足该条件。
+\end{proof}
+
+\section{访问测度的三个层次}
+\label{sec:measure-three-levels}
+
+需要把三个经常被合并的测度分开：
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item \textbf{全局最优策略的测度。}式 \eqref{eq:seq-objective} 的第一项在 $\cand$ 下积分，完整 KL 也在 $\cand$ 下积分；它的驻点自然携带 $d_{\cand}$。
+\item \textbf{行为数据的访问测度。}BPO 或残差回归通常在 $s\sim d_{\beh}$、$a\sim\beh(\cdot\mid s)$ 下训练。它可以逐点识别一个满支撑的条件最优解，但不会凭空提供 $d_{\cand}(s)=0$ 的 prefix 监督。
+\item \textbf{参数化模型的优化测度。}当 $\cand=\cand_\theta$ 不能同时实现所有状态上的闭式解时，平方回归的梯度由 $d_{\beh}$ 加权；即使理论上每个状态解相同，有限容量下哪些状态被优先拟合仍由访问测度决定。
+\end{enumerate}
+
+\begin{theorem}[正权重下的点wise 不变性与函数逼近偏差]
+\label{thm:weight-invariance}
+设每个状态上的目标条件分布 $p^+(\cdot\mid s)$ 唯一，且 $w(s)>0$ 对所有被考虑状态成立。对于无约束的条件策略族，
+\[
+\argmin_p\sum_s w(s)\KL(p(\cdot\mid s)\Vert p^+(\cdot\mid s))
+\]
+与 $w(s)$ 无关，均为 $p^+$。但对受限参数族 $p_\theta$，最小值和梯度一般依赖 $w$；若存在未覆盖状态 $w(s)=0$，其条件分布完全不可识别。
+\end{theorem}
+
+\begin{proof}
+无约束时目标是各状态 KL 的非负加权和；每一项都能同时取零，因此唯一解为逐状态的 $p^+$。受限参数族中不能逐项取零，权重改变各项残差在总体目标中的相对重要性，因而改变投影点。若 $w(s)=0$，该状态不出现在目标中，任意条件分布都给出相同损失。
+\end{proof}
+
+\begin{remark}
+因此“最终最优解可能一样”需要注明模型容量、support 和 score 的条件。即便闭式解相同，token-level 的训练梯度仍由 $d_{\beh}$ 加权，而 sequence-level PG 则由 $d_{\cand}$ 加权；两者在有限 batch、有限容量和 replay 下会产生不同的学习轨迹。
+\end{remark}
+
+\section{一个两步反例}
+\label{sec:two-step-counterexample}
+
+考虑两步树：第一步有 $a\in\{L,R\}$，第二步只在 $R$ 后有两个 action。令 $R(L)=0$，而 $R(R,u)=1$、$R(R,v)=0$。即使 $\beh$ 在 $R$ 后几乎不采样到 $u$，sequence PMD 的条件解仍由 $R$ 后的完整 continuation 配分函数决定；若 token-level 方法只用在 $d_{\beh}$ 下估计的局部硬 advantage，第二步稀有 prefix 的 target 几乎没有梯度，第一步也无法准确获得“进入 $R$ 会带来后续软价值”的信息。
+
+这个反例不否认逐状态闭式解的存在。它说明：局部最优问题的解耦依赖于已经知道正确的 $Q$；访问测度决定的是我们能否估计这个 $Q$、能否把它投影到共享参数以及能否覆盖稀有 prefix。sequence-level 的全局配分函数和 token-level 的局部回归在有限数据下承担不同的统计任务。
+
+\chapter{从最优策略回归到直接策略梯度}
+\label{ch:regression-pg}
+
+\section{序列级目标的直接策略梯度}
+\label{sec:seq-pg}
+
+令 $\ratio(y)=\cand(y)/\beh(y)$。对
+\[
+F_{\mathrm{seq}}(\cand)=\E_{\cand}[R]-\tau\KL(\cand\Vert\beh)
+\]
+求参数梯度。因为 $\log\ratio(y)=\log\cand(y)-\log\beh(y)$，且 $\beh$ 固定，有
+\begin{align}
+\nabla_\theta F_{\mathrm{seq}}(\cand_\theta)
+&=\E_{y\sim\cand_\theta}\left[
+\left(R(y)-\tau\log\ratio(y)\right)\nabla_\theta\log\cand_\theta(y)
+\right].
+\label{eq:seq-pg}\end{align}
+推导中出现的 $-\tau\E_{\cand}[\nabla\log\cand]$ 为零。换成行为数据后，式 \eqref{eq:seq-pg} 为
+\begin{equation}
+\label{eq:seq-pg-is}
+\nabla_\theta F_{\mathrm{seq}}
+=\E_{y\sim\beh}\left[
+W_T(y)\left(R(y)-\tau\log W_T(y)\right)
+\sum_{t=1}^{T}g_t(y)
+\right],
+\quad g_t=\nabla_\theta\log\cand_\theta(a_t\mid s_t).
+\end{equation}
+这是直接对正则化目标做 ascent 的 PG。其主要困难是 $W_T=\prod_t\ratio_t$ 的重尾，而不是 $\log W_T$ 的线性累积本身。
+
+\section{PMD-Part 回归的精确梯度}
+\label{sec:pmd-part-regression}
+
+定义序列最优性残差
+\begin{equation}
+\label{eq:seq-residual}
+\delta_{\mathrm{seq}}(y;\cand)
+=\frac{R(y)}{\tau}-\log W_T(y)-\log Z_0(x).
+\end{equation}
+PMD-Part 用行为测度下的平方回归
+\begin{equation}
+\label{eq:pmd-part-loss}
+\mathcal{L}_{\mathrm{part}}(\cand)
+=\frac{1}{2}\E_{y\sim\beh}[\delta_{\mathrm{seq}}(y;\cand)^2].
+\end{equation}
+设
+\[
+c(y)=R(y)-\tau\log W_T(y)-\tau\log Z_0(x).
+\]
+因为 $\nabla\delta_{\mathrm{seq}}=-\nabla\log W_T=-\sum_tg_t$，有
+\begin{equation}
+\label{eq:pmd-reg-grad}
+-\tau\nabla_\theta\mathcal{L}_{\mathrm{part}}
+=\E_{\beh}\left[c(y)\sum_tg_t(y)\right].
+\end{equation}
+
+\begin{proposition}[回归梯度与直接 PG 的关系]
+\label{prop:regression-not-pg}
+除非 $W_T(y)$ 为常数，或者处在精确镜像解 $\cand=\cand_{\mathrm{seq}}^+$，式 \eqref{eq:pmd-reg-grad} 与式 \eqref{eq:seq-pg-is} 一般不相同。二者共享相同的零点，但不共享一般的离开点方向。
+\end{proposition}
+
+\begin{proof}
+把式 \eqref{eq:seq-pg-is} 写成行为测度：其被积函数是 $W_T(y)c_0(y)g(y)$，其中 $c_0=R-\tau\log W_T$。回归梯度的被积函数是 $c(y)g(y)$，其中 $c=c_0-\tau\log Z_0$。常数项在直接 PG 中因 $\E_{\cand}[g]=0$ 消失，但在行为测度下 $\E_{\beh}[g]$ 一般不为零；更重要的是回归项没有 $W_T$。因此一般不等。
+
+在精确镜像解处，$\log W_T=R/\tau-\log Z_0$，所以 $c(y)=0$，回归梯度为零；直接 PG 也因该策略最大化式 \eqref{eq:seq-objective} 而为零。若 $W_T$ 在所有样本上为同一个常数，则两种测度只差一个常数，方向可以退化为相同。
+\end{proof}
+
+\begin{remark}[为什么还要回归]
+回归不是对同一个标量目标换一种写法，而是在解一个更容易从行为数据估计的最优性方程：
+\[
+\log\cand^+(y)-\log\beh(y)=R(y)/\tau-\log Z_0.
+\]
+它把乘性 ratio 从梯度权重中移到对数残差中。代价是：离开根点时它不再是原始 KL 正则化目标的无偏梯度；它优化的是“到镜像解的投影误差”，而非每一步都保持原目标的 ascent 方向。
+\end{remark}
+
+\section{token-level BPO 的直接 PG 与残差回归}
+\label{sec:bpo-pg}
+
+固定状态 $s$，记 $h(a)=\eta A(s,a)$、$\ratio(a)=\cand(a\mid s)/\beh(a\mid s)$，并令
+\[
+K(\cand)=\KL(\beh(\cdot\mid s)\Vert\cand(\cdot\mid s))
+=\E_{\beh}[-\log\ratio(a)].
+\]
+由于 $\E_{\beh}[A]=0$，有
+\begin{equation}
+\label{eq:K-identity}
+\E_{\beh}[h(a)-\log\ratio(a)]=K(\cand).
+\end{equation}
+BPO 的局部残差写成
+\begin{equation}
+\label{eq:bpo-local-residual}
+\delta_s(a)=h(a)-\log\ratio(a)-K(\cand).
+\end{equation}
+由式 \eqref{eq:K-identity}，$\E_{\beh}[\delta_s]=0$ 对任意 $\cand$ 都成立。镜像解满足
+\[
+\log\ratio^+(a)=h(a)-\log Z_A(s),
+\qquad
+K(\cand^+)=\log Z_A(s),
+\]
+故 $\delta_s(a)=0$。
+
+相应的局部 BPO 回归损失为
+\begin{equation}
+\label{eq:bpo-local-loss}
+\mathcal{L}_s(\cand)=\frac{1}{2\eta}\E_{a\sim\beh}[\delta_s(a)^2].
+\end{equation}
+
+\begin{proposition}[BPO 残差的 score centering]
+\label{prop:bpo-score-centering}
+令 $g(a)=\nabla_\theta\log\cand_\theta(a\mid s)$，$\bar g=\E_{\beh}[g]$。若对 $K(\cand)$ 完整求导，则
+\begin{equation}
+\label{eq:grad-K}
+\nabla_\theta K(\cand)=-\E_{\beh}[g]= -\bar g,
+\end{equation}
+且
+\begin{equation}
+\label{eq:bpo-centered-grad}
+-\eta\nabla_\theta\mathcal{L}_s
+=\E_{\beh}\left[\delta_s(a)\bigl(g(a)-\bar g\bigr)\right].
+\end{equation}
+因此 $-\KL(\beh\Vert\cand)$ 项在求导时把 raw score $g$ 变成了行为测度下的中心化 score $g-\E_{\beh}[g]$。
+\end{proposition}
+
+\begin{proof}
+由 $K=\E_{\beh}[\log\beh-\log\cand]$，行为策略固定，式 \eqref{eq:grad-K} 直接成立。又有
+\[
+\nabla_\theta\delta_s(a)=-g(a)-\nabla K=-g(a)+\bar g.
+\]
+对式 \eqref{eq:bpo-local-loss} 求导，得到
+\[
+\nabla\mathcal{L}_s
+=\frac1\eta\E_{\beh}[\delta_s(-g+\bar g)].
+\]
+乘以 $-\eta$ 即得式 \eqref{eq:bpo-centered-grad}。
+\end{proof}
+
+\begin{remark}[score centering 不等于 IS correction]
+式 \eqref{eq:bpo-centered-grad} 的中心化来自 $\KL(\beh\Vert\cand)$ 对候选策略参数的导数。它消除了行为测度下 score 的均值，但没有把 $\E_{\beh}$ 变成 $\E_{\cand}$；因此它不能单独恢复式 \eqref{eq:seq-pg-is} 或 token-level 直接 PG 中的 $\ratio$。中心化解决的是 baseline/score 的几何问题，IS 解决的是积分测度问题。
+\end{remark}
+
+\section{BPO 的直接 PG 形式}
+\label{sec:bpo-direct-pg}
+
+对局部 KL 正则目标
+\begin{equation}
+\label{eq:local-direct-objective}
+G_s(\cand)=\E_{a\sim\cand}[A(s,a)]-\frac{1}{\eta}\KL(\cand\Vert\beh)
+\end{equation}
+求导，得到
+\begin{equation}
+\label{eq:local-pg}
+\nabla G_s
+=\E_{a\sim\cand}\left[\left(A(s,a)-\frac1\eta\log\ratio(a)\right)g(a)\right]
+=\E_{a\sim\beh}\left[\ratio(a)\left(A(s,a)-\frac1\eta\log\ratio(a)\right)g(a)\right].
+\end{equation}
+式 \eqref{eq:local-pg} 是局部 KL 正则化目标的真实 PG。与式 \eqref{eq:bpo-centered-grad} 比较：
+\begin{itemize}
+\item 直接 PG 使用 $\ratio(a)$ 改变积分测度，并使用 forward KL $\KL(\cand\Vert\beh)$ 的 log-ratio；
+\item BPO 回归使用行为测度下的中心化残差 $\delta_s$，其根与闭式镜像解一致，但一般不等于直接 PG；
+\item 当 $\cand=\cand^+$ 时，$\delta_s=0$ 且 $\nabla G_s=0$，所以两者在驻点一致。
+\end{itemize}
+
+\begin{proposition}[何时可以说“形式一致”]
+\label{prop:formal-consistency}
+如果“形式一致”只指两种方法具有相同的精确目标策略和相同的零点，则 PMD-Part 与 BPO 回归都满足。若“形式一致”指每个训练点的随机梯度逐样本相等，则一般不满足；需要额外的 ratio 加权、特殊参数化或恰好位于镜像解。
+\end{proposition}
+
+\begin{proof}
+前者由式 \eqref{eq:seq-gibbs}、\eqref{eq:token-gibbs} 和残差为零条件直接得到。后者则由式 \eqref{eq:seq-pg-is} 与 \eqref{eq:pmd-reg-grad}、式 \eqref{eq:local-pg} 与 \eqref{eq:bpo-centered-grad} 的被积函数不同得到。
+\end{proof}
+
+\section{PMD-Mean：均值近似与隐式正则化}
+\label{sec:pmd-mean}
+
+PMD-Part 的序列级目标使用精确的配分函数：若 $u(y)=\log(\cand(y)/\beh(y))$，则其理想回归目标为
+\[
+u_{\mathrm{part}}^\star(y)=\frac{R(y)}{\tau}-\log Z_0(x).
+\]
+PMD-Mean 用行为策略下的均值奖励替代未知的 $\tau\log Z_0$。令
+\[
+\bar R=\E_{\beh}[R],\qquad \Delta(y)=R(y)-\bar R,qquad g(y)=\frac{\Delta(y)}{\tau},
+\]
+其总体平方损失可写为
+\begin{equation}
+\label{eq:pmd-mean-loss}
+\mathcal{L}_{\mathrm{mean}}(\cand)
+=\frac12\E_{y\sim\beh}\left[\left(\log\frac{\cand(y)}{\beh(y)}-g(y)\right)^2\right],
+\qquad \E_{\beh}\left[\frac{\cand}{\beh}\right]=1.
+\end{equation}
+这里的归一化约束是策略单纯形约束；它不能被从回归问题中删去。否则逐样本令 $u=g$ 通常不会满足 $\E_{\beh}[e^u]=1$。
+
+\begin{proposition}[PMD-Mean 的 Lambert-$W$ 驻点]
+\label{prop:pmd-mean-lambert}
+假设 $\beh(y)>0$，且 $\E_{\beh}[e^g]<\infty$。若 $\cand_{\mathrm{mean}}^+$ 是式 \eqref{eq:pmd-mean-loss} 的全局极小点，则存在唯一的 $\lambda\geq 0$，使得
+\begin{equation}
+\label{eq:pmd-mean-lambert}
+u^+(y)=g(y)-W\!\left(\lambda e^{g(y)}\right),
+\qquad
+\cand_{\mathrm{mean}}^+(y)=\beh(y)e^{u^+(y)},
+\end{equation}
+其中 $W$ 是满足 $W(z)e^{W(z)}=z$ 的 Lambert-$W$ 主分支，$\lambda$ 由 $\E_{\beh}[e^{u^+}]=1$ 确定。
+\end{proposition}
+
+\begin{proof}
+对 $u$ 加入归一化约束，拉格朗日函数为
+\[
+\mathscr{L}(u,\lambda)=\frac12\E_{\beh}[(u-g)^2]
+ +\lambda\left(\E_{\beh}[e^u]-1\right).
+\]
+逐点的一阶条件是
+\begin{equation}
+\label{eq:pmd-mean-kkt}
+u(y)-g(y)+\lambda e^{u(y)}=0.
+\end{equation}
+将 $v(y)=g(y)-u(y)$ 代入，得到
+\[
+v(y)e^{v(y)}=\lambda e^{g(y)},
+\]
+故 $v(y)=W(\lambda e^{g(y)})$，即式 \eqref{eq:pmd-mean-lambert}。又因为 $\E_{\beh}[g]=0$，对式 \eqref{eq:pmd-mean-kkt} 取期望并使用 $\E_{\beh}[e^u]=1$，得 $\E_{\beh}[u]=-\lambda$。Jensen 不等式给出 $\E_{\beh}[u]\leq\log\E_{\beh}[e^u]=0$，所以 $\lambda\geq0$。当 $\lambda\geq0$ 时，主分支上的 $W$ 单调递增，归一化方程左端随 $\lambda$ 严格递减（除非 $g$ 几乎处处为常数），因此解唯一。
+\end{proof}
+
+这个解与标准 PMD-Part 的 Gibbs 解有实质差异。PMD-Part 给出
+\[
+u_{\mathrm{part}}^+(y)=g(y)-\log\E_{\beh}[e^{g}],
+\]
+其中校正项是与 $y$ 无关的常数；PMD-Mean 的校正项 $W(\lambda e^{g(y)})$ 随奖励变化。只有在退化情形 $g$ 为常数，或者在局部近似中把 Lambert-$W$ 项视作常数，二者才重合。因此 PMD-Mean 不是标准 KL 镜像子问题的另一种无偏求解，而是先用均值构造回归方程，再在策略单纯形上投影所得到的不同更新。
+
+\begin{proposition}[PMD-Mean 的单调改进]
+\label{prop:pmd-mean-improvement}
+在命题 \ref{prop:pmd-mean-lambert} 的条件下，PMD-Mean 更新满足
+\begin{equation}
+\label{eq:pmd-mean-improvement}
+\E_{\cand_{\mathrm{mean}}^+}[R]\geq \E_{\beh}[R].
+\end{equation}
+若 $R$ 在行为测度下非退化且 $\lambda>0$，不等式严格成立。
+\end{proposition}
+
+\begin{proof}
+令 $q(y)=\cand_{\mathrm{mean}}^+(y)/\beh(y)=e^{u^+(y)}$。由式 \eqref{eq:pmd-mean-lambert} 以及
+\[
+\frac{\partial u^+}{\partial g}
+=\frac{1}{1+W(\lambda e^g)}>0,
+\]
+$q$ 是 $g$、从而也是 $R$ 的严格递增函数。归一化约束给出 $\E_{\beh}[q]=1$，于是
+\begin{align*}
+\E_{\cand_{\mathrm{mean}}^+}[R]-\E_{\beh}[R]
+&=\E_{\beh}[(q-1)R]
+=\Cov_{\beh}(q,R)\\
+&=\frac12\E_{Y,Y'\sim\beh}
+\left[(q(Y)-q(Y'))(R(Y)-R(Y'))\right]\geq0.
+\end{align*}
+最后一个不等式来自两个同向单调函数的乘积非负；若 $R$ 非退化且 $q$ 严格递增，则正概率集合上严格为正。
+\end{proof}
+
+PMD-Mean 因而保留了镜像更新的排序和单调改进性质，但它改变了每个奖励层级的策略比例。对本轮问题而言，这个例子把“回归最优性方程”和“直接最大化 $R-\tau\KL$”的差异展示得更清楚：PMD-Part 的残差根是 Gibbs 解，PMD-Mean 的残差根是 Lambert-$W$ 解，二者都能作为行为数据下的稳定回归目标，却只有前者逐点对应标准 KL 正则化目标。
+
+\chapter{score centering、优势中心化与 BPO 的关系}
+\label{ch:centering}
+
+\section{优势函数中心化}
+\label{sec:q-to-a}
+
+给定行为策略下的 action value $Q^{\beh}(s,a)$，定义
+\[
+V^{\beh}(s)=\E_{a\sim\beh(\cdot\mid s)}[Q^{\beh}(s,a)],
+\qquad
+A^{\beh}(s,a)=Q^{\beh}(s,a)-V^{\beh}(s).
+\]
+于是 $\E_{\beh}[A^{\beh}\mid s]=0$。对任意只依赖状态的 baseline $b(s)$，
+\[
+\E_{\beh}[Q^{\beh}(s,a)-b(s)]=V^{\beh}(s)-b(s).
+\]
+所以只有取 $b(s)=V^{\beh}(s)$ 时，score/advantage 才在行为动作测度下中心化。
+
+\begin{lemma}[中心化对真实 PG 的不变性]
+\label{lem:baseline-pg}
+对任意状态函数 $b(s)$，在目标策略动作测度下
+\[
+\E_{a\sim\cand(\cdot\mid s)}[b(s)\nabla_\theta\log\cand(a\mid s)]=0.
+\]
+因此在 on-policy PG 中，$Q$ 与 $A=Q-b(s)$ 给出相同的期望梯度。若样本来自 $\beh$ 而没有 ratio，替换 baseline 仍不改变测度偏差。
+\end{lemma}
+
+\begin{proof}
+对固定 $s$，
+\[
+\E_{a\sim\cand}[\nabla\log\cand(a\mid s)]
+=\sum_a\nabla\cand(a\mid s)=\nabla 1=0.
+\]
+乘以与 $a$ 无关的 $b(s)$ 即得结论。第二句是因为 baseline 只改变被积函数，不改变样本分布。
+\end{proof}
+
+\section{BPO 中的两种中心化不要混淆}
+\label{sec:two-centerings}
+
+BPO 相关推导里至少有两种中心化：
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item $Q\to A=Q-V^{\beh}$：中心化 reward/advantage，使 $\E_{\beh}[A]=0$，从而局部指数 target 的配分函数和残差恒等式更简洁。
+\item $g\to g-\E_{\beh}[g]$：对 $K=\KL(\beh\Vert\cand)$ 求导产生的 score centering，见式 \eqref{eq:bpo-centered-grad}。
+\end{enumerate}
+第一种是信号的中心化，第二种是参数 score 的中心化。它们都使用行为测度，但数学对象不同，不能把第二种解释成完整的 off-policy correction。
+
+\begin{proposition}[BPO 残差已经包含中心化，但包含的是什么]
+\label{prop:bpo-contains-centering}
+在精确的局部 BPO 残差 \eqref{eq:bpo-local-residual} 中，$K=\KL(\beh\Vert\cand)$ 使 $\E_{\beh}[\delta_s]=0$，其参数梯度使 score 变成 $g-\E_{\beh}[g]$。因此 BPO 确实内含 score-centering；但它没有内含 sequence IS，也没有消除 $d_{\beh}$ 对有限容量回归的加权作用。
+\end{proposition}
+
+\begin{proof}
+第一句是式 \eqref{eq:K-identity} 的直接推论，第二句是命题 \ref{prop:bpo-score-centering}。最后两句分别由式 \eqref{eq:local-pg} 中的 ratio 和定理 \ref{thm:weight-invariance} 说明。
+\end{proof}
+
+\chapter{结论与后续 MirrorOPD 的边界}
+\label{ch:conclusion}
+
+\section{对三个问题的直接回答}
+\label{sec:answers}
+
+\begin{enumerate}[label=\textbf{问题 \arabic*.},leftmargin=*]
+\item \textbf{token-level 与 sequence-level 是否因访问测度不同而不同？}
+
+是。精确 sequence PMD 的条件解可以写成 token 形式，但其中的 score 必须是包含 continuation soft value 的 $A_{\beh}^{\tau}$。BPO 使用行为 prefix 测度下的逐状态残差，理论闭式解在满支撑、无限容量且 score 正确时可以与 sequence 解一致；在有限数据、有限容量、硬 advantage、replay 或 prefix coverage 不足时，访问测度会改变估计误差和投影点。
+
+\item \textbf{为什么回归最优策略，而不是直接最大化 $R-\tau\KL$？}
+
+直接 PG 是原 KL 正则化目标的 ascent，行为数据下必须携带 $W_T$ 或 token ratio。PMD-Part/BPO 回归是在行为测度下求解镜像最优性方程，把 ratio 的乘法影响变成 log-ratio 的加法残差。它们在精确镜像策略处共享零点，但一般不共享每一步 PG 方向；回归方法的优势是方差和 support 处理，代价是离开根点时不再是原目标的无偏 ascent。
+
+\item \textbf{现在是否应当直接推导 OPD off-policy 算法？}
+
+暂不应把它和本轮基础推导混在一起。下一步需要先固定采用 sequence-level 还是 prefix-level 的目标、teacher score 是硬 $Q/A$ 还是 continuation soft $Q/A$、以及 KL 系数如何定义。KL 系数改变指数 target 的温度和教师加权分布；随后才适合参考信任区域策略蒸馏中的系数调度，分别控制 target 的几何距离和学生优化步长。
+\end{enumerate}
+
+\section{后续推导必须保留的区分}
+\label{sec:future-boundary}
+
+后续 MirrorOPD 推导至少要显式记录：
+\begin{enumerate}
+\item sequence-level target 的归一化常数与 continuation soft value；
+\item prefix-level target 使用的访问测度 $d_{\beh}$ 及其 support/coverage 条件；
+\item direct PG 中的 $W_T$、$W_{<t}$、$\ratio_t$ 与 $W_{>t}$ 分工；
+\item $Q\to A$ 的 reward centering 与 $g\to g-\E_{\beh}[g]$ 的 score centering；
+\item 回归残差的 stop-gradient 位置，以及它是否被当作原始目标的 ascent 方向；
+\item KL 前系数、target temperature、实际 Fisher/Natural Gradient 步长三者的独立作用。
+\end{enumerate}
+
+本文到此只完成 PMD/BPO 的测度与梯度基础，不声称已经给出 OPD 的 off-policy correction 算法。
+
+\backmatter
+\begin{thebibliography}{99}
+\bibitem{tomar2020mdpo}Tomar et al. \emph{Mirror Descent Policy Optimization}. arXiv:2005.09814, 2020.
+\bibitem{xu2026pmd}Xu et al. \emph{Approximation of Log-Partition Function in Policy Mirror Descent Induces Implicit Regularization for LLM Post-Training}. arXiv:2602.05933, 2026.
+\bibitem{song2026bpo}Song et al. \emph{Bellman Policy Optimization}. arXiv:2609.15987, 2026.
+\bibitem{xie2026topd}Xie et al. \emph{Trust Region Policy Distillation}. NeurIPS 2026.
+\end{thebibliography}
+
+\end{document}
