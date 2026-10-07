@@ -197,6 +197,137 @@ BPO 采用同一个最优性方程的“常数消除”形式。令
 \]
 所以 $C=\log Z_f$，从而 $u=u^+$。反过来，若 $u=u^+$，则 $b(a)=\log Z_f$ 为常数，故 $\delta(a)=0$。因此 BPO 和 PMD-Part 由同一个镜像最优解出发，并共享同一个可实现零点；它们的差别只出现在对这个最优性方程采用的残差和参数梯度上。
 
+\section{中心化条件的来源与 OPD 特化}
+\label{sec:centering-and-opd}
+
+前面的条件 $\E_\mu[f\mid s]=0$ 不是任意 per-token reward 都满足的恒等式。它在 $f=A^\mu$ 时成立，是因为优势函数按定义为
+\[
+A^\mu(s,a)=Q^\mu(s,a)-V^\mu(s),
+\qquad
+V^\mu(s)=\E_{a\sim\mu(\cdot\mid s)}[Q^\mu(s,a)],
+\]
+所以逐 prefix 有
+\begin{align*}
+\E_\mu[A^\mu(s,a)\mid s]
+&=\E_\mu[Q^\mu(s,a)\mid s]-V^\mu(s)\\
+&=V^\mu(s)-V^\mu(s)=0.
+\end{align*}
+如果 $f$ 是即时 reward、教师打分、logit reward 或任意 OPD per-token reward，这个均值通常不为零。此时可以定义
+\[
+\bar f(s):=\E_\mu[f(s,a)\mid s],
+\qquad
+\widetilde f(s,a):=f(s,a)-\bar f(s),
+\]
+并用 $\widetilde f$ 作为 BPO 的中心化信号。中心化只减去 prefix 相关的 action-independent 常数；在 Gibbs 解中，
+\[
+\frac{\mu(a\mid s)e^{\eta\widetilde f(s,a)}}
+{\E_\mu[e^{\eta\widetilde f(s,\cdot)}\mid s]}
+=
+\frac{\mu(a\mid s)e^{\eta f(s,a)}}
+{\E_\mu[e^{\eta f(s,\cdot)}\mid s]},
+\]
+因此不改变最优条件策略，只改变配分函数的表示。
+
+令 $r_{\mathrm{OPD}}(s,a)$ 表示 OPD 在当前 prefix 上提供的即时 token 信号。它可以是教师偏好分数、教师与行为策略的 log-ratio、或已经估计好的 token advantage。记
+\[
+\bar r(s)=\E_\mu[r_{\mathrm{OPD}}(s,a)\mid s],
+\qquad
+\widetilde r(s,a)=r_{\mathrm{OPD}}(s,a)-\bar r(s),
+\]
+则三种 token-level 方法都可以从同一个 OPD mirror subproblem 出发：
+\begin{equation}
+\label{eq:opd-mirror-subproblem}
+\max_{p\ll\mu}
+\left\{
+\E_p[r_{\mathrm{OPD}}(s,a)]
+-\frac1\eta\KL(p\Vert\mu(\cdot\mid s))
+\right\}.
+\end{equation}
+其精确教师策略为
+\begin{equation}
+\label{eq:opd-gibbs}
+\pi^+_{\mathrm{OPD}}(a\mid s)
+=
+\frac{\mu(a\mid s)e^{\eta r_{\mathrm{OPD}}(s,a)}}
+{Z_{\mathrm{OPD}}(s)},
+\qquad
+Z_{\mathrm{OPD}}(s)=\E_\mu[e^{\eta r_{\mathrm{OPD}}(s,\cdot)}\mid s].
+\end{equation}
+
+\paragraph{OPD--PMD-Part.}
+定义
+\[
+h_{\mathrm{OPD}}(s,a)=\eta r_{\mathrm{OPD}}(s,a)-\log Z_{\mathrm{OPD}}(s).
+\]
+PMD-Part 回归完整的 OPD log-ratio：
+\begin{equation}
+\label{eq:opd-part-loss}
+\mathcal L_{\mathrm{Part}}^{\mathrm{OPD}}
+=\frac12\E_{s\sim d_\mu,\,a\sim\mu}
+\left[u_\theta(s,a)-h_{\mathrm{OPD}}(s,a)\right]^2,
+\end{equation}
+其下降方向为
+\begin{equation}
+\label{eq:opd-part-gradient}
+-\nabla_\theta\mathcal L_{\mathrm{Part}}^{\mathrm{OPD}}
+=\E_{d_\mu\mu}
+\left[(h_{\mathrm{OPD}}-u_\theta)g_\theta\right].
+\end{equation}
+它不需要对 action 乘 IS ratio；访问测度 $d_\mu\mu$ 只决定 OPD residual 在 prefix 和 action 上的投影权重。
+
+\paragraph{OPD--PMD-Mean.}
+PMD-Mean 先用中心化信号
+\[
+g_{\mathrm{OPD}}(s,a)=\eta\widetilde r(s,a)
+\]
+替代未知的 $\log Z_{\mathrm{OPD}}$，再求解带归一化约束的投影：
+\begin{equation}
+\label{eq:opd-mean-loss}
+\min_u\frac12\E_{d_\mu\mu}[(u-g_{\mathrm{OPD}})^2]
+\quad\text{s.t.}\quad
+\E_{a\sim\mu(\cdot\mid s)}[e^{u(s,a)}]=1.
+\end{equation}
+固定 prefix 后，令 $\lambda(s)$ 为约束乘子，则一阶条件为
+\[
+u(s,a)-g_{\mathrm{OPD}}(s,a)+\lambda(s)e^{u(s,a)}=0.
+\]
+令 $v=g_{\mathrm{OPD}}-u$，得到
+\[
+v e^v=\lambda(s)e^{g_{\mathrm{OPD}}},
+\]
+所以
+\begin{equation}
+\label{eq:opd-mean-lambert}
+u_{\mathrm{Mean}}^+(s,a)
+=g_{\mathrm{OPD}}(s,a)
+-W\!\left(\lambda(s)e^{g_{\mathrm{OPD}}(s,a)}\right),
+\end{equation}
+其中 $\lambda(s)$ 由归一化约束确定。这个解一般不等于精确 OPD Gibbs log-ratio；它是行为测度下的中心化 log-ratio 投影。
+
+\paragraph{OPD--BPO.}
+对任意 OPD reward，BPO 应使用中心化 residual，而不能直接把 $\E_\mu[f]=0$ 当作无条件事实：
+\begin{equation}
+\label{eq:opd-bpo-residual}
+\delta_{\mathrm{OPD}}(s,a)
+=\eta\widetilde r(s,a)-u_\theta(s,a)
++\E_{a'\sim\mu(\cdot\mid s)}[u_\theta(s,a')].
+\end{equation}
+因为 $\E_\mu[\widetilde r\mid s]=0$，有 $\E_\mu[\delta_{\mathrm{OPD}}\mid s]=0$。完整 reverse-KL 的梯度为
+\[
+\nabla_\theta\delta_{\mathrm{OPD}}(s,a)
+=-\left(g_\theta(s,a)-\bar g_\theta(s)\right),
+\qquad
+\bar g_\theta(s)=\E_\mu[g_\theta(s,a)\mid s],
+\]
+所以未线性化 OPD--BPO 的下降方向为
+\begin{equation}
+\label{eq:opd-bpo-gradient}
+-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}^{\mathrm{OPD}}
+=\E_{d_\mu\mu}
+\left[\delta_{\mathrm{OPD}}(g_\theta-\bar g_\theta)\right].
+\end{equation}
+若 OPD reward 本身就是优势，$\widetilde r=r_{\mathrm{OPD}}$；若不是优势，式 \eqref{eq:opd-bpo-residual} 的中心化步骤是定义 BPO residual 所必需的。三者都使用同一个 token-level OPD mirror subproblem，但 PMD-Part 拟合精确配分函数，PMD-Mean 做归一化约束投影，BPO 做行为测度下的中心化 residual 回归。
+
 \section{PMD-Part：回归最优 log-ratio}
 \label{sec:pmd-part}
 
