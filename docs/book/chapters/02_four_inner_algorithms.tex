@@ -565,15 +565,19 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 \pi_k^+(v\mid s)=
 \exp\!\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)-\log Z_k(s)\right).
 \]
-为了写出 PMD-Mean 和 BPO 的中心化形式，定义两个可直接由完整词表求和得到的条件均值
+为了写出 PMD-Mean 和 BPO 的中心化形式，先把两个均值写成 KL 散度。定义
 \begin{align}
-\overline{\log(T/\pi_k)}(s)
-&=\sum_{v\in\mathcal V}\pi_k(v\mid s)
-  \log\frac{T(v\mid s)}{\pi_k(v\mid s)},\\
-\overline{\log(\pi_\theta/\pi_k)}(s)
-&=\sum_{v\in\mathcal V}\pi_k(v\mid s)
-  \log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}.
+\mathcal K_k^T(s)
+&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert T(\cdot\mid s)\right),\\
+\mathcal K_k^\theta(s)
+&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_\theta(\cdot\mid s)\right).
 \end{align}
+于是
+\begin{align}
+\overline{\log(T/\pi_k)}(s)&=-\mathcal K_k^T(s),\\
+\overline{\log(\pi_\theta/\pi_k)}(s)&=-\mathcal K_k^\theta(s).
+\end{align}
+后续可以对这两个 KL 分别采用 full vocabulary、top-$K$ 或 sampled-token 估计，但不能混淆它们与 MDPO 中 $\operatorname{KL}(\pi_\theta\Vert\pi_k)$ 的方向。
 于是四个 loss 可直接化为
 \begin{align}
 \mathcal L_{\mathrm{Part}}(s)
@@ -586,19 +590,19 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 &=\frac12\sum_{v\in\mathcal V}\pi_k(v\mid s)
 \Bigg[
 \left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
--\overline{\log(\pi_\theta/\pi_k)}(s)\right)
++\mathcal K_k^\theta(s)\right)
 \\[-2pt]
 &\hspace{35mm}
 -\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
--\overline{\log(T/\pi_k)}(s)\right)
++\mathcal K_k^T(s)\right)
 \Bigg]^2,
 \label{eq:ch2-opd-full-mean-simplified}\\
 D_\theta(s,v)
 &=\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}
--\overline{\log(T/\pi_k)}(s)\right)
++\mathcal K_k^T(s)\right)
 \\[-2pt]
 &\quad-\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
--\overline{\log(\pi_\theta/\pi_k)}(s)\right),
++\mathcal K_k^\theta(s)\right),
 \label{eq:ch2-opd-full-bpo-residual}\\
 \mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\sum_{v\in\mathcal V}\pi_k(v\mid s)D_\theta(s,v)^2,
 \label{eq:ch2-opd-full-bpo-simplified}\\
@@ -624,14 +628,14 @@ D_\theta(s,v)
 \For{$n=1,\ldots,N$}
     \State query $\log T(v\mid s_i)$, $\log\pi_k(v\mid s_i)$ and $\log\pi_\theta(v\mid s_i)$ for all $v\in\mathcal V$
     \State $\log Z_{k,i}\gets\operatorname{logsumexp}_v[(1-\eta)\log\pi_k(v\mid s_i)+\eta\log T(v\mid s_i)]$
-    \State $\overline{\log(T/\pi_k)}_i\gets\sum_v\pi_k(v\mid s_i)\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}$
-    \State $\overline{\log(\pi_\theta/\pi_k)}_i\gets\sum_v\pi_k(v\mid s_i)\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}$
+    \State $\mathcal K_{k,i}^T\gets\operatorname{KL}(\pi_k(\cdot\mid s_i)\Vert T(\cdot\mid s_i))$
+    \State $\mathcal K_{k,i}^\theta\gets\operatorname{KL}(\pi_k(\cdot\mid s_i)\Vert\pi_\theta(\cdot\mid s_i))$
     \If{$M=\mathrm{Part}$}
         \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\log Z_{k,i}\right]^2$
     \ElsIf{$M=\mathrm{Mean}$}
-        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(\pi_\theta/\pi_k)}_i-\eta\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(T/\pi_k)}_i\right)\right]^2$
+        \State $L\gets(2B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta-\eta\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right)\right]^2$
     \ElsIf{$M=\mathrm{BPO}$}
-        \State $D_i(v)\gets\eta\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(T/\pi_k)}_i\right]-\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\overline{\log(\pi_\theta/\pi_k)}_i\right]$
+        \State $D_i(v)\gets\eta\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right]-\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta\right]$
         \State $L\gets(2\eta B)^{-1}\sum_{i,v}\pi_k(v\mid s_i)D_i(v)^2$
     \ElsIf{$M=\mathrm{MDPO}$}
         \State $L\gets-B^{-1}\sum_i\sum_v\pi_\theta(v\mid s_i)\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta^{-1}\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}\right]$
