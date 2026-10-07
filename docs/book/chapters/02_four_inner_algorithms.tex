@@ -640,12 +640,19 @@ $\log\pi_\theta$ 的梯度。完整词表下
 =-\mathbb E_{v\sim\pi_k(\cdot\mid s)}
 \left[\nabla_\theta\log\pi_\theta(v\mid s)\right].
 \end{align}
+在下面的 policy-gradient 实现中，$A_{\mathrm{Part}}$、
+$A_{\mathrm{Mean}}$、$D_\theta$ 以及 MDPO 的 log-ratio 权重都必须整体
+使用 $\operatorname{stopgrad}$。这不是说它们在原始平方损失或原始
+MDPO objective 中没有参数依赖，而是这些依赖已经在前面的解析求导中处理过；
+直接实现 policy-gradient 时若不停止梯度，就会重复求导并产生错误的二阶项。
+
 对 PMD-Part，残差对 $\theta$ 的导数就是
 $\nabla_\theta\log\pi_\theta(v\mid s)$，故
 \begin{align}
 \nabla_\theta\mathcal L_{\mathrm{Part}}(s)
 &=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
-\left[A_{\mathrm{Part}}(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right],\\
+\left[\operatorname{stopgrad}\!\left(A_{\mathrm{Part}}(s,v)\right)
+\nabla_\theta\log\pi_\theta(v\mid s)\right],\\
 A_{\mathrm{Part}}(s,v)
 &=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
 -\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\operatorname{stopgrad}(\log Z_k(s)).
@@ -670,7 +677,8 @@ score-function 更新。
 -\mathbb E_{u\sim\pi_k(\cdot\mid s)}
 \left[\nabla_\theta\log\pi_\theta(u\mid s)\right]\Bigg)\Bigg]\\
 &=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
-\left[A_{\mathrm{Mean}}(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right],
+\left[\operatorname{stopgrad}\!\left(A_{\mathrm{Mean}}(s,v)\right)
+\nabla_\theta\log\pi_\theta(v\mid s)\right],
 \end{align}
 其中第二个等号使用了
 $\mathbb E_{v\sim\pi_k}[A_{\mathrm{Mean}}(s,v)]=0$。这一步只有在
@@ -685,7 +693,8 @@ $\mathcal K_k^\theta$ 保留梯度时才成立。
 \left[\nabla_\theta\log\pi_\theta(u\mid s)\right]\Bigg)\Bigg],\\
 -\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
 &=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
-\left[D_\theta(s,v)\nabla_\theta\log\pi_\theta(v\mid s)\right].
+\left[\operatorname{stopgrad}\!\left(D_\theta(s,v)\right)
+\nabla_\theta\log\pi_\theta(v\mid s)\right].
 \end{align}
 这就是前面删除第二项后的严格 policy-gradient 形式；被删除的项是
 $\mathbb E_{u\sim\pi_k}[D_\theta(s,u)]
@@ -706,7 +715,7 @@ $\pi_\theta$，也要微分 $U_\theta$：
 \Bigg[\left(F_k(s,v)-\frac1\eta U_\theta(s,v)-\frac1\eta\right)
 \nabla_\theta\log\pi_\theta(v\mid s)\Bigg]\\
 &=\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}
-\left[\left(F_k(s,v)-\frac1\eta U_\theta(s,v)\right)
+\left[\operatorname{stopgrad}\!\left(F_k(s,v)-\frac1\eta U_\theta(s,v)\right)
 \nabla_\theta\log\pi_\theta(v\mid s)\right],
 \end{align}
 因为 $\mathbb E_{v\sim\pi_\theta}[\nabla_\theta\log\pi_\theta(v\mid s)]=0$。因此 MDPO 是以当前 student
@@ -728,24 +737,29 @@ $\widehat{\mathcal K}_{k}^{\theta}$ 错误地 stop-gradient，PMD-Mean 和 BPO
 \begin{algorithm}[ht]
 \caption{OPD full-vocabulary token inner update\\{\small\textit{Semantics: 先化简逐 prefix 量，再对固定 mirror 子问题做 inner 优化}}}
 \begin{algorithmic}[1]
-\Require teacher $T$, frozen anchor $\pi_k$, prefix batch $\{s_i\}_{i=1}^B$, method $M$, $\eta$, inner steps $N$
+\Require prompt distribution $\mathcal D$, teacher $T$, frozen rollout policy $\pi_k$, rollout batch size $B$, horizon $H$, method $M$, $\eta$, inner steps $N$
 \Ensure updated student parameters $\theta$
+\State $\mathcal B_k\gets\varnothing$ \Comment{$\mathcal B_k$ is a multiset; repeated prefixes keep their multiplicity}
+\For{$i=1,\ldots,B$}
+    \State sample prompt $x_i\sim\mathcal D$
+    \State generate $y_i=(a_{i,1},\ldots,a_{i,\tau_i})$ autoregressively with $a_{i,t}\sim\pi_k(\cdot\mid s_{i,t})$, where $s_{i,t}=(x_i,a_{i,<t})$
+    \State $\mathcal B_k\gets\mathcal B_k\mathbin{\uplus}\{s_{i,t}:1\le t\le\tau_i\wedge H\}$
+\EndFor
+\State define $\widehat d_k$ as the empirical distribution that assigns each occurrence in $\mathcal B_k$ equal mass
+\Statex \hspace{-\algorithmicindent}\Comment{$\pi_k$ is frozen during rollout and all $N$ inner steps}
 \For{$n=1,\ldots,N$}
-    \State query $\log T(v\mid s_i)$, $\log\pi_k(v\mid s_i)$ and $\log\pi_\theta(v\mid s_i)$ for all $v\in\mathcal V$
-    \State $\log Z_{k,i}\gets\log\left(\sum_{v\in\mathcal V}\exp\left((1-\eta)\log\pi_k(v\mid s_i)+\eta\log T(v\mid s_i)\right)\right)$
-    \State $\mathcal K_{k,i}^T\gets\operatorname{KL}(\pi_k(\cdot\mid s_i)\Vert T(\cdot\mid s_i))$
-    \State $\mathcal K_{k,i}^\theta\gets\operatorname{KL}(\pi_k(\cdot\mid s_i)\Vert\pi_\theta(\cdot\mid s_i))$
+    \State query $\log T(v\mid s)$, $\log\pi_k(v\mid s)$ and $\log\pi_\theta(v\mid s)$ for every occurrence $s\in\mathcal B_k$ and $v\in\mathcal V$
+    \State $\log Z_k(s)\gets\log\left(\sum_{v\in\mathcal V}\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right)\right)$
+    \State $\mathcal K_k^T(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert T(\cdot\mid s))$
+    \State $\mathcal K_k^\theta(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_\theta(\cdot\mid s))$
     \If{$M=\mathrm{Part}$}
-        \State $A_i(v)\gets\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\operatorname{stopgrad}(\log Z_{k,i})$
-        \State $G\gets B^{-1}\sum_i\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}\left[A_i(v)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
+        \State $G\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k(\cdot\mid s)}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}-\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\log Z_k(s)\right)\nabla_\theta\log\pi_\theta(v\mid s)\right]$
     \ElsIf{$M=\mathrm{Mean}$}
-        \State $A_i(v)\gets\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta-\eta\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right)$
-        \State $G\gets B^{-1}\sum_i\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}\left[A_i(v)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
+        \State $G\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k(\cdot\mid s)}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}+\mathcal K_k^\theta(s)-\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\mathcal K_k^T(s)\right)\right)\nabla_\theta\log\pi_\theta(v\mid s)\right]$
     \ElsIf{$M=\mathrm{BPO}$}
-        \State $D_i(v)\gets\eta\left[\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^T\right]-\left[\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}+\mathcal K_{k,i}^\theta\right]$
-        \State $G\gets-\eta^{-1}B^{-1}\sum_i\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}\left[D_i(v)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
+        \State $G\gets-\eta^{-1}\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k(\cdot\mid s)}\left[\operatorname{stopgrad}\!\left(\eta\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\mathcal K_k^T(s)\right)-\left(\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}+\mathcal K_k^\theta(s)\right)\right)\nabla_\theta\log\pi_\theta(v\mid s)\right]$
     \ElsIf{$M=\mathrm{MDPO}$}
-        \State $G\gets-B^{-1}\sum_i\mathbb E_{v\sim\pi_\theta(\cdot\mid s_i)}\left[\left(\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\eta^{-1}\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}\right)\nabla_\theta\log\pi_\theta(v\mid s_i)\right]$
+        \State $G\gets-\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_\theta(\cdot\mid s)}\left[\operatorname{stopgrad}\!\left(\log\frac{T(v\mid s)}{\pi_k(v\mid s)}-\eta^{-1}\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}\right)\nabla_\theta\log\pi_\theta(v\mid s)\right]$
     \EndIf
     \State $\theta\gets\operatorname{OptimizerStep}(\theta,G)$ \Comment{$G$ is a descent gradient; expectations become MC averages}
 \EndFor
