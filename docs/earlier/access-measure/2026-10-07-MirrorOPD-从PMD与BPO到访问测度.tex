@@ -129,7 +129,7 @@ Q^\beh(s_t,a_t)=r_t(s_t,a_t)+\E_\beh\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\rig
 \]
 再取相应 soft advantage。直接把 $r_t$ 放进式 \eqref{eq:gibbs} 会得到局部目标，而不是完整序列目标。per-token reward 消除了终端奖励的稀疏性，却没有消除 future reward 对全局最优条件分布的作用。
 
-\chapter{从同一个最优化问题推导 PMD-Part、PMD-Mean 与 BPO}
+\chapter{从同一个最优化问题推导 PMD-Part、PMD-Mean、BPO 与 MDPO}
 \label{ch:four-methods}
 
 \section{共同的 token-level mirror 子问题}
@@ -141,7 +141,7 @@ u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\mu(a\mid s)},
 \qquad
  g_\theta(s,a)=\nabla_\theta\log\pi_\theta(a\mid s).
 \]
-统一用 $\eta>0$ 表示 Natural Gradient 的学习率。给定 token 信号 $f(s,a)$，三种方法都从同一个镜像子问题开始：
+统一用 $\eta>0$ 表示 Natural Gradient 的学习率。给定 token 信号 $f(s,a)$，四种方法都从同一个镜像子问题开始：
 \begin{equation}
 \label{eq:ch2-mirror}
 \max_{p\ll\mu(\cdot\mid s)}
@@ -207,8 +207,8 @@ V^\mu(s)=\E_{a\sim\mu}[Q^\mu(s,a)\mid s],
 \]
 后文在 BPO 和 PMD-Mean 中使用 $\widetilde f$；PMD-Part 直接保留精确的 $\log Z_f(s)$。
 
-\section{三种算法的逐步推导}
-\label{sec:ch2-three-methods}
+\section{四种算法的逐步推导}
+\label{sec:ch2-four-methods}
 
 \subsection{PMD-Part：回归完整的最优 log-ratio}
 
@@ -225,7 +225,40 @@ PMD-Part 损失和下降方向分别为
 -\nabla_\theta\mathcal L_{\mathrm{Part}}
 &=\E_{d_\mu,\mu}[q_\theta(s,a)g_\theta(s,a)].\label{eq:ch2-part-gradient}
 \end{align}
+给定 batch $\{(s_i,a_i)\}_{i=1}^{B}$，其中 $a_i\sim\mu(\cdot\mid s_i)$，实际代码使用
+\begin{equation}
+\label{eq:ch2-part-empirical}
+\widehat{\mathcal L}_{\mathrm{Part}}=\frac{1}{2B}\sum_{i=1}^{B}\left(\log\pi_\theta(a_i\mid s_i)-\log\mu(a_i\mid s_i)-h_i\right)^2,\quad\widehat G_{\mathrm{Part}}=\frac1B\sum_i(h_i-u_i)g_i,
+\end{equation}
+其中 $h_i=\eta f_i-\log Z_f(s_i)$、$u_i=\log\pi_\theta(a_i\mid s_i)-\log\mu(a_i\mid s_i)$，并对 $h_i$ 停止梯度。若不能精确枚举 $Z_f$，可用同一 prefix 的 $K$ 个行为 action 估计 $\widehat Z_f(s)=K^{-1}\sum_{j=1}^{K}\exp(\eta f(s,a_j))$；此时 target 估计误差会进入回归偏差。
 这里的 target 常数 $\log Z_f(s)$ 固定了 action-independent 方向。
+
+\subsection{MDPO：直接优化带 KL 正则的镜像目标}
+\label{sec:ch2-mdpo-generic}
+
+MDPO 保留式 \eqref{eq:ch2-mirror} 的原始目标，不先构造 log-ratio target。对固定 prefix，定义
+\begin{equation}
+\label{eq:ch2-mdpo-generic-objective}
+\mathcal J_{\mathrm{MDPO}}(\theta)
+=\E_{a\sim\pi_\theta}[f(s,a)]
+-\frac{1}{\eta}\KL\left(\pi_\theta(\cdot\mid s)\Vert\mu(\cdot\mid s)\right).
+\end{equation}
+令 $\rho_\theta(s,a)=\pi_\theta(a\mid s)/\mu(a\mid s)$。若可以枚举词表，KL 项直接计算为
+\begin{equation}
+\label{eq:ch2-mdpo-full-kl}
+\KL(\pi_\theta\Vert\mu)=\sum_a\pi_\theta(a\mid s)\log\rho_\theta(s,a).
+\end{equation}
+若训练样本来自 $a_i\sim\mu(\cdot\mid s_i)$，则每个样本的可计算标量为
+\begin{equation}
+\label{eq:ch2-mdpo-sample-integrand}
+\widehat j_i(\theta)=\rho_i f_i-\frac{1}{\eta}\rho_i\log\rho_i,\qquad \rho_i=\exp\left(\log\pi_\theta(a_i\mid s_i)-\log\mu(a_i\mid s_i)\right).
+\end{equation}
+对 $f_i$、$\mu$ 和行为样本停止梯度，batch ascent 方向为
+\begin{equation}
+\label{eq:ch2-mdpo-generic-gradient}
+\widehat G_{\mathrm{MDPO}}=\frac1B\sum_{i=1}^{B}\rho_i\left(f_i-\frac1\eta\log\rho_i\right)g_i,\qquad g_i=\nabla_\theta\log\pi_\theta(a_i\mid s_i).
+\end{equation}
+这里 $\rho_i$ 是 action-level importance ratio；如果 prefix 也来自 off-policy replay，还需在样本外乘 $W_{<t_i}$。MDPO 因而是四种方法中唯一直接对镜像目标做 ascent 的 inner，其他三种先构造 regression residual。
 
 \subsection{PMD-Mean：中心化 target 加归一化投影}
 
@@ -262,6 +295,18 @@ u_{\mathrm{Mean}}^+(s,a)
 -W\left(\lambda(s)e^{g_{\mathrm{Mean}}(s,a)}\right),
 \end{equation}
 其中 $\lambda(s)$ 由归一化约束唯一确定。PMD-Mean 是投影问题；除特殊情形外，式 \eqref{eq:ch2-mean-lambert} 不等于精确 Gibbs log-ratio。
+
+\paragraph{PMD-Mean 的 batch 估计量。}
+在每个 prefix 采 $K$ 个 action，记 $r_{ij}=\log(T(a_{ij}\mid s_i)/\mu(a_{ij}\mid s_i))$，则
+\begin{equation}
+\widehat{\bar r}_i=\frac1K\sum_{j=1}^{K}r_{ij},\qquad \widehat{\widetilde r}_{ij}=r_{ij}-\widehat{\bar r}_i.
+\end{equation}
+对第 $i$ 个 prefix 的第 $j$ 个样本，回归目标为 $\eta\widehat{\widetilde r}_{ij}$，经验损失为
+\begin{equation}
+\label{eq:ch2-mean-empirical}
+\widehat{\mathcal L}_{\mathrm{Mean}}=\frac{1}{2BK}\sum_{i=1}^{B}\sum_{j=1}^{K}\left(u_{ij}-\eta\widehat{\widetilde r}_{ij}\right)^2,\qquad u_{ij}=\log\frac{\pi_\theta(a_{ij}\mid s_i)}{\mu(a_{ij}\mid s_i)}.
+\end{equation}
+若使用完整 vocabulary，则把样本均值替换为 $\sum_a\mu(a\mid s_i)r(s_i,a)$；若只使用单个 action，中心化项不可由该样本无偏估计，必须使用额外 action、教师全分布或 control variate。
 
 \subsection{BPO：对同一最优性方程做中心化 residual 回归}
 
@@ -301,6 +346,22 @@ BPO 的 residual 是
 =\E_{d_\mu,\mu}
 [\delta_\theta(s,a)(g_\theta(s,a)-\bar g_\theta(s))].
 \end{equation}
+给定每个 prefix 的 $K$ 个行为 action，BPO 的经验估计量可以写成
+\begin{equation}
+\label{eq:ch2-bpo-empirical}
+\widehat{\mathcal L}_{\mathrm{BPO}}
+=\frac{1}{2\eta BK}\sum_{i=1}^{B}\sum_{j=1}^{K}\\widehat{\\delta}_{ij}^{\,2},
+\qquad
+\widehat G_{\mathrm{BPO}}
+=\frac{1}{BK}\sum_{i=1}^{B}\sum_{j=1}^{K}
+\widehat{\delta}_{ij}\left(g_{ij}-\widehat{\bar g}_i\right),
+\end{equation}
+其中
+\[
+\widehat{\bar g}_i=\frac1K\sum_{j=1}^{K}g_{ij},\qquad
+\widehat{\delta}_{ij}=\eta f_{ij}-u_{ij}-\frac1K\sum_{\ell=1}^{K}(\eta f_{i\ell}-u_{i\ell}).
+\]
+同一 prefix 内的 action 集合用于估计行为测度下的中心化项；只有一个 action 时，$\widehat{\bar g}_i$ 与 residual 均值不能由该条样本本身可靠估计。
 
 \subsection{PMD-Mean 与 BPO 都中心化，但投影对象不同}
 \label{sec:ch2-mean-bpo-difference}
@@ -457,8 +518,8 @@ r_k(s_t,a_t)=\log T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
 对 action 求和得到归一化常数 $Z_k(s)$，再应用定理 \ref{thm:gibbs} 即得结论。
 \end{proof}
 
-\subsection{同一个 OPD mirror step 的三种 inner 实例化}
-\label{sec:ch2-opd-three-inner}
+\subsection{同一个 OPD mirror step 的四种 inner 实例化}
+\label{sec:ch2-opd-four-inner}
 
 令
 \[
@@ -481,7 +542,7 @@ u_k^\star(s,a)
 \qquad
 u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}.
 \end{equation}
-下面三种方法的差异只在于如何用有限样本和参数化模型逼近这个同一个 $u_k^\star$。
+下面四种方法的差异只在于如何用有限样本和参数化模型逼近这个同一个 $u_k^\star$。
 
 \paragraph{PMD-Part 的 OPD inner。}
 若教师能够返回完整 token 分布，就可以直接计算
@@ -674,29 +735,12 @@ W_{<t}(s)=\frac{d_{\pi_k}(s)}{d_b(s)}.
 \end{equation}
 PMD-Part、PMD-Mean 和 BPO 在 action 层都可用 $a\sim\pi_k(\cdot\mid s)$ 的样本完成回归，不需要额外 action-level IS；off-policy 的主要问题转移到 prefix 访问测度 $W_{<t}$。若把 $d_b$ 当作固定投影测度而不做 $W_{<t}$，得到的是 replay 加权的近似 mirror step，而非严格的 $d_{\pi_k}$ 加权 outer 目标。这正是 OPD 可以利用状态丰富性、同时需要报告访问测度偏差的地方。
 
-\section{直接优化镜像目标：MDPO}
-\label{sec:ch2-mdpo}
-
-直接对镜像目标
-\begin{equation}
-\label{eq:ch2-mdpo-objective}
-F_s(\theta)=\E_{\pi_\theta}[f(s,a)]-\frac1\eta\KL(\pi_\theta\Vert\mu)
-\end{equation}
-做梯度上升。令 $\rho_\theta=\pi_\theta/\mu$，则
-\begin{equation}
-\label{eq:ch2-mdpo-gradient}
-\nabla F_s(\theta)=\E_{a\sim\pi_\theta}\left[\left(f(s,a)-\frac1\eta\log\rho_\theta(s,a)\right)g_\theta(s,a)\right]
-=\E_{a\sim\mu}\left[\rho_\theta(s,a)\left(f-\frac1\eta\log\rho_\theta\right)g_\theta\right].
-\end{equation}
-MDPO 与三种回归方法共享同一 Gibbs 驻点，但显式保留 action-level importance ratio。
-
-
 \section{共享零点、不同梯度的定理}
 \label{sec:ch2-theorems}
 
-\begin{proposition}[三种方法的共享零点]
+\begin{proposition}[四种方法的共享零点]
 \label{prop:ch2-shared-zero}
-在有限 action space、$\mu(a\mid s)>0$ 且策略归一化成立时，PMD-Part 与未线性化 BPO 在精确 Gibbs 策略 $\pi^+$ 处达到零 residual。PMD-Mean 在其中心化 target 可实现并满足归一化约束时达到同一策略；一般情况下它给出约束集合上的欧氏投影。
+在有限 action space、$\mu(a\mid s)>0$ 且策略归一化成立时，PMD-Part、PMD-Mean、未线性化 BPO 与 MDPO 在精确 Gibbs 策略 $\pi^+$ 处达到零 residual。PMD-Mean 在其中心化 target 可实现并满足归一化约束时达到同一策略；一般情况下它给出约束集合上的欧氏投影。
 \end{proposition}
 
 \begin{proof}
