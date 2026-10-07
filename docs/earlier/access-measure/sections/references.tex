@@ -1,6 +1,17 @@
 \backmatter
+\chapter{文献映射与适用边界}
+\label{ch:literature-map}
+
+本稿的四种 inner 变体都从同一个 KL 镜像子问题出发，但原始文献所证明的对象并不相同。MDPO 文献研究的是把线性化 RL 目标与相邻策略的 KL proximity 合并后、用多次梯度更新近似求解 trust-region 子问题；它并不等同于一次参数梯度步，也没有把有限网络的回归投影误差当作精确 mirror 解。PMD 文献则在 tabular 或函数空间中直接分析策略镜像算子及其策略评估误差，收敛结论依赖精确（或有界误差的）优势函数、完整支持和适当步长。由此，PMD-Part 与 PMD-Mean 可视为把 PMD 最优性方程变成不同的参数化投影；BPO 是中心化 residual 的另一种有限样本实现；MDPO 才是直接最大化 KL 正则化 mirror objective 的变体。\cite{tomar2020mdpo,zhan2021pmd,lan2022blockpmd}
+
+Natural Gradient 的经典结果说明，Fisher 逆预条件方向在局部二阶意义下与 KL 几何一致，并具有重参数化不变性；它只保证 mirror 更新的一阶等价。有限步的指数归一化、参数化误差和冻结 anchor 的 inner 预算仍需单独分析。正则化 MDP 的理论进一步表明，KL mirror operator 的闭式 Gibbs 形式和单调改进依赖固定正则化、精确 soft value/advantage 以及策略支持条件。OPD 中 teacher log-ratio 随 outer step 改变，因此这些定理应条件化在每个冻结的 $(T,\pi_k)$ 子问题上使用；跨 outer step 的结论来自本文的 projective contraction 与 inner-error recursion，而不是直接套用 PMD 的固定奖励定理。\cite{amari1998natural,geist2019regularizedmdp}
+
 \begin{thebibliography}{99}
 \bibitem{tomar2020mdpo}Tomar et al. \emph{Mirror Descent Policy Optimization}. arXiv:2005.09814, 2020.
+\bibitem{zhan2021pmd}Zhan et al. \emph{Policy Mirror Descent for Regularized Reinforcement Learning: A Generalized Framework with Linear Convergence}. arXiv:2105.11066, 2021. \url{https://arxiv.org/abs/2105.11066}
+\bibitem{lan2022blockpmd}Lan, Li, and Zhao. \emph{Block Policy Mirror Descent}. arXiv:2201.05756, 2022. \url{https://arxiv.org/abs/2201.05756}
+\bibitem{amari1998natural}Amari. \emph{Natural Gradient Works Efficiently in Learning}. Neural Computation, 10(2), 1998. \url{https://doi.org/10.1162/089976698300017746}
+\bibitem{geist2019regularizedmdp}Geist, Scherrer, and Pietquin. \emph{A Theory of Regularized Markov Decision Processes}. arXiv:1901.11275, 2019. \url{https://arxiv.org/abs/1901.11275}
 \bibitem{xu2026pmd}Xu et al. \emph{Approximation of Log-Partition Function in Policy Mirror Descent Induces Implicit Regularization for LLM Post-Training}. arXiv:2602.05933, 2026.
 \bibitem{song2026bpo}Song et al. \emph{Bellman Policy Optimization}. arXiv:2609.15987, 2026.
 \bibitem{openkimi}OpenKimi contributors. \emph{OpenKimi: PMD and RL post-training implementation}. GitHub repository, 2026. \url{https://github.com/horizon-llm/OpenKimi}.
