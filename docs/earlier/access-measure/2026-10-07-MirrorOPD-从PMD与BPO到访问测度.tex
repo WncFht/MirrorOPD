@@ -1,5 +1,5 @@
 % !TeX program = xelatex
-% 编译：TEXINPUTS='.:../../../.agents/skills/book-translation/templates/latex//:' xelatex ./2026-10-07-MirrorOPD-从PMD与BPO到访问测度.tex
+% 编译：TEXINPUTS='.:../../../.agents/skills/book-translation/templates/latex//:' xelatex ./2026-10-07-MirrorOPD-从 PMD 与 BPO 到访问测度.tex
 \documentclass[lang=cn,scheme=chinese,thmcnt=chapter,device=normal]{elegantbook}
 
 \usepackage{mathtools}
@@ -177,7 +177,7 @@ u^+(s,a)=\log\frac{\pi^+(a\mid s)}{\mu(a\mid s)}
 =\eta f(s,a)-\log Z_f(s).
 \end{equation}
 
-\subsection{为什么优势满足 $\E_\mu[f\mid s]=0$}
+\subsection{为什么优势函数的行为均值为零}
 
 条件 $\E_\mu[f(s,a)\mid s]=0$ 不是任意 reward 的性质。若 $f=A^\mu$ 是行为策略的优势函数，则
 \[
@@ -343,7 +343,7 @@ PMD-Mean 使用行为均值去掉未知的 prefix 常数。定义
 \begin{equation}
 \label{eq:ch2-opd-mean-signal}
 g_T(s,a)=\eta\left(r_T(s,a)-\E_\mu[r_T(s,a)\mid s]\right)
-=\log\frac{T(a\mid s)}{\mu(a\mid s)}-\E_\mu\left[\log\frac{T}{\mu}\middle\mid s\right].
+=\log\frac{T(a\mid s)}{\mu(a\mid s)}-\E_\mu\left[\log\frac{T}{\mu}\mid s\right].
 \end{equation}
 将 $g_T$ 代入式 \eqref{eq:ch2-mean-loss}，再通过 Lambert-$W$ 乘子恢复归一化。中心化只移除 prefix 常数，不改变教师 Gibbs 策略。
 
