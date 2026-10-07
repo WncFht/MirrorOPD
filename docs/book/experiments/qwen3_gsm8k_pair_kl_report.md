@@ -38,6 +38,12 @@ $$
 
 打分脚本使用 Transformers 的 `logits_to_keep`，只保留生成 token 对应的 logits。由于单张 RTX 4070 SUPER 只有 12 GiB，同时加载两个 bf16 模型会挤压激活和词表 logits，当前完整统计采用 bitsandbytes NF4 4-bit 权重、bf16 计算；`metadata.json` 明确记录这一点。两条 pilot 轨迹已经与完整词表公式逐项核对。正式结果在全量任务结束后写入 `kl_summary_by_k.csv`，图由 `plot_pair_kl.py` 生成。
 
+## 全量结果
+
+全量 prefix 数为 350,166，平均 reference reverse KL 为 0.2693 nats。Student 的 Top-1、Top-4、Top-8、Top-32 平均质量分别为 0.9421、0.9975、0.9995、0.99996。对应截断 RMSE 从 $K=0$ 的 1.0397 降到 $K=32$ 的 0.00217；一个 sampled-token 修正的理论 RMSE 从 0.8095 降到 0.02249。因而在真实 Qwen 分布上，$K\geq 4$ 后截断的确定性误差已经小于单 token 修正的条件标准差，体现了无偏高方差与有偏低方差之间的交换关系。
+
+真实 rollout token 的修正误差还受生成阶段 bf16 vLLM 与打分阶段 NF4 量化 Student 的轻微分布不一致影响；例如 $K=32$ 的观测平均误差为 $-2.76\times10^{-4}$，远小于其 0.0519 的观测 RMSE。理论 bias 仍按打分分布严格为零，观测 bias 不应被解读为修正估计量的条件 bias。完整数值见 [kl_summary_by_k.csv](qwen3_gsm8k_pair_kl/kl_summary_by_k.csv)，图见 [pair_kl_topk_metrics.png](qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png)。
+
 ## 解释边界
 
 这里的 `bias` 和 `variance` 是对固定 prefix、固定 Student/Teacher 分布的 scalar KL 估计量分析。它们不是 policy-gradient estimator 的方差，也没有把 KL 数值反向传播；这与当前只研究 KL 本身估计质量的实验目标一致。Student rollout 的答案正确率只作为轨迹数据的附带信息，不把 GSM8K reward 混入 KL 统计。
