@@ -97,6 +97,120 @@ $$
 
 ![tail ECDF](qwen3_gsm8k_mk/tail32_histogram.png)
 
+## $M(K)$ 对 KL 截断误差的真正保证
+
+仅知道 $M_s(K)=1-\delta$ 很大，不能推出 top-$K$ KL 的 RMSE 很小。原因可以通过尾部的精确分解看清楚。令
+
+$$
+S=S_K(p),\qquad
+\delta=p(S^c),\qquad
+\beta=q(S^c),
+$$
+
+并定义尾部条件分布
+
+$$
+p_T(v)=\frac{p(v)}{\delta},\qquad q_T(v)=\frac{q(v)}{\beta},\qquad v\in S^c.
+$$
+
+当 $\delta,\beta>0$ 时，Trunc KL 所遗漏的项满足恒等式；若 $\beta=0$ 且 $\delta>0$，则 $q$ 在 student 的尾部存在零概率，真实 KL 直接为 $+\infty$。
+
+$$
+\begin{aligned}
+T
+&=\sum_{v\in S^c}p(v)\log\frac{p(v)}{q(v)}\\
+&=\delta\log\frac{\delta}{\beta}
+  +\delta D_{\mathrm{KL}}(p_T\Vert q_T).
+\end{aligned}
+$$
+
+这个公式把两个因素分开了。$M(K)$ 只给出 $\delta$，而 $T$ 还取决于 teacher 在尾部给出的总质量 $\beta$，以及两个模型在尾部条件分布上的 KL。只要 $D_{\mathrm{KL}}(p_T\Vert q_T)$ 没有统一上界，$\delta$ 再小也不能给出统一的 KL 截断误差上界。
+
+### 无假设时的反例
+
+考虑只有两个 token 的分布，top-1 集合为第一个 token：
+
+$$
+p=(1-\delta,\delta),
+\qquad
+q=(1-\delta e^{-A},\delta e^{-A}),
+$$
+
+其中 $0<\delta<1/2$，$A>0$。此时 $M(1)=1-\delta$ 可以任意接近 1，但被截断的尾部项为
+
+$$
+T=\delta\log\frac{\delta}{\delta e^{-A}}=\delta A.
+$$
+
+固定任意很小的 $\delta$，让 $A\to\infty$，就得到 $M(1)\to1$ 而 Trunc 的 bias 和 RMSE 任意大。这里 teacher 与 student 在尾部的距离是由 $q$ 的极小尾部概率造成的。因而“teacher 与 student 距离很远”确实会破坏仅根据 $M(K)$ 作出的 RMSE 判断。
+
+反例还说明，teacher 的全局 KL 很大并不自动意味着 Trunc 一定很差：如果差异集中在 $S$ 内，Trunc 仍然可以准确保留全部主要 KL；真正决定截断误差的是被丢弃尾部的 KL，而不是总 KL 的大小。
+
+### 需要什么额外假设
+
+若在所有被截断 token 上有统一的 log-ratio 上界
+
+$$
+\left|\log\frac{p(v)}{q(v)}\right|\le L_K,\qquad v\in S^c,
+$$
+
+则
+
+$$
+|T|\le \delta L_K,
+\qquad
+\operatorname{RMSE}(\widehat D_{\mathrm{trunc}})le \delta L_K.
+$$
+
+若进一步使用尾部条件分布的上界
+
+$$
+D_{\mathrm{KL}}(p_T\Vert q_T)\le C_K,
+\qquad
+\left|\log(\delta/\beta)\right|\le B_K,
+$$
+
+则由精确分解得到
+
+$$
+|T|\le \delta(B_K+C_K).
+$$
+
+这才是可以把 $M(K)$ 转换为 KL 截断误差保证的条件。若 $B_K$ 或 $C_K$ 随 $K$ 增长，或者 teacher 的尾部概率 $\beta$ 远小于 student 的 $\delta$，$M(K)$ 的高质量并不能抵消尾部 log-ratio 的增长。
+
+### Corrected 方差也需要尾部二阶矩
+
+令 $Y\sim p$，sampled-token Corrected 估计量为
+
+$$
+\widehat D_{\mathrm{corr}}=H+\mathbf 1\{Y\in S^c\}\ell(Y),
+\qquad
+\ell(v)=\log\frac{p(v)}{q(v)}.
+$$
+
+写成尾部条件分布的形式，令
+
+$$
+\mu_T=\mathbb E_{p_T}[\ell(V)],
+\qquad
+\sigma_T^2=\operatorname{Var}_{p_T}(\ell(V)).
+$$
+
+则 $T=\delta\mu_T$，并且
+
+$$
+\operatorname{Var}(\widehat D_{\mathrm{corr}})
+=\delta\sigma_T^2+\delta(1-\delta)\mu_T^2.
+$$
+
+因此 Corrected 的方差不仅由 tail event 的概率 $\delta$ 决定，还由尾部 log-ratio 的条件方差和均值决定。即使 $\delta$ 达到 $10^{-5}$，若某些尾部 token 的 teacher 概率极小，$\sigma_T^2$ 或 $\mu_T^2$ 仍可使单样本 RMSE 很大。要得到可用的 variance bound，需要假设尾部 log-ratio 有界，或者直接估计尾部二阶矩
+
+$$
+S_{2,T}=\sum_{v\in S^c}p(v)\left(\log\frac{p(v)}{q(v)}\right)^2.
+$$
+
+在实际 OPD 实验中，$M(K)$ 应当与 $\beta$、尾部条件 KL 以及 $S_{2,T}$ 一起报告；单独报告 $M(K)$ 只能说明 top-$K$ 对 student 概率质量的覆盖率，不能单独说明 KL 估计量的 bias、variance 或 RMSE。
+
 ## 与已有 pair-KL 结果的关系
 
 前一组 Qwen3-1.7B rollout 上的 student--teacher pair-KL 实验显示，$K=32$ 时 Trunc RMSE 为约 $2.17\times10^{-3}$，sampled-token Corrected 的理论 RMSE 为约 $2.25\times10^{-2}$。这并不矛盾：本报告测量的是 student 分布的尾部概率质量，而 KL 估计量的 Corrected 方差还乘上尾部 log-ratio 的平方。当前 pair-KL 的 scoring 模型使用 NF4 量化，而 rollout 由 bf16 vLLM 产生；量化差异还会使经验 Corrected bias 偏离理想条件无偏结论。
