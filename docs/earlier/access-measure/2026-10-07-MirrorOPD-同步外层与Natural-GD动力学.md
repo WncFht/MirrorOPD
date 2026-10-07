@@ -197,6 +197,167 @@ $$
 
 三项分别来自 inner 未充分收敛、局部二次近似误差和新 rollout 的估计误差。增大 $M_k$ 只能降低第一项。实际 stopping rule 应检查当前策略到本轮固定 target 的 residual，达到阈值后同步并重新 rollout。$\eta=1$ 时每轮精确 target 都是同一个 teacher，外层本身没有额外的 mirror contraction；但若 inner 求解器对 teacher 的误差满足 $\varepsilon_{k+1}^{\mathrm{inner}}\le q^{M}\Delta_k$，则分散到多轮的 inner 仍给出 $\Delta_{k+1}\le q^M\Delta_k$。这只是把连续的 inner steps 分批执行，不能消除 rollout 噪声、参数投影误差或 optimizer 状态变化。
 
+### 与 TOP-D 的关系：小 $\eta$ 不等于小 $\alpha$
+
+neurips_2026.tex 中的 TOP-D 使用概率空间的算术插值
+
+$$
+H_\alpha(\pi_k)=(1-\alpha)\pi_k+\alpha T,
+\qquad
+\widetilde r_\alpha=\log\frac{H_\alpha(\pi_k)}{\pi_k}
+=\log\left(1-\alpha+\alpha\frac{T}{\pi_k}\right).
+$$
+
+我们的 OPD mirror step 则是
+
+$$
+G_\eta(\pi_k)=
+\frac{\pi_k^{1-\eta}T^\eta}{Z_k},
+\qquad
+r_\eta=\log\frac{G_\eta(\pi_k)}{\pi_k}
+=\eta\log\frac{T}{\pi_k}-\log Z_k.
+$$
+
+二者的差别不是记号差别。$\alpha$ 控制算术混合的概率位移，$\eta$ 控制 KL mirror 子问题的指数倾斜强度。对小步长展开，令 $r=\log(T/\pi_k)$，则
+
+$$
+H_\alpha(\pi_k)=\pi_k+\alpha(T-\pi_k),
+$$
+
+而
+
+$$
+G_\eta(\pi_k)(a)
+=\pi_k(a)\left[1+\eta\bigl(r(a)-\mathbb E_{\pi_k}r\bigr)\right]+O(\eta^2).
+$$
+
+因此，只有在 $T$ 已经接近 $\pi_k$ 时，使用 $r=\log(T/\pi_k)\approx(T-\pi_k)/\pi_k$，两者才满足 $\alpha\approx\eta$ 的一阶近似。远离 teacher 时，TOP-D 的算术插值仍是线性概率更新，而 mirror OPD 是 Fisher 几何下的指数更新。
+
+### 可以迁移的方差定理与其边界
+
+TOP-D 的有界方差证明依赖关键恒等式
+
+$$
+\widetilde r_\alpha=\log(1-\alpha+\alpha\rho),
+\qquad \rho=T/\pi_k,
+$$
+
+它给出下界 $\widetilde r_\alpha\geq\log(1-\alpha)$。在有限词表和 score gradient 满足 $\|\nabla_\theta\log\pi_\theta\|\leq M$ 时，论文得到 token gradient 二阶矩的统一上界，形式为
+
+$$
+\mathbb E\|\widetilde g\|^2
+\leq M^2|\mathcal V|
+\max\{\log^2(1-\alpha),C^\star\alpha\}.
+$$
+
+这个结论不能直接替换成我们的小 $\eta$ 结论。mirror reward $\eta\log(T/\pi_k)$ 仍然向下无界；$\eta$ 只做缩放，不建立统一的 support-independent 方差上界。二元反例是
+
+$$
+\pi_k=(1/2,1/2),\qquad T=(\epsilon,1-\epsilon),
+$$
+
+此时
+
+$$
+\mathbb E_{\pi_k}\left[\log^2(T/\pi_k)\right]
+\geq\frac12\log^2(2\epsilon)\longrightarrow\infty
+\quad(\epsilon\to0).
+$$
+
+所以 vanilla OPD 或 mirror OPD 要得到类似 TOP-D 的 uniform variance theorem，必须额外假设 teacher/student 概率下界，或者显式做 reward clipping、概率平滑或 support restriction。例如若 $T(a|s),\pi_k(a|s)\geq p_{\min}>0$，则 $|\log(T/\pi_k)|\leq\log(1/p_{\min})$，从而
+
+$$
+\operatorname{Var}(g_k)
+\leq M^2\log^2(1/p_{\min}).
+$$
+
+这是真正可迁移到 OPD 的方差定理，但它的常数依赖 support floor，不能宣称 vanilla OPD 在整个概率空间上天然有界。
+
+还要区分 token-level estimator 和完整 policy-gradient estimator。论文的定理只直接控制 $\nabla\log\pi(y_k|s_k)\,\widetilde r_k$ 的二阶矩；若使用完整 return $\sum_{j\geq k}r_j$，还需要有限 horizon、奖励二阶矩和长度尾部条件，不能由 token 定理自动推出整条 response 梯度的方差界。
+
+### 收敛定理的对应关系
+
+TOP-D 的收敛定理来自算术算子
+
+$$
+H_\alpha(\pi)=(1-\alpha)\pi+\alpha T,
+$$
+
+因此在 $L_1$ 距离中有精确恒等式
+
+$$
+d(H_\alpha(\pi),T)=(1-\alpha)d(\pi,T).
+$$
+
+加上每轮优化误差 $\epsilon_k$ 就得到论文的
+
+$$
+d(\pi_{k+1},T)\leq(1-\alpha)^{k+1}d(\pi_0,T)
++\sum_{j=0}^{k}(1-\alpha)^{k-j}\|\epsilon_j\|_1.
+$$
+
+我们的几何 mirror 算子在 projective log-ratio 度量中有对应的精确恒等式
+
+$$
+\operatorname{osc}_a\log\frac{G_\eta(\pi_k)}{T}
+=(1-\eta)\operatorname{osc}_a\log\frac{\pi_k}{T}.
+$$
+
+因此两套理论的结构完全平行，但度量不同：TOP-D 是 $L_1$/TV 的算术收缩，我们是 Hilbert/projective log-ratio 的几何收缩。若假设所有有效 action 的概率都落在 $[p_{\min},1]$，则这些度量在该紧集上等价，可以把我们的 projective 收敛转换成 TV 或 $L_1$ 收敛；没有这个 bounded-ratio 假设，不能直接把 projective contraction 改写成全局 $L_1$ contraction。
+
+### 性能下界能否迁移
+
+论文的性能下界本质上是有限时域 MDP 的 performance-difference bound。对固定 outer anchor $\pi_k$，冻结 $r_k=\log T-\log\pi_k$，可以定义
+
+$$
+\zeta_k(p)=\eta_r(\pi_k)+
+\ell_k\,\mathbb E_{s\sim d^{\pi_k}_{\mathrm{norm}},a\sim p}[A^{\pi_k}(s,a)].
+$$
+
+在有限 horizon、$|A^{\pi_k}|\leq A_{\max}$ 和新旧策略 TV 距离可控时，可得到同型下界
+
+$$
+\eta_r(p)
+\geq
+\zeta_k(p)-
+2A_{\max}T_{\max}\ell_k
+\mathbb E_{d^{\pi_k}_{\mathrm{norm}}}
+\left[\operatorname{TV}(p(\cdot|s),\pi_k(\cdot|s))\right].
+$$
+
+但这只是固定 reward 的 surrogate bound。vanilla OPD 的 reward $\log T-\log\pi$ 随当前策略变化；若没有在一个 outer 内冻结 anchor，就不能把每一步都当成同一个固定-reward MDP 来套用该定理。即使冻结了 anchor，还必须证明实际 PPO/clipping 或 Natural-GD 更新确实提高了 $\zeta_k$，而论文给出的 PPO 目标本身没有自动保证这一点。
+
+对 mirror OPD，若额外假设 $|r_k|\leq B$，则
+
+$$
+\operatorname{TV}(G_\eta(\pi_k),\pi_k)
+\leq\sqrt{\tfrac12\operatorname{KL}(G_\eta(\pi_k)\|\pi_k)}
+=O(\eta B).
+$$
+
+代入上面的性能下界，性能误差项是 $O(T_{\max}\xi_k\eta B)$。这说明小 $\eta$ 可以降低单步 occupancy-shift penalty，但并不自动保证性能提升；仍需 surrogate advantage gain 大于该 penalty。
+
+### vanilla OPD 的理论位置
+
+vanilla OPD 对应 TOP-D 的 $\alpha=1$，即时信号为
+
+$$
+r_k=\log\frac{T(a_k|s_k)}{\pi_k(a_k|s_k)}.
+$$
+
+它有三个层次的结论：
+
+1. 在 exact tabular、固定 prefix、完整 action expectation 且 inner 全局收敛时，$\eta=1$ 的 mirror OPD 一步得到 $T$；这是分布空间的精确结论。
+2. 在有限参数和有限 inner steps 下，只能得到 teacher projection 加优化误差；若梯度噪声没有 support floor 或 clipping，则不存在 TOP-D 那种全局统一方差界。
+3. 对实际 vanilla policy-gradient，若假设目标 $J(\theta)$ 是 $L$-smooth、梯度估计无偏且方差 $\sigma^2$ 有界，则标准非凸 SGD 只能推出
+
+$$
+\frac1K\sum_{k=0}^{K-1}\mathbb E\|\nabla J(\theta_k)\|^2
+=O\left(\frac{J(\theta_0)-J_*}{\gamma K}+L\gamma\sigma^2\right).
+$$
+
+若再有 PL/强凹条件，则可得到线性收敛到 $O(\gamma\sigma^2)$ 噪声地板。vanilla OPD 的困难在于这些条件恰好由无界 log-ratio、teacher support mismatch、长 response return 和 on-policy occupancy drift 破坏，因此不能无条件声称全局收敛或单调性能提升。
+
 ## 访问测度与 OPD 的边界
 
 如果 loss integrand 只依赖当前 prefix $s_t=(x,y_{<t})$ 和当前 action $a_t$，目标是 $d_{\pi_k}(s_t)\pi_k(a_t\mid s_t)$，而数据来自行为测度 $\nu$，只需使用历史权重
