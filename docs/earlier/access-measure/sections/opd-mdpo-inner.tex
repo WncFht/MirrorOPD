@@ -1,50 +1,9 @@
-\paragraph{MDPO 的 OPD inner。}
-MDPO 不回归 $u_k^\star$，而直接在冻结的 $\pi_k$ 上优化 mirror objective：
-\begin{equation}
-\label{eq:ch2-opd-mdpo-inner-full}
-\mathcal J_{k,\mathrm{MDPO}}(\theta)
-=
-\E_{s\sim d_b}\!\left[
-\E_{a\sim\pi_\theta(\cdot\mid s)}[r_k(s,a)]
--\frac{1}{\eta}
-\KL\!\left(\pi_\theta(\cdot\mid s)\Vert\pi_k(\cdot\mid s)\right)
-\right].
-\end{equation}
-若能够访问完整 vocabulary logits，KL 可以逐 token 精确计算：
+\paragraph{MDPO 的 OPD inner（补充说明）。}
+式 \eqref{eq:ch2-opd-mdpo-explicit-objective} 已经给出 action-level IS 版本。若 teacher、anchor 和 student 都能输出完整词表分布，MDPO 也可以直接计算
 \[
-\KL(\pi_\theta\Vert\pi_k)
-=\sum_a\pi_\theta(a\mid s)
-\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}.
+\sum_{v\in\mathcal V}\pi_\theta(v\mid s_i)
+\left[\log T(v\mid s_i)-\log\pi_k(v\mid s_i)\right]
+-\frac1\eta\sum_{v\in\mathcal V}\pi_\theta(v\mid s_i)
+\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}.
 \]
-若只有 $a\sim\pi_k$ 的 replay action，则令
-\[
-\rho_\theta(s,a)=\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)},
-\]
-用 action importance sampling 得到可直接实现的估计量
-\begin{equation}
-\label{eq:ch2-opd-mdpo-inner-is-objective}
-\widehat{\mathcal J}_{k,\mathrm{MDPO}}(\theta)
-=\E_{s\sim d_b,\,a\sim\pi_k}\!\left[
-\rho_\theta(s,a)r_k(s,a)
--\frac{1}{\eta}\rho_\theta(s,a)
-\log\rho_\theta(s,a)\right].
-\end{equation}
-停止 $r_k$、$\pi_k$ 和 replay 权重的梯度后，其 ascent 方向为
-\begin{equation}
-\label{eq:ch2-opd-mdpo-inner-gradient}
-\nabla_\theta\widehat{\mathcal J}_{k,\mathrm{MDPO}}
-=
-\E_{d_b,\pi_k}\!\left[
-\rho_\theta(s,a)
-\left(r_k(s,a)-\frac{1}{\eta}\log\rho_\theta(s,a)\right)
-g_\theta(s,a)\right].
-\end{equation}
-推导中额外出现的 $-\rho_\theta/\eta$ 项乘以 $g_\theta$ 后，利用
-\[
-\E_{\pi_\theta}[g_\theta\mid s]=0
-\]
-消失，因而式 \eqref{eq:ch2-opd-mdpo-inner-gradient} 是完整 reverse-KL 目标的梯度，而非把 KL 当作常数的近似。MDPO 的 inner 误差由 $\mathcal J_{k,\mathrm{MDPO}}(\theta)$ 的优化 gap 或
-\[
-\KL(\pi_\theta\Vert\pi_{k+1}^{\star})
-\]
-监控；它通常需要固定 $\pi_k$ 在同一 replay batch 上执行多次更新。
+这是一条对每个 prefix 的可微 KL objective；它不需要显式的 sampled action ratio。工程实现通常将第二项写成 logits 上的 reverse-KL penalty，或使用 token-level sampled-KL estimator。只有当数据由旧行为策略 $b$ 产生、而目标 expectation 属于当前 anchor prefix 测度时，才需要额外的 $\omega_i^k$；action-level $\rho_{ij}^{\theta}$ 与 prefix-level $\omega_i^k$ 负责两个不同的测度变换。

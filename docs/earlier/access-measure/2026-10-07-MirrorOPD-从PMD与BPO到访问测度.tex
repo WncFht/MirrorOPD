@@ -521,163 +521,190 @@ r_k(s_t,a_t)=\log T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
 \subsection{同一个 OPD mirror step 的四种 inner 实例化}
 \label{sec:ch2-opd-four-inner}
 
-令
+\paragraph{训练 batch 的统一记号。}
+第 $k$ 个 outer step 冻结 anchor policy $\pi_k$。对 replay 中的第 $i$ 个 prefix $s_i$，从 anchor 采集 $K$ 个 token $y_{ij}$。训练时可以直接取得三次 forward 的 log-prob：
+\begin{equation}
+\ell^{T}_{ij}=\log T(y_{ij}\mid s_i),\qquad
+\ell^{k}_{ij}=\log \pi_k(y_{ij}\mid s_i),\qquad
+\ell^{\theta}_{ij}=\log \pi_\theta(y_{ij}\mid s_i).
+\label{eq:ch2-opd-three-logprobs}
+\end{equation}
+其中 $T$ 是 teacher，$\pi_k$ 是生成该 batch 的冻结 anchor，$\pi_\theta$ 是当前 inner update 的 student。若 prefix 来自旧行为策略 $b$，还要记录
 \[
-u_k^\star(s,a)
-=\log\frac{\pi_{k+1}^\star(a\mid s)}{\pi_k(a\mid s)}
-=\eta r_k(s,a)-\log Z_k(s),
+\omega_i^k=\prod_{m<t_i}\frac{\pi_k(y_{im}\mid s_{im})}{b(y_{im}\mid s_{im})};
+\]
+若 batch 就是由 $\pi_k$ 生成，则 $\omega_i^k=1$。这个 prefix weight 只修正 prefix 的访问测度，不能替代 token-level 的 action ratio。
+
+对每个 $s_i$，完整词表 logits 还可以给出两个条件 KL：
+\begin{equation}
+D_i^{kT}=\sum_{v\in\mathcal V}\pi_k(v\mid s_i)
+\log\frac{\pi_k(v\mid s_i)}{T(v\mid s_i)},
+\qquad
+D_i^{k\theta}=\sum_{v\in\mathcal V}\pi_k(v\mid s_i)
+\log\frac{\pi_k(v\mid s_i)}{\pi_\theta(v\mid s_i)}.
+\label{eq:ch2-opd-forward-kls}
+\end{equation}
+它们分别由 anchor--teacher 和 anchor--student 的全词表 log-softmax 逐项求和得到。若系统只保留 sampled token，可用同一 prefix 的 $K$ 个样本估计
+\[
+\widehat D_i^{kT}=\frac1K\sum_{j=1}^{K}(\ell^k_{ij}-\ell^T_{ij}),
+\qquad
+\widehat D_i^{k\theta}=\frac1K\sum_{j=1}^{K}(\ell^k_{ij}-\ell^\theta_{ij}),
+\]
+并对这两个中心量停止梯度。前者在 $K>1$ 时是条件 KL 的 Monte Carlo 估计；后者在 student 变化时每次 inner update 重新计算。
+
+\paragraph{共同的 token-level mirror target。}
+OPD 在 prefix $s_i$ 上使用 teacher--anchor log-ratio 作为 token reward，
+\begin{equation}
+\widehat r_{ij}^{\,k}=\ell^T_{ij}-\ell^k_{ij}.
+\label{eq:ch2-opd-sampled-reward}
+\end{equation}
+对应的 mirror 子问题是
+\[
+\max_{q(\cdot\mid s_i)}\left\{
+\sum_vq(v\mid s_i)\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}
+-\frac1\eta\sum_vq(v\mid s_i)\log\frac{q(v\mid s_i)}{\pi_k(v\mid s_i)}
+\right\}.
+\]
+对归一化约束引入拉格朗日乘子，逐项求导得到
+\[
+\log q(v\mid s_i)=\log\pi_k(v\mid s_i)+\eta\log\frac{T(v\mid s_i)}{\pi_k(v\mid s_i)}-\log Z_i^k,
 \]
 其中
-\[
-r_k(s,a)=\log\frac{T(a\mid s)}{\pi_k(a\mid s)},
-\qquad
-Z_k(s)=\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta.
-\]
-因此三个量都可以完全写成
 \begin{equation}
-\label{eq:ch2-opd-explicit-target}
-u_k^\star(s,a)
-=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
--\log\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta,
-\qquad
-u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}.
+Z_i^k=\sum_{v\in\mathcal V}\pi_k(v\mid s_i)^{1-\eta}T(v\mid s_i)^\eta.
+\label{eq:ch2-opd-z-explicit}
 \end{equation}
-下面四种方法的差异只在于如何用有限样本和参数化模型逼近这个同一个 $u_k^\star$。
-
-\paragraph{PMD-Part 的 OPD inner。}
-若教师能够返回完整 token 分布，就可以直接计算
-\[
-h_k(s,a)
-=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
--\log\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta.
-\]
-在 replay prefix 上最小化
+因此所有 inner 方法都在逼近同一个 explicit log-ratio target
 \begin{equation}
-\label{eq:ch2-opd-part-inner}
-\mathcal L_{k,\mathrm{Part}}(\theta)
-=\frac12\E_{s\sim d_b,\,a\sim\pi_k}
+\log\frac{q(v\mid s_i)}{\pi_k(v\mid s_i)}
+=\eta\bigl[\log T(v\mid s_i)-\log\pi_k(v\mid s_i)\bigr]-\log Z_i^k.
+\label{eq:ch2-opd-explicit-mirror-target}
+\end{equation}
+下文只保留可由式 \eqref{eq:ch2-opd-three-logprobs}--\eqref{eq:ch2-opd-z-explicit} 计算的量。
+
+\paragraph{PMD-Part：log-ratio regression。}
+把式 \eqref{eq:ch2-opd-explicit-mirror-target} 移到平方损失，得到 batch 上直接可执行的 objective：
+\begin{equation}
+\widehat{\mathcal L}_{k,\mathrm{Part}}(\theta)
+=\frac{1}{2BK}\sum_{i=1}^{B}\sum_{j=1}^{K}\omega_i^k
 \left[
-\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
--\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
-+\log\sum_{a'}\pi_k(a'\mid s)^{1-\eta}T(a'\mid s)^\eta
+\ell^\theta_{ij}-\ell^k_{ij}
+-\eta(\ell^T_{ij}-\ell^k_{ij})
++\log Z_i^k
 \right]^2.
+\label{eq:ch2-opd-part-explicit-loss}
 \end{equation}
-停止 target 梯度后，
+其中 $\log Z_i^k$ 由 anchor 与 teacher 的全词表 logits 计算；不对括号内的 teacher、anchor、$Z_i^k$ 和 $\omega_i^k$ 反向传播。因为只有 $\ell^\theta_{ij}$ 依赖 $\theta$，最小化该损失的 ascent direction 为
 \begin{equation}
-\label{eq:ch2-opd-part-inner-gradient}
--\nabla_\theta\mathcal L_{k,\mathrm{Part}}
-=\E_{d_b,\pi_k}
-\left[h_k(s,a)-u_\theta(s,a)\right]g_\theta(s,a).
-\end{equation}
-对 batch $\{(s_i,a_i)\}_{i=1}^{B}$，其中 $s_i$ 来自 replay、$a_i\sim\pi_k(\cdot\mid s_i)$，对应的可执行估计量为
-\begin{equation}
-\label{eq:ch2-opd-part-empirical}
-\widehat{\mathcal L}_{k,\mathrm{Part}}
-=\frac{1}{2B}\sum_{i=1}^{B}(u_{\theta,i}-h_{k,i})^2,
-\qquad
--\widehat{\nabla}\mathcal L_{k,\mathrm{Part}}
-=\frac1B\sum_{i=1}^{B}(h_{k,i}-u_{\theta,i})g_{\theta,i}.
-\end{equation}
-如果 replay 的 prefix 测度是 $d_b$ 而目标 outer 测度是 $d_{\pi_k}$，把每一项替换为 $W^{k}_{<t_i}(u_{\theta,i}-h_{k,i})^2$，其中 $W^{k}_{<t_i}=d_{\pi_k}(s_i)/d_b(s_i)$ 的轨迹乘积估计见式 \eqref{eq:ch2-mdpo-prefix-weight}。
-在 tabular、全 action 覆盖且使用真实 $Z_k$ 的情形，零损失等价于 $\pi_\theta=\pi_{k+1}^\star$。共享参数或 prefix 覆盖不足时，得到的是 replay 测度下的投影，不能把零训练误差解释成所有 prefix 上的教师拟合。
-
-\paragraph{PMD-Mean 的 OPD inner。}
-当 $Z_k(s)$ 不方便计算时，先构造行为测度下的中心化信号
-\[
-\widetilde r_k(s,a)
-=\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
--\sum_{a'}\pi_k(a'\mid s)
-\log\frac{T(a'\mid s)}{\pi_k(a'\mid s)}.
-\]
-再令 $\widetilde h_k(s,a)=\eta\widetilde r_k(s,a)$，求解
-\begin{equation}
-\label{eq:ch2-opd-mean-inner}
-\min_\theta\frac12\E_{d_b,\pi_k}
+-\widehat{\nabla_\theta\mathcal L}_{k,\mathrm{Part}}
+=\frac{1}{BK}\sum_{i,j}\omega_i^k
 \left[
-\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
--\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
-+\eta\sum_{a'}\pi_k(a'\mid s)
-\log\frac{T(a'\mid s)}{\pi_k(a'\mid s)}
-\right]^2
-\quad\text{s.t.}\quad
-\sum_a\pi_k(a\mid s)
-\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}=1.
+\eta(\ell^T_{ij}-\ell^k_{ij})-\ell^\theta_{ij}+\ell^k_{ij}-\log Z_i^k
+\right]
+\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i).
+\label{eq:ch2-opd-part-explicit-gradient}
 \end{equation}
-在同一 prefix 采 $K$ 个 action 后，实际的 regression batch 为
-\begin{equation}
-\label{eq:ch2-opd-mean-empirical}
-\widehat{\bar r}_{k,i}=\frac1K\sum_{j=1}^{K}\log\frac{T(a_{ij}\mid s_i)}{\pi_k(a_{ij}\mid s_i)},
-\quad
-\widehat{\mathcal L}_{k,\mathrm{Mean}}
-=\frac{1}{2BK}\sum_{i,j}
-\left[u_{\theta,ij}-\eta\left(r_{k,ij}-\widehat{\bar r}_{k,i}\right)\right]^2.
-\end{equation}
-其梯度估计为 $-\widehat{\nabla}\mathcal L_{k,\mathrm{Mean}}=(BK)^{-1}\sum_{i,j}\left[\eta(r_{k,ij}-\widehat{\bar r}_{k,i})-u_{\theta,ij}\right]g_{\theta,ij}$，并对 $\widehat{\bar r}_{k,i}$ 停止梯度。若目标状态测度为 $d_{\pi_k}$，每个 prefix loss 和梯度项再乘 $W^k_{<t_i}$。
-约束是必要的：$u_\theta=\log(\pi_\theta/\pi_k)$ 必须满足
-\[
-\E_{\pi_k}[e^{u_\theta}\mid s]
-=\sum_a\pi_\theta(a\mid s)=1.
-\]
-在函数空间中，式 \eqref{eq:ch2-opd-mean-inner} 是中心化 target 到这个非线性约束集合的投影；其 KKT 方程和 Lambert-$W$ 解已经在式 \eqref{eq:ch2-mean-lambert} 中给出。只有当中心化 target 本身满足该约束时，PMD-Mean 才直接等于精确 Gibbs log-ratio。
+这就是实际 optimizer 看到的标量系数和 student score；实现上等价于对式 \eqref{eq:ch2-opd-part-explicit-loss} 调用一次标准 regression backward。
 
-\paragraph{BPO 的 OPD inner。}
-BPO 不显式估计 $\log Z_k$，而在每个 prefix 上把 residual 投影到行为测度的零均值子空间：
-\begin{equation}
-\delta_{k,\theta}(s,a)
-\;=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}
--\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
--\eta\sum_{a'}\pi_k(a'\mid s)
-\log\frac{T(a'\mid s)}{\pi_k(a'\mid s)}
-+\sum_{a'}\pi_k(a'\mid s)
-\log\frac{\pi_\theta(a'\mid s)}{\pi_k(a'\mid s)}.
-\label{eq:ch2-opd-bpo-inner-residual}
-\end{equation}
-\begin{equation}
-\mathcal L_{k,\mathrm{BPO}}(\theta)
-=\frac{1}{2\eta}\E_{d_b,\pi_k}\left[\delta_{k,\theta}(s,a)^2\right].
-\label{eq:ch2-opd-bpo-inner-loss}
-\end{equation}
-对完整 reverse-KL 项求导得到
-\begin{equation}
-\label{eq:ch2-opd-bpo-inner-gradient}
--\eta\nabla_\theta\mathcal L_{k,\mathrm{BPO}}
-=\E_{d_b,\pi_k}
-\left[\delta_{k,\theta}(s,a)
-\left(g_\theta(s,a)-\bar g_\theta(s)\right)\right],
-\end{equation}
-给定每个 prefix 的 $K$ 个 action，令
+\paragraph{PMD-Mean：用 anchor--teacher KL 做中心化。}
+由
 \[
-\widehat{\bar g}_{\theta,i}=\frac1K\sum_{j=1}^{K}g_{\theta,ij},\qquad
-\widehat{\delta}_{k,ij}=\eta r_{k,ij}-u_{\theta,ij}-\frac1K\sum_{\ell=1}^{K}(\eta r_{k,i\ell}-u_{\theta,i\ell}).
+\mathbb E_{v\sim\pi_k(\cdot\mid s_i)}
+[\log T(v\mid s_i)-\log\pi_k(v\mid s_i)]=-D_i^{kT},
 \]
-则 BPO 的可执行 loss 和 ascent 估计量为
+可以把未知的 $\log Z_i^k$ 替换为行为测度下的中心。实际回归损失是
 \begin{equation}
-\label{eq:ch2-opd-bpo-empirical}
-\widehat{\mathcal L}_{k,\mathrm{BPO}}=\frac{1}{2\eta BK}\sum_{i,j}\widehat{\delta}_{k,ij}^{2},
+\widehat{\mathcal L}_{k,\mathrm{Mean}}(\theta)
+=\frac{1}{2BK}\sum_{i,j}\omega_i^k
+\left[
+\ell^\theta_{ij}-\ell^k_{ij}
+-\eta\bigl(\ell^T_{ij}-\ell^k_{ij}+D_i^{kT}\bigr)
+\right]^2.
+\label{eq:ch2-opd-mean-explicit-loss}
+\end{equation}
+若无完整词表 KL，则将 $D_i^{kT}$ 换成停止梯度的 $\widehat D_i^{kT}=K^{-1}\sum_\ell(\ell^k_{i\ell}-\ell^T_{i\ell})$。对应的 ascent estimator 为
+\begin{equation}
+-\widehat{\nabla_\theta\mathcal L}_{k,\mathrm{Mean}}
+=\frac{1}{BK}\sum_{i,j}\omega_i^k
+\left[
+\eta\bigl(\ell^T_{ij}-\ell^k_{ij}+D_i^{kT}\bigr)-\ell^\theta_{ij}+\ell^k_{ij}
+\right]
+\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i).
+\label{eq:ch2-opd-mean-explicit-gradient}
+\end{equation}
+这里的中心化只改变每个 prefix 的 action-independent 常数；student 仍需满足 $\sum_v\pi_\theta(v\mid s_i)=1$。$K=1$ 时 sampled center 与该 token 完全相消，不能用单个 action 同时得到有效的条件中心和有效的梯度方差估计。
+
+\paragraph{未线性化 BPO：完整 reverse-KL residual regression。}
+BPO 在同一 anchor 测度下同时中心化 teacher--anchor 和 student--anchor ratio。对样本 $y_{ij}$ 定义可直接计算的 residual
+\begin{equation}
+\widehat\delta_{ij}^{\,k,\theta}
+=\eta\bigl(\ell^T_{ij}-\ell^k_{ij}+D_i^{kT}\bigr)
+-\bigl(\ell^\theta_{ij}-\ell^k_{ij}+D_i^{k\theta}\bigr).
+\label{eq:ch2-opd-bpo-explicit-residual}
+\end{equation}
+完整的未线性化 regression loss 为
+\begin{equation}
+\widehat{\mathcal L}_{k,\mathrm{BPO}}(\theta)
+=\frac{1}{2\eta BK}\sum_{i,j}\omega_i^k
+\left(\widehat\delta_{ij}^{\,k,\theta}\right)^2.
+\label{eq:ch2-opd-bpo-explicit-loss}
+\end{equation}
+这里 $D_i^{k\theta}$ 必须随 student forward 更新。对其求导时
+\[
+\nabla_\theta D_i^{k\theta}
+=-\sum_{v\in\mathcal V}\pi_k(v\mid s_i)\nabla_\theta\log\pi_\theta(v\mid s_i).
+\]
+所以 exact ascent estimator 是
+\begin{equation}
+-\eta\widehat{\nabla_\theta\mathcal L}_{k,\mathrm{BPO}}
+=\frac{1}{BK}\sum_{i,j}\omega_i^k\widehat\delta_{ij}^{\,k,\theta}
+\left[
+\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i)
+-\sum_{v\in\mathcal V}\pi_k(v\mid s_i)\nabla_\theta\log\pi_\theta(v\mid s_i)
+\right].
+\label{eq:ch2-opd-bpo-explicit-gradient}
+\end{equation}
+实现中第二项用同一 prefix 的 $K$ 个 sampled scores 的平均值替代：
+\[
+\widehat{\boldsymbol c}_{i}^{\,\theta}=\frac1K\sum_{\ell=1}^{K}\nabla_\theta\log\pi_\theta(y_{i\ell}\mid s_i),
+\]
+并用停止梯度的 $\widehat D_i^{k\theta}=K^{-1}\sum_\ell(\ell^k_{i\ell}-\ell^\theta_{i\ell})$。于是训练代码中的等价形式为
+\begin{equation}
+-\eta\widehat{\nabla_\theta\mathcal L}_{k,\mathrm{BPO}}
+=\frac{1}{BK}\sum_{i,j}\omega_i^k\widehat\delta_{ij}^{\,k,\theta}
+\left[\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i)-\widehat{\boldsymbol c}_{i}^{\,\theta}\right].
+\label{eq:ch2-opd-bpo-sampled-gradient}
+\end{equation}
+式 \eqref{eq:ch2-opd-bpo-explicit-gradient} 是完整词表 reverse-KL 的精确梯度；式 \eqref{eq:ch2-opd-bpo-sampled-gradient} 是实际 sampled implementation。它没有使用 BPO 后续的 clip、二元 KL 近似或 sign mask。
+
+\paragraph{MDPO：direct mirror objective 与 action-level IS。}
+MDPO 直接最大化
+\begin{equation}
+\widehat{\mathcal J}_{k,\mathrm{MDPO}}(\theta)
+=\frac{1}{BK}\sum_{i,j}\omega_i^k\rho_{ij}^{\theta}
+\left[
+\ell^T_{ij}-\ell^k_{ij}
+-\frac1\eta(\ell^\theta_{ij}-\ell^k_{ij})
+\right],
 \qquad
--\eta\widehat{\nabla}\mathcal L_{k,\mathrm{BPO}}
-=\frac1{BK}\sum_{i,j}\widehat{\delta}_{k,ij}(g_{\theta,ij}-\widehat{\bar g}_{\theta,i}).
+\rho_{ij}^{\theta}=\exp(\ell^\theta_{ij}-\ell^k_{ij}).
+\label{eq:ch2-opd-mdpo-explicit-objective}
 \end{equation}
-若使用 replay prefix 测度近似 $d_{\pi_k}$，同样在每个 $i$ 的项前乘 $W^k_{<t_i}$；若 $K=1$，中心化 residual 和 centered score 都退化，不能从单个 action 无偏恢复 BPO 的行为条件中心化。
-其中方括号表示标量 residual 与向量 score 的乘积，
-\[
-\delta_{k,\theta}(s,a)
-\left(g_\theta(s,a)-\bar g_\theta(s)\right),
-\qquad
-\bar g_\theta(s)=\E_{\pi_k}[g_\theta(s,a)\mid s].
-\]
-若 $\delta_{k,\theta}=0$，则
-\[
-u_\theta(s,a)=\eta r_k(s,a)+c_k(s)
-\]
-对某个 action-independent 常数 $c_k(s)$ 成立。归一化约束进一步给出
-\[
-1=\E_{\pi_k}[e^{u_\theta}\mid s]
-=e^{c_k(s)}Z_k(s),
-\qquad
-c_k(s)=-\log Z_k(s),
-\]
-所以 BPO 的精确零点也是 $u_k^\star$。这说明 BPO 与 PMD-Part 的最优策略相同，但其有限步梯度仍因中心化 score 而不同。
+因此可执行的 ascent estimator 为
+\begin{equation}
+\widehat{\nabla_\theta\mathcal J}_{k,\mathrm{MDPO}}
+=\frac{1}{BK}\sum_{i,j}\omega_i^k\rho_{ij}^{\theta}
+\left[
+\ell^T_{ij}-\ell^k_{ij}
+-\frac1\eta(\ell^\theta_{ij}-\ell^k_{ij})
+\right]
+\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i).
+\label{eq:ch2-opd-mdpo-explicit-gradient}
+\end{equation}
+推导中原本由 $\nabla\rho_{ij}^{\theta}$ 产生的 $-\rho_{ij}^{\theta}/\eta$ 常数项，在对 $a\sim\pi_\theta$ 求和后乘以 $\sum_a\pi_\theta(a\mid s)\nabla\log\pi_\theta(a\mid s)=0$，故式 \eqref{eq:ch2-opd-mdpo-explicit-gradient} 是完整 reverse-KL mirror objective 的梯度。若训练框架像官方 MDPO 实现一样直接从 sampled token 的 KL penalty 反向传播，则不显式形成 $\rho_{ij}^{\theta}$；那是 full-vocabulary/sampled-KL estimator，而式 \eqref{eq:ch2-opd-mdpo-explicit-gradient} 是 replay action 上的 unbiased action-IS estimator。
+
+\paragraph{四个 estimator 的共同训练接口。}
+四种 inner 都可以放入同一个 inner loop：固定 $T,\pi_k,b$，对每个 replay prefix 做 teacher、anchor 和 student forward，计算上面的 scalar coefficient，调用一次 backward，重复 $M$ 个 inner updates 后冻结所得 student 作为 $\pi_{k+1}$。PMD-Part 和 PMD-Mean 的 coefficient 是 regression residual；BPO 的 coefficient 还乘一个 centered score；MDPO 的 coefficient 是 action ratio 加 reverse-KL reward。若所有 prefix 均由当前 anchor 采样，则 $\omega_i^k=1$；若使用 replay，则必须保留 prefix product，否则四种 estimator 都只对 replay occupancy 无偏。
 
 \input{sections/opd-mdpo-inner.tex}
 \input{sections/opd-estimator-theory.tex}
@@ -692,7 +719,7 @@ c_k(s)=-\log Z_k(s),
 \end{theorem}
 
 \begin{proof}
-PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由上面的 residual 方程给出；归一化唯一确定 $c_k=-\log Z_k$，从而 $u_\theta=u_k^\star$。PMD-Mean 的可行集包含所有满足 $\E_{\pi_k}[e^u\mid s]=1$ 的 log-ratio；当中心化 target 可实现且投影残差为零时，它也得到同一 $u_k^\star$。对 MDPO，式 \eqref{eq:ch2-opd-mdpo-inner-full} 正是式 \eqref{eq:ch2-opd-mirror-step} 的参数化版本，利用 KL 分解可写成
+PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由上面的 residual 方程给出；归一化唯一确定 $c_k=-\log Z_k$，从而 $u_\theta=u_k^\star$。PMD-Mean 的可行集包含所有满足 $\E_{\pi_k}[e^u\mid s]=1$ 的 log-ratio；当中心化 target 可实现且投影残差为零时，它也得到同一 $u_k^\star$。对 MDPO，式 \eqref{eq:ch2-opd-mdpo-explicit-objective} 正是式 \eqref{eq:ch2-opd-mirror-step} 的参数化版本，利用 KL 分解可写成
 \[
 \mathcal J_{k,\mathrm{MDPO}}(\theta)
 =\frac{1}{\eta}\log Z_k(s)
