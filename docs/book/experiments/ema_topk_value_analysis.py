@@ -80,7 +80,7 @@ def write_csv(rows, path: Path):
 
 
 def configure_axis(axis, xlabel, ylabel):
-    axis.set_xscale("symlog", linthresh=1)
+    axis.set_xlim(0, 32)
     axis.set_xlabel(xlabel)
     axis.set_ylabel(ylabel)
     axis.grid(True, which="both", alpha=0.25)
@@ -124,23 +124,49 @@ def plot_variance(rows, out: Path):
 
 def plot_rmse(rows, out: Path):
     masses = sorted({row["mass_target"] for row in rows})
-    batch_sizes = [1, 32, 512, 32768]
-    colors = plt.cm.plasma(np.linspace(0.1, 0.9, len(batch_sizes)))
+    colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
-    for axis, mass in zip(axes.flat, masses):
+    for axis, mass, color in zip(axes.flat, masses, colors):
         cur = [row for row in rows if row["mass_target"] == mass]
         x = [row["top_k"] for row in cur]
-        axis.plot(x, [max(row["trunc_abs_relative_bias"], 1e-12) for row in cur], "k--", label="Trunc-Top-K (all B)")
-        for color, batch_size in zip(colors, batch_sizes):
-            corrected_rmse = [max(row["corrected_relative_std"] / np.sqrt(batch_size), 1e-12) for row in cur]
-            axis.plot(x, corrected_rmse, "o-", color=color, label=f"Top-K corrected, B={batch_size}")
+        axis.plot(x, [max(row["trunc_abs_relative_bias"], 1e-12) for row in cur], "k--", label="Trunc-Top-K")
+        corrected_rmse = [max(row["corrected_relative_std"], 1e-12) for row in cur]
+        axis.plot(x, corrected_rmse, "o-", color=color, label="Top-K corrected, one sampled token")
         axis.set_title(f"M32(pi)={mass:g}")
         configure_axis(axis, "Top-K (K=0 is sampled-token K1)", "relative scalar-KL RMSE")
-    axes[0, 0].legend(fontsize=7, ncol=2)
-    fig.suptitle("Scalar KL RMSE: truncation bias versus sampled-tail variance")
+    axes[0, 0].legend(fontsize=7)
+    fig.suptitle("Scalar KL RMSE with one sampled-token correction")
     fig.tight_layout()
     fig.savefig(out / "topk_value_rmse_vs_k.png", dpi=220)
     fig.savefig(out / "topk_value_rmse_vs_k.pdf")
+    plt.close(fig)
+
+
+def plot_single_token_summary(rows, out: Path):
+    masses = sorted({row["mass_target"] for row in rows})
+    colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharex=True)
+    for color, mass in zip(colors, masses):
+        cur = [row for row in rows if row["mass_target"] == mass]
+        x = [row["top_k"] for row in cur]
+        axes[0].plot(x, [row["trunc_abs_relative_bias"] for row in cur], "--", color=color, label=f"Trunc, M32={mass:g}")
+        axes[0].plot(x, [1e-12 for _ in cur], "-", color=color, alpha=0.45)
+        axes[1].plot(x, [row["corrected_relative_std"] ** 2 for row in cur], "o-", color=color, label=f"Corrected, M32={mass:g}")
+        axes[1].plot(x, [0.0 for _ in cur], "--", color=color, alpha=0.45)
+        axes[2].plot(x, [row["trunc_abs_relative_bias"] for row in cur], "--", color=color, label=f"Trunc, M32={mass:g}")
+        axes[2].plot(x, [row["corrected_relative_std"] for row in cur], "o-", color=color, label=f"Corrected, M32={mass:g}")
+    axes[0].set_title("Absolute relative bias")
+    axes[1].set_title("Relative variance")
+    axes[2].set_title("Relative RMSE")
+    for axis in axes:
+        configure_axis(axis, "Top-K, K=0,...,32", "relative scalar-KL error")
+    axes[0].legend(fontsize=7)
+    axes[1].legend(fontsize=7)
+    axes[2].legend(fontsize=7, ncol=2)
+    fig.suptitle("One sampled-token Top-K correction: scalar KL bias, variance, and RMSE")
+    fig.tight_layout()
+    fig.savefig(out / "topk_value_single_token_summary.png", dpi=220)
+    fig.savefig(out / "topk_value_single_token_summary.pdf")
     plt.close(fig)
 
 
@@ -154,11 +180,12 @@ def main():
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     device = "cpu" if args.cpu or not torch.cuda.is_available() else "cuda"
-    rows = make_rows(args.vocab, [0.2, 0.5, 0.8, 0.9], [0, 1, 4, 8, 16, 32, 64, 128, 256, 512], args.seed, device)
+    rows = make_rows(args.vocab, [0.2, 0.5, 0.8, 0.9], list(range(33)), args.seed, device)
     write_csv(rows, output / "value_metrics.csv")
     plot_bias(rows, output)
     plot_variance(rows, output)
     plot_rmse(rows, output)
+    plot_single_token_summary(rows, output)
     (output / "value_analysis_metadata.json").write_text(json.dumps({"device": device, "torch": torch.__version__, "cuda": torch.cuda.get_device_name(0) if device == "cuda" else None, "estimators": ["Trunc-Top-K", "Top-K corrected with one sampled token"]}, indent=2))
 
 
