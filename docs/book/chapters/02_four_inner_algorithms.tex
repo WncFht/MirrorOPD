@@ -620,6 +620,97 @@ D_\theta(s,v)
 \end{equation}
 因此完整 vocabulary 路径无需显式计算 centered score 的第二项；它在精确求和中严格抵消。
 
+\paragraph{对应的梯度与 stop-gradient 约定。}
+下面把式~\eqref{eq:ch2-opd-full-part-simplified}--\eqref{eq:ch2-opd-full-mdpo-simplified}
+写成可直接实现的 policy-gradient 形式。固定 outer step $k$ 时，$\pi_k$、$T$、
+$\log Z_k$ 和 $\mathcal K_k^T$ 都不依赖当前参数 $\theta$，实现中应使用
+$\operatorname{stopgrad}$。相反，$\mathcal K_k^\theta$ 必须保留对
+$\log\pi_\theta$ 的梯度。完整词表下
+\begin{equation}
+\label{eq:ch2-opd-grad-ktheta}
+\mathcal K_k^\theta(s)
+=\sum_v\pi_k(v\mid s)
+\left[\operatorname{stopgrad}\!\left(\log\pi_k(v\mid s)\right)
+-\log\pi_\theta(v\mid s)\right],
+\qquad
+\nabla_\theta\mathcal K_k^\theta(s)
+=-\sum_v\pi_k(v\mid s)\nabla_\theta\log\pi_\theta(v\mid s).
+\end{equation}
+记 $g_\theta(s,v)=\nabla_\theta\log\pi_\theta(v\mid s)$、
+$\bar g_\theta(s)=\sum_v\pi_k(v\mid s)g_\theta(s,v)$。对 PMD-Part，
+残差对 $\theta$ 的导数就是 $g_\theta$，故
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{Part}}(s)
+&=\sum_v\pi_k(v\mid s)A_{\mathrm{Part}}(s,v)g_\theta(s,v),\\
+A_{\mathrm{Part}}(s,v)
+&=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
+-\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\operatorname{stopgrad}(\log Z_k(s)).
+\end{align}
+因此其梯度下降方向是一个以 $\pi_k$ 为测度、以 $-A_{\mathrm{Part}}$ 为权重的
+score-function 更新。
+
+对 PMD-Mean，令 $A_{\mathrm{Mean}}(s,v)$ 表示式~\eqref{eq:ch2-opd-full-mean-simplified}
+中方括号内的量。由式~\eqref{eq:ch2-opd-grad-ktheta}，
+\begin{equation}
+\label{eq:ch2-opd-grad-mean-residual}
+\nabla_\theta A_{\mathrm{Mean}}(s,v)
+=g_\theta(s,v)-\bar g_\theta(s).
+\end{equation}
+于是
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{Mean}}(s)
+&=\sum_v\pi_k(v\mid s)A_{\mathrm{Mean}}(s,v)
+\bigl[g_\theta(s,v)-\bar g_\theta(s)\bigr]\\
+&=\sum_v\pi_k(v\mid s)A_{\mathrm{Mean}}(s,v)g_\theta(s,v),
+\end{align}
+其中第二个等号使用了
+$\sum_v\pi_k(v\mid s)A_{\mathrm{Mean}}(s,v)=0$。这一步只有在
+$\mathcal K_k^\theta$ 保留梯度时才成立。
+
+因为 $D_\theta=-A_{\mathrm{Mean}}$，BPO 的梯度为
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+&=-\frac1\eta\sum_v\pi_k(v\mid s)D_\theta(s,v)
+\bigl[g_\theta(s,v)-\bar g_\theta(s)\bigr],\\
+-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+&=\sum_v\pi_k(v\mid s)D_\theta(s,v)g_\theta(s,v).
+\end{align}
+这就是前面删除第二项后的严格 policy-gradient 形式；被删除的项是
+$\bar g_\theta(s)\sum_v\pi_k(v\mid s)D_\theta(s,v)=0$，而不是把
+$\bar g_\theta(s)$ 本身当成零。
+
+最后考虑 MDPO。记
+\[
+F_k(s,v)=\log\frac{T(v\mid s)}{\pi_k(v\mid s)},
+\qquad
+U_\theta(s,v)=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}.
+\]
+对式~\eqref{eq:ch2-opd-full-mdpo-simplified} 求导时，既要微分外层测度
+$\pi_\theta$，也要微分 $U_\theta$：
+\begin{align}
+\nabla_\theta\mathcal J_{\mathrm{MDPO}}(s)
+&=\sum_v\pi_\theta(v\mid s)
+\left[F_k(s,v)-\frac1\eta U_\theta(s,v)-\frac1\eta\right]
+g_\theta(s,v)\\
+&=\sum_v\pi_\theta(v\mid s)
+\left[F_k(s,v)-\frac1\eta U_\theta(s,v)\right]g_\theta(s,v),
+\end{align}
+因为 $\sum_v\pi_\theta(v\mid s)g_\theta(s,v)=0$。因此 MDPO 是以当前 student
+$\pi_\theta$ 为采样测度的 policy gradient，而 BPO/PMD-Mean 是以冻结 anchor
+$\pi_k$ 为测度、通过 centered residual 形成的 policy gradient。
+
+若 sampled-token 路径估计 $\mathcal K_k^\theta$，从 $a\sim\pi_k$ 采样时可以使用
+\begin{equation}
+\widehat{\mathcal K}_{k}^{\theta}(s,a)
+=\frac{\pi_k(a\mid s)}{\operatorname{stopgrad}(\pi_k(a\mid s))}
+\left[\operatorname{stopgrad}(\log\pi_k(a\mid s))
+-\log\pi_\theta(a\mid s)\right].
+\end{equation}
+它在数值上是 $\log\pi_k(a\mid s)-\log\pi_\theta(a\mid s)$，但保留了
+$-\nabla_\theta\log\pi_\theta(a\mid s)$。若把整个
+$\widehat{\mathcal K}_{k}^{\theta}$ 错误地 stop-gradient，PMD-Mean 和 BPO
+都会退化成未中心化的梯度，且不再对应式~\eqref{eq:ch2-opd-grad-mean-residual}。
+
 \begin{algorithm}[ht]
 \caption{OPD full-vocabulary token inner update\\{\small\textit{Semantics: 先化简逐 prefix 量，再对固定 mirror 子问题做 inner 优化}}}
 \begin{algorithmic}[1]
