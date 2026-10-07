@@ -18,7 +18,7 @@
 \newcommand{\beh}{\mu}
 \newcommand{\cand}{\pi}
 \newcommand{\ratio}{\rho}
-\newcommand{\stop}{\operatorname{stopgrad}}
+\newcommand{\stopgrad}{\operatorname{stopgrad}}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator{\supp}{supp}
@@ -248,7 +248,7 @@ BPO 的 token-level PMD 起点与式 \eqref{eq:token-subproblem} 相同，使用
 其中
 \begin{equation}
 \label{eq:bpo-weight}
- \widetilde w_{i,t}=rac{1+\epsilon-\beh(a_{i,t}\mid s_{i,t})}{1+\epsilon-\cand(a_{i,t}\mid s_{i,t})}.
+ \widetilde w_{i,t}=\frac{1+\epsilon-\beh(a_{i,t}\mid s_{i,t})}{1+\epsilon-\cand(a_{i,t}\mid s_{i,t})}.
 \end{equation}
 因此 BPO 最终训练的是 PG 形式的 surrogate；回归是理论构造和梯度来源，而不是独立的第二阶段优化器。
 
@@ -350,7 +350,7 @@ BPO 论文源码的主实验写明：每个 training step 先生成 256 个 prom
 \section{OpenKimi/PMD 的训练预算}
 \label{sec:openkimi-implementation}
 
-OpenKimi 的 PMD loss 默认先对完整 response 的 token log-ratio 求和，再把 sequence log-ratio broadcast 到 response 内 token。Qwen2.5-7B math recipe 设置 `PPO\_EPOCHS=1`、`train\_batch\_size=512`、`actor.ppo\_mini\_batch\_size=32`，所以静态 batch 下每个 outer step 约有 $512/32=16$ 个 mini-batch 更新。代码没有 inner residual stopping 或 PMD gap 检验；`total\_training\_steps=3000` 是 outer steps 上限。
+OpenKimi 的 PMD loss 默认先对完整 response 的 token log-ratio 求和，再把 sequence log-ratio broadcast 到 response 内 token。\par Qwen2.5-7B math recipe 设置 `PPO\_EPOCHS=1`、`train\_batch\_size=512`、`actor.ppo\_mini\_batch\_size=32`，所以静态 batch 下每个 outer step 约有 $512/32=16$ 个 mini-batch 更新。代码没有 inner residual stopping 或 PMD gap 检验；`total\_training\_steps=3000` 是 outer steps 上限。
 
 \section{经典 MDPO 的训练预算与 IS}
 \label{sec:mdpo-implementation}
