@@ -632,6 +632,8 @@ $$
 
 对 $0<\eta<1$，inner 完全收敛时得到的是 teacher 的几何插值，而不是 teacher 本身；选择较小 $\eta$ 的作用是缩短单个 target 的距离、降低有限样本和参数投影的风险。代价是需要更多 outer refreshes。因而 $\eta=1$ 应被理解为“最激进的一次 teacher projection”，而不是自动正确的默认值。
 
+本笔记中的比较结论对应的逐步证明单独整理在[TOP-D 与 Mirror OPD 定理证明](../2026-10-07-TOP-D与MirrorOPD定理证明.md)。该文档逐项重述 TOP-D 的有界方差、算术近端收敛和性能下界，并给出 projective 收缩、Gibbs 闭式解、support-floor 方差界以及固定 anchor 性能下界的证明。
+
 ### 参考文献
 
 [^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. _Mirror Descent Policy Optimization_. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
