@@ -510,3 +510,111 @@ $-\nabla_\theta\mathcal L_{\mathrm{Part}}=\mathbb E_{\pi_k}[qg_\theta\mid s]$，
 这个命题说明“都在 token level”只保证它们面对同一个局部镜像根，不保证优化轨迹相同。PMD-Part 回归完整的 action-dependent log-ratio，并把 $\log Z_f$ 当作固定 target；BPO 先消去 action-independent 常数，再对当前 student 的归一化项求导，因此多出 centered score。若使用的参数化使
 $\mathbb E_{\pi_k}[\nabla_\theta\log\pi_\theta]=0$
 （例如采样测度与当前 student 一致，或在特定 tabular 点上），差异项才会消失。
+
+\section{OPD 特化：逐 token reward 与两种信息访问模式}
+\label{sec:ch2-opd-specialization}
+
+在 OPD 中，第 $k$ 个 outer step 先固定 anchor $\pi_k$，然后从它产生 rollout。对 prefix
+$s_t=(x,y_{<t})$ 和实际 sampled token $a_t=y_t$，最直接的局部 teacher reward 是
+\begin{equation}
+\label{eq:ch2-opd-raw-reward}
+r_k(s_t,a_t)=\log T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
+\end{equation}
+它满足序列分解
+\[
+\sum_{t=1}^H r_k(s_t,a_t)=\log T(y\mid x)-\log\pi_k(y\mid x).
+\]
+因此在共同 mirror 子问题中应取 $f=r_k$；不能把整条序列的 log-ratio 当作每一个 prefix 的同一个 reward，否则会重复计算后缀差异。
+
+可以对 reward 做两种不同的“归一化”，必须区分它们的理论作用。对任意只依赖 prefix 的 baseline $b_k(s)$，令
+\begin{equation}
+\label{eq:ch2-opd-centered-reward}
+f_k^{\mathrm{ctr}}(s,a)=r_k(s,a)-b_k(s).
+\end{equation}
+它只把 partition function 乘上 $e^{-\eta b_k(s)}$，所以 Gibbs policy 不变；取
+$b_k(s)=\mathbb E_{\pi_k}[r_k(s,\cdot)\mid s]$ 就是条件中心化。若再除以尺度 $\sigma_k(s)>0$，则
+\[
+f_k^{\mathrm{std}}=(r_k-b_k)/\sigma_k
+\]
+会把有效温度从 $\eta$ 改成 $\eta/\sigma_k$，不再是同一个 mirror step，除非同时把正则参数改为 $\eta\sigma_k$。因此 OPD 的默认实现只做 additive centering；标准化只能作为明确的 temperature schedule。
+
+\subsection{完整 vocabulary logits：精确 token mirror target}
+\label{sec:ch2-opd-full-vocab}
+
+如果 teacher 和 anchor 都能在 prefix $s$ 返回完整词表 logits，则对每个 $v\in\mathcal V$ 计算
+\[
+r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
+\qquad
+\log Z_k(s)=\operatorname{logsumexp}_{v\in\mathcal V}
+\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\bigr).
+\]
+于是 exact target 为
+\[
+\pi_k^+(v\mid s)=\exp\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)-\log Z_k(s)\bigr).
+\]
+这时 PMD-Part 的 target、MDPO 的 reverse KL、以及 BPO/PMD-Mean 所需的 anchor conditional center 都可以在同一个 prefix 上精确计算。完整词表路径不需要 action-level importance sampling；唯一的随机性来自 prefix batch 和 optimizer。
+
+\begin{algorithm}[ht]
+\caption{OPD full-vocabulary token inner update\\{\small\textit{Semantics: 在每个 rollout prefix 上使用完整 teacher/anchor logits}}}
+\begin{algorithmic}[1]
+\Require teacher $T$, frozen anchor $\pi_k$, rollout prefixes $\{s_i\}$, $\eta$, method $M\in\{\mathrm{Part},\mathrm{Mean},\mathrm{BPO},\mathrm{MDPO}\}$
+\Ensure updated student $\pi_\theta$
+\For{each prefix $s_i$}
+    \State query $\log T(\cdot\mid s_i)$ and $\log\pi_k(\cdot\mid s_i)$ over all $v\in\mathcal V$
+    \State $r_i(v)\gets\log T(v\mid s_i)-\log\pi_k(v\mid s_i)$
+    \State $\log Z_i\gets\operatorname{logsumexp}_v(\log\pi_k(v\mid s_i)+\eta r_i(v))$
+    \State $p_i^+(v)\gets\exp(\log\pi_k(v\mid s_i)+\eta r_i(v)-\log Z_i)$
+    \If{$M=\mathrm{Part}$}
+        \State minimize $\frac12\sum_v\pi_k(v\mid s_i)[\log\pi_\theta(v\mid s_i)-\log\pi_k(v\mid s_i)-\log(p_i^+(v)/\pi_k(v\mid s_i))]^2$
+    \ElsIf{$M=\mathrm{Mean}$}
+        \State minimize the centered loss with exact $\pi_k$-weighted means and enforce $\sum_v\pi_k(v\mid s_i)e^{U_\theta(v)}=1$
+    \ElsIf{$M=\mathrm{BPO}$}
+        \State minimize $\frac1{2\eta}\sum_v\pi_k(v\mid s_i)D_\theta(s_i,v)^2$
+    \ElsIf{$M=\mathrm{MDPO}$}
+        \State maximize $\sum_v\pi_\theta(v\mid s_i)r_i(v)-\eta^{-1}\operatorname{KL}(\pi_\theta(\cdot\mid s_i)\Vert\pi_k(\cdot\mid s_i))$
+    \EndIf
+\EndFor
+\State update $\theta$ for the chosen inner budget; freeze $\pi_k$ throughout
+\State \Return $\theta$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{只有 sampled next token：无完整词表时的估计路径}
+\label{sec:ch2-opd-sampled-token}
+
+如果每个 prefix 只有 rollout 中的下一个 token $a\sim\pi_k(\cdot\mid s)$，仍然可以无偏观测 $r_k(s,a)$，但不能从一个样本无偏得到 $\log Z_k(s)$：先估计 $Z_k$ 再取对数会产生 plug-in bias。因此 sampled-token 路径不应把 PMD-Part 的 exact $\log Z_k$ 假装已知。可行选择如下。
+
+第一，使用 BPO 或 PMD-Mean，以同一个 prefix 的多条 sampled actions 估计 conditional center；它们不需要显式的 $\log Z_k$。第二，使用 MDPO 的 action-sampled objective，并用 K4/K3$^{++}$ 估计 KL 项；这要求保留 student/anchor 的 sampled log-prob。第三，如果只有一条 action，却仍想做 PMD-Part，只能使用外部 baseline、跨 batch center 或 self-normalized $\widehat{\log Z}$，并在理论和日志中标记其 bias。
+
+对单个 sampled token，PMD-Part 的可实现 loss 是带 baseline 的近似
+\[
+\widehat\ell_{\mathrm{Part}}=\frac12\bigl[\eta(r_k(s,a)-b(s))-U_\theta(s,a)\bigr]^2,
+\]
+它只有在 $b(s)=\log Z_k(s)/\eta$ 时才等于 exact residual；任意其他 baseline 会留下一个 prefix-dependent constant，因而改变 PMD-Part 的有限参数投影。BPO 的中心化 residual 则可用同 prefix 的 $K$ 个 sampled tokens 构造，$K=1$ 时必须使用跨样本或 frozen center。
+
+\begin{algorithm}[ht]
+\caption{OPD sampled-token inner update\\{\small\textit{Semantics: 每个 prefix 只访问 rollout 的下一个 token}}}
+\begin{algorithmic}[1]
+\Require frozen anchor $\pi_k$, teacher $T$, rollout pairs $(s_i,a_i)$, method $M$, center size $K$, $\eta$
+\Ensure updated student parameters $\theta$
+\For{each prefix $s_i$}
+    \State read $\log T(a_i\mid s_i)$ and $\log\pi_k(a_i\mid s_i)$
+    \State $r_i\gets\log T(a_i\mid s_i)-\log\pi_k(a_i\mid s_i)$
+    \If{$M=\mathrm{BPO}$ or $M=\mathrm{Mean}$}
+        \State obtain $K$ actions from independent same-prefix rollouts, or use a frozen cross-batch center
+        \State compute leave-one-out center of $r$ and $U_\theta$; keep the center's student gradient
+        \State update with the corresponding centered residual loss
+    \ElsIf{$M=\mathrm{MDPO}$}
+        \State form $R_i=\exp(\log\pi_\theta(a_i\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_i\mid s_i)))$
+        \State use $R_i r_i-\eta^{-1}\widehat{\mathrm{KL}}_i$ with K4/K3$^{++}$ and retain correct autograd paths
+    \ElsIf{$M=\mathrm{Part}$}
+        \State estimate or load a prefix baseline $\widehat{\log Z_i}$; record its bias source
+        \State update $\frac12[\eta r_i-\widehat{\log Z_i}-U_\theta(s_i,a_i)]^2$
+    \EndIf
+\EndFor
+\State update $\theta$ while keeping $\pi_k$ and $T$ frozen
+\State \Return $\theta$
+\end{algorithmic}
+\end{algorithm}
+
+完整 vocabulary 与 sampled-token 两条路径的区别是信息论上的：前者能精确知道整个 categorical mirror target，后者只能无偏知道在 anchor 下抽到的一个 action 的 reward。两者在无限 samples、无函数类误差且 center/partition 估计一致时收敛到同一个 token fixed point；有限 batch 下，full-vocabulary 的主要误差是参数优化和 prefix coverage，sampled-token 额外承担 reward、center、KL ratio 和 prefix reuse 的估计方差。
