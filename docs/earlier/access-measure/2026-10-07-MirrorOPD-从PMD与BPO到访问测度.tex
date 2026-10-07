@@ -289,7 +289,7 @@ MDPO 则不把式 \eqref{eq:ch2-logratio-equation} 改写成回归，而直接�
 \]
 训练时只对 $\ell^\theta$ 反向传播；teacher、anchor、目标常数和所有估计的 KL 都停止梯度。
 
-\paragraph{PMD-Part：回归完整 Gibbs log-ratio}
+\subsection{PMD-Part：回归完整 Gibbs log-ratio}
 \label{sec:ch2-pmd-part}
 
 定义显式 target
@@ -315,7 +315,7 @@ PMD-Part 在 anchor 测度下最小化
 \end{equation}
 这一步是普通的 log-ratio regression；它没有把 KL 视为常数，也没有使用 action-level importance ratio。
 
-\paragraph{PMD-Mean：中心化 target 与归一化约束}
+\subsection{PMD-Mean：中心化 target 与归一化约束}
 \label{sec:ch2-pmd-mean}
 
 由定义可得
@@ -358,7 +358,7 @@ U_a^\star-\eta\widetilde f_k(s,a)=\eta\bar f_k(s)-\log Z_f(s),
 它与 action 无关，且自动满足 $\sum_a\pi_k(a\mid s)e^{U_a^\star}=1$；这说明 PMD-Mean 恢复的是同一个 Gibbs 分布，而不是把 $\log Z_f$ 任意设为零。
 
 
-\paragraph{BPO：中心化最优性 residual}
+\subsection{BPO：中心化最优性 residual}
 \label{sec:ch2-bpo}
 
 BPO 不显式回归 $\log Z_f$，而将同一个最优性方程的 action-independent 部分消去。定义
@@ -395,7 +395,7 @@ D_\theta(s,a)
 \end{equation}
 BPO 的 score centering 来自对当前 student--anchor KL 的精确求导；它不是因为先对 reward 做了一个近似。
 
-\paragraph{MDPO：直接优化 mirror objective}
+\subsection{MDPO：直接优化 mirror objective}
 \label{sec:ch2-mdpo-generic}
 
 MDPO 直接最大化式 \eqref{eq:ch2-mirror} 的参数化版本：
@@ -590,7 +590,7 @@ D_{it}^{k\theta}=\sum_{v\in\mathcal V}\pi_k(v\mid s_{it})\log\frac{\pi_k(v\mid s
 \]
 并停止中心量的梯度。以下公式中的 $\sum_{(i,t)\in\mathcal I}$ 可以直接实现为 response-token masked mean。
 
-\paragraph{共同 target。}
+\paragraph*{共同 target。}
 OPD token reward 为
 \[
 r_{it}^k=\ell^T_{it}-\ell^k_{it}.
@@ -602,7 +602,7 @@ r_{it}^k=\ell^T_{it}-\ell^k_{it}.
 Z_k(s_{it})=\sum_v\pi_k(v\mid s_{it})^{1-\eta}T(v\mid s_{it})^\eta.
 \]
 
-\paragraph{PMD-Part。}
+\paragraph*{PMD-Part。}
 \begin{equation}
 \label{eq:ch2-opd-part-explicit-loss}
 \widehat{\mathcal L}_{k,\mathrm{Part}}
@@ -617,7 +617,7 @@ Z_k(s_{it})=\sum_v\pi_k(v\mid s_{it})^{1-\eta}T(v\mid s_{it})^\eta.
 \nabla_\theta\log\pi_\theta(y_{it}\mid x_i,y_{i,<t}).
 \end{equation}
 
-\paragraph{PMD-Mean。}
+\paragraph*{PMD-Mean。}
 因为
 \[
 \mathbb E_{v\sim\pi_k(\cdot\mid s_{it})}[\log T(v\mid s_{it})-\log\pi_k(v\mid s_{it})]=-D_{it}^{kT},
@@ -637,7 +637,7 @@ Z_k(s_{it})=\sum_v\pi_k(v\mid s_{it})^{1-\eta}T(v\mid s_{it})^\eta.
 \nabla_\theta\log\pi_\theta(y_{it}\mid x_i,y_{i,<t}).
 \end{equation}
 
-\paragraph{未线性化 BPO。}
+\paragraph*{未线性化 BPO。}
 完整 reverse-KL residual 为
 \begin{equation}
 \label{eq:ch2-opd-bpo-explicit-residual}
@@ -664,7 +664,7 @@ Z_k(s_{it})=\sum_v\pi_k(v\mid s_{it})^{1-\eta}T(v\mid s_{it})^\eta.
 -\sum_v\pi_k(v\mid s_{it})\nabla_\theta\log\pi_\theta(v\mid s_{it})\right].
 \end{equation}
 
-\paragraph{MDPO。}
+\paragraph*{MDPO。}
 令
 \[
 R_{it}^{\theta}=\exp(\ell^\theta_{it}-\ell^k_{it}).
