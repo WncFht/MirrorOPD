@@ -1,9 +1,9 @@
-\subsection{为什么 inner 需要多步：从精确 KL 几何到 Natural Gradient}
+\section{Natural Gradient 与 inner 收敛}
 \label{sec:ch2-natural-gradient}
 
 前面的 mirror 解是在策略分布空间中定义的，而实际训练变量是神经网络参数 $\theta$。因此需要把“固定一个 outer target 后的 inner 优化”从分布空间搬到参数空间。下面先不假设局部二次模型，而是从 softmax 参数化和 KL 的定义逐步展开。
 
-固定一个 prefix $s$，令 $z_\theta(s)\in\mathbb R^{|\mathcal A|}$ 为学生 logits，$\pi_\theta(\cdot\mid s)=\operatorname{softmax}(z_\theta(s))$。在第 $k$ 个 outer step 中冻结 $\pi_k$ 和 $r_k$，把 inner 的镜像目标写成最小化形式
+固定一个历史 $s$，令 $z_\theta(s)\in\mathbb R^{|\mathcal A|}$ 为学生 logits，$\pi_\theta(\cdot\mid s)=\operatorname{softmax}(z_\theta(s))$。在第 $k$ 个 outer step 中冻结 $\pi_k$ 和 $r_k$，把 inner 的镜像目标写成最小化形式
 \begin{equation}
 \label{eq:ch2-opd-inner-objective}
 \mathcal J_k(\theta)
@@ -15,7 +15,7 @@
 \end{equation}
 其中 $\E_{s,a}$ 的 action 测度可以是 $\pi_\theta$、$\pi_k$ 或 replay 加权测度；下文的局部曲率只要求该测度固定且具有有限二阶矩。
 
-\paragraph{第一步：logit 空间的 KL 一阶项消失。}
+\paragraph*{第一步：logit 空间的 KL 一阶项消失。}
 令 $\delta z=z_\theta-z_{\theta_k}$，其中 $\pi_{\theta_k}=\pi_k$。对固定的行为分布 $q=\pi_k$ 定义
 \[
 K(z)=\KL(\operatorname{softmax}(z)\Vert q).
@@ -54,7 +54,7 @@ $F_k$ 是 categorical policy 的 Fisher 矩阵，半正定且零空间由所有�
 \end{equation}
 在 logits 位于有界集合时成立。这个三阶余项来自 softmax 的三阶导数有界，而不是额外的二元 KL 假设。
 
-\paragraph{第二步：reward 项的一阶展开。}
+\paragraph*{第二步：reward 项的一阶展开。}
 令
 \[
 \ell_k(\theta)
@@ -76,7 +76,7 @@ r_k(s,a)\nabla_\theta\log\pi_{\theta_k}(a\mid s)
 \end{equation}
 并且 $|R_r(\Delta\theta)|\leq C_r\|\Delta\theta\|^2$。这里 $b_k$ 是固定 outer target 在当前学生处的 policy-gradient 方向；如果使用 PMD-Part 或 BPO 的回归 loss，则 $b_k$ 被相应的 regression score 替代，但 KL 曲率项相同。
 
-\paragraph{第三步：从 logits Jacobian 得到参数空间曲率。}
+\paragraph*{第三步：从 logits Jacobian 得到参数空间曲率。}
 令
 \[
 J_k(s)=\left.\frac{\partial z_\theta(s)}{\partial\theta}\right|_{\theta=\theta_k}.
@@ -112,7 +112,7 @@ A_k=\E_s[J_k(s)^{\mathsf T}F_k(s)J_k(s)],
 
 \begin{proposition}[局部曲率的正半定性与不可辨识方向]
 \label{prop:ch2-local-curvature}
-$A_k$ 对称半正定。若某个参数方向 $v$ 满足 $J_k(s)v$ 对所有 replay prefix 都是常数 logit 平移，则 $A_kv=0$；该方向不改变策略分布，因而 KL 不能为它提供曲率。若在商空间上 $A_k\succeq mI$，则镜像 inner 目标在该商空间局部强凸。
+$A_k$ 对称半正定。若某个参数方向 $v$ 满足 $J_k(s)v$ 对所有 replay历史 都是常数 logit 平移，则 $A_kv=0$；该方向不改变策略分布，因而 KL 不能为它提供曲率。若在商空间上 $A_k\succeq mI$，则镜像 inner 目标在该商空间局部强凸。
 \end{proposition}
 
 \begin{proof}
@@ -127,7 +127,7 @@ v^{\mathsf T}A_kv
 
 \subsection*{Mirror Descent 与普通梯度的离散动力学}
 
-在 tabular prefix、教师分布固定且 inner 可以精确求解的情形，mirror outer 更新是
+在 tabular历史、教师分布固定且 inner 可以精确求解的情形，mirror outer 更新是
 \[
 \pi_{k+1}(a\mid s)
 =\frac{\pi_k(a\mid s)\exp(\eta f_k(s,a))}
@@ -183,7 +183,7 @@ v^{\mathsf T}A_kv
 
 \begin{theorem}[OPD 中 mirror outer 与 Natural Gradient 的等价边界]
 \label{thm:ch2-md-ng-equivalence}
-在固定 prefix、可表示的 tabular policy 和精确 Fisher 矩阵条件下，mirror outer step 与 Natural Gradient 满足：
+在固定历史、可表示的 tabular policy 和精确 Fisher 矩阵条件下，mirror outer step 与 Natural Gradient 满足：
 \begin{enumerate}
 \item 分布空间的一阶等价：式 \eqref{eq:ch2-md-first-order} 的一阶项等于 Fisher--Rao Natural Gradient；
 \item 参数空间的局部等价：若 $\pi_\theta$ 在 $\theta_k$ 附近可微，且使用 $A_k$ 的精确逆，则
@@ -313,7 +313,7 @@ B^{-1}\Fisher_\vartheta^\dagger\nabla_\vartheta\mathcal J.
 这解释了 MDPO 和 EffOPD 中的两个实现判断。只在 $\theta_k$ 处做一次梯度步时，KL 的一阶梯度为零，trust-region 曲率尚未进入更新；固定 $\pi_k$ 并执行多次 inner 更新，才能逼近式 \eqref{eq:ch2-opd-inner-objective}。Natural Gradient 进一步把步长按照 $A_k$ 的几何尺度归一化，但它仍然需要信赖域、阻尼和有限 inner 预算来处理模型非线性与 Fisher 估计误差。
 
 
-\paragraph{几何中间分布与算术 proximal teacher 的区别。} 式 \eqref{eq:ch2-opd-geometric-bridge} 给出的 $\pi_k^{1-\eta}T^\eta/Z_k$ 是 KL 镜像子问题的精确解，因此在 log-probability 空间插值。TOP-D 中的算术 teacher
+\paragraph*{几何中间分布与算术 proximal teacher 的区别。} 式 \eqref{eq:ch2-opd-geometric-bridge} 给出的 $\pi_k^{1-\eta}T^\eta/Z_k$ 是 KL 镜像子问题的精确解，因此在 log-probability 空间插值。TOP-D 中的算术 teacher
 \[
 \widetilde T_\eta=(1-\eta)\pi_k+\eta T
 \]
