@@ -1,0 +1,403 @@
+\section{四种 inner 的可执行估计量、无偏性与方差}
+\label{sec:ch2-estimator-theory}
+
+本节把四种 inner 写成可以直接实现的随机估计量。所有公式都在第 $k$ 个 outer step 内理解：$\pi_k$、教师 $T$、token reward $r_k$ 和 replay 行为策略 $b$ 冻结，只有学生参数 $\theta$ 更新。记
+\[
+ g_\theta(s,a)=\nabla_\theta\log\pi_\theta(a\mid s),
+ \qquad
+ u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)},
+\]
+并假设策略支持满足 $\pi_k(a\mid s)>0$ 且 $b(a\mid s)>0$ whenever the corresponding target probability is nonzero。对任意向量估计量 $X$，令
+\[
+ \operatorname{Var}(X)=\mathbb E\|X-\mathbb E X\|_2^2
+ =\mathbb E\|X\|_2^2-\|\mathbb E X\|_2^2.
+\]
+
+\subsection{统一的单样本和批量方差公式}
+\label{subsec:unified-estimator-variance}
+
+先考虑固定 prefix $s$ 和固定 action 测度 $\nu(\cdot\mid s)$。如果目标梯度可以写成
+\[
+ G_s=\mathbb E_{a\sim\nu}[Y(s,a)],
+\]
+用 $B$ 个条件独立样本 $Y_1,\ldots,Y_B$ 的平均值
+\[
+ \widehat G_s=\frac1B\sum_{i=1}^B Y_i
+\]
+满足
+\begin{equation}
+\label{eq:inner-unbiased-mean}
+ \mathbb E[\widehat G_s]=G_s,
+ \qquad
+ \mathbb E\|\widehat G_s-G_s\|_2^2
+ =\frac1B\operatorname{Var}(Y).
+\end{equation}
+这说明增加 batch size 只能降低抽样方差，不能消除由错误访问测度、错误的归一化常数或函数类投影造成的系统偏差。
+
+若样本来自 $b$ 而目标 action 测度是 $\nu$，定义
+\[
+ \omega_\nu(s,a)=\frac{\nu(a\mid s)}{b(a\mid s)}.
+\]
+只要 $\mathbb E_b[\omega_\nu\|Y\|_2]<\infty$，则
+\[
+ G_s=\mathbb E_{a\sim b}[\omega_\nu(s,a)Y(s,a)],
+\]
+因此 $\omega_\nu Y$ 是无偏估计量。其方差由二阶矩控制：若 $\|Y\|_2\leq C_Y$，则
+\begin{equation}
+\label{eq:inner-is-second-moment}
+ \mathbb E_b\|\omega_\nu Y\|_2^2
+ \leq C_Y^2\,\mathbb E_b[\omega_\nu^2]
+ =C_Y^2\bigl(1+\chi^2(\nu\Vert b)\bigr).
+\end{equation}
+因此 action-level IS 的代价由 $1+\chi^2(\nu\Vert b)$ 给出，而不是由 ratio 的均值给出；后者恒等于 $1$，不能反映方差。
+
+当 prefix 也来自 replay 时，目标状态测度为 $d_{\pi_k}$，定义
+\[
+ W^k_{<t}=\prod_{j<t}\frac{\pi_k(y_j\mid s_j)}{b(y_j\mid s_j)}.
+\]
+对局部信号 $Y_t$，严格的估计量为 $W^k_{<t}Y_t$。若 $\|Y_t\|_2\leq C_Y$ 且每个 prefix 的条件 action ratio 满足
+\[
+ \mathbb E_b\left[\left(\frac{\pi_k(a\mid s)}{b(a\mid s)}\right)^2\middle|s\right]
+ \leq 1+\chi_{\max}^2,
+\]
+则递推得到
+\begin{equation}
+\label{eq:prefix-second-moment}
+ \mathbb E_b[(W^k_{<t})^2]
+ \leq (1+\chi_{\max}^2)^{t-1},
+ \qquad
+ \mathbb E_b\|W^k_{<t}Y_t\|_2^2
+ \leq C_Y^2(1+\chi_{\max}^2)^{t-1}.
+\end{equation}
+这就是长 prefix 上方差随时间增长的来源。它与 token-level inner 是否使用 regression 无关，只由访问测度校正决定。
+
+\begin{proposition}[投影误差与抽样方差的正交分解]
+\label{prop:projection-sampling-decomposition}
+设目标梯度为 $G$，算法实际在函数类 $\mathcal F$ 和采样测度 $m$ 下优化，函数类投影给出的梯度为 $G_{\mathcal F,m}$。令 $\widehat G_B$ 是该投影梯度的无偏 batch 估计量，则
+\[
+ \mathbb E\|\widehat G_B-G\|_2^2
+ =\|G_{\mathcal F,m}-G\|_2^2
+ +\frac1B\operatorname{Var}(Y_{\mathcal F,m}).
+\]
+\end{proposition}
+
+\begin{proof}
+写成 $\widehat G_B-G=(\widehat G_B-G_{\mathcal F,m})+(G_{\mathcal F,m}-G)$。第一项的期望为零，故交叉项期望为零；再用式 \eqref{eq:inner-unbiased-mean} 即得结论。第一项是不可由加大 batch 消除的 projection/measure bias，第二项才是 Monte Carlo variance。
+\end{proof}
+
+\subsection{PMD-Part：完整 log-ratio target 的回归估计}
+\label{subsec:estimator-part}
+
+PMD-Part 的单样本 residual 和梯度分别为
+\[
+ q_{k,\theta}(s,a)=h_k(s,a)-u_\theta(s,a),
+ \qquad
+ Y_{\mathrm{Part}}(s,a)=q_{k,\theta}(s,a)g_\theta(s,a),
+\]
+其中
+\[
+ h_k(s,a)=\eta r_k(s,a)-\log Z_k(s),
+ \qquad
+ Z_k(s)=\mathbb E_{a\sim\pi_k}\left[e^{\eta r_k(s,a)}\right].
+\]
+若 $(s,a)\sim d_{\pi_k}\pi_k$，则
+\[
+ -\nabla_\theta\mathcal L_{\mathrm{Part}}
+ =\mathbb E[q_{k,\theta}g_\theta].
+\]
+在 replay 上的严格无偏估计量是
+\begin{equation}
+\label{eq:part-unbiased-estimator}
+ \widehat G_{\mathrm{Part}}
+ =\frac1B\sum_{i=1}^B
+ W^k_{<t_i}\,\frac{\pi_k(a_i\mid s_i)}{b(a_i\mid s_i)}
+ q_{k,\theta}(s_i,a_i)g_\theta(s_i,a_i).
+\end{equation}
+若 action 已按 $\pi_k$ 采样，只保留 prefix weight；若把 replay 测度本身作为训练目标，则去掉 $W^k_{<t_i}$ 得到 replay-projection 梯度。
+
+对于真实 $Z_k$，式 \eqref{eq:part-unbiased-estimator} 在支持和二阶矩条件下无偏，且
+\[
+ \operatorname{MSE}(\widehat G_{\mathrm{Part}})
+ =\frac1B\operatorname{Var}_{d_{\pi_k},\pi_k}(q_{k,\theta}g_\theta)
+\]
+在 on-policy prefix 下成立。工程上常用 $M$ 个 action 样本估计 $Z_k$：
+\[
+ \widehat Z_{k,M}(s)=\frac1M\sum_{j=1}^M e^{\eta r_k(s,a_j)},
+ \qquad a_j\sim\pi_k(\cdot\mid s).
+\]
+由于 $\log$ 是凹函数，\[
+ \mathbb E[\log\widehat Z_{k,M}(s)]\leq\log Z_k(s),
+\]
+所以 $-\log\widehat Z_{k,M}$ 对 $-\log Z_k$ 产生向上的有限样本偏差。若 $X=e^{\eta r_k}$ 有有限方差，二阶 delta method 给出
+\begin{equation}
+\label{eq:logz-delta-method}
+ \mathbb E[\log\widehat Z_{k,M}]
+ =\log Z_k-\frac{\operatorname{Var}(X)}{2MZ_k^2}+O(M^{-2}),
+ \qquad
+ \operatorname{Var}(\log\widehat Z_{k,M})
+ =\frac{\operatorname{Var}(X)}{MZ_k^2}+O(M^{-2}).
+\end{equation}
+因此 PMD-Part 的主要额外误差来自 $\log Z$ 的 plug-in，而不是回归梯度本身。
+
+\subsection{PMD-Mean：中心化 target 与归一化约束}
+\label{subsec:estimator-mean}
+
+令
+\[
+ r_{k,0}(s,a)=r_k(s,a)-\bar r_k(s),
+ \qquad
+ \bar r_k(s)=\mathbb E_{\pi_k}[r_k(s,a)].
+\]
+PMD-Mean 使用目标 $\eta r_{k,0}$，并在函数空间中施加
+\[
+ \mathbb E_{\pi_k}[e^{u_\theta(s,a)}\mid s]=1.
+\]
+对一个 prefix 采 $K$ 个 action，定义
+\[
+ \widehat{\bar r}_{k,i}=\frac1K\sum_{j=1}^K r_k(s_i,a_{ij}),
+ \qquad
+ \widehat Y_{ij}^{\mathrm{Mean}}
+ =\left[\eta(r_k(s_i,a_{ij})-\widehat{\bar r}_{k,i})-u_\theta(s_i,a_{ij})\right]g_\theta(s_i,a_{ij}).
+\]
+如果把中心和当前 action 用独立样本计算，则 $\mathbb E[\widehat{\bar r}_{k,i}\mid s_i]=\bar r_k(s_i)$，从而该估计量对中心化 PMD-Mean 梯度无偏。若中心和当前 action 共用同一组 $K$ 样本，标量中心本身仍无偏，但它与 $g_\theta(s_i,a_{ij})$ 相关，导致有限 $K$ 的乘积估计量出现协方差项：
+\begin{equation}
+\label{eq:mean-covariance-bias}
+ \mathbb E\left[(r_j-\widehat{\bar r})g_j\mid s\right]
+ =\mathbb E[(r-\bar r)g\mid s]-\frac1K\operatorname{Cov}_{\pi_k}(r,g\mid s).
+\end{equation}
+一个简单的修正是 leave-one-out center：
+\[
+ \widehat{\bar r}_{-j}=\frac1{K-1}\sum_{\ell\ne j}r_{\ell},
+ \qquad K>1.
+\]
+此时 $\widehat{\bar r}_{-j}$ 与 $a_j$ 条件独立，故对应的 product estimator 无偏。其方差包含
+\[
+ \operatorname{Var}(\widehat{\bar r}_{-j}\mid s)
+ =\frac{\operatorname{Var}_{\pi_k}(r\mid s)}{K-1},
+\]
+因此 $K$ 增大可以降低 center noise，但不能消除 model projection bias。
+
+\subsection{BPO：完整中心化 score 的有限样本估计}
+\label{subsec:estimator-bpo}
+
+令
+\[
+ d_{k,\theta}(s,a)=\eta r_k(s,a)-u_\theta(s,a),
+ \qquad
+ \bar d_{k,\theta}(s)=\mathbb E_{\pi_k}[d_{k,\theta}(s,a)],
+\]
+则未线性化 BPO 的精确梯度可写为
+\[
+ G_{\mathrm{BPO}}(s)=
+ \mathbb E_{\pi_k}\left[(d_{k,\theta}-\bar d_{k,\theta})
+ (g_\theta-\bar g_\theta)\mid s\right],
+ \qquad
+ \bar g_\theta=\mathbb E_{\pi_k}[g_\theta\mid s].
+\]
+用同一 prefix 的 $K$ 个 action 直接计算样本中心：
+\[
+ \widehat d_{ij}=d_{ij}-\frac1K\sum_{\ell=1}^K d_{i\ell},
+ \qquad
+ \widehat g_{ij}=g_{ij}-\frac1K\sum_{\ell=1}^K g_{i\ell}.
+\]
+则
+\begin{equation}
+\label{eq:bpo-sample-covariance}
+ \widehat G_{\mathrm{BPO},i}
+ =\frac1K\sum_{j=1}^K\widehat d_{ij}\widehat g_{ij}
+\end{equation}
+是一个样本协方差。条件于 prefix，i.i.d. 样本给出精确恒等式
+\begin{equation}
+\label{eq:bpo-bias-factor}
+ \mathbb E[\widehat G_{\mathrm{BPO},i}\mid s_i]
+ =\frac{K-1}{K}G_{\mathrm{BPO}}(s_i).
+\end{equation}
+因此共用中心时，BPO 的梯度有一个明确的 $-(1/K)$ shrinkage bias；乘以 $K/(K-1)$ 可消除该 bias，但会放大方差。等价地，可以使用一个 action 计算中心、另一个独立 action 计算 residual 和 score。对向量 $\widehat d\widehat g$，若四阶矩有限，其 batch variance 仍按 $1/B$ 缩放；$K$ 只减少每个 prefix 的条件协方差。
+
+\begin{proof}
+记 $X_j=d_j-\bar d$、$Y_j=g_j-\bar g$。样本中心化恒等式为
+\[
+ \frac1K\sum_j(d_j-\bar d_K)(g_j-\bar g_K)
+ =\frac1K\sum_jX_jY_j-\left(\frac1K\sum_jX_j\right)\left(\frac1K\sum_jY_j\right).
+\]
+第一项期望为 $\mathbb E[XY]$，第二项期望为 $K^{-1}\mathbb E[XY]$，因为不同样本的交叉项均为零，故得到式 \eqref{eq:bpo-bias-factor}。
+\end{proof}
+
+\subsection{MDPO：action ratio、Top-k KL 与完整梯度}
+\label{subsec:estimator-mdpo}
+
+固定 prefix 后，MDPO 的梯度为
+\[
+ G_{\mathrm{MDPO}}(s)=\mathbb E_{a\sim\pi_\theta}
+ \left[c_{k,\theta}(s,a)g_\theta(s,a)\right],
+ \quad
+ c_{k,\theta}=r_k-\frac1\eta\log\frac{\pi_\theta}{\pi_k}.
+\]
+若 replay action 来自 $b$，单样本无偏估计量为
+\begin{equation}
+\label{eq:mdpo-action-is-estimator}
+ X_{\mathrm{MDPO}}(s,a)=
+ \frac{\pi_\theta(a\mid s)}{b(a\mid s)}c_{k,\theta}(s,a)g_\theta(s,a),
+ \qquad a\sim b(\cdot\mid s).
+\end{equation}
+若状态也需从 $d_b$ 换成 $d_{\pi_k}$，再乘 $W^k_{<t}$。在 $\|c_{k,\theta}g_\theta\|\leq C$ 时，二阶矩满足
+\[
+ \mathbb E_b\|X_{\mathrm{MDPO}}\|^2
+ \leq C^2\bigl(1+\chi^2(\pi_\theta\Vert b)\bigr).
+\]
+
+当 token vocabulary logits 可访问时，可以用 Top-k 估计 reverse KL 而不截断尾部。取任意 head 集 $S(s)$（Top-$K$ 只是降低方差的选择），令 $P=\pi_\theta(\cdot\mid s)$、$Q=\pi_k(\cdot\mid s)$，并从 $a\sim P$ 采一个尾部样本。记 $r_\theta(a)=P_a/\operatorname{sg}(P_a)$，前向值为 $1$ 但反向传播保留 $P_a$ 的 score 梯度。定义
+\begin{equation}
+\label{eq:topk-reverse-kl-estimator}
+ \widehat D_{K}(P\Vert Q)
+ =\sum_{j\in S}P_j\log\frac{P_j}{Q_j}
+ +\mathbf 1\{a\notin S\}\,r(a)\,\operatorname{sg}\!\left(-\log\frac{Q_a}{P_a}\right),
+\end{equation}
+第一项是 head 的精确 reverse KL；第二项的期望为
+\[
+ \sum_{a\notin S}P_a\frac{Q_a}{P_a}\log\frac{P_a}{Q_a}
+ =\sum_{a\notin S}Q_a\log\frac{P_a}{Q_a},
+\]
+与第一项相加得到 $\KL(P\Vert Q)$。对 $\theta$ 求梯度时，head 使用精确梯度，tail 使用停止梯度的 ratio 和 score；逐项展开可得其期望等于 $\nabla_\theta\KL(P\Vert Q)$。因此 Top-k 估计量同时满足
+\[
+ \mathbb E[\widehat D_K]=\KL(P\Vert Q),
+ \qquad
+ \mathbb E[\nabla_\theta\widehat D_K]=\nabla_\theta\KL(P\Vert Q).
+\]
+若完全截断 tail，第二个等式右侧少掉 tail 梯度，产生不可由 batch size 消除的 bias。Top-k 的方差仅来自 tail Bernoulli 和 tail action；随着 head mass 增大，tail 二阶矩通常下降。
+
+\begin{proposition}[四种 inner 的无偏条件]
+\label{prop:four-inner-unbiased}
+在 target、anchor 和 reward 都停止梯度，策略支持覆盖成立，且所有相关一阶和二阶矩有限时：
+\begin{enumerate}[label=(\roman*)]
+ \item PMD-Part 在使用真实 $Z_k$、正确 prefix/action ratio 时无偏；用 $\widehat Z$ 时产生式 \eqref{eq:logz-delta-method} 的 plug-in bias。
+ \item PMD-Mean 在中心估计与当前 action 独立，或使用 leave-one-out center 时无偏；同样本 center 产生式 \eqref{eq:mean-covariance-bias} 的 covariance bias。
+ \item BPO 的同 prefix 样本协方差估计量带有 $(K-1)/K$ shrinkage；乘以 $K/(K-1)$ 或使用独立中心后无偏。
+ \item MDPO 的 action-level IS 估计量无偏；prefix ratio 用于把 replay occupancy 换成 $d_{\pi_k}$，不能用 full suffix ratio 代替。
+\end{enumerate}
+\end{proposition}
+
+\section{inner 算法的选择：理论与工程折中}
+\label{sec:ch2-inner-choice}
+
+四种方法共享同一个 token-level mirror root，但它们需要的模型访问、随机量和 off-policy 修正不同。对 OPD，教师通常能够在已访问 prefix 上返回 logits，学生也能够返回同一 prefix 的 logits；这个事实决定了默认方案应优先利用 logit 信息，而不是把整个 token 分布重新当作黑盒采样器。
+
+\paragraph{PMD-Part 是默认 inner。}
+它直接回归
+\[
+ u_\theta(s,a)\approx h_k(s,a)=\eta r_k(s,a)-\log Z_k(s),
+\]
+梯度是标量 residual 与 score 的乘积，不需要 action-level IS（action 按 $\pi_k$ 采样时）。$Z_k$ 可以用全词表 log-sum-exp 精确计算；词表太大时，式 \eqref{eq:topk-reverse-kl-estimator} 提供了 head exact plus tail sample 的无偏替代。它的主要偏差来源只有参数函数类投影和 $\widehat{\log Z}$ 的 plug-in，而不是中心估计与 score 的乘积偏差。因此在 OPD 有 teacher logits、能够缓存 top-$K$ logits 时，PMD-Part 的实现最短，诊断指标也最直接：监控 $\|u_\theta-h_k\|^2$ 和 mirror KL。
+
+\paragraph{MDPO 是需要直接优化时的备选。}
+MDPO 不构造 $h_k$，而直接最大化 reward 减 reverse KL。它适合 teacher reward 不便逐 action 回归、但可以稳定计算 candidate policy ratio 的场景。代价是每一个 replay action 都带有 $\pi_\theta/b$，prefix reuse 还要带 $W^k_{<t}$；二阶矩随 action ratio 和 prefix ratio 同时增长。Top-k KL 可以把 reverse-KL 的词表求和代价降到 $O(K)$，但不能消除 action IS 本身的方差。工程上应把 MDPO 放在 PMD-Part 之后作为 ablation 或在 teacher logits 不完整时使用。
+
+\paragraph{PMD-Mean 适合不计算配分函数的实现。}
+它只需要估计 $\bar r_k(s)$，但必须维护
+\[
+ \mathbb E_{\pi_k}[e^{u_\theta}\mid s]=1
+\]
+这一非线性约束。若使用同一组 action 同时计算中心和 residual，会出现式 \eqref{eq:mean-covariance-bias} 的 covariance bias；leave-one-out 或独立中心可以修复无偏性，却提高每个 prefix 的采样成本。它适合作为不具备完整 vocabulary logits、但能在同一 prefix 采多次 action 的实现。
+
+\paragraph{BPO 适合做低方差中心化对照。}
+BPO 的 centered score 去除了 action-independent baseline，理论上能降低梯度方差；但 token-level 实现至少需要每个 prefix 的两个 action，直接使用 $K$ 个样本时还有式 \eqref{eq:bpo-bias-factor} 的 $ (K-1)/K$ shrinkage。BPO 还需要对 residual 和 score 同时做中心化，调试时难以区分 reward noise、中心估计误差和模型投影误差。因而它更适合在 PMD-Part 已经跑通后验证中心化是否带来实际方差收益，而不适合作为第一版 OPD inner。
+
+综合而言，建议的工程顺序是：\textbf{PMD-Part + Top-k KL} 作为主算法，\textbf{MDPO + Top-k reverse KL} 作为直接目标基线，PMD-Mean 和 BPO 作为分别检验“去掉配分函数”和“中心化 score”作用的对照。四者都应使用相同的 prefix replay、相同的 $W^k_{<t}$ 选项和相同的 inner stopping rule，这样差异才归因于 inner 几何而不是访问测度。
+
+\subsection{可执行的 outer--inner 流程}
+\label{subsec:outer-inner-algorithm}
+
+第 $k$ 个 outer step 的实现顺序如下。先冻结 $\pi_k$ 和 teacher $T$，在 replay prefix 上计算 $r_k=\log T-\log\pi_k$，并缓存学生、teacher 的 top-$K$ logits。然后选择一种 inner：PMD-Part 回归 $h_k$，PMD-Mean 回归中心化 reward，BPO 回归中心化 residual，MDPO 使用 action-ratio mirror ascent。每次 inner update 都在同一冻结 target 上进行；当估计的 mirror gap、log-ratio residual 或 held-out KL 降到 $\varepsilon_k$ 后，才把所得学生记为 $\pi_{k+1}$ 并刷新 teacher。这样 outer 的 teacher 不会在 inner 尚未稳定时移动，避免把两个时间尺度混成一个 optimizer trajectory。
+
+\section{OPD 的 outer 规划与 inner 容差}
+\label{sec:ch2-outer-plan}
+
+一个 outer step 应当把 teacher、anchor 和 inner 优化严格分开。第 $k$ 步先冻结学生 $\pi_k$，由 teacher 产生
+\[
+ r_k(s,a)=\log\frac{T(a\mid s)}{\pi_k(a\mid s)}.
+\]
+随后定义镜像目标
+\[
+ \pi_{k+1}^{\star}(a\mid s)
+ =\frac{\pi_k(a\mid s)e^{\eta r_k(s,a)}}{Z_k(s)}
+ =\frac{\pi_k(a\mid s)^{1-\eta}T(a\mid s)^\eta}{Z_k(s)}.
+\]
+在 $0<\eta\leq1$ 时，它是 student 与 teacher 的几何中间分布；$\eta=1$ 才是一步到 teacher。实际算法先固定这个 target，再用四种 inner 之一得到近似参数 $\pi_{k+1}$，最后才进入下一次 teacher refresh。
+
+\subsection{精确 outer 收缩与有限 inner 误差}
+\label{subsec:outer-contraction-inner-error}
+
+定义同一 prefix 上任意两个 action 的 projective log-ratio
+\[
+ \Delta_k(s;a,a')
+ =\log\frac{\pi_k(a\mid s)}{T(a\mid s)}
+ -\log\frac{\pi_k(a'\mid s)}{T(a'\mid s)}.
+\]
+精确 mirror update 满足
+\begin{equation}
+\label{eq:outer-projective-contraction}
+ \Delta_{k+1}(s;a,a')=(1-\eta)\Delta_k(s;a,a').
+\end{equation}
+若 inner 产生的 logit/projection error 为 $e_k(s,a)$，且其 projective oscillation 满足
+\[
+ \operatorname{osc}_s(e_k)=\max_a e_k(s,a)-\min_a e_k(s,a)\leq\varepsilon_k,
+\]
+则
+\begin{equation}
+\label{eq:outer-inexact-recurrence}
+ \operatorname{osc}_s(\rho_{k+1})
+ \leq (1-\eta)\operatorname{osc}_s(\rho_k)+\varepsilon_k,
+ \qquad
+ \rho_k=\log(\pi_k/T).
+\end{equation}
+迭代展开为
+\[
+ \operatorname{osc}_s(\rho_K)
+ \leq (1-\eta)^K\operatorname{osc}_s(\rho_0)
+ +\sum_{j=0}^{K-1}(1-\eta)^{K-1-j}\varepsilon_j.
+\]
+若 $\varepsilon_j\leq\bar\varepsilon$，渐近误差不超过 $\bar\varepsilon/\eta$。因此 outer 目标误差为 $\delta_{\mathrm{out}}$ 时，应把每个 inner 的 projective error 控制在
+\[
+ \varepsilon_k\lesssim\eta\,\delta_{\mathrm{out}}.
+\]
+这给出了停止条件，而不是预先规定一个与 $\eta$ 无关的 optimizer step 数。
+
+\subsection{inner 的 Natural Gradient 收敛与步长系数}
+\label{subsec:eta-inner-steps}
+
+在第 $k$ 步的局部参数模型中，令 $A_k$ 是 replay prefix 上的 Fisher 曲率，特征值属于 $[m_k,M_k]$。普通梯度对
+\[
+ Q_k(\Delta)=\frac{1}{2\eta}\Delta^{\mathsf T}A_k\Delta-b_k^{\mathsf T}\Delta
+\]
+做步长为 $\gamma$ 的更新，其误差传播矩阵为
+\[
+ E_{k,\eta}=I-\frac{\gamma}{\eta}A_k,
+ \qquad
+ q_k(\eta,\gamma)=\max\left\{\left|1-\frac{\gamma m_k}{\eta}\right|,
+ \left|1-\frac{\gamma M_k}{\eta}\right|\right\}.
+\]
+收敛要求 $0<\gamma<2\eta/M_k$，并且达到 inner 误差 $\epsilon$ 至少需要
+\begin{equation}
+\label{eq:inner-step-count}
+ N_{\mathrm{in}}
+ \geq
+ \frac{\log(\epsilon_0/\epsilon)}{-\log q_k(\eta,\gamma)}.
+\end{equation}
+若把实际 optimizer step 按比例设为 $\gamma=\eta\widetilde\gamma$，则
+\[
+ q_k=\max\{|1-\widetilde\gamma m_k|,|1-\widetilde\gamma M_k|\},
+\]
+收敛率与 $\eta$ 一阶解耦；最优固定步长为
+\[
+ \widetilde\gamma^\star=\frac{2}{m_k+M_k},
+ \qquad
+ q_k^\star=\frac{M_k-m_k}{M_k+m_k}.
+\]
+若 $\gamma$ 不随 $\eta$ 缩放，则 $\eta$ 越小，$\gamma/\eta$ 越大，可能越快也可能越过稳定区间；$\eta$ 越大，$\gamma/\eta$ 越小，inner 收敛变慢。这个结论解释了为什么 Natural Gradient 的学习率应与 mirror 系数联动，而不是在所有 outer step 使用固定的 AdamW learning rate。
+
+outer 与 inner 的总成本还受目标移动量影响。对 $0<\eta\ll1$，\[
+ \KL(\pi_{k+1}^{\star}\Vert\pi_k)=O(\eta^2),
+ \qquad
+ \operatorname{osc}(u_k^\star)=O(\eta),
+\]
+所以小 $\eta$ 每个 outer target 更近，通常需要更少的 inner updates 才达到绝对参数误差；但 outer 收缩率 $1-\eta$ 变慢，需要 $O(\eta^{-1}\log(1/\delta_{\mathrm{out}}))$ 个 outer steps。大 $\eta$ 减少 outer 次数，却放大单次 target 位移、ratio 和 regression residual 的二阶矩；当 $\eta>1$ 时，式 \eqref{eq:outer-projective-contraction} 进入符号翻转区间，$1<\eta<2$ 仍有 projective 绝对收缩但会振荡，$\eta\geq2$ 不再收缩。因此工程默认应取 $0<\eta\leq1$，并用 inner mirror gap 或 KL 停止，而不是固定 inner step 数。

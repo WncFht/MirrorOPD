@@ -653,7 +653,7 @@ BPO 不显式估计 $\log Z_k$，而在每个 prefix 上把 residual 投影到�
 则 BPO 的可执行 loss 和 ascent 估计量为
 \begin{equation}
 \label{eq:ch2-opd-bpo-empirical}
-\widehat{\mathcal L}_{k,\mathrm{BPO}}=\frac{1}{2\eta BK}\sum_{i,j}\widehat{\delta}_{k,ij}^{,2},
+\widehat{\mathcal L}_{k,\mathrm{BPO}}=\frac{1}{2\eta BK}\sum_{i,j}\widehat{\delta}_{k,ij}^{2},
 \qquad
 -\eta\widehat{\nabla}\mathcal L_{k,\mathrm{BPO}}
 =\frac1{BK}\sum_{i,j}\widehat{\delta}_{k,ij}(g_{\theta,ij}-\widehat{\bar g}_{\theta,i}).
@@ -680,6 +680,7 @@ c_k(s)=-\log Z_k(s),
 所以 BPO 的精确零点也是 $u_k^\star$。这说明 BPO 与 PMD-Part 的最优策略相同，但其有限步梯度仍因中心化 score 而不同。
 
 \input{sections/opd-mdpo-inner.tex}
+\input{sections/opd-estimator-theory.tex}
 
 \begin{theorem}[四种 OPD inner 的精确零点]
 \label{thm:ch2-opd-inner-common-root}
