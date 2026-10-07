@@ -17,7 +17,7 @@ $$
 M_{32}(\pi)=\sum_{j\in\operatorname{TopK}(\pi,32)}\pi(j)\approx m.
 $$
 
-然后在同一个固定的 $(\pi,\pi_{\mathrm{ref}})$ 上独立抽取 $B$ 个 token。这样，横轴 $B$ 只代表 estimator 使用的 sampled token 数；不同 panel 的差异来自策略集中度，不来自不同的 prompt 或 rollout。
+然后在同一个固定的 $(\pi,\pi_{\mathrm{ref}})$ 上独立抽取 $B$ 个 token。这里的 $B$ 只服务于附录中的方差实验：它表示把同一个 prefix 的单-token 估计量重复平均 $B$ 次后的有效 Monte Carlo 样本量，不是 Top-K KL 训练算法要求对同一个 prefix 额外采样 $B$ 次。实际训练中，每个 prefix 只 rollout 一个 token $y_n$，先计算 logits 的 Top-$K$ 精确头部，再用这个 sampled token 做尾部修正；minibatch 中不同 prefix/token position 的平均才会带来实际的方差降低。不同 panel 的差异来自策略集中度，不来自不同的 prompt 或 rollout。
 
 ## 比较的三个估计量
 
@@ -27,17 +27,28 @@ $$
 g_{\mathrm{true},j}=\pi(j)\left(\log\frac{\pi(j)}{\pi_{\mathrm{ref}}(j)}-\operatorname{KL}(\pi\Vert\pi_{\mathrm{ref}})\right).
 $$
 
-对 sampled token $Y\sim\pi$，脚本实现论文的 K4 自动微分形式：
+对一个 sampled token $Y\sim\pi$，脚本实现论文的 K4 自动微分形式：
 
 $$
 g_{\mathrm{K4}}(Y)=\operatorname{sg}\!\left(\log\frac{\pi(Y)}{\pi_{\mathrm{ref}}(Y)}\right)\nabla\log\pi(Y).
 $$
 
-只截断估计量计算 Top-$K$ 头部的 exact KL 梯度；Top-K 估计量把它和 $\mathbf1\{Y\notin S_K\}g_{\mathrm{K4}}(Y)$ 相加，其中 $S_K=\operatorname{TopK}(\pi,K)$。每个点重复 128 次，报告
+只截断估计量计算 Top-$K$ 头部的 exact KL 梯度；实际的单-token Top-K 估计量把它和 $\mathbf1\{Y\notin S_K\}g_{\mathrm{K4}}(Y)$ 相加，其中 $S_K=\operatorname{TopK}(\pi,K)$。实验为了估计 RMSE，对这个单-token 估计量重复采样并平均，每个点重复 128 次，报告
 
 $$
 \operatorname{RelRMSE}=\frac{\sqrt{\mathbb E\lVert\hat g-g_{\mathrm{true}}\rVert_2^2}}{\lVert g_{\mathrm{true}}\rVert_2}.
 $$
+
+在 OPD 的 outer rollout 中，$Y$ 通常来自冻结的 rollout policy $\pi_k$，而 inner update 的当前策略是 $\pi_\theta$。此时单个 prefix 的尾部项需要停止梯度的重要性权重
+
+$$
+s_k(Y)=\operatorname{sg}\!\left(\frac{\pi_\theta(Y)}{\pi_k(Y)}\right),
+\qquad
+\mathbf1\{Y\notin S_K\}\,s_k(Y)\,r_\theta(Y)\,
+\operatorname{sg}\!\left(\log\frac{\pi_\theta(Y)}{\pi_{\rm ref}(Y)}\right),
+$$
+
+其中 $r_\theta(Y)=\pi_\theta(Y)/\operatorname{sg}(\pi_\theta(Y))$。当 rollout 与当前策略同策略时，$\pi_k=\pi_\theta$，$s_k(Y)=1$；这仍然是每个 prefix 一个 sampled token，而不是对同一 prefix 采样一批 token。
 
 实现文件是 [`ema_topk_reproduction.py`](../ema_topk_reproduction.py)，结果包含 `metrics.csv`、`metadata.json`、PNG 和 PDF 图。
 
