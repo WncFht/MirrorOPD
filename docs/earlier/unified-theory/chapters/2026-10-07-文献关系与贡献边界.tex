@@ -1,0 +1,87 @@
+\chapter{文献关系与研究贡献的边界}
+
+\section{镜像几何、策略改进与参数投影}
+负熵镜像下降、自然梯度和信赖域分别描述分布的有限近端步、参数的瞬时方向和可接受的移动范围。
+Beck--Teboulle 的凸分析给出 Bregman 三点不等式，Amari 的信息几何给出 Fisher 度量，Kakade 将自然梯度用于策略优化。
+这些对象在第 2 章通过同一局部二次展开联系起来；神经网络参数更新与精确分布镜像步的差别由可表示性和高阶项决定。
+Natural Actor-Critic、TRPO 与 Guided Policy Search 是将这些几何结构接入采样、critic 和参数拟合的直接前序\cite{beck2003,amari1998,kakade01,peters08,trpo15,gps16}。
+
+PMD 的核心理论问题是反复更新 advantage 或 $Q$ 后，整个控制问题的值函数怎样改进。
+精确 PMD 的最优速率、regularized PMD、一般参数化 PMD、homotopic PMD、lookahead、学习镜像映射、block 更新和随机镜像下降分别改变了精确性、正则项、策略类、访问顺序和 oracle 噪声\cite{lan23,zhan2022,ding23,alfano23,homotopic22,lookahead24,learnmap24,block22,smd22}。
+它们的 convergence theorem 不能只凭“都用了 KL”搬到 OPD：OPD 的 $\log T-\log b$ 一般不是环境 advantage。
+本书因此先证明固定教师的 projective 收缩，再在第 7 章单独给出 advantage 一致性条件下的性能界。
+
+探索、bounded advantage 与平均回报的分析补充了不同的适用条件\cite{explore25,mdac25,ngmd23,onpg23,bregman21}。
+若把原始教师 log-ratio 截断成 bounded advantage，可得到更直接的二阶矩控制，但截断改变了 Gibbs target。
+这应被视为明确的目标修改，并用未截断目标误差衡量偏差。
+随机 mirror descent 的方差缩减、Hessian-aided 自然梯度和递归 policy gradient 可以改进 oracle 估计\cite{vrsm22,hvrng24,recursivepg19}；它们不能恢复行为数据从未覆盖的 prefix。
+
+\section{离策略优化的三种分工}
+\subsection{访问分布上的优化}
+Relative Entropy Policy Search（REPS）对 occupancy 分布施加相对熵限制，Bellman 流约束将不同状态连起来\cite{reps10}。
+固定 prefix 的 token 更新没有这组全局流约束，因此即使局部目标也是指数倾斜，也不能把 occupancy 层的保证直接移植过来。
+OptiDICE 一类 occupancy correction 方法与这个问题同属访问测度路线；它们的比率对象应与 action likelihood ratio 分开。
+
+Dynamic Mirror Descent MPC、Supported Trust Region Optimization 与 Beyond State-Wise Mirror Descent 分别提供动态规划、支持约束和参数化离线优化的相关视角\cite{dynamicmd21,stro23,beyondstate26}。
+本书对应的问题是：replay 测度下的投影与当前访问测度下的投影是否共享解，及有限容量时相差多少。
+第 3 章的共同零点条件和第 7 章的测度替换界分别回答这两层问题。
+
+\subsection{目标构造与拟合分开}
+MPO 的 E-step 构造指数倾斜目标，M-step 用 forward KL 或加权最大似然拟合参数策略，并可另加 old-policy trust region\cite{mpo18}。
+RE-MPO、AWR、V-MPO 与较早的 reward-weighted regression 都提供了“奖励决定目标、监督学习负责投影”的实现路线\cite{rempo18,awr19,vmpo19,rwr07}。
+这个分工使镜像温度和 student 的移动半径拥有独立接口。
+反向 KL 投影、正向 KL 投影和残差回归在完整可表示且精确求解时可共享目标；在有限策略类中，其最优投影一般不同。
+
+Cautious Policy Programming 根据性能下界选择候选策略的混合比例\cite{cpp23}。
+这种算术混合与 KL 镜像几何插值对应不同曲线，可作为性能门控基线，但不能与 $\eta$ 同名后宣称数学等价。
+
+\subsection{估计器校正与回归换目标}
+精确 sequence IS 修正联合轨迹期望，per-decision IS 利用条件期望删除 suffix 权重，action IS 只修正当前动作分布。
+残差回归把训练目标改为最优性条件的平方，其零点可与 Gibbs 解相同。
+这四个对象应分别写出期望测度、被积函数和所需支持条件。
+“没有乘序列权重”只是一条实现事实，不能推出对原始 on-policy policy gradient 无偏。
+
+\section{LLM 后训练中的镜像目标}
+Kimi k1.5 的策略优化配方、PMD-mean、BPO 和 Reference-Sampled Boltzmann Projection 分别把策略近端更新、配分函数近似、Bellman 残差和参考采样投影带入 LLM 后训练\cite{kimi25,pmdmean26,bpo26,rsbp26}。
+PMD-mean 将 log-partition 替换为均值后，优化的驻点方程改变；第 6 章据此区分精确中心化残差与近似配分函数目标。
+小 $\eta$ 的局部展开可以相近，不能由此推出有限步目标相同。
+
+偏好对齐中的 optimistic online mirror descent、Nash learning、iterative Nash policy optimization、magnetic preference optimization 和 online preference optimization 研究随反馈或对手改变的分布更新\cite{optimisticllm25,nashhf23,inash24,magnetic25,onlinepref24}。
+固定教师 OPD 的收缩证明依赖共同不动点 $T$；当教师随时间变化，应加入 target drift，或改用静态、动态 regret。
+在线 KL 正则化的 regret 分析和 Banach--Bregman 随机迭代框架为这种扩展提供相关理论入口\cite{logregkl25,banach25}。
+
+KL 放在 value estimation、梯度目标、old-policy anchor 或未来过程奖励中，其作用不同\cite{designkl25,rethinkkl25,futurekl26}。
+DistiLLM 的分布匹配与 mixing diverse preference alignment 的多来源目标组合，也应与访问测度校正分开\cite{distillm24,mpopref25}。
+本书的记号始终保留 teacher、behavior、anchor、actor 四个角色，以免将这些目标压成一个“KL 系数”。
+
+\section{OPD 的目标与访问分布}
+MiniLLM、GKD、Thinking Machines 的 on-policy distillation 与 on-policy context distillation 强调 student 所访问的 prefix 对训练分布的影响\cite{minillm23,gkd23,tmopd25,contextopd26}。
+BOND 的 best-of-$N$ 蒸馏则先通过候选选择改变 target\cite{bond24}。
+候选选择、教师 token 分布和固定真实回报定义了不同的投影对象，性能比较必须交代哪一个发生变化。
+
+VESPO、OAPL、MInTRL 与 TOP-D 提供序列优化、离策略学习、干预和 teacher trust region 的直接近邻\cite{vespo26,oapl26,mintrl26,topd26}。
+TOP-D 使用算术混合教师来限制 reward tails，MirrorOPD 用几何 target 定义近端零点。
+第 6 章完整推导两种权重的界与小步方向，因此比较的重点是尾部控制、最终教师偏差和有限步轨迹。
+
+Many Faces、OPD Geometry、Revisiting OPD 与 Position Bias 提供关于蒸馏目标、几何、估计路径和位置效应的相关讨论\cite{manyfaces26,opdgeometry26,revisitopd26,iwopd26}。
+Distribution-Aligned Sequence Distillation、reasoning-prefix distillation 与 Near-Policy Distillation 则把分布对齐、prefix 选择和近策略数据作为独立设计轴\cite{dasd26,prefixopd26,nearopd26}。
+AOPD、ROPD、SOD 与 Flow-OPD 这些原笔记中的方法线索仍对应异步、鲁棒、逐步和生成过程蒸馏的比较方向；在没有精确算法定义时，本书不为这些简称赋予共同定理。
+
+\section{直接重叠工作与本书的增量}
+Least Square Policy Distillation（LSPD）直接覆盖了 OPD 的 RL 解释、最小二乘蒸馏与离策略复用的研究交集\cite{lspd26}。
+DDO-RM 的 distribution-level policy improvement、CataOPD 的 teacher 引导、TGPO 的大差异策略优化以及 OPD with verifiable reward 又分别覆盖目标构造、可达轨迹和 dense-plus-sparse reward\cite{ddorm26,cataopd26,tgpo26,opdvr26}。
+因此“将镜像下降用于 OPD”不能单独构成首次贡献声明。
+
+Entropy-Aware OPD、EasyOPD、SEED、POPO、Self-Distilled Policy Gradient 与 Distilled Reinforcement Learning 继续拓展熵控制、工程接口、自演化和自蒸馏路线\cite{entropyopd26,easyopd26,seed26,popo26,sdpg26,distrl26}。
+本书保留这些比较对象，但定理围绕明确的算子与测度表述，避免从方法名字推断已有或缺失的保证。
+
+本书能够精确陈述的工作是：给出固定教师的局部 Gibbs 算子及序列条件分布差别；
+证明未充分 inner 求解后的 outer 误差传播；保留 $\eta$、actor 步长、EMA 强度与更新顺序分析同步动力学；
+将 target 构造、参数求解和访问测度分别纳入可证明条件；通过同预算实验检验方差和最终性能之间的关系。
+这些数学结果的贡献边界由所写假设决定，文献新颖性还需针对对应原论文逐项比较。
+
+\section{阅读路径}
+先阅读 MD、Natural Policy Gradient、MDPO 与 PMD，配合第 2 章区分分布步与参数步。
+随后阅读一般参数化、homotopic 和 lookahead PMD，理解哪些保证需要精确 oracle。
+第三组阅读 PMD-mean、BPO、MPO 与参考采样 Boltzmann 投影，配合第 3 章比较驻点与测度。
+最后阅读 EMA Policy Gradient、TOP-D 及访问分布相关 OPD 工作，配合第 4--8 章研究同步和实验。

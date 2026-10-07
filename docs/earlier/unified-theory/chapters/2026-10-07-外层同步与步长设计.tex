@@ -1,0 +1,188 @@
+\chapter{有限 inner 求解、outer 同步与步长}
+\label{chap:outer}
+
+\section{以振幅定义误差}
+固定 teacher，定义
+\[
+ d_{\mathrm{proj}}(p,q)=\osc_a\log\frac{p(a)}{q(a)},\qquad
+ \osc_a u=\max_a u(a)-\min_a u(a).
+\]
+这是严格正概率 simplex 上的 Hilbert projective 距离。
+加动作无关常数不改变振幅；三角不等式来自
+$\osc(u+v)\le\osc u+\osc v$。
+若 $\osc\log(p/q)=0$，则 $p=cq$，归一化要求 $c=1$。
+采用这个定义后，inner 误差项前面没有额外系数 $2$。
+
+\begin{theorem}[exact outer 与所有步长区间]\label{thm:projective}
+固定 $T>0$，令 $p_{k+1}=G_{\eta_k}(p_k)$。则
+\[
+ \Delta_{k+1}=|1-\eta_k|\Delta_k,\qquad
+ \Delta_k=d_{\mathrm{proj}}(p_k,T).
+\]
+对常数步长，$0<\eta<1$ 同向收敛，$\eta=1$ 一步投影，
+$1<\eta<2$ 差分交替收敛，$\eta=2$ 振幅不变。
+$\eta>2$ 且 $p_0\ne T$ 时振幅发散。
+\end{theorem}
+\begin{proof}
+由 Gibbs 公式，
+\[
+ \log\frac{p_{k+1}(a)}{T(a)}
+ =(1-\eta_k)\log\frac{p_k(a)}{T(a)}-\log Z_k.
+\]
+对任意动作对相减，$\log Z_k$ 消失。对实数 $c$，
+$\osc(cu)=|c|\osc u$，代入即得恒等式。
+$\Delta_k\to0$ 推出 $p_k\to T$：令 $u_a=p_k(a)/T(a)$，
+归一化 $\sum_a T(a)u_a=1$ 要求 $\min u\le1\le\max u$，
+故 $|\log u_a|\le\Delta_k$，每个坐标收敛。
+\end{proof}
+
+\section{提前同步后重新 rollout}
+第 $k$ 轮 exact target 为 $q_{k+1}=G_{\eta_k}(p_k)$，
+实际 student 为 $p_{k+1}$，误差定义为
+\[
+ \varepsilon_k=d_{\mathrm{proj}}(p_{k+1},q_{k+1}).
+\]
+下一轮保存的是实际 $p_{k+1}$，信号为 $\log T-\log p_{k+1}$，
+目标为 $G_{\eta_{k+1}}(p_{k+1})$，不会继续优化旧 target。
+
+\begin{theorem}[非精确 outer 的误差传播]\label{thm:inexact}
+若 $0<\eta_k\le1$，则
+\[
+ \Delta_K\le P_{0,K}\Delta_0+
+ \sum_{j=0}^{K-1}P_{j+1,K}\varepsilon_j,\qquad
+ P_{i,K}=\prod_{\ell=i}^{K-1}(1-\eta_\ell).
+\]
+常数 $\eta$ 且 $\varepsilon_k\le\bar\varepsilon$ 时
+$\limsup_K\Delta_K\le\bar\varepsilon/\eta$。
+常数 $\eta>0$ 且 $\varepsilon_k\to0$ 时 $\Delta_K\to0$。
+\end{theorem}
+\begin{proof}
+由三角不等式，
+\[
+ \Delta_{k+1}\le d_{\mathrm{proj}}(p_{k+1},q_{k+1})
+             +d_{\mathrm{proj}}(q_{k+1},T)
+ =\varepsilon_k+(1-\eta_k)\Delta_k.
+\]
+代入前一轮，再逐轮展开，得到乘积加权式。
+常数步长下几何级数和为
+$\sum_{j=0}^{K-1}(1-\eta)^j=[1-(1-\eta)^K]/\eta$。
+证明误差趋零时，任取 $a>0$，选择 $N$ 使 $j\ge N$ 时
+$\varepsilon_j\le a\eta$。有限个 $j<N$ 的项随 $K$ 衰减为零，
+剩余尾和至多为 $a$；令 $a\downarrow0$ 完成证明。
+\end{proof}
+第一轮没收敛的影响是 $P_{1,K}\varepsilon_0$，会被后续正确更新逐渐遗忘。
+新 rollout 噪声与未访问 prefix 的误差仍进入新的 $\varepsilon_k$。
+该递推需要逐 prefix 的误差控制，不由单个 batch 平均 loss 自动推出。
+
+\section{固定 anchor 的参数局部模型}
+令 logits Jacobian 为 $J_k(s)$，categorical Fisher 为
+$C_k(s)=\diag(p_k)-p_kp_k^\top$，固定训练测度下
+\[
+ A_k=\E_s[J_k(s)^\top C_k(s)J_k(s)],\qquad
+ Q_k(\delta)=\frac1{2\eta_k}\delta^\top A_k\delta-b_k^\top\delta.
+\]
+这是把 reward 项一阶线性化、KL 项二阶展开后的模型，
+不是一般真实目标完整 Hessian；真实 reward Hessian 会增加 $O(\|\delta\|^2)$ 项。
+在可辨识商空间 $A_k$ 的谱位于 $[m_k,L_k]$，最优位移为
+$\delta_k^\star=\eta_k A_k^{-1}b_k$。
+
+\begin{theorem}[局部 GD 与 Natural-GD 的 inner 精度]\label{thm:inner}
+普通 GD 使用 $0<\gamma<2\eta_k/L_k$，则
+\[
+ \|e_M\|_{A_k}\le q_k^M\|e_0\|_{A_k},\qquad
+ q_k=\max_{\lambda\in[m_k,L_k]}|1-\gamma\lambda/\eta_k|.
+\]
+最优常数步长为 $2\eta_k/(m_k+L_k)$，对应
+$q_k=(L_k-m_k)/(L_k+m_k)$。
+预条件步 $\delta_{m+1}=\delta_m-\gamma A_k^{-1}\nabla Q_k(\delta_m)$
+满足 $e_{m+1}=(1-\gamma/\eta_k)e_m$，$\gamma=\eta_k$ 时一步解模型。
+\end{theorem}
+\begin{proof}
+最优性给出 $A_k\delta_k^\star=\eta_kb_k$，故
+\[
+ e_{m+1}=(I-\gamma A_k/\eta_k)e_m.
+\]
+用正交矩阵对角化 $A_k=U\Lambda U^\top$，
+\[
+ \|e_{m+1}\|_{A_k}^2
+ =\sum_i\lambda_i(1-\gamma\lambda_i/\eta_k)^2(U^\top e_m)_i^2
+ \le q_k^2\|e_m\|_{A_k}^2.
+\]
+递推得到第一式。端点绝对乘子相等时最坏谱半径最小，
+解 $1-\gamma m_k/\eta_k=-(1-\gamma L_k/\eta_k)$ 得最优步长。
+预条件时直接消去 $A_k$，得到标量乘子。
+\end{proof}
+病态 Fisher 增加 inner 数量。实际 Natural-GD 用 damping 或采样 Fisher，
+需分析 $P^{1/2}A_kP^{1/2}$ 的谱；伪逆只在 $b_k$ 位于像空间且去掉 gauge 后有效。
+
+若在局部邻域有
+$d_{\mathrm{proj}}(\pi_\theta,\pi_{\theta'})\le C_k\|\theta-\theta'\|_{A_k}$，
+才可将参数 inner 误差转为
+\[
+ \varepsilon_k\le C_kq_k^{M_k}\|\delta_k^\star\|_{A_k}
+              +C_{\mathrm{nl}}\|\delta_k^\star\|^2
+              +\varepsilon_k^{\mathrm{sampling}}
+              +\varepsilon_k^{\mathrm{representation}}.
+\]
+增大 $M_k$ 只能减少第一项。$\eta=1$ 时 target 始终是 teacher，
+有限 inner 多轮收敛来自求解器收缩，重新 rollout 负责修正覆盖。
+
+\section{Hard、delayed 与逐步同步}
+Hard sync 在 batch 边界复制 student，并冻结 $r_k,T,p_k$ 直到 inner 结束，
+这是主算法。停止条件应控制到本轮 target 的误差。
+若要求 $\varepsilon_k\le c\eta_k^2$，常数步长稳态偏差为 $O(\eta_k)$；
+若只要求 $\varepsilon_k\le c\eta_k$，稳态上界为 $O(1)$。
+因此更小步长不自动提高精度。
+
+Delayed sync 保持旧 anchor $\bar p$ 跨多批次。
+固定 teacher 时有精确 target 比较
+\[
+ d_{\mathrm{proj}}(G_\eta(p),G_\eta(\bar p))
+ =|1-\eta|\,d_{\mathrm{proj}}(p,\bar p).
+\]
+这量只度量 target drift；rollout distribution mismatch 还需另算。
+若每个 optimizer step 都同步，旧 KL 在初始化点的一阶梯度反复为零。
+将这些更新解释成固定子问题的 inner solve 会破坏定理假设；
+若每步都解新的 exact 微小 mirror step，则是另一个有更多 outer 的算法。
+
+\section{KL budget 与可变步长}
+令 $r=\log(T/b)$，$A(\eta)=\log\E_b e^{\eta r}$，
+则 $A'=\E_{G_\eta(b)}r$、$A''=\Var_{G_\eta(b)}r$。
+\begin{theorem}[镜像路径 KL 的单调性]\label{thm:budget}
+\[
+ D(\eta)=\KL(G_\eta(b)\Vert b)=\eta A'(\eta)-A(\eta),\qquad
+ D'(\eta)=\eta A''(\eta)\ge0.
+\]
+若 $b\ne T$，有限共同 support 下 $D$ 在 $\eta>0$ 严格递增。
+\end{theorem}
+\begin{proof}
+归一化权重对 $\eta$ 求导为
+$\partial_\eta p_\eta(a)=p_\eta(a)[r(a)-\E_{p_\eta}r]$，
+所以 $A''=\E r^2-(\E r)^2$。代入 KL 表达式求导，$A'$ 相消。
+$b\ne T$ 时 $r$ 非常数，正权重方差严格为正。
+\end{proof}
+预算 $\delta\in(0,\KL(T\Vert b))$ 在 $(0,1)$ 唯一可解；
+预算大于该端点时应取 $\eta=1$，不能声称区间内总有解。
+对固定 prefix，Taylor 展开
+\[
+ D(\eta)=\frac{\eta^2}{2}\Var_b(r)+O(\eta^3),\qquad
+ \eta\simeq\sqrt{\frac{2\delta}{\widehat{\Var}_b(r)+\epsilon_{\mathrm{var}}}}.
+\]
+全局共享 $\eta$ 可用 $\nu$ 平均 KL 或高分位预算，但二者保障不同。
+对 sampled actions，需要置信余量；单个经验方差不能排除未采样的尖锐动作。
+
+\begin{corollary}[递减步长与 vanishing relative error]
+若 $0<\eta_k<1$、$\sum_k\eta_k=\infty$ 且
+$\varepsilon_k/\eta_k\to0$，则 $\Delta_k\to0$。
+\end{corollary}
+\begin{proof}
+乘积满足 $P_{N,K}\le e^{-\sum_{k=N}^{K-1}\eta_k}\to0$。
+任给 $a>0$，选 $N$ 使 $\varepsilon_k\le a\eta_k$（$k\ge N$）。
+递推为 $\Delta_{k+1}-a\le(1-\eta_k)(\Delta_k-a)$，
+所以 $\limsup\Delta_k\le a$。令 $a\downarrow0$。
+\end{proof}
+仅要求 $\varepsilon_k\to0$ 对递减 $\eta_k$ 不够；
+如 $\varepsilon_k=c\eta_k$ 会留下半径 $c$。
+固定小步长达到 $\epsilon$ 的 outer 数量约为
+$\eta^{-1}\log(\Delta_0/\epsilon)$，应连同 rollout 成本和 inner 残差共同比较。
+

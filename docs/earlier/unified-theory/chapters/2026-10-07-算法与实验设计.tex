@@ -1,0 +1,111 @@
+\chapter{算法实现与可证伪实验}
+\label{chap:implementation}
+
+\section{把外层目标与内层优化器分开实现}
+实现采用四个独立对象：行为版本 $b_k$、镜像 anchor $\bar\pi_k$、当前 actor $p_\theta$、固定教师 $T$。
+在 hard sync 且 fresh rollout 的基准中，前两个对象数值相同；在 replay、delayed sync 或 EMA 中，它们一般不同。
+每条 response 保存生成版本、prompt、prefix、行为 log-prob 和采样配置。
+anchor log-prob 必须用本轮冻结的 anchor 重算；行为 log-prob 只有在明确的测度校正项中使用。
+温度、top-$p$、截断和 EOS 处理改变真实采样分布，保存模型 softmax log-prob 不能替代保存截断后分布。
+
+每个 outer step 的顺序为：先同步本轮 anchor，随后采样或组合 replay，计算并停止梯度的教师信号，最后在该固定子问题上做 inner 更新。
+一旦同步 anchor，旧残差的零点也随之移动，必须重新计算 $\log T-\log\bar\pi_k$。
+只更新参数副本而继续复用旧 reward，得到的是另一条动力学。
+EMA 则必须指定在 actor 更新前还是更新后执行，以及周期按 minibatch、rollout 还是 outer step 计数。
+这些选择直接进入第~\ref{chap:ema}~章的矩阵，无法用同一个“同步率”概括。
+
+优化器状态也需要固定语义。保留 Adam 动量会使下一轮的首个 inner 更新依赖上一轮目标。
+清空动量给出更接近独立近端求解的基准，保留动量给出带记忆的求解器；两种实现应各自命名并记录。
+理论中 $q^M$ 的收缩率对应固定二次模型的梯度下降，不能直接赋给任意 Adam 设置。
+
+\section{Fisher 距离控制与数值求解}
+令 $g$ 为当前镜像 surrogate 的参数梯度，$F$ 为同一 prefix 测度下的 Fisher 矩阵。
+求解阻尼系统
+\[
+ (F+\lambda I)d=g,\qquad \lambda>0.
+\]
+共轭梯度无需显式存储矩阵，可用 Fisher-vector product 计算每次迭代。
+当目标是最大化 surrogate，候选更新写成
+\[
+ \Delta\theta=\sqrt{\frac{2\epsilon_{\mathrm{NG}}}{d^\top Fd}}\,d.
+\]
+若 $d^\top Fd=0$，停止该方向更新；该分母为零表明所估 Fisher 无法识别此方向，继续放大步长没有几何依据。
+阻尼系统与距离归一化使用的矩阵不同，因此不能将分母随意替换为 $g^\top d$。
+无阻尼且精确求解时，两者相等；有阻尼时
+\[
+ g^\top d=d^\top Fd+\lambda\lVert d\rVert^2.
+\]
+
+以冻结 batch 的实际 $\KL(p_{\theta+\Delta\theta}\Vert p_\theta)$ 验证二阶预测，超预算时回溯缩短步长。
+这控制的是 inner 求解路径；$\eta$ 控制镜像目标的位置。
+固定 $\eta$、改变 $\epsilon_{\mathrm{NG}}$，理论零点不变；固定几何半径、改变 $\eta$，零点改变。
+有限训练预算下，两者都会改变最终 student，因此应同时报告目标位置和追赶误差。
+
+\section{与理论匹配的停止条件}
+对于 tabular 全支持基准，可以直接计算
+\[
+ E_k=\sup_s\osc_a\log\frac{p_{k,M}(a\mid s)}{G_{\eta_k}(\bar\pi_k)(a\mid s)}.
+\]
+按 $E_k\le c\eta_k$ 停止，控制固定误差地板；要得到逐渐精确的 teacher 收敛，则要求 $E_k/\eta_k\to0$。
+神经网络中只能在验证 prefix 集合估计该量，不能将有限集合的最大值当成所有 prefix 的最大值。
+同时报告训练 residual、验证 target KL、深度分层覆盖率，识别过拟合和缺少访问的状态。
+
+平方残差均值、梯度范数和 projective 误差具有不同量纲。
+若残差平方的阈值随 $\eta_k^2$ 缩放，还需要 support 下界和范数转换常数，才能推出 $E_k=O(\eta_k)$。
+简单地让 loss 小于一个固定数字，在小 $\eta$ 时会让求解误差支配镜像信号。
+
+\section{四项研究假设及其反证}
+\subsection{残差回归与序列 IS 的方差}
+在相同 replay、相同 student、相同目标和相同 token 预算下，比较序列 IS 梯度与最优性残差梯度的二阶矩。
+第~\ref{chap:opd}~章的条件期望结论只保证可用 Rao--Blackwell 化删除无关的 suffix 权重；
+残差回归改变优化目标，方差更小必须通过估计器分析和实验共同检验。
+按 response 长度报告梯度 trace、最大样本贡献与有效样本量
+\[
+ \mathrm{ESS}=\frac{(\sum_i w_i)^2}{\sum_i w_i^2}.
+\]
+较小方差同时伴随较大偏差时，应报告两者和最终目标误差，不能只展示 ESS。
+
+\subsection{局部目标与序列目标的长期影响}
+在 dense teacher log-ratio 和 sparse verifier reward 两个 regime 分别比较。
+逐 prefix 的几何 teacher 插值有局部闭式解，完整序列 Gibbs 还包含 continuation partition function。
+因此在 sparse reward 下，局部化后的 value 或 advantage 误差必须单独测量。
+对相同 prompt 测试浅层和深层 prefix，并记录 suffix 成功率；若局部 KL 下降而深层成功率恶化，说明局部目标与长程 credit 的差异主导结果。
+
+\subsection{镜像步长与实际几何步长的可分辨性}
+先固定 $\eta$ 扫描 $\epsilon_{\mathrm{NG}}$，再固定半径扫描 $\eta$。
+记录目标分布、实际 inner KL、target KL 与更新次数。
+当足够多 inner 更新后不同半径仍给出不同零点，应检查投影容量、测度变化和停止梯度实现。
+预测 KL 与实际 KL 长期不符，则 Fisher 估计或局部二阶近似不适合作为控制器。
+
+\subsection{旧数据的覆盖与测度误差}
+使用 fresh-only、replay-only 和 mixed-prefix 三组数据，保持教师和 anchor log-prob 重算一致。
+先在完整 tabular support 中隔离纯测度效应，再在有限神经网络中加入未访问 prefix。
+第~\ref{chap:guarantees}~章给出有界 integrand 的测度替换误差；零残差共享解并不意味着有限参数投影与测度无关。
+当 coverage 相同而 replay 性能仍明显下降，应测量加权投影误差、行为概率记录和版本漂移，不能预先归因为 coverage。
+
+\section{实验矩阵与公平预算}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{p{0.14\textwidth}p{0.79\textwidth}}
+\toprule
+实验轴 & 设置与对应判据\\\midrule
+目标 & SFT、vanilla reverse-KL OPD、sequence PMD-part、PMD-mean、BPO、prefix MirrorOPD；每项明确优化目标和 prefix 测度。\\
+数据 & fresh rollout、1/4/16/64 版本滞后、不同 replay 混合比例；同时报告 wall time 与有效 token。\\
+测度修正 & 无 IS、action IS、per-decision IS、sequence IS、残差回归；区分无偏修正与换目标。\\
+inner 求解 & Adam、KL 回溯、Fisher/NG；比较固定更新数、固定 token 数与同 residual 三种预算。\\
+镜像强度 & $\eta\in\{0.1,0.3,0.5,0.7,1\}$；另保留原温度网格 $\tau\in\{0.25,0.5,1,2,4\}$，其中 $\eta=\tau^{-1}>1$ 标注为外推区间。\\
+同步 & hard、delayed、参数 EMA、logit EMA；记录实际同步周期、EMA 系数及 pre/post-update 顺序。\\
+信号 & dense teacher、终局 verifier、advantage regression；教师质量与支持下界作为独立轴。\\
+诊断 & reward、pass@k、双向 KL、Fisher 距离、ESS、$\E[(\log W)^2]$、梯度 trace、prefix coverage、inner residual 和 actor--anchor lag。\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+先在有限动作、有限前缀树上实现精确求解和有限 inner 更新。
+精确 hard sync 的振幅曲线应满足 $D_k=|1-\eta|^kD_0$，$\eta=1$ 在一次全支持投影后为零。
+有固定 inner 误差时应出现 $O(\varepsilon/\eta)$ 地板；EMA 模态应吻合矩阵谱半径及稳定边界。
+这一步检验数学模型与代码语义一致，再进入神经网络容量和采样误差实验。
+
+最终比较使用相同总 teacher 查询数、生成 token 数和训练 token 数，并独立报告 wall time。
+较小 $\eta$ 所需 outer 次数增加，不能用“每轮更稳”直接推出总训练更快。
+EMA 需要用发散率、可用 actor 步长和达到同一 target KL 的成本证明收益；仅展示较平滑 loss 曲线不足以说明收益。
