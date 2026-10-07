@@ -302,62 +302,257 @@ BPO 的 residual 是
 [\delta_\theta(s,a)(g_\theta(s,a)-\bar g_\theta(s))].
 \end{equation}
 
-\section{OPD 的具体化：从教师分布反推 token reward}
+\subsection{PMD-Mean 与 BPO 都中心化，但投影对象不同}
+\label{sec:ch2-mean-bpo-difference}
+
+两种方法都可以写出一个中心化的信号 $\widetilde f$，但中心化发生在不同的优化问题中。PMD-Mean 先把精确最优 log-ratio
+
+\[
+u^+(s,a)=\eta f(s,a)-\log Z_f(s)
+\]
+
+替换为可观测的中心化 target $\eta\widetilde f(s,a)$，然后在满足 $\E_\mu[e^{u}\mid s]=1$ 的函数集合上做平方距离投影。它的残差是
+
+\[
+r_{\mathrm{Mean}}(s,a)=\eta\widetilde f(s,a)-u_\theta(s,a),
+\]
+
+并没有把当前策略的 $u_\theta$ 再次中心化。
+
+BPO 使用的是同一个镜像最优性方程的 centered residual。展开式 \eqref{eq:ch2-bpo-residual} 可得
+
+\[
+\delta_\theta(s,a)=\eta f(s,a)-u_\theta(s,a)
+-\E_\mu[\eta f(s,\cdot)-u_\theta(s,\cdot)\mid s].
+\]
+
+若 $f$ 已经满足 $\E_\mu[f\mid s]=0$，这变为
+
+\[
+\delta_\theta(s,a)=\eta f(s,a)-u_\theta(s,a)+\E_\mu[u_\theta(s,\cdot)\mid s].
+\]
+
+因此二者的 residual 差为
+
+\[
+\delta_\theta-r_{\mathrm{Mean}}=\E_\mu[u_\theta(s,\cdot)\mid s]
+\]
+
+（在 $f$ 已中心化时）。这个差是只依赖 prefix 的常数，策略在精确解处可以通过归一化吸收它；但是在参数空间进行有限步回归时，它会改变梯度，因为 PMD-Mean 使用 $g_\theta$，而未线性化 BPO 对完整 reverse-KL 求导后使用 $g_\theta-\bar g_\theta$。所以“都出现 $\widetilde f$”只说明它们共享同一个 action-independent 不可辨识方向，并不意味着两个损失或梯度相同。
+
+\begin{proposition}[PMD-Mean 与 BPO 的等价条件]
+\label{prop:ch2-mean-bpo-equivalence}
+固定一个 prefix，并假设 $\E_\mu[f\mid s]=0$。若同时满足
+
+\[
+\E_\mu[u_\theta\mid s]=0,
+\qquad
+\bar g_\theta(s)=\E_\mu[g_\theta(s,a)\mid s]=0,
+\]
+
+则 PMD-Mean 的 residual 与 BPO residual 相同，且两者的下降方向相同。策略归一化只给出 $\E_{\pi_\theta}[g_\theta]=0$，而不是所需的 $\E_\mu[g_\theta]=0$；同样，$\E_\mu[u_\theta\mid s]=0$ 也不是归一化约束的结果。因此在行为测度 $\mu$ 下，二者通常只共享精确零点而不共享有限步梯度。
+\end{proposition}
+
+\begin{proof}
+在 $\E_\mu[f\mid s]=0$ 下，前面的恒等式给出
+\[
+\delta_\theta-r_{\mathrm{Mean}}=\E_\mu[u_\theta\mid s].
+\]
+若该均值为零，则 residual 相同。PMD-Mean 的下降方向为 $\E_\mu[r_{\mathrm{Mean}}g_\theta]$；BPO 的下降方向由式 \eqref{eq:ch2-bpo-gradient} 给出。若再有 $\bar g_\theta=0$，则
+\[
+\E_\mu[\delta_\theta(g_\theta-\bar g_\theta)]
+=\E_\mu[r_{\mathrm{Mean}}g_\theta],
+\]
+故两者相同。反之，只要任一 action-independent 项没有被这两个条件消除，有限参数更新就会产生梯度差异。
+\end{proof}
+
+\section{OPD 的 inner--outer mirror 流程：教师并非每步都被完全拟合}
 \label{sec:ch2-opd-instantiation}
 
-OPD 的教师通常直接给出下一个 token 的条件分布，而不是已经中心化的优势函数。令教师分布为 $T(a\mid s)$，行为策略为 $\mu(a\mid s)$，并假设 $T(\cdot\mid s)\ll\mu(\cdot\mid s)$。要求镜像子问题的最优策略恰好等于教师，即 $\pi^+(\cdot\mid s)=T(\cdot\mid s)$。由式 \eqref{eq:ch2-optimal-logratio} 反解可取
+本节把 OPD 写成一个明确的 outer--inner 算法。固定教师策略 $T(a\mid s)$，令第 $k$ 次 outer 迭代开始时的学生策略为 $\pi_k(a\mid s)$。假设在教师有正概率的 action 上，学生也有正概率，即 $T(\cdot\mid s)\ll\pi_k(\cdot\mid s)$。OPD 的逐 token 信号取为当前学生到教师的 log-ratio
 \begin{equation}
-\label{eq:ch2-opd-reward}
-r_T(s,a)=\frac{1}{\eta}\log\frac{T(a\mid s)}{\mu(a\mid s)}+c(s),
+\label{eq:ch2-opd-current-reward}
+f_k(s,a)=\log\frac{T(a\mid s)}{\pi_k(a\mid s)}.
 \end{equation}
-其中 $c(s)$ 是只依赖 prefix 的任意常数。取 $c(s)=0$ 时，
-\begin{align*}
-Z_{r_T}(s)
-&=\E_\mu\left[\exp\left(\eta r_T(s,a)\right)\mid s\right]\\
-&=\E_\mu\left[\frac{T(a\mid s)}{\mu(a\mid s)}\mid s\right]=1.
-\end{align*}
-因此
-\begin{equation}
-\label{eq:ch2-opd-gibbs-teacher}
-\frac{\mu(a\mid s)e^{\eta r_T(s,a)}}{Z_{r_T}(s)}=T(a\mid s).
-\end{equation}
-这说明 OPD 的 token reward 可以直接取教师与行为策略的 log-ratio；它是使教师分布成为 KL 镜像问题精确解的反推构造。若还存在外部 token reward $r_{\rm ext}$，取
-\begin{equation}
-\label{eq:ch2-opd-tilted-reward}
-r_{\rm OPD}(s,a)=r_{\rm ext}(s,a)+\frac{1}{\eta}\log\frac{T(a\mid s)}{\mu(a\mid s)}
-\end{equation}
-可得
-\begin{equation}
-\label{eq:ch2-opd-tilted-policy}
-\pi^+(a\mid s)=\frac{T(a\mid s)e^{\eta r_{\rm ext}(s,a)}}{\E_{a'\sim T(\cdot\mid s)}[e^{\eta r_{\rm ext}(s,a')}]}.
-\end{equation}
+这里的 reward 依赖 outer 迭代编号 $k$；它不是一个固定的、一次性定义的 $r_T$。它衡量教师相对于当前学生在 prefix $s$ 下对 action $a$ 的局部偏好。
 
-将 $r_T$ 代入三种算法即可得到 OPD 实例化。PMD-Part 的 target、损失和下降方向为
+\subsection{一个 outer step 的精确 mirror 解}
+
+给定 $\pi_k$ 和 $f_k$，第 $k$ 次 mirror 子问题为
+\begin{equation}
+\label{eq:ch2-opd-mirror-step}
+\pi_{k+1}^{\star}
+=\argmax_{p\ll\pi_k}
+\left\{
+\E_{a\sim p}[f_k(s,a)]
+-\frac{1}{\eta}\KL\left(p\middle\Vert\pi_k(\cdot\mid s)\right)
+\right\},
+\qquad 0<\eta\leq 1.
+\end{equation}
+把 $f_k$ 代入 Gibbs 解，得到
 \begin{align}
-h_T(s,a)&=\eta r_T(s,a)-\log Z_{r_T}(s)=\log\frac{T(a\mid s)}{\mu(a\mid s)},\\
-\mathcal L_{\rm Part}^{\rm OPD}&=\frac12\E_{d_\mu,\mu}\left[\left(u_\theta-\log\frac{T}{\mu}\right)^2\right],\\
--\nabla\mathcal L_{\rm Part}^{\rm OPD}&=\E_{d_\mu,\mu}\left[\left(\log\frac{T}{\mu}-u_\theta\right)g_\theta\right].
+\pi_{k+1}^{\star}(a\mid s)
+&=\frac{\pi_k(a\mid s)\exp\left(\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}\right)}{Z_k(s)}\\
+&=\frac{\pi_k(a\mid s)^{1-\eta}T(a\mid s)^{\eta}}{Z_k(s)},
+\label{eq:ch2-opd-geometric-bridge}
 \end{align}
+其中
+\begin{equation}
+\label{eq:ch2-opd-bridge-normalizer}
+Z_k(s)=\sum_{a}\pi_k(a\mid s)^{1-\eta}T(a\mid s)^{\eta}.
+\end{equation}
+因此，$\eta=1$ 时 $\pi_{k+1}^{\star}=T$，一次 mirror step 直接到教师；$0<\eta<1$ 时得到学生和教师在 log-probability 空间的几何插值。该中间分布不是额外启发式，而是式 \eqref{eq:ch2-opd-mirror-step} 的精确解。
 
-PMD-Mean 使用行为均值去掉未知的 prefix 常数。定义
-\begin{equation}
-\label{eq:ch2-opd-mean-signal}
-g_T(s,a)=\eta\left(r_T(s,a)-\E_\mu[r_T(s,a)\mid s]\right)
-=\log\frac{T(a\mid s)}{\mu(a\mid s)}-\E_\mu\left[\log\frac{T}{\mu}\mid s\right].
-\end{equation}
-将 $g_T$ 代入式 \eqref{eq:ch2-mean-loss}，再通过 Lambert-$W$ 乘子恢复归一化。中心化只移除 prefix 常数，不改变教师 Gibbs 策略。
+\begin{theorem}[OPD mirror step 的几何中间分布]
+\label{thm:ch2-opd-geometric-bridge}
+在有限 action space 和 $T(\cdot\mid s)\ll\pi_k(\cdot\mid s)$ 下，式 \eqref{eq:ch2-opd-mirror-step} 的唯一解是式 \eqref{eq:ch2-opd-geometric-bridge}。特别地，$\eta=1$ 时一步到达教师；$0<\eta<1$ 时该更新保持在学生与教师之间，并满足 $\pi_{k+1}^{\star}\ll\pi_k$。
+\end{theorem}
 
-BPO 使用同一个 OPD reward 的中心化 residual：
+\begin{proof}
+将 $f_k=\log(T/\pi_k)$ 代入镜像目标，并忽略与 $p$ 无关的项，有
+\begin{align*}
+\E_p[f_k]-\frac1\eta\KL(p\Vert\pi_k)
+&=-\frac1\eta\E_p\left[\log p-(1-\eta)\log\pi_k-\eta\log T\right].
+\end{align*}
+令 $q_k(a\mid s)=\pi_k(a\mid s)^{1-\eta}T(a\mid s)^\eta$，并令 $Z_k=\sum_a q_k(a\mid s)$。则上式等于
+\[
+\frac1\eta\log Z_k-\frac1\eta\KL(p\Vert q_k/Z_k).
+\]
+KL 非负且仅在 $p=q_k/Z_k$ 时取零，因此得到唯一解。$\eta=1$ 时 $q_k=T$ 且 $Z_k=1$；当 $0<\eta<1$ 时，$q_k$ 对两种分布的 log 概率作凸组合，且由支持假设满足绝对连续性。
+\end{proof}
+
+\subsection{inner 求解与 outer 更新的区别}
+
+式 \eqref{eq:ch2-opd-mirror-step} 是 outer 第 $k$ 步要解决的目标，不能把它和参数优化步数混为一谈。实际学生只能表示 $\pi_\theta$，因此固定行为策略 $\pi_k$ 后，inner 优化是在同一批 prefix 上最小化
 \begin{equation}
-\label{eq:ch2-opd-bpo-residual}
-\delta_T(s,a)=\eta\left(r_T(s,a)-\E_\mu[r_T\mid s]\right)-u_\theta(s,a)+\E_\mu[u_\theta\mid s].
+\label{eq:ch2-opd-inner-regression}
+\mathcal L_k(\theta)
+=\frac12\E_{s\sim d_{\mathrm{replay}},\,a\sim\pi_k(\cdot\mid s)}
+\left[
+\log\frac{\pi_{k+1}^{\star}(a\mid s)}{\pi_k(a\mid s)}
+-\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}
+\right]^2.
 \end{equation}
-其未线性化下降方向为
+若 inner 被精确求解，得到 $\pi_\theta=\pi_{k+1}^{\star}$；若只做有限次 SGD，得到的是近似解 $\widehat\pi_{k+1}$，其误差会进入 outer 迭代的误差项。因而一个完整的 outer step 是：冻结 $\pi_k$，构造 $f_k$，用 replay 中丰富的 prefix 近似 $d_{\pi_k}$ 或其覆盖测度，进行若干 inner 更新，得到 $\widehat\pi_{k+1}$，然后令 $\pi_{k+1}\leftarrow\widehat\pi_{k+1}$ 并重新采样或继续积累数据。
+
+\begin{proposition}[有限 inner 误差的 projective outer 递推]
+\label{prop:ch2-opd-inner-error}
+对每个 prefix 定义 log-ratio 振幅
+\[
+\Delta_k(s)=\max_a\log\frac{\pi_k(a\mid s)}{T(a\mid s)}-\min_a\log\frac{\pi_k(a\mid s)}{T(a\mid s)}.
+\]
+若精确 mirror 解被有限 inner 优化替换为 $\widehat\pi_{k+1}$，定义其 projective 误差为 $\zeta_k(s)$，使得
+\[
+\Delta(\widehat\pi_{k+1},T;s)\leq(1-\eta)\Delta_k(s)+\zeta_k(s).
+\]
+则
 \begin{equation}
-\label{eq:ch2-opd-bpo-gradient}
--\eta\nabla\mathcal L_{\rm BPO}^{\rm OPD}=\E_{d_\mu,\mu}\left[\delta_T(s,a)\left(g_\theta(s,a)-\E_\mu[g_\theta\mid s]\right)\right].
+\label{eq:ch2-opd-outer-error}
+\Delta_{k+1}(s)\leq(1-\eta)\Delta_k(s)+\zeta_k(s).
 \end{equation}
-在 $T$ 的完整 logits 可得时，式 \eqref{eq:ch2-opd-reward} 是逐 token 的精确信号；从有限采样近似教师分布时，才会额外引入 reward 和 log-ratio 的估计误差。
+因此若 $\limsup_k\zeta_k(s)\leq\zeta_\infty(s)$，则
+\[
+\limsup_{k\to\infty}\Delta_k(s)\leq\frac{\zeta_\infty(s)}{\eta}.
+\]
+\end{proposition}
+
+\begin{proof}
+精确 mirror 解满足式 \eqref{eq:ch2-opd-projective-contraction}。有限 inner 误差的定义直接给出三角型递推式 \eqref{eq:ch2-opd-outer-error}。递推展开后，初始项按 $(1-\eta)^k$ 衰减，误差项由几何级数控制：
+\[
+\sum_{j=0}^{k-1}(1-\eta)^j\zeta_{k-1-j}(s)
+\leq \frac{\sup_{j\geq k_0}\zeta_j(s)}{\eta}+o(1).
+\]
+取上极限即得结论。
+\end{proof}
+
+\paragraph{关于 $L_1$ 距离。} 上述 projective 递推是无条件成立的；若进一步假设所有迭代满足 $m\leq\pi_k(a\mid s)/T(a\mid s)\leq M$，则归一化和有限 action space 将 projective 误差连续地转化为 $L_1$ 误差，从而得到相应的 $L_1$ 几何收敛界。没有这样的概率比上下界时，不能直接把 $1-\eta$ 写成任意 $L_1$ 距离的收缩系数。令
+\[
+\Delta_k(s)=\max_a\log\frac{\pi_k(a\mid s)}{T(a\mid s)}-\min_a\log\frac{\pi_k(a\mid s)}{T(a\mid s)},
+\]
+则精确满足
+\begin{equation}
+\label{eq:ch2-opd-projective-contraction}
+\Delta_{k+1}(s)=(1-\eta)\Delta_k(s).
+\end{equation}
+由 $\E_T[\pi_k/T]=1$，$\Delta_k\to0$ 蕴含 $\pi_k\to T$。文中的 $L_1$ 递推应理解为在概率比有统一上下界时的推论；否则应优先使用式 \eqref{eq:ch2-opd-projective-contraction}。
+
+\subsection{为什么 inner 需要多步：局部曲率与 Natural Gradient}
+\label{sec:ch2-natural-gradient}
+
+把固定 outer step 的回归或镜像目标限制到参数化策略附近。令 $\Delta\theta$ 表示相对当前参数的增量，$J(s,a)$ 表示 logit 对参数的 Jacobian，$\Fisher(s)$ 表示当前策略的 Fisher 矩阵。对 KL 项作二阶展开，并把 reward 项作一阶展开，可以得到局部二次模型
+\begin{equation}
+\label{eq:ch2-local-quadratic}
+\mathcal Q(\Delta\theta)
+=\frac12\Delta\theta^{\mathsf T}A\Delta\theta-b^{\mathsf T}\Delta\theta+C,
+\qquad
+A=\E_{s,a}\!\left[J(s,a)^{\mathsf T}\Fisher(s)J(s,a)\right].
+\end{equation}
+这里 $b$ 是镜像目标在当前参数处的 score 方向，$A$ 是把策略空间 KL 曲率拉回参数空间后的矩阵。它解释了为什么“inner 做到收敛”与“做一次参数梯度”是两件不同的事。
+
+\begin{theorem}[局部二次模型下的 inner 梯度下降速度]
+\label{thm:ch2-local-gd}
+假设 $A$ 对称半正定，并在其正特征值子空间上正定。对
+\[
+\Delta\theta_{m+1}
+=\Delta\theta_m-\gamma\nabla\mathcal Q(\Delta\theta_m)
+=(I-\gamma A)\Delta\theta_m+\gamma b
+\]
+取 $0<\gamma<2/\lambda_{\max}(A)$。则在 $A$ 的正特征值子空间上，迭代收敛到 $\Delta\theta^\star=A^\dagger b$，并且误差满足
+\[
+\|\Delta\theta_m-\Delta\theta^\star\|_A
+\leq
+\left(\max_{\lambda_i(A)>0}|1-\gamma\lambda_i(A)|\right)^m
+\|\Delta\theta_0-\Delta\theta^\star\|_A.
+\]
+若 $\lambda_{\min}^+(A)$ 很小，则最慢方向的收缩率接近 $1-\gamma\lambda_{\min}^+(A)$；其步数由条件数 $\kappa(A)=\lambda_{\max}(A)/\lambda_{\min}^+(A)$ 控制。
+\end{theorem}
+
+\begin{proof}
+一阶条件为 $\nabla\mathcal Q(\Delta\theta)=A\Delta\theta-b$。由于 $A$ 对称，可取正交特征分解 $A=U\Lambda U^{\mathsf T}$。在正特征值子空间中，令 $e_m=\Delta\theta_m-\Delta\theta^\star$，则
+\[
+e_{m+1}=(I-\gamma A)e_m.
+\]
+在第 $i$ 个特征方向上，
+\[
+e_{m+1,i}=(1-\gamma\lambda_i)e_{m,i}.
+\]
+条件 $0<\gamma<2/\lambda_{\max}(A)$ 等价于所有正特征值满足 $|1-\gamma\lambda_i|<1$。因此
+\[
+\|e_m\|_A^2
+=\sum_{\lambda_i>0}\lambda_i(1-\gamma\lambda_i)^{2m}e_{0,i}^2
+\leq
+\left(\max_{\lambda_i>0}|1-\gamma\lambda_i|\right)^{2m}\|e_0\|_A^2.
+\]
+开平方即得结论。零特征值方向不由局部目标确定，使用 Moore--Penrose 逆得到最小范数代表元 $A^\dagger b$。
+\end{proof}
+
+Natural Gradient 用 Fisher 预条件器把更新写成
+\[
+\Delta\theta_{m+1}
+=\Delta\theta_m-\gamma\Fisher_\theta^\dagger
+\nabla_\theta\mathcal Q(\Delta\theta_m).
+\]
+当 $\Fisher_\theta$ 与 $A$ 的主要病态方向一致时，它会压平不同参数坐标的尺度；理想的 $A^\dagger$ 预条件器在二次模型上可一步到达 $\Delta\theta^\star$。实际 Natural Gradient 通常只使用 Fisher 的近似，因此得到的是改善条件数而不是普遍的一步收敛。AdamW 的逐坐标二阶矩也不等价于 Fisher 逆，因而没有同样的几何不变性保证。
+
+经典 MDPO 的关键实现结论正是这一点：若在 $\theta_k$ 处只做一次梯度步，$\KL(\pi_\theta\Vert\pi_k)$ 在 $\theta=\theta_k$ 的一阶梯度为零，该步退化为普通 policy gradient，尚未体现 trust-region 的曲率；固定旧策略并进行多次 inner 更新，才会真正逼近式 \eqref{eq:ch2-mirror} 的镜像解。因而本文的 outer step 定义为“固定 $\pi_k$ 后把 inner 子问题优化到给定误差”，而不是把一次 SGD 更新误称为一次收敛的 mirror step。
+
+\paragraph{几何中间分布与算术 proximal teacher 的区别。} 式 \eqref{eq:ch2-opd-geometric-bridge} 给出的 $\pi_k^{1-\eta}T^\eta/Z_k$ 是 KL 镜像子问题的精确解，因此在 log-probability 空间插值。TOP-D 中的算术 teacher
+\[
+\widetilde T_\eta=(1-\eta)\pi_k+\eta T
+\]
+是另一个用于控制 log-ratio 方差的 teacher operator。它同样产生 student 与 teacher 之间的中间分布，但不等价于 KL mirror 解；前者改变 target teacher，后者改变 proximal 优化问题的解。
+
+\subsection{OPD 的 off-policy prefix 复用}
+
+OPD 的优势在于教师可以在学生访问到的 prefix 上提供稠密 token 信号。设 replay 测度为 $d_b$，只要 $d_{\pi_k}\ll d_b$，outer mirror 目标可以写成
+\begin{equation}
+\label{eq:ch2-opd-prefix-is}
+\E_{s\sim d_{\pi_k}}[\ell_k(s)]
+=\E_{s\sim d_b}\left[W_{<t}(s)\ell_k(s)\right],
+\qquad
+W_{<t}(s)=\frac{d_{\pi_k}(s)}{d_b(s)}.
+\end{equation}
+PMD-Part、PMD-Mean 和 BPO 在 action 层都可用 $a\sim\pi_k(\cdot\mid s)$ 的样本完成回归，不需要额外 action-level IS；off-policy 的主要问题转移到 prefix 访问测度 $W_{<t}$。若把 $d_b$ 当作固定投影测度而不做 $W_{<t}$，得到的是 replay 加权的近似 mirror step，而非严格的 $d_{\pi_k}$ 加权 outer 目标。这正是 OPD 可以利用状态丰富性、同时需要报告访问测度偏差的地方。
 
 \section{直接优化镜像目标：MDPO}
 \label{sec:ch2-mdpo}
@@ -374,6 +569,7 @@ F_s(\theta)=\E_{\pi_\theta}[f(s,a)]-\frac1\eta\KL(\pi_\theta\Vert\mu)
 =\E_{a\sim\mu}\left[\rho_\theta(s,a)\left(f-\frac1\eta\log\rho_\theta\right)g_\theta\right].
 \end{equation}
 MDPO 与三种回归方法共享同一 Gibbs 驻点，但显式保留 action-level importance ratio。
+
 
 \section{共享零点、不同梯度的定理}
 \label{sec:ch2-theorems}
