@@ -66,6 +66,26 @@ Z_f(s)=\sum_{v\in\mathcal V}\pi_k(v\mid s)\exp\!\bigl(\eta f(s,v)\bigr).
 若 $f=A^{\pi_k}$ 是 anchor 的优势函数，则 $\bar f_k(s)=0$ 是优势函数定义推出的恒等式；对一般 teacher score 或 OPD log-ratio，$\bar f_k(s)=0$ 不是自动成立的假设。
 \end{definition}
 
+\begin{proposition}[优势函数的 anchor 条件均值]
+\label{prop:ch2-advantage-centering}
+若 $f(s,a)=A^{\pi_k}(s,a)$，则对每个满足 $\pi_k(\cdot\mid s)$ 定义的历史，
+\begin{equation}
+\label{eq:ch2-advantage-zero-mean}
+\mathbb E_{a\sim\pi_k(\cdot\mid s)}[f(s,a)\mid s]=0.
+\end{equation}
+对于一般 OPD log-ratio 或 teacher score，该等式不是定义恒等式，必须显式估计并减去条件均值。
+\end{proposition}
+
+\begin{proof}
+由 $A^{\pi_k}(s,a)=Q^{\pi_k}(s,a)-V^{\pi_k}(s)$ 以及
+$V^{\pi_k}(s)=\mathbb E_{a\sim\pi_k}[Q^{\pi_k}(s,a)\mid s]$，有
+\begin{align*}
+\mathbb E_{\pi_k}[A^{\pi_k}(s,a)\mid s]
+&=\mathbb E_{\pi_k}[Q^{\pi_k}(s,a)\mid s]-V^{\pi_k}(s)\\
+&=V^{\pi_k}(s)-V^{\pi_k}(s)=0.
+\end{align*}
+\end{proof}
+
 \begin{proposition}[中心化不改变 mirror 最优策略]
 \label{prop:ch2-centering}
 用 $\widetilde f_k$ 替代 $f$ 不改变式 \eqref{eq:ch2-mirror} 的最优分布。
@@ -210,7 +230,20 @@ PMD-Mean 用 $\eta\widetilde f_k$ 作为回归 target，并要求 student log-ra
 \quad\text{s.t.}\quad
 \mathbb E_{\pi_k}[e^{U}\mid s]=1.
 \end{equation}
-约束正是 $\sum_a\pi_\theta(a\mid s)=1$ 在 log-ratio 坐标中的表达。若把词表上的函数值写为 $U_a$ 和 $G_a=\eta\widetilde f_k(s,a)$，拉格朗日函数为
+
+\begin{theorem}[PMD-Mean 的逐历史 Lambert-$W$ 投影]
+\label{thm:ch2-mean-lambert}
+在有限词表、$\pi_k(a\mid s)>0$ 且约束可行时，上述中心化平方回归的唯一 KKT 解满足
+\begin{equation}
+\label{eq:ch2-mean-lambert-theorem}
+U_a=G_a-W\!\left(\lambda(s)e^{G_a}\right),\qquad
+G_a=\eta\widetilde f_k(s,a),
+\end{equation}
+其中 $\lambda(s)\geq0$ 由 $\sum_a\pi_k(a\mid s)e^{U_a}=1$ 唯一确定。
+\end{theorem}
+
+\begin{proof}
+以下给出固定历史 $s$ 的 KKT 推导。令词表上的函数值为 $U_a$ 和 $G_a=\eta\widetilde f_k(s,a)$，拉格朗日函数为
 \[
 \mathscr L(U,\lambda)
 =\frac12\sum_a\pi_k(a\mid s)(U_a-G_a)^2
@@ -229,7 +262,10 @@ U_a=G_a-W\!\left(\lambda e^{G_a}\right),
 \[
 \Phi(\lambda)=\sum_a\pi_k(a\mid s)\exp\!\left(G_a-W(\lambda e^{G_a})\right),qquad \lambda\geq0.
 \]
-Lambert--$W$ 在非负轴上单调递增，因此每一项随 $\lambda$ 单调递减；当 $\lambda=0$ 时 $\Phi(0)=\sum_a\pi_k(a\mid s)e^{G_a}$，而 $\lambda\to\infty$ 时 $\Phi(\lambda)\to0$。只要中心化 target 不已经满足 $\Phi(0)=1$，方程 $\Phi(\lambda)=1$ 有唯一正根；若 $\Phi(0)=1$，则 $\lambda=0$，得到 $U_a=G_a$。因此 PMD-Mean 是中心化 target 在指数归一化集合上的投影。特别地，精确 Gibbs 解的 log-ratio 为
+Lambert--$W$ 在非负轴上单调递增，因此每一项随 $\lambda$ 单调递减；当 $\lambda=0$ 时 $\Phi(0)=\sum_a\pi_k(a\mid s)e^{G_a}$，而 $\lambda\to\infty$ 时 $\Phi(\lambda)\to0$。只要中心化 target 不已经满足 $\Phi(0)=1$，方程 $\Phi(\lambda)=1$ 有唯一正根；若 $\Phi(0)=1$，则 $\lambda=0$，得到 $U_a=G_a$。因此 PMD-Mean 是中心化 target 在指数归一化集合上的投影。严格凸性和 $\Phi$ 的严格单调性给出 KKT 解的唯一性。
+\end{proof}
+
+约束 $\sum_a\pi_\theta(a\mid s)=1$ 正是 log-ratio 坐标中的指数归一化条件。特别地，精确 Gibbs 解的 log-ratio 为
 \[
 U_a^\star=\eta f(s,a)-\log Z_f(s),\qquad
 U_a^\star-\eta\widetilde f_k(s,a)=\eta\bar f_k(s)-\log Z_f(s),
