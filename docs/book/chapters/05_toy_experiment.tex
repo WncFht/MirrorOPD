@@ -1,0 +1,58 @@
+\chapter{可枚举 Token 实验与实现边界}
+
+\section{实验设置}
+
+实验脚本位于 \texttt{experiments/toy\_token\_inner.py}。它只包含一个固定 history 和四个 token：
+\[
+ \mu=(0.62,0.23,0.10,0.05),
+ \qquad
+ T=(0.08,0.17,0.25,0.50).
+\]
+每个方法从同一个初始策略开始，完整枚举 vocabulary，不使用 rollout，不使用 sequence-level reward。这样可以单独检查 token-level inner 的数学对象。PMD-Part 和 PMD-Mean 用 exact weighted squared residual；BPO 使用完整 categorical objective；MDPO 使用 exact categorical Fisher preconditioner。
+
+\section{结果}
+
+表~\ref{tab:toy-results} 报告 400 个 inner updates 后与 exact target 的 total variation 距离和 KL。BPO、MDPO 达到机器精度；PMD-Part、PMD-Mean 使用固定 learning rate，因此保留小的优化误差，降低 learning rate 或继续更新后继续下降。
+
+\begin{table}[ht]
+\centering
+\caption{固定测度 token inner 的可枚举实验。}
+\label{tab:toy-results}
+\begin{tabular}{llrr}
+\toprule
+$\eta$ & 方法 & $\TV(p,p^+)$ & $\KL(p\Vert p^+)$\\
+\midrule
+0.25 & PMD-Part & 1.11e-3 & 6.79e-6\\
+0.25 & PMD-Mean & 1.25e-3 & 8.30e-6\\
+0.25 & BPO & $2.16\times10^{-15}$ & $-5.35\times10^{-17}$\\
+0.25 & MDPO & $1.11\times10^{-16}$ & $9.34\times10^{-17}$\\
+0.50 & PMD-Part & 2.65e-3 & 2.54e-5\\
+0.50 & PMD-Mean & 4.71e-3 & 6.85e-5\\
+0.50 & BPO & $9.54\times10^{-13}$ & $5.44\times10^{-17}$\\
+0.50 & MDPO & $1.25\times10^{-16}$ & $3.14\times10^{-17}$\\
+0.80 & PMD-Part & 2.97e-3 & 2.65e-5\\
+0.80 & PMD-Mean & 1.12e-2 & 2.73e-4\\
+0.80 & BPO & $4.15\times10^{-7}$ & $7.20\times10^{-13}$\\
+0.80 & MDPO & $1.80\times10^{-16}$ & $-7.73\times10^{-17}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+实验验证了三个实现结论。第一，四个方法的 exact fixed point 相同；差别在于 residual、policy-gradient estimator 和 Fisher geometry。第二，BPO 必须把 KL 作为带正确梯度的项；K4 可以在不保存完整词表时实现这一点。第三，$\eta$ 改变的是 mirror target 的位置：$\eta$ 越大，target 越接近 teacher；它不能代替 inner optimizer learning rate。
+
+\section{正式 LLM 实验前必须通过的检查}
+
+在 Pythia-14M/70M 上运行前，代码应先逐项通过以下 oracle tests：
+
+\begin{enumerate}
+\item 对随机 categorical logits，检查 PMD-Part 的 \texttt{logsumexp} target 与显式求和一致；
+\item 对随机 $p,q$，用大量样本检查 K4 value 与 exact $\KL(p\Vert q)$ 的误差按 $O(B^{-1/2})$ 下降；
+\item 用 autograd finite difference 检查 K4 gradient，而不是只检查 value；
+\item 检查固定 anchor 采样的 importance correction 在 $p/q$ 接近一时无偏；
+\item 人为增加 inner steps，确认 current-anchor $\chi^2$ 和估计方差同时上升；
+\item hard sync 后重新 rollout，确认新一轮 residual 使用新的 anchor，而不是上一轮缓存的 log-prob。
+\end{enumerate}
+
+这些检查完成前不运行大型模型 sweep。当前仓库中的 toy 输出由
+\texttt{uv run --with torch python experiments/toy\_token\_inner.py} 生成，结果保存在\texttt{experiments/toy\_token\_inner.csv}。独立的
+\texttt{experiments/test\_kl\_estimators.py} 使用 200,000 个 token 样本检查 K4 的 value 与 autograd gradient；本次运行的绝对 value 误差为 $5.6\times10^{-5}$，gradient 的 $ell_2$ 误差为 $1.5\times10^{-3}$。

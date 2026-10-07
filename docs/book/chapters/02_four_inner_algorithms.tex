@@ -1,0 +1,111 @@
+\chapter{四种 Token-level Inner 算法}
+
+\section{PMD-Part：完整 partition 的残差回归}
+
+在固定 $s$ 上，令 $a\sim\mu_k$. PMD-Part 最小化式~\eqref{eq:part-loss}。其 score-function 梯度为
+\begin{equation}\label{eq:part-gradient}
+ -\nabla_\theta\mathcal L_{\mathrm{part}}
+ =\E_{\mu_k}\left[
+ \left(\eta r_k-\log Z_k-u_\theta\right)
+ \nabla_\theta\log\pi_\theta(a\mid s)
+ \right].
+\end{equation}
+注意 $\log Z_k$、$r_k$ 和 $\log\mu_k$ 在 inner 内停止梯度。若 action 是从 replay 测度 $\beta$ 采样，则乘上
+\[
+ w_{\theta/\beta}(s,a)=\frac{\pi_\theta(a\mid s)}{\beta(a\mid s)}
+\]
+才能把梯度还原到 $\pi_\theta$ 测度；若只想优化固定 replay projection，则不乘该权重。
+
+\begin{algorithm}[ht]
+\caption{固定测度 PMD-Part}
+\begin{algorithmic}[1]
+\Require frozen anchor $\mu_k$, teacher $T$, history batch $s_i$, $\eta$
+\For{each $s_i$}
+  \State $\log Z_i\gets\operatorname{logsumexp}_a((1-\eta)\log\mu_k(a\mid s_i)+\eta\log T(a\mid s_i))$
+  \State sample $a_i\sim\mu_k(\cdot\mid s_i)$ and compute $r_i=\log T(a_i\mid s_i)-\log\mu_k(a_i\mid s_i)$
+  \State $q_i\gets\eta r_i-\log Z_i-\log\pi_\theta(a_i\mid s_i)+\log\mu_k(a_i\mid s_i)$
+\EndFor
+\State update $\theta$ by minimizing $\frac{1}{2B}\sum_i q_i^2$
+\end{algorithmic}
+\end{algorithm}
+
+\section{PMD-Mean：anchor 测度下的中心化}
+
+PMD-Mean 使用 $m_k(s)=\E_{\mu_k}r_k(s,a)$，并在两边都去除 anchor 测度下的 action-independent 均值。令
+\[
+\bar u_\theta(s)=\E_{\mu_k}[u_\theta(s,a)],
+\qquad
+q_{\mathrm{mean}}=(u_\theta-\bar u_\theta)-\eta(r_k-m_k).
+\]
+这相当于在 quotient space $u\sim u+c(s)$ 上回归。对固定 $s$，若 $m_k$ 精确，则
+\[
+ q_{\mathrm{mean}}=0
+ \Longleftrightarrow
+ u_\theta-\bar u_\theta=\eta(r_k-m_k).
+\]
+将中心化等式与 $u_\theta=\eta r_k-\log Z_k$ 比较即可恢复同一个 target；这里不要求 $\eta m_k=\log Z_k$。有限参数回归的条件数和噪声则与 PMD-Part 不同。
+
+当每个 history 有 $K$ 条独立 anchor action 时，使用 leave-one-out center
+\[
+ \widehat m_{-j}(s)=\frac{1}{K-1}\sum_{\ell\ne j}r_k(s,a_\ell)
+\]
+可以避免中心与当前 score 的协方差偏差。直接使用同一批样本的均值会产生因子 $(K-1)/K$ 的梯度收缩。
+
+\section{BPO：固定测度上的 KL 正则化梯度}
+
+BPO 在本章中定义为直接优化共同目标~\eqref{eq:common-objective}，但不回归整条 log-ratio，而是使用 policy-gradient 形式：
+\begin{equation}\label{eq:bpo-gradient-exact}
+ g_{\mathrm{BPO}}(s)
+ =\E_{a\sim p_\theta}\left[
+ \left(r_k(s,a)-\frac1\eta\log\frac{p_\theta(a\mid s)}{\mu_k(a\mid s)}\right)
+ \nabla_\theta\log p_\theta(a\mid s)\right].
+\end{equation}
+这是 $\nabla_\theta\mathcal J_{k,s}(p_\theta)$ 的精确形式；加任意 action-independent baseline 不改变梯度。
+
+固定测度实现从 $\mu_k$ 采样，令 $w_\theta=p_\theta/\mu_k$，则
+\begin{equation}\label{eq:bpo-fixed-measure}
+ g_{\mathrm{BPO}}(s)
+ =\E_{a\sim\mu_k}\left[\operatorname{sg}(w_\theta)
+ \left(r_k-\frac1\eta\log w_\theta\right)
+ \nabla_\theta\log p_\theta(a\mid s)\right].
+\end{equation}
+这里的 $\operatorname{sg}(w_\theta)$ 只负责改变积分测度；score 本身保留梯度。
+
+为了不枚举词表，使用 2602.04417 中的 K4 估计量。对 $a\sim p_\theta$，设 $w=\mu_k(a)/p_\theta(a)$、$r_\theta=p_\theta(a)/\operatorname{sg}(p_\theta(a))$，则
+\begin{equation}\label{eq:k4}
+ \widehat{\KL}_{\mathrm{K4}}=r_\theta[-\log w]
+\end{equation}
+在数值上无偏估计 $\KL(p_\theta\Vert\mu_k)$，其自动微分梯度也无偏估计该 KL 的梯度。固定 $\mu_k$ 采样时，再乘以 $\operatorname{sg}(p_\theta/\mu_k)$ 做 action-measure correction。K1 只有无偏 value 而没有正确的 gradient；K3 的 gradient 对应相反方向的 KL，不能在这里直接使用。
+
+\begin{algorithm}[ht]
+\caption{固定测度 BPO-K4}
+\begin{algorithmic}[1]
+\Require frozen $\mu_k,T$, token histories $s_i$, $\eta$
+\For{each sampled $a_i\sim\mu_k$}
+  \State $r_i\gets\log T(a_i\mid s_i)-\log\mu_k(a_i\mid s_i)$
+  \State $w_i\gets\exp(\log\pi_\theta(a_i\mid s_i)-\log\mu_k(a_i\mid s_i))$
+  \State $k_i\gets\operatorname{sg}(w_i)\,r_{\theta,i}[-\log(\mu_k(a_i\mid s_i)/\pi_\theta(a_i\mid s_i))]$
+  \State maximize $\operatorname{sg}(w_i)r_i-k_i/\eta$ with automatic differentiation
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\section{MDPO：Fisher 几何下的同一子问题}
+
+MDPO 不改变 target，而改变 inner 的更新几何。令
+\[
+ F_\theta(s)=\E_{a\sim\mu_k}\left[\operatorname{sg}(w_\theta)
+ g_\theta(s,a)g_\theta(s,a)^\top\right]
+\]
+为 anchor-measure 下的 Fisher 矩阵，$g_\theta$ 为式~\eqref{eq:bpo-fixed-measure} 的梯度。MDPO 的自然梯度步是
+\begin{equation}\label{eq:mdpo-step}
+ \theta^+ =\theta+\alpha F_\theta(s)^{\dagger}g_\theta(s).
+\end{equation}
+在 tabular categorical policy 的概率坐标中，$\alpha=1$ 且使用 exact gradient 时，该步等价于 mirror step 的一阶坐标表示；在神经网络参数中，它只是对共同目标的 Fisher-preconditioned近似，因此需要 inner line search 或 trust-region cap。
+
+\begin{proposition}[共同固定点]
+若词表支持满足条件，且使用 exact partition/K4 gradient、函数类能够表示目标，则 PMD-Part、PMD-Mean、BPO-K4 和 MDPO 的共同 stationary distribution 都是 $p_k^+$。
+\end{proposition}
+\begin{proof}
+PMD-Part 由平方 residual 为零得到式~\eqref{eq:token-target}。PMD-Mean 只改变 action-independent 常数，归一化恢复同一常数。BPO-K4 是共同目标的无偏梯度；严格凹的 KL 正则目标只有一个 stationary distribution。MDPO 使用同一梯度的正定 Fisher 预条件，因而不改变零点。\hfill$\square$
+\end{proof}

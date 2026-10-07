@@ -1,0 +1,106 @@
+\chapter{固定测度的 Token 级优化问题}
+
+\section{外层同步与内层对象}
+
+第 $k$ 个 outer step 开始时，学生策略、anchor 和教师分别记为
+\[
+\pi_k(\cdot\mid s),\qquad \mu_k(\cdot\mid s),\qquad T(\cdot\mid s).
+\]
+hard sync 时 $\mu_k=\pi_k$；soft sync 时 $\mu_k$ 是学生参数的 EMA。一个 token history $s=(x,y_{<t})$ 在本章内被冻结。外层采样只负责产生一批 history；inner 不再改变该批 history 的访问测度，也不重新计算教师目标。
+
+定义教师相对 anchor 的 token reward
+\[
+r_k(s,a)=\log T(a\mid s)-\log\mu_k(a\mid s).
+\]
+我们研究的 inner 子问题是
+\begin{equation}\label{eq:common-objective}
+ \max_{p\in\Delta(\mathcal V)}
+ \mathcal J_{k,s}(p)
+ =\E_{a\sim p}[r_k(s,a)]-
+ \frac{1}{\eta}\KL(p\Vert\mu_k),
+ \qquad \eta>0.
+\end{equation}
+这里的 $p$ 是当前 history 上的下一个 token 分布，\emph{不是}整条 response 的分布。访问测度固定只意味着 $s$ 不随 inner 更新；它不意味着优化变量 $p$ 必须等于采样分布 $\mu_k$。
+
+\section{共同闭式解}
+
+令
+\[
+ Z_k(s)=\sum_{a\in\mathcal V}\mu_k(a\mid s)\exp(\eta r_k(s,a)).
+\]
+由于 $r_k=\log T-\log\mu_k$，有
+\begin{equation}\label{eq:token-partition}
+ Z_k(s)=\sum_a\mu_k(a\mid s)^{1-\eta}T(a\mid s)^\eta.
+\end{equation}
+
+\begin{theorem}[Token mirror target]
+\label{thm:token-target}
+若 $\mu_k(a\mid s)>0$ 时 $T(a\mid s)>0$，则式~\eqref{eq:common-objective} 的唯一最大点为
+\begin{equation}\label{eq:token-target}
+ p_k^+(a\mid s)=
+ \frac{\mu_k(a\mid s)\exp(\eta r_k(s,a))}{Z_k(s)}
+ =\frac{\mu_k(a\mid s)^{1-\eta}T(a\mid s)^\eta}{Z_k(s)}.
+\end{equation}
+并且对任意 $p$，
+\begin{equation}\label{eq:variational-identity}
+ \mathcal J_{k,s}(p)
+ =\frac{1}{\eta}\log Z_k(s)
+ -\frac{1}{\eta}\KL(p\Vert p_k^+).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+由式~\eqref{eq:token-target}，
+\[
+ \log p_k^+(a\mid s)=\log\mu_k(a\mid s)+\eta r_k(s,a)-\log Z_k(s).
+\]
+因此
+\begin{align*}
+ \KL(p\Vert p_k^+)
+ &=\sum_a p(a\mid s)\left[
+ \log\frac{p(a\mid s)}{\mu_k(a\mid s)}
+ -\eta r_k(s,a)+\log Z_k(s)\right]\\
+ &=\KL(p\Vert\mu_k)-\eta\E_p[r_k]+\log Z_k(s).
+\end{align*}
+移项得到式~\eqref{eq:variational-identity}。KL 非负且仅在 $p=p_k^+$ 时为零，所以最大点唯一。\hfill$\square$
+\end{proof}
+
+\begin{corollary}[几何插值与极限]
+当 $\eta=0$ 时 $p_k^+=\mu_k$ 的一阶极限成立；当 $\eta=1$ 时 $p_k^+=T$；当 $0<\eta<1$ 时，logits 满足
+\[
+ \log p_k^+=(1-\eta)\log\mu_k+\eta\log T-\log Z_k.
+\]
+因此 $\eta$ 是 token-level teacher interpolation，而不是 inner optimizer 的学习率。
+\end{corollary}
+
+\section{固定测度下的三个等价表述}
+
+定义 $m_k(s)=\E_{a\sim\mu_k}[r_k(s,a)]$。由 KL 定义，
+\begin{equation}\label{eq:reward-center}
+ m_k(s)=-\KL(\mu_k(\cdot\mid s)\Vert T(\cdot\mid s)).
+\end{equation}
+将 reward 换成 $r_k-m_k$ 只改变 partition 的常数：
+\[
+ \E_{\mu_k}[e^{\eta(r_k-m_k)}]=e^{-\eta m_k}Z_k,
+\]
+所以闭式分布 $p_k^+$ 不变。这是 PMD-Part 与 PMD-Mean 共享固定点的原因。
+
+若定义 $u_\theta(s,a)=\log\pi_\theta(a\mid s)-\log\mu_k(a\mid s)$，则 exact regression residual 为
+\begin{equation}\label{eq:part-residual}
+ q_{\mathrm{part}}(s,a;\theta)=u_\theta(s,a)-\eta r_k(s,a)+\log Z_k(s).
+\end{equation}
+PMD-Mean 使用
+\begin{equation}\label{eq:mean-residual}
+ q_{\mathrm{mean}}(s,a;\theta)=u_\theta(s,a)-\eta[r_k(s,a)-m_k(s)].
+\end{equation}
+二者的零点都等价于 $\pi_\theta=p_k^+$，但有限样本中 $\log Z_k$ 与 $m_k$ 的估计方差不同。
+
+\section{参数化策略的投影}
+
+实际神经网络只能表示 $\{\pi_\theta\}$。固定 history 测度 $\rho_k(s)$ 后，PMD-Part 的总体 inner loss 定义为
+\begin{equation}\label{eq:part-loss}
+ \mathcal L_{\mathrm{part}}(\theta)
+ =\frac12\E_{s\sim\rho_k,a\sim\mu_k}
+ \left[q_{\mathrm{part}}(s,a;\theta)^2\right].
+\end{equation}
+若模型在每个 history 上可以实现式~\eqref{eq:token-target}，则全局最小值为零；否则最小值是 anchor history 测度下的函数类投影误差。inner steps 增加只能逼近该投影，不能消除模型表达误差或 history coverage 误差。

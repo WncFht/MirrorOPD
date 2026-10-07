@@ -1,0 +1,95 @@
+\chapter{Outer 同步与有限 inner 的动力学}
+
+\section{Hard sync 的精确动力学}
+
+先考虑每个 history 的 teacher 分布 $T$ 不随 outer 改变，并且 inner 精确收敛到式~\eqref{eq:token-target}。hard sync 定义为
+\[
+ \mu_k=\pi_k,
+ \qquad
+ \pi_{k+1}=\frac{\pi_k^{1-\eta}T^\eta}{Z_k}.
+\]
+
+\begin{theorem}[Hard-sync geometric interpolation]
+\label{thm:hard-sync}
+若 $0<\eta\leq1$ 且初始策略与 $T$ 互相绝对连续，则
+\begin{equation}\label{eq:hard-closed}
+ \pi_k(a\mid s)=
+ \frac{\pi_0(a\mid s)^{(1-\eta)^k}
+ T(a\mid s)^{1-(1-\eta)^k}}
+ {\sum_b\pi_0(b\mid s)^{(1-\eta)^k}T(b\mid s)^{1-(1-\eta)^k}}.
+\end{equation}
+并且
+\[
+ \log\frac{\pi_k(a\mid s)}{T(a\mid s)}
+ =(1-\eta)^k\log\frac{\pi_0(a\mid s)}{T(a\mid s)}-\log C_k(s),
+\]
+其中 $C_k(s)$ 是归一化常数。$\eta=1$ 时一个 exact inner 将策略直接变成 teacher；$0<\eta<1$ 时每一轮只消除比例 $\eta$ 的 log-density mismatch。
+\end{theorem}
+
+\begin{proof}
+归纳证明。$k=0$ 显然成立。假设式~\eqref{eq:hard-closed} 成立，则
+\[
+ \pi_{k+1}\propto\pi_k^{1-\eta}T^\eta
+ \propto \pi_0^{(1-\eta)^{k+1}}
+ T^{(1-\eta)(1-(1-\eta)^k)+\eta}.
+\]
+指数合并为 $1-(1-\eta)^{k+1}$，归一化后得到结论。\hfill$\square$
+\end{proof}
+
+\begin{corollary}[Outer contraction]
+在任意固定 $s$ 上，unnormalized log-ratio 的 contraction factor 是 $1-\eta$。若 log-ratio 初始振幅不超过 $B$，则归一化后 total variation 满足
+\[
+ \TV(\pi_k,T)\leq\frac12\left(e^{2B(1-\eta)^k}-1\right).
+\]
+该界说明小 $\eta$ 不是免费加稳定性：它把每轮变化缩小，同时把达到相同 teacher proximity 所需的 outer steps 增加到 $O(\eta^{-1}\log(1/\varepsilon))$。
+\end{corollary}
+
+\section{有限 inner 与 stale target}
+
+实际第 $k$ 轮只运行 $M_k$ 个 inner steps，得到 $\widehat\pi_{k+1}$。假设在每个 history 上有 log-density 误差
+\[
+ \left|\log\frac{\widehat\pi_{k+1}(a\mid s)}{\pi_{k+1}^+(a\mid s)}\right|\leq\varepsilon_k
+\]
+在归一化前成立。则归一化后
+\begin{equation}\label{eq:finite-inner-tv}
+ \TV(\widehat\pi_{k+1},\pi_{k+1}^+)
+ \leq \frac12(e^{2\varepsilon_k}-1).
+\end{equation}
+令 $d_k=\TV(\pi_k,T)$，由 triangle inequality 和 hard-sync contraction 得
+\begin{equation}\label{eq:outer-error-recursion}
+ d_{k+1}
+ \leq (1-\eta)d_k+\delta_k,
+ \qquad
+ \delta_k=\frac12(e^{2\varepsilon_k}-1).
+\end{equation}
+因此
+\[
+ d_K\leq(1-\eta)^K d_0+
+ \sum_{j=0}^{K-1}(1-\eta)^{K-1-j}\delta_j.
+\]
+有限 inner 误差不会被简单地“下一轮 rollout”消失；它会以几何权重累积。若 $\delta_j\leq\bar\delta$，稳态误差上界为 $\bar\delta/\eta$。
+
+\section{Soft sync 的耦合动力学}
+
+若 anchor 使用 EMA，令
+\[
+ \mu_{k+1}=\lambda\mu_k+(1-\lambda)\widehat\pi_{k+1}
+\]
+表示概率空间中的近似 soft sync。精确 inner 目标是
+\[
+ \widehat\pi_{k+1}\propto\mu_k^{1-\eta}T^\eta.
+\]
+忽略归一化扰动并在线性 log-density 坐标中写 $z_k=\log\mu_k-\log T$，得到近似递推
+\[
+ z_{k+1}\approx[\lambda+(1-\lambda)(1-\eta)]z_k
+ =[1-(1-\lambda)\eta]z_k.
+\]
+所以 EMA 同时把 outer contraction 从 $1-\eta$ 改成 $1-(1-\lambda)\eta$。当 $\lambda$ 接近 $1$，anchor 漂移非常慢，训练稳定但 teacher tracking 速度下降；这不是 inner 学习率的效果，而是 outer target 的真实动力学。
+
+\section{访问测度固定的含义}
+
+本章所有递推都是逐 history 的 token distribution 递推。真实 LLM 中 history 集合由 $\rho_k$ 产生；只要 inner 内固定该集合，以上结论适用于 conditional token target。outer rollout 更新后，$\rho_{k+1}$ 改变，必须额外记录 coverage drift：
+\[
+ \Delta_k=\TV(\rho_{k+1},\rho_k).
+\]
+若 token loss 在所有 history 上有上界 $C$，则访问测度改变给目标梯度带来至多 $2C\Delta_k$ 的偏差。因而“固定测度下求解 token 子问题”和“outer 重新 rollout”是两个严格分开的步骤。
