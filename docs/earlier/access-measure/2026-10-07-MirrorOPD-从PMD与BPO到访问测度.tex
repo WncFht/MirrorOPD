@@ -9,6 +9,8 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{float}
+\usepackage{array}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
 
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Var}{\operatorname{Var}}
@@ -36,7 +38,7 @@
 
 \chapter*{摘要}
 \addcontentsline{toc}{chapter}{摘要}
-本文从固定 prefix 上的 KL 镜像子问题出发，统一写出 PMD-Part、PMD-Mean、BPO 与 MDPO 的优化目标、精确最优解和参数梯度。主线结论是：PMD-Part 的闭式 target 是 Gibbs 分布；PMD-Mean 是带单纯形约束的 Lambert-$W$ 投影；MDPO 直接优化 KL 正则化目标，梯度中保留 action importance ratio；BPO 从平方残差回归出发，在当前策略点附近线性化，再把梯度实现为带 mismatch weight 的 per-token policy-gradient surrogate。四者可以共享同一个 token-level 最优策略，但离开最优点后的梯度并不相同。重要性采样降低测度偏差却引入 ratio 方差，回归和 BPO 的截断权重降低方差却产生投影或截断偏差。最后核对 OpenKimi、经典 MDPO 和 BPO 论文源码，区分固定 inner budget 与真正的子问题收敛。
+本文从固定 prefix 上的 KL 镜像子问题出发，统一写出 PMD-Part、PMD-Mean、BPO 与 MDPO 的优化目标、精确最优解和参数梯度。主线结论是：PMD-Part 的闭式 target 是 Gibbs 分布；PMD-Mean 是带单纯形约束的 Lambert-$W$ 投影；MDPO 直接优化 KL 正则化目标，梯度中保留 action importance ratio；BPO 从平方 residual 回归出发；本稿保留完整 reverse-KL 导数并分析其中心化 score 梯度，不把后续线性化、二元 KL 或工程权重作为理论前提。四者可以共享同一个 token-level 最优策略，但离开最优点后的梯度并不相同。重要性采样降低测度偏差却引入 ratio 方差，回归型方法则承担访问测度下的投影偏差。最后核对 OpenKimi、经典 MDPO 和 BPO 论文源码，区分固定 inner budget 与真正的子问题收敛。
 
 \tableofcontents
 \mainmatter
@@ -84,21 +86,26 @@
 \end{theorem}
 
 \begin{proof}
-由式 \eqref{eq:gibbs}，有
+先检查式 \eqref{eq:gibbs} 确实定义了概率分布。由于 $Z_f(s)$ 是有限正数，
 \[
-\log\cand^+(a\mid s)=\log\beh(a\mid s)+f(s,a)/\tau-\log Z_f(s).
+\sum_a\cand^+(a\mid s)
+=\frac{1}{Z_f(s)}\sum_a\beh(a\mid s)e^{f(s,a)/\tau}=1.
 \]
-代入 KL 得
+并且 $\cand^+(a\mid s)>0$ 只可能发生在 $\beh(a\mid s)>0$ 的 action 上，所以 $\cand^+\ll\beh$。
+对任意满足 $p\ll\beh$ 的候选分布，由定义逐项展开可得
 \begin{align*}
 \KL(p\Vert\cand^+)
+&=\E_p\left[\log\frac{p}{\cand^+}\right]\\
+&=\E_p\left[\log\frac{p}{\beh}
+      -\frac{f}{\tau}+\log Z_f(s)\right]\\
 &=\KL(p\Vert\beh)-\frac1\tau\E_p[f]+\log Z_f(s).
 \end{align*}
-整理得到
-\[
+将等式两边乘以 $-\tau$ 并整理，得到目标恒等式
+\begin{equation*}
 \E_p[f]-\tau\KL(p\Vert\beh)
 =\tau\log Z_f(s)-\tau\KL(p\Vert\cand^+).
-\]
-KL 非负且仅在 $p=\cand^+$ 时为零，故解唯一。
+\end{equation*}
+KL 散度满足 $\KL(p\Vert\cand^+)\geq0$，且等号当且仅当 $p=\cand^+$ 几乎处处成立。因此任意候选分布的目标值都不超过 $\tau\log Z_f(s)$，而 $p=\cand^+$ 达到该上界，故它是唯一最优解。
 \end{proof}
 
 \begin{corollary}[优势形式]
@@ -157,7 +164,7 @@ PMD-Part 在行为测度下回归精确最优性方程：
 
 PMD-Part 的重要性质是目标中没有 ratio 权重；ratio 只出现在被拟合的 log-ratio 中。因此它避免了直接 policy gradient 的乘法重尾，但有限模型下它优化的是 $d_\beh$ 加权的投影。
 
-\section{PMD-Mean：中心化回归与 Lambert-$W$}
+\section{\texorpdfstring{PMD-Mean：中心化回归与 Lambert-$W$}{PMD-Mean：中心化回归与 Lambert-W}}
 \label{sec:pmd-mean}
 
 令
@@ -185,11 +192,36 @@ PMD-Mean 不显式估计 $\log Z_f(s)$，而求解
 \end{theorem}
 
 \begin{proof}
-对固定 $s$ 加入约束乘子，拉格朗日函数为
+固定 prefix $s$，记行为概率为 $\beh_a=\beh(a\mid s)$，并把 $g_a=g(s,a)$。由于 action space 有限且 $\beh_a>0$，该问题是严格凸目标加凸归一化约束；因此满足 KKT 条件的解就是唯一全局解。其拉格朗日函数为
 \[
-\frac12\E_\beh[(u-g)^2]+\lambda(s)(\E_\beh[e^u]-1).
+\mathcal J(u,\lambda)=
+\frac12\sum_a\beh_a(u_a-g_a)^2
++\lambda\left(\sum_a\beh_a e^{u_a}-1\right).
 \]
-逐 action 的一阶条件是 $u-g+\lambda e^u=0$。令 $v=g-u$，则 $ve^v=\lambda e^g$，所以 $v=W(\lambda e^g)$，得到式 \eqref{eq:mean-lambert}。归一化条件确定 $\lambda$；当 $\lambda\geq0$ 时左侧随 $\lambda$ 单调下降，故解唯一。
+对每个 $u_a$ 求偏导，并利用 $\beh_a>0$，得到
+\[
+0=\frac{1}{\beh_a}\frac{\partial\mathcal J}{\partial u_a}
+=u_a-g_a+\lambda e^{u_a}.
+\]
+令 $v_a=g_a-u_a$，则 $u_a-g_a=-v_a$，代入上式并乘以 $e^{v_a}$：
+\[
+v_a=\lambda e^{g_a-v_a}
+\quad\Longleftrightarrow\quad
+v_a e^{v_a}=\lambda e^{g_a}.
+\]
+Lambert-$W$ 函数由 $W(z)e^{W(z)}=z$ 定义，所以
+\[
+v_a=W(\lambda e^{g_a}),
+\qquad
+u_a=g_a-W(\lambda e^{g_a}),
+\]
+这就是式 \eqref{eq:mean-lambert}。
+剩下的乘子由归一化方程确定。令
+\[
+H(\lambda)=\sum_a\beh_a
+\exp\left(g_a-W(\lambda e^{g_a})\right).
+\]
+对 $\lambda\geq0$，每个 $W(\lambda e^{g_a})$ 随 $\lambda$ 单调增加，因此 $H$ 连续单调下降；可行条件保证存在 $\lambda$ 使 $H(\lambda)=1$。严格凸性保证该乘子对应的 $u$ 唯一。
 \end{proof}
 
 PMD-Part 的修正项 $\log Z_f(s)$ 对 action 是常数，PMD-Mean 的 Lambert-$W$ 项依赖 action。两者只有在退化或额外近似下才相同；它们可以拥有相同的排序和单调改进性质，但不是同一个 mirror subproblem 的两个无偏实现。
@@ -201,13 +233,29 @@ MDPO 直接对式 \eqref{eq:token-subproblem} 的目标做参数优化。令
 \[
 F_s(\theta)=\E_{a\sim\cand_\theta}[f(s,a)]-\tau\KL(\cand_\theta\Vert\beh).
 \]
-对 $\theta$ 求导，利用 $\E_{\cand}[g_\theta]=0$，得到
+对 $\theta$ 求导时，先将 KL 写成
+\[
+\KL(\cand_\theta\Vert\beh)=
+\E_{a\sim\cand_\theta}[\log\ratio_\theta].
+\]
+对第一项使用 score identity，对第二项使用乘积法则：
+\begin{align*}
+\nabla_\theta\E_{\cand_\theta}[f]
+&=\E_{\cand_\theta}[f g_\theta],\\
+\nabla_\theta\E_{\cand_\theta}[\log\ratio_\theta]
+&=\E_{\cand_\theta}[g_\theta\log\ratio_\theta]
+  +\E_{\cand_\theta}[\nabla_\theta\log\ratio_\theta]\\
+&=\E_{\cand_\theta}[g_\theta\log\ratio_\theta]
+  +\E_{\cand_\theta}[g_\theta]
+=\E_{\cand_\theta}[g_\theta\log\ratio_\theta],
+\end{align*}
+因为 $\beh$ 不依赖 $\theta$，所以 $\nabla_\theta\log\ratio_\theta=g_\theta$，且归一化恒等式给出 $\E_{\cand_\theta}[g_\theta]=0$。因此
 \begin{equation}
 \label{eq:mdpo-onpolicy-gradient}
 \nabla F_s
 =\E_{a\sim\cand}\left[
 \left(f(s,a)-\tau\log\ratio_\theta(s,a)\right)g_\theta(s,a)
-\right],
+\right].
 \end{equation}
 其中 $\ratio_\theta=\cand_\theta/\beh$。若样本来自行为策略，则
 \begin{equation}
@@ -240,7 +288,7 @@ BPO 的 token-level PMD 起点与式 \eqref{eq:token-subproblem} 相同，使用
 
 理论上先对 residual 平方损失求梯度；本文件不把 BPO 的 clip、二元 KL 近似或具体 mismatch weight 纳入推导。对逐 prefix 的 token-level residual，完整 reverse KL 的导数是
 \begin{equation}
-\nabla_\theta\bigl[\log\rho(a)+\KL(\beh\Vert\cand)\bigr ]= g(a)-\E_\beh[g(a)].
+\nabla_\theta\bigl[\log\rho(a)+\KL(\beh\Vert\cand)\bigr]= g(a)-\E_\beh[g(a)].
 \label{eq:bpo-score-centering}
 \end{equation}
 因此 BPO 的未线性化梯度天然包含行为测度下的 score centering；下一章证明它与 PMD-Part 的差异恰好是一个 action-independent 常数乘以行为 score 均值。
@@ -276,7 +324,7 @@ BPO 的 token-level PMD 起点与式 \eqref{eq:token-subproblem} 相同，使用
 \label{thm:mdpo-exact-mse}
 设 $G=\E_\beh[\rho cg]$，批量大小为 $n$，并假设 $\E_\beh[\rho^2c^2\lVert g\rVert^2]<\infty$。则样本均值 $\widehat G_n$ 满足
 \begin{align}
-\operatorname{Bias}(\widehat G_n)&=0,\\\\
+\operatorname{Bias}(\widehat G_n)&=0,\\
 \E\lVert\widehat G_n-G\rVert^2
 &=\frac1n\left(\E_\beh[\rho^2c^2\lVert g\rVert^2]-\lVert G\rVert^2\right).
 \end{align}
@@ -288,24 +336,69 @@ BPO 的 token-level PMD 起点与式 \eqref{eq:token-subproblem} 相同，使用
 \end{theorem}
 
 \begin{proof}
-独立样本均值的期望等于单样本期望，所以偏差为零。对向量随机变量使用
-$\E\lVert n^{-1}\sum_i(X_i-\E X_i)\rVert^2=n^{-1}\E\lVert X-\E X\rVert^2$，得到第二式。最后由 $\E_\beh[\rho^2]=1+\chi^2(\cand\Vert\beh)$ 和逐点界得到上界。
+令
+\[
+X_i=\rho(a_i)c(a_i)g(a_i),
+\qquad a_i\stackrel{\mathrm{i.i.d.}}{\sim}\beh,
+\qquad \widehat G_n=\frac1n\sum_{i=1}^nX_i.
+\]
+由 support 条件，$\rho=\cand/\beh$ 在 $\beh$-几乎处处有定义。换测度恒等式给出
+\begin{align*}
+\E_\beh[X_i]
+&=\sum_a\beh(a)\frac{\cand(a)}{\beh(a)}c(a)g(a)\\
+&=\sum_a\cand(a)c(a)g(a)=\E_\cand[cg]=G.
+\end{align*}
+因此
+$\E[\widehat G_n]=n^{-1}\sum_i\E[X_i]=G$，样本均值的偏差严格为零。
+再令 $Y_i=X_i-G$。独立性和 $\E[Y_i]=0$ 消掉交叉项，故
+\begin{align*}
+\E\lVert\widehat G_n-G\rVert^2
+&=\E\left\lVert\frac1n\sum_iY_i\right\rVert^2\\
+&=\frac{1}{n^2}\sum_i\E\lVert Y_i\rVert^2
+=\frac1n\left(\E\lVert X_1\rVert^2-\lVert G\rVert^2\right).
+\end{align*}
+这就是向量均方误差公式。最后，若 $\lVert g\rVert\leq B_g$ 且 $|c|\leq B_c$，则
+\[
+\E_\beh\lVert X_1\rVert^2
+\leq B_g^2B_c^2\E_\beh[\rho^2]
+=B_g^2B_c^2\bigl(1+\chi^2(\cand\Vert\beh)\bigr),
+\]
+其中最后一个等号来自
+$\chi^2(\cand\Vert\beh)=\E_\beh[(\rho-1)^2]=\E_\beh[\rho^2]-1$。去掉非负项 $\lVert G\rVert^2$ 即得到协方差迹的上界。
 \end{proof}
 
-在自回归序列中，$W_{\leq t}=\prod_{k\leq t}\rho_k$ 满足
+在自回归序列中，$W_{\leq t}=\prod_{k\leq t}\rho_k$ 的二阶矩可以逐步展开。给定 prefix $y_{<t}$，有
+\[
+\E_\beh[\rho_t^2\mid y_{<t}]
+=\sum_a\beh(a\mid y_{<t})
+\left(\frac{\cand(a\mid y_{<t})}{\beh(a\mid y_{<t})}\right)^2
+=1+\chi^2\bigl(\cand(\cdot\mid y_{<t})\Vert\beh(\cdot\mid y_{<t})\bigr).
+\]
+因为 $W_{\leq t}=W_{<t}\rho_t$，塔式法则给出
+\begin{align*}
+\E_\beh[W_{\leq t}^2]
+&=\E_\beh\left[W_{<t}^2\E_\beh[\rho_t^2\mid y_{<t}]\right]\\
+&=\E_\beh\left[W_{<t}^2\left(1+\chi^2(s_t)\right)\right].
+\end{align*}
+若所有可达 prefix 都满足 $c_{\rm lo}\leq\chi^2(s)\leq c_{\rm hi}$，则递推归纳得到
 \begin{equation}
-\E_\beh[W_{\leq t}^2]=\E_\beh[W_{<t}^2(1+\chi^2(s_t))].
+(1+c_{\rm lo})^t\leq\E_\beh[W_{\leq t}^2]\leq(1+c_{\rm hi})^t.
 \end{equation}
-若 $c_{\rm lo}\leq\chi^2(s)\leq c_{\rm hi}$，则
+这给出了 prefix IS 方差随修正长度增长的明确阶数。
+
+再考虑完整权重 $W=W_{\leq t}W_{>t}$。在条件 $y_{\leq t}$ 下，后缀权重的均值为一：$\E[W_{>t}\mid y_{\leq t}]=1$，因此
+$\E[W\mid y_{\leq t}]=W_{\leq t}$。全方差公式于是给出
 \begin{equation}
-(1+c_{\rm lo})^t\leq\E[W_{\leq t}^2]\leq(1+c_{\rm hi})^t.
-\end{equation}
-这说明前缀 IS 的方差随已修正的 prefix 长度增长；完整 sequence IS 还要承受后缀的条件方差。具体地，$W=W_{\leq t}W_{>t}$ 且 $\E[W_{>t}\mid y_{\leq t}]=1$，所以
-\begin{equation}
-\operatorname{Var}(W)=\operatorname{Var}(W_{\leq t})+\E[W_{\leq t}^2\operatorname{Var}(W_{>t}\mid y_{\leq t})].
 \label{eq:prefix-total-variance}
+\begin{aligned}
+\operatorname{Var}(W)
+&=\operatorname{Var}(\E[W\mid y_{\leq t}])
+ +\E[\operatorname{Var}(W\mid y_{\leq t})]\\
+&=\operatorname{Var}(W_{\leq t})
+ +\E[W_{\leq t}^2\operatorname{Var}(W_{>t}\mid y_{\leq t})].
+\end{aligned}
 \end{equation}
-等式中的第二项严格为正，只要 prefix 之后存在行为策略与学生策略不同的可达状态。这是“后缀权重只增加方差”的精确形式。
+第二项非负；只要 prefix 之后存在策略比率不恒等于一的可达状态，它就严格为正。这说明后缀权重只能增加方差，不能抵消 prefix 权重已经产生的方差。
 
 \section{未线性化 BPO：与 PMD-Part 的梯度差异定理}
 
@@ -351,16 +444,53 @@ h(a)=\eta f(a)-\log Z_f,qquad q(a)=h(a)-u(a).
 \end{theorem}
 
 \begin{proof}
-由 $\E_\beh[f]=0$ 和 $\log Z_f$ 的定义，PMD-Part 残差为 $q=\eta f-\log Z_f-u$。又因为 $\KL(\beh\Vert\cand)=-\E_\beh[u]$，BPO 残差满足 $\delta=\eta f-u+\E_\beh[u]=q+\log Z_f+\E_\beh[u]$。因此 $c_s$ 与 action 无关，且 $\E_\beh[\delta]=0$。
+先把两个残差都写成同一组基本量。由于 $f$ 是行为优势，
+$\E_\beh[f]=0$；又因为 $u=\log(\cand/\beh)$，有
+\[
+\KL(\beh\Vert\cand)
+=\E_\beh\left[\log\frac{\beh}{\cand}\right]
+=-\E_\beh[u].
+\]
+所以 BPO 残差逐点为
+\[
+\delta=\eta f-u-\KL(\beh\Vert\cand)
+=\eta f-u+\E_\beh[u].
+\]
+PMD-Part 残差是 $q=\eta f-\log Z_f-u$，两式相减得到
+\[
+\delta-q=\log Z_f+\E_\beh[u]=c_s.
+\]
+这里 $c_s$ 只依赖 prefix $s$，不依赖 action $a$。同时
+\[
+\E_\beh[\delta]
+=\eta\E_\beh[f]-\E_\beh[u]+\E_\beh[u]=0.
+\]
 
-链式法则和式 \eqref{eq:bpo-centered-score} 给出
+接着对平方损失求导。因为 target、行为策略和访问测度停止梯度，只有 $\delta$ 依赖 $\theta$，故
+\[
+\nabla_\theta\mathcal L_{\rm BPO}^{\rm tok}
+=\frac1\eta\E_\beh[\delta\nabla_\theta\delta].
+\]
+对式 \eqref{eq:bpo-delta} 求导，并使用
+$\nabla_\theta u=g$ 与
+$\nabla_\theta\KL(\beh\Vert\cand)=-\bar g$，得到
+\[
+\nabla_\theta\delta=-g+\bar g=-(g-\bar g).
+\]
+因此
 \begin{align*}
 -\eta\nabla\mathcal L_{\rm BPO}^{\rm tok}
 &=\E_\beh[\delta(g-\bar g)]\\
-&=\E_\beh[\delta g]-\E_\beh[\delta]\bar g=\E_\beh[\delta g]\\
+&=\E_\beh[\delta g]-\E_\beh[\delta]\bar g\\
+&=\E_\beh[\delta g]\\
+&=\E_\beh[(q+c_s)g]\\
+&=\E_\beh[qg]+c_s\E_\beh[g]\\
 &=\E_\beh[qg]+c_s\bar g.
 \end{align*}
-这里使用的是 $\E_\beh[\delta]=0$；不能把 $\E_\beh[g]$ 误写成零，score 的零均值恒等式是 $\E_\cand[g]=0$。而 $-\nabla\mathcal L_{\rm Part}^{(\eta)}=\E_\beh[qg]$，所以差异正好是 $c_s\bar g$。
+另一方面，PMD-Part 的损失为
+$\mathcal L_{\rm Part}^{(\eta)}=\frac12\E_\beh[q^2]$，所以
+$-\nabla\mathcal L_{\rm Part}^{(\eta)}=\E_\beh[qg]$。代入即可得到式 \eqref{eq:bpo-part-exact}。
+注意这里用到的是残差的行为测度均值 $\E_\beh[\delta]=0$；不能把 $\E_\beh[g]$ 误写成零。score 的零均值恒等式是 $\E_\cand[g]=0$，因为 score 是相对于候选策略而非行为策略取期望。
 \end{proof}
 
 二者只在 $c_s\bar g=0$ 时退化为相同梯度，例如锚点 $\cand=\beh$、可实现根处，或参数化恰好使 $\bar g=0$。一般离开锚点后，BPO 的 score centering 会留下 $c_s\bar g$ 这一额外项。若 $f$ 不是优势而有非零行为均值，必须先把 $f$ 中心化，否则 residual 与 PMD-Part 的 target 不再只差常数。若把 reverse KL 近似成二元项、停止其梯度、加入 clip 或使用不精确的 $Z_f$，式 \eqref{eq:bpo-part-exact} 也不再成立，只能视为近似 PG surrogate。
@@ -435,7 +565,7 @@ $\operatorname{Var}(\delta^2)\leq\E[\delta^4]$ 即得结论。
 \centering
 \caption{PMD、MDPO 与 BPO 的目标和实现差异}
 \label{tab:method-comparison}
-\begin{tabular}{p{0.16\textwidth}p{0.23\textwidth}p{0.23\textwidth}p{0.25\textwidth}}
+\begin{tabular}{P{0.16\textwidth}P{0.23\textwidth}P{0.23\textwidth}P{0.25\textwidth}}
 \toprule
 方法 & 理论更新 & 梯度/权重 & 主要偏差方差来源 \\
 \midrule
