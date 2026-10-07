@@ -573,6 +573,14 @@ r_k(s,v)=\log T(v\mid s)-\log\pi_k(v\mid s),
 \mathcal K_k^\theta(s)
 &\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_\theta(\cdot\mid s)\right).
 \end{align}
+在 outer--inner 记号 $\theta_{k,n}$ 中，$k$ 是 outer step 编号，$n$
+是该 outer step 内的 inner optimizer step 编号。因此
+$\mathcal K_{k,n}^\theta(s)$ 简写
+$\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{\theta_{k,n}}(\cdot\mid s))$：
+左侧分布 $\pi_k$ 在整个 inner loop 固定，右侧 student 随 $n$ 改变，故每次
+inner 更新后都要用新参数重算这个量。相反，$\mathcal K_k^T(s)$ 在固定
+outer step 内不随 $n$ 改变。这里的 $\mathcal K$ 表示 KL 散度；它和
+Top-$K$ 估计器中的整数 $K$ 不是同一个对象。
 于是
 \begin{align}
 \overline{\log(T/\pi_k)}(s)&=-\mathcal K_k^T(s),\\
@@ -733,6 +741,93 @@ $\pi_k$ 为测度、通过 centered residual 形成的 policy gradient。
 $-\nabla_\theta\log\pi_\theta(a\mid s)$。若把整个
 $\widehat{\mathcal K}_{k}^{\theta}$ 错误地 stop-gradient，PMD-Mean 和 BPO
 都会退化成未中心化的梯度，且不再对应式~\eqref{eq:ch2-opd-grad-mean-residual}。
+
+\subsection{$\log Z_k$ 与 KL 中心的估计、缓存和显存}
+\label{sec:ch2-opd-z-kl-estimation}
+
+2602.04417 的 Top-$K$ 方法直接估计 KL：在 top-$K$ 头部计算精确项，在尾部用
+采样项校正。它不直接给出本节的 $\log Z_k$，因为
+\begin{equation}
+Z_k(s)=\mathbb E_{a\sim\pi_k(\cdot\mid s)}
+\left[\left(\frac{T(a\mid s)}{\pi_k(a\mid s)}\right)^\eta\right].
+\label{eq:ch2-opd-z-importance}
+\end{equation}
+这一区别很重要：$\widehat Z_k$ 可以无偏，但 $\log\widehat Z_k$ 不能无偏。
+
+在固定 prefix $s$ 上，从冻结 anchor 采样 $a_j\sim\pi_k(\cdot\mid s)$，令
+$r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s)$。则两个中心满足
+\begin{align}
+\mathcal K_k^T(s)&=\mathbb E_{a\sim\pi_k}[-r_k(s,a)],\\
+\mathcal K_{k,n}^\theta(s)&=\mathbb E_{a\sim\pi_k}
+\left[\log\pi_k(a\mid s)-\log\pi_{\theta_{k,n}}(a\mid s)\right].
+\end{align}
+因此 $m$ 个独立 next-token 样本的均值分别是两个 KL 的无偏估计。
+真实 rollout 中每个 prefix 通常只有一个后继 token；该 token 是无偏单点样本，
+但不是 conditional KL 的精确值。若要降低方差，可以在已经算出 anchor logits
+后额外抽取 $m-1$ 个 token，这只增加 categorical 抽样和 log-prob 记录，
+无需生成额外长序列。不同 prefix 的 token 不能互相当作同一条件分布的样本。
+
+其中 $\mathcal K_k^T$ 在整个 outer step 内固定，teacher/anchor log-prob 可以
+缓存；$\mathcal K_{k,n}^\theta$ 必须在每个 inner step 重新计算。实现已经推导
+好的 policy-gradient 时，KL 中心作为权重整体使用 stop-gradient；实现原始
+Mean/BPO 平方损失时则必须保留其对 student 的导数。
+
+对 $\mathcal K_{k,n}^\theta=\operatorname{KL}(\pi_k\Vert\pi_{\theta_{k,n}})$，
+取 $S_k(s)=\operatorname{TopK}(\pi_k(\cdot\mid s))$，可构造
+\begin{align}
+\widehat{\mathcal K}_{k,n}^{\theta}(s)
+={}&\sum_{v\in S_k(s)}\pi_k(v\mid s)
+\log\frac{\pi_k(v\mid s)}{\pi_{\theta_{k,n}}(v\mid s)}\\
+&+\frac1m\sum_{j=1}^{m}\mathbf 1\{a_j\notin S_k(s)\}
+\log\frac{\pi_k(a_j\mid s)}{\pi_{\theta_{k,n}}(a_j\mid s)},
+\qquad a_j\sim\pi_k(\cdot\mid s).
+\label{eq:ch2-opd-topk-anchor-kl}
+\end{align}
+对固定 $S_k$，尾部项是精确尾部求和的无偏 Monte Carlo 估计，且其 autograd
+梯度的期望等于真实 KL 梯度。$K=0$ 是纯 sampled-token，$K=|\mathcal V|$
+是 exact KL。给定头部后，条件方差为
+\begin{equation}
+\operatorname{Var}(\widehat{\mathcal K}_{k,n}^{\theta}\mid S_k)
+=\frac1m\operatorname{Var}_{a\sim\pi_k}\left[
+\mathbf 1\{a\notin S_k\}
+\log\frac{\pi_k(a\mid s)}{\pi_{\theta_{k,n}}(a\mid s)}\right].
+\end{equation}
+增大 $K$ 通常降低尾部质量和方差，但实际大小取决于尾部 log-ratio 的二阶矩。
+对 $\mathcal K_k^T$ 可使用同样的头尾分解；由于它不需要反向传播，anchor
+样本均值往往已经足够。
+
+对 $Z_k$，头尾分解应先估计 $Z_k$ 再取对数。令
+$S_Z(s)$ 为 $((1-\eta)\log\pi_k+\eta\log T)$ 的 top-$K$ 索引，则
+\begin{align}
+\widehat Z_k(s)
+={}&\sum_{v\in S_Z(s)}\pi_k(v\mid s)^{1-\eta}T(v\mid s)^\eta\\
+&+\frac1m\sum_{j=1}^{m}\mathbf 1\{a_j\notin S_Z(s)\}
+\left(\frac{T(a_j\mid s)}{\pi_k(a_j\mid s)}\right)^\eta,
+\qquad a_j\sim\pi_k(\cdot\mid s).
+\label{eq:ch2-opd-topk-z}
+\end{align}
+式~\eqref{eq:ch2-opd-topk-z} 对 $Z_k$ 无偏，但 Jensen 不等式给出
+\begin{equation}
+\mathbb E[\log\widehat Z_k]\leq\log Z_k,
+\qquad
+\mathbb E[\log\widehat Z_k]-\log Z_k
+\approx-\frac{\operatorname{Var}(\widehat Z_k)}{2Z_k^2}.
+\end{equation}
+尾部重要性比率具有长尾时，单 token plug-in 估计尤其不稳定；裁剪比率可降方差，
+但会引入额外偏差。$\eta=1$ 时 $Z_k=1$，所以 $\log Z_k=0$ 精确已知；
+$\eta=0$ 时同样如此。$0<\eta<1$ 时，若不需要 PMD-Part，PMD-Mean/BPO
+可以绕开这项 log-of-mean 偏差。
+
+缓存上，CPU/NVMe 只需保存 token IDs、mask、response mask、anchor/teacher
+的 action log-prob 和可选的 top-$K$ 摘要；student log-prob 每个 inner step
+重算。保存完整 logits 的代价是 $O(BH|\mathcal V|)$，保存 top-$K$ 摘要是
+$O(BHK)$。以 $|\mathcal V|=150{,}000$、FP16 为例，一个 prefix-token 的
+完整 logits 约 $300$ kB，8192 token 单序列约 $2.46$ GB；因此不能把全词表
+logits 放进 replay buffer。GPU 只保留当前 microbatch 的 student 激活和当前
+token 块 logits，并在块处理后释放。当前 OPD 最稳妥的首版路径是缓存 anchor/
+teacher action log-prob，用额外 anchor next-token 样本估计两个 KL 中心；
+PMD-Part 只在 $\eta=1$ 或已验证 $\log Z_k$ 误差足够小时启用，再用 top-$K$
+实验比较中心方差、$\log Z_k$ 偏差和峰值显存。
 
 \begin{algorithm}[ht]
 \caption{OPD full-vocabulary outer--inner optimization\\{\small\textit{Semantics: 每个 outer step 用 $\pi_k$ rollout，固定 anchor 做 $N$ 个 inner policy-gradient step，再同步得到 $\pi_{k+1}$}}}
