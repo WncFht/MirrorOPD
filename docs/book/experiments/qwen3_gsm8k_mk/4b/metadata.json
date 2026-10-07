@@ -1,0 +1,7 @@
+{
+  "model": "Qwen/Qwen3-4B",
+  "n_examples": 1319,
+  "n_prefixes": 335570,
+  "quantization": "4bit",
+  "definition": "exact full-vocabulary forward pass; M_K is Student/model top-K next-token mass"
+}
