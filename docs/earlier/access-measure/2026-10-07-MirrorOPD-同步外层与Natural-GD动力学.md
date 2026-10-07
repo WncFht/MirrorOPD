@@ -370,6 +370,62 @@ $$
 
 因此，对你的问题最直接的回答是：**固定 $\eta$ 时，每个 outer 都重新产生或重新校正数据；只在该 outer 内复用同一批数据做多个 inner steps。** 固定的是每一轮的镜像步长，不是 $\pi_0$、$Q^{\pi_0}$ 或 rollout batch。
 
+## $\eta=1$：理想情形下的一步 teacher 投影
+
+对 OPD 的固定-prefix 子问题，令
+
+$$
+J_k(p)=\mathbb E_{a\sim p}[\log T(a\mid s)-\log\pi_k(a\mid s)]
+-\frac1\eta\operatorname{KL}(p\Vert\pi_k).
+$$
+
+在 $\eta=1$ 时，KL 展开后 anchor 项完全抵消：
+
+$$
+\begin{aligned}
+J_k(p)
+&=\mathbb E_p[\log T-\log\pi_k]
+ -\mathbb E_p[\log p-\log\pi_k]\\
+&=\mathbb E_p[\log T-\log p]
+=-\operatorname{KL}(p\Vert T).
+\end{aligned}
+$$
+
+因此，只要 inner 在策略分布空间中求到全局最优，唯一解就是
+
+$$
+p^\star(\cdot\mid s)=T(\cdot\mid s).
+$$
+
+这也直接来自一般 Gibbs 解
+
+$$
+p^\star_\eta(a\mid s)
+=\frac{\pi_k(a\mid s)^{1-\eta}T(a\mid s)^\eta}
+{\sum_b\pi_k(b\mid s)^{1-\eta}T(b\mid s)^\eta},
+$$
+
+因为 $\eta=1$ 时分子为 $T(a\mid s)$，配分函数为 $1$。所以在 exact tabular、完整词表、全 prefix 覆盖和无限 inner budget 的理想模型里，$\pi_0$ 只需要产生第一轮访问测度；第一个 outer 结束后就有 $\pi_1=T$，之后 $r_1=0$，策略保持不变。
+
+这并不意味着实际神经网络训练只要把超参数设为 $\eta=1$ 就一定得到 teacher。需要同时满足以下条件：
+
+- inner optimizer 找到 $-\operatorname{KL}(\pi_\theta\Vert T)$ 在参数族中的全局最优，而不是局部驻点或受容量限制的投影；
+- 所有需要匹配的 prefix 都被访问，或者 loss 使用完整 prefix/vocabulary expectation；
+- teacher 在 anchor 的 support 上有有限 log-prob，不能直接出现 $\log T=-\infty$；
+- sampled action、prefix occupancy、teacher logits 和 normalization 的估计误差足够小。
+
+如果只在一批 $\pi_0$ rollout 上训练，inner 收敛的对象是这些 rollout prefix 上的 teacher 投影。未访问 prefix 的参数没有被约束，因而不能推出全局的 $\pi_1=T$。如果使用参数化 student，实际极限是
+
+$$
+\pi_{\theta_1}\in
+\arg\min_{\theta}\mathbb E_{s\sim\text{training measure}}
+\operatorname{KL}(\pi_\theta(\cdot\mid s)\Vert T(\cdot\mid s)),
+$$
+
+而不是逐状态精确等于 teacher。
+
+对 $0<\eta<1$，inner 完全收敛时得到的是 teacher 的几何插值，而不是 teacher 本身；选择较小 $\eta$ 的作用是缩短单个 target 的距离、降低有限样本和参数投影的风险。代价是需要更多 outer refreshes。因而 $\eta=1$ 应被理解为“最激进的一次 teacher projection”，而不是自动正确的默认值。
+
 ### 参考文献
 
 [^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. _Mirror Descent Policy Optimization_. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
