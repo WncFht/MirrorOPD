@@ -132,12 +132,12 @@ Q^\beh(s_t,a_t)=r_t(s_t,a_t)+\E_\beh\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\rig
 \chapter{统一的 token-level Mirror Descent 与 OPD 实例化}
 \label{ch:four-methods}
 
-本章只使用一套符号。固定第 $k$ 个 outer step 的 anchor policy $\pi_k$，候选 student policy 记为 $\pi_\theta$，teacher policy 记为 $T$。自然梯度步长统一记为 $\eta>0$。prefix 记为 $s$，下一个 token 记为 $a$，所有条件分布均省略 $s$ 时会在公式中明确补回。四种 inner 的区别只来自求解同一个 mirror 子问题的方式；它们不对应四个不同的 token-level 最优策略。
+本章只使用一套序列建模符号。给定 prompt $x$，student 生成 rollout $y_{1:H}$；第 $t$ 个 token 的历史为 $s_t=(x,y_{<t})$。固定第 $k$ 个 outer step 的 anchor policy $\pi_k$，候选 student policy 记为 $\pi_\theta$，teacher policy 记为 $T$，自然梯度步长统一记为 $\eta>0$。$s_t$ 只表示 rollout 的条件历史，训练样本始终是一条完整的 prompt--rollout；四种 inner 的区别只来自求解同一个 mirror 子问题的方式。
 
 \section{共同的 mirror 子问题与精确解}
 \label{sec:ch2-common}
 
-给定固定 prefix $s$ 和 token 信号 $f(s,a)$，定义
+给定固定历史 $s$ 和 token 信号 $f(s,a)$，定义
 \begin{equation}
 \label{eq:ch2-mirror}
 \mathcal M_s(p;f,\pi_k)
@@ -208,10 +208,80 @@ Z_f(s)=\sum_{v\in\mathcal V}\pi_k(v\mid s)\exp\!\bigl(\eta f(s,v)\bigr).
 分子和归一化常数同时乘以同一个因子 $e^{-\eta\bar f_k(s)}$，归一化后的分布不变。
 \end{proof}
 
+\section{从镜像最优性方程到四种可训练目标}
+\label{sec:ch2-objective-derivation}
+
+定理 \ref{thm:ch2-gibbs} 给出的不是一个抽象的分布结论，而是一个可以被监督学习近似的逐 token 方程。把式 \eqref{eq:ch2-optimal-policy} 移项，得到
+\begin{equation}
+\label{eq:ch2-logratio-equation}
+\log\pi_k^+(a\mid s)-\log\pi_k(a\mid s)
+=\eta f(s,a)-\log Z_f(s).
+\end{equation}
+左侧是 candidate student 相对于冻结 anchor 的 log-ratio，右侧只由冻结的 token signal 和归一化常数决定。令
+\[
+U_\theta(s,a)=\log\pi_\theta(a\mid s)-\log\pi_k(a\mid s),
+\qquad
+H_k(s,a)=\eta f(s,a)-\log Z_f(s),
+\]
+则求解 mirror 子问题在参数化策略类中的直接替代，就是在训练测度下让 $U_\theta$ 拟合 $H_k$：
+\begin{equation}
+\label{eq:ch2-regression-from-mirror}
+\min_\theta\ \mathbb E\left[(U_\theta-H_k)^2\right].
+\end{equation}
+因此 PMD-Part 的平方损失不是额外假设，而是把镜像最优性方程变成参数化模型可优化的投影问题。对式 \eqref{eq:ch2-regression-from-mirror} 求导，使用
+\[
+\nabla_\theta U_\theta(s,a)=\nabla_\theta\log\pi_\theta(a\mid s),
+\]
+立即得到式 \eqref{eq:ch2-part-gradient}。
+
+PMD-Mean 来自同一个方程的中心化。由于 $\log Z_f(s)$ 只依赖 $s$，对 anchor action 取条件均值时
+\[
+\mathbb E_{\pi_k}[H_k(s,a)\mid s]
+=\eta\mathbb E_{\pi_k}[f(s,a)\mid s]-\log Z_f(s).
+\]
+减去该均值后，未知的 $\log Z_f$ 消失，得到
+\begin{equation}
+\label{eq:ch2-centered-logratio-equation}
+H_k(s,a)-\mathbb E_{\pi_k}[H_k(s,\cdot)\mid s]
+=\eta\widetilde f_k(s,a).
+\end{equation}
+这解释了 PMD-Mean 的 target 来源。它不能只回归中心化 target，还必须保留 $U_\theta=\log(\pi_\theta/\pi_k)$ 的概率归一化约束；否则相差一个 依赖历史的 常数的所有 log-ratio 都会被视为同一个解。
+
+BPO 再对式 \eqref{eq:ch2-logratio-equation} 两边作同样的中心化，但中心化的是 residual：
+\begin{align}
+D_\theta(s,a)
+&=\bigl[\eta f(s,a)-U_\theta(s,a)\bigr]
+-\mathbb E_{\pi_k}\bigl[\eta f(s,\cdot)-U_\theta(s,\cdot)\mid s\bigr].
+\label{eq:ch2-bpo-from-optimality}
+\end{align}
+当 $D_\theta=0$ 时，只能先推出 $U_\theta=\eta f-C(s)$；概率归一化再唯一确定 $C(s)=\log Z_f(s)$。这就是 BPO 与 PMD-Part 共享精确零点、但有限参数更新不同的原因。BPO 的 score centering 并非预先加入的 baseline，而是对 $\mathbb E_{\pi_k}[U_\theta]$ 求导后必然产生的项。
+
+MDPO 则不把式 \eqref{eq:ch2-logratio-equation} 改写成回归，而直接对原始 mirror objective 求最大化。由式 \eqref{eq:ch2-kl-decomp}，对任意参数化 student 有
+\begin{equation}
+\label{eq:ch2-mdpo-kl-gap}
+\mathcal J_{\mathrm{MDPO}}(\theta)
+=\frac1\eta\log Z_f(s)
+-\frac1\eta\operatorname{KL}\!\left(\pi_\theta(\cdot\mid s)\middle\Vert\pi_k^+(\cdot\mid s)\right).
+\end{equation}
+所以 MDPO 的 inner 是在直接最小化 student 与 Gibbs target 的 reverse KL gap；PMD-Part、PMD-Mean 和 BPO 则是在不同坐标和不同投影测度下最小化该最优性方程的平方残差。
+
+\begin{proposition}[平方回归的投影含义]
+\label{prop:ch2-regression-projection}
+若 student 函数类不能表示 $H_k$，PMD-Part 的精确 inner 解是 $H_k$ 在函数类诱导的 $L_2(d_{\pi_k}\pi_k)$ 几何下的投影；若训练样本的历史访问测度改为 $m$，投影也相应变为 $L_2(m\pi_k)$。因此 inner loss 为零只在 target 可表示且训练测度覆盖目标测度时才意味着精确 mirror 解。
+\end{proposition}
+
+\begin{proof}
+平方损失是 Hilbert 空间中的正交投影问题。对任意可行扰动 $v$，最优点 $U^\star$ 满足
+\[
+\mathbb E_{m,\pi_k}[(U^\star-H_k)v]=0.
+\]
+这正是 $H_k$ 到可行函数集合的正交投影条件。若 $H_k$ 属于该集合，投影残差为零；否则残差由函数类和测度共同决定。
+\end{proof}
+
 \section{四种 inner 的统一推导}
 \label{sec:ch2-four-methods}
 
-下面固定一个 prefix，令
+下面固定一个历史，令
 \[
 \ell^T(a)=\log T(a\mid s),\qquad
 \ell^k(a)=\log\pi_k(a\mid s),\qquad
@@ -276,7 +346,17 @@ U_a-G_a+\lambda e^{U_a}=0.
 \label{eq:ch2-mean-lambert}
 U_a=G_a-W\!\left(\lambda e^{G_a}\right),
 \end{equation}
-其中 $\lambda$ 由归一化约束唯一确定。PMD-Mean 因而是中心化 target 在指数归一化集合上的投影；只有当中心化 target 自身满足该约束时，投影才等于精确 Gibbs log-ratio。
+其中 $\lambda$ 由归一化约束唯一确定。为说明唯一性，定义
+\[
+\Phi(\lambda)=\sum_a\pi_k(a\mid s)\exp\!\left(G_a-W(\lambda e^{G_a})\right),qquad \lambda\geq0.
+\]
+Lambert--$W$ 在非负轴上单调递增，因此每一项随 $\lambda$ 单调递减；当 $\lambda=0$ 时 $\Phi(0)=\sum_a\pi_k(a\mid s)e^{G_a}$，而 $\lambda\to\infty$ 时 $\Phi(\lambda)\to0$。只要中心化 target 不已经满足 $\Phi(0)=1$，方程 $\Phi(\lambda)=1$ 有唯一正根；若 $\Phi(0)=1$，则 $\lambda=0$，得到 $U_a=G_a$。因此 PMD-Mean 是中心化 target 在指数归一化集合上的投影。特别地，精确 Gibbs 解的 log-ratio 为
+\[
+U_a^\star=\eta f(s,a)-\log Z_f(s),\qquad
+U_a^\star-\eta\widetilde f_k(s,a)=\eta\bar f_k(s)-\log Z_f(s),
+\]
+它与 action 无关，且自动满足 $\sum_a\pi_k(a\mid s)e^{U_a^\star}=1$；这说明 PMD-Mean 恢复的是同一个 Gibbs 分布，而不是把 $\log Z_f$ 任意设为零。
+
 
 \subsection{BPO：中心化最优性 residual}
 \label{sec:ch2-bpo}
@@ -355,8 +435,67 @@ MDPO 直接最大化式 \eqref{eq:ch2-mirror} 的参数化版本：
 PMD-Part 在零损失处满足 $U_\theta=\eta f-\log Z_f$，于是得到式 \eqref{eq:ch2-optimal-policy}。BPO 的零 residual 只确定 $U_\theta=\eta f-C(s)$；代入 $\mathbb E_{\pi_k}[e^{U_\theta}]=1$ 得 $C(s)=\log Z_f(s)$。PMD-Mean 若中心化 target 属于归一化约束集合，则其平方投影残差为零，并由中心化不变性得到同一策略。MDPO 由式 \eqref{eq:ch2-kl-decomp} 直接得到唯一最大点。
 \end{proof}
 
+
+\begin{proposition}[未线性化 BPO 与 PMD-Part 的梯度差异]
+\label{prop:ch2-bpo-part-gradient-gap}
+固定一个历史 $s$，令
+\begin{equation}
+\label{eq:ch2-bpo-part-qc}
+q(s,a)=\eta f(s,a)-\log Z_f(s)-U_\theta(s,a),
+\qquad
+c(s)=\log Z_f(s)+\mathbb E_{\pi_k}[U_\theta(s,\cdot)\mid s]-\eta\mathbb E_{\pi_k}[f(s,\cdot)\mid s].
+\end{equation}
+则未线性化 BPO residual 满足 $D_\theta=q+c$，并且
+\begin{equation}
+\label{eq:ch2-bpo-part-gradient-gap}
+-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}
+=-\nabla_\theta\mathcal L_{\mathrm{Part}}
++c(s)\,\mathbb E_{a\sim\pi_k}[\nabla_\theta\log\pi_\theta(a\mid s)\mid s].
+\end{equation}
+因此两者在精确镜像解处都有零梯度，但在一般参数点不相同。它们只有在
+$c(s)\,\mathbb E_{\pi_k}[\nabla_\theta\log\pi_\theta]=0$
+时才给出相同的方向。
+\end{proposition}
+
+\begin{proof}
+从 PMD-Part 的最优性残差出发，先把 BPO 的中心化式逐项展开：
+\begin{align*}
+D_\theta(s,a)
+&=\eta f(s,a)-U_\theta(s,a)
+ -\mathbb E_{\pi_k}[\eta f(s,\cdot)-U_\theta(s,\cdot)\mid s]\\
+&=\eta f(s,a)-\log Z_f(s)-U_\theta(s,a)
+ +\log Z_f(s)+\mathbb E_{\pi_k}[U_\theta(s,\cdot)\mid s]\\
+&=q(s,a)+c(s).
+\end{align*}
+由定义，$\mathbb E_{\pi_k}[D_\theta\mid s]=0$。BPO 的精确梯度为
+\begin{align*}
+-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}
+&=\mathbb E_{\pi_k}\left[D_\theta
+ \left(g_\theta-\bar g_\theta\right)\mid s\right],\\
+ g_\theta(a)&=\nabla_\theta\log\pi_\theta(a\mid s),
+ \qquad \bar g_\theta=\mathbb E_{\pi_k}[g_\theta\mid s].
+\end{align*}
+代入 $D_\theta=q+c$，并使用 $\mathbb E_{\pi_k}[D_\theta\mid s]=0$，可得
+\begin{align*}
+\mathbb E_{\pi_k}[D_\theta(g_\theta-\bar g_\theta)\mid s]
+&=\mathbb E_{\pi_k}[(q+c)g_\theta\mid s]
+ -\mathbb E_{\pi_k}[D_\theta\mid s]\bar g_\theta\\
+&=\mathbb E_{\pi_k}[qg_\theta\mid s]+c(s)\bar g_\theta.
+\end{align*}
+而 PMD-Part 的梯度式为
+$-\nabla_\theta\mathcal L_{\mathrm{Part}}=\mathbb E_{\pi_k}[qg_\theta\mid s]$，故式
+\eqref{eq:ch2-bpo-part-gradient-gap}
+成立。若 $q=0$，则由归一化约束有 $c=0$，两边同时为零；离开该点时 $c$ 通常非零，差异项保留。
+\end{proof}
+
+这个命题说明“都在 token level”只保证它们面对同一个局部镜像根，不保证优化轨迹相同。PMD-Part 回归完整的 action-dependent log-ratio，并把 $\log Z_f$ 当作固定 target；BPO 先消去 action-independent 常数，再对当前 student 的归一化项求导，因此多出 centered score。若使用的参数化使
+$\mathbb E_{\pi_k}[\nabla_\theta\log\pi_\theta]=0$
+（例如采样测度与当前 student 一致，或在特定 tabular 点上），差异项才会消失。
+
 \section{OPD：从 teacher log-ratio 到 outer--inner 算法}
 \label{sec:ch2-opd-instantiation}
+
+给定 prompt $x$，第 $k$ 个 outer batch 采集 $y_{1:H}\sim\pi_k(\cdot\mid x)$。teacher 在同一条 rollout 的历史 $s_t=(x,y_{<t})$ 上给出 $T(\cdot\mid s_t)$，student 给出 $\pi_k(\cdot\mid s_t)$。因此 OPD 的训练信号按 rollout 的 response token 定义；prompt token 只提供条件，不参加 response loss。
 
 OPD 不引入额外的外部 reward，而在第 $k$ 个 outer step 使用 teacher 与当前 anchor 的局部 log-ratio：
 \begin{equation}
@@ -369,7 +508,7 @@ r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s).
 \sum_{t=1}^{H}r_k(s_t,a_t)
 =\log T(y\mid x)-\log\pi_k(y\mid x).
 \end{equation}
-因此 $r_k$ 是对 teacher--student 序列差异的无损分摊，不是一个与 prefix 无关的固定终端 reward。
+因此 $r_k$ 是对 teacher--student 序列差异的无损分摊，不是一个与 历史无关的固定终端 reward。
 
 \begin{definition}[OPD mirror target]
 \label{def:ch2-opd-target}
@@ -409,119 +548,150 @@ $\eta=1$ 时一步得到 $T$；$0<\eta<1$ 时 projective 误差按 $1-\eta$ 几�
 减去任意两个 action 的等式，归一化常数抵消，得到 projective 递推。
 \end{proof}
 
-\section{四种 OPD inner 的可执行估计量}
+\section{OPD prompt--rollout 上的四种 inner 估计量}
 \label{sec:ch2-opd-four-inner}
 
-对第 $i$ 个训练 prefix $s_i$，采样 $K$ 个 anchor token $y_{ij}\sim\pi_k(\cdot\mid s_i)$，记录
+一个 OPD training example 由 prompt $x_i$ 和一条 response rollout
+$y_{i,1:H_i}$ 组成。第 $t$ 个有效 response token 的历史写成
+$s_{it}=(x_i,y_{i,<t})$，这里只表示 rollout 的条件历史；训练样本始终是一条完整的 prompt--rollout。令
+\[
+\mathcal I=\{(i,t):1\leq i\leq B,\ t\in\operatorname{mask}(y_i)\},
+\qquad N=|\mathcal I|.
+\]
+对每个 $(i,t)\in\mathcal I$，一次 teacher、anchor 和 student forward 给出
 \begin{equation}
 \label{eq:ch2-opd-three-logprobs}
-\ell^T_{ij}=\log T(y_{ij}\mid s_i),\qquad
-\ell^k_{ij}=\log\pi_k(y_{ij}\mid s_i),\qquad
-\ell^\theta_{ij}=\log\pi_\theta(y_{ij}\mid s_i).
+\ell^T_{it}=\log T(y_{it}\mid x_i,y_{i,<t}),\quad
+\ell^k_{it}=\log\pi_k(y_{it}\mid x_i,y_{i,<t}),\quad
+\ell^\theta_{it}=\log\pi_\theta(y_{it}\mid x_i,y_{i,<t}).
 \end{equation}
-完整词表 logits 给出
+同一 rollout 的所有 token 共享 prompt 和历史；loss 只在 response mask 上求和。若一次 prompt 采集 $K$ 条 rollout，则额外的 rollout 索引只用于估计条件均值，不改变 token 的定义。
+
+完整词表 forward 可以在每个 $(i,t)$ 上计算
 \begin{equation}
 \label{eq:ch2-opd-forward-kls}
-D_i^{kT}=\sum_v\pi_k(v\mid s_i)[\log\pi_k(v\mid s_i)-\log T(v\mid s_i)],
-\quad
-D_i^{k\theta}=\sum_v\pi_k(v\mid s_i)[\log\pi_k(v\mid s_i)-\log\pi_\theta(v\mid s_i)].
-\end{equation}
-如果没有完整词表求和，可用同一 prefix 的 sampled estimates
-\[
-\widehat D_i^{kT}=K^{-1}\sum_j(\ell^k_{ij}-\ell^T_{ij}),
+D_{it}^{kT}=\sum_{v\in\mathcal V}\pi_k(v\mid s_{it})\log\frac{\pi_k(v\mid s_{it})}{T(v\mid s_{it})},
 \qquad
-\widehat D_i^{k\theta}=K^{-1}\sum_j(\ell^k_{ij}-\ell^\theta_{ij}),
+D_{it}^{k\theta}=\sum_{v\in\mathcal V}\pi_k(v\mid s_{it})\log\frac{\pi_k(v\mid s_{it})}{\pi_\theta(v\mid s_{it})}.
+\end{equation}
+只有 sampled token 时，用同一条件历史下的 $K$ 条 rollout 估计
+\[
+\widehat D_{it}^{kT}=K^{-1}\sum_{j=1}^{K}(\ell^k_{ijt}-\ell^T_{ijt}),
+\qquad
+\widehat D_{it}^{k\theta}=K^{-1}\sum_{j=1}^{K}(\ell^k_{ijt}-\ell^\theta_{ijt}),
 \]
-并停止中心量的梯度。以下所有式子都可以逐项实现。
+并停止中心量的梯度。以下公式中的 $\sum_{(i,t)\in\mathcal I}$ 可以直接实现为 response-token masked mean。
+
+\paragraph{共同 target。}
+OPD token reward 为
+\[
+r_{it}^k=\ell^T_{it}-\ell^k_{it}.
+\]
+由 Gibbs 定理，目标 log-ratio 为
+\[
+\eta r_{it}^k-\log Z_k(s_{it}),
+\qquad
+Z_k(s_{it})=\sum_v\pi_k(v\mid s_{it})^{1-\eta}T(v\mid s_{it})^\eta.
+\]
 
 \paragraph{PMD-Part。}
 \begin{equation}
 \label{eq:ch2-opd-part-explicit-loss}
 \widehat{\mathcal L}_{k,\mathrm{Part}}
-=\frac1{2BK}\sum_{i,j}
-\left[\ell^\theta_{ij}-\ell^k_{ij}
--\eta(\ell^T_{ij}-\ell^k_{ij})+\log Z_k(s_i)\right]^2.
+=\frac1{2N}\sum_{(i,t)\in\mathcal I}
+\left[\ell^\theta_{it}-\ell^k_{it}-\eta(\ell^T_{it}-\ell^k_{it})+\log Z_k(s_{it})\right]^2.
 \end{equation}
 \begin{equation}
 \label{eq:ch2-opd-part-explicit-gradient}
--\widehat\nabla\mathcal L_{k,\mathrm{Part}}
-=\frac1{BK}\sum_{i,j}
-\left[\eta(\ell^T_{ij}-\ell^k_{ij})-\ell^\theta_{ij}+\ell^k_{ij}-\log Z_k(s_i)\right]
-\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i).
+-\widehat\nabla_\theta\mathcal L_{k,\mathrm{Part}}
+=\frac1N\sum_{(i,t)\in\mathcal I}
+\left[\eta(\ell^T_{it}-\ell^k_{it})-\ell^\theta_{it}+\ell^k_{it}-\log Z_k(s_{it})\right]
+\nabla_\theta\log\pi_\theta(y_{it}\mid x_i,y_{i,<t}).
 \end{equation}
+
 \paragraph{PMD-Mean。}
+因为
+\[
+\mathbb E_{v\sim\pi_k(\cdot\mid s_{it})}[\log T(v\mid s_{it})-\log\pi_k(v\mid s_{it})]=-D_{it}^{kT},
+\]
+可用中心化 target 替代 $\log Z_k$：
 \begin{equation}
 \label{eq:ch2-opd-mean-explicit-loss}
 \widehat{\mathcal L}_{k,\mathrm{Mean}}
-=\frac1{2BK}\sum_{i,j}
-\left[\ell^\theta_{ij}-\ell^k_{ij}
--\eta(\ell^T_{ij}-\ell^k_{ij}+D_i^{kT})\right]^2,
+=\frac1{2N}\sum_{(i,t)\in\mathcal I}
+\left[\ell^\theta_{it}-\ell^k_{it}-\eta(\ell^T_{it}-\ell^k_{it}+D_{it}^{kT})\right]^2,
 \end{equation}
 \begin{equation}
 \label{eq:ch2-opd-mean-explicit-gradient}
--\widehat\nabla\mathcal L_{k,\mathrm{Mean}}
-=\frac1{BK}\sum_{i,j}
-\left[\eta(\ell^T_{ij}-\ell^k_{ij}+D_i^{kT})-\ell^\theta_{ij}+\ell^k_{ij}\right]
-\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i).
+-\widehat\nabla_\theta\mathcal L_{k,\mathrm{Mean}}
+=\frac1N\sum_{(i,t)\in\mathcal I}
+\left[\eta(\ell^T_{it}-\ell^k_{it}+D_{it}^{kT})-\ell^\theta_{it}+\ell^k_{it}\right]
+\nabla_\theta\log\pi_\theta(y_{it}\mid x_i,y_{i,<t}).
 \end{equation}
-\paragraph{BPO。}
+
+\paragraph{未线性化 BPO。}
+完整 reverse-KL residual 为
 \begin{equation}
 \label{eq:ch2-opd-bpo-explicit-residual}
-\widehat\delta_{ij}
-=\eta(\ell^T_{ij}-\ell^k_{ij}+D_i^{kT})
--\left(\ell^\theta_{ij}-\ell^k_{ij}+D_i^{k\theta}\right).
+\delta_{it}^{k,\theta}
+=\eta(\ell^T_{it}-\ell^k_{it}+D_{it}^{kT})
+-\left(\ell^\theta_{it}-\ell^k_{it}+D_{it}^{k\theta}\right).
 \end{equation}
 \begin{equation}
 \label{eq:ch2-opd-bpo-explicit-loss}
 \widehat{\mathcal L}_{k,\mathrm{BPO}}
-=\frac1{2\eta BK}\sum_{i,j}\widehat\delta_{ij}^{\,2},
+=\frac1{2\eta N}\sum_{(i,t)\in\mathcal I}(\delta_{it}^{k,\theta})^2.
 \end{equation}
+由
+\[
+\nabla_\theta D_{it}^{k\theta}
+=-\sum_v\pi_k(v\mid s_{it})\nabla_\theta\log\pi_\theta(v\mid s_{it}),
+\]
+得到
 \begin{equation}
 \label{eq:ch2-opd-bpo-explicit-gradient}
--\eta\widehat\nabla\mathcal L_{k,\mathrm{BPO}}
-=\frac1{BK}\sum_{i,j}\widehat\delta_{ij}
-\left[\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i)
--\sum_v\pi_k(v\mid s_i)\nabla_\theta\log\pi_\theta(v\mid s_i)\right].
+-\eta\widehat\nabla_\theta\mathcal L_{k,\mathrm{BPO}}
+=\frac1N\sum_{(i,t)\in\mathcal I}\delta_{it}^{k,\theta}
+\left[\nabla_\theta\log\pi_\theta(y_{it}\mid s_{it})
+-\sum_v\pi_k(v\mid s_{it})\nabla_\theta\log\pi_\theta(v\mid s_{it})\right].
 \end{equation}
-实际 sampled 实现把第二项替换为 $K^{-1}\sum_\ell\nabla_\theta\log\pi_\theta(y_{i\ell}\mid s_i)$，并把 $D_i^{k\theta}$ 替换为停止梯度的 $\widehat D_i^{k\theta}$。
+
 \paragraph{MDPO。}
-令 $R_{ij}^{\theta}=\exp(\ell^\theta_{ij}-\ell^k_{ij})$。anchor token 样本上的 objective 与 ascent estimator 分别为
+令
+\[
+R_{it}^{\theta}=\exp(\ell^\theta_{it}-\ell^k_{it}).
+\]
+anchor rollout 上的 action-level IS objective 和 ascent estimator 为
 \begin{equation}
 \label{eq:ch2-opd-mdpo-explicit-objective}
 \widehat{\mathcal J}_{k,\mathrm{MDPO}}
-=\frac1{BK}\sum_{i,j}R_{ij}^{\theta}
-\left[(\ell^T_{ij}-\ell^k_{ij})-\frac1\eta(\ell^\theta_{ij}-\ell^k_{ij})\right],
+=\frac1N\sum_{(i,t)\in\mathcal I}R_{it}^{\theta}
+\left[(\ell^T_{it}-\ell^k_{it})-\frac1\eta(\ell^\theta_{it}-\ell^k_{it})\right],
 \end{equation}
 \begin{equation}
 \label{eq:ch2-opd-mdpo-explicit-gradient}
-\widehat\nabla\mathcal J_{k,\mathrm{MDPO}}
-=\frac1{BK}\sum_{i,j}R_{ij}^{\theta}
-\left[(\ell^T_{ij}-\ell^k_{ij})-\frac1\eta(\ell^\theta_{ij}-\ell^k_{ij})\right]
-\nabla_\theta\log\pi_\theta(y_{ij}\mid s_i).
+\widehat\nabla_\theta\mathcal J_{k,\mathrm{MDPO}}
+=\frac1N\sum_{(i,t)\in\mathcal I}R_{it}^{\theta}
+\left[(\ell^T_{it}-\ell^k_{it})-\frac1\eta(\ell^\theta_{it}-\ell^k_{it})\right]
+\nabla_\theta\log\pi_\theta(y_{it}\mid s_{it}).
 \end{equation}
+这里 $R_{it}^{\theta}$ 修正的是 action 测度；如果 rollout 的 token 历史来自 replay，访问测度修正应单独使用式 \eqref{eq:ch2-opd-history-is} 的 $\Omega_k(s_{it})$，二者不能合并成一个含义不明的 ratio。
 
-\begin{proposition}[PMD-Mean、BPO 与 PMD-Part 的差异]
-\label{prop:ch2-mean-bpo-equivalence}
-三者共享式 \eqref{eq:ch2-optimal-policy} 的精确零点，但有限步梯度一般不同。PMD-Mean 使用 $\eta\widetilde f_k-U_\theta$ 乘以 ordinary student score；BPO 使用
+\begin{theorem}[prompt--rollout inner 的共同零点]
+\label{thm:ch2-opd-inner-common-root}
+在每个 response token 的词表分布可表示、$Z_k(s_{it})$ 精确可计算且优化测度覆盖所有有效 rollout 历史时，四个 inner 的零 residual 或最大值都对应
 \[
-D_\theta=\eta\widetilde f_k-U_\theta+\mathbb E_{\pi_k}[U_\theta]
+\pi_\theta(\cdot\mid x_i,y_{i,<t})
+=\frac{\pi_k(\cdot\mid x_i,y_{i,<t})^{1-\eta}
+T(\cdot\mid x_i,y_{i,<t})^\eta}{Z_k(x_i,y_{i,<t})}
 \]
-乘以 centered student score。二者只有在
-\[
-\mathbb E_{\pi_k}[U_\theta]=0,
-\qquad
-\mathbb E_{\pi_k}[\nabla\log\pi_\theta]=0
-\]
-同时成立时才给出相同梯度。
-\end{proposition}
+对所有有效 $(i,t)$ 成立。有限 rollout、参数化限制和有限 inner updates 会把这个 pointwise 结论变成 rollout-mask 测度下的投影。
+\end{theorem}
 
 \begin{proof}
-将 $D_\theta$ 与 PMD-Mean residual 相减得到
-\[
-D_\theta-(\eta\widetilde f_k-U_\theta)=\mathbb E_{\pi_k}[U_\theta].
-\]
-BPO 的 score 由 $D_\theta$ 对 student 参数求导产生，正好是 ordinary score 减去其 anchor 均值。代入两式并展开，差异由上述两个 action-independent 项的乘积给出；它们并非由策略归一化自动消失，因为归一化只保证 $\mathbb E_{\pi_\theta}[\nabla\log\pi_\theta]=0$。
+PMD-Part 直接令平方残差为零；PMD-Mean 的归一化约束恢复 action-independent 的 $\log Z_k$；BPO 的中心化 residual 为零后由同一归一化约束恢复 $\log Z_k$；MDPO 则由式 \eqref{eq:ch2-mdpo-kl-gap} 的 reverse-KL 分解得到唯一最大点。逐 token 应用即可得到整条 prompt--rollout batch 的结论。
 \end{proof}
+
 
 \section{Inner 误差、outer 更新与 Natural Gradient}
 \label{sec:ch2-inner-outer}
@@ -559,20 +729,40 @@ BPO 的 score 由 $D_\theta$ 对 student 参数求导产生，正好是 ordinary
 \section{访问测度的最小必要说明}
 \label{sec:ch2-access-measure}
 
-上面的 inner 公式默认 prefix 按 $d_{\pi_k}$ 采样。若训练数据来自另一个 replay prefix measure $\nu$，定义 Radon--Nikodym 权重
+上面的 inner 公式默认 历史按 $d_{\pi_k}$ 采样。若训练数据来自另一个 replay 历史测度 $\nu$，定义 Radon--Nikodym 权重
 \[
 \Omega_k(s)=\frac{d_{\pi_k}(s)}{d_{\nu}(s)}.
 \]
 对任何只依赖当前 $(s,a)$ 的 inner integrand $Y(s,a)$，有
 \begin{equation}
-\label{eq:ch2-opd-prefix-is}
+\label{eq:ch2-opd-history-is}
 \mathbb E_{s\sim d_{\pi_k},\,a\sim\pi_k}[Y(s,a)]
 =\mathbb E_{s\sim d_\nu,\,a\sim\pi_k}[\Omega_k(s)Y(s,a)].
 \end{equation}
-这说明 prefix 权重只负责把访问测度从 replay 移回 anchor；它不改变四种 inner 的 token-level 公式。对于局部 OPD reward，不需要额外乘后缀权重；只有当目标改成终端序列 return 时，才应重新推导完整的 sequence importance sampling。
+这说明 历史权重只负责把访问测度从 replay 移回 anchor；它不改变四种 inner 的 token-level 公式。对于局部 OPD reward，不需要额外乘后缀权重；只有当目标改成终端序列 return 时，才应重新推导完整的 sequence importance sampling。
+
+\begin{proposition}[局部 token 目标的访问测度修正]
+\label{prop:ch2-local-access-measure}
+设 $Y_t(x,y_{<t},y_t)$ 只依赖当前 rollout 历史和当前 token。若目标 rollout 历史测度为 $d_{\pi_k}$，数据历史测度为 $d_\nu$，且 $d_{\pi_k}\ll d_\nu$，则
+\[
+\mathbb E_{d_{\pi_k},\pi_k}[Y_t]
+=\mathbb E_{d_\nu,\pi_k}[\Omega_k(s_t)Y_t],
+\qquad
+\Omega_k(s_t)=\frac{d_{\pi_k}(s_t)}{d_\nu(s_t)}.
+\]
+局部 token reward 不需要乘未来 token 的密度比。
+\end{proposition}
+
+\begin{proof}
+按历史 $s_t$ 分解联合期望：
+\[
+\sum_{s_t}d_{\pi_k}(s_t)\sum_a\pi_k(a\mid s_t)Y_t(s_t,a).
+\]
+将 $d_{\pi_k}(s_t)=\Omega_k(s_t)d_\nu(s_t)$ 代入，即得到式 \eqref{eq:ch2-opd-history-is}。因为 $Y_t$ 不包含 $y_{>t}$，对未来 token 的积分在两边都等于 $1$；再乘后缀密度比会改变被估计的目标。
+\end{proof}
 
 \begin{remark}
-本章把 replay 的访问信息统一写成目标 prefix 测度 $d_{\pi_k}$、数据 prefix 测度 $d_\nu$ 及其比值 $\Omega_k$；该比值只修正 prefix 访问测度，与 MDPO 的 action ratio 分开定义。
+本章把 replay 的访问信息统一写成目标历史测度 $d_{\pi_k}$、数据历史测度 $d_\nu$ 及其比值 $\Omega_k$；该比值只修正 历史 访问测度，与 MDPO 的 action ratio 分开定义。
 \end{remark}
 
 \chapter{梯度的偏差与方差}
