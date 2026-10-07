@@ -83,7 +83,7 @@ r_k(s,a)=\log T(a\mid s)-\log\mu_k(a\mid s).
 \[
  \E_{\mu_k}[e^{\eta(r_k-m_k)}]=e^{-\eta m_k}Z_k,
 \]
-所以闭式分布 $p_k^+$ 不变。这是 PMD-Part 与 PMD-Mean 共享固定点的原因。
+所以原始 mirror 子问题的闭式分布 $p_k^+$ 不变。这里必须保留中心化后的配分函数；用均值代替对数配分函数是另一项近似，会改变回归问题的总体解。
 
 若定义 $u_\theta(s,a)=\log\pi_\theta(a\mid s)-\log\mu_k(a\mid s)$，则 exact regression residual 为
 \begin{equation}\label{eq:part-residual}
@@ -93,7 +93,7 @@ PMD-Mean 使用
 \begin{equation}\label{eq:mean-residual}
  q_{\mathrm{mean}}(s,a;\theta)=u_\theta(s,a)-\eta[r_k(s,a)-m_k(s)].
 \end{equation}
-二者的零点都等价于 $\pi_\theta=p_k^+$，但有限样本中 $\log Z_k$ 与 $m_k$ 的估计方差不同。
+PMD-Part 的零残差对应 $\pi_\theta=p_k^+$。PMD-Mean 采用原论文的均值近似 $\log Z_k\approx\eta m_k$，仅中心化 reward，不中心化 $u_\theta$。对非恒定 reward，由严格 Jensen 不等式有 $\E_{\mu_k}[e^{\eta(r_k-m_k)}]>1$，其 target 不满足策略归一化，因而最优残差不能为零。它的总体最优解是第二章推导的 Lambert-$W$ 分布，与 Gibbs 分布不同。
 
 \section{参数化策略的投影}
 

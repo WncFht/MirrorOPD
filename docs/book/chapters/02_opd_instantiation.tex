@@ -1,0 +1,744 @@
+\section{OPD 特化：逐 token reward 与两种信息访问模式}
+\label{sec:ch2-opd-specialization}
+
+在 OPD 中，第 $k$ 个 outer step 先固定 anchor $\pi_k$，然后从它产生 rollout。对 prefix
+$s_t=(x,y_{<t})$ 和实际 sampled token $a_t=y_t$，最直接的局部 teacher reward 是
+\begin{equation}
+\label{eq:ch2-opd-raw-reward}
+r_k(s_t,a_t)=\log\pi_T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
+\end{equation}
+它满足序列分解
+\[
+\sum_{t=1}^H r_k(s_t,a_t)=\log\pi_T(y\mid x)-\log\pi_k(y\mid x).
+\]
+因此在共同 mirror 子问题中应取 $f=r_k$；不能把整条序列的 log-ratio 当作每一个 prefix 的同一个 reward，否则会重复计算后缀差异。
+
+可以对 reward 做两种不同的“归一化”，必须区分它们的理论作用。对任意只依赖 prefix 的 baseline $b_k(s)$，令
+\begin{equation}
+\label{eq:ch2-opd-centered-reward}
+f_k^{\mathrm{ctr}}(s,a)=r_k(s,a)-b_k(s).
+\end{equation}
+它只把 partition function 乘上 $e^{-\eta b_k(s)}$，所以 Gibbs policy 不变；取
+$b_k(s)=\mathbb E_{\pi_k}[r_k(s,\cdot)\mid s]$ 就是条件中心化。若再除以尺度 $\sigma_k(s)>0$，则
+\[
+f_k^{\mathrm{std}}=(r_k-b_k)/\sigma_k
+\]
+会把有效温度从 $\eta$ 改成 $\eta/\sigma_k$，不再是同一个 mirror step，除非同时把正则参数改为 $\eta\sigma_k$。因此 OPD 的默认实现只做 additive centering；标准化只能作为明确的 temperature schedule。
+
+\subsection{完整 vocabulary logits：精确 token mirror target}
+\label{sec:ch2-opd-full-vocab}
+
+如果 teacher 和 anchor 都能在 prefix $s$ 返回完整词表 logits，则对每个 $v\in\mathcal V$ 计算
+\[
+r_k(s,v)=\log\pi_T(v\mid s)-\log\pi_k(v\mid s),
+\qquad
+\log Z_k(s)=\operatorname{logsumexp}_{v\in\mathcal V}
+\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)\bigr).
+\]
+于是 exact target 为
+\[
+\pi_k^+(v\mid s)=\exp\bigl((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)-\log Z_k(s)\bigr).
+\]
+这时 PMD-Part 的 target、MDPO 的 reverse KL、以及 BPO/PMD-Mean 所需的 anchor conditional center 都可以在同一个 prefix 上精确计算。完整词表路径不需要 action-level importance sampling；唯一的随机性来自 prefix batch 和 optimizer。
+
+在写算法之前先把四个 inner 的计算量化简。对一个固定 prefix，teacher、anchor 和当前 student 的信息都直接写成 token log-probability。PMD 的归一化常数是
+\begin{equation}
+\label{eq:ch2-opd-full-logz}
+\log Z_k(s)=
+\log\left(\sum_{v\in\mathcal V}
+\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)\right)\right).
+\end{equation}
+因此 exact mirror target 为
+\[
+\pi_k^+(v\mid s)=
+\exp\!\left((1-\eta)\log\pi_k(v\mid s)+\eta\log\pi_T(v\mid s)-\log Z_k(s)\right).
+\]
+为了写出 PMD-Mean 和 BPO 的中心化形式，先把两个均值写成 KL 散度。定义
+\begin{align}
+K_k^T(s)
+&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert \pi_T(\cdot\mid s)\right),\\
+K_{k,n}^\theta(s)
+&\coloneqq \operatorname{KL}\!\left(\pi_k(\cdot\mid s)\middle\Vert\pi_{k,n}(\cdot\mid s)\right).
+\end{align}
+在 outer--inner 记号 $\theta_{k,n}$ 中，$k$ 是 outer step 编号，$n$
+是该 outer step 内的 inner optimizer step 编号。因此
+$K_{k,n}^\theta(s)$ 简写
+$\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$：
+左侧分布 $\pi_k$ 在整个 inner loop 固定，右侧 student 随 $n$ 改变，故每次
+inner 更新后都要用新参数重算这个量。相反，$K_k^T(s)$ 在固定 outer step
+内不随 $n$ 改变。
+于是
+\begin{align}
+\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}\right]&=-K_k^T(s),\\
+\mathbb E_{v\sim\pi_k}\left[\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right]&=-K_{k,n}^\theta(s).
+\end{align}
+后续可以对这两个 KL 分别采用 full vocabulary、top-$K$ 或 sampled-token 估计，但不能混淆它们与 MDPO 中 $\operatorname{KL}(\pi_\theta\Vert\pi_k)$ 的方向。
+于是四个 loss 可直接化为
+\begin{align}
+\mathcal L_{\mathrm{Part}}(s)
+&=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
+-\eta\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
++\log Z_k(s)\right]^2,
+\label{eq:ch2-opd-full-part-simplified}\\
+\mathcal L_{\mathrm{Mean}}(s)
+&=\frac12\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\Bigg[
+\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
+-\eta\left(\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
++K_k^T(s)\right)
+\Bigg]^2,
+\label{eq:ch2-opd-full-mean-simplified}\\
+D_{k,n}(s,v)
+&=\eta\left(\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
++K_k^T(s)\right)
+\\[-2pt]
+&\quad-\left(\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}
++K_{k,n}^\theta(s)\right),
+\label{eq:ch2-opd-full-bpo-residual}\\
+\mathcal L_{\mathrm{BPO}}(s)&=\frac1{2\eta}\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_{k,n}(s,v)^2],
+\label{eq:ch2-opd-full-bpo-simplified}\\
+\mathcal J_{\mathrm{MDPO}}(s)
+&=\mathbb E_{v\sim\pi_{k,n}(\cdot\mid s)}
+\left[\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)}
+-\frac1\eta\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}\right].
+\label{eq:ch2-opd-full-mdpo-simplified}
+\end{align}
+由于 $\mathbb E_{v\sim\pi_k(\cdot\mid s)}[D_{k,n}(s,v)]=0$，BPO 的完整词表梯度进一步化为
+\begin{equation}
+\label{eq:ch2-opd-full-bpo-gradient-simplified}
+-\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\left(r_k(s,v)+K_k^T(s)
+-\frac{\Delta_{k,n}(s,v)+K_{k,n}^\theta(s)}{\eta}\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\right].
+\end{equation}
+因此完整 vocabulary 路径无需显式计算 centered score 的第二项；它在精确求和中严格抵消。
+
+\subsubsection*{对应的梯度与 stop-gradient 约定}
+为便于对照前面的推导，下面这一组梯度公式中的旧记号统一解释为
+\[
+\pi_\theta=\pi_{k,n},\qquad T=\pi_T,\qquad
+\mathcal K_k^T=K_k^T,\qquad
+\mathcal K_{k,n}^\theta=K_{k,n}^\theta,\qquad
+D_\theta=D_{k,n}.
+\]
+这些只是同一 outer--inner 状态的记号映射；$k$ 和 $n$ 的冻结关系不变。后续新公式优先写成
+$\Delta_{k,n}$、$K_k^T$、$K_{k,n}^\theta$ 和 $D_{k,n}$，从而明确区分不同 KL 方向。
+下面把式~\eqref{eq:ch2-opd-full-part-simplified}--\eqref{eq:ch2-opd-full-mdpo-simplified}
+写成可直接实现的 policy-gradient 形式。固定 outer step $k$ 时，$\pi_k$、$\pi_T$、
+$\log Z_k$ 和 $\mathcal K_k^T$ 都不依赖当前参数 $\theta$，实现中应使用
+$\operatorname{stopgrad}$。相反，$\mathcal K_k^\theta$ 必须保留对
+$\log\pi_\theta$ 的梯度。完整词表下
+\begin{align}
+\label{eq:ch2-opd-grad-ktheta}
+\mathcal K_k^\theta(s)
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\operatorname{stopgrad}\!\left(\log\pi_k(v\mid s)\right)
+-\log\pi_\theta(v\mid s)\right],
+\\
+\nabla_\theta\mathcal K_k^\theta(s)
+&
+=-\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\nabla_\theta\log\pi_\theta(v\mid s)\right].
+\end{align}
+在下面的 policy-gradient 实现中，$A_{\mathrm{Part}}$、
+$A_{\mathrm{Mean}}$、$D_\theta$ 以及 MDPO 的 log-ratio 权重都必须整体
+使用 $\operatorname{stopgrad}$。这不是说它们在原始平方损失或原始
+MDPO objective 中没有参数依赖，而是这些依赖已经在前面的解析求导中处理过；
+直接实现 policy-gradient 时若不停止梯度，就会重复计入权重的导数，使所得梯度偏离已推导的 score-function 公式。
+
+对 PMD-Part，残差对 $\theta$ 的导数就是
+$\nabla_\theta\log\pi_\theta(v\mid s)$，故
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{Part}}(s)
+&=\mathbb E_{v\sim\pi_k(\cdot\mid s)}
+\left[\operatorname{stopgrad}\!\left(A_{\mathrm{Part}}(s,v)\right)
+\nabla_\theta\log\pi_\theta(v\mid s)\right],\\
+A_{\mathrm{Part}}(s,v)
+&=\log\frac{\pi_\theta(v\mid s)}{\pi_k(v\mid s)}
+-\eta\log\frac{T(v\mid s)}{\pi_k(v\mid s)}+\operatorname{stopgrad}(\log Z_k(s)).
+\end{align}
+因此其梯度下降方向是一个以 $\pi_k$ 为测度、以 $-A_{\mathrm{Part}}$ 为权重的
+score-function 更新。
+
+对 PMD-Mean，原论文定义对应的 residual 是
+\begin{equation}
+A_{\mathrm{Mean}}(s,v)
+=\Delta_{k,n}(s,v)-\eta\bigl(r_k(s,v)+K_k^T(s)\bigr),
+\qquad
+\nabla_\theta A_{\mathrm{Mean}}(s,v)
+=\nabla_\theta\log\pi_{k,n}(v\mid s).
+\label{eq:ch2-opd-grad-mean-residual}
+\end{equation}
+因此
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{Mean}}(s)
+=\mathbb E_{v\sim\pi_k}
+\left[\operatorname{stopgrad}\!\left(
+\Delta_{k,n}-\eta(r_k+K_k^T)\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\right].
+\end{equation}
+该 residual 的 anchor 均值是 $-K_{k,n}^\theta(s)$，一般不为零。
+PMD-Mean 不使用 student KL center，也没有 centered score。
+
+BPO 的 residual 则满足 $D_{k,n}=-A_{\mathrm{Mean}}-K_{k,n}^\theta$。
+完整词表求和中 $\mathbb E_{\pi_k}[D_{k,n}\mid s]=0$，故其梯度为
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+&=-\frac1\eta\mathbb E_{v\sim\pi_k}
+\left[D_{k,n}(s,v)\left(
+\nabla_\theta\log\pi_{k,n}(v\mid s)
+-\mathbb E_{u\sim\pi_k}[\nabla_\theta\log\pi_{k,n}(u\mid s)]
+\right)\right]\\
+&=\mathbb E_{v\sim\pi_k}
+\left[\operatorname{stopgrad}\!\left(
+\frac{\Delta_{k,n}+K_{k,n}^\theta}{\eta}
+-r_k-K_k^T\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\right].
+\label{eq:ch2-opd-bpo-gradient-expanded}
+\end{align}
+这里已把负号和 $\eta^{-1}$ 乘入权重，而非比较缩放后的 $-\eta\nabla\mathcal L_{\mathrm{BPO}}$。对应的实际下降方向是
+\begin{equation}
+-\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+=\mathbb E_{v\sim\pi_k}
+\left[\operatorname{stopgrad}\!\left(
+r_k+K_k^T-\frac{\Delta_{k,n}+K_{k,n}^\theta}{\eta}\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\right].
+\label{eq:ch2-opd-bpo-descent-expanded}
+\end{equation}
+被删除的是 $\mathbb E_{\pi_k}[D_{k,n}]\mathbb E_{\pi_k}[\nabla\log\pi_{k,n}]=0$，而非 score 期望本身。对照 PMD-Mean，二者满足
+\[
+\nabla\mathcal L_{\mathrm{Mean}}
+=\eta\nabla\mathcal L_{\mathrm{BPO}}
++K_{k,n}^\theta\nabla K_{k,n}^\theta.
+\]
+因此相同初始 anchor 只保证第一步同尺度方向一致，不保证后续 inner 轨迹相同。
+
+最后考虑 MDPO。记
+\[
+ r_k(s,v)=\log\frac{\pi_T(v\mid s)}{\pi_k(v\mid s)},
+\qquad
+\Delta_{k,n}(s,v)=\log\frac{\pi_{k,n}(v\mid s)}{\pi_k(v\mid s)}.
+\]
+对式~\eqref{eq:ch2-opd-full-mdpo-simplified} 求导时，既要微分外层测度
+$\pi_\theta$，也要微分 $U_\theta$：
+\begin{align}
+\nabla_\theta\mathcal J_{\mathrm{MDPO}}(s)
+&=\mathbb E_{v\sim\pi_{k,n}(\cdot\mid s)}
+\Bigg[\left(r_k(s,v)-\frac1\eta \Delta_{k,n}(s,v)-\frac1\eta\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\Bigg]\\
+&=\mathbb E_{v\sim\pi_{k,n}(\cdot\mid s)}
+\left[\operatorname{stopgrad}\!\left(r_k(s,v)-\frac1\eta \Delta_{k,n}(s,v)\right)
+\nabla_\theta\log\pi_{k,n}(v\mid s)\right],
+\end{align}
+因为 $\mathbb E_{v\sim\pi_\theta}[\nabla_\theta\log\pi_\theta(v\mid s)]=0$。因此 MDPO 是以当前 student
+$\pi_\theta$ 为采样测度的 policy gradient，而 BPO 和 PMD-Mean 使用冻结 anchor $\pi_k$ 测度。BPO 中心化完整 residual；PMD-Mean 仅中心化 reward。
+
+若 sampled-token 路径估计 $\mathcal K_k^\theta$，从 $a\sim\pi_k$ 采样时可以使用
+\begin{equation}
+\widehat{\mathcal K}_{k}^{\theta}(s,a)
+=\frac{\pi_k(a\mid s)}{\operatorname{stopgrad}(\pi_k(a\mid s))}
+\left[\operatorname{stopgrad}(\log\pi_k(a\mid s))
+-\log\pi_\theta(a\mid s)\right].
+\end{equation}
+它在数值上是 $\log\pi_k(a\mid s)-\log\pi_\theta(a\mid s)$，但保留了
+$-\nabla_\theta\log\pi_\theta(a\mid s)$。若把整个
+$\widehat{\mathcal K}_{k}^{\theta}$ 错误地 stop-gradient，BPO 原始平方损失就会丢失 centered-score 导数。PMD-Mean 原始损失不包含这个 student KL；它的 reward center $K_k^T$ 本来就应冻结。
+
+\subsection{有限词表与 sampled-token：KL 与 partition 估计}
+\label{sec:ch2-opd-z-kl-estimation}
+
+2602.04417 的 Top-$K$ 方法直接估计 KL：在 top-$K$ 头部计算精确项，在尾部用
+采样项校正。它不直接给出本节的 $\log Z_k$，因为
+\begin{equation}
+Z_k(s)=\mathbb E_{a\sim\pi_k(\cdot\mid s)}
+\left[\left(\frac{T(a\mid s)}{\pi_k(a\mid s)}\right)^\eta\right].
+\label{eq:ch2-opd-z-importance}
+\end{equation}
+这一区别很重要：$\widehat Z_k$ 可以无偏，但 $\log\widehat Z_k$ 不能无偏。
+
+在固定 prefix $s$ 上，从冻结 anchor 采样 $a_j\sim\pi_k(\cdot\mid s)$，令
+$r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s)$。则两个中心满足
+\begin{align}
+\mathcal K_k^T(s)&=\mathbb E_{a\sim\pi_k}[-r_k(s,a)],\\
+\mathcal K_{k,n}^\theta(s)&=\mathbb E_{a\sim\pi_k}
+\left[\log\pi_k(a\mid s)-\log\pi_{\theta_{k,n}}(a\mid s)\right].
+\end{align}
+因此 $m$ 个独立 next-token 样本的均值分别是两个 KL 的无偏估计。
+真实 rollout 中每个 prefix 通常只有一个后继 token；该 token 是无偏单点样本，
+但不是 conditional KL 的精确值。若要降低方差，可以在已经算出 anchor logits
+后额外抽取 $m-1$ 个 token，这只增加 categorical 抽样和 log-prob 记录，
+无需生成额外长序列。不同 prefix 的 token 不能互相当作同一条件分布的样本。
+
+其中 $\mathcal K_k^T$ 在整个 outer step 内固定，teacher/anchor log-prob 可以
+缓存；$\mathcal K_{k,n}^\theta$ 必须在每个 inner step 重新计算。实现已经推导
+好的 policy-gradient 时，KL 中心作为权重整体使用 stop-gradient；实现原始
+BPO 平方损失时则必须保留 student KL 的导数；PMD-Mean 只需要冻结的 teacher KL center。
+
+对 $\mathcal K_{k,n}^\theta=\operatorname{KL}(\pi_k\Vert\pi_{\theta_{k,n}})$，
+取 $S_k(s)=\operatorname{TopK}(\pi_k(\cdot\mid s))$，可构造
+\begin{align}
+\widehat{\mathcal K}_{k,n}^{\theta}(s)
+={}&\sum_{v\in S_k(s)}\pi_k(v\mid s)
+\log\frac{\pi_k(v\mid s)}{\pi_{\theta_{k,n}}(v\mid s)}\\
+&+\frac1m\sum_{j=1}^{m}\mathbf 1\{a_j\notin S_k(s)\}
+\log\frac{\pi_k(a_j\mid s)}{\pi_{\theta_{k,n}}(a_j\mid s)},
+\qquad a_j\sim\pi_k(\cdot\mid s).
+\label{eq:ch2-opd-topk-anchor-kl}
+\end{align}
+对固定 $S_k$，尾部项是精确尾部求和的无偏 Monte Carlo 估计，且其 autograd
+梯度的期望等于真实 KL 梯度。这里的“梯度无偏”是指把该估计量直接放进
+原始 KL 损失并对 student 反向传播时的性质；本章的最终实现采用已经解析化的
+policy-gradient 形式，KL 估计值只作为数值权重，必须整体
+$\operatorname{stopgrad}$，因此不需要再对这个估计量执行 autograd。
+$K=0$ 是纯 sampled-token，$K=|\mathcal V|$ 是 exact KL；这两个端点是同一
+个 top-$K$ 族的插值端点，不单独构成一个算法分支。给定头部后，条件方差为
+\begin{equation}
+\operatorname{Var}(\widehat{\mathcal K}_{k,n}^{\theta}\mid S_k)
+=\frac1m\operatorname{Var}_{a\sim\pi_k}\left[
+\mathbf 1\{a\notin S_k\}
+\log\frac{\pi_k(a\mid s)}{\pi_{\theta_{k,n}}(a\mid s)}\right].
+\end{equation}
+增大 $K$ 通常降低尾部质量和方差，但实际大小取决于尾部 log-ratio 的二阶矩。
+对 $\mathcal K_k^T$ 可使用同样的头尾分解；由于它不需要反向传播，anchor
+样本均值往往已经足够。
+
+为了把 2602.04417 中“截断偏差换取采样方差”的结论直接用于 OPD，下面给出
+一个与 KL、score 加权梯度和 partition function 都兼容的统一形式。固定 prefix
+$s$，令 $p(v)$ 为 rollout 测度（本章中通常是 $p=\pi_k(\cdot\mid s)$），
+$h(v)$ 为待求期望的 integrand，定义
+\begin{equation}
+Q=\mathbb E_{v\sim p}[h(v)],\qquad
+Q_K^{\mathrm{head}}=\sum_{v\in S_K}p(v)h(v),\qquad
+\tau_K=\mathbb E_{v\sim p}[\mathbf 1\{v\notin S_K\}h(v)],
+\label{eq:ch2-opd-generic-tail}
+\end{equation}
+其中 $S_K$ 是固定的 top-$K$ 集合。用 $m$ 个独立的 auxiliary token
+$a_1,\ldots,a_m\sim p$ 做尾部校正时，定义
+\begin{equation}
+\widehat Q_{K,m}=Q_K^{\mathrm{head}}+
+\frac1m\sum_{j=1}^{m}\mathbf 1\{a_j\notin S_K\}h(a_j).
+\label{eq:ch2-opd-generic-topk}
+\end{equation}
+
+\begin{theorem}[Top-$K$ 截断与尾部校正的偏差--方差分解]
+\label{thm:ch2-opd-topk-bias-variance}
+在 $\mathbb E_p[h^2]<\infty$ 且 $S_K$ 与 auxiliary samples 独立时，纯头部估计
+$\widehat Q_K^{\mathrm{tr}}=Q_K^{\mathrm{head}}$ 与尾部校正估计
+$\widehat Q_{K,m}$ 分别满足
+\begin{align}
+\operatorname{Bias}(\widehat Q_K^{\mathrm{tr}})&=-\tau_K,&
+\operatorname{Var}(\widehat Q_K^{\mathrm{tr}})&=0,&
+\operatorname{MSE}(\widehat Q_K^{\mathrm{tr}})&=\tau_K^2,\\
+\operatorname{Bias}(\widehat Q_{K,m})&=0,&
+\operatorname{Var}(\widehat Q_{K,m})&=\frac{V_K}{m},&
+\operatorname{MSE}(\widehat Q_{K,m})&=\frac{V_K}{m},
+\end{align}
+其中
+\begin{equation}
+V_K=\mathbb E_p\left[\mathbf 1\{v\notin S_K\}h(v)^2\right]-\tau_K^2.
+\label{eq:ch2-opd-tail-variance}
+\end{equation}
+如果 $S_K\subseteq S_{K+1}$，则尾部二阶矩
+$A_K=\mathbb E_p[\mathbf 1\{v\notin S_K\}h(v)^2]$ 单调不增，且
+$V_K\le A_K$。尾部均值 $\tau_K$ 在 $h\ge0$ 时单调不增；对符号不定的
+$h$，它本身不必单调，但有
+\begin{equation}
+|\tau_K|\le \sqrt{p(S_K^c)A_K}.
+\label{eq:ch2-opd-tail-cauchy}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+记 $X_j=\mathbf 1\{a_j\notin S_K\}h(a_j)$。由 $a_j\sim p$，有
+$\mathbb E[X_j]=\tau_K$，且 $\operatorname{Var}(X_j)=V_K$。因此
+\begin{equation}
+\mathbb E[\widehat Q_{K,m}]
+ =Q_K^{\mathrm{head}}+\tau_K=Q,
+\qquad
+\operatorname{Var}(\widehat Q_{K,m})
+ =\operatorname{Var}\left(\frac1m\sum_{j=1}^mX_j\right)
+ =\frac{V_K}{m},
+\end{equation}
+其中最后一步使用了独立性。纯头部估计没有随机项，且
+$Q_K^{\mathrm{head}}-Q=-\tau_K$，从而得到前三个等式。若集合嵌套，
+$\mathbf 1\{v\notin S_{K+1}\}\le\mathbf 1\{v\notin S_K\}$，故对非负
+$h^2$ 有 $A_{K+1}\le A_K$。当 $h\ge0$ 时，尾部指示函数逐点下降，
+所以 $0\le\tau_{K+1}\le\tau_K$。一般情形下对尾部随机变量应用
+Cauchy--Schwarz 不等式即可得到式~\eqref{eq:ch2-opd-tail-cauchy}。
+\end{proof}
+
+定理~\ref{thm:ch2-opd-topk-bias-variance} 有两个直接含义。对
+$h_{\mathrm{KL}}(v)=\log\frac{\pi_k(v\mid s)}{\pi_{\theta}(v\mid s)}$
+或 $h_T(v)=\log\frac{\pi_k(v\mid s)}{T(v\mid s)}$，$h$ 可能正也可能负，
+因此不能声称“增大 $K$ 必然单调减小截断 bias”；能够保证的是尾部二阶矩和
+上界下降。对 $h_Z(v)=\exp(\eta r_k(s,v))\ge0$，尾部均值本身单调下降，
+所以纯截断的 $Z_k$ 估计具有严格的单侧负偏差，而且随 $K$ 减小。
+这正是 2602.04417 中 truncated KL 与 tail-corrected Top-$K$ KL 的数学区别。
+
+如果最终对象是 score 加权的 policy gradient，令
+$g_\theta(v)=\nabla_\theta\log\pi_\theta(v\mid s)$，把
+$h(v)$ 换成向量 $h(v)g_\theta(v)$，定理逐坐标成立，并得到
+\begin{equation}
+\operatorname{Bias}(\widehat G_K^{\mathrm{tr}})
+ =-\mathbb E_p[\mathbf 1\{v\notin S_K\}h(v)g_\theta(v)],
+\qquad
+\operatorname{Cov}(\widehat G_{K,m})
+ =\frac1m\operatorname{Cov}_p(\mathbf 1\{v\notin S_K\}h(v)g_\theta(v)).
+\label{eq:ch2-opd-gradient-topk-mse}
+\end{equation}
+这描述的是“估计最终梯度权重”的误差，而不是对 detached 估计量求导。
+本章 Algorithm~5 采用后者：先解析得到 score-function 公式，再把
+$\widehat h$ 整体 stop-gradient。因此实现不需要保存估计量的 autograd 图；
+只需控制式~\eqref{eq:ch2-opd-gradient-topk-mse} 中的数值 bias 和 variance。
+
+对 $Z_k$，头尾分解应先估计 $Z_k$ 再取对数。令
+$S_Z(s)$ 为 $((1-\eta)\log\pi_k+\eta\log T)$ 的 top-$K$ 索引，则
+\begin{align}
+\widehat Z_k(s)
+={}&\sum_{v\in S_Z(s)}\pi_k(v\mid s)^{1-\eta}T(v\mid s)^\eta\\
+&+\frac1m\sum_{j=1}^{m}\mathbf 1\{a_j\notin S_Z(s)\}
+\left(\frac{T(a_j\mid s)}{\pi_k(a_j\mid s)}\right)^\eta,
+\qquad a_j\sim\pi_k(\cdot\mid s).
+\label{eq:ch2-opd-topk-z}
+\end{align}
+式~\eqref{eq:ch2-opd-topk-z} 对 $Z_k$ 无偏，但 Jensen 不等式给出
+\begin{equation}
+\mathbb E[\log\widehat Z_k]\leq\log Z_k,
+\qquad
+\mathbb E[\log\widehat Z_k]-\log Z_k
+\approx-\frac{\operatorname{Var}(\widehat Z_k)}{2Z_k^2}.
+\end{equation}
+尾部重要性比率具有长尾时，单 token plug-in 估计尤其不稳定；裁剪比率可降方差，
+但会引入额外偏差。$\eta=1$ 时 $Z_k=1$，所以 $\log Z_k=0$ 精确已知；
+$\eta=0$ 时同样如此。$0<\eta<1$ 时，若不需要 PMD-Part，PMD-Mean/BPO
+可以绕开这项 log-of-mean 偏差。
+
+\begin{theorem}[Partition function 的 log-of-mean 偏差]
+\label{thm:ch2-opd-logz-delta}
+设 $\widehat Z_{K,m}$ 是式~\eqref{eq:ch2-opd-topk-z} 的尾部校正估计，
+$\mathbb E[\widehat Z_{K,m}]=Z_k>0$，且尾部三阶绝对矩有限。记
+$V_{K}=\operatorname{Var}(\mathbf 1\{a\notin S_Z\}
+(T(a\mid s)/\pi_k(a\mid s))^\eta)$。当 $m$ 足够大时，
+\begin{align}
+\mathbb E[\log\widehat Z_{K,m}]-\log Z_k
+&=-\frac{V_K}{2mZ_k^2}+O(m^{-3/2}),\\
+\operatorname{Var}(\log\widehat Z_{K,m})
+&=\frac{V_K}{mZ_k^2}+O(m^{-3/2}).
+\end{align}
+若改用纯头部估计 $Z_K^{\mathrm{tr}}=\sum_{v\in S_Z}
+\pi_k(v)^{1-\eta}T(v)^\eta$，则
+\begin{equation}
+Z_K^{\mathrm{tr}}-Z_k=-\tau_K^Z\le0,
+\qquad
+\log Z_K^{\mathrm{tr}}-\log Z_k\le0,
+\end{equation}
+其中 $\tau_K^Z\ge0$ 是式~\eqref{eq:ch2-opd-generic-tail} 对
+$h_Z$ 的尾部均值。因而纯截断的 log-partition bias 是确定性的单侧偏差，
+而尾部校正的 plug-in log 估计是由方差诱导的负偏差。
+\end{theorem}
+
+\begin{proof}
+令 $\Delta=\widehat Z_{K,m}-Z_k$。由无偏性，$\mathbb E[\Delta]=0$，且
+$\mathbb E[\Delta^2]=V_K/m$。在 $Z_k$ 邻域对
+$f(z)=\log z$ 作三阶 Taylor 展开：
+\begin{equation}
+\log(Z_k+\Delta)=\log Z_k+\frac{\Delta}{Z_k}
+ -\frac{\Delta^2}{2Z_k^2}+R_3,
+\end{equation}
+其中在三阶矩有界时 $\mathbb E|R_3|=O(m^{-3/2})$。取期望并使用
+$\mathbb E[\Delta]=0$ 得到第一式。对同一展开取方差，首阶随机项为
+$\Delta/Z_k$，故
+$\operatorname{Var}(\log\widehat Z_{K,m})=V_K/(mZ_k^2)+O(m^{-3/2})$。
+最后，$h_Z\ge0$ 给出 $\tau_K^Z\ge0$，所以
+$Z_K^{\mathrm{tr}}\le Z_k$；由于 log 单调递增，第二个不等式随之成立。
+\end{proof}
+
+定理~\ref{thm:ch2-opd-logz-delta} 说明了为什么不能把“无偏的
+$\widehat Z_k$”直接等同于“无偏的 $\log Z_k$”。在 PMD-Part 中，若使用
+plug-in 估计，$\log Z_k$ 的误差会进入每个 token 的 residual；在完整词表路径上，该误差乘以 anchor 下的 student score 均值，一般不为零；sampled-token 路径还承担随机 score 的额外方差。因此 PMD-Part 对 $m$、$K$ 和尾部比率的要求严格于 PMD-Mean/BPO。
+当 $m$ 个样本独立且把同一 prefix 的梯度平均时，partition 诱导的梯度方差
+按 $1/m$ 下降；当外层有 $B$ 个相互独立 prefix 时，条件于 prefix 的这部分
+方差进一步按 $1/B$ 下降，但 prefix coverage 误差不随 $m$ 消失。
+
+\subsubsection*{$\log Z_k$ 的展开估计：从 $Z_k$ 的 plug-in 走向可控偏差}
+直接计算 $\log\widehat Z_k$ 是最简单的方案，但它把非线性的 log 放在 Monte
+Carlo 均值之后，必然产生 Jensen bias。对于 OPD，$Z_k$ 具有更特殊的结构：
+\begin{equation}
+Z_k(s)=\mathbb E_{a\sim\pi_k}\left[e^{\eta r_k(s,a)}\right],
+\qquad
+r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s).
+\label{eq:ch2-opd-z-cumulant-start}
+\end{equation}
+因此 $\log Z_k$ 是随机变量 $r_k$ 的 cumulant-generating function 在
+$\eta$ 处的值。令 $\kappa_j(r_k)$ 为 $r_k$ 的第 $j$ 阶 cumulant，则在
+矩母函数存在的邻域内
+\begin{equation}
+\log Z_k(s)=\sum_{j=1}^{\infty}\frac{\eta^j}{j!}\kappa_j(r_k).
+\label{eq:ch2-opd-logz-cumulant-series}
+\end{equation}
+前两项为
+\begin{equation}
+\log Z_k(s)=\eta\,\mathbb E[r_k]
+ +\frac{\eta^2}{2}\operatorname{Var}(r_k)
+ +R_3(s),
+\label{eq:ch2-opd-logz-second-order}
+\end{equation}
+其中 $R_3$ 收集三阶及以上 cumulant。因为
+$\mathbb E[r_k]=-\mathcal K_k^T$，二阶近似也可以写成
+\begin{equation}
+\log Z_k(s)\approx-\eta K_k^T(s)
+ +\frac{\eta^2}{2}\operatorname{Var}_{a\sim\pi_k}[r_k(s,a)].
+\label{eq:ch2-opd-logz-kl-expansion}
+\end{equation}
+这给出了比 $-\eta\widehat{\mathcal K}_k^T$ 更准确的近似：只使用均值会遗漏
+log-sum-exp 的二阶曲率项，而该项在 teacher 与 anchor 差异较大时不可忽略。
+
+若从同一个 prefix 取得 $m$ 个 auxiliary token，令 $\widehat\kappa_j$ 为
+对应的 unbiased $j$ 阶 k-statistic，并定义
+\begin{equation}
+\widehat L_{J,m}(s)=\sum_{j=1}^{J}\frac{\eta^j}{j!}\widehat\kappa_j(r_k).
+\label{eq:ch2-opd-logz-kstat-estimator}
+\end{equation}
+则
+\begin{theorem}[Cumulant 截断估计器的 bias 与方差]
+\label{thm:ch2-opd-logz-cumulant}
+若 $\mathbb E|r_k|^{J+1}<\infty$ 且 cumulant series 在 $\eta$ 处收敛，则
+\begin{equation}
+\mathbb E[\widehat L_{J,m}]-\log Z_k
+ =-\sum_{j=J+1}^{\infty}\frac{\eta^j}{j!}\kappa_j(r_k),
+\qquad
+\operatorname{Var}(\widehat L_{J,m})=O(m^{-1}).
+\end{equation}
+若 $|\eta r_k|\le c$ 几乎处处成立，则截断 bias 满足
+\begin{equation}
+\left|\mathbb E[\widehat L_{J,m}]-\log Z_k\right|
+\leq \frac{e^c|\eta|^{J+1}}{(J+1)!}
+\mathbb E\left[|r_k|^{J+1}\right].
+\end{equation}
+\end{theorem}
+\begin{proof}
+由 k-statistic 的无偏性，$\mathbb E[\widehat\kappa_j]=\kappa_j$。将其代入
+式~\eqref{eq:ch2-opd-logz-cumulant-series} 的前 $J$ 项，第一式立即成立。
+有限阶样本 cumulant 是有限个样本乘积的 U-statistic 线性组合；在相应矩存在
+时，其方差为 $O(m^{-1})$，不同阶之间的协方差也为 $O(m^{-1})$，所以
+$\operatorname{Var}(\widehat L_{J,m})=O(m^{-1})$。最后，对
+$e^{\eta r_k}$ 的 cumulant-generating function 在零点作 Taylor 展开，
+Taylor 余项的绝对值由 $e^c|\eta r_k|^{J+1}/(J+1)!$ 控制，取期望即得
+偏差上界。
+\end{proof}
+
+对 OPD 的常用二阶实现，$J=2$ 时可以直接使用样本均值和无偏样本方差：
+\begin{equation}
+\widehat L_{2,m}(s)=\eta\bar r_k(s)
+ +\frac{\eta^2}{2}\,\widehat{\operatorname{Var}}(r_k(s,\cdot)).
+\label{eq:ch2-opd-logz-second-estimator}
+\end{equation}
+它不再具有 log-of-mean 的 $O(m^{-1})$ Jensen bias；剩余 bias 是明确的
+cumulant truncation bias。代价是需要估计方差，并且当 $\eta|r_k|$ 较大时，
+三阶及以上 cumulant 不能忽略。因此它适合 teacher/anchor 接近、$r_k$ 集中
+的阶段，不适合重要性比率重尾的阶段。
+
+Top-$K$ 头部还可以进一步降低展开的尾部误差。令
+\begin{equation}
+Z_H=\sum_{v\in S_Z}\pi_k(v)^{1-\eta}T(v)^\eta,
+\qquad
+u(a)=\mathbf 1\{a\notin S_Z\}
+ \left(\frac{T(a)}{\pi_k(a)}\right)^\eta,
+\qquad \tau=\mathbb E_{\pi_k}[u(a)],
+\end{equation}
+则 $Z_k=Z_H+\tau$。当 $\rho=\tau/Z_H<1$ 时，
+\begin{equation}
+\log Z_k=\log Z_H+
+\sum_{\ell=1}^{\infty}\frac{(-1)^{\ell+1}}{\ell}\rho^\ell.
+\label{eq:ch2-opd-logz-tail-series}
+\end{equation}
+用 $m$ 个尾部样本构造
+\begin{equation}
+\widehat{\tau^\ell}=\binom{m}{\ell}^{-1}
+\sum_{1\le i_1<\cdots<i_\ell\le m}
+\prod_{q=1}^{\ell}u(a_{i_q}),
+\qquad a_i\overset{\mathrm{iid}}{\sim}\pi_k,
+\end{equation}
+这是 $\tau^\ell$ 的无偏 U-statistic。于是可定义
+\begin{equation}
+\widehat L_{K,J}(s)=\log Z_H+
+\sum_{\ell=1}^{J}\frac{(-1)^{\ell+1}}{\ell Z_H^\ell}
+\widehat{\tau^\ell}.
+\label{eq:ch2-opd-logz-tail-series-estimator}
+\end{equation}
+它的期望等于式~\eqref{eq:ch2-opd-logz-tail-series} 的前 $J$ 项，且截断余项满足
+\begin{equation}
+\left|\mathbb E[\widehat L_{K,J}]-\log Z_k\right|
+\leq \frac{\rho^{J+1}}{(J+1)(1-\rho)}.
+\label{eq:ch2-opd-logz-tail-remainder}
+\end{equation}
+这个估计器在 $K$ 增大时更有意义：$Z_H$ 增大、$\rho$ 减小，二阶或三阶
+展开就能达到很小的确定性 truncation bias；$K=0$ 时 $Z_H=0$，应退回
+cumulant 展开或直接使用正值的 $\log\widehat Z$ plug-in。实际实现中建议先用
+$J=2$，同时记录 $\widehat\rho$、plug-in 与展开估计的差异，用它判断是否进入
+重尾区域。
+
+2602.04417 的合成图可以作为本节偏差--方差实验的模板。论文固定
+$|\mathcal V|=32000$，令 reference logits 为 $\mathcal N(0,I)$，当前策略
+logits 为 $s\mathcal N(0,I)$，通过调整 $s$ 使
+$\sum_{j\in\operatorname{TopK}(\pi,32)}\pi(j)$ 接近
+$\{0.2,0.5,0.8,0.9\}$。对
+
+\[K\in\{4,8,16,32,64,128,256\},\qquad B\in\{1,2,4,\ldots,32768\}.\]
+分别计算 sampled、纯截断和 tail-corrected
+Top-$K$ 的 token-logit 真梯度与估计梯度，并绘制
+\begin{equation}
+\operatorname{RelRMSE}
+ =\frac{\sqrt{\mathbb E\lVert\widehat g-g_{\mathrm{true}}\rVert_2^2}}
+ {\lVert g_{\mathrm{true}}\rVert_2}.
+\end{equation}
+交点就是论文所谓 critical sample size。官方仓库
+\url{https://github.com/LunjunZhang/ema-pg} 公开了
+\path{compute_memory_efficient_kl}、K3$^{++}$/K4/K5 和 GPU top-$K$ benchmark，
+但没有公开生成 \path{simulated_topk_kl_four_masses_v5.pdf} 的脚本；因此我们可以
+按上述协议在本项目中重建一份，并把 OPD 的 $\log Z_k$ plug-in、二阶 cumulant
+和 Top-$K$ 尾部展开作为额外曲线。图中应同时报告 value bias、gradient RelRMSE、
+尾部命中率和峰值显存，不能只画 KL 数值方差。
+
+\subsubsection*{偏差--方差定理：从 KL 数值到最终 policy gradient}
+对一个 prefix 的任意估计器 $\widehat q$，最终关心的是带 score 的量
+$\widehat g=\widehat q\,\nabla_\theta\log\pi_\theta$。其均方误差分解为
+\begin{equation}
+\mathbb E\lVert\widehat g-g\rVert^2
+=\lVert\mathbb E[\widehat g]-g\rVert^2
++\operatorname{tr}\operatorname{Cov}(\widehat g).
+\end{equation}
+因此，单独比较 $\widehat{\mathcal K}$ 的数值方差并不足够：一个有轻微
+截断偏差但尾部方差极低的估计器，可能比无偏但重尾的 sampled estimator
+产生更小的梯度 MSE。2602.04417 的 Top-$K$ 结论正是这个取舍：加入尾部校正
+保持无偏，代价是尾部采样方差；只保留头部则引入可控的截断偏差。
+
+对 OPD 的 PMD-Part，$\log Z_k$ 的误差直接进入 residual，而 residual 又
+乘以 score。若使用 $\widehat c_k=\log\widehat Z_k$，令
+$\delta_Z=\widehat c_k-\log Z_k$，则单 prefix 的梯度误差包含
+\begin{equation}
+\Delta g_Z
+=\delta_Z\,\mathbb E_{v\sim\pi_k}
+\left[\nabla_\theta\log\pi_\theta(v\mid s)\right]
+\end{equation}
+以及 $\delta_Z$ 与 sampled score 的协方差项。完整词表下 score 均值可以精确求和，但只有当 student 等于 anchor 等特殊条件成立时才为零；sampled-token 下即使 partition 估计与 token 独立，其均值误差仍会乘以这个非零 score 均值，有限 batch 还引入随机梯度噪声。故 PMD-Part 对 partition
+估计的要求比 BPO/PMD-Mean 更严格。
+
+对同一 prefix 同时估计中心和 policy-gradient 权重时，还要考虑协方差：若
+$\widehat c$ 与 score 使用同一枚 token，$\mathbb E[\widehat c\,\widehat g]$
+一般不等于 $\mathbb E[\widehat c]\mathbb E[\widehat g]$。采用独立的 auxiliary
+next-token 样本估计中心，或使用 leave-one-out center，可以消除这类自耦合偏差；
+代价是额外的 token 抽样和少量 log-prob 存储。跨 prefix 聚合只能降低总体
+均值方差，不能把不同条件分布下的样本变成同一 conditional center。
+
+最后，prefix 覆盖误差与 token 估计误差应分开记录。即使 token-level estimator
+在给定 $s$ 上无偏，rollout 只访问由 $\pi_k$ 诱导的有限 prefix 多重集，仍有
+$\widehat d_k-d_k$ 的 outer 测度误差。增加 Top-$K$ 或 auxiliary samples 只
+降低条件 token 方差，不能修复 prefix coverage；增加 rollout 数量或重新采样
+outer batch 才能降低这一项。实验日志应至少分别保存：prefix 数量与重复率、
+KL/partition 的 batch 均值和方差、尾部采样次数、梯度范数与峰值显存。
+
+缓存上，CPU/NVMe 只需保存 token IDs、mask、response mask、anchor/teacher
+的 action log-prob 和可选的 top-$K$ 摘要；student log-prob 每个 inner step
+重算。保存完整 logits 的代价是 $O(BH|\mathcal V|)$，保存 top-$K$ 摘要是
+$O(BHK)$。以 $|\mathcal V|=150{,}000$、FP16 为例，一个 prefix-token 的
+完整 logits 约 $300$ kB，8192 token 单序列约 $2.46$ GB；因此不能把全词表
+logits 放进 replay buffer。GPU 只保留当前 microbatch 的 student 激活和当前
+token 块 logits，并在块处理后释放。当前 OPD 最稳妥的首版路径是缓存 anchor/
+teacher action log-prob，用额外 anchor next-token 样本估计两个 KL 中心；
+PMD-Part 只在 $\eta=1$ 或已验证 $\log Z_k$ 误差足够小时启用，再用 top-$K$
+实验比较中心方差、$\log Z_k$ 偏差和峰值显存。
+
+\begin{algorithm}[ht]
+\caption{OPD full-vocabulary outer--inner optimization\\{\small\textit{Semantics: 每个 outer step 用 $\pi_k$ rollout，固定 anchor 做 $N$ 个 inner policy-gradient step，再同步得到 $\pi_{k+1}$}}}
+\begin{algorithmic}[1]
+\Require prompt distribution $\mathcal D$, teacher $\pi_T$, initial student $\pi_0=\pi_{\theta_{0,0}}$, outer steps $K$, rollout batch size $B$, horizon $H$, method $M$, $\eta$, inner steps $N$, inner learning rate schedule $\{\alpha_{k,n}\}$, sync mode $\mathrm{Sync}\in\{\mathrm{hard},\mathrm{soft}\}$, soft-sync weight $\rho\in(0,1]$
+\Ensure final policy $\pi_K$ and parameters $\theta_K$
+\For{$k=0,\ldots,K-1$}
+    \State $\mathcal B_k\gets\varnothing$ \Comment{$\mathcal B_k$ is a multiset; repeated prefixes keep their multiplicity}
+    \For{$i=1,\ldots,B$}
+        \State sample prompt $x_i\sim\mathcal D$
+        \State generate $y_i=(a_{i,1},\ldots,a_{i,\tau_i})$ with $a_{i,t}\sim\pi_k(\cdot\mid s_{i,t})$, $s_{i,t}=(x_i,a_{i,<t})$
+        \State $\mathcal B_k\gets\mathcal B_k\mathbin{\uplus}\{s_{i,t}:1\le t\le\tau_i\wedge H\}$
+    \EndFor
+    \State define $\widehat d_k$ as the empirical distribution assigning each occurrence in $\mathcal B_k$ equal mass
+    \State $\theta_{k,0}\gets\theta_k$ \Comment{initialize the inner student from the current outer policy}
+    \For{$n=0,\ldots,N-1$}
+        \State query $\log\pi_T(v\mid s)$, $\log\pi_k(v\mid s)$ and $\log\pi_{k,n}(v\mid s)$ for every occurrence $s\in\mathcal B_k$ and $v\in\mathcal V$
+        \State $\log Z_k(s)\gets\log\left(\sum_{v\in\mathcal V}\exp\left((1-\eta)\log\pi_k(v\mid s)+\eta\log T(v\mid s)\right)\right)$
+        \State $K_k^T(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert \pi_T(\cdot\mid s))$
+        \State $K_{k,n}^\theta(s)\gets\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s))$
+        \If{$M=\mathrm{Part}$}
+            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}-\eta\log\frac{\pi_T}{\pi_k}+\log Z_k\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
+        \ElsIf{$M=\mathrm{Mean}$}
+            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_{k,n}}{\pi_k}-\eta\left(\log\frac{\pi_T}{\pi_k}+K_k^T\right)\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
+        \ElsIf{$M=\mathrm{BPO}$}
+            \State $G_{k,n}\gets\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_k}\left[\operatorname{stopgrad}\!\left(\eta^{-1}\left(\log\frac{\pi_{k,n}}{\pi_k}+K_{k,n}^\theta\right)-\log\frac{\pi_T}{\pi_k}-K_k^T\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
+        \ElsIf{$M=\mathrm{MDPO}$}
+            \State $G_{k,n}\gets-\mathbb E_{s\sim\widehat d_k}\mathbb E_{v\sim\pi_{k,n}}\left[\operatorname{stopgrad}\!\left(\log\frac{\pi_T}{\pi_k}-\eta^{-1}\log\frac{\pi_{k,n}}{\pi_k}\right)\nabla_{\theta_{k,n}}\log\pi_{k,n}\right]$
+        \EndIf
+        \State $\theta_{k,n+1}\gets\operatorname{OptimizerStep}(\theta_{k,n},G_{k,n};\alpha_{k,n})$ \Comment{expectations are implemented by exact sums or MC averages}
+    \EndFor
+    \If{$\mathrm{Sync}=\mathrm{hard}$}
+        \State $\theta_{k+1}\gets\theta_{k,N}$ and $\pi_{k+1}\gets\pi_{\theta_{k+1}}$
+    \Else
+        \State $\pi_{k+1}(\cdot\mid s)\gets(1-\rho)\pi_k(\cdot\mid s)+\rho\pi_{\theta_{k,N}}(\cdot\mid s)$ for every prefix $s$
+        \State choose $\theta_{k+1}$ to represent $\pi_{k+1}$ \Comment{in parameter-EMA implementations, set $\theta_{k+1}=(1-\rho)\theta_k+\rho\theta_{k,N}$}
+    \EndIf
+\EndFor
+\State \Return $(\pi_K,\theta_K)$
+\end{algorithmic}
+\end{algorithm}
+
+算法中的同步发生在整个 inner loop 结束之后。因而在固定 $k$ 的所有
+$N$ 次更新中，rollout 测度、anchor ratio $\pi_k/T$ 以及所有 mirror
+target 都保持不变；只有 student 参数 $\theta_{k,n}$ 变化。hard sync
+令下一轮 anchor 完全等于 inner 末端 student，soft sync 则令下一轮
+anchor 是旧 anchor 与 inner 末端 student 的凸组合。完成同步后丢弃
+$\widehat d_k$，使用新的 $\pi_{k+1}$ 重新 rollout，而不是继续复用旧
+rollout。若 inner loop 没有收敛，$\pi_{\theta_{k,N}}$ 只是当前固定
+mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射严格定义。
+
+\subsubsection*{只有 sampled next token：无完整词表时的估计路径}
+
+如果每个 prefix 只有 rollout 中的下一个 token $a\sim\pi_k(\cdot\mid s)$，仍然可以无偏观测 $r_k(s,a)$，但不能从一个样本无偏得到 $\log Z_k(s)$：先估计 $Z_k$ 再取对数会产生 plug-in bias。因此 sampled-token 路径不应把 PMD-Part 的 exact $\log Z_k$ 假装已知。可行选择如下。
+
+第一，使用 BPO 或 PMD-Mean，以同一个 prefix 的多条 sampled actions 估计 conditional center；它们不需要显式的 $\log Z_k$。第二，使用 MDPO 的 action-sampled objective，并用 K4/K3$^{++}$ 估计 KL 项；这要求保留 student/anchor 的 sampled log-prob。第三，如果只有一条 action，却仍想做 PMD-Part，只能使用外部 baseline、跨 batch center 或 self-normalized $\widehat{\log Z}$，并在理论和日志中标记其 bias。
+
+对单个 sampled token，PMD-Part 的可实现 loss 是带 baseline 的近似
+\[
+\widehat\ell_{\mathrm{Part}}=\frac12\bigl[\eta(r_k(s,a)-b(s))-U_\theta(s,a)\bigr]^2,
+\]
+它只有在 $b(s)=\log Z_k(s)/\eta$ 时才等于 exact residual；任意其他 baseline 会留下一个 prefix-dependent constant，因而改变 PMD-Part 的有限参数投影。BPO 的中心化 residual 则可用同 prefix 的 $K$ 个 sampled tokens 构造，$K=1$ 时必须使用跨样本或 frozen center。
+
+\begin{algorithm}[ht]
+\caption{OPD sampled-token inner update\\{\small\textit{Semantics: 每个 prefix 只访问 rollout 的下一个 token}}}
+\begin{algorithmic}[1]
+\Require frozen anchor $\pi_k$, teacher $T$, rollout pairs $(s_i,a_i)$, method $M$, center size $K$, $\eta$
+\Ensure updated student parameters $\theta$
+\For{each prefix $s_i$}
+    \State read $\log T(a_i\mid s_i)$ and $\log\pi_k(a_i\mid s_i)$
+    \State $r_i\gets\log T(a_i\mid s_i)-\log\pi_k(a_i\mid s_i)$
+    \If{$M=\mathrm{Mean}$}
+        \State obtain independent auxiliary actions at the same prefix to estimate a frozen reward center $\widehat{\bar r}_i$
+        \State $\ell_i\gets\frac12[U_\theta(s_i,a_i)-\eta\operatorname{stopgrad}(r_i-\widehat{\bar r}_i)]^2$
+    \ElsIf{$M=\mathrm{BPO}$}
+        \State estimate the reward center and current student log-ratio center at the same prefix
+        \State form a centered residual loss with the $1/(2\eta)$ factor; retain the student center's derivative
+        \State use the finite-sample correction specified in the BPO inner algorithm
+    \ElsIf{$M=\mathrm{MDPO}$}
+        \State form $R_i=\exp(\log\pi_\theta(a_i\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_i\mid s_i)))$
+        \State use $R_i r_i-\eta^{-1}\widehat{\mathrm{KL}}_i$ with K4/K3$^{++}$ and retain correct autograd paths
+    \ElsIf{$M=\mathrm{Part}$}
+        \State estimate or load a prefix baseline $\widehat{\log Z_i}$; record its bias source
+        \State update $\frac12[\eta r_i-\widehat{\log Z_i}-U_\theta(s_i,a_i)]^2$
+    \EndIf
+\EndFor
+\State update $\theta$ while keeping $\pi_k$ and $T$ frozen
+\State \Return $\theta$
+\end{algorithmic}
+\end{algorithm}
+
+完整 vocabulary 与 sampled-token 两条路径的区别是信息论上的：前者能精确知道整个 categorical mirror target，后者只能无偏知道在 anchor 下抽到的一个 action 的 reward。对每个给定方法，两条信息访问路径在无限样本、无函数类误差且 center/partition 估计一致时具有相同总体解；PMD-Mean 的解是 Lambert-$W$ 分布，另外三种方法的解是 Gibbs 分布。有限 batch 下，full-vocabulary 的主要误差是参数优化和 prefix coverage，sampled-token 额外承担 reward、center、KL ratio 和 prefix reuse 的估计方差。

@@ -2,7 +2,7 @@
 
 \section{Hard sync 的精确动力学}
 
-先考虑每个 history 的 teacher 分布 $T$ 不随 outer 改变，并且 inner 精确收敛到式~\eqref{eq:token-target}。hard sync 定义为
+先考虑每个 history 的 teacher 分布 $T$ 不随 outer 改变，并且 PMD-Part、未线性化 BPO 或 MDPO 的 inner 精确收敛到式~\eqref{eq:token-target} 的 Gibbs 分布。hard sync 定义为
 \[
  \mu_k=\pi_k,
  \qquad
@@ -44,9 +44,25 @@
 该界说明小 $\eta$ 不是免费加稳定性：它把每轮变化缩小，同时把达到相同 teacher proximity 所需的 outer steps 增加到 $O(\eta^{-1}\log(1/\varepsilon))$。
 \end{corollary}
 
+\section{PMD-Mean 的精确 outer 目标}
+
+PMD-Mean 的精确 inner 不满足前节的 Gibbs 插值递推。固定 $s$，令
+\[
+G_k(a)=\eta\left(\log\frac{T(a)}{\pi_k(a)}
+-\mathbb E_{\pi_k}\left[\log\frac T{\pi_k}\right]\right).
+\]
+hard sync 的精确递推为
+\[
+\pi_{k+1}^{\mathrm{Mean}}(a)
+=\pi_k(a)\exp\left(G_k(a)-W_0(\lambda_k e^{G_k(a)})\right),
+\]
+其中 $\lambda_k$ 每轮由归一化重新确定。action-dependent 的 Lambert-$W$ 项阻止了前节的指数合并，因此不能把 $(1-\eta)^k$ 的闭式递推或 $\eta=1$ 的一步 teacher 结论用于 PMD-Mean。
+
+teacher 仍是 PMD-Mean 的固定点：当 $\pi_k=T$ 时，$G_k=0$、$\lambda_k=0$，所以 $\pi_{k+1}=T$。具有 teacher 固定点与每一轮都恢复 Gibbs inner 解是不同结论，后者对 PMD-Mean 不成立。
+
 \section{有限 inner 与 stale target}
 
-实际第 $k$ 轮只运行 $M_k$ 个 inner steps，得到 $\widehat\pi_{k+1}$。假设在每个 history 上有 log-density 误差
+本节先以 Gibbs inner 方法为对象。实际第 $k$ 轮只运行 $M_k$ 个 inner steps，得到 $\widehat\pi_{k+1}$。假设在每个 history 上有 log-density 误差
 \[
  \left|\log\frac{\widehat\pi_{k+1}(a\mid s)}{\pi_{k+1}^+(a\mid s)}\right|\leq\varepsilon_k
 \]
@@ -55,19 +71,25 @@
  \TV(\widehat\pi_{k+1},\pi_{k+1}^+)
  \leq \frac12(e^{2\varepsilon_k}-1).
 \end{equation}
-令 $d_k=\TV(\pi_k,T)$，由 triangle inequality 和 hard-sync contraction 得
-\begin{equation}\label{eq:outer-error-recursion}
- d_{k+1}
- \leq (1-\eta)d_k+\delta_k,
- \qquad
- \delta_k=\frac12(e^{2\varepsilon_k}-1).
-\end{equation}
-因此
+几何插值在 log-ratio 振幅上收缩，不能据此前的推论直接宣称 TV 每步以 $1-\eta$ 收缩。定义
 \[
- d_K\leq(1-\eta)^K d_0+
- \sum_{j=0}^{K-1}(1-\eta)^{K-1-j}\delta_j.
+b_k=\max_a\log\frac{\pi_k(a\mid s)}{T(a\mid s)}
+-\min_a\log\frac{\pi_k(a\mid s)}{T(a\mid s)}.
 \]
-有限 inner 误差不会被简单地“下一轮 rollout”消失；它会以几何权重累积。若 $\delta_j\leq\bar\delta$，稳态误差上界为 $\bar\delta/\eta$。
+精确 Gibbs 更新把振幅变成 $(1-\eta)b_k$；上述逐 action log-density 误差最多再增加 $2\varepsilon_k$。因此
+\begin{equation}\label{eq:outer-error-recursion}
+b_{k+1}\le(1-\eta)b_k+2\varepsilon_k,
+\end{equation}
+归纳展开得到
+\[
+b_K\le(1-\eta)^K b_0
++2\sum_{j=0}^{K-1}(1-\eta)^{K-1-j}\varepsilon_j.
+\]
+归一化分布的 log-ratio 最小值不大于零，最大值不小于零，故 $|\log(\pi_K/T)|\le b_K$。由 $\TV(\pi_K,T)=\frac12\mathbb E_T[|\pi_K/T-1|]$ 得
+\[
+\TV(\pi_K,T)\le\min\left\{1,\frac12(e^{b_K}-1)\right\}.
+\]
+若 $\varepsilon_j\le\bar\varepsilon$，振幅的稳态上界为 $2\bar\varepsilon/\eta$。这给出有限 inner 误差的几何累积关系；对 PMD-Mean 需要另行分析其 Lambert-$W$ 更新，不能套用该递推。
 
 \section{Soft sync 的耦合动力学}
 
@@ -75,7 +97,7 @@
 \[
  \mu_{k+1}=\lambda\mu_k+(1-\lambda)\widehat\pi_{k+1}
 \]
-表示概率空间中的近似 soft sync。精确 inner 目标是
+表示概率空间中的近似 soft sync。对 PMD-Part、BPO 和 MDPO，精确 inner 目标是
 \[
  \widehat\pi_{k+1}\propto\mu_k^{1-\eta}T^\eta.
 \]
@@ -84,7 +106,7 @@
  z_{k+1}\approx[\lambda+(1-\lambda)(1-\eta)]z_k
  =[1-(1-\lambda)\eta]z_k.
 \]
-所以 EMA 同时把 outer contraction 从 $1-\eta$ 改成 $1-(1-\lambda)\eta$。当 $\lambda$ 接近 $1$，anchor 漂移非常慢，训练稳定但 teacher tracking 速度下降；这不是 inner 学习率的效果，而是 outer target 的真实动力学。
+对 PMD-Mean，必须把上述 Gibbs target 替换为 Lambert-$W$ target，不能沿用这个线性化系数。对 Gibbs inner 方法，EMA 同时把 outer contraction 从 $1-\eta$ 改成 $1-(1-\lambda)\eta$。当 $\lambda$ 接近 $1$，anchor 漂移非常慢，训练稳定但 teacher tracking 速度下降；这不是 inner 学习率的效果，而是 outer target 的真实动力学。
 
 \section{访问测度固定的含义}
 

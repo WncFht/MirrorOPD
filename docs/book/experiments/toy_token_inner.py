@@ -2,51 +2,58 @@
 """Enumerated token-level inner audit.
 
 Every method sees one frozen categorical anchor q and teacher T.  There is no
-rollout or sequence-level objective: the experiment checks the common token
-target and the finite-step behavior of four update geometries.
+rollout or sequence-level objective: the experiment separates the Lambert-W
+PMD-Mean target from the Gibbs target and measures finite-step optimization.
 """
+
 from __future__ import annotations
 
 import csv
 from pathlib import Path
 
 import torch
+from token_inner import (
+    bpo_loss,
+    mdpo_objective,
+    mean_target,
+    pmd_mean_loss,
+    pmd_part_loss,
+)
 
 
 def softmax(z: torch.Tensor) -> torch.Tensor:
     return torch.softmax(z, dim=-1)
 
 
-def run(method: str, eta: float, steps: int = 400, lr: float = 0.15) -> dict[str, float]:
+def run(
+    method: str, eta: float, steps: int = 400, lr: float = 0.15
+) -> dict[str, float]:
     torch.manual_seed(20261008)
     q = torch.tensor([0.62, 0.23, 0.10, 0.05], dtype=torch.float64)
     teacher = torch.tensor([0.08, 0.17, 0.25, 0.50], dtype=torch.float64)
     logits = torch.log(torch.tensor([0.70, 0.15, 0.10, 0.05], dtype=torch.float64))
     target = softmax((1 - eta) * torch.log(q) + eta * torch.log(teacher))
+    reward = torch.log(teacher) - torch.log(q)
+    lambert_target, multiplier = mean_target(q, reward, eta)
+    own_target = lambert_target if method == "pmd_mean" else target
     for _ in range(steps):
         logits = logits.detach().requires_grad_(True)
         p = softmax(logits)
-        logp, logq, logt = torch.log(p), torch.log(q), torch.log(teacher)
-        reward = logt - logq
-        ratio = logp - logq
         if method == "pmd_part":
-            logz = torch.logsumexp(torch.log(q) + eta * reward, dim=0)
-            loss = 0.5 * torch.sum(q * (ratio - eta * reward + logz) ** 2)
+            loss = pmd_part_loss(logits, q, reward, eta)
             loss.backward()
             grad = logits.grad
             logits = logits - lr * grad
         elif method == "pmd_mean":
-            ubar = torch.sum(q * ratio)
-            rbar = torch.sum(q * reward)
-            loss = 0.5 * torch.sum(q * ((ratio - ubar) - eta * (reward - rbar)) ** 2)
+            loss = pmd_mean_loss(logits, q, reward, eta)
             loss.backward()
             logits = logits - lr * logits.grad
         elif method == "bpo":
-            objective = torch.sum(p * reward) - torch.sum(p * ratio) / eta
-            objective.backward()
-            logits = logits + lr * logits.grad
+            loss = bpo_loss(logits, q, reward, eta)
+            loss.backward()
+            logits = logits - lr * logits.grad
         elif method == "mdpo":
-            objective = torch.sum(p * reward) - torch.sum(p * ratio) / eta
+            objective = mdpo_objective(logits, q, reward, eta)
             objective.backward()
             # Exact categorical Fisher natural gradient in centered logit coordinates.
             g = logits.grad
@@ -61,12 +68,20 @@ def run(method: str, eta: float, steps: int = 400, lr: float = 0.15) -> dict[str
         "eta": eta,
         "target_tv": float(0.5 * torch.abs(p - target).sum()),
         "target_kl": float(torch.sum(p * (torch.log(p) - torch.log(target)))),
+        "own_target_tv": float(0.5 * torch.abs(p - own_target).sum()),
+        "own_target_kl": float(torch.sum(p * (torch.log(p) - torch.log(own_target)))),
+        "structural_tv": float(0.5 * torch.abs(own_target - target).sum()),
+        "mean_multiplier": multiplier if method == "pmd_mean" else 0.0,
         "teacher_kl": float(torch.sum(p * (torch.log(p) - torch.log(teacher)))),
     }
 
 
 def main() -> None:
-    rows = [run(m, eta) for eta in (0.25, 0.5, 0.8) for m in ("pmd_part", "pmd_mean", "bpo", "mdpo")]
+    rows = [
+        run(m, eta)
+        for eta in (0.25, 0.5, 0.8)
+        for m in ("pmd_part", "pmd_mean", "bpo", "mdpo")
+    ]
     out = Path(__file__).with_name("toy_token_inner.csv")
     with out.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=rows[0])

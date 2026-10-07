@@ -36,7 +36,7 @@
 最后一项在 $p$ 下期望为零，第一项正是 KL 的 score-function derivative。\hfill$\square$
 \end{proof}
 
-K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应 $\KL(q\Vert p)$ 的方向；K2 梯度正确但 value 有偏。因此 BPO 的 KL 项应优先使用 K4、K3$^{++}$ 或完整 vocabulary 计算。
+K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应 $\KL(q\Vert p)$ 的方向；K2 梯度正确但 value 有偏。上述构造针对 MDPO 中的 $\KL(p\Vert q)$。BPO 的 student center 是相反方向的 $\KL(q\Vert p)$，应在冻结 anchor $q$ 下估计 $\log(q/p)$；PMD-Mean 不含这个 student KL center。
 
 \section{固定 anchor 测度上的重要性校正}
 
@@ -44,19 +44,35 @@ K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应
 \[
  \E_q[\sg(\rho_\theta)h(a)]=\E_p[h(a)].
 \]
-因此 BPO 的固定测度估计量为
+因此 MDPO 的固定 anchor 测度梯度可直接写为
 \[
- \widehat g_i
- =\sg(\rho_i)\left[r_i-\frac1\eta\widehat k_{4,i}\right]g_i,
- \qquad a_i\sim q.
+\widehat g_i^{\mathrm{MDPO}}
+=\sg\!\left(\frac{p(a_i)}{q(a_i)}\right)
+\sg\!\left[f(a_i)-\frac1\eta\log\frac{p(a_i)}{q(a_i)}\right]
+\nabla_\theta\log p(a_i),\qquad a_i\sim q.
 \]
-在 $p/q$ 的二阶矩有限时，它无偏；其单样本方差满足
+reward、log-ratio 与 score 的乘积二阶可积时，它无偏；若该乘积范数由 $C$ 上界，则
 \begin{equation}\label{eq:bpo-variance}
- \E_q\|\widehat g_i\|^2
- \leq C^2\E_q[\rho_\theta^2]
- =C^2\bigl(1+\chi^2(p\Vert q)\bigr),
+\mathbb E_q\|\widehat g_i^{\mathrm{MDPO}}\|^2
+\le C^2\mathbb E_q[(p/q)^2]
+=C^2\bigl(1+\chi^2(p\Vert q)\bigr).
 \end{equation}
-其中 $C$ 上界 reward、K4 项和 score 的乘积。故 inner 走远以后，固定 anchor 的估计方差由 $\chi^2(p\Vert q)$ 控制；这正是必须记录 current-anchor divergence 的原因。
+这里的 $p/q$ 测度校正属于 MDPO；不能据此为 PMD-Mean 或 BPO 添加 student importance ratio。它们原本就在冻结 anchor 下定义，action 从 $q$ 采样时无需这种校正。
+
+对 BPO，完整 conditional center 已知时的实际下降方向为
+\[
+-\nabla\mathcal L_{\mathrm{BPO}}
+=\mathbb E_q\left[
+\left(f-\mathbb E_q[f]-\frac{U-\mathbb E_q[U]}\eta\right)
+\nabla\log p\right],\qquad U=\log(p/q).
+\]
+对 PMD-Mean，则为
+\[
+-\nabla\mathcal L_{\mathrm{Mean}}
+=\mathbb E_q\left[
+\bigl(\eta(f-\mathbb E_q[f])-U\bigr)\nabla\log p\right].
+\]
+估计 center 时须区分解析 policy-gradient 权重与 sampled 原始平方损失：前者使用停止梯度的权重，后者的 BPO student center 保留梯度，并采用第二章给出的有限样本系数校正。单个 center 估计量的无偏性不自动保证它嵌入平方损失后的梯度无偏。
 
 \section{Top-$K$ 与完整词表的关系}
 
@@ -74,9 +90,9 @@ K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应
 
 \section{有限 inner 更新的误差}
 
-设 exact token target 为 $p_k^+$，inner 算法在固定 $s$ 上得到 $p_{k,m}$。定义 total variation error
+设方法自己的总体最优分布为 $p_k^{*,M}$，inner 算法在固定 $s$ 上得到 $p_{k,m}$。PMD-Mean 使用 Lambert-$W$ target，另外三种方法使用 Gibbs target $p_k^+$。定义优化误差
 \[
- e_{k,m}(s)=\frac12\|p_{k,m}(\cdot\mid s)-p_k^+(\cdot\mid s)\|_1.
+ e_{k,m}(s)=\frac12\|p_{k,m}(\cdot\mid s)-p_k^{*,M}(\cdot\mid s)\|_1.
 \]
 若 loss gradient 是 $L$-smooth，且使用 unbiased gradient with variance at most $\sigma^2/B$，标准 projected SGD 给出
 \[
@@ -85,4 +101,12 @@ K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应
 \frac{2(\mathcal L_0-\mathcal L_*)}{\alpha M}
  +\frac{L\alpha\sigma^2}{B}.
 \]
-如果使用固定 anchor 而 current policy 逐渐远离它，则 $\sigma^2$ 需要替换为含 $1+\chi^2(p_{k,m}\Vert\mu_k)$ 的上界。因而 inner 做得越久，不一定越接近 exact target：优化误差下降的同时，off-policy estimator variance 会上升。
+对采用 student/anchor importance ratio 的 MDPO estimator，方差界包含 $1+\chi^2(p_{k,m}\Vert\mu_k)$。PMD-Mean 和 BPO 的 anchor-measure estimator 应直接分析其 residual、score 与 center 的联合二阶矩，不能套用这个 importance-ratio 结论。
+
+PMD-Mean 到 Gibbs 分布的差异还包含总体目标偏差：
+\[
+\TV(p_{k,m},p_k^+)
+\le \TV(p_{k,m},p_k^{*,\mathrm{Mean}})
++\TV(p_k^{*,\mathrm{Mean}},p_k^+).
+\]
+增加 inner steps 只能降低第一项，第二项由均值近似决定。
