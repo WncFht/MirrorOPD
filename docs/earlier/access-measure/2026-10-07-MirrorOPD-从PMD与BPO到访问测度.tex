@@ -132,6 +132,71 @@ Q^\beh(s_t,a_t)=r_t(s_t,a_t)+\E_\beh\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\rig
 \chapter{四种方法从最优解出发的推导}
 \label{ch:four-methods}
 
+\section{共同起点：同一个镜像子问题如何产生两个 residual}
+\label{sec:common-residual-origin}
+
+固定 prefix $s$，把行为策略简写为 $\mu(a)$，把候选策略简写为 $\pi(a)$，并令 $u(a)=\log(\pi(a)/\mu(a))$。统一采用 Natural Gradient 学习率 $\eta$，镜像子问题为
+\begin{equation}
+\label{eq:common-mirror-objective}
+\max_{p\ll\mu}
+\left\{\E_p[f]-\frac1\eta\KL(p\Vert\mu)\right\}.
+\end{equation}
+对任意 $p$，定义
+\[
+Z_f=\E_\mu[e^{\eta f}],
+\qquad
+\pi^+(a)=\frac{\mu(a)e^{\eta f(a)}}{Z_f}.
+\]
+与定理 \ref{thm:gibbs} 相同的 KL 分解给出
+\[
+\E_p[f]-\frac1\eta\KL(p\Vert\mu)
+=\frac1\eta\log Z_f-
+\frac1\eta\KL(p\Vert\pi^+).
+\]
+因此最优策略满足
+\begin{equation}
+\label{eq:common-optimality-equation}
+ u^+(a)=\log\frac{\pi^+(a)}{\mu(a)}
+ =\eta f(a)-\log Z_f.
+\end{equation}
+这一步是 PMD-Part 与 BPO 的共同起点，尚未引入任何线性化、clip 或重要性采样。
+
+PMD-Part 直接把式 \eqref{eq:common-optimality-equation} 当作逐 action 的回归方程。定义
+\begin{equation}
+\label{eq:part-residual-from-optimum}
+ q(a):=u^+(a)-u(a)
+ =\underbrace{\eta f(a)-\log Z_f}_{h(a)}-u(a).
+\end{equation}
+所以 PMD-Part 的平方损失就是 $q(a)^2/2$ 的行为测度平均。
+
+BPO 采用同一个最优性方程的“常数消除”形式。令
+\[
+ b(a):=\eta f(a)-u(a).
+\]
+在行为优势满足 $\E_\mu[f]=0$ 时，
+\begin{align*}
+\E_\mu[b]
+&=\eta\E_\mu[f]-\E_\mu[u]\\
+&=-\E_\mu[u]\\
+&=\KL(\mu\Vert\pi).
+\end{align*}
+于是 BPO 的 centered residual 是
+\begin{equation}
+\label{eq:bpo-residual-from-optimum}
+\delta(a):=b(a)-\E_\mu[b]
+=\eta f(a)-u(a)-\KL(\mu\Vert\pi)
+=\eta f(a)-u(a)+\E_\mu[u].
+\end{equation}
+它等价于把同一个最优性方程中的 action-independent 常数先减去行为均值。
+
+两种 residual 的零点仍然相同。若 $\delta(a)=0$ 对所有有正行为概率的 action 成立，则 $u(a)=\eta f(a)-C$，其中 $C$ 与 action 无关。策略归一化要求
+\[
+1=\E_\mu[e^{u}]
+=e^{-C}\E_\mu[e^{\eta f}]
+=e^{-C}Z_f,
+\]
+所以 $C=\log Z_f$，从而 $u=u^+$。反过来，若 $u=u^+$，则 $b(a)=\log Z_f$ 为常数，故 $\delta(a)=0$。因此 BPO 和 PMD-Part 由同一个镜像最优解出发，并共享同一个可实现零点；它们的差别只出现在对这个最优性方程采用的残差和参数梯度上。
+
 \section{PMD-Part：回归最优 log-ratio}
 \label{sec:pmd-part}
 
