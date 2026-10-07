@@ -135,6 +135,32 @@ def plot_error_sweep(metrics, out: Path):
     fig.tight_layout(); fig.savefig(out / "topk_error_vs_k.png", dpi=220); fig.savefig(out / "topk_error_vs_k.pdf"); plt.close(fig)
 
 
+def plot_bias_variance(rows, out: Path):
+    masses = sorted({r["mass_target"] for r in rows})
+    fig, ax = plt.subplots(1, 2, figsize=(12, 4.4), sharey=True)
+    colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
+    for c, mass in zip(colors, masses):
+        cur = [r for r in rows if r["mass_target"] == mass]
+        x = [r["top_k"] for r in cur]
+        bias_trunc = np.asarray([r["trunc_bias_rmse"] for r in cur])
+        bias_masked = np.asarray([r["paper_asymptotic_bias"] for r in cur])
+        rmse = np.asarray([r["single_token_rmse"] for r in cur])
+        std = np.sqrt(np.maximum(rmse * rmse - bias_masked * bias_masked, 0.0))
+        ax[0].plot(x, bias_trunc, ":", color=c, alpha=.8)
+        ax[0].plot(x, bias_masked, "o-", color=c, label=f"M32={mass:g}")
+        ax[1].plot(x, std, "o-", color=c, label=f"M32={mass:g}")
+    for a in ax:
+        a.set_xscale("symlog", linthresh=1); a.set_yscale("log"); a.grid(True, which="both", alpha=.25)
+        a.set_xlabel("Top-K (K=0 is sampled K4)")
+    ax[0].set_title("Bias component")
+    ax[0].set_ylabel("relative error")
+    ax[0].legend(fontsize=8)
+    ax[1].set_title("Standard-deviation component")
+    ax[1].legend(fontsize=8)
+    fig.suptitle("Bias--variance decomposition for one prefix and one sampled token\nsolid: literal masked-tail bias; dotted: truncated-head bias")
+    fig.tight_layout(); fig.savefig(out / "topk_bias_variance.png", dpi=220); fig.savefig(out / "topk_bias_variance.pdf"); plt.close(fig)
+
+
 def main():
     p = argparse.ArgumentParser(); p.add_argument("--metrics", required=True); p.add_argument("--output", required=True)
     p.add_argument("--vocab", type=int, default=32000); p.add_argument("--seed", type=int, default=20261008)
@@ -144,7 +170,7 @@ def main():
     rows = structural_rows(a.vocab, [0.2, .5, .8, .9], [0, 1, 4, 8, 16, 32, 64, 128, 256, 512], a.seed, device)
     write_csv(rows, out / "structural_metrics.csv")
     metrics = load_metrics(Path(a.metrics))
-    plot_structural(rows, out); plot_error_sweep(metrics, out)
+    plot_structural(rows, out); plot_error_sweep(metrics, out); plot_bias_variance(rows, out)
     (out / "analysis_metadata.json").write_text(json.dumps({"device": device, "torch": torch.__version__, "cuda": torch.cuda.get_device_name(0) if device == "cuda" else None}, indent=2))
 
 
