@@ -1,0 +1,287 @@
+\chapter{MirrorOPD 的四种 inner 变体：统一动力学与误差递推}
+\label{chap:mirroropd-unified-inner}
+
+本章把 PMD-Part、PMD-Mean、BPO 与 MDPO 放在同一个 outer--inner 框架中。四种方法共享一个冻结的 anchor policy $\pi_k$，区别只在 inner 目标如何表示同一个 KL-proximal mirror target，以及有限样本和有限优化步如何产生误差。除非特别说明，策略具有完整支持，动作空间有限，teacher 分布记为 $T(\cdot\mid s)$，步长满足 $0<\eta\leq 1$。
+
+\section{统一的 outer 算法}
+\label{sec:unified-outer}
+
+第 $k$ 个 outer step 先从 prompt 分布和 anchor policy 采样访问测度：
+\[
+ x_i\sim\mathcal D,\qquad y_i\sim\pi_k(\cdot\mid x_i),
+ \qquad s_{it}=(x_i,y_{i,<t}).
+\]
+在整个 inner 阶段冻结 $\pi_k$、$T$、访问历史和由它们计算的 target。令
+\[
+ r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s),
+ \qquad
+ Z_k(s)=\E_{a\sim\pi_k(\cdot\mid s)}e^{\eta r_k(s,a)}.
+\]
+精确的 mirror target 是
+\begin{equation}
+\label{eq:unified-mirror-target}
+ \pi_{k+1}^{\star}(a\mid s)
+ =\frac{\pi_k(a\mid s)e^{\eta r_k(s,a)}}{Z_k(s)}
+ =\frac{\pi_k(a\mid s)^{1-\eta}T(a\mid s)^\eta}{Z_k(s)}.
+\end{equation}
+outer 更新只在 inner 结束后同步一次：$\pi_{k+1}\leftarrow\pi_{\theta_{k,M_k}}$。如果在 inner 的每一步都把当前 student 写回 anchor，则 KL 参考点移动，算法退化为普通 natural policy gradient，下面关于固定 proximal 子问题的结论不再适用。
+
+\begin{algorithm}
+\caption{MirrorOPD 的统一 outer--inner 迭代\\{\small\textit{Semantics: 根据本章统一定义重构；inner 目标由四种变体分别给出}}}
+\begin{algorithmic}
+\STATE \textbf{Input:} prompt 分布 $\mathcal D$；初始全支持策略 $\pi_0$；步长 $\eta$；outer 次数 $K$；inner 预算 $M_k$
+\STATE \textbf{Output:} 策略序列 $(\pi_k)_{k=0}^{K}$
+\FOR{$k=0$ \TO $K-1$}
+    \STATE 采样 $x_i\sim\mathcal D$、$y_i\sim\pi_k(\cdot\mid x_i)$，构造历史 $s_{it}$
+    \STATE 冻结 $\pi_k,T,r_k,Z_k$，设置 $\theta_{k,0}\gets\theta_k$
+    \FOR{$m=0$ \TO $M_k-1$}
+        \STATE $\theta_{k,m+1}\gets\operatorname{InnerUpdate}(\theta_{k,m};\pi_k,T,r_k)$
+    \ENDFOR
+    \STATE $\pi_{k+1}(\cdot\mid s)\gets\pi_{\theta_{k,M_k}}(\cdot\mid s)$；$\theta_{k+1}\gets\theta_{k,M_k}$
+\ENDFOR
+\STATE \textbf{Return:} $(\pi_k)_{k=0}^{K}$
+\end{algorithmic}
+\end{algorithm}
+
+为简化记号，以下定义 log-ratio
+\[
+ u_{k,\theta}(s,a)=\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)},
+ \qquad
+ c_k(s)=\log Z_k(s).
+\]
+精确 fixed-point 条件统一为
+\begin{equation}
+\label{eq:common-fixed-point}
+ u_{k,\theta}^{\star}(s,a)=\eta r_k(s,a)-c_k(s),
+ \qquad
+ \E_{\pi_k}[e^{u_{k,\theta}^{\star}}\mid s]=1.
+\end{equation}
+
+\section{PMD-Part：逐动作回归完整 log-ratio}
+\label{sec:pmd-part-unified}
+
+PMD-Part 直接回归式 \eqref{eq:common-fixed-point} 的完整 target：
+\begin{equation}
+\label{eq:pmd-part-objective}
+ \mathcal L_{\mathrm{Part},k}(\theta)
+ =\frac12\E_{m_k}\!\left[
+ u_{k,\theta}(s,a)-\eta r_k(s,a)+c_k(s)
+ \right]^2,
+\end{equation}
+其中 $m_k$ 是 prompt--rollout token 的访问测度。若 $m_k$ 覆盖每个有效 $(s,a)$，零损失当且仅当 $\pi_\theta=\pi_{k+1}^{\star}$。算法实现将 $c_k$ 视为停止梯度的 target；估计 $Z_k$ 时产生的 plug-in 误差属于 outer 误差，而非增加 inner 步数可以消除的优化误差。
+
+\begin{algorithm}
+\caption{PMD-Part inner update\\{\small\textit{Semantics: 根据完整 log-ratio target 重构}}}
+\begin{algorithmic}
+\STATE \textbf{Input:} 冻结 $\pi_k,T$；batch $\mathcal B$；步长 $\alpha$
+\STATE \textbf{Output:} 更新后的参数 $\theta^+$
+\FOR{$(s,a)\in\mathcal B$}
+    \STATE $r\gets\log T(a\mid s)-\log\pi_k(a\mid s)$
+    \STATE $c\gets\log\E_{v\sim\pi_k(\cdot\mid s)}[e^{\eta r(s,v)}]$
+    \STATE $e\gets u_{k,\theta}(s,a)-\eta r+c$
+\ENDFOR
+\STATE $\theta^+\gets\theta-\alpha\nabla_\theta\frac{1}{2|\mathcal B|}\sum_{(s,a)\in\mathcal B}e(s,a)^2$
+\STATE \textbf{Return:} $\theta^+$
+\end{algorithmic}
+\end{algorithm}
+
+\section{PMD-Mean：回归中心化 reward 与归一化约束}
+\label{sec:pmd-mean-unified}
+
+定义 anchor 测度下的均值
+\[
+ \bar r_k(s)=\E_{\pi_k}[r_k(s,a)\mid s]=-\KL(\pi_k(\cdot\mid s)\Vert T(\cdot\mid s)).
+\]
+PMD-Mean 回归中心化 target：
+\begin{equation}
+\label{eq:pmd-mean-objective}
+ \mathcal L_{\mathrm{Mean},k}(\theta)
+ =\frac12\E_{m_k}\!\left[
+ u_{k,\theta}(s,a)-\eta\{r_k(s,a)-\bar r_k(s)\}
+ \right]^2.
+\end{equation}
+该 target 只确定 action-dependent 部分。若不同时满足 $\E_{\pi_k}[e^{u_{k,\theta}}\mid s]=1$，则 log-ratio 可以任意偏移常数，不能保证得到归一化策略。精确解在施加归一化约束后恢复
+\[
+ u_{k,\theta}^{\star}=\eta r_k-c_k,
+ \quad c_k=\log\E_{\pi_k}e^{\eta r_k}.
+\]
+
+\begin{algorithm}
+\caption{PMD-Mean inner update\\{\small\textit{Semantics: 根据中心化 PMD target 重构}}}
+\begin{algorithmic}
+\STATE \textbf{Input:} 冻结 $\pi_k,T$；每个历史的独立 anchor actions $\{a_j\}_{j=1}^{L}$；步长 $\alpha$
+\STATE \textbf{Output:} 更新后的参数 $\theta^+$
+\FOR{每个历史 $s$}
+    \STATE $\bar r\gets L^{-1}\sum_{j=1}^{L}[\log T(a_j\mid s)-\log\pi_k(a_j\mid s)]$
+    \FOR{batch 中的 action $a$}
+        \STATE $e(s,a)\gets u_{k,\theta}(s,a)-\eta[r_k(s,a)-\bar r]$
+    \ENDFOR
+\ENDFOR
+\STATE $\theta^+\gets\theta-\alpha\nabla_\theta\frac{1}{2|\mathcal B|}\sum e(s,a)^2$
+\STATE 施加或检查 $\E_{\pi_k}[e^{u_{k,\theta^+}}\mid s]=1$
+\STATE \textbf{Return:} $\theta^+$
+\end{algorithmic}
+\end{algorithm}
+
+共用 action 样本计算 $\bar r$ 与 score 会引入协方差偏差；leave-one-out 或独立样本可恢复条件无偏性。该偏差应并入 $\varepsilon_k$，不能误认为优化器未收敛。
+
+\section{BPO：中心化 score 的非线性回归}
+\label{sec:bpo-unified}
+
+BPO 同时中心化 reward target 和 student log-ratio。令
+\[
+ d_{k,\theta}(s,a)=\eta r_k(s,a)-u_{k,\theta}(s,a),
+ \qquad
+ \bar d_{k,\theta}(s)=\E_{\pi_k}[d_{k,\theta}(s,a)\mid s],
+\]
+其目标为
+\begin{equation}
+\label{eq:bpo-objective}
+ \mathcal L_{\mathrm{BPO},k}(\theta)
+ =\frac{1}{2\eta}\E_{m_k}
+ \left[d_{k,\theta}(s,a)-\bar d_{k,\theta}(s)
+ \right]^2.
+\end{equation}
+BPO 的非线性在于 $\bar d_{k,\theta}$ 依赖当前 student。其零点要求 $d_{k,\theta}(s,a)$ 对 action 为常数；结合策略归一化，常数唯一等于 $c_k(s)$，故 fixed point 仍为式 \eqref{eq:common-fixed-point}。有限步时，BPO 的 centered score 会改变 Hessian 和轨迹，虽然精确零点相同。
+
+\begin{algorithm}
+\caption{BPO inner update\\{\small\textit{Semantics: 根据当前 student 的中心化 score 重构}}}
+\begin{algorithmic}
+\STATE \textbf{Input:} 冻结 $\pi_k,T$；anchor actions $\{a_j\}_{j=1}^{L}$；步长 $\alpha$
+\STATE \textbf{Output:} 更新后的参数 $\theta^+$
+\FOR{每个历史 $s$}
+    \FOR{$j=1$ \TO $L$}
+        \STATE $d_j\gets\eta[\log T(a_j\mid s)-\log\pi_k(a_j\mid s)]-u_{k,\theta}(s,a_j)$
+    \ENDFOR
+    \STATE $\bar d\gets L^{-1}\sum_{j=1}^{L}d_j$
+    \STATE $\mathcal L_s\gets(2\eta L)^{-1}\sum_{j=1}^{L}(d_j-\bar d)^2$
+\ENDFOR
+\STATE $\theta^+\gets\theta-\alpha\nabla_\theta\sum_s\mathcal L_s$
+\STATE \textbf{Return:} $\theta^+$
+\end{algorithmic}
+\end{algorithm}
+
+\section{MDPO：KL 正则 surrogate 的直接优化}
+\label{sec:mdpo-unified}
+
+MDPO 不回归 log-ratio，而是最大化 KL 正则 surrogate：
+\begin{equation}
+\label{eq:mdpo-objective}
+ \mathcal J_{\mathrm{MDPO},k}(\theta)
+ =\E_{s}\left[
+ \E_{a\sim\pi_\theta}[r_k(s,a)\mid s]
+ -\frac1\eta\KL(\pi_\theta(\cdot\mid s)\Vert\pi_k(\cdot\mid s))
+ \right].
+\end{equation}
+对每个历史，KL 分解给出
+\begin{equation}
+\label{eq:mdpo-kl-decomposition}
+ \mathcal J_{\mathrm{MDPO},k}(\theta\mid s)
+ =\frac1\eta\log Z_k(s)
+ -\frac1\eta\KL(\pi_\theta(\cdot\mid s)\Vert\pi_{k+1}^{\star}(\cdot\mid s)).
+\end{equation}
+因此 MDPO 的精确 fixed point 直接是 $\pi_{k+1}^{\star}$。实际实现可以使用完整词表 KL，也可以在 anchor rollout 上使用 action-level importance ratio；后者还需要独立处理 replay history ratio。
+
+\begin{algorithm}
+\caption{MDPO inner update\\{\small\textit{Semantics: 根据 KL 正则 surrogate 重构}}}
+\begin{algorithmic}
+\STATE \textbf{Input:} 冻结 $\pi_k,T$；batch $\mathcal B$；步长 $\alpha$
+\STATE \textbf{Output:} 更新后的参数 $\theta^+$
+\STATE $\mathcal J\gets0$
+\FOR{$s\in\mathcal B$}
+    \STATE $\mathcal J\gets\mathcal J+\E_{a\sim\pi_\theta}[r_k(s,a)]-\eta^{-1}\KL(\pi_\theta(\cdot\mid s)\Vert\pi_k(\cdot\mid s))$
+\ENDFOR
+\STATE $\theta^+\gets\theta+\alpha\nabla_\theta\mathcal J$
+\STATE \textbf{Return:} $\theta^+$
+\end{algorithmic}
+\end{algorithm}
+
+\section{四种 inner 的误差递推与比较定理}
+\label{sec:inner-error-comparison}
+
+定义第 $k$ 个 outer 的策略误差
+\[
+ e_k(s)=\left\|\log\frac{\pi_{k+1}(\cdot\mid s)}{\pi_{k+1}^{\star}(\cdot\mid s)}\right\|_{\mathrm{osc}},
+ \qquad \|v\|_{\mathrm{osc}}=\max_a v_a-\min_a v_a.
+\]
+它忽略 action-independent 的 logit 平移，正好对应 PMD-Mean 与 BPO 的不变方向。假设每种 inner 的优化器在冻结目标下满足
+\begin{equation}
+\label{eq:inner-contraction-assumption}
+ e_k(s)\leq q_{v,k}(s)e_{k,0}(s)+b_{v,k}(s),
+ \qquad 0\leq q_{v,k}(s)<1,
+\end{equation}
+其中 $v\in\{\mathrm{Part},\mathrm{Mean},\mathrm{BPO},\mathrm{MDPO}\}$，$b_{v,k}$ 汇总采样、归一化和函数类投影误差。若 inner 从上一 outer 策略开始，精确 mirror target 的 projective 动力学为
+\[
+ \Delta_{k+1}^{\star}(s)=(1-\eta)\Delta_k(s),
+ \quad
+ \Delta_k(s)=\left\|\log\frac{\pi_k}{T}\right\|_{\mathrm{osc}}.
+\]
+
+\begin{theorem}[四种 inner 的统一 outer 误差递推]
+\label{thm:four-inner-recursion}
+在完整支持、固定 anchor、目标可表示且式 \eqref{eq:inner-contraction-assumption} 成立时，四种方法均满足
+\begin{equation}
+\label{eq:four-inner-recursion}
+ \Delta_{k+1}(s)
+ \leq (1-\eta)\Delta_k(s)
+ +q_{v,k}(s)e_{k,0}(s)+b_{v,k}(s).
+\end{equation}
+若 $q_{v,k}\leq\bar q<1$、$b_{v,k}\leq\bar b$ 且 $e_{k,0}\leq\Delta_k$，则
+\[
+ \Delta_K(s)\leq[(1-\eta)+\bar q]^K\Delta_0(s)
+ +\frac{\bar b}{1-(1-\eta)-\bar q},
+\]
+只要 $(1-\eta)+\bar q<1$。更一般地，对任意误差序列，
+\[
+ \Delta_K\leq(1-\eta)^K\Delta_0
+ +\sum_{j=0}^{K-1}(1-\eta)^{K-1-j}
+ [q_{v,j}e_{j,0}+b_{v,j}].
+\]
+\end{theorem}
+
+\begin{proof}
+精确 target 的 log-ratio 差满足
+\[
+ \log\frac{\pi_{k+1}^{\star}(a\mid s)}{T(a\mid s)}
+ =(1-\eta)\log\frac{\pi_k(a\mid s)}{T(a\mid s)}-c_k(s),
+\]
+因此去掉常数后振幅乘以 $1-\eta$。有限 inner 输出与精确 target 的振幅差由三角不等式和式 \eqref{eq:inner-contraction-assumption} 上界。反复代入得到有限 $K$ 展开；当系数统一有界时，使用等比数列求和得到第二个结论。
+\end{proof}
+
+\begin{theorem}[四种 inner 的 fixed-point 等价与有限步差异]
+\label{thm:four-inner-fixed-point}
+在每个历史上均可表示策略、$Z_k$ 精确、访问测度覆盖所有 action 且优化达到全局最优的条件下，PMD-Part、PMD-Mean、BPO 和 MDPO 的 fixed point 都唯一等于式 \eqref{eq:unified-mirror-target}。有限 inner 步时：
+\begin{enumerate}
+    \item PMD-Part 的误差主要由完整 target 回归和 $\log Z_k$ 估计决定；
+    \item PMD-Mean 还需要归一化约束，使用共享样本估计中心会产生协方差偏差；
+    \item BPO 的 centered score 改变有限步 Hessian，但不改变零点；
+    \item MDPO 的误差是 KL surrogate 的优化误差，且 action-level importance sampling 另外引入测度方差。
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+PMD-Part 的零残差直接给出式 \eqref{eq:common-fixed-point}。PMD-Mean 和 BPO 的零残差只确定相差 action-independent 常数的 log-ratio；代入 $\E_{\pi_k}e^{u}=1$ 唯一确定该常数为 $-c_k$。MDPO 由式 \eqref{eq:mdpo-kl-decomposition} 可知，目标函数等于常数减 reverse KL，故其唯一极值分布为 $\pi_{k+1}^{\star}$。四点的有限步误差来源分别来自相应目标的估计与优化过程。
+\end{proof}
+
+\begin{table}[H]
+\centering
+\caption{四种 inner 的统一比较}
+\label{tab:four-inner-comparison}
+\begin{tabular}{p{0.17\textwidth}p{0.23\textwidth}p{0.24\textwidth}p{0.24\textwidth}}
+\toprule
+变体 & inner 目标 & 精确 fixed point & 主要误差源 \\
+\midrule
+PMD-Part & 完整 log-ratio 平方回归 & $\pi_k^{1-\eta}T^\eta/Z_k$ & $\log Z_k$ plug-in、投影、回归未收敛 \\
+PMD-Mean & 中心化 reward 回归 + 归一化 & 同上 & center 协方差、归一化漂移、测度偏差 \\
+BPO & 中心化 student score 的非线性回归 & 同上 & 当前 student 中心的估计噪声、非线性优化 \\
+MDPO & reward $-$ reverse KL/$\eta$ & 同上 & surrogate 优化误差、IS 方差、critic/teacher 误差 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+最后强调同步纪律：上述定理都要求每个 outer 内固定 $\pi_k$。若在 inner 第 $m$ 步使用 $\pi_{k,m}$ 重新计算 $r$ 或 KL anchor，则目标变成随时间变化的 $\mathcal J_{k,m}$，误差递推需额外加入漂移项
+\[
+ \zeta_k\;\geq\;\sum_{m=0}^{M_k-1}
+ \left\|\log\frac{\pi_{k,m+1}}{\pi_{k,m}}\right\|_{\mathrm{osc}}.
+\]
+当 $\zeta_k$ 不可求和时，不能直接套用固定 proximal target 的线性收缩结论。

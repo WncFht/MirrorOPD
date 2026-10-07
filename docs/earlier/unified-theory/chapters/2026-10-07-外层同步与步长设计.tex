@@ -186,3 +186,78 @@ $\varepsilon_k/\eta_k\to0$，则 $\Delta_k\to0$。
 固定小步长达到 $\epsilon$ 的 outer 数量约为
 $\eta^{-1}\log(\Delta_0/\epsilon)$，应连同 rollout 成本和 inner 残差共同比较。
 
+\section{线性步长调度的精确界}
+固定 $\eta$ 不是 MirrorOPD 的必要条件。一个常用的实现是先用较小的镜像步，
+再在线性调度中逐渐增大到目标值。令
+\[
+ \eta_k=\min\{\eta_{\max},\eta_{\min}+k\delta\},
+ \qquad 0<\eta_{\min}\le\eta_{\max}\le1,
+\]
+其中 $\delta\ge0$。这里的调度只改变第 $k$ 个 outer 子问题的目标，
+不改变该 outer 内固定 anchor 的定义。
+
+\begin{theorem}[线性调度的乘积收缩与复杂度]
+\label{thm:linear-schedule}
+在精确 hard-sync、共同 support 且 $0<\eta_k\le1$ 的条件下，
+\[
+ d_{\mathrm{proj}}(p_K,T)
+ =\Big(\prod_{k=0}^{K-1}(1-\eta_k)\Big)d_{\mathrm{proj}}(p_0,T)
+ \le \exp\!\Big(-\sum_{k=0}^{K-1}\eta_k\Big)d_{\mathrm{proj}}(p_0,T).
+\]
+若在线性段内 $\eta_k=\eta_{\min}+k\delta$ 且
+$\eta_{\min}+ (K-1)\delta\le1$，则
+\[
+ \sum_{k=0}^{K-1}\eta_k
+ =K\eta_{\min}+\frac{\delta K(K-1)}2,
+\]
+从而达到 $d_{\mathrm{proj}}(p_K,T)\le\varepsilon$ 的充分条件是
+\[
+ K\eta_{\min}+\frac{\delta K(K-1)}2
+ \ge\log\frac{d_{\mathrm{proj}}(p_0,T)}\varepsilon.
+\]
+在线性段结束后固定 $\eta_{\max}$，额外需要至多
+\[
+ \left\lceil \frac{\log(d_{\mathrm{proj}}(p_{K_0},T)/\varepsilon)}
+ {-\log(1-\eta_{\max})}\right\rceil
+\]
+个 outer，其中 $K_0$ 是进入平台的时刻。
+\end{theorem}
+
+\begin{proof}
+由定理~\ref{thm:projective}，每一个 exact outer 都满足
+\[
+ \Delta_{k+1}=(1-\eta_k)\Delta_k,
+ \qquad \Delta_k=d_{\mathrm{proj}}(p_k,T).
+\]
+逐步相乘得到第一式。对 $x\in[0,1)$，不等式
+$1-x\le e^{-x}$ 来自 $\log(1-x)\le-x$；对每个 $\eta_k$ 应用它，得到指数界。
+
+在线性段内直接求等差数列的和：
+\[
+ \sum_{k=0}^{K-1}(\eta_{\min}+k\delta)
+ =K\eta_{\min}+\delta\sum_{k=0}^{K-1}k
+ =K\eta_{\min}+\frac{\delta K(K-1)}2.
+\]
+将其代入指数界并令右侧不超过 $\varepsilon$，得到充分条件。
+平台阶段每一步乘以 $1-\eta_{\max}$，所以
+\[
+ \Delta_{K_0+j}\le(1-\eta_{\max})^j\Delta_{K_0}.
+\]
+取对数并向上取整即得最后一个上界。
+\end{proof}
+
+该定理说明线性调度的收益来自累计镜像强度，而不是来自改变 exact target 的收敛点。
+在有限 inner 情形，若第 $k$ 轮误差为 $\varepsilon_k$，只需把定理
+~\ref{thm:inexact} 的权重替换为
+\[
+ P_{j+1,K}=\prod_{\ell=j+1}^{K-1}(1-\eta_\ell),
+ \qquad
+ \Delta_K\le P_{0,K}\Delta_0+\sum_{j=0}^{K-1}P_{j+1,K}\varepsilon_j.
+\]
+因此增大 $\eta_k$ 同时带来两种相反效应：乘积收缩更快，但若 inner 预算不随
+目标位移增加，$\varepsilon_k$ 可能变大。一个可验证的调度规则是令停止阈值满足
+\[
+ \varepsilon_k\le c\,\eta_k^{1+\rho},\qquad \rho>0,
+\]
+此时误差项相对于当轮镜像移动是渐近可忽略的；若只保持
+$\varepsilon_k\le c\eta_k$，则只能保证一个与 $c$ 同阶的残差半径。

@@ -109,3 +109,35 @@ inner 求解 & Adam、KL 回溯、Fisher/NG；比较固定更新数、固定 tok
 最终比较使用相同总 teacher 查询数、生成 token 数和训练 token 数，并独立报告 wall time。
 较小 $\eta$ 所需 outer 次数增加，不能用“每轮更稳”直接推出总训练更快。
 EMA 需要用发散率、可用 actor 步长和达到同一 target KL 的成本证明收益；仅展示较平滑 loss 曲线不足以说明收益。
+
+\section{有限时域同步审计}
+为了把上述递推和实现语义分开检验，目录
+\texttt{MirrorOPD/experiment/outer\_dynamics\_qa/} 提供了一个可复现的有限时域
+二动作实验。环境有 $H=6$ 个独立 prefix 状态，每个状态有两个动作；每个 outer
+冻结 $\pi_k$，从它采样，执行固定数量的 inner 更新，然后 hard-sync 得到
+$\pi_{k+1}$。教师由有限时域 reward 的 Boltzmann 分布构造，因而可以直接计算
+精确的 $G_{\eta_k}(\pi_k)$、实际策略与 target 的 KL，以及每轮 reward gain。
+
+实验同时运行 PMD-Part、PMD-Mean、BPO 和 MDPO 四个 inner 变体，并在相同随机种子、
+样本和学习率下比较固定 $\eta$ 与从 $0.2$ 线性增加到 $0.7$ 的调度。运行命令为：
+\begin{verbatim}
+uv run --with numpy --with matplotlib python \\
+  科研/pmd-theory/MirrorOPD/experiment/outer_dynamics_qa/run_finite_horizon.py
+\end{verbatim}
+输出 CSV 保存每个 outer 的 target displacement 和 finite-inner residual；审计文件
+记录了 seed、预算和最终数值。图~\ref{fig:finite-outer-audit} 展示 reward、
+策略到当轮 target 的 KL，以及单轮 reward gain。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{../MirrorOPD/experiment/outer_dynamics_qa/finite_horizon_outer_dynamics.pdf}
+\caption{有限时域 MirrorOPD 同步审计。四种 inner 变体共享冻结 anchor、teacher、
+采样批次和优化预算；线性调度只在 outer 边界改变 $\eta_k$。}
+\label{fig:finite-outer-audit}
+\end{figure}
+
+该实验的作用是验证动力学，而不是替代神经网络实验。具体地，
+\texttt{target\_kl\_anchor} 检验精确镜像位移，\texttt{kl\_policy\_target}
+检验有限 inner 误差，二者分别对应定理~\ref{thm:projective} 和
+定理~\ref{thm:inexact} 中的两个量。若增加 inner steps 后前者保持不变而后者下降，
+说明实现确实把 $\eta$（目标位置）和 inner 学习率（求解精度）分开了。
