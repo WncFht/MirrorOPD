@@ -245,7 +245,7 @@ PMD-Mean 来自同一个方程的中心化。由于 $\log Z_f(s)$ 只依赖 $s$�
 H_k(s,a)-\mathbb E_{\pi_k}[H_k(s,\cdot)\mid s]
 =\eta\widetilde f_k(s,a).
 \end{equation}
-这解释了 PMD-Mean 的 target 来源。它不能只回归中心化 target，还必须保留 $U_\theta=\log(\pi_\theta/\pi_k)$ 的概率归一化约束；否则相差一个 依赖历史的 常数的所有 log-ratio 都会被视为同一个解。
+这解释了 PMD-Mean 的 target 来源。它不能只回归中心化 target，还必须保留 $U_\theta=\log(\pi_\theta/\pi_k)$ 的概率归一化约束；否则相差一个依赖历史的常数的所有 log-ratio 都会被视为同一个解。
 
 BPO 再对式 \eqref{eq:ch2-logratio-equation} 两边作同样的中心化，但中心化的是 residual：
 \begin{align}
@@ -289,7 +289,7 @@ MDPO 则不把式 \eqref{eq:ch2-logratio-equation} 改写成回归，而直接�
 \]
 训练时只对 $\ell^\theta$ 反向传播；teacher、anchor、目标常数和所有估计的 KL 都停止梯度。
 
-\subsection{PMD-Part：回归完整 Gibbs log-ratio}
+\paragraph{PMD-Part：回归完整 Gibbs log-ratio}
 \label{sec:ch2-pmd-part}
 
 定义显式 target
@@ -315,7 +315,7 @@ PMD-Part 在 anchor 测度下最小化
 \end{equation}
 这一步是普通的 log-ratio regression；它没有把 KL 视为常数，也没有使用 action-level importance ratio。
 
-\subsection{PMD-Mean：中心化 target 与归一化约束}
+\paragraph{PMD-Mean：中心化 target 与归一化约束}
 \label{sec:ch2-pmd-mean}
 
 由定义可得
@@ -358,7 +358,7 @@ U_a^\star-\eta\widetilde f_k(s,a)=\eta\bar f_k(s)-\log Z_f(s),
 它与 action 无关，且自动满足 $\sum_a\pi_k(a\mid s)e^{U_a^\star}=1$；这说明 PMD-Mean 恢复的是同一个 Gibbs 分布，而不是把 $\log Z_f$ 任意设为零。
 
 
-\subsection{BPO：中心化最优性 residual}
+\paragraph{BPO：中心化最优性 residual}
 \label{sec:ch2-bpo}
 
 BPO 不显式回归 $\log Z_f$，而将同一个最优性方程的 action-independent 部分消去。定义
@@ -395,7 +395,7 @@ D_\theta(s,a)
 \end{equation}
 BPO 的 score centering 来自对当前 student--anchor KL 的精确求导；它不是因为先对 reward 做了一个近似。
 
-\subsection{MDPO：直接优化 mirror objective}
+\paragraph{MDPO：直接优化 mirror objective}
 \label{sec:ch2-mdpo-generic}
 
 MDPO 直接最大化式 \eqref{eq:ch2-mirror} 的参数化版本：
@@ -495,7 +495,15 @@ $\mathbb E_{\pi_k}[\nabla_\theta\log\pi_\theta]=0$
 \section{OPD：从 teacher log-ratio 到 outer--inner 算法}
 \label{sec:ch2-opd-instantiation}
 
-给定 prompt $x$，第 $k$ 个 outer batch 采集 $y_{1:H}\sim\pi_k(\cdot\mid x)$。teacher 在同一条 rollout 的历史 $s_t=(x,y_{<t})$ 上给出 $T(\cdot\mid s_t)$，student 给出 $\pi_k(\cdot\mid s_t)$。因此 OPD 的训练信号按 rollout 的 response token 定义；prompt token 只提供条件，不参加 response loss。
+OPD 的一个训练样本先采样 prompt $x\sim\mathcal D_X$，再从第 $k$ 个 anchor policy 采样一整条 response rollout
+$y_{1:H}\sim\pi_k(\cdot\mid x)$。因此样本的联合概率是
+\[
+ p_k(x,y_{1:H})=\mathcal D_X(x)\prod_{t=1}^{H}
+ \pi_k(y_t\mid x,y_{<t}).
+\]
+这里的 $y_{<t}$ 只出现在条件概率中；优化和统计的基本单位是一条完整的 prompt--rollout，prompt token 只提供条件，不参加 response loss。teacher 和 student 在这条相同 rollout 上逐 token forward，得到
+$T(\cdot\mid x,y_{<t})$、$\pi_k(\cdot\mid x,y_{<t})$ 和候选
+$\pi_\theta(\cdot\mid x,y_{<t})$。
 
 OPD 不引入额外的外部 reward，而在第 $k$ 个 outer step 使用 teacher 与当前 anchor 的局部 log-ratio：
 \begin{equation}
@@ -508,7 +516,7 @@ r_k(s,a)=\log T(a\mid s)-\log\pi_k(a\mid s).
 \sum_{t=1}^{H}r_k(s_t,a_t)
 =\log T(y\mid x)-\log\pi_k(y\mid x).
 \end{equation}
-因此 $r_k$ 是对 teacher--student 序列差异的无损分摊，不是一个与 历史无关的固定终端 reward。
+因此 $r_k$ 是对 teacher--student 序列差异的无损分摊，不是一个与历史无关的固定终端 reward。
 
 \begin{definition}[OPD mirror target]
 \label{def:ch2-opd-target}
