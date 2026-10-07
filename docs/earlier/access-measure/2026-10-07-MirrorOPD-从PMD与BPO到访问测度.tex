@@ -129,365 +129,301 @@ Q^\beh(s_t,a_t)=r_t(s_t,a_t)+\E_\beh\left[\sum_{k>t}r_k(s_k,a_k)\mid s_t,a_t\rig
 \]
 再取相应 soft advantage。直接把 $r_t$ 放进式 \eqref{eq:gibbs} 会得到局部目标，而不是完整序列目标。per-token reward 消除了终端奖励的稀疏性，却没有消除 future reward 对全局最优条件分布的作用。
 
-\chapter{四种方法从最优解出发的推导}
+\chapter{从同一个最优化问题推导 PMD-Part、PMD-Mean 与 BPO}
 \label{ch:four-methods}
 
-\section{共同起点：同一个镜像子问题如何产生两个 residual}
-\label{sec:common-residual-origin}
+\section{共同的 token-level mirror 子问题}
+\label{sec:ch2-common}
 
-固定 prefix $s$，把行为策略简写为 $\mu(a)$，把候选策略简写为 $\pi(a)$，并令 $u(a)=\log(\pi(a)/\mu(a))$。统一采用 Natural Gradient 学习率 $\eta$，镜像子问题为
-\begin{equation}
-\label{eq:common-mirror-objective}
-\max_{p\ll\mu}
-\left\{\E_p[f]-\frac1\eta\KL(p\Vert\mu)\right\}.
-\end{equation}
-对任意 $p$，定义
+固定 prefix $s$，行为策略记为 $\mu(a\mid s)$，候选学生策略记为 $\pi_\theta(a\mid s)$，并定义
 \[
-Z_f=\E_\mu[e^{\eta f}],
+u_\theta(s,a)=\log\frac{\pi_\theta(a\mid s)}{\mu(a\mid s)},
 \qquad
-\pi^+(a)=\frac{\mu(a)e^{\eta f(a)}}{Z_f}.
+ g_\theta(s,a)=\nabla_\theta\log\pi_\theta(a\mid s).
 \]
-与定理 \ref{thm:gibbs} 相同的 KL 分解给出
-\[
-\E_p[f]-\frac1\eta\KL(p\Vert\mu)
-=\frac1\eta\log Z_f-
-\frac1\eta\KL(p\Vert\pi^+).
-\]
-因此最优策略满足
+统一用 $\eta>0$ 表示 Natural Gradient 的学习率。给定 token 信号 $f(s,a)$，三种方法都从同一个镜像子问题开始：
 \begin{equation}
-\label{eq:common-optimality-equation}
- u^+(a)=\log\frac{\pi^+(a)}{\mu(a)}
- =\eta f(a)-\log Z_f.
+\label{eq:ch2-mirror}
+\max_{p\ll\mu(\cdot\mid s)}
+\left\{
+\E_{a\sim p}[f(s,a)]
+-\frac1\eta\KL(p\Vert\mu(\cdot\mid s))
+\right\}.
 \end{equation}
-这一步是 PMD-Part 与 BPO 的共同起点，尚未引入任何线性化、clip 或重要性采样。
-
-PMD-Part 直接把式 \eqref{eq:common-optimality-equation} 当作逐 action 的回归方程。定义
-\begin{equation}
-\label{eq:part-residual-from-optimum}
- q(a):=u^+(a)-u(a)
- =\underbrace{\eta f(a)-\log Z_f}_{h(a)}-u(a).
-\end{equation}
-所以 PMD-Part 的平方损失就是 $q(a)^2/2$ 的行为测度平均。
-
-BPO 采用同一个最优性方程的“常数消除”形式。令
+定义
 \[
- b(a):=\eta f(a)-u(a).
+Z_f(s)=\E_{a\sim\mu(\cdot\mid s)}[e^{\eta f(s,a)}].
 \]
-在行为优势满足 $\E_\mu[f]=0$ 时，
+对任意候选分布 $p$，直接展开 KL 得到
 \begin{align*}
-\E_\mu[b]
-&=\eta\E_\mu[f]-\E_\mu[u]\\
-&=-\E_\mu[u]\\
-&=\KL(\mu\Vert\pi).
+\KL(p\Vert\pi^+)
+&=\E_p\left[\log\frac{p}{\mu}-\eta f+\log Z_f(s)\right]\\
+&=\KL(p\Vert\mu)-\eta\E_p[f]+\log Z_f(s),
 \end{align*}
-于是 BPO 的 centered residual 是
-\begin{equation}
-\label{eq:bpo-residual-from-optimum}
-\delta(a):=b(a)-\E_\mu[b]
-=\eta f(a)-u(a)-\KL(\mu\Vert\pi)
-=\eta f(a)-u(a)+\E_\mu[u].
-\end{equation}
-它等价于把同一个最优性方程中的 action-independent 常数先减去行为均值。
-
-两种 residual 的零点仍然相同。若 $\delta(a)=0$ 对所有有正行为概率的 action 成立，则 $u(a)=\eta f(a)-C$，其中 $C$ 与 action 无关。策略归一化要求
+其中
 \[
-1=\E_\mu[e^{u}]
-=e^{-C}\E_\mu[e^{\eta f}]
-=e^{-C}Z_f,
+\pi^+(a\mid s)=\frac{\mu(a\mid s)e^{\eta f(s,a)}}{Z_f(s)}.
 \]
-所以 $C=\log Z_f$，从而 $u=u^+$。反过来，若 $u=u^+$，则 $b(a)=\log Z_f$ 为常数，故 $\delta(a)=0$。因此 BPO 和 PMD-Part 由同一个镜像最优解出发，并共享同一个可实现零点；它们的差别只出现在对这个最优性方程采用的残差和参数梯度上。
+整理后，镜像目标满足
+\begin{equation}
+\label{eq:ch2-kl-decomp}
+\E_p[f]-\frac1\eta\KL(p\Vert\mu)
+=\frac1\eta\log Z_f(s)-\frac1\eta\KL(p\Vert\pi^+).
+\end{equation}
+因此唯一最优策略是 $\pi^+$，其最优 log-ratio 为
+\begin{equation}
+\label{eq:ch2-optimal-logratio}
+u^+(s,a)=\log\frac{\pi^+(a\mid s)}{\mu(a\mid s)}
+=\eta f(s,a)-\log Z_f(s).
+\end{equation}
 
-\section{中心化条件的来源与 OPD 特化}
-\label{sec:centering-and-opd}
+\subsection{为什么优势满足 $\E_\mu[f\mid s]=0$}
 
-前面的条件 $\E_\mu[f\mid s]=0$ 不是任意 per-token reward 都满足的恒等式。它在 $f=A^\mu$ 时成立，是因为优势函数按定义为
+条件 $\E_\mu[f(s,a)\mid s]=0$ 不是任意 reward 的性质。若 $f=A^\mu$ 是行为策略的优势函数，则
 \[
 A^\mu(s,a)=Q^\mu(s,a)-V^\mu(s),
 \qquad
-V^\mu(s)=\E_{a\sim\mu(\cdot\mid s)}[Q^\mu(s,a)],
+V^\mu(s)=\E_{a\sim\mu}[Q^\mu(s,a)\mid s],
 \]
-所以逐 prefix 有
+从而
 \begin{align*}
 \E_\mu[A^\mu(s,a)\mid s]
 &=\E_\mu[Q^\mu(s,a)\mid s]-V^\mu(s)\\
-&=V^\mu(s)-V^\mu(s)=0.
+&=0.
 \end{align*}
-如果 $f$ 是即时 reward、教师打分、logit reward 或任意 OPD per-token reward，这个均值通常不为零。此时可以定义
+若 $f$ 是即时 reward、教师分数或一般 OPD 信号，则必须把中心化作为显式定义。令
 \[
-\bar f(s):=\E_\mu[f(s,a)\mid s],
+\bar f(s)=\E_\mu[f(s,a)\mid s],
 \qquad
-\widetilde f(s,a):=f(s,a)-\bar f(s),
+\widetilde f(s,a)=f(s,a)-\bar f(s).
 \]
-并用 $\widetilde f$ 作为 BPO 的中心化信号。中心化只减去 prefix 相关的 action-independent 常数；在 Gibbs 解中，
+减去只依赖 prefix 的常数不改变 Gibbs 策略，因为
 \[
 \frac{\mu(a\mid s)e^{\eta\widetilde f(s,a)}}
 {\E_\mu[e^{\eta\widetilde f(s,\cdot)}\mid s]}
 =
 \frac{\mu(a\mid s)e^{\eta f(s,a)}}
-{\E_\mu[e^{\eta f(s,\cdot)}\mid s]},
+{\E_\mu[e^{\eta f(s,\cdot)}\mid s]}.
 \]
-因此不改变最优条件策略，只改变配分函数的表示。
+后文在 BPO 和 PMD-Mean 中使用 $\widetilde f$；PMD-Part 直接保留精确的 $\log Z_f(s)$。
 
-令 $r_{\mathrm{OPD}}(s,a)$ 表示 OPD 在当前 prefix 上提供的即时 token 信号。它可以是教师偏好分数、教师与行为策略的 log-ratio、或已经估计好的 token advantage。记
+\section{三种算法的逐步推导}
+\label{sec:ch2-three-methods}
+
+\subsection{PMD-Part：回归完整的最优 log-ratio}
+
+把式 \eqref{eq:ch2-optimal-logratio} 当作 supervised target，定义
 \[
-\bar r(s)=\E_\mu[r_{\mathrm{OPD}}(s,a)\mid s],
+h(s,a)=\eta f(s,a)-\log Z_f(s),
 \qquad
-\widetilde r(s,a)=r_{\mathrm{OPD}}(s,a)-\bar r(s),
+q_\theta(s,a)=h(s,a)-u_\theta(s,a).
 \]
-则三种 token-level 方法都可以从同一个 OPD mirror subproblem 出发：
-\begin{equation}
-\label{eq:opd-mirror-subproblem}
-\max_{p\ll\mu}
-\left\{
-\E_p[r_{\mathrm{OPD}}(s,a)]
--\frac1\eta\KL(p\Vert\mu(\cdot\mid s))
-\right\}.
-\end{equation}
-其精确教师策略为
-\begin{equation}
-\label{eq:opd-gibbs}
-\pi^+_{\mathrm{OPD}}(a\mid s)
-=
-\frac{\mu(a\mid s)e^{\eta r_{\mathrm{OPD}}(s,a)}}
-{Z_{\mathrm{OPD}}(s)},
-\qquad
-Z_{\mathrm{OPD}}(s)=\E_\mu[e^{\eta r_{\mathrm{OPD}}(s,\cdot)}\mid s].
-\end{equation}
+PMD-Part 损失和下降方向分别为
+\begin{align}
+\mathcal L_{\mathrm{Part}}
+&=\frac12\E_{d_\mu,\mu}[q_\theta(s,a)^2],\label{eq:ch2-part-loss}\\
+-\nabla_\theta\mathcal L_{\mathrm{Part}}
+&=\E_{d_\mu,\mu}[q_\theta(s,a)g_\theta(s,a)].\label{eq:ch2-part-gradient}
+\end{align}
+这里的 target 常数 $\log Z_f(s)$ 固定了 action-independent 方向。
 
-\paragraph{OPD--PMD-Part.}
-定义
-\[
-h_{\mathrm{OPD}}(s,a)=\eta r_{\mathrm{OPD}}(s,a)-\log Z_{\mathrm{OPD}}(s).
-\]
-PMD-Part 回归完整的 OPD log-ratio：
-\begin{equation}
-\label{eq:opd-part-loss}
-\mathcal L_{\mathrm{Part}}^{\mathrm{OPD}}
-=\frac12\E_{s\sim d_\mu,\,a\sim\mu}
-\left[u_\theta(s,a)-h_{\mathrm{OPD}}(s,a)\right]^2,
-\end{equation}
-其下降方向为
-\begin{equation}
-\label{eq:opd-part-gradient}
--\nabla_\theta\mathcal L_{\mathrm{Part}}^{\mathrm{OPD}}
-=\E_{d_\mu\mu}
-\left[(h_{\mathrm{OPD}}-u_\theta)g_\theta\right].
-\end{equation}
-它不需要对 action 乘 IS ratio；访问测度 $d_\mu\mu$ 只决定 OPD residual 在 prefix 和 action 上的投影权重。
+\subsection{PMD-Mean：中心化 target 加归一化投影}
 
-\paragraph{OPD--PMD-Mean.}
-PMD-Mean 先用中心化信号
+PMD-Mean 不显式回归 $\log Z_f$，而令
 \[
-g_{\mathrm{OPD}}(s,a)=\eta\widetilde r(s,a)
+g_{\mathrm{Mean}}(s,a)=\eta\widetilde f(s,a)
 \]
-替代未知的 $\log Z_{\mathrm{OPD}}$，再求解带归一化约束的投影：
+并求解
 \begin{equation}
-\label{eq:opd-mean-loss}
-\min_u\frac12\E_{d_\mu\mu}[(u-g_{\mathrm{OPD}})^2]
+\label{eq:ch2-mean-loss}
+\min_u\frac12\E_{d_\mu,\mu}[(u-g_{\mathrm{Mean}})^2]
 \quad\text{s.t.}\quad
 \E_{a\sim\mu(\cdot\mid s)}[e^{u(s,a)}]=1.
 \end{equation}
-固定 prefix 后，令 $\lambda(s)$ 为约束乘子，则一阶条件为
+固定 prefix 后，写出拉格朗日函数
 \[
-u(s,a)-g_{\mathrm{OPD}}(s,a)+\lambda(s)e^{u(s,a)}=0.
+\mathcal J(u,\lambda)
+=\frac12\sum_a\mu_a(u_a-g_a)^2
++\lambda\left(\sum_a\mu_a e^{u_a}-1\right).
 \]
-令 $v=g_{\mathrm{OPD}}-u$，得到
+因为 $\mu_a>0$，一阶条件为
 \[
-v e^v=\lambda(s)e^{g_{\mathrm{OPD}}},
+u_a-g_a+\lambda e^{u_a}=0.
 \]
-所以
+令 $v_a=g_a-u_a$，则
+\[
+v_a e^{v_a}=\lambda e^{g_a}.
+\]
+由 Lambert-$W$ 的定义 $W(z)e^{W(z)}=z$，得到
 \begin{equation}
-\label{eq:opd-mean-lambert}
+\label{eq:ch2-mean-lambert}
 u_{\mathrm{Mean}}^+(s,a)
-=g_{\mathrm{OPD}}(s,a)
--W\!\left(\lambda(s)e^{g_{\mathrm{OPD}}(s,a)}\right),
+=g_{\mathrm{Mean}}(s,a)
+-W\left(\lambda(s)e^{g_{\mathrm{Mean}}(s,a)}\right),
 \end{equation}
-其中 $\lambda(s)$ 由归一化约束确定。这个解一般不等于精确 OPD Gibbs log-ratio；它是行为测度下的中心化 log-ratio 投影。
+其中 $\lambda(s)$ 由归一化约束唯一确定。PMD-Mean 是投影问题；除特殊情形外，式 \eqref{eq:ch2-mean-lambert} 不等于精确 Gibbs log-ratio。
 
-\paragraph{OPD--BPO.}
-对任意 OPD reward，BPO 应使用中心化 residual，而不能直接把 $\E_\mu[f]=0$ 当作无条件事实：
-\begin{equation}
-\label{eq:opd-bpo-residual}
-\delta_{\mathrm{OPD}}(s,a)
-=\eta\widetilde r(s,a)-u_\theta(s,a)
-+\E_{a'\sim\mu(\cdot\mid s)}[u_\theta(s,a')].
-\end{equation}
-因为 $\E_\mu[\widetilde r\mid s]=0$，有 $\E_\mu[\delta_{\mathrm{OPD}}\mid s]=0$。完整 reverse-KL 的梯度为
+\subsection{BPO：对同一最优性方程做中心化 residual 回归}
+
+先定义 $b_\theta(s,a)=\eta f(s,a)-u_\theta(s,a)$。令
 \[
-\nabla_\theta\delta_{\mathrm{OPD}}(s,a)
+\bar b_\theta(s)=\E_{a\sim\mu}[b_\theta(s,a)\mid s].
+\]
+BPO 的 residual 是
+\begin{equation}
+\label{eq:ch2-bpo-residual}
+\delta_\theta(s,a)=b_\theta(s,a)-\bar b_\theta(s).
+\end{equation}
+若使用中心化信号 $\widetilde f$，则
+\[
+\delta_\theta
+=\eta\widetilde f-u_\theta+\E_\mu[u_\theta\mid s],
+\qquad
+\E_\mu[\delta_\theta\mid s]=0.
+\]
+完整 reverse-KL 的导数给出
+\[
+\nabla_\theta\delta_\theta(s,a)
 =-\left(g_\theta(s,a)-\bar g_\theta(s)\right),
 \qquad
-\bar g_\theta(s)=\E_\mu[g_\theta(s,a)\mid s],
+\bar g_\theta(s)=\E_\mu[g_\theta(s,a)\mid s].
 \]
-所以未线性化 OPD--BPO 的下降方向为
+所以未线性化 BPO 损失
 \begin{equation}
-\label{eq:opd-bpo-gradient}
--\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}^{\mathrm{OPD}}
-=\E_{d_\mu\mu}
-\left[\delta_{\mathrm{OPD}}(g_\theta-\bar g_\theta)\right].
+\label{eq:ch2-bpo-loss}
+\mathcal L_{\mathrm{BPO}}
+=\frac{1}{2\eta}\E_{d_\mu,\mu}[\delta_\theta(s,a)^2]
 \end{equation}
-若 OPD reward 本身就是优势，$\widetilde r=r_{\mathrm{OPD}}$；若不是优势，式 \eqref{eq:opd-bpo-residual} 的中心化步骤是定义 BPO residual 所必需的。三者都使用同一个 token-level OPD mirror subproblem，但 PMD-Part 拟合精确配分函数，PMD-Mean 做归一化约束投影，BPO 做行为测度下的中心化 residual 回归。
-
-\section{PMD-Part：回归最优 log-ratio}
-\label{sec:pmd-part}
-
-定义 $u_\theta(s,a)=\log\cand_\theta(a\mid s)/\beh(a\mid s)$，并令
-\[
-h(s,a)=\eta f(s,a)-\log Z_f(s).
-\]
-PMD-Part 在行为测度下回归精确最优性方程：
+的下降方向为
 \begin{equation}
-\label{eq:part-loss}
- \mathcal L_{\mathrm{Part}}(\theta)
- =\frac12\E_{s\sim d_\beh,\,a\sim\beh}
- \left[u_\theta(s,a)-h(s,a)\right]^2.
-\end{equation}
-把 target $h$ 和行为策略视为固定，记 $g_\theta(s,a)=\nabla_\theta\log\cand_\theta(a\mid s)$，则
-\begin{equation}
-\label{eq:part-gradient}
- -\nabla_\theta\mathcal L_{\mathrm{Part}}
- =\E_{d_\beh\beh}\left[(h-u_\theta)g_\theta\right].
+\label{eq:ch2-bpo-gradient}
+-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}
+=\E_{d_\mu,\mu}
+[\delta_\theta(s,a)(g_\theta(s,a)-\bar g_\theta(s))].
 \end{equation}
 
-\begin{proposition}[PMD-Part 的零点]
-\label{prop:part-zero}
-在无限容量、正访问权重和满 action support 下，$\mathcal L_{\mathrm{Part}}=0$ 当且仅当 $\cand_\theta(\cdot\mid s)=\cand^+(\cdot\mid s)$ 对 $d_\beh$-几乎处处的 prefix 成立。
+\section{OPD 的具体化：从教师分布反推 token reward}
+\label{sec:ch2-opd-instantiation}
+
+OPD 的教师通常直接给出下一个 token 的条件分布，而不是已经中心化的优势函数。令教师分布为 $T(a\mid s)$，行为策略为 $\mu(a\mid s)$，并假设 $T(\cdot\mid s)\ll\mu(\cdot\mid s)$。要求镜像子问题的最优策略恰好等于教师，即 $\pi^+(\cdot\mid s)=T(\cdot\mid s)$。由式 \eqref{eq:ch2-optimal-logratio} 反解可取
+\begin{equation}
+\label{eq:ch2-opd-reward}
+r_T(s,a)=\frac{1}{\eta}\log\frac{T(a\mid s)}{\mu(a\mid s)}+c(s),
+\end{equation}
+其中 $c(s)$ 是只依赖 prefix 的任意常数。取 $c(s)=0$ 时，
+\begin{align*}
+Z_{r_T}(s)
+&=\E_\mu\left[\exp\left(\eta r_T(s,a)\right)\mid s\right]\\
+&=\E_\mu\left[\frac{T(a\mid s)}{\mu(a\mid s)}\mid s\right]=1.
+\end{align*}
+因此
+\begin{equation}
+\label{eq:ch2-opd-gibbs-teacher}
+\frac{\mu(a\mid s)e^{\eta r_T(s,a)}}{Z_{r_T}(s)}=T(a\mid s).
+\end{equation}
+这说明 OPD 的 token reward 可以直接取教师与行为策略的 log-ratio；它是使教师分布成为 KL 镜像问题精确解的反推构造。若还存在外部 token reward $r_{\rm ext}$，取
+\begin{equation}
+\label{eq:ch2-opd-tilted-reward}
+r_{\rm OPD}(s,a)=r_{\rm ext}(s,a)+\frac{1}{\eta}\log\frac{T(a\mid s)}{\mu(a\mid s)}
+\end{equation}
+可得
+\begin{equation}
+\label{eq:ch2-opd-tilted-policy}
+\pi^+(a\mid s)=\frac{T(a\mid s)e^{\eta r_{\rm ext}(s,a)}}{\E_{a'\sim T(\cdot\mid s)}[e^{\eta r_{\rm ext}(s,a')}]}.
+\end{equation}
+
+将 $r_T$ 代入三种算法即可得到 OPD 实例化。PMD-Part 的 target、损失和下降方向为
+\begin{align}
+h_T(s,a)&=\eta r_T(s,a)-\log Z_{r_T}(s)=\log\frac{T(a\mid s)}{\mu(a\mid s)},\\
+\mathcal L_{\rm Part}^{\rm OPD}&=\frac12\E_{d_\mu,\mu}\left[\left(u_\theta-\log\frac{T}{\mu}\right)^2\right],\\
+-\nabla\mathcal L_{\rm Part}^{\rm OPD}&=\E_{d_\mu,\mu}\left[\left(\log\frac{T}{\mu}-u_\theta\right)g_\theta\right].
+\end{align}
+
+PMD-Mean 使用行为均值去掉未知的 prefix 常数。定义
+\begin{equation}
+\label{eq:ch2-opd-mean-signal}
+g_T(s,a)=\eta\left(r_T(s,a)-\E_\mu[r_T(s,a)\mid s]\right)
+=\log\frac{T(a\mid s)}{\mu(a\mid s)}-\E_\mu\left[\log\frac{T}{\mu}\middle\mid s\right].
+\end{equation}
+将 $g_T$ 代入式 \eqref{eq:ch2-mean-loss}，再通过 Lambert-$W$ 乘子恢复归一化。中心化只移除 prefix 常数，不改变教师 Gibbs 策略。
+
+BPO 使用同一个 OPD reward 的中心化 residual：
+\begin{equation}
+\label{eq:ch2-opd-bpo-residual}
+\delta_T(s,a)=\eta\left(r_T(s,a)-\E_\mu[r_T\mid s]\right)-u_\theta(s,a)+\E_\mu[u_\theta\mid s].
+\end{equation}
+其未线性化下降方向为
+\begin{equation}
+\label{eq:ch2-opd-bpo-gradient}
+-\eta\nabla\mathcal L_{\rm BPO}^{\rm OPD}=\E_{d_\mu,\mu}\left[\delta_T(s,a)\left(g_\theta(s,a)-\E_\mu[g_\theta\mid s]\right)\right].
+\end{equation}
+在 $T$ 的完整 logits 可得时，式 \eqref{eq:ch2-opd-reward} 是逐 token 的精确信号；从有限采样近似教师分布时，才会额外引入 reward 和 log-ratio 的估计误差。
+
+\section{直接优化镜像目标：MDPO}
+\label{sec:ch2-mdpo}
+
+直接对镜像目标
+\begin{equation}
+\label{eq:ch2-mdpo-objective}
+F_s(\theta)=\E_{\pi_\theta}[f(s,a)]-\frac1\eta\KL(\pi_\theta\Vert\mu)
+\end{equation}
+做梯度上升。令 $\rho_\theta=\pi_\theta/\mu$，则
+\begin{equation}
+\label{eq:ch2-mdpo-gradient}
+\nabla F_s(\theta)=\E_{a\sim\pi_\theta}\left[\left(f(s,a)-\frac1\eta\log\rho_\theta(s,a)\right)g_\theta(s,a)\right]
+=\E_{a\sim\mu}\left[\rho_\theta(s,a)\left(f-\frac1\eta\log\rho_\theta\right)g_\theta\right].
+\end{equation}
+MDPO 与三种回归方法共享同一 Gibbs 驻点，但显式保留 action-level importance ratio。
+
+\section{共享零点、不同梯度的定理}
+\label{sec:ch2-theorems}
+
+\begin{proposition}[三种方法的共享零点]
+\label{prop:ch2-shared-zero}
+在有限 action space、$\mu(a\mid s)>0$ 且策略归一化成立时，PMD-Part 与未线性化 BPO 在精确 Gibbs 策略 $\pi^+$ 处达到零 residual。PMD-Mean 在其中心化 target 可实现并满足归一化约束时达到同一策略；一般情况下它给出约束集合上的欧氏投影。
 \end{proposition}
 
 \begin{proof}
-平方损失为非负数。它为零当且仅当 $u_\theta=h$ 在行为测度下几乎处处成立。指数化并使用式 \eqref{eq:optimal-logratio} 即得 $\cand_\theta=\cand^+$。反向蕴含显然成立。
+PMD-Part 由 $u_\theta=h$ 直接得到 $u_\theta=u^+$。对 BPO，若 $\delta_\theta=0$，则 $u_\theta=\eta f-C(s)$，其中 $C(s)$ 与 action 无关。归一化给出
+\[
+1=\E_\mu[e^{u_\theta}\mid s]
+=e^{-C(s)}\E_\mu[e^{\eta f}\mid s]
+=e^{-C(s)}Z_f(s),
+\]
+所以 $C(s)=\log Z_f(s)$，即 $u_\theta=u^+$。PMD-Mean 在 target 可实现并满足归一化约束时也取到该策略；不可实现时，它取的是约束集合上的欧氏投影。
 \end{proof}
 
-PMD-Part 的重要性质是目标中没有 ratio 权重；ratio 只出现在被拟合的 log-ratio 中。因此它避免了直接 policy gradient 的乘法重尾，但有限模型下它优化的是 $d_\beh$ 加权的投影。
-
-\section{\texorpdfstring{PMD-Mean：中心化回归与 Lambert-$W$}{PMD-Mean：中心化回归与 Lambert-W}}
-\label{sec:pmd-mean}
-
-令
+\begin{theorem}[未线性化 BPO 与 PMD-Part 的梯度差异]
+\label{thm:ch2-bpo-part-gap}
+令 $q_\theta=h-u_\theta$，并令
 \[
-\bar f(s)=\E_{a\sim\beh}[f(s,a)\mid s],
-\qquad g(s,a)=\eta\left(f(s,a)-\bar f(s)\right).
+c_\theta(s)=\log Z_f(s)+\E_\mu[u_\theta(s,a)\mid s],
+\qquad
+\bar g_\theta(s)=\E_\mu[g_\theta(s,a)\mid s].
 \]
-PMD-Mean 不显式估计 $\log Z_f(s)$，而求解
+则 $\delta_\theta=q_\theta+c_\theta$，且
 \begin{equation}
-\label{eq:mean-loss}
- \min_u\;\frac12\E_{s\sim d_\beh,a\sim\beh}[(u-g)^2]
- \quad\text{s.t.}\quad
- \E_{a\sim\beh(\cdot\mid s)}[e^{u(s,a)}]=1\quad\forall s.
+\label{eq:ch2-bpo-part-gap}
+-\eta\nabla\mathcal L_{\mathrm{BPO}}
+=-\nabla\mathcal L_{\mathrm{Part}}
++\E_{s\sim d_\mu}[c_\theta(s)\bar g_\theta(s)].
 \end{equation}
-约束是策略归一化，而不是可省略的附加条件。
-
-\begin{theorem}[PMD-Mean 的逐 prefix 解]
-\label{thm:mean-lambert}
-在有限 action space、$\beh(a\mid s)>0$ 和可行条件下，式 \eqref{eq:mean-loss} 的 KKT 解满足
-\begin{equation}
-\label{eq:mean-lambert}
- u^+(s,a)=g(s,a)-W\!\left(\lambda(s)e^{g(s,a)}\right),
-\end{equation}
-其中 $\lambda(s)\geq0$ 由 $\E_\beh[e^{u^+(s,\cdot)}\mid s]=1$ 唯一确定。
+因此二者共享零点，但一般不具有相同的梯度场；只有 $c_\theta(s)\bar g_\theta(s)=0$ 对 $d_\mu$-几乎处处成立时才相同。
 \end{theorem}
 
 \begin{proof}
-固定 prefix $s$，记行为概率为 $\beh_a=\beh(a\mid s)$，并把 $g_a=g(s,a)$。由于 action space 有限且 $\beh_a>0$，该问题是严格凸目标加凸归一化约束；因此满足 KKT 条件的解就是唯一全局解。其拉格朗日函数为
-\[
-\mathcal J(u,\lambda)=
-\frac12\sum_a\beh_a(u_a-g_a)^2
-+\lambda\left(\sum_a\beh_a e^{u_a}-1\right).
-\]
-对每个 $u_a$ 求偏导，并利用 $\beh_a>0$，得到
-\[
-0=\frac{1}{\beh_a}\frac{\partial\mathcal J}{\partial u_a}
-=u_a-g_a+\lambda e^{u_a}.
-\]
-令 $v_a=g_a-u_a$，则 $u_a-g_a=-v_a$，代入上式并乘以 $e^{v_a}$：
-\[
-v_a=\lambda e^{g_a-v_a}
-\quad\Longleftrightarrow\quad
-v_a e^{v_a}=\lambda e^{g_a}.
-\]
-Lambert-$W$ 函数由 $W(z)e^{W(z)}=z$ 定义，所以
-\[
-v_a=W(\lambda e^{g_a}),
-\qquad
-u_a=g_a-W(\lambda e^{g_a}),
-\]
-这就是式 \eqref{eq:mean-lambert}。
-剩下的乘子由归一化方程确定。令
-\[
-H(\lambda)=\sum_a\beh_a
-\exp\left(g_a-W(\lambda e^{g_a})\right).
-\]
-对 $\lambda\geq0$，每个 $W(\lambda e^{g_a})$ 随 $\lambda$ 单调增加，因此 $H$ 连续单调下降；可行条件保证存在 $\lambda$ 使 $H(\lambda)=1$。严格凸性保证该乘子对应的 $u$ 唯一。
-\end{proof}
-
-PMD-Part 的修正项 $\log Z_f(s)$ 对 action 是常数，PMD-Mean 的 Lambert-$W$ 项依赖 action。两者只有在退化或额外近似下才相同；它们可以拥有相同的排序和单调改进性质，但不是同一个 mirror subproblem 的两个无偏实现。
-
-\section{MDPO：直接优化 KL 正则化目标}
-\label{sec:mdpo}
-
-MDPO 直接对式 \eqref{eq:token-subproblem} 的目标做参数优化。令
-\[
-F_s(\theta)=\E_{a\sim\cand_\theta}[f(s,a)]-\frac1\eta\KL(\cand_\theta\Vert\beh).
-\]
-对 $\theta$ 求导时，先将 KL 写成
-\[
-\KL(\cand_\theta\Vert\beh)=
-\E_{a\sim\cand_\theta}[\log\ratio_\theta].
-\]
-对第一项使用 score identity，对第二项使用乘积法则：
+由 $q_\theta=\eta f-\log Z_f-u_\theta$，而 BPO 使用
+$\delta_\theta=\eta f-u_\theta+\E_\mu[u_\theta\mid s]$，相减得到
+$\delta_\theta=q_\theta+c_\theta$。另一方面，$\E_\mu[\delta_\theta\mid s]=0$，所以
 \begin{align*}
-\nabla_\theta\E_{\cand_\theta}[f]
-&=\E_{\cand_\theta}[f g_\theta],\\
-\nabla_\theta\E_{\cand_\theta}[\log\ratio_\theta]
-&=\E_{\cand_\theta}[g_\theta\log\ratio_\theta]
-  +\E_{\cand_\theta}[\nabla_\theta\log\ratio_\theta]\\
-&=\E_{\cand_\theta}[g_\theta\log\ratio_\theta]
-  +\E_{\cand_\theta}[g_\theta]
-=\E_{\cand_\theta}[g_\theta\log\ratio_\theta],
+-\eta\nabla\mathcal L_{\mathrm{BPO}}
+&=\E[\delta_\theta(g_\theta-\bar g_\theta)]\\
+&=\E[\delta_\theta g_\theta]\\
+&=\E[(q_\theta+c_\theta)g_\theta]\\
+&=\E[q_\theta g_\theta]+\E[c_\theta\bar g_\theta].
 \end{align*}
-因为 $\beh$ 不依赖 $\theta$，所以 $\nabla_\theta\log\ratio_\theta=g_\theta$，且归一化恒等式给出 $\E_{\cand_\theta}[g_\theta]=0$。因此
-\begin{equation}
-\label{eq:mdpo-onpolicy-gradient}
-\nabla F_s
-=\E_{a\sim\cand}\left[
-\left(f(s,a)-\frac1\eta\log\ratio_\theta(s,a)\right)g_\theta(s,a)
-\right].
-\end{equation}
-其中 $\ratio_\theta=\cand_\theta/\beh$。若样本来自行为策略，则
-\begin{equation}
-\label{eq:mdpo-is-gradient}
-\nabla F_s
-=\E_{a\sim\beh}\left[
-\ratio_\theta(s,a)\left(f(s,a)-\frac1\eta\log\ratio_\theta(s,a)\right)g_\theta(s,a)
-\right].
-\end{equation}
-这就是 MDPO 中的 action-level IS。若状态也来自 replay 的 $d_\beh$，而目标是 $d_{\cand}$ 下的 occupancy 目标，还需要 prefix ratio；经典实现通常把状态测度固定为 replay/rollout 测度，因而没有完整解决 state-distribution mismatch。
-
-\begin{proposition}[MDPO 梯度与 PMD-Part 回归梯度的零点一致、方向不一致]
-\label{prop:mdpo-part}
-MDPO 的梯度式 \eqref{eq:mdpo-is-gradient} 与 PMD-Part 梯度式 \eqref{eq:part-gradient} 在精确镜像解处都为零，但一般不相等。
-\end{proposition}
-
-\begin{proof}
-在镜像解处，$\log\ratio=\eta f-\log Z_f$，故式 \eqref{eq:mdpo-onpolicy-gradient} 为最优目标的驻点；PMD-Part 的 residual $h-u$ 逐点为零。离开镜像解时，MDPO 被积函数包含 $\ratio_\theta$ 和 $f-\frac1\eta\log\ratio_\theta$，PMD-Part 被积函数只有 $h-u_\theta$，两者测度和残差均不同。
+第一项正是 $-\nabla\mathcal L_{\mathrm{Part}}$，得到式 \eqref{eq:ch2-bpo-part-gap}。
 \end{proof}
-
-\section{BPO：从 token 最优性到实际 PG surrogate}
-\label{sec:bpo}
-
-BPO 的 token-level PMD 起点与式 \eqref{eq:token-subproblem} 相同，使用 $f=A^\beh$。在终端奖励情形，论文先定义 token residual
-\begin{equation}
-\label{eq:bpo-token-residual}
- d_\pi(s_t,a_t)=\eta A^\beh(s_t,a_t)-\left[\log\frac{\cand(a_t\mid s_t)}{\beh(a_t\mid s_t)}+\KL(\beh(\cdot\mid s_t)\Vert\cand(\cdot\mid s_t))\right].
-\end{equation}
-该 residual 在 $a_t\sim\beh(\cdot\mid s_t)$ 下条件均值为零。BPO 将沿轨迹的 residual 累加成平方回归目标，并证明其零点与 PMD 解一致。
-
-理论上先对 residual 平方损失求梯度；本文件不把 BPO 的 clip、二元 KL 近似或具体 mismatch weight 纳入推导。对逐 prefix 的 token-level residual，完整 reverse KL 的导数是
-\begin{equation}
-\nabla_\theta\bigl[\log\rho(a)+\KL(\beh\Vert\cand)\bigr]= g(a)-\E_\beh[g(a)].
-\label{eq:bpo-score-centering}
-\end{equation}
-因此 BPO 的未线性化梯度天然包含行为测度下的 score centering；下一章证明它与 PMD-Part 的差异恰好是一个 action-independent 常数乘以行为 score 均值。
 
 \chapter{梯度的偏差与方差}
 \label{ch:bias-variance}
@@ -595,135 +531,6 @@ $\E[W\mid y_{\leq t}]=W_{\leq t}$。全方差公式于是给出
 \end{aligned}
 \end{equation}
 第二项非负；只要 prefix 之后存在策略比率不恒等于一的可达状态，它就严格为正。这说明后缀权重只能增加方差，不能抵消 prefix 权重已经产生的方差。
-
-\section{未线性化 BPO：与 PMD-Part 的梯度差异定理}
-
-BPO 的逐 prefix 残差（取 $f=A^\beh$，故 $\E_\beh[f\mid s]=0$）写成
-\begin{equation}
-\delta(a)=\eta f(a)-u(a)-\KL(\beh\Vert\cand).
-\label{eq:bpo-delta}
-\end{equation}
-因为 $\KL(\beh\Vert\cand)=-\E_\beh[u]$，有 $\E_\beh[\delta]=0$。理论 BPO 损失为
-\begin{equation}
-\mathcal L_{\rm BPO}^{\rm tok}=\frac{1}{2\eta}\E_\beh[\delta(a)^2].
-\end{equation}
-对完整 reverse KL 求导时
-\begin{equation}
-\nabla_\theta\KL(\beh\Vert\cand)=-\E_\beh[g(a)]= -\bar g,
-\qquad \bar g:=\E_\beh[g(a)],
-\end{equation}
-从而
-\begin{equation}
-\nabla_\theta\delta(a)=-(g(a)-\bar g).
-\label{eq:bpo-centered-score}
-\end{equation}
-
-\begin{theorem}[未线性化 BPO 与 PMD-Part 的精确梯度差异]
-\label{thm:bpo-part-equivalence}
-设 $f=A^\beh$ 满足 $\E_\beh[f\mid s]=0$，$\log Z_f$ 使用精确配分函数，target、$\beh$ 与访问测度均停止梯度。定义
-\begin{equation}
-h(a)=\eta f(a)-\log Z_f,\qquad q(a)=h(a)-u(a).
-\end{equation}
-则
-\begin{equation}
-\delta(a)=q(a)+c_s,\qquad c_s=\log Z_f+\E_\beh[u],
-\end{equation}
-且
-\begin{equation}
--\eta\nabla\mathcal L_{\rm BPO}^{\rm tok}
-=\E_\beh[\delta(g-\bar g)]
-=\E_\beh[qg]+c_s\bar g
-=-\nabla\mathcal L_{\rm Part}^{(\eta)}+c_s\bar g,
-\label{eq:bpo-part-exact}
-\end{equation}
-其中 $\bar g=\E_\beh[g]$，$\mathcal L_{\rm Part}^{(\eta)}=\frac12\E_\beh[q^2]$ 是把温度写成 $1/\eta$ 的 PMD-Part 损失。因此二者的梯度相同当且仅当 $c_s\bar g=0$；一般情况下并不相同。
-\end{theorem}
-
-\begin{proof}
-先把两个残差都写成同一组基本量。由于 $f$ 是行为优势，
-$\E_\beh[f]=0$；又因为 $u=\log(\cand/\beh)$，有
-\[
-\KL(\beh\Vert\cand)
-=\E_\beh\left[\log\frac{\beh}{\cand}\right]
-=-\E_\beh[u].
-\]
-所以 BPO 残差逐点为
-\[
-\delta=\eta f-u-\KL(\beh\Vert\cand)
-=\eta f-u+\E_\beh[u].
-\]
-PMD-Part 残差是 $q=\eta f-\log Z_f-u$，两式相减得到
-\[
-\delta-q=\log Z_f+\E_\beh[u]=c_s.
-\]
-这里 $c_s$ 只依赖 prefix $s$，不依赖 action $a$。同时
-\[
-\E_\beh[\delta]
-=\eta\E_\beh[f]-\E_\beh[u]+\E_\beh[u]=0.
-\]
-
-接着对平方损失求导。因为 target、行为策略和访问测度停止梯度，只有 $\delta$ 依赖 $\theta$，故
-\[
-\nabla_\theta\mathcal L_{\rm BPO}^{\rm tok}
-=\frac1\eta\E_\beh[\delta\nabla_\theta\delta].
-\]
-对式 \eqref{eq:bpo-delta} 求导，并使用
-$\nabla_\theta u=g$ 与
-$\nabla_\theta\KL(\beh\Vert\cand)=-\bar g$，得到
-\[
-\nabla_\theta\delta=-g+\bar g=-(g-\bar g).
-\]
-因此
-\begin{align*}
--\eta\nabla\mathcal L_{\rm BPO}^{\rm tok}
-&=\E_\beh[\delta(g-\bar g)]\\
-&=\E_\beh[\delta g]-\E_\beh[\delta]\bar g\\
-&=\E_\beh[\delta g]\\
-&=\E_\beh[(q+c_s)g]\\
-&=\E_\beh[qg]+c_s\E_\beh[g]\\
-&=\E_\beh[qg]+c_s\bar g.
-\end{align*}
-另一方面，PMD-Part 的损失为
-$\mathcal L_{\rm Part}^{(\eta)}=\frac12\E_\beh[q^2]$，所以
-$-\nabla\mathcal L_{\rm Part}^{(\eta)}=\E_\beh[qg]$。代入即可得到式 \eqref{eq:bpo-part-exact}。
-注意这里用到的是残差的行为测度均值 $\E_\beh[\delta]=0$；不能把 $\E_\beh[g]$ 误写成零。score 的零均值恒等式是 $\E_\cand[g]=0$，因为 score 是相对于候选策略而非行为策略取期望。
-\end{proof}
-
-二者只在 $c_s\bar g=0$ 时退化为相同梯度，例如锚点 $\cand=\beh$、可实现根处，或参数化恰好使 $\bar g=0$。一般离开锚点后，BPO 的 score centering 会留下 $c_s\bar g$ 这一额外项。若 $f$ 不是优势而有非零行为均值，必须先把 $f$ 中心化，否则 residual 与 PMD-Part 的 target 不再只差常数。若把 reverse KL 近似成二元项、停止其梯度、加入 clip 或使用不精确的 $Z_f$，式 \eqref{eq:bpo-part-exact} 也不再成立，只能视为近似 PG surrogate。
-\section{为什么同为 token-level 仍然不等价}
-\label{sec:bpo-part-intuition}
-
-token-level 只说明二者都在固定 prefix $s$ 上处理条件分布；它没有规定必须使用同一个参数空间度量。PMD-Part 回归的是带有确定常数项 $-\log Z_f(s)$ 的完整 log-ratio：
-\[
-q(a)=\underbrace{\eta f(a)-\log Z_f(s)}_{h(a)}-u(a).
-\]
-因此它的平方损失直接惩罚 action-independent 的常数误差，梯度为 $\E_\beh[qg]$。BPO 使用的是 reverse-KL 中心化后的 residual：
-\[
-\delta(a)=\eta f(a)-u(a)+\E_\beh[u]
-=q(a)+c_s,
-\qquad c_s=\log Z_f(s)+\E_\beh[u].
-\]
-BPO 的目标只关心 $u(a)-\eta f(a)$ 在行为 action 测度下的中心化部分，因而沿着所有 action 同时平移 $u$ 的方向不会产生同样的惩罚。
-
-真正产生梯度差异的是对 BPO reverse KL 的求导。逐点求导给出
-\[
-\nabla_\theta\delta(a)=-(g(a)-\bar g),
-\qquad \bar g=\E_\beh[g].
-\]
-代入平方损失后，残差的行为均值为零，于是
-\[
--\eta\nabla \mathcal L_{\rm BPO}
-=\E_\beh[\delta(g-\bar g)]
-=\E_\beh[\delta g]
-=\E_\beh[qg]+c_s\bar g.
-\]
-PMD-Part 从一开始就把 $\log Z_f$ 当作固定 target 常数，不会产生 $c_s\bar g$ 这一项。换句话说，差异不是来自 token-level 与 sequence-level 的访问测度，也不是来自 clip 或线性化；它来自两个平方回归问题对 action-independent 方向的处理不同，以及 BPO 对 reverse KL 求导产生的行为 score centering。
-
-两者仍然共享同一个可实现根：在 $u=h$ 时，$q=0$、$c_s=0$ 且 $\delta=0$。共享根只说明最优解一致，不说明离开根以后向量场一致。以二动作 logit 参数化为例，若 $\beh(1)=m$、$\cand_\theta(1)=p$，则
-\[
-g(1)=1-p,\qquad g(0)=-p,qquad \bar g=m-p.
-\]
-只要 $p\neq m$ 且 $c_s\neq0$，就有 $c_s\bar g\neq0$，BPO 和 PMD-Part 的更新方向严格不同。这一差异即使在有限 action、精确配分函数和完整 reverse KL 下仍然存在。
 
 \section{PMD-Part 的投影偏差与 BPO 的中心化方差}
 
