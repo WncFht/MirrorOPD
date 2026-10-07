@@ -421,6 +421,145 @@ Z_k(s)=\sum_{a}\pi_k(a\mid s)^{1-\eta}T(a\mid s)^{\eta}.
 KL 非负且仅在 $p=q_k/Z_k$ 时取零，因此得到唯一解。$\eta=1$ 时 $q_k=T$ 且 $Z_k=1$；当 $0<\eta<1$ 时，$q_k$ 对两种分布的 log 概率作凸组合，且由支持假设满足绝对连续性。
 \end{proof}
 
+\subsection{OPD token reward 的来源与序列层解释}
+\label{sec:ch2-opd-reward-origin}
+
+OPD 中的教师通常能在给定 prefix $s_t=(x,a_{<t})$ 时返回下一个 token 的条件分布 $T(a_t\mid s_t)$。学生在同一个 prefix 上给出 $\pi_k(a_t\mid s_t)$。两者的逐 token 对数似然差定义为
+\begin{equation}
+\label{eq:ch2-opd-token-logratio}
+r_k(s_t,a_t)=\log T(a_t\mid s_t)-\log\pi_k(a_t\mid s_t).
+\end{equation}
+这个定义只使用教师和学生分布，不引入外部 reward。它也不是人为指定的常数，因为对一条完整序列 $y=(a_1,\ldots,a_H)$ 有
+\begin{align}
+\sum_{t=1}^{H}r_k(s_t,a_t)
+&=\sum_{t=1}^{H}\log\frac{T(a_t\mid s_t)}{\pi_k(a_t\mid s_t)}\\
+&=\log\frac{T(y\mid x)}{\pi_k(y\mid x)}.
+\label{eq:ch2-opd-sequence-telescope}
+\end{align}
+因此 token reward 是序列级 teacher--student log-ratio 的一个无损分解。它把一个序列信号分摊到教师已经访问到的每个 prefix 上；它没有把序列目标替换成与未来无关的即时 reward。若优化的是完整序列目标，式 \eqref{eq:ch2-opd-sequence-telescope} 的后续 token 贡献仍然通过 return 或 soft $Q$ 进入 prefix 的训练权重。
+
+\begin{proposition}[OPD reward 的镜像最优性]
+\label{prop:ch2-opd-reward-optimality}
+固定 prefix $s$ 和行为策略 $\pi_k$。令 $r_k$ 如式 \eqref{eq:ch2-opd-token-logratio}，则
+\[
+\pi_k(a\mid s)\exp\bigl(\eta r_k(s,a)\bigr)
+=\pi_k(a\mid s)^{1-\eta}T(a\mid s)^\eta.
+\]
+所以以 $r_k$ 为 token 信号的 KL mirror 子问题，其最优分布必然是学生和教师的几何中间分布，而不是预先假设的教师分布。
+\end{proposition}
+
+\begin{proof}
+将式 \eqref{eq:ch2-opd-token-logratio} 代入左侧：
+\[
+\pi_k(a\mid s)\exp\!\left(\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}\right)
+=\pi_k(a\mid s)^{1-\eta}T(a\mid s)^\eta.
+\]
+对 action 求和得到归一化常数 $Z_k(s)$，再应用定理 \ref{thm:gibbs} 即得结论。
+\end{proof}
+
+\subsection{同一个 OPD mirror step 的三种 inner 实例化}
+\label{sec:ch2-opd-three-inner}
+
+令
+\[
+u_k^\star(s,a)
+=\log\frac{\pi_{k+1}^\star(a\mid s)}{\pi_k(a\mid s)}
+=\eta r_k(s,a)-\log Z_k(s),
+\]
+其中 $Z_k$ 由式 \eqref{eq:ch2-opd-bridge-normalizer} 给出。下面三种方法的差异只在于如何用有限样本和参数化模型逼近这个同一个 $u_k^\star$。
+
+\paragraph{PMD-Part 的 OPD inner。}
+若教师能够返回完整 token 分布，就可以直接计算
+\[
+h_k(s,a)=\eta\log\frac{T(a\mid s)}{\pi_k(a\mid s)}-\log Z_k(s).
+\]
+在 replay prefix 上最小化
+\begin{equation}
+\label{eq:ch2-opd-part-inner}
+\mathcal L_{k,\mathrm{Part}}(\theta)
+=\frac12\E_{s\sim d_b,\,a\sim\pi_k}
+\left[\log\frac{\pi_\theta(a\mid s)}{\pi_k(a\mid s)}-h_k(s,a)\right]^2.
+\end{equation}
+停止 target 梯度后，
+\begin{equation}
+\label{eq:ch2-opd-part-inner-gradient}
+-\nabla_\theta\mathcal L_{k,\mathrm{Part}}
+=\E_{d_b,\pi_k}
+\left[h_k(s,a)-u_\theta(s,a)\right]g_\theta(s,a).
+\end{equation}
+在 tabular、全 action 覆盖且使用真实 $Z_k$ 的情形，零损失等价于 $\pi_\theta=\pi_{k+1}^\star$。共享参数或 prefix 覆盖不足时，得到的是 replay 测度下的投影，不能把零训练误差解释成所有 prefix 上的教师拟合。
+
+\paragraph{PMD-Mean 的 OPD inner。}
+当 $Z_k(s)$ 不方便计算时，先构造行为测度下的中心化信号
+\[
+\widetilde r_k(s,a)
+=r_k(s,a)-\E_{a'\sim\pi_k}[r_k(s,a')\mid s].
+\]
+再令 $\widetilde h_k=\eta\widetilde r_k$，求解
+\begin{equation}
+\label{eq:ch2-opd-mean-inner}
+\min_\theta\frac12\E_{d_b,\pi_k}
+\left[u_\theta(s,a)-\widetilde h_k(s,a)\right]^2
+\quad\text{s.t.}\quad
+\E_{a\sim\pi_k}\!\left[e^{u_\theta(s,a)}\mid s\right]=1.
+\end{equation}
+约束是必要的：$u_\theta=\log(\pi_\theta/\pi_k)$ 必须满足
+\[
+\E_{\pi_k}[e^{u_\theta}\mid s]
+=\sum_a\pi_\theta(a\mid s)=1.
+\]
+在函数空间中，式 \eqref{eq:ch2-opd-mean-inner} 是中心化 target 到这个非线性约束集合的投影；其 KKT 方程和 Lambert-$W$ 解已经在式 \eqref{eq:ch2-mean-lambert} 中给出。只有当中心化 target 本身满足该约束时，PMD-Mean 才直接等于精确 Gibbs log-ratio。
+
+\paragraph{BPO 的 OPD inner。}
+BPO 不显式估计 $\log Z_k$，而在每个 prefix 上把 residual 投影到行为测度的零均值子空间：
+\begin{align}
+\delta_{k,\theta}(s,a)
+&=\eta r_k(s,a)-u_\theta(s,a)
+-\E_{\pi_k}\!\left[\eta r_k(s,\cdot)-u_\theta(s,\cdot)\mid s\right],\label{eq:ch2-opd-bpo-inner-residual}\\
+\mathcal L_{k,\mathrm{BPO}}(\theta)
+&=\frac{1}{2\eta}\E_{d_b,\pi_k}\left[\delta_{k,\theta}(s,a)^2\right].\label{eq:ch2-opd-bpo-inner-loss}
+\end{align}
+对完整 reverse-KL 项求导得到
+\begin{equation}
+\label{eq:ch2-opd-bpo-inner-gradient}
+-\eta\nabla_\theta\mathcal L_{k,\mathrm{BPO}}
+=\E_{d_b,\pi_k}
+\left[\delta_{k,\theta}(s,a)
+\left(g_\theta(s,a)-\bar g_\theta(s)\right)\right],
+\end{equation}
+其中方括号表示标量 residual 与向量 score 的乘积，
+\[
+\delta_{k,\theta}(s,a)
+\left(g_\theta(s,a)-\bar g_\theta(s)\right),
+\qquad
+\bar g_\theta(s)=\E_{\pi_k}[g_\theta(s,a)\mid s].
+\]
+若 $\delta_{k,\theta}=0$，则
+\[
+u_\theta(s,a)=\eta r_k(s,a)+c_k(s)
+\]
+对某个 action-independent 常数 $c_k(s)$ 成立。归一化约束进一步给出
+\[
+1=\E_{\pi_k}[e^{u_\theta}\mid s]
+=e^{c_k(s)}Z_k(s),
+\qquad
+c_k(s)=-\log Z_k(s),
+\]
+所以 BPO 的精确零点也是 $u_k^\star$。这说明 BPO 与 PMD-Part 的最优策略相同，但其有限步梯度仍因中心化 score 而不同。
+
+\begin{theorem}[三种 OPD inner 的精确零点]
+\label{thm:ch2-opd-inner-common-root}
+在有限 action space、$\pi_k(a\mid s)>0$ 且函数类能够表示任意 log-ratio 的条件下，PMD-Part、PMD-Mean 和未线性化 BPO 的精确零点都对应
+\[
+\pi_\theta(\cdot\mid s)=\pi_{k+1}^{\star}(\cdot\mid s).
+\]
+它们的有限样本或有限参数更新不同，来自投影测度、target 常数的处理和 score 是否中心化，而不是来自不同的 token-level mirror 最优解。
+\end{theorem}
+
+\begin{proof}
+PMD-Part 的结论由 $u_\theta=h_k=u_k^\star$ 直接得到。BPO 的零点由上面的 residual 方程给出；归一化唯一确定 $c_k=-\log Z_k$，从而 $u_\theta=u_k^\star$。PMD-Mean 的可行集包含所有满足 $\E_{\pi_k}[e^u\mid s]=1$ 的 log-ratio；当中心化 target 可实现且投影残差为零时，它也得到同一 $u_k^\star$。若中心化 target 不可行或模型类受限，PMD-Mean 的解是约束集合上的投影，此时只能保证投影误差而不能保证精确 Gibbs 解。
+\end{proof}
+
 \subsection{inner 求解与 outer 更新的区别}
 
 式 \eqref{eq:ch2-opd-mirror-step} 是 outer 第 $k$ 步要解决的目标，不能把它和参数优化步数混为一谈。实际学生只能表示 $\pi_\theta$，因此固定行为策略 $\pi_k$ 后，inner 优化是在同一批 prefix 上最小化
