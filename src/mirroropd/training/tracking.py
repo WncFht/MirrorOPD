@@ -142,4 +142,14 @@ class WandbLogger:
         return uploaded
 
     def finish(self, exit_code=0):
-        self.wandb.finish(exit_code=exit_code)
+        run = getattr(self.wandb, "run", None)
+        if run is None or getattr(run, "_is_finished", False):
+            return
+        try:
+            self.wandb.finish(exit_code=exit_code)
+        except RuntimeError as error:
+            # W&B may close its service before Tracking.__del__ runs during
+            # interpreter shutdown.  The history has already been flushed;
+            # do not turn that benign ordering issue into a training error.
+            if "closed" not in str(error).lower():
+                raise
