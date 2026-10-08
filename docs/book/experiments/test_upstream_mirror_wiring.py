@@ -25,6 +25,10 @@ class Batch:
         return cls(values)
 
 
+class Config(dict):
+    __getattr__ = dict.__getitem__
+
+
 def load_method(path, classname, name, namespace):
     tree = ast.parse(path.read_text())
     cls = next(
@@ -51,6 +55,7 @@ def main():
         / "pmd-theory/MirrorOPD/source_audit/TA-OPD/verl/verl"
     )
     check_mode_routing(root)
+    check_rollout_guards(root)
     tu = SimpleNamespace(
         assign_non_tensor_data=lambda data, key, value: data.__setitem__(key, value),
         get_non_tensor_data=lambda data, key, default=None: data.get(key, default),
@@ -214,9 +219,6 @@ def check_mode_routing(root):
         )
         prepare(distill)
 
-        class Config(dict):
-            __getattr__ = dict.__getitem__
-
         config = Config(
             distillation=distill,
             algorithm={"use_kl_in_reward": False},
@@ -253,6 +255,77 @@ def check_mode_routing(root):
     print(
         "PASS three-mode config gates, reference/teacher selection, PPO bypass, native mode routing"
     )
+
+
+def check_rollout_guards(root):
+    tree = ast.parse((root / "trainer/ppo/ray_trainer.py").read_text())
+    cls = next(
+        n
+        for n in tree.body
+        if isinstance(n, ast.ClassDef) and n.name == "RayPPOTrainer"
+    )
+    init = next(
+        n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__"
+    )
+    guard = next(
+        n
+        for n in init.body
+        if isinstance(n, ast.If)
+        and isinstance(n.test, ast.Attribute)
+        and n.test.attr == "mirror_opd"
+    )
+    function = ast.parse("def validate(config):\n    pass").body[0]
+    function.body = guard.body
+    namespace = {}
+    exec(
+        compile(
+            ast.fix_missing_locations(ast.Module(body=[function], type_ignores=[])),
+            "upstream-rollout-guards",
+            "exec",
+        ),
+        namespace,
+    )
+    rollout = Config(
+        temperature=1.0,
+        top_p=1.0,
+        top_k=-1,
+        do_sample=True,
+        skip=Config(enable=False),
+        quantization=None,
+        multi_turn=Config(enable=False),
+        agent=Config(
+            default_agent_loop="single_turn_agent",
+            agent_loop_config_path=None,
+            custom_async_server=Config(path=None),
+        ),
+    )
+    config = Config(
+        actor_rollout_ref=Config(
+            rollout=rollout, actor=Config(use_kl_loss=False, entropy_coeff=0)
+        ),
+        algorithm=Config(adv_estimator="reinforce_plus_plus", use_kl_in_reward=False),
+    )
+    # These optional keys are absent from the actual upstream Hydra schema.
+    assert "repetition_penalty" not in rollout
+    assert "agent_loop_manager_class" not in rollout.agent
+    namespace["validate"](config)
+    for field, bad in (
+        ("top_p", 0.9),
+        ("top_k", 32),
+        ("temperature", 0),
+        ("temperature", float("nan")),
+        ("do_sample", False),
+    ):
+        original = rollout[field]
+        rollout[field] = bad
+        try:
+            namespace["validate"](config)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"Accepted invalid rollout {field}={bad}")
+        rollout[field] = original
+    print("PASS upstream rollout guard defaults and invalid sampling rejection")
 
 
 if __name__ == "__main__":

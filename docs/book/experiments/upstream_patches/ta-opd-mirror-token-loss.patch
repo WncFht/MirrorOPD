@@ -685,7 +685,7 @@ index 8f6cd41..c5b36aa 100644
              # without registering a teacher model worker in role-worker mapping
              self.mapping[Role.TeacherModel] = "teacher_pool"
 diff --git a/verl/trainer/ppo/ray_trainer.py b/verl/trainer/ppo/ray_trainer.py
-index d1eaa7b..7a3da58 100644
+index d1eaa7b..b2b3427 100644
 --- a/verl/trainer/ppo/ray_trainer.py
 +++ b/verl/trainer/ppo/ray_trainer.py
 @@ -38,7 +38,7 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
@@ -718,13 +718,13 @@ index d1eaa7b..7a3da58 100644
 +            rollout = config.actor_rollout_ref.rollout
 +            if not (0 < rollout.temperature < float("inf")):
 +                raise ValueError("MirrorOPD requires a finite positive rollout temperature")
-+            if rollout.top_p != 1 or rollout.top_k not in (-1, 0) or rollout.repetition_penalty != 1:
++            if rollout.top_p != 1 or rollout.top_k not in (-1, 0) or rollout.get("repetition_penalty", 1) != 1:
 +                raise ValueError("MirrorOPD requires untruncated categorical rollout without repetition penalty")
 +            if not rollout.do_sample or rollout.skip.enable or rollout.quantization is not None:
 +                raise ValueError("MirrorOPD requires fresh stochastic rollout without quantization")
 +            agent = rollout.agent
 +            if (rollout.multi_turn.enable or agent.default_agent_loop != "single_turn_agent"
-+                    or agent.agent_loop_config_path or agent.agent_loop_manager_class
++                    or agent.agent_loop_config_path or agent.get("agent_loop_manager_class")
 +                    or agent.custom_async_server.path):
 +                raise ValueError("MirrorOPD currently requires the standard single-turn rollout agent")
 +            if config.algorithm.get("adv_estimator") == "remax":

@@ -15,7 +15,9 @@ esac
 task_python="$task_root/.venv/bin/python"
 mkdir -p "$task_root/data" "$task_root/logs" "$task_root/scratch"
 export TMPDIR="$task_root/scratch"
-export RAY_TMPDIR="$task_root/scratch"
+# Ray creates long session/socket names; keep the disk-backed prefix short.
+export RAY_TMPDIR="${MIRROR_RAY_TMPDIR:-$HOME/.cache/mopd-ray}"
+mkdir -p "$RAY_TMPDIR"
 export PYTHONPATH="$task_root/verl${PYTHONPATH:+:$PYTHONPATH}"
 export TOKENIZERS_PARALLELISM=false
 export WANDB_MODE=disabled
@@ -59,17 +61,24 @@ cd "$task_root/verl"
   actor_rollout_ref.actor.fsdp_config.param_offload=true \
   actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
   actor_rollout_ref.actor.fsdp_config.use_torch_compile=false \
+  actor_rollout_ref.actor.fsdp_config.model_dtype=bfloat16 \
   actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.ref.fsdp_config.param_offload=true \
   actor_rollout_ref.ref.fsdp_config.use_torch_compile=false \
+  actor_rollout_ref.ref.fsdp_config.model_dtype=bfloat16 \
   actor_rollout_ref.rollout.name=vllm \
   actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
   actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+  actor_rollout_ref.rollout.max_num_seqs=4 \
+  actor_rollout_ref.rollout.max_num_batched_tokens=256 \
+  actor_rollout_ref.rollout.max_model_len=128 \
+  actor_rollout_ref.rollout.calculate_log_probs=true \
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.rollout.temperature=1 actor_rollout_ref.rollout.top_p=1 \
   actor_rollout_ref.rollout.top_k=-1 actor_rollout_ref.rollout.n=1 \
   actor_rollout_ref.rollout.enforce_eager=true \
   distillation.enabled=true \
+  distillation.n_gpus_per_node=0 distillation.nnodes=0 \
   distillation.mirror_teacher_model_path=Qwen/Qwen3-1.7B \
   distillation.distillation_loss.loss_mode="$mode" \
   distillation.distillation_loss.topk=32 \
@@ -86,4 +95,6 @@ cd "$task_root/verl"
   trainer.default_local_dir="$task_root/checkpoints/$mode" \
   trainer.project_name=mirror-opd-canary trainer.experiment_name="$mode" \
   'trainer.logger=[console]' \
+  +ray_kwargs.ray_init.object_store_memory=536870912 \
+  ray_kwargs.ray_init.num_cpus=4 \
   "$@"
