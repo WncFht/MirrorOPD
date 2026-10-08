@@ -82,6 +82,47 @@
       "teacher_param_offload": false,
       "cpu_threads": 1,
       "rollout_workers": 1
+    },
+    {
+      "method": "mirror_mdpo",
+      "source": "archbox:~/src/mirroropd-taopd/logs/canary-mdpo.log",
+      "process_exit_code": 0,
+      "steps": [
+        {
+          "step": 1,
+          "metrics": {
+            "training/rollout_probs_diff_mean": 0.005523397121578455,
+            "training/rollout_actor_probs_pearson_corr": 0.9994128346443176,
+            "actor/loss": -3.164466142654419,
+            "actor/grad_norm": 29.758421897888184,
+            "actor/perf/max_memory_allocated_gb": 6.334334373474121,
+            "actor/perf/max_memory_reserved_gb": 8.515625,
+            "response_length/clip_ratio": 1.0,
+            "timing_s/update_actor": 2.1452134160008427,
+            "timing_s/update_weights": 1.7334866750006768
+          }
+        },
+        {
+          "step": 2,
+          "metrics": {
+            "training/rollout_probs_diff_mean": 0.005771729163825512,
+            "training/rollout_actor_probs_pearson_corr": 0.9992387294769287,
+            "actor/loss": -1.251754879951477,
+            "actor/grad_norm": 15.825546264648438,
+            "actor/perf/max_memory_allocated_gb": 6.349719524383545,
+            "actor/perf/max_memory_reserved_gb": 8.533203125,
+            "response_length/clip_ratio": 1.0,
+            "timing_s/update_actor": 2.0177076540003327,
+            "timing_s/update_weights": 1.8735906010006147
+          }
+        }
+      ],
+      "checkpoint_saved": true,
+      "traceback_in_log": false,
+      "actor_param_offload": false,
+      "teacher_param_offload": false,
+      "cpu_threads": 1,
+      "rollout_workers": 1
     }
   ]
 }
