@@ -1,12 +1,15 @@
 BOOK_DIR := docs/book
 BOOK := 2026-10-08-固定测度Token级MirrorOPD
 
-.PHONY: book test upstream bootstrap check
+.PHONY: book test upstream data bootstrap check
 book:
 	cd $(BOOK_DIR) && latexmk -xelatex -interaction=nonstopmode -halt-on-error $(BOOK).tex
 
 upstream:
 	bash scripts/bootstrap-upstream.sh
+
+data:
+	python3 scripts/restore-data.py
 
 test:
 	uv run --with torch --with numpy python experiments/test_mean_bpo.py
@@ -22,6 +25,7 @@ bootstrap:
 	bash scripts/crossnote-links.sh
 	pre-commit install
 	git config blame.ignoreRevsFile .git-blame-ignore-revs
+	python3 scripts/restore-data.py
 
 check:
 	npm run format:check
