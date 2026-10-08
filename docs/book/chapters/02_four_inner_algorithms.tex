@@ -1,0 +1,618 @@
+\chapter{统一的 token-level Mirror Descent 与 OPD 实例化}
+\label{ch:four-methods}
+
+本章沿用第一章的 outer--inner 记号：$\pi_k$ 是冻结 anchor，$\pi_{k,n}$ 是当前 student，$\pi_T$ 是 teacher，$d_k$ 是冻结 prefix 访问测度。所有梯度均在 $\theta=\theta_{k,n}$ 处计算。以下先对一般冻结信号 $f$ 推导，再取 OPD 信号 $f=r_k$。
+
+\section{共同的 mirror 子问题与精确解}
+\label{sec:ch2-common}
+
+\begin{definition}[Token-level mirror 子问题]
+\label{def:ch2-mirror-subproblem}
+给定固定历史 $s$、token 信号 $f(s,a)$ 和 anchor $\pi_k$，定义
+\begin{equation}
+\label{eq:ch2-mirror}
+\mathcal M_s(p;f,\pi_k)
+=\mathbb E_{a\sim p(\cdot\mid s)}[f(s,a)]
+-\frac1\eta\operatorname{KL}\!\left(p(\cdot\mid s)\middle\Vert\pi_k(\cdot\mid s)\right).
+\end{equation}
+镜像子问题是在所有满足 $p\ll\pi_k$ 的概率分布上最大化 $\mathcal M_s$。同时定义配分函数
+\begin{equation}
+\label{eq:ch2-mirror-normalizer}
+Z_f(s)=\sum_{v\in\mathcal V}\pi_k(v\mid s)\exp\!\bigl(\eta f(s,v)\bigr).
+\end{equation}
+\end{definition}
+
+\begin{theorem}[KL mirror 子问题的 Gibbs 解]
+\label{thm:ch2-gibbs}
+在有限词表、$Z_f(s)<\infty$ 且 $\pi_k(v\mid s)>0$ 的条件下，式 \eqref{eq:ch2-mirror} 的唯一解是
+\begin{equation}
+\label{eq:ch2-optimal-policy}
+\pi_k^{\star,\mathrm{Gibbs}}(v\mid s)=\frac{\pi_k(v\mid s)e^{\eta f(s,v)}}{Z_f(s)},
+\qquad
+\log\frac{\pi_k^{\star,\mathrm{Gibbs}}(v\mid s)}{\pi_k(v\mid s)}
+=\eta f(s,v)-\log Z_f(s).
+\end{equation}
+对任意候选 $p$，还有精确分解
+\begin{equation}
+\label{eq:ch2-kl-decomp}
+\mathcal M_s(p;f,\pi_k)
+=\frac1\eta\log Z_f(s)
+-\frac1\eta\operatorname{KL}\!\left(p\middle\Vert\pi_k^{\star,\mathrm{Gibbs}}(\cdot\mid s)\right).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+由式 \eqref{eq:ch2-optimal-policy}，有
+\[
+\log\frac{p(v\mid s)}{\pi_k^{\star,\mathrm{Gibbs}}(v\mid s)}
+=\log\frac{p(v\mid s)}{\pi_k(v\mid s)}-\eta f(s,v)+\log Z_f(s).
+\]
+对 $v$ 按 $p$ 求期望，得到
+\[
+\operatorname{KL}(p\Vert\pi_k^{\star,\mathrm{Gibbs}})
+=\operatorname{KL}(p\Vert\pi_k)-\eta\mathbb E_p[f]+\log Z_f(s).
+\]
+移项即得式 \eqref{eq:ch2-kl-decomp}。KL 非负且仅在 $p=\pi_k^{\star,\mathrm{Gibbs}}$ 时取零，因此最优解唯一。
+\end{proof}
+
+\begin{definition}[中心化 token 信号]
+\label{def:ch2-centered-signal}
+对任意 $f$ 定义 anchor 条件均值和中心化信号
+\[
+\bar f_k(s)=\mathbb E_{a\sim\pi_k}[f(s,a)\mid s],
+\qquad
+\widetilde f_k(s,a)=f(s,a)-\bar f_k(s).
+\]
+若 $f=A^{\pi_k}$ 是 anchor 的优势函数，则 $\bar f_k(s)=0$ 是优势函数定义推出的恒等式；对一般 teacher score 或 OPD log-ratio，$\bar f_k(s)=0$ 不是自动成立的假设。
+\end{definition}
+
+\begin{proposition}[优势函数的 anchor 条件均值]
+\label{prop:ch2-advantage-centering}
+若 $f(s,a)=A^{\pi_k}(s,a)$，则对每个满足 $\pi_k(\cdot\mid s)$ 定义的历史，
+\begin{equation}
+\label{eq:ch2-advantage-zero-mean}
+\mathbb E_{a\sim\pi_k(\cdot\mid s)}[f(s,a)\mid s]=0.
+\end{equation}
+对于一般 OPD log-ratio 或 teacher score，条件均值需要计算或估计；PMD-Mean 与 BPO 使用相应的中心化 target。
+\end{proposition}
+
+\begin{proof}
+由 $A^{\pi_k}(s,a)=Q^{\pi_k}(s,a)-V^{\pi_k}(s)$ 以及
+$V^{\pi_k}(s)=\mathbb E_{a\sim\pi_k}[Q^{\pi_k}(s,a)\mid s]$，有
+\begin{align*}
+\mathbb E_{\pi_k}[A^{\pi_k}(s,a)\mid s]
+&=\mathbb E_{\pi_k}[Q^{\pi_k}(s,a)\mid s]-V^{\pi_k}(s)\\
+&=V^{\pi_k}(s)-V^{\pi_k}(s)=0.
+\end{align*}
+\end{proof}
+
+\begin{proposition}[中心化不改变 mirror 最优策略]
+\label{prop:ch2-centering}
+用 $\widetilde f_k$ 替代 $f$ 不改变式 \eqref{eq:ch2-mirror} 的最优分布。
+\end{proposition}
+
+\begin{proof}
+因为 $\bar f_k(s)$ 与 action 无关，
+\[
+\pi_k(v\mid s)e^{\eta\widetilde f_k(s,v)}
+=e^{-\eta\bar f_k(s)}\pi_k(v\mid s)e^{\eta f(s,v)}.
+\]
+分子和归一化常数同时乘以同一个因子 $e^{-\eta\bar f_k(s)}$，归一化后的分布不变。
+\end{proof}
+
+\section{从镜像最优性方程到四种可训练目标}
+\label{sec:ch2-objective-derivation}
+
+定理 \ref{thm:ch2-gibbs} 给出的不是孤立的分布结论，而是一条可以被 inner
+optimizer 直接拟合的逐 token 方程。下面先把这条方程、平方损失和 BPO 的
+中心化残差逐步写出，再进入四种算法的实现。
+
+\subsection{镜像最优性方程与训练测度}
+\label{subsec:ch2-optimality-bridge}
+
+把式 \eqref{eq:ch2-optimal-policy} 移项，得到
+\begin{equation}
+\label{eq:ch2-logratio-equation}
+\log\frac{\pi_k^{\star,\mathrm{Gibbs}}(a\mid s)}{\pi_k(a\mid s)}
+=\eta f(s,a)-\log Z_f(s).
+\end{equation}
+在参数化 inner 中，左侧由 $\pi_{k,n}$ 近似。因此定义镜像方程残差
+\begin{equation}
+R_{k,n}^{\mathrm{Part}}(s,a)
+\coloneqq
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\eta f(s,a)+\log Z_f(s).
+\label{eq:ch2-mirror-equation-residual}
+\end{equation}
+精确 mirror 解的条件是 $R_{k,n}^{\mathrm{Part}}(s,a)=0$ 对所有有正概率的
+$(s,a)$ 成立。
+
+为什么训练测度是 $\pi_k$ 而不是 $\pi_{k,n}$？在第 $k$ 个 outer step，
+rollout 已由冻结的 $\pi_k$ 产生；我们要解决的是固定 anchor 的 mirror
+子问题，而不是在 inner 过程中不断改变积分测度。于是参数化投影定义为
+\begin{equation}
+\lVert R_{k,n}^{\mathrm{Part}}\rVert_k^2
+\coloneqq
+\mathbb E_{s\sim d_k}\mathbb E_{a\sim\pi_k(\cdot\mid s)}
+\left[R_{k,n}^{\mathrm{Part}}(s,a)^2\right].
+\label{eq:ch2-anchor-projection-norm}
+\end{equation}
+这也是 on-policy rollout 下可直接估计的投影几何。若改用行为测度 $\beta_k$
+采样，必须乘以冻结的 importance weight
+$\pi_k(a\mid s)/\beta_k(a\mid s)$，否则求解的是 $L_2(d_k\beta_k)$ 投影。
+
+\subsection{PMD-Part 与 PMD-Mean：从方程到平方损失}
+\label{subsec:ch2-pmd-loss-derivation}
+
+PMD-Part 直接最小化式 \eqref{eq:ch2-mirror-equation-residual} 的平方。将
+student log-ratio 和冻结 target 展开，得到
+\begin{equation}
+\label{eq:ch2-regression-from-mirror}
+\mathcal L_{\mathrm{Part}}(\theta)
+=\frac12\mathbb E_{s\sim d_k,a\sim\pi_k}
+\left[
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\eta f(s,a)+\operatorname{sg}\!\left(\log Z_f(s)\right)
+\right]^2.
+\end{equation}
+其中 $\operatorname{sg}$ 表示停止梯度；$\pi_k$、$f$ 和 $Z_f$ 在本轮
+inner 中都冻结。因为
+\[
+\nabla_\theta\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+=\nabla_\theta\log\pi_{k,n}(a\mid s),
+\]
+其梯度为
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{Part}}
+=\mathbb E_{d_k,\pi_k}
+\left[\operatorname{sg}\!\left(
+\log\frac{\pi_{k,n}}{\pi_k}-\eta f+\log Z_f
+\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\label{eq:ch2-part-gradient-bridge}
+\end{equation}
+这说明 PMD-Part 是 anchor 测度下对完整 mirror log-ratio 的 $L_2$ 投影，
+而不是把一个 teacher label 当作普通的 supervised token label。
+
+PMD-Mean 使用原论文的均值近似，而不是对 student log-ratio 做条件中心化。使用第一章定义的冻结 target $G_k(s,a)=\eta(f(s,a)-\bar f_k(s))$。
+将完整 target 中的 $\log Z_f(s)$ 用 $\eta\bar f_k(s)$ 近似，得到
+\begin{equation}
+\mathcal L_{\mathrm{Mean}}(\theta)
+=\frac12\mathbb E_{d_k,\pi_k}
+\left[\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\eta\bigl(f(s,a)-\bar f_k(s)\bigr)\right]^2.
+\label{eq:ch2-mean-loss-bridge}
+\end{equation}
+这里的 reward center 在整个 inner loop 冻结；损失中没有
+$\operatorname{KL}(\pi_k\Vert\pi_{k,n})$。定义 $R_{k,n}^{\mathrm{Mean}}=U_{k,n}-G_k$，直接求导得到
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{Mean}}
+=\mathbb E_{d_k,\pi_k}
+\left[(U_{k,n}-G_k)\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\label{eq:ch2-mean-gradient-bridge}
+\end{equation}
+均值近似遗漏的归一化修正是
+\[
+\log Z_f(s)-\eta\bar f_k(s)
+=\log\mathbb E_{\pi_k}[e^{G_k(s,\cdot)}\mid s]\ge0.
+\]
+非恒定信号对应严格正值，此时 $G_k$ 不满足指数归一化约束。
+因此 PMD-Mean 即使具有完整函数类和无限样本，也不恢复原始 Gibbs 解；其受约束总体解见定理~\ref{thm:ch2-mean-lambert}。
+若改为拟合 $U_{k,n}-\mathbb E_{\pi_k}[U_{k,n}\mid s]-G_k$，得到的是后面的 BPO 中心化残差，已经改变了 PMD-Mean 的目标。
+
+\subsection{BPO：中心化最优性残差}
+\label{subsec:ch2-bpo-loss-derivation}
+
+BPO 将镜像方程残差按冻结 anchor 条件中心化。配分函数项是 action-independent 常数，中心化后消失：
+\begin{align}
+R_{k,n}^{\mathrm{BPO}}(s,a)
+&\coloneqq U_{k,n}(s,a)-\eta f(s,a)
+-\mathbb E_{\pi_k}[U_{k,n}(s,\cdot)-\eta f(s,\cdot)\mid s]
+\label{eq:ch2-bpo-from-optimality}\\
+&=U_{k,n}(s,a)-G_k(s,a)+\mathcal K_{k,n}^{S}(s).
+\label{eq:ch2-bpo-expanded}
+\end{align}
+这里 $\mathbb E_{\pi_k}[U_{k,n}\mid s]=-\mathcal K_{k,n}^{S}$，所以 student KL 前是正号。OPD 中 $f=r_k$，故
+\begin{equation}
+R_{k,n}^{\mathrm{BPO}}(s,a)
+=\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}+\mathcal K_{k,n}^{S}(s)
+-\eta\left(\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)}+\mathcal K_k^{T}(s)\right).
+\label{eq:ch2-bpo-opd-expanded}
+\end{equation}
+BPO 最小化
+\begin{equation}
+\mathcal L_{\mathrm{BPO}}(\theta)
+=\frac1{2\eta}\mathbb E_{d_k,\pi_k}[(R_{k,n}^{\mathrm{BPO}})^2].
+\label{eq:ch2-bpo-loss-bridge}
+\end{equation}
+使用第一章定义的 score $\psi_{k,n}$ 及其 anchor 均值 $\bar\psi_{k,n}$，保留 student KL 的导数得到
+\[
+\nabla_\theta\mathcal K_{k,n}^{S}=-\bar\psi_{k,n},\qquad
+\nabla_\theta R_{k,n}^{\mathrm{BPO}}=\psi_{k,n}-\bar\psi_{k,n}.
+\]
+因此精确梯度为
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}
+&=\frac1\eta\mathbb E_{d_k,\pi_k}[R_{k,n}^{\mathrm{BPO}}(\psi_{k,n}-\bar\psi_{k,n})]
+\label{eq:ch2-bpo-gradient-bridge}\\
+&=\mathbb E_{d_k,\pi_k}\left[
+\left(\frac{U_{k,n}+\mathcal K_{k,n}^{S}}\eta-f+\bar f_k\right)\psi_{k,n}\right].
+\end{align}
+第二行使用 $\mathbb E_{\pi_k}[R_{k,n}^{\mathrm{BPO}}\mid s]=0$，已把 $\eta^{-1}$ 乘入权重。梯度下降使用上述梯度的负值。消失的是 residual 均值乘以 score 均值，score 的 anchor 期望 $\bar\psi_{k,n}$ 本身通常不为零。
+
+\subsection{MDPO：最小化原始 mirror objective 的负值}
+\label{subsec:ch2-mdpo-loss-derivation}
+
+MDPO 使用原 mirror objective 的负值作为损失，统一执行梯度下降：
+\begin{equation}
+\mathcal L_{\mathrm{MDPO}}(\theta)
+=-\mathbb E_{s\sim d_k,a\sim\pi_{k,n}}[f(s,a)]
++\frac1\eta\mathbb E_{s\sim d_k}\operatorname{KL}(\pi_{k,n}(\cdot\mid s)\Vert\pi_k(\cdot\mid s)).
+\label{eq:ch2-mdpo-objective-bridge}
+\end{equation}
+逐历史应用式~\eqref{eq:ch2-kl-decomp}，得到
+\begin{equation}
+\mathcal L_{\mathrm{MDPO}}(\theta\mid s)
+=-\frac1\eta\log Z_f(s)
++\frac1\eta\operatorname{KL}(\pi_{k,n}(\cdot\mid s)\Vert\pi_k^{\star,\mathrm{Gibbs}}(\cdot\mid s)).
+\label{eq:ch2-mdpo-kl-gap}
+\end{equation}
+这里 KL 的左侧分布是当前 student，与 $\mathcal K_{k,n}^{S}=\operatorname{KL}(\pi_k\Vert\pi_{k,n})$ 的方向不同。
+
+对 student 测度和 log-ratio 同时求导，有
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{MDPO}}
+&=\mathbb E_{d_k,\pi_{k,n}}\left[\left(\frac{U_{k,n}+1}\eta-f\right)\psi_{k,n}\right]\\
+&=\mathbb E_{d_k,\pi_{k,n}}\left[\operatorname{sg}\!\left(\frac{U_{k,n}}\eta-f\right)\psi_{k,n}\right].
+\label{eq:ch2-mdpo-gradient-bridge}
+\end{align}
+第二行使用 $\mathbb E_{\pi_{k,n}}[\psi_{k,n}\mid s]=0$。其下降方向是 $-\nabla_\theta\mathcal L_{\mathrm{MDPO}}$，无需把 $\eta$ 吸收进 optimizer 步长。
+
+\begin{proposition}[平方回归的投影含义]
+\label{prop:ch2-regression-projection}
+若 student 函数类不能表示式 \eqref{eq:ch2-logratio-equation} 的右侧，
+PMD-Part 的精确 inner 解是镜像方程在函数类诱导的 $L_2(d_k\pi_k)$ 几何下的
+投影；若训练样本的历史访问测度改为 $\nu$，投影也相应变为 $L_2(\nu\pi_k)$。
+因此 inner loss 为零只在 target 可表示且训练测度覆盖目标测度时才意味着精确
+mirror 解。
+\end{proposition}
+
+\begin{proof}
+平方损失定义了可行 log-ratio 集合上的最小距离问题。对任意光滑可行曲线的一阶切向扰动 $v$，局部最优残差
+$\mathscr E^\star$ 满足
+\[
+\mathbb E_{\nu,\pi_k}[\mathscr E^\star v]=0.
+\]
+这是残差与可行切空间正交的必要条件。参数化可行集合通常非凸，该条件本身不保证全局最优。若 target 属于该集合，
+投影残差为零；否则残差由函数类和测度共同决定。
+\end{proof}
+
+\section{四种 inner 的统一推导}
+\label{sec:ch2-four-methods}
+
+下面保留各方法特有的归一化、采样校正与更新几何。直接对原始损失反向传播时，student 的全部参数依赖均保留；使用解析 policy-gradient surrogate 时，权重整体停止梯度。
+
+\subsection{PMD-Part：回归完整 Gibbs log-ratio}
+\label{sec:ch2-pmd-part}
+
+PMD-Part 的损失已在式~\eqref{eq:ch2-regression-from-mirror} 定义。
+\begin{equation}
+\mathcal L_{\mathrm{Part}}=\frac12\mathbb E_{d_k,\pi_k}[(R_{k,n}^{\mathrm{Part}})^2],
+\qquad R_{k,n}^{\mathrm{Part}}=U_{k,n}-\eta f+\log Z_f.
+\label{eq:ch2-part-loss}
+\end{equation}
+固定 history 后，anchor 与 target 冻结，逐步求导得到
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{Part}}(s)
+&=\frac12\nabla_\theta\sum_a\pi_k(a\mid s)(R_{k,n}^{\mathrm{Part}}(s,a))^2\\
+&=\sum_a\pi_k(a\mid s)R_{k,n}^{\mathrm{Part}}(s,a)\nabla_\theta U_{k,n}(s,a)\\
+&=\mathbb E_{\pi_k}[R_{k,n}^{\mathrm{Part}}\psi_{k,n}\mid s].
+\label{eq:ch2-part-gradient}
+\end{align}
+梯度下降方向为 $-\mathbb E_{\pi_k}[R_{k,n}^{\mathrm{Part}}\psi_{k,n}\mid s]$。这是固定 anchor 下的 log-ratio regression，不使用 student-to-anchor 的 action-level importance ratio。
+
+若实际 rollout 来自行为测度 $\beta_k$，而目标仍是 $L_2(\pi_k)$ 投影，则每个 sampled 平方损失项乘以冻结权重 $\operatorname{sg}(\pi_k(a\mid s)/\beta_k(a\mid s))$。不加这个权重时，算法仍然有清晰含义，但求解的是 $L_2(\beta_k)$ 投影。
+
+\begin{algorithm}[ht]
+\caption{PMD-Part inner update\\{\small\textit{Semantics: 固定 anchor 下的完整 Gibbs log-ratio 回归}}}
+\begin{algorithmic}[1]
+\Require frozen $\pi_k$, teacher signal $f$, histories $\{s_i\}_{i=1}^B$, $\eta$, step size $\alpha_{k,n}$
+\Ensure updated parameters $\theta_{k,n+1}$
+\For{$i=1,\ldots,B$}
+    \State sample $a_i\sim\pi_k(\cdot\mid s_i)$
+    \State $\log Z_i\gets\operatorname{logsumexp}_{v\in\mathcal V}(\log\pi_k(v\mid s_i)+\eta f(s_i,v))$
+    \State $H_i\gets\eta f(s_i,a_i)-\operatorname{stopgrad}(\log Z_i)$
+    \State $U_i\gets\log\pi_{k,n}(a_i\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_i\mid s_i))$
+    \State $\ell_i\gets\frac12\bigl(U_i-\operatorname{stopgrad}(H_i)\bigr)^2$
+\EndFor
+\State $g_{k,n}\gets\nabla_\theta(B^{-1}\sum_i\ell_i)$
+\State $\theta_{k,n+1}\gets\theta_{k,n}-\alpha_{k,n}g_{k,n}$
+\State \Return $\theta_{k,n+1}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{PMD-Mean：中心化 target 与归一化约束}
+\label{sec:ch2-pmd-mean}
+
+由定义可得
+\[
+\mathbb E_{a\sim\pi_k}[f(s,a)]=\bar f_k(s),
+\qquad
+\mathbb E_{a\sim\pi_k}[\widetilde f_k(s,a)]=0.
+\]
+PMD-Mean 用 $\eta\widetilde f_k$ 作为回归 target，并要求 student log-ratio 满足归一化约束
+\begin{equation}
+\label{eq:ch2-mean-loss}
+\min_{U}\ \frac12\mathbb E_{\pi_k}\left[(U-\eta\widetilde f_k)^2\mid s\right]
+\quad\text{s.t.}\quad
+\mathbb E_{\pi_k}[e^{U}\mid s]=1.
+\end{equation}
+
+\begin{theorem}[PMD-Mean 的逐历史 Lambert-$W$ 投影]
+\label{thm:ch2-mean-lambert}
+在有限词表、$\pi_k(a\mid s)>0$ 且约束可行时，上述仅中心化 reward 的平方回归具有唯一全局最小点，其 KKT 解满足
+\begin{equation}
+\label{eq:ch2-mean-lambert-theorem}
+U_a=G_a-W_0\!\left(\lambda_k(s)e^{G_a}\right),\qquad
+G_a=\eta\widetilde f_k(s,a),
+\end{equation}
+其中 $\lambda_k(s)\geq0$ 由 $\sum_a\pi_k(a\mid s)e^{U_a}=1$ 唯一确定。
+\end{theorem}
+
+\begin{proof}
+以下给出固定历史 $s$ 的 KKT 推导。令词表上的函数值为 $U_a$ 和 $G_a=\eta\widetilde f_k(s,a)$，拉格朗日函数为
+\[
+\mathscr L(U,\lambda_k)
+=\frac12\sum_a\pi_k(a\mid s)(U_a-G_a)^2
++\lambda_k\left(\sum_a\pi_k(a\mid s)e^{U_a}-1\right).
+\]
+一阶条件为
+\[
+U_a-G_a+\lambda_k e^{U_a}=0.
+\]
+令 $V_a=G_a-U_a$，则 $V_a e^{V_a}=\lambda_k e^{G_a}$，所以
+\begin{equation}
+\label{eq:ch2-mean-lambert}
+U_a=G_a-W_0\!\left(\lambda_k e^{G_a}\right),
+\end{equation}
+其中 $\lambda_k$ 由归一化约束唯一确定。为说明唯一性，定义
+\[
+\Phi(\lambda_k)=\sum_a\pi_k(a\mid s)\exp\!\left(G_a-W_0(\lambda_k e^{G_a})\right),\qquad \lambda_k\geq0.
+\]
+由于 $\mathbb E_{\pi_k}[G\mid s]=0$，Jensen 不等式给出
+$\Phi(0)=\mathbb E_{\pi_k}[e^G\mid s]\ge1$。Lambert--$W$ 的主分支在非负轴上严格递增，所以 $\Phi$ 连续且严格递减，且 $\Phi(\lambda_k)\to0$ 当 $\lambda_k\to\infty$。因此归一化方程有唯一非负根；非恒定 $G$ 对应严格正根，$G\equiv0$ 时根为零。
+
+对于该根 $\lambda_k\ge0$，拉格朗日函数的 Hessian 是
+\[
+\nabla_U^2\mathscr L
+=\operatorname{diag}\!\left(\pi_k(a\mid s)(1+\lambda_k e^{U_a})\right)\succ0.
+\]
+因此构造出的 $U$ 唯一最小化这个拉格朗日函数。所有满足归一化约束的 $U$ 都有 $\mathscr L(U,\lambda_k)=\mathcal L_{\mathrm{Mean}}(U)$，构造的最小点又满足约束，故它是原受约束问题的唯一全局最小点。这一论证不要求指数归一化等式的可行集是凸集。
+\end{proof}
+
+policy 归一化 $\sum_a\pi_{k,n}(a\mid s)=1$ 正是 log-ratio 坐标中的指数归一化条件。Lambert-$W$ 解对应
+\[
+\pi_k^{\star,\mathrm{Mean}}(a\mid s)
+=\pi_k(a\mid s)\exp\!\left(G_k(s,a)-W_0(\lambda_k(s)e^{G_k(s,a)})\right).
+\]
+精确 Gibbs 解的 log-ratio 则为
+\[
+U_a^{\mathrm{Gibbs}}=G_a-\log\mathbb E_{\pi_k}[e^G\mid s].
+\]
+将其代入 PMD-Mean 的 KKT 条件，要求
+\[
+-\log\mathbb E_{\pi_k}[e^G\mid s]
++\lambda_k\frac{e^{G_a}}{\mathbb E_{\pi_k}[e^G\mid s]}=0
+\]
+对所有 action 同时成立。非恒定 $G$ 时第一个量严格为负，第二个量随 action 改变，因此不存在满足所有方程的单一 $\lambda_k$。PMD-Mean 使用 action-dependent 的 Lambert-$W$ 修正，Gibbs 使用 action-independent 的 log-partition 修正；二者仅在信号恒定时重合。
+
+本节损失的乘子 $\lambda_k$ 对应原论文乘子除以 $\tau^2$，其中 $\tau=1/\eta$。对 KKT 条件按 anchor 求均值，由 $\mathbb E_{\pi_k}[G]=0$ 和 $\mathbb E_{\pi_k}[e^U]=1$ 得到
+\[
+\lambda_k=-\mathbb E_{\pi_k}[U]
+=\operatorname{KL}(\pi_k\Vert\pi_k^{\star,\mathrm{Mean}}).
+\]
+固定这个由解确定的 $\lambda_k$，同一分布也唯一最大化
+\begin{equation}
+\mathbb E_p[f]-\frac1\eta\operatorname{KL}(p\Vert\pi_k)
+-\frac{\lambda_k}{2\eta}\chi^2(p\Vert\pi_k),
+\qquad
+\chi^2(p\Vert\pi_k)=\mathbb E_{\pi_k}\left[\left(\frac p{\pi_k}-1\right)^2\right].
+\label{eq:ch2-mean-mixed-objective}
+\end{equation}
+为验证这一等价，令 $\xi$ 为概率归一化乘子。混合目标的逐 action 一阶条件为
+\[
+f_a-\frac1\eta(U_a+1)-\frac{\lambda_k}{\eta}(e^{U_a}-1)+\xi=0.
+\]
+在 PMD-Mean 解处有 $U_a+\lambda_k e^{U_a}=\eta(f_a-\bar f_k)$；取
+$\xi=(1-\lambda_k)/\eta-\bar f_k$ 即满足上式。混合目标中的负 KL 严格凹，负 $\chi^2$ 凹，因此这个驻点是唯一全局最大点。这里的等价指总体最优分布相同，不表示两个训练目标在任意参数点上的梯度相同。
+
+实际样本只需估计冻结的 reward center。给定同一 history 的 $m\ge2$ 个独立 anchor actions，使用 leave-one-out 均值
+\[
+\widehat{\bar f}_{-j}=\frac1{m-1}\sum_{\ell\ne j}f(s,a_\ell).
+\]
+student log-ratio $U_{k,n}(s,a_j)$ 保持原值，不计算或减去 $\bar U_{k,n}$。因为该 center 不依赖 student，leave-one-out reward center 的有限样本平方损失与总体损失只相差一个参数无关的条件方差项，其梯度无偏。
+若 $m=1$，需要外部同 prefix 的 reward center；使用不准确的冻结 baseline 会改变回归目标，必须单独记录该误差。
+
+\begin{algorithm}[ht]
+\caption{PMD-Mean inner update\\{\small\textit{Semantics: 中心化 target 在指数归一化集合上的投影}}}
+\begin{algorithmic}[1]
+\Require frozen $\pi_k$, signal $f$, histories $\{s_i\}_{i=1}^{B}$, $m\ge2$, $\eta$, step size $\alpha_{k,n}$
+\Ensure updated parameters $\theta_{k,n+1}$
+\For{each history $s_i$}
+    \For{$j=1,\ldots,m$}
+        \State sample $a_{ij}\sim\pi_k(\cdot\mid s_i)$
+        \State $U_{ij}\gets\log\pi_{k,n}(a_{ij}\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_{ij}\mid s_i))$
+        \State $F_{ij}\gets f(s_i,a_{ij})$
+    \EndFor
+    \For{$j=1,\ldots,m$}
+        \State $\bar F_{-j}\gets(m-1)^{-1}\sum_{\ell\ne j}F_{i\ell}$
+        \State $\ell_{ij}\gets\frac12[U_{ij}-\eta\operatorname{stopgrad}(F_{ij}-\bar F_{-j})]^2$
+    \EndFor
+\EndFor
+\State $g_{k,n}\gets\nabla_\theta[(Bm)^{-1}\sum_{i,j}\ell_{ij}]$
+\State $\theta_{k,n+1}\gets\theta_{k,n}-\alpha_{k,n}g_{k,n}$
+\State \Return $\theta_{k,n+1}$
+\end{algorithmic}
+\end{algorithm}
+
+
+\subsection{BPO：中心化最优性 residual}
+\label{sec:ch2-bpo}
+
+BPO 的 residual、损失和梯度分别见式~\eqref{eq:ch2-bpo-expanded}、\eqref{eq:ch2-bpo-loss-bridge}、\eqref{eq:ch2-bpo-gradient-bridge}。为后续引用，同一对象记为
+\begin{equation}
+R_{k,n}^{\mathrm{BPO}}=U_{k,n}-G_k+\mathcal K_{k,n}^{S},\qquad
+\mathcal L_{\mathrm{BPO}}=\frac1{2\eta}\mathbb E_{d_k,\pi_k}[(R_{k,n}^{\mathrm{BPO}})^2].
+\label{eq:ch2-bpo-residual}
+\end{equation}
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}
+=\frac1\eta\mathbb E_{d_k,\pi_k}[R_{k,n}^{\mathrm{BPO}}(\psi_{k,n}-\bar\psi_{k,n})].
+\label{eq:ch2-bpo-gradient}
+\end{equation}
+centered score 来自 student center 的导数。令 $z(s,a)=U_{k,n}(s,a)-\eta f(s,a)$，用一个主 action $a_i$ 和 $m$ 个独立辅助 actions $b_{i\ell}$ 估计 center，则
+\[
+\mathbb E\left[\left(z(s,a_i)-\frac1m\sum_{\ell=1}^m z(s,b_{i\ell})\right)^2\right]
+=\left(1+\frac1m\right)\operatorname{Var}_{\pi_k}(z\mid s).
+\]
+因此 sampled 平方损失需乘 $m/(m+1)$，其 autograd 梯度才无偏。若同 prefix 共有 $m\ge2$ 个 actions，leave-one-out center 使用其余 $m-1$ 个样本，对应系数为 $(m-1)/m$。独立性本身不能消除 residual 与 center 导数乘积中的协方差。
+
+\begin{algorithm}[ht]
+\caption{BPO inner update\\{\small\textit{Semantics: 固定 anchor 下对正向中心化残差求平方损失}}}
+\begin{algorithmic}[1]
+\Require frozen $\pi_k$, signal $f$, histories $\{s_i\}_{i=1}^{B}$, auxiliary count $m\ge1$, $\eta$, step size $\alpha_{k,n}$
+\Ensure updated parameters $\theta_{k,n+1}$
+\For{each history $s_i$}
+    \State sample $a_i\sim\pi_k(\cdot\mid s_i)$ and $b_{i1},\ldots,b_{im}\sim\pi_k(\cdot\mid s_i)$ independently
+    \State $z_i\gets U_{k,n}(s_i,a_i)-\eta f(s_i,a_i)$
+    \State $\bar z_i\gets m^{-1}\sum_{\ell=1}^{m}[U_{k,n}(s_i,b_{i\ell})-\eta f(s_i,b_{i\ell})]$
+    \State $\widehat R_i^{\mathrm{BPO}}\gets z_i-\bar z_i$, $\ell_i\gets\frac{m}{m+1}\frac{(\widehat R_i^{\mathrm{BPO}})^2}{2\eta}$
+\EndFor
+\State $g_{k,n}\gets\nabla_\theta(B^{-1}\sum_i\ell_i)$
+\State $\theta_{k,n+1}\gets\theta_{k,n}-\alpha_{k,n}g_{k,n}$
+\State \Return $\theta_{k,n+1}$
+\end{algorithmic}
+\end{algorithm}
+
+若从行为测度 $\beta$ 采样，不能先把 $z$ 乘以 importance weight 再平方；这会把二阶矩的权重变成平方。可用两个独立样本 $a,b\sim\beta(\cdot\mid s)$，令 $w(v)=\operatorname{sg}(\pi_k(v\mid s)/\beta(v\mid s))$，使用
+\[
+\widehat{\mathcal L}_{\mathrm{BPO}}(s)
+=\frac{w(a)w(b)}{4\eta}[z(a)-z(b)]^2.
+\]
+因为 $\mathbb E_{a,b\sim\pi_k}[(z(a)-z(b))^2]=2\operatorname{Var}_{\pi_k}(z)$，上述估计器的期望恰为原始 BPO 损失，且固定权重下 autograd 给出无偏梯度。
+
+\subsection{MDPO：直接优化 mirror objective}
+\label{sec:ch2-mdpo-generic}
+
+MDPO 的损失见式~\eqref{eq:ch2-mdpo-objective-bridge}。完整词表计算
+\begin{equation}
+\operatorname{KL}(\pi_{k,n}\Vert\pi_k)
+=\sum_a\pi_{k,n}(a\mid s)U_{k,n}(s,a).
+\label{eq:ch2-mdpo-full-kl}
+\end{equation}
+若从 anchor 采样，用显式指数权重改写 student 期望：
+\begin{equation}
+\mathcal L_{\mathrm{MDPO}}(s)
+=\mathbb E_{\pi_k}\left[e^{U_{k,n}}\left(\frac{U_{k,n}}\eta-f\right)\mid s\right].
+\label{eq:ch2-mdpo-sample-integrand}
+\end{equation}
+原损失中的指数权重保留梯度；解析求导后的 policy-gradient 权重整体冻结，得到
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{MDPO}}(s)
+=\mathbb E_{\pi_k}\left[\operatorname{sg}\!\left(e^{U_{k,n}}\left(\frac{U_{k,n}}\eta-f\right)\right)\psi_{k,n}\mid s\right].
+\label{eq:ch2-mdpo-generic-gradient}
+\end{equation}
+额外的 $\eta^{-1}$ score 项在完整求和时由 $\mathbb E_{\pi_{k,n}}[\psi_{k,n}]=0$ 抵消。
+
+自然梯度只改变更新几何。令 $h_{k,n}=\nabla_\theta\mathcal L_{\mathrm{MDPO}}$，Fisher 信息矩阵为
+\[
+F_{k,n}=\mathbb E_{d_k,\pi_{k,n}}[\psi_{k,n}(s,a)\psi_{k,n}(s,a)^\top].
+\]
+anchor 采样时用 $\operatorname{sg}(e^{U_{k,n}})$ 校正测度。tabular categorical logits 的 Fisher 零空间为常数方向，故用伪逆 $F_{k,n}^{\dagger}$；神经网络参数化中用阻尼 $\gamma>0$ 或 KL trust region。自然步长与镜像系数 $\eta$ 分别控制数值更新和总体 target。
+
+\begin{algorithm}[ht]
+\caption{MDPO natural-gradient inner update\\{\small\textit{Semantics: 最小化固定 history 的负 mirror objective}}}
+\begin{algorithmic}[1]
+\Require frozen $\pi_k$, signal $f$, histories $\{s_i\}_{i=1}^{B}$, $\eta$, natural step $\alpha_{k,n}$, damping $\gamma\ge0$
+\Ensure updated parameters $\theta_{k,n+1}$
+\For{each history $s_i$}
+    \State sample $a_i\sim\pi_k(\cdot\mid s_i)$
+    \State $U_i\gets U_{k,n}(s_i,a_i)$, $w_i\gets e^{U_i}$
+    \State $\ell_i\gets w_i(U_i/\eta-f(s_i,a_i))$ \Comment{retain the student derivative of $w_i$}
+    \State $g_i^{\mathrm{score}}\gets\nabla_\theta\log\pi_{k,n}(a_i\mid s_i)$
+\EndFor
+\State $g_{k,n}\gets\nabla_\theta(B^{-1}\sum_i\ell_i)$
+\State $F\gets B^{-1}\sum_i\operatorname{stopgrad}(w_i)g_i^{\mathrm{score}}(g_i^{\mathrm{score}})^\top$
+\State $\theta_{k,n+1}\gets\theta_{k,n}-\alpha_{k,n}(F+\gamma I)^\dagger g_{k,n}$
+\State \Return $\theta_{k,n+1}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}[Gibbs 解与 PMD-Mean 的 Lambert-$W$ 解]
+\label{thm:ch2-inner-common-root}
+在 tabular policy、完整 action 支持和精确词表期望下，PMD-Part、未线性化 BPO 和 MDPO 的总体最优解是式~\eqref{eq:ch2-optimal-policy} 的 Gibbs 分布。PMD-Mean 的总体最优解是定理~\ref{thm:ch2-mean-lambert} 的 Lambert-$W$ 分布；非恒定信号下与 Gibbs 分布不同。参数化 student 或有限样本还会引入函数类投影、采样及优化误差。
+\end{theorem}
+
+\begin{proof}
+PMD-Part 在零损失处满足 $U_{k,n}=\eta f-\log Z_f$，得到 Gibbs 分布。BPO 的零 residual 只要求 $U_{k,n}=\eta f-C(s)$；代入 $\mathbb E_{\pi_k}[e^{U_{k,n}}]=1$ 得 $C(s)=\log Z_f(s)$。MDPO 的负 mirror 损失由式~\eqref{eq:ch2-kl-decomp} 得到唯一最小点。PMD-Mean 的受约束全局最小点及与 Gibbs 解的分离已在定理~\ref{thm:ch2-mean-lambert} 后证明。
+\end{proof}
+
+\begin{proposition}[PMD-Mean 与 BPO 的损失和梯度差异]
+\label{prop:ch2-mean-bpo-gap}
+固定历史 $s$，两个 residual 满足 $R_{k,n}^{\mathrm{Mean}}=R_{k,n}^{\mathrm{BPO}}-\mathcal K_{k,n}^{S}$，因此
+\begin{align}
+\mathcal L_{\mathrm{Mean}}(s)&=\eta\mathcal L_{\mathrm{BPO}}(s)+\frac12(\mathcal K_{k,n}^{S}(s))^2,\\
+\nabla_\theta\mathcal L_{\mathrm{Mean}}(s)&=\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)+\mathcal K_{k,n}^{S}(s)\nabla_\theta\mathcal K_{k,n}^{S}(s).
+\label{eq:ch2-mean-bpo-gap}
+\end{align}
+\end{proposition}
+\begin{proof}
+$\mathbb E_{\pi_k}[R_{k,n}^{\mathrm{BPO}}\mid s]=0$，平方展开得
+\[
+\frac12\mathbb E_{\pi_k}[(R_{k,n}^{\mathrm{BPO}}-\mathcal K_{k,n}^{S})^2\mid s]
+=\frac12\mathbb E_{\pi_k}[(R_{k,n}^{\mathrm{BPO}})^2\mid s]+\frac12(\mathcal K_{k,n}^{S})^2.
+\]
+再使用损失定义并求导。下降方向的同尺度关系为
+\[
+-\nabla_\theta\mathcal L_{\mathrm{Mean}}
+=-\eta\nabla_\theta\mathcal L_{\mathrm{BPO}}+\mathcal K_{k,n}^{S}\bar\psi_{k,n}.
+\]
+初始化 $\pi_{k,0}=\pi_k$ 时 $\mathcal K_{k,0}^{S}=0$，两者同尺度方向一致；离开 anchor 后差异通常保留。tabular softmax logits 中 $\bar\psi_{k,n}=\pi_k-\pi_{k,n}$，额外下降方向是 $\mathcal K_{k,n}^{S}(\pi_k-\pi_{k,n})$。
+\end{proof}
+
+\begin{proposition}[未线性化 BPO 与 PMD-Part 的梯度差异]
+\label{prop:ch2-bpo-part-gradient-gap}
+固定历史 $s$，定义
+\begin{equation}
+C_{k,n}(s)\coloneqq\log Z_f(s)-\eta\bar f_k(s)-\mathcal K_{k,n}^{S}(s).
+\label{eq:ch2-bpo-part-qc}
+\end{equation}
+则 $R_{k,n}^{\mathrm{BPO}}=R_{k,n}^{\mathrm{Part}}-C_{k,n}$，且
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+=\frac1\eta\nabla_\theta\mathcal L_{\mathrm{Part}}(s)
+-\frac{C_{k,n}(s)}\eta\bar\psi_{k,n}(s).
+\label{eq:ch2-bpo-part-gradient-gap}
+\end{equation}
+\end{proposition}
+\begin{proof}
+逐项展开中心化残差：
+\begin{align*}
+R_{k,n}^{\mathrm{BPO}}
+&=U_{k,n}-\eta f-\mathbb E_{\pi_k}[U_{k,n}-\eta f\mid s]\\
+&=U_{k,n}-\eta f+\log Z_f
+-\left(\log Z_f+\mathbb E_{\pi_k}[U_{k,n}\mid s]-\eta\bar f_k\right)\\
+&=R_{k,n}^{\mathrm{Part}}-C_{k,n}.
+\end{align*}
+这里必须保留 $-\eta\bar f_k$，因为一般 OPD 信号的 anchor 均值不为零。由 BPO residual 均值为零，
+\begin{align*}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+&=\frac1\eta\mathbb E_{\pi_k}[R_{k,n}^{\mathrm{BPO}}(\psi_{k,n}-\bar\psi_{k,n})\mid s]\\
+&=\frac1\eta\mathbb E_{\pi_k}[(R_{k,n}^{\mathrm{Part}}-C_{k,n})\psi_{k,n}\mid s]\\
+&=\frac1\eta\nabla_\theta\mathcal L_{\mathrm{Part}}(s)-\frac{C_{k,n}}\eta\bar\psi_{k,n}.
+\end{align*}
+在 Gibbs 解处 $R_{k,n}^{\mathrm{Part}}=0$，其 anchor 均值也为零，因此 $C_{k,n}=0$，两种梯度同时为零。一般参数点只有 $C_{k,n}\bar\psi_{k,n}=0$ 时才具有相同的同尺度方向。
+\end{proof}
+
+PMD-Part 回归完整镜像方程，BPO 消去 action-independent 常数再回归中心化方程。二者总体最优分布相同，而 residual、积分后的梯度和有限步轨迹不同。
+
+\input{chapters/02_opd_instantiation}

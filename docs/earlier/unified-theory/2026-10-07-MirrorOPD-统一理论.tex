@@ -1,0 +1,58 @@
+% !TeX program = xelatex
+% 编译：xelatex 2026-10-07-MirrorOPD-统一理论.tex（必要时重复两次）
+\documentclass[lang=cn,scheme=chinese,thmcnt=chapter,device=normal]{elegantbook}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\osc}{\operatorname{osc}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\dd}{\mathrm{d}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\softmax}{softmax}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\tightlist}{}
+\hypersetup{pdftitle={MirrorOPD 统一理论：镜像下降、同步与 EMA 动力学}}
+\setcounter{tocdepth}{1}
+
+\addbibresource{references.bib}
+\begin{document}
+\frontmatter
+\begin{titlepage}
+\vspace*{0.18\textheight}
+\begin{center}
+{\bfseries\Huge MirrorOPD 统一理论}\par\vspace{1ex}
+{\Large 镜像下降与策略蒸馏的动力学}\par\vspace{3ex}
+{\large Natural-GD、外层同步、EMA 锚点与 TOP-D}\par\vspace{6ex}
+{\large 2026 年 10 月 7 日}
+\end{center}
+\end{titlepage}
+\tableofcontents
+\mainmatter
+\input{chapters/2026-10-07-问题与统一框架}
+\input{chapters/2026-10-07-镜像下降与自然梯度}
+\input{chapters/2026-10-07-OPD 目标与访问测度}
+\input{chapters/2026-10-07-外层同步与步长设计}
+\input{chapters/2026-10-07-四种 inner 统一动力学}
+\input{chapters/2026-10-07-EMA 锚点动力学}
+\input{chapters/2026-10-07-TOP-D 与 PMD-mean 及 vanilla-OPD}
+\input{chapters/2026-10-07-方差与性能保证}
+\input{chapters/2026-10-07-算法与实验设计}
+\input{chapters/2026-10-07-文献关系与贡献边界}
+\printbibliography[heading=bibintoc,title={参考文献}]
+\end{document}

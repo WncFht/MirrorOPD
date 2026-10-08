@@ -1,0 +1,12 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "split": "test",
+  "n_examples": 128,
+  "temperature": 1.0,
+  "top_p": 1.0,
+  "max_new_tokens": 256,
+  "device": "cuda",
+  "dtype": "torch.bfloat16",
+  "n_prefixes": 27531,
+  "definition": "M_K is the probability mass of the exact top-K tokens of the temperature-scaled sampling distribution at each generated prefix."
+}

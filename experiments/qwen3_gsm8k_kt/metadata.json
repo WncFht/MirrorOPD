@@ -1,0 +1,9 @@
+{
+  "student": "Qwen/Qwen3-1.7B",
+  "teacher": "Qwen/Qwen3-4B",
+  "rollouts": "/home/fanghaotian/src/md-opd-work/runs/qwen3_gsm8k_student_t1/rollouts.jsonl",
+  "n_examples": 1319,
+  "n_prefixes": 350166,
+  "quantization": "4bit",
+  "definition": "K_k^T(s)=KL(pi_k(.|s)||pi_T(.|s)), exact full-vocabulary value on NF4-scored models"
+}

@@ -1,0 +1,36 @@
+\documentclass[lang=cn,scheme=chinese,openany]{elegantbook}
+\usepackage{amsmath,amssymb,mathtools,bm,booktabs,algorithm,algpseudocode,graphicx,hyperref}
+\usepackage{cleveref}
+\newcommand{\E}{\mathbb E}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\sg}{\operatorname{stopgrad}}
+\newcommand{\tail}{\mathrm{tail}}
+\newcommand{\R}{\mathbb R}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{固定测度下的 Token 级 MirrorOPD}
+\author{MirrorOPD Research Notes}
+\date{2026 年 10 月 8 日}
+\begin{document}
+\maketitle
+\frontmatter
+\tableofcontents
+\mainmatter
+\input{chapters/01_problem_and_exact_solution}
+\input{chapters/02_four_inner_algorithms}
+\input{chapters/03_kl_estimators_and_variance}
+\input{chapters/04_outer_dynamics_and_finite_inner}
+\input{chapters/05_toy_experiment}
+\backmatter
+\chapter*{参考资料}
+\begingroup\raggedright
+PMD-Mean 的 reward 中心化目标与 Lambert-$W$ 解依据
+\path{../pmd-theory/2602.05933_zh_CN/main_arxiv.tex} 中的
+$\mathcal L_{\mathrm{mean}}$ 定义与附录约束优化推导。
+本文 KL 估计量的记号与 K3$^{++}$、K4、K5、Top-$J$ 估计量来自
+\path{../pmd-theory/2602.04417_zh_CN/example_paper.tex}；One-Shot-OPD 的实现审计见
+\path{../pmd-theory/MirrorOPD/source_audit/One-Shot-OPD/}。
+\par\endgroup
+\end{document}

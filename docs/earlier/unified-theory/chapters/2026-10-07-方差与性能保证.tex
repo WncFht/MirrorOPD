@@ -1,0 +1,177 @@
+\chapter{从局部几何到方差与性能保证}
+\label{chap:guarantees}
+
+\section{projective 距离如何约束 KL}
+\begin{lemma}[从振幅到概率距离]\label{lem:proj-kl}
+令 $D=d_{\mathrm{proj}}(p,q)$。则每个动作满足
+$|\log(p(a)/q(a))|\le D$，且
+\[
+ \KL(p\Vert q)\le D,\qquad \KL(q\Vert p)\le D,\qquad
+ \TV(p,q)\le\frac12(e^D-1).
+\]
+\end{lemma}
+\begin{proof}
+设 $u_a=\log(p(a)/q(a))$。由 $\sum_a q(a)e^{u_a}=1$，
+$\min_a u_a\le0\le\max_a u_a$。于是区间长度 $D$ 控制所有 $|u_a|$。
+对 $p$ 或 $q$ 求期望给出两条 KL 上界。
+又
+\[
+ 2\TV(p,q)=\sum_a q(a)|e^{u_a}-1|
+ \le\max\{e^D-1,1-e^{-D}\}=e^D-1.
+\]
+\end{proof}
+该引理把 outer 振幅递推转成 KL 和概率误差，但其方向不能随意反转。
+一个很稀有动作上的巨大 log-ratio 可只有很小的平均 KL，
+故平均 target KL 不能自动替代最大 projective residual。
+
+\section{访问误差对回归目标的影响}
+\begin{theorem}[固定 prefix 测度替换误差]
+对有界 integrand $|\ell(s)|\le B$，若 $\nu,\widetilde\nu$ 为概率分布，则
+\[
+ |\E_\nu\ell-\E_{\widetilde\nu}\ell|\le2B\TV(\nu,\widetilde\nu).
+\]
+若 $\nu\ll\widetilde\nu$ 且 $w=\dd\nu/\dd\widetilde\nu$，
+\[
+ \E_{\widetilde\nu}[w\ell]=\E_\nu\ell.
+\]
+若 $w\le C$，则 $\E_{\widetilde\nu}[(w\ell)^2]\le C\E_\nu[\ell^2]$。
+\end{theorem}
+\begin{proof}
+第一式由
+$|\sum_s(\nu(s)-\widetilde\nu(s))\ell(s)|
+ \le B\sum_s|\nu(s)-\widetilde\nu(s)|$。
+第二式按 Radon--Nikodym 定义变换积分。
+第三式逐点使用 $w^2\le Cw$，然后应用第二式。
+\end{proof}
+这给出 replay 的完整账目：丢掉 $w$ 有测度偏差，保留 $w$ 有二阶矩代价，
+没有 support 则 $w$ 不存在。采用历史 ratio 或短窗口，需按目标 integrand
+证明其校正语义；不存在一个统一的“无 IS 因而无偏”定理。
+
+\section{OPD 的条件方差界}
+对随机向量采用 $\Var(g)=\E\|g-\E g\|_2^2$。
+\begin{theorem}[支持下界与 raw OPD 方差]\label{thm:floor}
+假设对全部被训练 prefix 和动作，
+$T(a\mid s),b(a\mid s)\ge p_{\min}>0$，
+且 $\|\nabla_\theta\log\pi_\theta(a\mid s)\|\le M$。
+令
+\[
+ g=\nabla_\theta\log\pi_\theta(a\mid s)\log\frac{T(a\mid s)}{b(a\mid s)}.
+\]
+无论 action 使用哪个概率分布采样，都有
+\[
+ \Var(g)\le M^2\log^2(1/p_{\min}).
+\]
+若信号乘 $\eta$，右端相应乘 $\eta^2$。
+\end{theorem}
+\begin{proof}
+由 $p_{\min}\le T,b\le1$，
+\[
+ p_{\min}\le T/b\le1/p_{\min},
+ \quad|\log(T/b)|\le\log(1/p_{\min}).
+\]
+逐样本 $\|g\|^2$ 因而不超过右端。
+恒等式
+$\Var(g)=\E\|g\|^2-\|\E g\|^2\le\E\|g\|^2$ 完成证明。
+\end{proof}
+
+固定有限词表且 teacher 有统一正下界时，对 on-policy
+$\log(T/\pi)$ 还可利用 $\sum_a\pi(a)\log^2\pi(a)$ 的有限上界，
+不必强制 student floor；上一定理是更容易诊断的充分条件，
+不是所有有限方差的必要条件。
+跨 prefix 的 teacher log-prob 没有统一下界、response return 很长、
+或 score 不受控时，则没有跨问题的统一 raw OPD 常数。
+$\eta$ 降低信号幅度，并不独自修复这些 support 与尾部问题。
+
+\section{有限 horizon 下的性能差}
+固定 MDP reward $r$，horizon 不超过 $H$，终止后进入零奖励吸收状态。
+令 $V^\pi_t,Q^\pi_t,A^\pi_t$ 含时间索引，状态中可显式包含 $t$。
+定义 $J_r(\pi)=\E_\pi\sum_{t=1}^{H}r_t$。
+
+\begin{lemma}[有限 horizon performance difference]\label{lem:pdl}
+\[
+ J_r(p)-J_r(b)=\sum_{t=1}^{H}
+       \E_{s_t\sim d_t^p,a_t\sim p}[A^b_t(s_t,a_t)].
+\]
+\end{lemma}
+\begin{proof}
+Bellman 方程给出
+$A^b_t(s,a)=r_t(s,a)+\E[V^b_{t+1}(s')\mid s,a]-V^b_t(s)$。
+沿 $p$ 轨迹求和并用塔式期望，
+\[
+ \E_p\sum_t A^b_t
+ =\E_p\sum_t r_t+\E_p[V^b_{H+1}(s_{H+1})-V^b_1(s_1)].
+\]
+末端价值为零，prompt 初始分布对所有策略相同，
+初始价值期望为 $J_r(b)$，得到结论。
+\end{proof}
+
+\begin{theorem}[固定 reward 的 surrogate 下界]\label{thm:finite-performance}
+定义
+\[
+ f_t(s)=\E_{a\sim p}A^b_t(s,a),\quad
+ \xi=\max_{t,s}|f_t(s)|,\quad
+ \zeta_b(p)=J_r(b)+\sum_t\E_{d_t^b}f_t.
+\]
+则
+\[
+ J_r(p)\ge\zeta_b(p)-2H
+       \sum_{i=1}^{H}\E_{s_i\sim d_i^b}
+            [\,\xi\,\TV(p(\cdot\mid s_i),b(\cdot\mid s_i))\,].
+\]
+未归一化 occupancy 总质量为 $\ell_b$ 时，可写成
+$2H\xi\ell_b\E_{d^b/\ell_b}\TV(p,b)$。
+\end{theorem}
+\begin{proof}
+由引理加减行为 occupancy 的优势期望，
+\[
+ |J_r(p)-\zeta_b(p)|
+ \le\xi\sum_{t=1}^{H}\|d_t^p-d_t^b\|_1.
+\]
+为了界定第 $t$ 步差异，构造混合轨迹：第一个使用全部 $p$，
+随后逐个把前 $i$ 个 action policy 换为 $b$。
+相邻两条轨迹在第 $i$ 步之前均使用 $b$，所以该步状态分布为 $d_i^b$；
+第 $i$ 步后两者使用相同 $p$ kernel。
+Markov kernel 对 $L^1$ 不扩张，故相邻轨迹的第 $t$ 步状态差
+至多为 $2\E_{d_i^b}\TV(p,b)$。对 $i<t$ 望远镜求和，
+\[
+ \|d_t^p-d_t^b\|_1\le2\sum_{i=1}^{t-1}\E_{d_i^b}\TV(p,b).
+\]
+再交换 $t,i$ 次序，
+\[
+ \sum_t\|d_t^p-d_t^b\|_1
+ \le2\sum_{i=1}^{H-1}(H-i)\E_{d_i^b}\TV(p,b)
+ \le2H\sum_i\E_{d_i^b}\TV(p,b).
+\]
+代回并取下界。可变长度用终止吸收状态处理，
+吸收后的 action 分布相同，故 TV 为零，最终 occupancy 可限制在活跃 prefix。
+\end{proof}
+
+\section{teacher 几何与真实性能的桥梁}
+固定 outer reward $r_k=\log T-\log b$ 时，上述定理适用于 $J_{r_k}$，
+但它和环境 reward $R$ 一般不同。
+在每个 prefix 的 Gibbs 解只能保证其自身局部 surrogate：
+\[
+ \langle G_\eta(b)-b,r_k\rangle
+ \ge\eta^{-1}\KL(G_\eta(b)\Vert b)\ge0.
+\]
+该式由将最优解目标与候选 $b$ 的目标值（其近端 KL 为零）比较得到，
+并不证明 $J_R$ 增加。
+
+若真实优势满足
+$A_R^b(s,a)=c\,r_k(s,a)+u(s)+e(s,a)$，$c>0$，
+且 $|e(s,a)|\le\epsilon_A$，
+对两个 action 分布 $p,b$ 作差消去 $u(s)$ 后
+\[
+ \E_p A_R^b-\E_b A_R^b
+ \ge c\langle p-b,r_k\rangle-2\epsilon_A\TV(p,b).
+\]
+这里 $\E_b A_R^b=0$。因此要从 teacher 信号推出真实性能，
+必须把这个误差、projection 误差与 occupancy 罚项同时放进下界。
+
+若 $T=b e^{\lambda A_R^b}/Z$，
+则 $r_k=\lambda A_R^b-\log Z$，差分中常数消失。
+这是可以严格桥接的特殊情况；任意教师能力强于学生不构成此假设。
+例如一个动作真实奖励为一、另一个为零，而 teacher 对后者概率更高，
+student 向 teacher 收缩的同时真实回报下降。
+几何收敛和真实任务性能必须分别报告。
+

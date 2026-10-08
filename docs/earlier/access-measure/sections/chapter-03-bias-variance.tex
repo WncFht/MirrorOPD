@@ -1,0 +1,169 @@
+\chapter{梯度的偏差与方差}
+\label{ch:bias-variance}
+
+\section{估计对象必须先固定}
+
+\begin{definition}[三类需要区分的梯度对象]
+\label{def:ch3-gradient-objects}
+固定历史 $s$，令 $g(a)=\nabla_\theta\log\cand_\theta(a\mid s)$、$u(a)=\log(\cand_\theta(a\mid s)/\beh(a\mid s))$，并令 $\rho(a)=e^{u(a)}$。本章区分：
+\begin{enumerate}[label=(\roman*)]
+    \item 直接 KL 镜像目标的梯度 $\nabla F_s$；
+    \item 行为测度下回归损失的梯度 $-\nabla\mathcal L_{\rm Part}$；
+    \item BPO 的逐历史残差损失梯度。
+\end{enumerate}
+这三个量分别对应不同的 population objective，不能仅因它们都使用 token score 就视作同一估计对象。
+\end{definition}
+
+三者在精确镜像解处共享零点，但只有第一个是 $F_s$ 的梯度。偏差必须相对于明确的目标定义；把行为测度下的回归梯度称为 ``无偏 off-policy policy gradient'' 会混淆两个目标。
+
+\section{MDPO：无偏但承担 action-ratio 的二阶矩}
+
+令 $c(a)=f(s,a)-\frac1\eta u(a)$。MDPO 的单样本估计量为
+\begin{equation}
+\widehat G_{\rm MDPO}=\rho(a)c(a)g(a),\qquad a\sim\beh(\cdot\mid s),
+\end{equation}
+并且在 $\cand\ll\beh$、$\E_\beh[\rho\lVert cg\rVert]<\infty$ 时
+\begin{equation}
+\E_\beh[\widehat G_{\rm MDPO}]=\E_\cand[cg]=\nabla F_s.
+\end{equation}
+因此 action-level IS 本身不产生偏差；若 prefix 来自 $d_\beh$ 而目标要求 $d_\cand$，还必须乘 $W_{<t}=d_\cand(s_t)/d_\beh(s_t)$。这两个密度比修正的是不同测度。
+
+\begin{theorem}[MDPO 梯度的精确偏差--方差分解]
+\label{thm:mdpo-exact-mse}
+设 $G=\E_\beh[\rho cg]$，批量大小为 $n$，并假设 $\E_\beh[\rho^2c^2\lVert g\rVert^2]<\infty$。则样本均值 $\widehat G_n$ 满足
+\begin{align}
+\operatorname{Bias}(\widehat G_n)&=0,\\
+\E\lVert\widehat G_n-G\rVert^2
+&=\frac1n\left(\E_\beh[\rho^2c^2\lVert g\rVert^2]-\lVert G\rVert^2\right).
+\end{align}
+若 $\lVert g\rVert\leq B_g$、$|c|\leq B_c$，则
+\begin{equation}
+\operatorname{tr}\operatorname{Cov}(\widehat G_n)
+\leq\frac{B_g^2B_c^2}{n}(1+\chi^2(\cand\Vert\beh)).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+令
+\[
+X_i=\rho(a_i)c(a_i)g(a_i),
+\qquad a_i\stackrel{\mathrm{i.i.d.}}{\sim}\beh,
+\qquad \widehat G_n=\frac1n\sum_{i=1}^nX_i.
+\]
+由 support 条件，$\rho=\cand/\beh$ 在 $\beh$-几乎处处有定义。换测度恒等式给出
+\begin{align*}
+\E_\beh[X_i]
+&=\sum_a\beh(a)\frac{\cand(a)}{\beh(a)}c(a)g(a)\\
+&=\sum_a\cand(a)c(a)g(a)=\E_\cand[cg]=G.
+\end{align*}
+因此
+$\E[\widehat G_n]=n^{-1}\sum_i\E[X_i]=G$，样本均值的偏差严格为零。
+再令 $Y_i=X_i-G$。独立性和 $\E[Y_i]=0$ 消掉交叉项，故
+\begin{align*}
+\E\lVert\widehat G_n-G\rVert^2
+&=\E\left\lVert\frac1n\sum_iY_i\right\rVert^2\\
+&=\frac{1}{n^2}\sum_i\E\lVert Y_i\rVert^2
+=\frac1n\left(\E\lVert X_1\rVert^2-\lVert G\rVert^2\right).
+\end{align*}
+这就是向量均方误差公式。最后，若 $\lVert g\rVert\leq B_g$ 且 $|c|\leq B_c$，则
+\[
+\E_\beh\lVert X_1\rVert^2
+\leq B_g^2B_c^2\E_\beh[\rho^2]
+=B_g^2B_c^2\bigl(1+\chi^2(\cand\Vert\beh)\bigr),
+\]
+其中最后一个等号来自
+$\chi^2(\cand\Vert\beh)=\E_\beh[(\rho-1)^2]=\E_\beh[\rho^2]-1$。去掉非负项 $\lVert G\rVert^2$ 即得到协方差迹的上界。
+\end{proof}
+
+在自回归序列中，$W_{\leq t}=\prod_{k\leq t}\rho_k$ 的二阶矩可以逐步展开。给定 prefix $y_{<t}$，有
+\[
+\E_\beh[\rho_t^2\mid y_{<t}]
+=\sum_a\beh(a\mid y_{<t})
+\left(\frac{\cand(a\mid y_{<t})}{\beh(a\mid y_{<t})}\right)^2
+=1+\chi^2\bigl(\cand(\cdot\mid y_{<t})\Vert\beh(\cdot\mid y_{<t})\bigr).
+\]
+因为 $W_{\leq t}=W_{<t}\rho_t$，塔式法则给出
+\begin{align*}
+\E_\beh[W_{\leq t}^2]
+&=\E_\beh\left[W_{<t}^2\E_\beh[\rho_t^2\mid y_{<t}]\right]\\
+&=\E_\beh\left[W_{<t}^2\left(1+\chi^2(s_t)\right)\right].
+\end{align*}
+若所有可达 prefix 都满足 $c_{\rm lo}\leq\chi^2(s)\leq c_{\rm hi}$，则递推归纳得到
+\begin{equation}
+(1+c_{\rm lo})^t\leq\E_\beh[W_{\leq t}^2]\leq(1+c_{\rm hi})^t.
+\end{equation}
+这给出了 prefix IS 方差随修正长度增长的明确阶数。
+
+再考虑完整权重 $W=W_{\leq t}W_{>t}$。在条件 $y_{\leq t}$ 下，后缀权重的均值为一：$\E[W_{>t}\mid y_{\leq t}]=1$，因此
+$\E[W\mid y_{\leq t}]=W_{\leq t}$。全方差公式于是给出
+\begin{equation}
+\label{eq:prefix-total-variance}
+\begin{aligned}
+\operatorname{Var}(W)
+&=\operatorname{Var}(\E[W\mid y_{\leq t}])
+ +\E[\operatorname{Var}(W\mid y_{\leq t})]\\
+&=\operatorname{Var}(W_{\leq t})
+ +\E[W_{\leq t}^2\operatorname{Var}(W_{>t}\mid y_{\leq t})].
+\end{aligned}
+\end{equation}
+第二项非负；只要 prefix 之后存在策略比率不恒等于一的可达状态，它就严格为正。这说明后缀权重只能增加方差，不能抵消 prefix 权重已经产生的方差。
+
+\section{PMD-Part 的投影偏差与 BPO 的中心化方差}
+
+设策略类受限为 $\Pi$。PMD-Part 的 population 解为
+\begin{equation}
+\theta_{\rm Part}^*=\argmin_{\theta\in\Pi}\E_{d_\beh,\beh}[(u_\theta-h)^2],
+\end{equation}
+而 BPO 的逐 prefix 解为
+\begin{equation}
+\theta_{\rm BPO}^*=\argmin_{\theta\in\Pi}\E_{d_\beh}\operatorname{Var}_{a\sim\beh}[u_\theta(a)-\eta f(a)].
+\end{equation}
+二者在可实现时拥有同一零点；不可实现时，BPO 不惩罚 action-independent 的误差，因此它允许更大的常数方向自由度，而 PMD-Part 通过精确的 $\log Z_f$ 固定该常数。共享参数网络下，$d_\beh$ 同时决定状态间投影误差如何分配。
+
+\begin{proposition}[prefix IS 的偏差--方差阶梯]
+\label{prop:prefix-bias-variance}
+对终端或未来回报 $R$，行为样本下的 token-level 不加前缀权重估计量，其期望与目标策略梯度的差可分解为
+\begin{equation}
+\sum_s(d_\cand-d_\beh)(s)\sum_a\nabla\cand(a\mid s)A^\beh(s,a)
++\sum_s d_\cand(s)\sum_a\nabla\cand(a\mid s)(A^\cand-A^\beh)(s,a).
+\end{equation}
+乘 $W_{<t}$ 后第一项恰好消失；再乘后缀 $W_{>t}$ 才能修正第二项，但其额外方差正是式 \eqref{eq:prefix-total-variance} 的第二项。
+\end{proposition}
+
+\begin{proof}
+第一项来自把 $d_\cand$ 替换为 $d_\beh$，第二项来自把 $A^\cand$ 替换为可估计的 $A^\beh$。前缀密度比将行为 prefix 测度换成 $d_\cand$，所以只消掉第一项；后缀比率不改变已经使用的优势估计，却引入条件二阶矩，故只能修正价值滞后而不能降低方差。
+\end{proof}
+
+\begin{remark}[可加残差为何能绕开乘积]
+若信号写成逐 token 鞅差之和 $D=\sum_tD_t$，且 $\E[D_t\mid s_t]=0$，则交叉项消失并有
+\begin{equation}
+\E[D^2]=\sum_t\E[D_t^2].
+\end{equation}
+这正是离策略修正文档中 ``可加泛函的换测度界'' 的核心：回归型 PMD/BPO 利用逐点最优性或中心化残差，把序列乘积权重替换成逐步二阶量；代价是目标从真策略梯度改成行为测度下的投影问题。
+
+\end{remark}
+
+\begin{proposition}[可加 BPO 残差的损失估计方差]
+\label{prop:bpo-loss-variance}
+设轨迹残差可写成 $\delta=\sum_{t=1}^{T}e_t$，其中 $e_t$ 是关于 prefix 过滤的鞅差，且 $|e_t|\leq B_e$。则
+\begin{equation}
+\E[\delta^2]=\sum_{t=1}^{T}\E[e_t^2],
+\qquad
+\E[\delta^4]\leq T^2B_e^2\sum_{t=1}^{T}\E[e_t^2].
+\end{equation}
+对 $n$ 条独立轨迹的平方残差损失估计量
+$\widehat{\mathcal L}=n^{-1}\sum_i\delta_i^2/(2\eta)$，有
+\begin{equation}
+\operatorname{Var}(\widehat{\mathcal L})
+\leq \frac{T^2B_e^2}{4\eta^2n}
+\sum_{t=1}^{T}\E[e_t^2].
+\end{equation}
+因此中心化残差的统计方差按 token 二阶量相加，而不是按 sequence ratio 的二阶矩相乘。
+\end{proposition}
+
+\begin{proof}
+鞅差正交给出第一式。由 Cauchy--Schwarz，
+$\delta^2=(\sum_te_t)^2\leq T\sum_te_t^2\leq T^2B_e^2$，故
+$\delta^4\leq T^2B_e^2\delta^2$。独立样本均值的方差为单样本方差除以 $n$，再用
+$\operatorname{Var}(\delta^2)\leq\E[\delta^4]$ 即得结论。
+\end{proof}

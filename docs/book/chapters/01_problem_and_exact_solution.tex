@@ -1,0 +1,121 @@
+\chapter{固定测度的 Token 级优化问题}
+
+\section{外层同步与内层对象}
+
+词表记为 $\mathcal V$，prompt 为 $x$，生成序列为 $y_{1:H}$，第 $t$ 个 token 之前的 prefix 为 $s_t=(x,y_{<t})$。第 $k$ 轮 outer 开始时的冻结 anchor 为 $\pi_k$，本轮第 $n$ 次 inner 更新的 student 为
+\begin{equation}
+\pi_{k,n}(a\mid s)=\pi_{\theta_{k,n}}(a\mid s),
+\qquad \pi_{k,0}=\pi_k.
+\end{equation}
+教师统一记为 $\pi_T$，在本轮 inner 内冻结。$d_k$ 表示由 $\pi_k$ rollout 诱导的 prefix 访问测度，$\widehat d_k$ 表示当前 rollout batch 的经验测度。inner 固定 prefix batch、anchor 和教师，只更新 student 参数。
+
+全篇使用同一组 log-ratio 和 KL 记号：
+\begin{align}
+U_{k,n}(s,a)&\coloneqq\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)},\\
+r_k(s,a)&\coloneqq\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)},\\
+\mathcal K_k^T(s)&\coloneqq\KL\!\left(\pi_k(\cdot\mid s)\Vert\pi_T(\cdot\mid s)\right),\\
+\mathcal K_{k,n}^S(s)&\coloneqq\KL\!\left(\pi_k(\cdot\mid s)\Vert\pi_{k,n}(\cdot\mid s)\right).
+\end{align}
+因此 $\mathbb E_{\pi_k}[r_k\mid s]=-\mathcal K_k^T(s)$，$\mathbb E_{\pi_k}[U_{k,n}\mid s]=-\mathcal K_{k,n}^S(s)$。前者是冻结 teacher reward 的均值，后者随 student 更新变化。通用 mirror 问题中的信号记为 $f$，其冻结中心化 target 为 $G_k=\eta(f-\mathbb E_{\pi_k}[f\mid s])$。OPD 实例化时取 $f=r_k$，因此
+\begin{equation}
+G_k(s,a)\coloneqq\eta\bigl(r_k(s,a)+\mathcal K_k^T(s)\bigr),
+\qquad\mathbb E_{\pi_k}[G_k\mid s]=0.
+\end{equation}
+score 向量记为 $\psi_{k,n}(s,a)=\nabla_{\theta_{k,n}}\log\pi_{k,n}(a\mid s)$，其 anchor 条件均值为 $\bar\psi_{k,n}(s)=\mathbb E_{\pi_k}[\psi_{k,n}\mid s]$。
+
+镜像系数为 $\eta>0$，inner 学习率为 $\alpha_{k,n}$。outer 总步数为 $K_{\mathrm{out}}$，每轮 inner 步数为 $N$，rollout batch 大小为 $B$，同一 prefix 的辅助 action 样本数为 $m$，保留的头部 token 数为 $J$。展开截断阶数用 $L$，避免与头部大小混用。所有损失统一最小化，算法使用其梯度 $g_{k,n}=\nabla_{\theta_{k,n}}\mathcal L$ 执行下降。
+
+同步在 inner 结束后进行。hard sync 取 $\pi_{k+1}=\pi_{k,N}$；概率空间的 soft sync 取
+\begin{equation}
+\pi_{k+1}=(1-\rho)\pi_k+\rho\pi_{k,N},\qquad\rho\in(0,1].
+\end{equation}
+参数 EMA 是这个概率混合映射的实现近似，需要另行说明。$\lambda_k(s)$ 只表示 PMD-Mean 的归一化乘子，$\gamma$ 表示自然梯度阻尼。student/anchor importance ratio 记为 $\omega_{k,n}=\pi_{k,n}/\pi_k$，K4 的 score surrogate 记为 $c_{k,n}=\pi_{k,n}/\operatorname{sg}(\pi_{k,n})$，其中 $\operatorname{sg}$ 表示停止梯度。
+
+我们研究的 inner 子问题是
+\begin{equation}\label{eq:common-objective}
+ \max_{p\in\Delta(\mathcal V)}
+ \mathcal J_{k,s}(p)
+ =\E_{a\sim p}[r_k(s,a)]-
+ \frac{1}{\eta}\KL(p\Vert\pi_k),
+ \qquad \eta>0.
+\end{equation}
+这里的 $p$ 是当前 history 上的下一个 token 分布，\emph{不是}整条 response 的分布。访问测度固定只意味着 $s$ 不随 inner 更新；它不意味着优化变量 $p$ 必须等于采样分布 $\pi_k$。
+
+\section{原始 mirror 子问题的 Gibbs 解}
+
+令
+\[
+ Z_k(s)=\sum_{a\in\mathcal V}\pi_k(a\mid s)\exp(\eta r_k(s,a)).
+\]
+由于 $r_k=\log\pi_T-\log\pi_k$，有
+\begin{equation}\label{eq:token-partition}
+ Z_k(s)=\sum_a\pi_k(a\mid s)^{1-\eta}\pi_T(a\mid s)^\eta.
+\end{equation}
+
+\begin{theorem}[Token mirror target]
+\label{thm:token-target}
+若有限词表上 $\pi_k(a\mid s)>0$ 且 $\pi_T(a\mid s)>0$ 对每个 action 成立，则式~\eqref{eq:common-objective} 的唯一最大点为
+\begin{equation}\label{eq:token-target}
+ \pi_k^{\star,\mathrm{Gibbs}}(a\mid s)=
+ \frac{\pi_k(a\mid s)\exp(\eta r_k(s,a))}{Z_k(s)}
+ =\frac{\pi_k(a\mid s)^{1-\eta}\pi_T(a\mid s)^\eta}{Z_k(s)}.
+\end{equation}
+并且对任意 $p$，
+\begin{equation}\label{eq:variational-identity}
+ \mathcal J_{k,s}(p)
+ =\frac{1}{\eta}\log Z_k(s)
+ -\frac{1}{\eta}\KL(p\Vert \pi_k^{\star,\mathrm{Gibbs}}).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+由式~\eqref{eq:token-target}，
+\[
+ \log \pi_k^{\star,\mathrm{Gibbs}}(a\mid s)=\log\pi_k(a\mid s)+\eta r_k(s,a)-\log Z_k(s).
+\]
+因此
+\begin{align*}
+ \KL(p\Vert \pi_k^{\star,\mathrm{Gibbs}})
+ &=\sum_a p(a\mid s)\left[
+ \log\frac{p(a\mid s)}{\pi_k(a\mid s)}
+ -\eta r_k(s,a)+\log Z_k(s)\right]\\
+ &=\KL(p\Vert\pi_k)-\eta\E_p[r_k]+\log Z_k(s).
+\end{align*}
+移项得到式~\eqref{eq:variational-identity}。KL 非负且仅在 $p=\pi_k^{\star,\mathrm{Gibbs}}$ 时为零，所以最大点唯一。\hfill$\square$
+\end{proof}
+
+\begin{corollary}[几何插值与极限]
+当 $\eta\to0^+$ 时 $\pi_k^{\star,\mathrm{Gibbs}}\to\pi_k$；当 $\eta=1$ 时 $\pi_k^{\star,\mathrm{Gibbs}}=\pi_T$；当 $0<\eta<1$ 时，logits 满足
+\[
+ \log \pi_k^{\star,\mathrm{Gibbs}}=(1-\eta)\log\pi_k+\eta\log\pi_T-\log Z_k.
+\]
+因此 $\eta$ 是 token-level teacher interpolation，而不是 inner optimizer 的学习率。
+\end{corollary}
+
+\section{Reward 中心化与回归残差}
+
+定义 $\bar r_k(s)=\mathbb E_{a\sim\pi_k}[r_k(s,a)]=-\mathcal K_k^T(s)$。将 reward 换成 $r_k-\bar r_k$ 后，配分函数为
+\[
+\mathbb E_{\pi_k}[e^{\eta(r_k-\bar r_k)}]=e^{-\eta\bar r_k}Z_k.
+\]
+分子和配分函数同乘一个 action 无关的常数，原始 mirror 问题的 Gibbs 解不变。下面的平方回归需要区分完整配分函数与均值近似。
+
+三个 residual 全部采用 student 减 target 的方向：
+\begin{align}
+R^{\mathrm{Part}}_{k,n}(s,a)&\coloneqq U_{k,n}(s,a)-\eta r_k(s,a)+\log Z_k(s),\label{eq:part-residual}\\
+R^{\mathrm{Mean}}_{k,n}(s,a)&\coloneqq U_{k,n}(s,a)-G_k(s,a),\label{eq:mean-residual}\\
+R^{\mathrm{BPO}}_{k,n}(s,a)&\coloneqq U_{k,n}(s,a)-G_k(s,a)+\mathcal K_{k,n}^S(s).
+\end{align}
+PMD-Part 的零残差对应 $\pi_{k,n}=\pi_k^{\star,\mathrm{Gibbs}}$。PMD-Mean 以 $\eta\bar r_k$ 近似 $\log Z_k$，仅中心化 reward。对非恒定 reward，由严格 Jensen 不等式有 $\mathbb E_{\pi_k}[e^{G_k}]>1$，所以拟合值 $U=G_k$ 不满足概率归一化，最优残差不能为零。其总体最优分布记为 $\pi_k^{\star,\mathrm{Mean}}$，由第二章的 Lambert-$W$ 解确定。
+
+BPO 则中心化完整的 student--target residual。其 residual 均值为零，而 Mean 的 residual 均值为 $-\mathcal K_{k,n}^S$。这些定义直接区分两个目标，无需额外改变 residual 符号。
+
+\section{参数化策略的投影}
+
+实际神经网络只能表示参数化策略族。固定 prefix 测度 $d_k$ 后，PMD-Part 的总体 inner loss 定义为
+\begin{equation}\label{eq:part-loss}
+ \mathcal L_{\mathrm{Part}}(\theta_{k,n})
+ =\frac12\E_{s\sim d_k,a\sim\pi_k}
+ \left[R^{\mathrm{Part}}_{k,n}(s,a)^2\right].
+\end{equation}
+若模型在每个 history 上可以实现式~\eqref{eq:token-target}，则全局最小值为零；否则最小值是 anchor history 测度下的函数类投影误差。inner steps 增加只能逼近该投影，不能消除模型表达误差或 history coverage 误差。
