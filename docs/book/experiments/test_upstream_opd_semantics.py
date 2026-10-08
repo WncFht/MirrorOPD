@@ -127,6 +127,38 @@ def main():
         assert (grad[0, ~valid] == 0).all()
         assert grad[0, valid].abs().sum() > 0
     print('PASS: jagged MirrorOPD adapter: 3 methods, invalid-position masking and live gradients')
+    # Partial-support centers change BPO's score update and its regression
+    # gradient in different ways; check both derived error identities.
+    q = torch.tensor([.4,.3,.2,.1], dtype=torch.float64)
+    teacher = torch.tensor([.05,.15,.3,.5], dtype=torch.float64)
+    x = torch.tensor([-.3,.2,.7,-.1], dtype=torch.float64, requires_grad=True)
+    lp = x.log_softmax(-1)
+    eta = .3
+    reward = teacher.log()-q.log()
+    kt = (q*(q.log()-teacher.log())).sum()
+    ks = (q*(q.log()-lp)).sum()
+    head = slice(0,2)
+    qt = q[2:].sum()
+    khat_t = (q[head]*(q[head].log()-teacher[head].log())).sum()+qt*(qt.log()-teacher[2:].sum().log())
+    khat_s = (q[head]*(q[head].log()-lp[head])).sum()+qt*(qt.log()-lp[2:].logsumexp(-1))
+    d = lp-q.log()+ks-eta*(reward+kt)
+    dhat = lp-q.log()+khat_s-eta*(reward+khat_t)
+    exact = (q*d.square()).sum()/(2*eta)
+    surrogate = (q*(dhat/eta).detach()*lp).sum()
+    regression = (q*dhat.square()).sum()/(2*eta)
+    ge = torch.autograd.grad(exact,x,retain_graph=True)[0]
+    gs = torch.autograd.grad(surrogate,x,retain_graph=True)[0]
+    gr = torch.autograd.grad(regression,x,retain_graph=True)[0]
+    score_mean = torch.autograd.grad((q*lp).sum(),x,retain_graph=True)[0]
+    center_gradient = torch.autograd.grad(khat_s,x,retain_graph=True)[0]
+    torch.testing.assert_close(gs-ge, ((kt-khat_t)-(ks-khat_s)/eta)*score_mean)
+    torch.testing.assert_close(gr-gs, (q*dhat).sum()/eta*center_gradient)
+    assert (gr-gs).abs().max() > 1e-3
+    mean_regression = .5*(q*(lp-q.log()-eta*(reward+khat_t)).square()).sum()
+    mean_surrogate = (q*(lp-q.log()-eta*(reward+khat_t)).detach()*lp).sum()
+    torch.testing.assert_close(torch.autograd.grad(mean_regression,x,retain_graph=True)[0],
+                               torch.autograd.grad(mean_surrogate,x)[0])
+    print('PASS: Tail-aware BPO bias and regression-gradient discrepancy; Mean equivalence')
     print('PASS: upstream normalized-weight identity and small-tail floor verified')
 
 
