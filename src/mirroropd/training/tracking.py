@@ -95,9 +95,51 @@ class WandbLogger:
     def __init__(self, wandb_module, config):
         self.wandb = wandb_module
         configure_wandb(wandb_module.run, config or {})
+        # W&B has one global history step per run. The displayed x axes are
+        # defined separately above, so this private counter only prevents an
+        # inner write from making a later outer write non-monotone.
+        self._internal_step = max(int(getattr(wandb_module.run, "step", 0) or 0), 0)
+        self._inner_records_seen = 0
 
     def log(self, data, step):
-        self.wandb.log({"00_axes/outer_step": step, **grouped_metrics(data, "outer")}, step=step)
+        self._internal_step += 1
+        self.wandb.log(
+            {"00_axes/outer_step": step, **grouped_metrics(data, "outer")},
+            step=self._internal_step,
+        )
+
+    def log_inner_records(self, path):
+        """Upload newly completed worker records to this run."""
+        if not path:
+            return 0
+        import json
+        from pathlib import Path
+
+        target = Path(path)
+        if not target.exists():
+            return 0
+        lines = target.read_text(encoding="utf-8").splitlines()
+        if self._inner_records_seen > len(lines):
+            self._inner_records_seen = 0
+        uploaded = 0
+        for index in range(self._inner_records_seen, len(lines)):
+            try:
+                record = json.loads(lines[index])
+            except json.JSONDecodeError:
+                break
+            self._internal_step += 1
+            self.wandb.log(
+                {
+                    "00_axes/inner_update": index,
+                    "00_axes/inner_outer": record.get("outer_call"),
+                    "00_axes/inner_epoch_index": record.get("inner_step"),
+                    **grouped_metrics(record.get("metrics", {}), "inner"),
+                },
+                step=self._internal_step,
+            )
+            uploaded += 1
+        self._inner_records_seen += uploaded
+        return uploaded
 
     def finish(self, exit_code=0):
         self.wandb.finish(exit_code=exit_code)

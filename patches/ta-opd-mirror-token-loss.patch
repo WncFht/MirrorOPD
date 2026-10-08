@@ -5,7 +5,7 @@ index 7a5d6f0..26527fd 100644
 @@ -327,13 +327,11 @@ def apply_monkey_patch(
      """Replace _flash_attention_forward to _ulysses_flash_attention_forward"""
      module = sys.modules[model.__module__]
-
+ 
 -    try:
 -        num_attention_heads, num_key_value_heads = model.config.num_attention_heads, model.config.num_key_value_heads
 -    except AttributeError:
@@ -18,7 +18,7 @@ index 7a5d6f0..26527fd 100644
 +    attention_config = getattr(model.config, "text_config", model.config)
 +    num_attention_heads = attention_config.num_attention_heads
 +    num_key_value_heads = getattr(attention_config, "num_key_value_heads", num_attention_heads)
-
+ 
      assert num_attention_heads % ulysses_sp_size == 0, (
          f"num_attention_heads {num_attention_heads} must be divisible by ulysses_sp_size {ulysses_sp_size}"
 diff --git i/verl/verl/trainer/distillation/fsdp/losses.py w/verl/verl/trainer/distillation/fsdp/losses.py
@@ -28,7 +28,7 @@ index 94d8574..366d385 100644
 @@ -16,6 +16,17 @@
  import torch
  import torch.nn.functional as F
-
+ 
 +from mirroropd.training.cache import (
 +    build_mirror_anchor_cache,
 +    build_mirror_opd_cache_from_full_logits,
@@ -45,8 +45,8 @@ index 94d8574..366d385 100644
      slice_input_tensor,
 @@ -32,257 +43,18 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
      return kld.sum(dim=-1)
-
-
+ 
+ 
 -def build_mirror_anchor_cache(
 -    anchor_logits: torch.Tensor,
 -    actions: torch.Tensor,
@@ -249,8 +249,8 @@ index 94d8574..366d385 100644
 +        student_logits, data, stage, topk,
 +        sequence_parallel_world_size=get_ulysses_sequence_parallel_world_size(),
 +    )
-
-
+ 
+ 
  def compute_mirror_opd_from_cache(student_logits, data, config, data_format):
 -    """Consume prediction-position-aligned caches after engine unpadding.
 -
@@ -305,8 +305,8 @@ index 94d8574..366d385 100644
 -    else:
 -        result["distillation_losses"] = student_logits.sum(-1) * 0
 -    return result
-
-
+ 
+ 
  def sample_corrected_ta_opd(
 diff --git i/verl/verl/trainer/distillation/losses.py w/verl/verl/trainer/distillation/losses.py
 index 496116e..2d596a8 100644
@@ -319,8 +319,8 @@ index 496116e..2d596a8 100644
 -        "mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"
 +        "mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"
      }
-
-
+ 
+ 
 +def populate_global_batch_info(config: ActorConfig, data: TensorDict) -> None:
 +    """Record the full-batch normalization factors before a loss can return.
 +
@@ -339,9 +339,9 @@ index 496116e..2d596a8 100644
  class DistillationLossSettings(BaseConfig):
      """
 @@ -179,7 +193,7 @@ def compute_topk_loss(
-
+ 
              loss_mode = distillation_config.distillation_loss.loss_mode
-
+ 
 -            if loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"):
 +            if loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"):
                  return fsdp_losses.compute_mirror_opd_from_cache(
@@ -356,7 +356,7 @@ index 496116e..2d596a8 100644
          return distill_loss, distill_metrics
      policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
 @@ -363,7 +378,7 @@ def distillation_loss(
-
+ 
  @register_distillation_loss(
      DistillationLossSettings(
 -        names=["mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"],
@@ -381,11 +381,11 @@ index 496116e..2d596a8 100644
 +        for key, (reduction, value) in token_moments(fields, mask).items()
 +    }
 +    return losses, metrics
-
-
+ 
+ 
  @register_distillation_loss(
 diff --git i/verl/verl/trainer/ppo/ray_trainer.py w/verl/verl/trainer/ppo/ray_trainer.py
-index 44780d7..982ddb5 100644
+index 44780d7..4537acf 100644
 --- i/verl/verl/trainer/ppo/ray_trainer.py
 +++ w/verl/verl/trainer/ppo/ray_trainer.py
 @@ -1348,7 +1348,7 @@ class RayPPOTrainer:
@@ -395,10 +395,22 @@ index 44780d7..982ddb5 100644
 -                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center")}
 +                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center", "mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob")}
          return DataProto.from_tensordict(tu.get_tensordict(result))
-
+ 
      def _update_actor(self, batch: DataProto) -> DataProto:
+@@ -1717,6 +1717,11 @@ class RayPPOTrainer:
+                         # update actor
+                         with marked_timer("update_actor", timing_raw, color="red"):
+                             actor_output = self._update_actor(batch)
++                        # MirrorOPD workers append reduced per-inner-step
++                        # diagnostics to JSONL.  Upload them from the driver
++                        # into the already initialized W&B run so Ray actors
++                        # never create duplicate runs or race on SDK state.
++                        logger.log_mirror_inner_diagnostics(os.environ.get("MIRROR_INNER_METRICS_PATH"))
+ 
+                         # Check if the ESI (Elastic Server Instance)/training plan is close to expiration.
+                         esi_close_to_expiration = should_save_ckpt_esi(
 diff --git i/verl/verl/utils/tracking.py w/verl/verl/utils/tracking.py
-index 0fdede9..d79cace 100644
+index 0fdede9..64e3d4b 100644
 --- i/verl/verl/utils/tracking.py
 +++ w/verl/verl/utils/tracking.py
 @@ -78,7 +78,9 @@ class Tracking:
@@ -409,9 +421,23 @@ index 0fdede9..d79cace 100644
 +            from mirroropd.training.tracking import WandbLogger
 +
 +            self.logger["wandb"] = WandbLogger(wandb, config)
-
+ 
          if "trackio" in default_backend:
              import trackio
+@@ -185,6 +187,13 @@ class Tracking:
+             if backend is None or default_backend in backend:
+                 logger_instance.log(data=data, step=step)
+ 
++    def log_mirror_inner_diagnostics(self, path):
++        """Flush worker-written MirrorOPD records through the driver W&B run."""
++        logger_instance = self.logger.get("wandb")
++        if logger_instance is None or not hasattr(logger_instance, "log_inner_records"):
++            return 0
++        return logger_instance.log_inner_records(path)
++
+     def __del__(self):
+         if "wandb" in self.logger:
+             self.logger["wandb"].finish(exit_code=0)
 diff --git i/verl/verl/utils/vllm/patch.py w/verl/verl/utils/vllm/patch.py
 index 951c5ca..4162c6a 100644
 --- i/verl/verl/utils/vllm/patch.py
@@ -425,7 +451,7 @@ index 951c5ca..4162c6a 100644
 +        if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)):
 +            return
          raise ValueError("The provided model does not have a valid 'model' or 'language_model' attribute.")
-
+ 
      if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)) and not isinstance(inner_model, tuple(SUPPORTED_MOE_MODELS)):
 diff --git i/verl/verl/workers/config/distillation.py w/verl/verl/workers/config/distillation.py
 index 9ff66f7..280ebf8 100644
@@ -433,7 +459,7 @@ index 9ff66f7..280ebf8 100644
 +++ w/verl/verl/workers/config/distillation.py
 @@ -88,7 +88,7 @@ class DistillationLossConfig(BaseConfig):
      loss_settings: Optional[dict] = None
-
+ 
      def __post_init__(self):
 -        if self.loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"):
 +        if self.loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"):
@@ -443,7 +469,7 @@ index 9ff66f7..280ebf8 100644
 @@ -267,7 +267,7 @@ class DistillationConfig(BaseConfig):
          if not self.enabled:
              return
-
+ 
 -        if self.distillation_loss.loss_mode in {"mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"}:
 +        if self.distillation_loss.loss_mode in {"mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"}:
              if not self.mirror_teacher_model_path or not self.mirror_teacher_model_path.strip():
@@ -456,7 +482,7 @@ index 3e3798d..feaaae7 100644
 @@ -111,6 +111,28 @@ class FSDPEngine(BaseEngine):
          self.optimizer_config = optimizer_config
          self.checkpoint_config = checkpoint_config
-
+ 
 +        # FlashAttention kernels accept fp16/bf16 inputs only.  A control run
 +        # may deliberately request fp32 weights for numerical diagnostics;
 +        # select PyTorch SDPA for that combination while preserving FlashAttention
@@ -480,7 +506,7 @@ index 3e3798d..feaaae7 100644
 +            )
 +
          self.mode = None
-
+ 
          self.rank = torch.distributed.get_rank()
 diff --git i/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
 index 3d859d0..13d4bd5 100644
@@ -512,7 +538,7 @@ index 3d859d0..13d4bd5 100644
                      append_to_dict(metrics, output)
 +                if has_mirror:
 +                    self._mirror_outer_call = mirror_outer_call + 1
-
+ 
                  output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
              else:
 diff --git i/verl/verl/workers/utils/padding.py w/verl/verl/workers/utils/padding.py

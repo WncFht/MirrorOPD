@@ -67,7 +67,10 @@ bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
 status=$?
 set -e
 printf '%s\n' "$status" >"$run_dir/exit-code.txt"
-if [[ $status == 0 && -f "$run_dir/wandb-run.json" ]]; then
+# Successful runs upload inner rows at every outer boundary from the driver.
+# Keep the publisher as a recovery path for interrupted runs only; replaying a
+# completed run would duplicate every W&B history row.
+if [[ $status != 0 && -f "$run_dir/wandb-run.json" ]]; then
   PYTHONPATH="$repo_root/src${PYTHONPATH:+:$PYTHONPATH}" "$task_python" \
     "$script_dir/publish_wandb_diagnostics.py" --run "$run_dir" --include-outer \
     >"$run_dir/wandb-publish.log" 2>&1 || echo "W&B diagnostic publish failed; local JSONL retained" >&2
