@@ -385,7 +385,7 @@ index 496116e..2d596a8 100644
  
  @register_distillation_loss(
 diff --git i/verl/verl/trainer/ppo/ray_trainer.py w/verl/verl/trainer/ppo/ray_trainer.py
-index 44780d7..4537acf 100644
+index 44780d7..298862e 100644
 --- i/verl/verl/trainer/ppo/ray_trainer.py
 +++ w/verl/verl/trainer/ppo/ray_trainer.py
 @@ -1348,7 +1348,7 @@ class RayPPOTrainer:
@@ -397,7 +397,15 @@ index 44780d7..4537acf 100644
          return DataProto.from_tensordict(tu.get_tensordict(result))
  
      def _update_actor(self, batch: DataProto) -> DataProto:
-@@ -1717,6 +1717,11 @@ class RayPPOTrainer:
+@@ -1458,6 +1458,7 @@ class RayPPOTrainer:
+             logger.log(data=val_metrics, step=self.global_steps)
+             if self.config.trainer.get("val_only", False):
+                 self._shutdown_dump_executor()
++                logger.finish(exit_code=0)
+                 return
+ 
+         if self.config.actor_rollout_ref.rollout.skip.get("enable", False):
+@@ -1717,6 +1718,11 @@ class RayPPOTrainer:
                          # update actor
                          with marked_timer("update_actor", timing_raw, color="red"):
                              actor_output = self._update_actor(batch)
@@ -409,11 +417,27 @@ index 44780d7..4537acf 100644
  
                          # Check if the ESI (Elastic Server Instance)/training plan is close to expiration.
                          esi_close_to_expiration = should_save_ckpt_esi(
+@@ -1828,6 +1834,7 @@ class RayPPOTrainer:
+                     self._shutdown_dump_executor()
+                     pprint(f"Final validation metrics: {last_val_metrics}")
+                     progress_bar.close()
++                    logger.finish(exit_code=0)
+                     return
+ 
+                 # this is experimental and may be changed/removed in the future
 diff --git i/verl/verl/utils/tracking.py w/verl/verl/utils/tracking.py
-index 0fdede9..64e3d4b 100644
+index 0fdede9..a7914ae 100644
 --- i/verl/verl/utils/tracking.py
 +++ w/verl/verl/utils/tracking.py
-@@ -78,7 +78,9 @@ class Tracking:
+@@ -67,6 +67,7 @@ class Tracking:
+                 assert backend in self.supported_backend, f"{backend} is not supported"
+ 
+         self.logger = {}
++        self._finished = False
+ 
+         if "tracking" in default_backend or "wandb" in default_backend:
+             import os
+@@ -78,7 +79,9 @@ class Tracking:
                  settings = wandb.Settings(https_proxy=config["trainer"]["wandb_proxy"])
              entity = os.environ.get("WANDB_ENTITY", None)
              wandb.init(project=project_name, name=experiment_name, entity=entity, config=config, settings=settings)
@@ -424,10 +448,11 @@ index 0fdede9..64e3d4b 100644
  
          if "trackio" in default_backend:
              import trackio
-@@ -185,6 +187,13 @@ class Tracking:
+@@ -185,9 +188,19 @@ class Tracking:
              if backend is None or default_backend in backend:
                  logger_instance.log(data=data, step=step)
  
+-    def __del__(self):
 +    def log_mirror_inner_diagnostics(self, path):
 +        """Flush worker-written MirrorOPD records through the driver W&B run."""
 +        logger_instance = self.logger.get("wandb")
@@ -435,9 +460,26 @@ index 0fdede9..64e3d4b 100644
 +            return 0
 +        return logger_instance.log_inner_records(path)
 +
-     def __del__(self):
++    def finish(self, exit_code=0):
++        if self._finished:
++            return
++        self._finished = True
          if "wandb" in self.logger:
-             self.logger["wandb"].finish(exit_code=0)
+-            self.logger["wandb"].finish(exit_code=0)
++            self.logger["wandb"].finish(exit_code=exit_code)
+         if "swanlab" in self.logger:
+             self.logger["swanlab"].finish()
+         if "vemlp_wandb" in self.logger:
+@@ -201,6 +214,9 @@ class Tracking:
+         if "file" in self.logger:
+             self.logger["file"].finish()
+ 
++    def __del__(self):
++        self.finish(exit_code=0)
++
+ 
+ class ClearMLLogger:
+     def __init__(self, project_name: str, experiment_name: str, config):
 diff --git i/verl/verl/utils/vllm/patch.py w/verl/verl/utils/vllm/patch.py
 index 951c5ca..4162c6a 100644
 --- i/verl/verl/utils/vllm/patch.py
