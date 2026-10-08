@@ -53,10 +53,10 @@ index a2f1871..07888a9 100644
 \ No newline at end of file
 +teacher_key: data_source
 diff --git a/verl/trainer/distillation/fsdp/losses.py b/verl/trainer/distillation/fsdp/losses.py
-index d37c85d..1a3b62e 100644
+index d37c85d..94d8574 100644
 --- a/verl/trainer/distillation/fsdp/losses.py
 +++ b/verl/trainer/distillation/fsdp/losses.py
-@@ -32,6 +32,268 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
+@@ -32,6 +32,259 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
      return kld.sum(dim=-1)
  
  
@@ -181,28 +181,19 @@ index d37c85d..1a3b62e 100644
 +    if stage == "anchor":
 +        if topk is None:
 +            raise ValueError("anchor cache inference requires mirror_cache_topk")
-+        return build_mirror_anchor_cache(student_logits, values("mirror_actions"), values("mirror_valid"), topk)
++        return build_mirror_anchor_cache(
++            student_logits, values("mirror_actions"), values("mirror_valid"), topk
++        )
 +    if stage == "teacher":
-+        cache = {
-+            key: values(key)
-+            for key in (
-+                "mirror_valid",
-+                "mirror_actions",
-+                "mirror_anchor_ids",
-+                "mirror_anchor_head_log_probs",
-+                "mirror_anchor_tail_log_prob",
-+                "mirror_anchor_action_log_prob",
-+                "mirror_vocab_size",
-+            )
-+        }
++        cache = {key: values(key) for key in (
++            "mirror_valid", "mirror_actions", "mirror_anchor_ids",
++            "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
++            "mirror_anchor_action_log_prob", "mirror_vocab_size",
++        )}
 +        completed = complete_mirror_teacher_cache(student_logits, cache)
-+        return {
-+            key: completed[key]
-+            for key in (
-+                "mirror_teacher_action_log_prob",
-+                "mirror_teacher_center",
-+            )
-+        }
++        return {key: completed[key] for key in (
++            "mirror_teacher_action_log_prob", "mirror_teacher_center",
++        )}
 +    raise ValueError(f"unknown mirror_cache_stage: {stage}")
 +
 +
@@ -325,7 +316,7 @@ index d37c85d..1a3b62e 100644
  def sample_corrected_ta_opd(
      taopd_with_sg: torch.Tensor,
      student_logp_y: torch.Tensor,
-@@ -73,12 +335,7 @@ def sample_corrected_ta_opd(
+@@ -73,12 +326,7 @@ def sample_corrected_ta_opd(
  
      # Tail log-probabilities come directly from log1mexp(logsumexp(top-k)),
      # so the correction never forms 1 - sum(exp(top-k log-probs)).
@@ -339,7 +330,7 @@ index d37c85d..1a3b62e 100644
  
      if behavior_logp_y is None:
          # On-policy p(y) / sg(p(y)); this avoids exp(log p) underflow and 0/0.
-@@ -95,9 +352,6 @@ def sample_corrected_ta_opd(
+@@ -95,9 +343,6 @@ def sample_corrected_ta_opd(
      return taopd_with_sg + sample_correction.to(dtype=taopd_with_sg.dtype)
  
  
@@ -349,7 +340,7 @@ index d37c85d..1a3b62e 100644
  def compute_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -160,8 +414,6 @@ def compute_reverse_kl_topk(
+@@ -160,8 +405,6 @@ def compute_reverse_kl_topk(
      }
  
  
@@ -358,7 +349,7 @@ index d37c85d..1a3b62e 100644
  def compute_mopd_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -188,11 +440,7 @@ def compute_mopd_reverse_kl_topk(
+@@ -188,11 +431,7 @@ def compute_mopd_reverse_kl_topk(
          teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
          teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
  
@@ -371,7 +362,7 @@ index d37c85d..1a3b62e 100644
  
      # Compute only the student log probabilities needed on the teacher support.
      student_log_z = torch.logsumexp(student_logits, dim=-1).float()
-@@ -205,9 +453,7 @@ def compute_mopd_reverse_kl_topk(
+@@ -205,9 +444,7 @@ def compute_mopd_reverse_kl_topk(
      student_mass = student_topk_probs.sum(dim=-1)
      teacher_mass = teacher_topk_probs.sum(dim=-1)
  
@@ -382,7 +373,7 @@ index d37c85d..1a3b62e 100644
      distillation_losses = support_kl + teacher_mass - student_mass
  
      with torch.no_grad():
-@@ -216,14 +462,10 @@ def compute_mopd_reverse_kl_topk(
+@@ -216,14 +453,10 @@ def compute_mopd_reverse_kl_topk(
              k=teacher_topk_ids.shape[-1],
              dim=-1,
          ).indices
@@ -399,7 +390,7 @@ index d37c85d..1a3b62e 100644
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
          overlap_token_advantage = torch.where(
              overlap_count > 0,
-@@ -287,7 +529,6 @@ def compute_normalized_reverse_kl_topk(
+@@ -287,7 +520,6 @@ def compute_normalized_reverse_kl_topk(
          index=teacher_topk_ids,
      )
  
@@ -407,7 +398,7 @@ index d37c85d..1a3b62e 100644
      # original masses before normalization, used for metrics
      student_mass = student_topk_log_probs.exp().sum(dim=-1)
      teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
-@@ -308,9 +549,7 @@ def compute_normalized_reverse_kl_topk(
+@@ -308,9 +540,7 @@ def compute_normalized_reverse_kl_topk(
      overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
      overlap_count = overlap_mask.sum(dim=-1)
  
@@ -418,7 +409,7 @@ index d37c85d..1a3b62e 100644
  
      overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
      overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
-@@ -343,13 +582,9 @@ def compute_normalized_reverse_kl_topk(
+@@ -343,13 +573,9 @@ def compute_normalized_reverse_kl_topk(
          cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
  
          # Cov_{I~p}(p_I, log p_I - log q_I)
@@ -434,7 +425,7 @@ index d37c85d..1a3b62e 100644
  
      return {
          "distillation_losses": distillation_losses,
-@@ -364,7 +599,6 @@ def compute_normalized_reverse_kl_topk(
+@@ -364,7 +590,6 @@ def compute_normalized_reverse_kl_topk(
      }
  
  
@@ -442,7 +433,7 @@ index d37c85d..1a3b62e 100644
  def compute_unnormalized_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -412,7 +646,6 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -412,7 +637,6 @@ def compute_unnormalized_reverse_kl_topk(
          index=teacher_topk_ids,
      )
  
@@ -450,7 +441,7 @@ index d37c85d..1a3b62e 100644
      # original masses before normalization, used for metrics
      student_mass = student_topk_log_probs.exp().sum(dim=-1)
      teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
-@@ -426,9 +659,7 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -426,9 +650,7 @@ def compute_unnormalized_reverse_kl_topk(
      overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
      overlap_count = overlap_mask.sum(dim=-1)
  
@@ -461,7 +452,7 @@ index d37c85d..1a3b62e 100644
  
      overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
      overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
-@@ -461,13 +692,9 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -461,13 +683,9 @@ def compute_unnormalized_reverse_kl_topk(
          cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
  
          # Cov_{I~p}(p_I, log p_I - log q_I)
@@ -477,7 +468,7 @@ index d37c85d..1a3b62e 100644
  
      return {
          "distillation_losses": distillation_losses,
-@@ -482,13 +709,9 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -482,13 +700,9 @@ def compute_unnormalized_reverse_kl_topk(
      }
  
  
@@ -492,7 +483,7 @@ index d37c85d..1a3b62e 100644
  
  _LOG2 = math.log(2.0)
  
-@@ -498,8 +721,8 @@ def log1mexp(log_x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
+@@ -498,8 +712,8 @@ def log1mexp(log_x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
      cond = log_x > -_LOG2
      a_in = torch.where(cond, log_x, torch.full_like(log_x, -_LOG2))
      b_in = torch.where(cond, torch.full_like(log_x, -_LOG2), log_x)
@@ -503,7 +494,7 @@ index d37c85d..1a3b62e 100644
      return torch.where(cond, out_a, out_b)
  
  
-@@ -526,16 +749,10 @@ def compute_taopd_with_sg(
+@@ -526,16 +740,10 @@ def compute_taopd_with_sg(
          teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
          teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
  
@@ -522,7 +513,7 @@ index d37c85d..1a3b62e 100644
      student_topk_log_probs = student_topk_logits - student_log_z.unsqueeze(-1)
      teacher_topk_log_probs = teacher_topk_log_probs.float()
  
-@@ -544,28 +761,18 @@ def compute_taopd_with_sg(
+@@ -544,28 +752,18 @@ def compute_taopd_with_sg(
      student_log_p_tail = log1mexp(student_log_mass)
      teacher_log_q_tail = log1mexp(teacher_log_mass)
  
@@ -556,7 +547,7 @@ index d37c85d..1a3b62e 100644
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
          overlap_token_advantage = torch.where(
              overlap_count > 0,
-@@ -584,7 +791,6 @@ def compute_taopd_with_sg(
+@@ -584,7 +782,6 @@ def compute_taopd_with_sg(
      }
  
  
@@ -564,7 +555,7 @@ index d37c85d..1a3b62e 100644
  def compute_taopd_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -680,9 +886,7 @@ def compute_taopd_reverse_kl_topk(
+@@ -680,9 +877,7 @@ def compute_taopd_reverse_kl_topk(
  
          # Per-token forward-KL contribution q(v) * log(q(v)/p(v)), a diagnostic only.
          # only use real teacher top-k tokens here, not the collapsed other token
@@ -1015,10 +1006,10 @@ index c4c7d8f..3d859d0 100644
  
              # construct TrainingWorkerConfig
 diff --git a/verl/workers/utils/padding.py b/verl/workers/utils/padding.py
-index 6d537ea..cc41e92 100644
+index 6d537ea..61f4779 100644
 --- a/verl/workers/utils/padding.py
 +++ b/verl/workers/utils/padding.py
-@@ -107,9 +107,64 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
+@@ -107,9 +107,73 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
          data["teacher_sampled_logprob"] = teacher_sampled_logprob_nested
          # print(f"padding: {teacher_sampled_logprob.shape}")
  
@@ -1036,7 +1027,14 @@ index 6d537ea..cc41e92 100644
 +            continue
 +        if value.shape[:2] != attention_mask.shape:
 +            raise ValueError(f"{key} must be aligned to the full padded sequence")
-+        unpadded = index_first_axis(value.flatten(0, 1), indices)
++        flattened = value.flatten(0, 1)
++        # FlashAttention's index_first_axis requires a channel dimension.
++        scalar_field = flattened.ndim == 1
++        if scalar_field:
++            flattened = flattened.unsqueeze(-1)
++        unpadded = index_first_axis(flattened, indices)
++        if scalar_field:
++            unpadded = unpadded.squeeze(-1)
 +        data[key] = torch.nested.nested_tensor_from_jagged(unpadded, offsets=cu_seqlens)
 +
      return data
@@ -1071,7 +1069,9 @@ index 6d537ea..cc41e92 100644
 +    """
 +    values = tensor.values() if tensor.is_nested else tensor
 +    mask = data["attention_mask"]
-+    indices = tu.get_non_tensor_data(data, key="indices")
++    indices = tu.get_non_tensor_data(data, key="indices", default=None)
++    if indices is None:
++        raise ValueError("full-sequence restoration requires unpadding indices")
 +    if values.shape[0] != indices.numel():
 +        raise ValueError("cache output token count differs from unpadding indices")
 +    indices = indices.to(values.device)

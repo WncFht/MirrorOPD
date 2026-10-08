@@ -58,7 +58,7 @@ def main():
     check_rollout_guards(root)
     tu = SimpleNamespace(
         assign_non_tensor_data=lambda data, key, value: data.__setitem__(key, value),
-        get_non_tensor_data=lambda data, key, default=None: data.get(key, default),
+        get_non_tensor_data=lambda data, key, default: data.get(key, default),
         assign_non_tensor=lambda data, **kwargs: data.update(kwargs),
         get=lambda data, key: data.get(key),
         get_tensordict=lambda data: dict(data),
@@ -70,13 +70,18 @@ def main():
         offsets = torch.cat([torch.zeros(1, dtype=torch.long), lengths.cumsum(0)])
         return value.flatten(0, 1)[indices], indices, offsets
 
+    def index_first_axis(value, indices):
+        # Match the actual FlashAttention interface, including scalar-cache shape.
+        assert value.ndim >= 2
+        return value[indices]
+
     ns = {
         "torch": torch,
         "TensorDict": dict,
         "DataProto": Batch,
         "F": torch.nn.functional,
         "tu": tu,
-        "index_first_axis": lambda value, indices: value[indices],
+        "index_first_axis": index_first_axis,
         "unpad_input": unpad,
         "get_ulysses_sequence_parallel_world_size": lambda: 1,
     }

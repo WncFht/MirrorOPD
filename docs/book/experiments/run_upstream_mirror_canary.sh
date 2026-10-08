@@ -45,11 +45,23 @@ pd.DataFrame([
 ]).to_parquet(sys.argv[1], index=False)
 PY
 
+# Reuse upstream GSM8K scoring for monitoring without the fork's DeepScaler dependency.
+cat >"$task_root/data/canary_reward.py" <<'PY'
+from verl.utils.reward_score.gsm8k import compute_score as gsm8k_score
+
+
+def compute_score(data_source, solution_str, ground_truth, extra_info=None, **kwargs):
+    return gsm8k_score(solution_str, ground_truth)
+PY
+
 cd "$task_root/verl"
 "$task_python" -m verl.trainer.main_ppo \
   data.train_files="$task_root/data/canary.parquet" \
   data.val_files="$task_root/data/canary.parquet" \
   data.train_batch_size=2 data.max_prompt_length=64 data.max_response_length=64 \
+  data.dataloader_num_workers=0 \
+  reward.custom_reward_function.path="$task_root/data/canary_reward.py" \
+  reward.custom_reward_function.name=compute_score \
   actor_rollout_ref.model.path=Qwen/Qwen3-0.6B \
   actor_rollout_ref.model.use_remove_padding=false \
   actor_rollout_ref.model.use_fused_kernels=false \
@@ -72,6 +84,7 @@ cd "$task_root/verl"
   actor_rollout_ref.rollout.max_num_seqs=4 \
   actor_rollout_ref.rollout.max_num_batched_tokens=256 \
   actor_rollout_ref.rollout.max_model_len=128 \
+  actor_rollout_ref.rollout.agent.num_workers=2 \
   actor_rollout_ref.rollout.calculate_log_probs=true \
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.rollout.temperature=1 actor_rollout_ref.rollout.top_p=1 \
