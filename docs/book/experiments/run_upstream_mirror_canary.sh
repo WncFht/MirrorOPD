@@ -62,6 +62,7 @@ cd "$task_root/verl"
   data.dataloader_num_workers=0 \
   reward.custom_reward_function.path="$task_root/data/canary_reward.py" \
   reward.custom_reward_function.name=compute_score \
+  reward.num_workers=1 \
   actor_rollout_ref.model.path=Qwen/Qwen3-0.6B \
   actor_rollout_ref.model.use_remove_padding=false \
   actor_rollout_ref.model.use_fused_kernels=false \
