@@ -33,13 +33,9 @@ def load_model(name: str, device: str, quantization: str):
 def sequence_logits(model, prompt_ids, generated_ids, device):
     if not generated_ids:
         return torch.empty((0, model.config.vocab_size), dtype=torch.float32)
-    ids = torch.tensor(
-        [prompt_ids + generated_ids[:-1]], dtype=torch.long, device=device
-    )
+    ids = torch.tensor([prompt_ids + generated_ids[:-1]], dtype=torch.long, device=device)
     return (
-        model(input_ids=ids, use_cache=False, logits_to_keep=len(generated_ids))
-        .logits[0]
-        .float()
+        model(input_ids=ids, use_cache=False, logits_to_keep=len(generated_ids)).logits[0].float()
     )
 
 
@@ -61,9 +57,7 @@ def main():
     args = ap.parse_args()
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
-    examples = [
-        json.loads(x) for x in Path(args.rollouts).read_text().splitlines() if x.strip()
-    ]
+    examples = [json.loads(x) for x in Path(args.rollouts).read_text().splitlines() if x.strip()]
     quant = None if args.quantization == "none" else args.quantization
     student = load_model(args.student, args.device, quant)
     teacher = load_model(args.teacher, args.device, quant)
@@ -72,12 +66,8 @@ def main():
     with torch.inference_mode():
         for ex_idx, ex in enumerate(examples):
             gen = ex["generated_token_ids"]
-            p_logits = sequence_logits(
-                student, ex["prompt_token_ids"], gen, args.device
-            )
-            q_logits = sequence_logits(
-                teacher, ex["prompt_token_ids"], gen, args.device
-            )
+            p_logits = sequence_logits(student, ex["prompt_token_ids"], gen, args.device)
+            q_logits = sequence_logits(teacher, ex["prompt_token_ids"], gen, args.device)
             p_log = torch.log_softmax(p_logits, dim=-1)
             q_log = torch.log_softmax(q_logits, dim=-1)
             p = p_log.exp()
@@ -85,7 +75,7 @@ def main():
             entropy = -(p * p_log).sum(dim=-1)
             vals = kl.detach().cpu().numpy().astype(np.float64)
             ents = entropy.detach().cpu().numpy().astype(np.float64)
-            for t, (value, ent) in enumerate(zip(vals, ents)):
+            for t, (value, ent) in enumerate(zip(vals, ents, strict=True)):
                 prefix_rows.append(
                     {
                         "example_id": ex_idx,

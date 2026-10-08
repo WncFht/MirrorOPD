@@ -23,9 +23,7 @@ def main():
     estimate = k4.mean()
     grad = torch.autograd.grad(estimate, logits)[0]
     print(f"exact_value={exact_value.item():.8f}")
-    print(
-        f"mc_value={estimate.item():.8f} abs_err={abs(estimate.item() - exact_value.item()):.3e}"
-    )
+    print(f"mc_value={estimate.item():.8f} abs_err={abs(estimate.item() - exact_value.item()):.3e}")
     print(f"grad_l2_err={torch.linalg.vector_norm(grad - exact_grad).item():.3e}")
     assert abs(estimate.item() - exact_value.item()) < 2.5e-2
     assert torch.linalg.vector_norm(grad - exact_grad).item() < 2.5e-2

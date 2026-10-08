@@ -51,11 +51,9 @@ def main():
         student = copy.deepcopy(initial)
         optimizer = torch.optim.SGD(student.parameters(), lr=0.01)
         settings = SimpleNamespace(
-            distillation_loss=SimpleNamespace(
-                loss_mode="mirror_" + method, mirror_eta=0.5
-            )
+            distillation_loss=SimpleNamespace(loss_mode="mirror_" + method, mirror_eta=0.5)
         )
-        for outer in range(3):
+        for _outer in range(3):
             # Hard synchronization: next anchor includes every inner update.
             anchor = copy.deepcopy(student).eval().requires_grad_(False)
             frozen_params = [p.clone() for p in anchor.parameters()]
@@ -86,7 +84,7 @@ def main():
                 )
             frozen_cache = {key: value.clone() for key, value in cache.items()}
             centers = []
-            for inner in range(4):
+            for _inner in range(4):
                 optimizer.zero_grad()
                 outputs = functions["compute_mirror_opd_from_cache"](
                     student(ids, attention_mask=torch.ones_like(ids)).logits,
@@ -99,25 +97,19 @@ def main():
                 centers.append(outputs["mirror_student_center"][valid].clone())
                 loss.backward()
                 assert all(
-                    p.grad is None or torch.isfinite(p.grad).all()
-                    for p in student.parameters()
+                    p.grad is None or torch.isfinite(p.grad).all() for p in student.parameters()
                 )
                 optimizer.step()
-                assert all(
-                    torch.equal(value, frozen_cache[key])
-                    for key, value in cache.items()
-                )
-            torch.testing.assert_close(
-                centers[0], torch.zeros_like(centers[0]), atol=2e-7, rtol=0
-            )
+                assert all(torch.equal(value, frozen_cache[key]) for key, value in cache.items())
+            torch.testing.assert_close(centers[0], torch.zeros_like(centers[0]), atol=2e-7, rtol=0)
             assert (centers[-1] - centers[0]).abs().max() > 1e-8
             assert all(
                 torch.equal(p, saved)
-                for p, saved in zip(anchor.parameters(), frozen_params)
+                for p, saved in zip(anchor.parameters(), frozen_params, strict=True)
             )
             assert any(
                 not torch.equal(p, saved)
-                for p, saved in zip(student.parameters(), frozen_params)
+                for p, saved in zip(student.parameters(), frozen_params, strict=True)
             )
         print(
             f"PASS upstream {method}: 3 outer x 4 inner, frozen caches, recomputed centers, hard sync"

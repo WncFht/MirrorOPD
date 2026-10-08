@@ -60,8 +60,7 @@ def inner_update(
     can be reused for several inner updates, matching replay-style inner training.
     """
     p = softmax(logits)
-    logp, logb, logt = log_softmax(logits), np.log(anchor), np.log(teacher)
-    s, k = actions.shape
+    logb, logt = np.log(anchor), np.log(teacher)
     scores = score_vectors(p, actions)
     gathered_p = np.take_along_axis(p, actions, axis=1)
     gathered_b = np.take_along_axis(anchor, actions, axis=1)
@@ -96,7 +95,11 @@ def inner_update(
         # MD-OPD repository: samples come from the frozen anchor and the KL
         # penalty is evaluated directly on those samples.  ``mdpo_is`` is the
         # population-correct action-IS estimator, useful as an oracle control.
-        coeff = (gathered_r - ratio_log / eta) if name == "mdpo" else rho * (gathered_r - ratio_log / eta)
+        coeff = (
+            (gathered_r - ratio_log / eta)
+            if name == "mdpo"
+            else rho * (gathered_r - ratio_log / eta)
+        )
         grad = np.mean(coeff[..., None] * scores, axis=1)
     else:
         raise ValueError(name)

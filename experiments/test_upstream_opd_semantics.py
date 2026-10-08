@@ -37,9 +37,7 @@ def main():
     # Reward uses normalized weights but raw full-vocabulary log-ratios.
     torch.testing.assert_close(reward, -norm - torch.log(p.sum() / q.sum()))
     assert not torch.isclose(reward, -norm)
-    print(
-        f"One-Shot sum reward={reward.item():.9f}; negative conditional KL={-norm.item():.9f}"
-    )
+    print(f"One-Shot sum reward={reward.item():.9f}; negative conditional KL={-norm.item():.9f}")
     ns = load_functions(
         root / "TA-OPD/verl/verl/trainer/distillation/fsdp/losses.py",
         [
@@ -61,9 +59,7 @@ def main():
     assert (actual[2:] > 99 * tails[2:]).all()
     # Enumerate reused behavior actions: correction must have correct value
     # AND gradient, even when behavior differs substantially from student.
-    logits = torch.tensor(
-        [0.5, -0.1, -0.7, 0.2], dtype=torch.float64, requires_grad=True
-    )
+    logits = torch.tensor([0.5, -0.1, -0.7, 0.2], dtype=torch.float64, requires_grad=True)
     lp = logits.log_softmax(-1)
     p = lp.exp()
     q = torch.tensor([0.2, 0.4, 0.1, 0.3], dtype=torch.float64)
@@ -134,9 +130,7 @@ def main():
                     atol=3e-7,
                     rtol=3e-6,
                 )
-    print(
-        "PASS: TA-OPD fork MirrorOPD primitive: 9 support/method cases, exact gradient endpoints"
-    )
+    print("PASS: TA-OPD fork MirrorOPD primitive: 9 support/method cases, exact gradient endpoints")
     load_functions(
         root / "TA-OPD/verl/verl/trainer/distillation/fsdp/losses.py",
         ["compute_mirror_opd_from_cache"],
@@ -154,29 +148,22 @@ def main():
         "mirror_anchor_ids": torch.tensor([[0, 1]]).expand(7, -1).clone(),
         "mirror_anchor_head_log_probs": anchor[:2].log().expand(7, -1).clone(),
         "mirror_anchor_tail_log_prob": torch.full((7,), 0.3).log(),
-        "mirror_anchor_action_log_prob": anchor[
-            torch.tensor([0, 0, 1, 0, 0, 2, 0])
-        ].log(),
-        "mirror_teacher_action_log_prob": teacher[
-            torch.tensor([0, 0, 1, 0, 0, 2, 0])
-        ].log(),
+        "mirror_anchor_action_log_prob": anchor[torch.tensor([0, 0, 1, 0, 0, 2, 0])].log(),
+        "mirror_teacher_action_log_prob": teacher[torch.tensor([0, 0, 1, 0, 0, 2, 0])].log(),
         "mirror_teacher_center": kt.expand(7).clone(),
     }
     # Invalid positions deliberately contain unusable ids and NaN caches.
     cache["mirror_anchor_ids"][~valid] = -99
-    for key, value in cache.items():
+    for value in cache.values():
         if value.is_floating_point():
             value[~valid] = float("nan")
     nested = {
-        key: torch.nested.nested_tensor_from_jagged(value, offsets)
-        for key, value in cache.items()
+        key: torch.nested.nested_tensor_from_jagged(value, offsets) for key, value in cache.items()
     }
     for method in ("pmd_mean", "bpo", "mdpo"):
         x = torch.randn(1, 7, 4, requires_grad=True)
         cfg = SimpleNamespace(
-            distillation_loss=SimpleNamespace(
-                loss_mode="mirror_" + method, mirror_eta=0.5
-            )
+            distillation_loss=SimpleNamespace(loss_mode="mirror_" + method, mirror_eta=0.5)
         )
         fields = ns["compute_mirror_opd_from_cache"](x, nested, cfg, "thd")
         direct = ns["compute_mirror_opd_token_loss"](
@@ -198,9 +185,7 @@ def main():
         grad = torch.autograd.grad(fields["distillation_losses"].sum(), x)[0]
         assert (grad[0, ~valid] == 0).all()
         assert grad[0, valid].abs().sum() > 0
-    print(
-        "PASS: jagged MirrorOPD adapter: 3 methods, invalid-position masking and live gradients"
-    )
+    print("PASS: jagged MirrorOPD adapter: 3 methods, invalid-position masking and live gradients")
     # Partial-support centers change BPO's score update and its regression
     # gradient in different ways; check both derived error identities.
     q = torch.tensor([0.4, 0.3, 0.2, 0.1], dtype=torch.float64)
@@ -216,9 +201,7 @@ def main():
     khat_t = (q[head] * (q[head].log() - teacher[head].log())).sum() + qt * (
         qt.log() - teacher[2:].sum().log()
     )
-    khat_s = (q[head] * (q[head].log() - lp[head])).sum() + qt * (
-        qt.log() - lp[2:].logsumexp(-1)
-    )
+    khat_s = (q[head] * (q[head].log() - lp[head])).sum() + qt * (qt.log() - lp[2:].logsumexp(-1))
     d = lp - q.log() + ks - eta * (reward + kt)
     dhat = lp - q.log() + khat_s - eta * (reward + khat_t)
     exact = (q * d.square()).sum() / (2 * eta)
@@ -229,22 +212,16 @@ def main():
     gr = torch.autograd.grad(regression, x, retain_graph=True)[0]
     score_mean = torch.autograd.grad((q * lp).sum(), x, retain_graph=True)[0]
     center_gradient = torch.autograd.grad(khat_s, x, retain_graph=True)[0]
-    torch.testing.assert_close(
-        gs - ge, ((kt - khat_t) - (ks - khat_s) / eta) * score_mean
-    )
+    torch.testing.assert_close(gs - ge, ((kt - khat_t) - (ks - khat_s) / eta) * score_mean)
     torch.testing.assert_close(gr - gs, (q * dhat).sum() / eta * center_gradient)
     assert (gr - gs).abs().max() > 1e-3
-    mean_regression = (
-        0.5 * (q * (lp - q.log() - eta * (reward + khat_t)).square()).sum()
-    )
+    mean_regression = 0.5 * (q * (lp - q.log() - eta * (reward + khat_t)).square()).sum()
     mean_surrogate = (q * (lp - q.log() - eta * (reward + khat_t)).detach() * lp).sum()
     torch.testing.assert_close(
         torch.autograd.grad(mean_regression, x, retain_graph=True)[0],
         torch.autograd.grad(mean_surrogate, x)[0],
     )
-    print(
-        "PASS: Tail-aware BPO bias and regression-gradient discrepancy; Mean equivalence"
-    )
+    print("PASS: Tail-aware BPO bias and regression-gradient discrepancy; Mean equivalence")
     anchor_logits = torch.tensor([[2.0, 1.0, 0.0, -1.0], [0.1, 0.2, 0.3, 0.4]])
     teacher_logits = torch.tensor([[0.1, 0.7, 1.2, -0.4], [0.4, 0.3, 0.2, 0.1]])
     actions = torch.tensor([2, -99])
@@ -252,21 +229,18 @@ def main():
     cache = ns["build_mirror_opd_cache_from_full_logits"](
         anchor_logits, teacher_logits, actions, valid, topk=2
     )
-    anchor_cache = ns["build_mirror_anchor_cache"](
-        anchor_logits, actions, valid, topk=2
-    )
+    anchor_cache = ns["build_mirror_anchor_cache"](anchor_logits, actions, valid, topk=2)
     saved_anchor = {key: value.clone() for key, value in anchor_cache.items()}
     compact = ns["complete_mirror_teacher_cache"](teacher_logits, anchor_cache)
     assert compact.keys() == cache.keys()
     for key in cache:
         torch.testing.assert_close(compact[key], cache[key])
-    assert all(
-        torch.equal(value, saved_anchor[key]) for key, value in anchor_cache.items()
-    )
+    assert all(torch.equal(value, saved_anchor[key]) for key, value in anchor_cache.items())
     try:
         ns["complete_mirror_teacher_cache"](torch.zeros(2, 5), anchor_cache)
     except ValueError as error:
-        assert "vocabulary sizes" in str(error)
+        if "vocabulary sizes" not in str(error):
+            raise AssertionError("unexpected vocabulary validation error") from error
     else:
         raise AssertionError("mismatched teacher vocabulary was accepted")
     q = anchor_logits.log_softmax(-1).exp()
@@ -326,9 +300,7 @@ def main():
             "TensorDict": dict,
             "F": torch.nn.functional,
             "tu": SimpleNamespace(
-                get_non_tensor_data=lambda data, key, default=None: data.get(
-                    key, default
-                )
+                get_non_tensor_data=lambda data, key, default=None: data.get(key, default)
             ),
         },
     )
@@ -357,8 +329,7 @@ def main():
     tlogits = torch.randn(len(indices), 16)
     anchor = ns["compute_mirror_cache_from_logits"](qlogits, nested, "anchor", topk=3)
     nested_anchor = {
-        key: torch.nested.nested_tensor_from_jagged(value, offsets)
-        for key, value in anchor.items()
+        key: torch.nested.nested_tensor_from_jagged(value, offsets) for key, value in anchor.items()
     }
     teacher = ns["compute_mirror_cache_from_logits"](tlogits, nested_anchor, "teacher")
     oracle = ns["build_mirror_opd_cache_from_full_logits"](
@@ -370,14 +341,12 @@ def main():
     )
     for key, value in teacher.items():
         torch.testing.assert_close(value, oracle[key])
-    for key, value in {**anchor, **teacher}.items():
+    for value in {**anchor, **teacher}.values():
         restored = padding["no_padding_2_full_padding"](value, data)
         torch.testing.assert_close(restored.flatten(0, 1)[indices], value)
         assert restored[~attention.bool()].eq(0).all()
     restored_actions = padding["no_padding_2_padding"](anchor["mirror_actions"], data)
-    torch.testing.assert_close(
-        restored_actions, torch.where(response_mask.bool(), ids[:, 3:], 0)
-    )
+    torch.testing.assert_close(restored_actions, torch.where(response_mask.bool(), ids[:, 3:], 0))
     print(
         "PASS: worker cache inference and padding: ragged prompts/responses, predecessor alignment, vector fields"
     )

@@ -71,7 +71,6 @@ def run_categorical_opd(
         frozen_anchor = anchor.detach()
         log_anchor = frozen_anchor.log()
         log_teacher = teacher.log()
-        reward = log_teacher - log_anchor
         # Tail-aware centers are evaluated from the frozen outer anchor.
         teacher_kl = tail_aware_kl(log_anchor, log_teacher, config.top_k)
         for _ in range(config.inner_steps):
@@ -117,12 +116,8 @@ def run_categorical_opd(
                 "rollout_unique": float(actions.unique().numel()),
                 "teacher_tail_aware": float(teacher_kl),
                 "teacher_exact": float(exact_kl(anchor.log(), log_teacher)),
-                "student_anchor_exact": float(
-                    exact_kl(anchor.log(), inner_policy.log())
-                ),
-                "inner_to_teacher_exact": float(
-                    exact_kl(inner_policy.log(), log_teacher)
-                ),
+                "student_anchor_exact": float(exact_kl(anchor.log(), inner_policy.log())),
+                "inner_to_teacher_exact": float(exact_kl(inner_policy.log(), log_teacher)),
                 "inner_loss": float(loss.detach()),
             }
         )

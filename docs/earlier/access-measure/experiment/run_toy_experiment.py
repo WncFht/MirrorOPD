@@ -46,13 +46,9 @@ def run(
         target = mirror_target(anchor, teacher, eta)
         actions_batch = sample_actions(anchor, samples, rng)
         for inner in range(inner_steps):
-            logits, diag = inner_update(
-                method, logits, anchor, teacher, actions_batch, eta, lr
-            )
+            logits, diag = inner_update(method, logits, anchor, teacher, actions_batch, eta, lr)
             if not np.all(np.isfinite(logits)):
-                raise FloatingPointError(
-                    f"unstable {method} at outer={outer}, inner={inner}"
-                )
+                raise FloatingPointError(f"unstable {method} at outer={outer}, inner={inner}")
         student = softmax(logits)
         history.append(
             {
@@ -121,12 +117,8 @@ def main() -> None:
         for rec in records:
             h = rec["history"]
             x = [v["outer"] for v in h]
-            axes[0].plot(
-                x, [v["kl_student_teacher"] for v in h], marker="o", label=rec["method"]
-            )
-            axes[1].plot(
-                x, [v["kl_student_target"] for v in h], marker="o", label=rec["method"]
-            )
+            axes[0].plot(x, [v["kl_student_teacher"] for v in h], marker="o", label=rec["method"])
+            axes[1].plot(x, [v["kl_student_target"] for v in h], marker="o", label=rec["method"])
             axes[2].plot(
                 x,
                 [v["inner_coefficient_var"] for v in h],

@@ -72,9 +72,7 @@ def main() -> None:
             quantile_table(prefix, label, "prefix"),
             quantile_table(prompt, label, "prompt"),
         ]
-    pd.concat(stat, ignore_index=True).to_csv(
-        out / "mk_distribution_stats.csv", index=False
-    )
+    pd.concat(stat, ignore_index=True).to_csv(out / "mk_distribution_stats.csv", index=False)
 
     fig, ax = plt.subplots(figsize=(7.2, 4.4))
     for label, (prefix, _) in data.items():
@@ -137,7 +135,7 @@ def main() -> None:
     plt.close(fig)
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharey=True)
-    for ax, (label, (prefix, prompt)) in zip(axes, data.items()):
+    for ax, (label, (_prefix, prompt)) in zip(axes, data.items(), strict=False):
         vals = prompt["mean_m32"].to_numpy()
         ax.hist(vals, bins=40, color=COLORS[label], alpha=0.78)
         ax.axvline(

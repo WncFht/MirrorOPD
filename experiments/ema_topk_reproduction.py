@@ -33,9 +33,7 @@ def calibrate_scale(z: torch.Tensor, target: float, k: int = 32) -> float:
     return (lo + hi) / 2
 
 
-def head_gradient(
-    p: torch.Tensor, log_ratio: torch.Tensor, top_idx: torch.Tensor
-) -> torch.Tensor:
+def head_gradient(p: torch.Tensor, log_ratio: torch.Tensor, top_idx: torch.Tensor) -> torch.Tensor:
     """Gradient wrt logits of sum_{j in top_idx} p_j log(p_j/q_j)."""
     a = torch.zeros_like(p)
     a[top_idx] = log_ratio[top_idx] + 1.0
@@ -107,9 +105,7 @@ def estimate_rmse(
 
 
 def run(args: argparse.Namespace) -> None:
-    device = torch.device(
-        "cuda" if torch.cuda.is_available() and not args.cpu else "cpu"
-    )
+    device = torch.device("cuda" if torch.cuda.is_available() and not args.cpu else "cpu")
     torch.manual_seed(args.seed)
     gen = torch.Generator(device=device).manual_seed(args.seed + 17)
     z = torch.randn(args.vocab, device=device)
@@ -171,7 +167,7 @@ def make_plot(rows: list[dict[str, float]], out: Path) -> None:
     batches = sorted({int(r["batch_size"]) for r in rows})
     fig, axes = plt.subplots(2, 2, figsize=(12, 8), sharex=True, sharey=True)
     colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(ks)))
-    for ax, mass in zip(axes.flat, masses):
+    for ax, mass in zip(axes.flat, masses, strict=False):
         subset = [r for r in rows if float(r["mass_target"]) == mass]
         # Sampled K4 is common to all top-k choices; plot it once.
         sample = [r for r in subset if int(r["top_k"]) == ks[0]]
@@ -182,11 +178,9 @@ def make_plot(rows: list[dict[str, float]], out: Path) -> None:
             lw=2,
             label="sampled K4",
         )
-        for color, k in zip(colors, ks):
+        for color, k in zip(colors, ks, strict=True):
             cur = [r for r in subset if int(r["top_k"]) == k]
-            ax.loglog(
-                batches, [r["trunc_rmse"] for r in cur], color=color, ls=":", alpha=0.65
-            )
+            ax.loglog(batches, [r["trunc_rmse"] for r in cur], color=color, ls=":", alpha=0.65)
             ax.loglog(
                 batches,
                 [r["topk_rmse"] for r in cur],

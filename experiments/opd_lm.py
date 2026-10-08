@@ -37,9 +37,7 @@ def aggregate_kl(anchor_head, anchor_tail, other_log_probs, support):
     other_head = other_log_probs.gather(-1, support)
     mask = torch.ones_like(other_log_probs, dtype=torch.bool)
     mask.scatter_(-1, support, False)
-    other_tail_log = torch.logsumexp(
-        other_log_probs.masked_fill(~mask, float("-inf")), -1
-    )
+    other_tail_log = torch.logsumexp(other_log_probs.masked_fill(~mask, float("-inf")), -1)
     head = (anchor_head.exp() * (anchor_head - other_head)).sum(-1)
     positive = anchor_tail > 0
     # Do not compute 0 * infinity for full-vocabulary support.
@@ -51,9 +49,7 @@ def aggregate_kl(anchor_head, anchor_tail, other_log_probs, support):
 
 
 @torch.no_grad()
-def freeze_cache(
-    anchor, teacher, prompt, generated, top_k, device="cpu", temperature=1.0
-):
+def freeze_cache(anchor, teacher, prompt, generated, top_k, device="cpu", temperature=1.0):
     if not prompt or not generated:
         raise ValueError("nonempty prompt and generated token ids required")
     ids = torch.tensor(prompt + generated[:-1], dtype=torch.long, device=device)
@@ -84,9 +80,7 @@ def freeze_cache(
 
 def train_trajectory(student, cache, method, eta, temperature=1.0):
     device = next(student.parameters()).device
-    lp = log_probs(
-        student, cache.input_ids.to(device), cache.prompt_length, temperature
-    )
+    lp = log_probs(student, cache.input_ids.to(device), cache.prompt_length, temperature)
     actions = cache.actions.to(device)
     student_action = lp.gather(-1, actions[:, None]).squeeze(-1)
     with torch.no_grad():

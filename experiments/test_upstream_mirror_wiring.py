@@ -32,14 +32,10 @@ class Config(dict):
 def load_method(path, classname, name, namespace):
     tree = ast.parse(path.read_text())
     cls = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.ClassDef) and node.name == classname
+        node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == classname
     )
     method = next(
-        node
-        for node in cls.body
-        if isinstance(node, ast.FunctionDef) and node.name == name
+        node for node in cls.body if isinstance(node, ast.FunctionDef) and node.name == name
     )
     method.decorator_list = []
     exec(
@@ -50,10 +46,7 @@ def load_method(path, classname, name, namespace):
 
 
 def main():
-    root = (
-        Path(__file__).resolve().parents[1]
-        / "upstream/TA-OPD/verl/verl"
-    )
+    root = Path(__file__).resolve().parents[1] / "upstream/TA-OPD/verl/verl"
     check_mode_routing(root)
     check_rollout_guards(root)
     check_rollout_versions(root)
@@ -62,7 +55,7 @@ def main():
         get_non_tensor_data=lambda data, key, default: data.get(key, default),
         assign_non_tensor=lambda data, **kwargs: data.update(kwargs),
         get=lambda data, key: data.get(key),
-        get_tensordict=lambda data: dict(data),
+        get_tensordict=dict,
     )
 
     def unpad(value, mask):
@@ -158,9 +151,7 @@ def main():
     trainer = SimpleNamespace(
         mirror_opd=True,
         config=SimpleNamespace(
-            actor_rollout_ref=SimpleNamespace(
-                actor=actor, rollout=SimpleNamespace(temperature=0.7)
-            )
+            actor_rollout_ref=SimpleNamespace(actor=actor, rollout=SimpleNamespace(temperature=0.7))
         ),
         distillation_config=SimpleNamespace(distillation_loss=SimpleNamespace(topk=3)),
         actor_rollout_wg=SimpleNamespace(compute_log_prob=score),
@@ -208,9 +199,9 @@ def check_mode_routing(root):
         ns,
     )
     expected = torch.tensor(0.75, requires_grad=True)
-    ns["distillation_loss"] = lambda *args: (expected, {})
+    ns["distillation_loss"] = lambda *_args: (expected, {})
 
-    def forbidden_ppo(*args):
+    def forbidden_ppo(*_args):
         raise AssertionError("MirrorOPD must not evaluate a PPO objective")
 
     ns["ppo_loss"] = forbidden_ppo
@@ -233,7 +224,8 @@ def check_mode_routing(root):
         assert ns["need_reference_policy"](config)
         assert not ns["need_teacher_policy"](config)
         loss, metrics = ns["distillation_ppo_loss"](None, distill)
-        assert loss is expected and "distillation/loss" in metrics
+        assert loss is expected
+        assert "distillation/loss" in metrics
         for field, bad in (
             ("mirror_teacher_model_path", ""),
             ("n_gpus_per_node", 1),
@@ -265,14 +257,8 @@ def check_mode_routing(root):
 
 def check_rollout_guards(root):
     tree = ast.parse((root / "trainer/ppo/ray_trainer.py").read_text())
-    cls = next(
-        n
-        for n in tree.body
-        if isinstance(n, ast.ClassDef) and n.name == "RayPPOTrainer"
-    )
-    init = next(
-        n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__"
-    )
+    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "RayPPOTrainer")
+    init = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == "__init__")
     guard = next(
         n
         for n in init.body
@@ -306,9 +292,7 @@ def check_rollout_guards(root):
         ),
     )
     config = Config(
-        actor_rollout_ref=Config(
-            rollout=rollout, actor=Config(use_kl_loss=False, entropy_coeff=0)
-        ),
+        actor_rollout_ref=Config(rollout=rollout, actor=Config(use_kl_loss=False, entropy_coeff=0)),
         algorithm=Config(adv_estimator="reinforce_plus_plus", use_kl_in_reward=False),
     )
     # These optional keys are absent from the actual upstream Hydra schema.
@@ -338,15 +322,21 @@ def check_rollout_versions(root):
     namespace = {}
     load_functions(
         root / "trainer/distillation/losses.py",
-        ["validate_mirror_rollout_version"], namespace,
+        ["validate_mirror_rollout_version"],
+        namespace,
     )
     validate = namespace["validate_mirror_rollout_version"]
     for version in (0, 1, 2):
         assert validate({"global_steps": [version, version]}, version, 2) == {
             "mirror/rollout_weight_version": version
         }
-    for fields in ({}, {"global_steps": [None, 2]}, {"global_steps": [1, 2]},
-                   {"global_steps": [2]}, {"global_steps": [3, 3]}):
+    for fields in (
+        {},
+        {"global_steps": [None, 2]},
+        {"global_steps": [1, 2]},
+        {"global_steps": [2]},
+        {"global_steps": [3, 3]},
+    ):
         try:
             validate(fields, 2, 2)
         except ValueError:

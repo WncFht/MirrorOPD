@@ -18,9 +18,7 @@ def span(p, t):
 def main():
     torch.manual_seed(20261008)
     count = 0
-    for dimension, eta, _ in itertools.product(
-        (2, 4, 8), (0.1, 0.5, 1.0, 2.0), range(8)
-    ):
+    for dimension, eta, _ in itertools.product((2, 4, 8), (0.1, 0.5, 1.0, 2.0), range(8)):
         q = torch.randn(dimension, dtype=torch.float64).softmax(-1)
         t = torch.randn(dimension, dtype=torch.float64).softmax(-1)
         reward = t.log() - q.log()
@@ -33,9 +31,7 @@ def main():
         excess = pmd_mean_loss(candidate.log(), q, reward, eta) - pmd_mean_loss(
             p.log(), q, reward, eta
         )
-        identity = 0.5 * (q @ (candidate.log() - p.log()).square()) + multiplier * kl(
-            p, candidate
-        )
+        identity = 0.5 * (q @ (candidate.log() - p.log()).square()) + multiplier * kl(p, candidate)
         torch.testing.assert_close(excess, identity, atol=2e-10, rtol=2e-9)
         if eta <= 1:
             bound = kl(q, t) - (1 / eta - 1) * kl(p, q)
@@ -83,12 +79,8 @@ def main():
         errors.append(float((p - limit).abs().max()))
         assert abs(multiplier / eta - float(q @ h.clamp_min(0))) < 0.2
     assert errors[2] < errors[1] < errors[0]
-    print(
-        f"PASS: {count} random OPD cases; multiplier bounds, exact excess-loss identity,"
-    )
-    print(
-        "teacher KL descent, span contraction, enumerated LOO loss/gradient and large-eta limit."
-    )
+    print(f"PASS: {count} random OPD cases; multiplier bounds, exact excess-loss identity,")
+    print("teacher KL descent, span contraction, enumerated LOO loss/gradient and large-eta limit.")
     print(f"Large-eta max probability errors: {errors}")
 
 

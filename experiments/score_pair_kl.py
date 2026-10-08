@@ -38,17 +38,13 @@ def load_model(name: str, device: str, quantization: str):
 
 
 @torch.inference_mode()
-def sequence_logits(
-    model, prompt_ids: list[int], generated_ids: list[int], device: str
-):
+def sequence_logits(model, prompt_ids: list[int], generated_ids: list[int], device: str):
     if not generated_ids:
         return torch.empty((0, model.config.vocab_size), dtype=torch.float32)
     # Omitting the final generated token makes the last n logits exactly the
     # distributions that predict generated_ids[0:n]. logits_to_keep avoids
     # materialising logits for prompt positions.
-    ids = torch.tensor(
-        [prompt_ids + generated_ids[:-1]], dtype=torch.long, device=device
-    )
+    ids = torch.tensor([prompt_ids + generated_ids[:-1]], dtype=torch.long, device=device)
     out = model(input_ids=ids, use_cache=False, logits_to_keep=len(generated_ids))
     return out.logits[0].float().cpu()
 
@@ -74,9 +70,7 @@ def main():
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
     examples = [
-        json.loads(line)
-        for line in Path(args.rollouts).read_text().splitlines()
-        if line.strip()
+        json.loads(line) for line in Path(args.rollouts).read_text().splitlines() if line.strip()
     ]
     if args.max_examples:
         examples = examples[: args.max_examples]
@@ -144,18 +138,12 @@ def main():
                 corrected_observed = head + correction
                 # The normalized Top-K objective renormalizes both policies on
                 # the same student-defined support S_K.  It is undefined at K=0.
-                normalized = (
-                    (head / mass + np.log(teacher_head_mass / mass))
-                    if k
-                    else float("nan")
-                )
+                normalized = (head / mass + np.log(teacher_head_mass / mass)) if k else float("nan")
                 # Sum tail probabilities directly: 1 - accumulated float32
                 # head mass loses precision for highly concentrated prefixes.
                 p_tail = float(p_tails[k])
                 q_tail = float(q_tails[k])
-                tail_aware = head + (
-                    p_tail * math.log(p_tail / q_tail) if p_tail > 0 else 0.0
-                )
+                tail_aware = head + (p_tail * math.log(p_tail / q_tail) if p_tail > 0 else 0.0)
                 if k == 0:
                     tail_aware = 0.0  # One aggregate token has KL exactly zero.
                 sums[k].append(
@@ -214,9 +202,7 @@ def main():
                 "variance_corrected": float(variance.mean()),
                 "rmse_corrected_theory": float(np.sqrt(np.mean(variance))),
                 "bias_corrected_observed": float((corrected - true).mean()),
-                "rmse_corrected_observed": float(
-                    np.sqrt(np.mean((corrected - true) ** 2))
-                ),
+                "rmse_corrected_observed": float(np.sqrt(np.mean((corrected - true) ** 2))),
                 "mean_normalized_kl": mean_normalized,
                 "bias_normalized": bias_normalized,
                 "variance_normalized": 0.0,
@@ -246,9 +232,7 @@ def main():
             indent=2,
         )
     )
-    print(
-        json.dumps({"n_examples": len(examples), "n_prefixes": prefix_count}, indent=2)
-    )
+    print(json.dumps({"n_examples": len(examples), "n_prefixes": prefix_count}, indent=2))
 
 
 if __name__ == "__main__":

@@ -94,9 +94,7 @@ def grouped_update(
             # the paper's binary-KL complement ratio and mask.
             adv = eta * (r + kl_rows(bb[None, :], tt[None, :])[0])
             omega = (1.0 + bpo_eps - bb[aa]) / np.maximum(1.0 + bpo_eps - pp[aa], 1e-8)
-            keep = ~(
-                ((adv > 0) & (omega > 1.0 + 0.2)) | ((adv < 0) & (omega < 1.0 - 0.2))
-            )
+            keep = ~(((adv > 0) & (omega > 1.0 + 0.2)) | ((adv < 0) & (omega < 1.0 - 0.2)))
             # The paper writes a minimization loss ``-2 eta A w log pi``;
             # converting its gradient to a logit *ascent* direction removes
             # the leading minus sign.
@@ -118,7 +116,7 @@ def grouped_update(
     }
 
 
-def occupancy(probs: np.ndarray, vocab: int, horizon: int) -> np.ndarray:
+def occupancy(probs: np.ndarray, vocab: int, horizon: int) -> np.ndarray:  # noqa: ARG001 — retained public tree-depth argument
     d = np.zeros(probs.shape[0])
     d[0] = 1.0
     for state in range(probs.shape[0]):
@@ -143,7 +141,7 @@ def run(
     lr: float,
 ) -> dict:
     rng = np.random.default_rng(seed)
-    parents, depths = build_tree(vocab, horizon)
+    parents, _depths = build_tree(vocab, horizon)
     n_states = len(parents)
     teacher = softmax(rng.normal(0.0, 1.25, size=(n_states, vocab)))
     logits = log_softmax(teacher) + rng.normal(0.0, 1.5, size=(n_states, vocab))

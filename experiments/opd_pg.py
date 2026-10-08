@@ -8,9 +8,7 @@ KL centers are computed separately on anchor top-k plus aggregate tail.
 import torch
 
 
-def coefficients(
-    method, log_student, log_anchor, log_teacher, teacher_center, student_center, eta
-):
+def coefficients(method, log_student, log_anchor, log_teacher, teacher_center, student_center, eta):
     if eta <= 0:
         raise ValueError("eta must be positive")
     u = log_student - log_anchor

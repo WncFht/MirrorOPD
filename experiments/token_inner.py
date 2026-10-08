@@ -6,9 +6,7 @@ import torch
 
 
 def mirror_target(anchor, teacher, eta):
-    return torch.softmax(
-        (1.0 - eta) * torch.log(anchor) + eta * torch.log(teacher), dim=-1
-    )
+    return torch.softmax((1.0 - eta) * torch.log(anchor) + eta * torch.log(teacher), dim=-1)
 
 
 def pmd_part_loss(logits, anchor, reward, eta):
@@ -79,9 +77,7 @@ def mean_target(anchor, reward, eta):
         else:
             high = mid
     multiplier = (low + high) / 2
-    return torch.tensor(
-        probabilities(multiplier), dtype=q.dtype, device=q.device
-    ), multiplier
+    return torch.tensor(probabilities(multiplier), dtype=q.dtype, device=q.device), multiplier
 
 
 def mdpo_step(logits, anchor, reward, eta, step_size=1.0):

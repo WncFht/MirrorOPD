@@ -51,7 +51,7 @@ def main():
     )
     results = llm.generate(prompts, params)
     rows = []
-    for i, (ex, res) in enumerate(zip(ds, results)):
+    for i, (ex, res) in enumerate(zip(ds, results, strict=True)):
         o = res.outputs[0]
         rows.append(
             {

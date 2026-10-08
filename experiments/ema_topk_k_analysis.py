@@ -26,9 +26,7 @@ def calibrate(z: torch.Tensor, target: float) -> float:
 
 
 @torch.no_grad()
-def structural_rows(
-    vocab: int, masses: list[float], ks: list[int], seed: int, device: str
-):
+def structural_rows(vocab: int, masses: list[float], ks: list[int], seed: int, device: str):
     torch.manual_seed(seed)
     z = torch.randn(vocab, device=device)
     zr = torch.randn(vocab, device=device)
@@ -63,9 +61,7 @@ def structural_rows(
             d = h - true
             dp = (d * p).sum()
             cross = (p[tail] * lr[tail] * (d[tail] - dp)).sum()
-            vnorm2 = (
-                p[tail] * lr[tail].square() * (1 - 2 * p[tail] + (p.square().sum()))
-            ).sum()
+            vnorm2 = (p[tail] * lr[tail].square() * (1 - 2 * p[tail] + (p.square().sum()))).sum()
             single_mse = d.square().sum() + 2 * cross + vnorm2
             rows.append(
                 {
@@ -98,16 +94,13 @@ def write_csv(rows, path: Path):
 
 def plot_structural(rows, out: Path):
     masses = sorted({r["mass_target"] for r in rows})
-    ks = sorted({r["top_k"] for r in rows})
     fig, ax = plt.subplots(2, 2, figsize=(12, 8))
     ax = ax.flat
     colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
-    for c, mass in zip(colors, masses):
+    for c, mass in zip(colors, masses, strict=True):
         cur = [r for r in rows if r["mass_target"] == mass]
         x = [r["top_k"] for r in cur]
-        ax[0].plot(
-            x, [r["top_mass"] for r in cur], "o-", color=c, label=f"M32={mass:g}"
-        )
+        ax[0].plot(x, [r["top_mass"] for r in cur], "o-", color=c, label=f"M32={mass:g}")
         ax[1].plot(x, [r["tail_mass"] for r in cur], "o-", color=c)
         ax[2].plot(
             x,
@@ -127,7 +120,7 @@ def plot_structural(rows, out: Path):
     ax[2].set_yscale("log")
     ax[2].set_ylabel("single-token relative RMSE")
     ax[2].set_title("One prefix, one sampled token")
-    for c, mass in zip(colors, masses):
+    for c, mass in zip(colors, masses, strict=True):
         cur = [r for r in rows if r["mass_target"] == mass]
         x = [r["top_k"] for r in cur]
         ax[3].plot(x, [r["trunc_bias_rmse"] for r in cur], "o:", color=c, alpha=0.8)
@@ -154,7 +147,7 @@ def plot_error_sweep(metrics, out: Path):
     masses = sorted({float(r["mass_target"]) for r in metrics})
     bs = [1, 32, 512, 32768]
     fig, ax = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
-    for a, mass in zip(ax.flat, masses):
+    for a, mass in zip(ax.flat, masses, strict=False):
         cur = [r for r in metrics if float(r["mass_target"]) == mass]
         for b in bs:
             rs = [r for r in cur if int(r["batch_size"]) == b]
@@ -185,7 +178,7 @@ def plot_bias_variance(rows, out: Path):
     masses = sorted({r["mass_target"] for r in rows})
     fig, ax = plt.subplots(1, 2, figsize=(12, 4.4), sharey=True)
     colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
-    for c, mass in zip(colors, masses):
+    for c, mass in zip(colors, masses, strict=True):
         cur = [r for r in rows if r["mass_target"] == mass]
         x = [r["top_k"] for r in cur]
         bias_trunc = np.asarray([r["trunc_bias_rmse"] for r in cur])

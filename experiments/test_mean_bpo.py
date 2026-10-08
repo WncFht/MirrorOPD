@@ -31,8 +31,7 @@ def check_case(q, reward, eta, logits):
             shift = torch.zeros_like(logits)
             shift[j] = 1e-5
             finite = (
-                loss(logits + shift, q, reward, eta)
-                - loss(logits - shift, q, reward, eta)
+                loss(logits + shift, q, reward, eta) - loss(logits - shift, q, reward, eta)
             ) / 2e-5
             close(finite, gradient[j], atol=2e-9)
     target, multiplier = mean_target(q, reward, eta)
@@ -67,9 +66,7 @@ def check_sample_correction():
         for indices in itertools.product(range(len(q)), repeat=k + 1):
             probability = q[list(indices)].prod()
             residual = z[indices[0]] - z[list(indices[1:])].mean()
-            sampled = sampled + probability * (k / (k + 1)) * residual.square() / (
-                2 * eta
-            )
+            sampled = sampled + probability * (k / (k + 1)) * residual.square() / (2 * eta)
         close(sampled, exact)
         close(
             torch.autograd.grad(sampled, logits, retain_graph=True)[0],
@@ -77,26 +74,17 @@ def check_sample_correction():
         )
     beta = torch.tensor([0.5, 0.4, 0.1], dtype=q.dtype)
     weighted = sum(
-        beta[a]
-        * beta[b]
-        * (q[a] / beta[a])
-        * (q[b] / beta[b])
-        * (z[a] - z[b]).square()
-        / (4 * eta)
+        beta[a] * beta[b] * (q[a] / beta[a]) * (q[b] / beta[b]) * (z[a] - z[b]).square() / (4 * eta)
         for a, b in itertools.product(range(3), repeat=2)
     )
     close(weighted, exact)
-    close(
-        torch.autograd.grad(weighted, logits)[0], torch.autograd.grad(exact, logits)[0]
-    )
+    close(torch.autograd.grad(weighted, logits)[0], torch.autograd.grad(exact, logits)[0])
 
 
 def main():
     torch.manual_seed(20261008)
     cases = 0
-    for dimension, eta, _ in itertools.product(
-        (2, 4, 8), (0.1, 0.5, 1.0, 2.0), range(4)
-    ):
+    for dimension, eta, _ in itertools.product((2, 4, 8), (0.1, 0.5, 1.0, 2.0), range(4)):
         q = torch.randn(dimension, dtype=torch.float64).softmax(-1)
         reward = torch.randn(dimension, dtype=torch.float64)
         logits = torch.randn(dimension, dtype=torch.float64)
@@ -115,9 +103,7 @@ def main():
         "Lambert-W normalization/KKT/stationarity, Gibbs zeros, first-step scaling, constant reward,"
     )
     print("enumerated finite-sample correction and off-behavior pair weighting.")
-    print(
-        f"Two-action Mean={target.tolist()}, Gibbs={teacher.tolist()}, lambda={multiplier:.12f}"
-    )
+    print(f"Two-action Mean={target.tolist()}, Gibbs={teacher.tolist()}, lambda={multiplier:.12f}")
 
 
 if __name__ == "__main__":

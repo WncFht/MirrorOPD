@@ -58,19 +58,13 @@ ax[1].plot(
     color=colors["normalized"],
     label="Normalized",
 )
-ax[1].plot(
-    df.top_k, df.bias_corrected_theory, "-", color=colors["ema"], label="EMA theory"
-)
-ax[1].set(
-    xlabel="K", ylabel="signed bias (nats)", title="Bias versus full-vocabulary KL"
-)
+ax[1].plot(df.top_k, df.bias_corrected_theory, "-", color=colors["ema"], label="EMA theory")
+ax[1].set(xlabel="K", ylabel="signed bias (nats)", title="Bias versus full-vocabulary KL")
 ax[1].set_yscale("symlog", linthresh=1e-5)
 ax[1].grid(alpha=0.25)
 ax[2].plot(df.top_k, df.rmse_trunc, "o-", color=colors["trunc"], label="Truncated")
 ax[2].plot(df.top_k, df.rmse_tail_aware, "^-", color=colors["ta"], label="Tail-aware")
-ax[2].plot(
-    df.top_k, df.rmse_corrected_theory, "-", color=colors["ema"], label="EMA theory"
-)
+ax[2].plot(df.top_k, df.rmse_corrected_theory, "-", color=colors["ema"], label="EMA theory")
 ax[2].plot(
     df.top_k,
     df.rmse_corrected_observed,

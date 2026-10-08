@@ -84,12 +84,9 @@ def find_crossings(rows):
     crossings = []
     for mass in sorted({row["mass_target"] for row in rows}):
         cur = [row for row in rows if row["mass_target"] == mass]
-        diffs = [
-            row["trunc_abs_relative_bias"] - row["corrected_relative_std"]
-            for row in cur
-        ]
+        diffs = [row["trunc_abs_relative_bias"] - row["corrected_relative_std"] for row in cur]
         crossing = float(cur[-1]["top_k"])
-        for left, right, d_left, d_right in zip(cur, cur[1:], diffs, diffs[1:]):
+        for left, right, d_left, d_right in zip(cur, cur[1:], diffs, diffs[1:], strict=False):
             if d_left == 0:
                 crossing = float(left["top_k"])
                 break
@@ -112,7 +109,7 @@ def configure_axis(axis, xlabel, ylabel):
 def plot_bias(rows, out: Path):
     masses = sorted({row["mass_target"] for row in rows})
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
-    for axis, mass in zip(axes.flat, masses):
+    for axis, mass in zip(axes.flat, masses, strict=False):
         cur = [row for row in rows if row["mass_target"] == mass]
         x = [row["top_k"] for row in cur]
         axis.plot(
@@ -123,13 +120,9 @@ def plot_bias(rows, out: Path):
         )
         axis.plot(x, [1e-12 for _ in cur], "--", label="Top-K corrected")
         axis.set_title(f"M32(pi)={mass:g}")
-        configure_axis(
-            axis, "Top-K (K=0 is sampled-token K1)", "absolute relative bias"
-        )
+        configure_axis(axis, "Top-K (K=0 is sampled-token K1)", "absolute relative bias")
     axes[0, 0].legend(fontsize=8)
-    fig.suptitle(
-        "Scalar KL bias: deterministic truncation versus sampled-token correction"
-    )
+    fig.suptitle("Scalar KL bias: deterministic truncation versus sampled-token correction")
     fig.tight_layout()
     fig.savefig(out / "topk_value_bias.png", dpi=220)
     fig.savefig(out / "topk_value_bias.pdf")
@@ -139,7 +132,7 @@ def plot_bias(rows, out: Path):
 def plot_variance(rows, out: Path):
     masses = sorted({row["mass_target"] for row in rows})
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
-    for axis, mass in zip(axes.flat, masses):
+    for axis, mass in zip(axes.flat, masses, strict=False):
         cur = [row for row in rows if row["mass_target"] == mass]
         x = [row["top_k"] for row in cur]
         axis.plot(
@@ -170,7 +163,7 @@ def plot_rmse(rows, out: Path):
     masses = sorted({row["mass_target"] for row in rows})
     colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True, sharey=True)
-    for axis, mass, color in zip(axes.flat, masses, colors):
+    for axis, mass, color in zip(axes.flat, masses, colors, strict=False):
         cur = [row for row in rows if row["mass_target"] == mass]
         x = [row["top_k"] for row in cur]
         axis.plot(
@@ -188,9 +181,7 @@ def plot_rmse(rows, out: Path):
             label="Top-K corrected, one sampled token",
         )
         axis.set_title(f"M32(pi)={mass:g}")
-        configure_axis(
-            axis, "Top-K (K=0 is sampled-token K1)", "relative scalar-KL RMSE"
-        )
+        configure_axis(axis, "Top-K (K=0 is sampled-token K1)", "relative scalar-KL RMSE")
     axes[0, 0].legend(fontsize=7)
     fig.suptitle("Scalar KL RMSE with one sampled-token correction")
     fig.tight_layout()
@@ -203,7 +194,7 @@ def plot_single_token_summary(rows, out: Path):
     masses = sorted({row["mass_target"] for row in rows})
     colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(masses)))
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharex=True)
-    for color, mass in zip(colors, masses):
+    for color, mass in zip(colors, masses, strict=True):
         cur = [row for row in rows if row["mass_target"] == mass]
         x = [row["top_k"] for row in cur]
         axes[0].plot(
@@ -244,9 +235,7 @@ def plot_single_token_summary(rows, out: Path):
     axes[0].legend(fontsize=7)
     axes[1].legend(fontsize=7)
     axes[2].legend(fontsize=7, ncol=2)
-    fig.suptitle(
-        "One sampled-token Top-K correction: scalar KL bias, variance, and RMSE"
-    )
+    fig.suptitle("One sampled-token Top-K correction: scalar KL bias, variance, and RMSE")
     fig.tight_layout()
     fig.savefig(out / "topk_value_single_token_summary.png", dpi=220)
     fig.savefig(out / "topk_value_single_token_summary.pdf")
@@ -258,10 +247,8 @@ def plot_crossings(crossings, out: Path):
     values = [row["crossing_k"] for row in crossings]
     fig, axis = plt.subplots(figsize=(6, 4.5))
     axis.plot(masses, values, "o-", color="tab:red", linewidth=2)
-    for mass, value in zip(masses, values):
-        axis.annotate(
-            f"K={value:.2f}", (mass, value), xytext=(5, 7), textcoords="offset points"
-        )
+    for mass, value in zip(masses, values, strict=True):
+        axis.annotate(f"K={value:.2f}", (mass, value), xytext=(5, 7), textcoords="offset points")
     axis.set_xlabel("$M_{32}(\\pi)$")
     axis.set_ylabel("intersection $K^*$")
     axis.set_title("Where one-token corrected RMSE meets truncation RMSE")
@@ -284,9 +271,7 @@ def main():
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     device = "cpu" if args.cpu or not torch.cuda.is_available() else "cuda"
-    rows = make_rows(
-        args.vocab, [0.2, 0.5, 0.8, 0.9], list(range(33)), args.seed, device
-    )
+    rows = make_rows(args.vocab, [0.2, 0.5, 0.8, 0.9], list(range(33)), args.seed, device)
     write_csv(rows, output / "value_metrics.csv")
     plot_bias(rows, output)
     plot_variance(rows, output)

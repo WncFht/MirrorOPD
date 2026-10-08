@@ -74,19 +74,14 @@ def main():
                 history = run_categorical_opd(anchor, teacher, cfg)
                 assert len(history) == cfg.outer_steps
                 assert all(
-                    torch.isfinite(torch.tensor(list(row.values()))).all()
-                    for row in history
+                    torch.isfinite(torch.tensor(list(row.values()))).all() for row in history
                 )
-                assert (
-                    history[-1]["inner_to_teacher_exact"] < history[0]["teacher_exact"]
-                )
+                assert history[-1]["inner_to_teacher_exact"] < history[0]["teacher_exact"]
                 torch.manual_seed(20261008)
                 cfg.sampled_inner = True
                 cfg.rollout_batch = 4096
                 sampled = run_categorical_opd(anchor, teacher, cfg)
-                assert (
-                    sampled[-1]["inner_to_teacher_exact"] < sampled[0]["teacher_exact"]
-                )
+                assert sampled[-1]["inner_to_teacher_exact"] < sampled[0]["teacher_exact"]
     print("PASS: 60 exact gradients; 180 enumerated MC gradients; 36 outer/inner runs")
 
 

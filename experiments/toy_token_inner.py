@@ -25,9 +25,7 @@ def softmax(z: torch.Tensor) -> torch.Tensor:
     return torch.softmax(z, dim=-1)
 
 
-def run(
-    method: str, eta: float, steps: int = 400, lr: float = 0.15
-) -> dict[str, float]:
+def run(method: str, eta: float, steps: int = 400, lr: float = 0.15) -> dict[str, float]:
     torch.manual_seed(20261008)
     q = torch.tensor([0.62, 0.23, 0.10, 0.05], dtype=torch.float64)
     teacher = torch.tensor([0.08, 0.17, 0.25, 0.50], dtype=torch.float64)
@@ -78,9 +76,7 @@ def run(
 
 def main() -> None:
     rows = [
-        run(m, eta)
-        for eta in (0.25, 0.5, 0.8)
-        for m in ("pmd_part", "pmd_mean", "bpo", "mdpo")
+        run(m, eta) for eta in (0.25, 0.5, 0.8) for m in ("pmd_part", "pmd_mean", "bpo", "mdpo")
     ]
     out = Path(__file__).with_name("toy_token_inner.csv")
     with out.open("w", newline="", encoding="utf-8") as f:

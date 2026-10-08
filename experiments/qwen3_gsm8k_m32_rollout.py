@@ -8,6 +8,7 @@ import csv
 import json
 import math
 import re
+from itertools import pairwise
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -34,9 +35,7 @@ def rollout(args, output: Path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.bfloat16 if device == "cuda" else torch.float32
     tokenizer = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model, torch_dtype=dtype, device_map=device
-    )
+    model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=dtype, device_map=device)
     model.eval()
     dataset = load_dataset("openai/gsm8k", "main", split=args.split)
     dataset = dataset.select(range(min(args.n, len(dataset))))
@@ -66,7 +65,7 @@ def rollout(args, output: Path):
         prediction = extract_prediction(generated_text)
         prompt_rows = []
         for step, (token_id, score) in enumerate(
-            zip(generated_ids.tolist(), generated.scores)
+            zip(generated_ids.tolist(), generated.scores, strict=True)
         ):
             # Keep the probability-mass calculation in float64: Qwen's logits
             # are often so peaked that float32 rounds M32 to exactly one.
@@ -75,9 +74,7 @@ def rollout(args, output: Path):
             top_values, top_indices = torch.topk(probs, k=min(32, probs.numel()))
             top_mask = torch.zeros_like(probs, dtype=torch.bool)
             top_mask[top_indices] = True
-            tail32_mass = (
-                probs[~top_mask].sum().clamp_min(torch.finfo(probs.dtype).tiny)
-            )
+            tail32_mass = probs[~top_mask].sum().clamp_min(torch.finfo(probs.dtype).tiny)
             token_prob = probs[token_id]
             rank = int((probs > token_prob).sum().item()) + 1
             entropy = float(-(probs * torch.log(probs.clamp_min(1e-30))).sum().item())
@@ -113,9 +110,7 @@ def rollout(args, output: Path):
                 "median_m32": float(np.median([r["m32"] for r in prompt_rows]))
                 if prompt_rows
                 else math.nan,
-                "mean_entropy_nats": float(
-                    np.mean([r["entropy_nats"] for r in prompt_rows])
-                )
+                "mean_entropy_nats": float(np.mean([r["entropy_nats"] for r in prompt_rows]))
                 if prompt_rows
                 else math.nan,
             }
@@ -150,15 +145,10 @@ def rollout(args, output: Path):
 
 
 def plot(rows, output: Path):
-    m32 = np.asarray([row["m32"] for row in rows])
     tail32 = np.asarray([row["tail32_mass"] for row in rows])
     entropy = np.asarray([row["entropy_nats"] for row in rows])
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5))
-    tail_bins = (
-        np.geomspace(tail32.min(), tail32.max(), 40)
-        if tail32.max() > tail32.min()
-        else 10
-    )
+    tail_bins = np.geomspace(tail32.min(), tail32.max(), 40) if tail32.max() > tail32.min() else 10
     axes[0].hist(tail32, bins=tail_bins, color="tab:blue", alpha=0.85)
     axes[0].set_xscale("log")
     axes[0].set_xlabel("tail mass $1-M_{32}(\\pi)$")
@@ -171,7 +161,7 @@ def plot(rows, output: Path):
     axes[2].scatter(entropy, tail32, s=3, alpha=0.12, rasterized=True)
     bins = np.linspace(entropy.min(), entropy.max(), 25)
     centers, means, lows, highs = [], [], [], []
-    for left, right in zip(bins[:-1], bins[1:]):
+    for left, right in pairwise(bins):
         mask = (entropy >= left) & (entropy < right)
         if mask.sum() < 5:
             continue
@@ -180,9 +170,7 @@ def plot(rows, output: Path):
         lows.append(np.quantile(tail32[mask], 0.1))
         highs.append(np.quantile(tail32[mask], 0.9))
     axes[2].plot(centers, means, "o-", color="tab:red", label="bin mean")
-    axes[2].fill_between(
-        centers, lows, highs, color="tab:red", alpha=0.2, label="10--90%"
-    )
+    axes[2].fill_between(centers, lows, highs, color="tab:red", alpha=0.2, label="10--90%")
     axes[2].set_xlabel("entropy (nats)")
     axes[2].set_yscale("log")
     axes[2].set_ylabel("tail mass $1-M_{32}(\\pi)$")

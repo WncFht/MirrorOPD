@@ -7,6 +7,7 @@ compared under fixed and linearly increasing eta schedules. The environment has
 H independent time states with a terminal reward table; this isolates the
 synchronization/occupancy mechanics while retaining finite-horizon returns.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,8 +47,18 @@ def eta_at(schedule: str, outer: int, outer_steps: int, eta0: float, eta1: float
     return eta0 + frac * (eta1 - eta0)
 
 
-def run(method: str, schedule: str, seed: int, horizon: int, outer_steps: int,
-        inner_steps: int, samples: int, lr: float, eta0: float, eta1: float) -> list[dict[str, float | int | str]]:
+def run(
+    method: str,
+    schedule: str,
+    seed: int,
+    horizon: int,
+    outer_steps: int,
+    inner_steps: int,
+    samples: int,
+    lr: float,
+    eta0: float,
+    eta1: float,
+) -> list[dict[str, float | int | str]]:
     rng = np.random.default_rng(seed)
     rewards = reward_table(horizon)
     # The teacher is the Boltzmann policy of finite-horizon rewards.
@@ -63,23 +74,31 @@ def run(method: str, schedule: str, seed: int, horizon: int, outer_steps: int,
         for inner in range(inner_steps):
             logits, last_diag = inner_update(method, logits, anchor, teacher, actions, eta, lr)
             if not np.all(np.isfinite(logits)):
-                raise FloatingPointError(f"unstable {method}/{schedule} outer={outer} inner={inner}")
+                raise FloatingPointError(
+                    f"unstable {method}/{schedule} outer={outer} inner={inner}"
+                )
         policy = softmax(logits)
         # Occupancy is uniform over time states in this diagnostic MDP.
         value = float(np.mean(np.sum(policy * rewards, axis=1)))
         anchor_value = float(np.mean(np.sum(anchor * rewards, axis=1)))
-        records.append({
-            "seed": seed, "method": method, "schedule": schedule,
-            "outer": outer, "eta": eta, "value": value,
-            "anchor_value": anchor_value,
-            "value_gain": value - anchor_value,
-            "kl_policy_teacher": float(np.mean(kl_rows(policy, teacher))),
-            "kl_policy_anchor": float(np.mean(kl_rows(policy, anchor))),
-            "kl_policy_target": float(np.mean(kl_rows(policy, target))),
-            "target_kl_anchor": float(np.mean(kl_rows(target, anchor))),
-            "inner_update_norm": last_diag.get("update_norm", np.nan),
-            "inner_coefficient_var": last_diag.get("coefficient_var", np.nan),
-        })
+        records.append(
+            {
+                "seed": seed,
+                "method": method,
+                "schedule": schedule,
+                "outer": outer,
+                "eta": eta,
+                "value": value,
+                "anchor_value": anchor_value,
+                "value_gain": value - anchor_value,
+                "kl_policy_teacher": float(np.mean(kl_rows(policy, teacher))),
+                "kl_policy_anchor": float(np.mean(kl_rows(policy, anchor))),
+                "kl_policy_target": float(np.mean(kl_rows(policy, target))),
+                "target_kl_anchor": float(np.mean(kl_rows(target, anchor))),
+                "inner_update_norm": last_diag.get("update_norm", np.nan),
+                "inner_coefficient_var": last_diag.get("coefficient_var", np.nan),
+            }
+        )
     return records
 
 
@@ -112,7 +131,9 @@ def write_audit(path: Path, args: argparse.Namespace, rows: list[dict[str, objec
         "|---|---|---:|---:|---:|",
     ]
     for (method, schedule), row in sorted(finals.items()):
-        lines.append(f"| {method} | {schedule} | {row['value']:.6f} | {row['kl_policy_teacher']:.6f} | {row['kl_policy_target']:.6f} |")
+        lines.append(
+            f"| {method} | {schedule} | {row['value']:.6f} | {row['kl_policy_teacher']:.6f} | {row['kl_policy_target']:.6f} |"
+        )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -132,8 +153,20 @@ def main() -> None:
     rows: list[dict[str, object]] = []
     for schedule in SCHEDULES:
         for method in METHODS:
-            rows.extend(run(method, schedule, args.seed, args.horizon, args.outer_steps,
-                            args.inner_steps, args.samples, args.lr, args.eta0, args.eta1))
+            rows.extend(
+                run(
+                    method,
+                    schedule,
+                    args.seed,
+                    args.horizon,
+                    args.outer_steps,
+                    args.inner_steps,
+                    args.samples,
+                    args.lr,
+                    args.eta0,
+                    args.eta1,
+                )
+            )
     csv_path = args.out_dir / "finite_horizon_outer_dynamics.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
@@ -142,8 +175,10 @@ def main() -> None:
     audit_path = args.out_dir / "finite_horizon_outer_dynamics_audit.md"
     write_audit(audit_path, args, rows)
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+
     fig, axes = plt.subplots(1, 3, figsize=(14, 4), constrained_layout=True)
     for method in METHODS:
         for schedule in SCHEDULES:

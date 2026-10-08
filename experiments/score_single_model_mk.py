@@ -22,9 +22,7 @@ def main():
     args = ap.parse_args()
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
-    rows = [
-        json.loads(x) for x in Path(args.rollouts).read_text().splitlines() if x.strip()
-    ]
+    rows = [json.loads(x) for x in Path(args.rollouts).read_text().splitlines() if x.strip()]
     dtype = torch.bfloat16 if args.device.startswith("cuda") else torch.float32
     kw = {"torch_dtype": dtype, "device_map": args.device}
     if args.quantization != "none":
@@ -50,11 +48,7 @@ def main():
                 dtype=torch.long,
                 device=args.device,
             )
-            logits = (
-                model(input_ids=ids, use_cache=False, logits_to_keep=n)
-                .logits[0]
-                .float()
-            )
+            logits = model(input_ids=ids, use_cache=False, logits_to_keep=n).logits[0].float()
             probs = torch.softmax(logits, dim=-1)
             topvals, topidx = torch.topk(probs, k=32, dim=-1)
             # Compute the tail directly.  ``1 - M32`` loses all significant
@@ -76,8 +70,7 @@ def main():
                     "example_id": i,
                     "generated_tokens": n,
                     **{
-                        f"mean_m{k}": sum(x[f"m{k}"] for x in own) / n
-                        for k in (1, 2, 4, 8, 16, 32)
+                        f"mean_m{k}": sum(x[f"m{k}"] for x in own) / n for k in (1, 2, 4, 8, 16, 32)
                     },
                     **{
                         f"median_m{k}": sorted(x[f"m{k}"] for x in own)[n // 2]

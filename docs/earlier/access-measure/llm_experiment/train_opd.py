@@ -36,11 +36,7 @@ def masked_mean(x: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
 
 
 def token_logprob(logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
-    return (
-        F.log_softmax(logits[:, :-1], dim=-1)
-        .gather(-1, labels[:, 1:, None])
-        .squeeze(-1)
-    )
+    return F.log_softmax(logits[:, :-1], dim=-1).gather(-1, labels[:, 1:, None]).squeeze(-1)
 
 
 def make_prompts(tokenizer, n: int, seed: int) -> list[str]:
@@ -59,9 +55,7 @@ def make_prompts(tokenizer, n: int, seed: int) -> list[str]:
     rng.shuffle(texts)
     prompts = []
     for text in texts:
-        ids = tokenizer(text, truncation=True, max_length=48, add_special_tokens=False)[
-            "input_ids"
-        ]
+        ids = tokenizer(text, truncation=True, max_length=48, add_special_tokens=False)["input_ids"]
         if len(ids) >= 16:
             prompts.append(tokenizer.decode(ids[:16], skip_special_tokens=True))
         if len(prompts) >= n:
@@ -81,9 +75,9 @@ def rollout(
     eta: float,
     device: torch.device,
 ):
-    enc = tokenizer(
-        prompts, return_tensors="pt", padding=True, truncation=True, max_length=64
-    ).to(device)
+    enc = tokenizer(prompts, return_tensors="pt", padding=True, truncation=True, max_length=64).to(
+        device
+    )
     anchor_out = student.generate(
         **enc,
         max_new_tokens=max_new_tokens,
@@ -105,9 +99,7 @@ def rollout(
     log_anchor = all_anchor.gather(-1, labels[:, 1:, None]).squeeze(-1)
     log_teacher = all_teacher.gather(-1, labels[:, 1:, None]).squeeze(-1)
     # Exact categorical log-partition for q ∝ anchor^(1-eta) teacher^eta.
-    log_partition_all = torch.logsumexp(
-        (1.0 - eta) * all_anchor + eta * all_teacher, dim=-1
-    )
+    log_partition_all = torch.logsumexp((1.0 - eta) * all_anchor + eta * all_teacher, dim=-1)
     log_partition = log_partition_all
     mask = token_mask[:, 1:]
     return (
@@ -129,7 +121,7 @@ def inner_loss(
     log_partition: torch.Tensor,
     mask: torch.Tensor,
     eta: float,
-    vocab_chunk: int = 0,
+    vocab_chunk: int = 0,  # noqa: ARG001 — legacy caller compatibility; full logits are used
 ) -> tuple[torch.Tensor, dict[str, float]]:
     log_student = token_logprob(student_logits, labels)
     reward = log_teacher - log_anchor
@@ -164,14 +156,12 @@ def inner_loss(
             "residual_rms": float(
                 torch.sqrt(masked_mean((ratio_log - eta * reward).square(), m)).cpu()
             ),
-            "coefficient_var": float(torch.var(coeff[m.bool()]).cpu())
-            if bool(m.any())
-            else 0.0,
+            "coefficient_var": float(torch.var(coeff[m.bool()]).cpu()) if bool(m.any()) else 0.0,
         }
     return loss, diag
 
 
-def evaluate(student, teacher, labels, log_anchor, log_teacher, mask):
+def evaluate(student, teacher, labels, log_anchor, log_teacher, mask):  # noqa: ARG001 — teacher log-probabilities are already cached
     with torch.no_grad():
         logits = student(labels).logits
         log_student = token_logprob(logits, labels)
@@ -221,9 +211,9 @@ def main() -> None:
     )
     # Keep the trainable tiny student in fp32 for stable tiny-batch updates;
     # the frozen teacher remains fp16 to reduce inference memory.
-    student = AutoModelForCausalLM.from_pretrained(
-        args.student, torch_dtype=torch.float32
-    ).to(device)
+    student = AutoModelForCausalLM.from_pretrained(args.student, torch_dtype=torch.float32).to(
+        device
+    )
     for p in teacher.parameters():
         p.requires_grad_(False)
     optimizer = torch.optim.AdamW(student.parameters(), lr=args.lr)
@@ -235,8 +225,7 @@ def main() -> None:
             eta = (
                 args.eta
                 if args.eta_final is None
-                else args.eta
-                + (args.eta_final - args.eta) * outer / max(1, args.outer_steps - 1)
+                else args.eta + (args.eta_final - args.eta) * outer / max(1, args.outer_steps - 1)
             )
             # Freeze anchor by snapshotting student weights and using the snapshot
             # for rollout/log-prob computation. The student itself is only updated
@@ -245,20 +234,18 @@ def main() -> None:
             # anchor log-probs are computed before the first optimizer step; the
             # resulting tensors are detached and reused throughout this outer step.
             student.eval()
-            sequences, log_anchor, log_teacher, log_partition, mask, prompt_len = (
-                rollout(
-                    student,
-                    teacher,
-                    tokenizer,
-                    prompts,
-                    args.max_new_tokens,
-                    eta,
-                    device,
-                )
+            sequences, log_anchor, log_teacher, log_partition, mask, _prompt_len = rollout(
+                student,
+                teacher,
+                tokenizer,
+                prompts,
+                args.max_new_tokens,
+                eta,
+                device,
             )
             student.train()
             last = {}
-            for inner in range(args.inner_steps):
+            for _inner in range(args.inner_steps):
                 optimizer.zero_grad(set_to_none=True)
                 loss_total = 0.0
                 for start in range(0, len(prompts), args.batch_size):
@@ -273,9 +260,7 @@ def main() -> None:
                         mask[sl],
                         eta,
                     )
-                    loss_total = loss_total + loss / math.ceil(
-                        len(prompts) / args.batch_size
-                    )
+                    loss_total = loss_total + loss / math.ceil(len(prompts) / args.batch_size)
                     last = diag
                 loss_total.backward()
                 torch.nn.utils.clip_grad_norm_(student.parameters(), 1.0)
