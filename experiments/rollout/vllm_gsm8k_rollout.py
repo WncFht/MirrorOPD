@@ -26,15 +26,22 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     tok = AutoTokenizer.from_pretrained(args.model)
     ds = load_dataset("openai/gsm8k", "main", split=args.split)
-    prompts = [
-        tok.apply_chat_template(
-            [{"role": "user", "content": x["question"]}],
+
+    def format_prompt(question: str) -> str:
+        if tok.chat_template is None:
+            return (
+                "Solve the following math problem. Show your work and finish "
+                "with the final answer in the form #### number.\n\n"
+                f"Question: {question}\n\nAnswer:"
+            )
+        return tok.apply_chat_template(
+            [{"role": "user", "content": question}],
             tokenize=False,
             add_generation_prompt=True,
             enable_thinking=False,
         )
-        for x in ds
-    ]
+
+    prompts = [format_prompt(x["question"]) for x in ds]
     llm = LLM(
         model=args.model,
         dtype="bfloat16",
