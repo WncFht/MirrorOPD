@@ -307,7 +307,7 @@ On-policy OPD & $\beta_k=\pi_{k,n}$，$w=1$ & $-(r_k+\mathcal K_{k,n}^{T})$ & To
 PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
 PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
 BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$（含 score 中心化） & Gibbs \\
-MDPO & anchor $\pi_k$,$e^U=\pi_{k,n}/\pi_k$ & $e^U(U/\eta-f)$ & Gibbs \\
+MDPO & anchor $\pi_k$,$\omega_{k,n}=\pi_{k,n}/\pi_k$ & $\omega_{k,n}(U/\eta-f)$ & Gibbs \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -319,7 +319,7 @@ MDPO & anchor $\pi_k$,$e^U=\pi_{k,n}/\pi_k$ & $e^U(U/\eta-f)$ & Gibbs \\
 \pi_{k,n}^{\star}(a\mid s)
 =\frac{\pi_k(a\mid s)e^{\eta f(s,a)}}{\mathbb E_{v\sim\pi_k(\cdot\mid s)}e^{\eta f(s,v)}}.
 \end{equation}
-它们的区别在于残差是否中心化、是否显式使用 $e^U$ 测度校正以及采用普通梯度还是
+它们的区别在于残差是否中心化、是否显式使用 $\omega_{k,n}$ 测度校正以及采用普通梯度还是
 自然梯度，因此有限 inner steps 的轨迹和方差并不相同。PMD-Mean 拟合
 $\eta(f-\bar f_k)$ 并另外施加指数归一化，其固定点是 Lambert-$W$ 投影；除非
 $f$ 在该 prefix 上为常数，它不等于式~\eqref{eq:ch2-four-methods-common-gibbs}。
@@ -337,7 +337,7 @@ reward，$\mathcal K_{k,n}^{T}$ 是对同一 prefix 的 student--teacher KL base
 的严格特例，而不是 PMD 的另一个有限-$\eta$ 解。
 
 对 MDPO 要作一个精确限定：若每个 outer step 都重新用当前策略 rollout，确实有
-$\pi_k=\beta_k$，从而 $e^U$ 不再承担跨策略的 importance correction；但有限
+$\pi_k=\beta_k$，从而 $\omega_{k,n}$ 不再承担跨策略的 importance correction；但有限
 $\eta$ 时系数仍包含 $U/\eta$，所以得到的是 on-policy MDPO。只有取
 $\eta\to\infty$（或显式删除镜像项）时，它才退化为本章的 On-policy OPD
 baseline。这个区分解释了实验中 \texttt{mdpo + on-policy} 与 \texttt{opd\_onpolicy}
@@ -516,7 +516,7 @@ U_a^{\mathrm{Gibbs}}=G_a-\log\mathbb E_{\pi_k}[e^G\mid s].
 \]
 对所有 action 同时成立。非恒定 $G$ 时第一个量严格为负，第二个量随 action 改变，因此不存在满足所有方程的单一 $\lambda_k$。PMD-Mean 使用 action-dependent 的 Lambert-$W$ 修正，Gibbs 使用 action-independent 的 log-partition 修正；二者仅在信号恒定时重合。
 
-本节损失的乘子 $\lambda_k$ 对应原论文乘子除以 $\tau^2$，其中 $\tau=1/\eta$。对 KKT 条件按 anchor 求均值，由 $\mathbb E_{\pi_k}[G]=0$ 和 $\mathbb E_{\pi_k}[e^U]=1$ 得到
+本节损失的乘子 $\lambda_k$ 对应原论文乘子除以 $\tau^2$，其中 $\tau=1/\eta$。对 KKT 条件按 anchor 求均值，由 $\mathbb E_{\pi_k}[G]=0$ 和 $\mathbb E_{\pi_k}[\omega_{k,n}]=1$ 得到
 \[
 \lambda_k=-\mathbb E_{\pi_k}[U]
 =\operatorname{KL}(\pi_k\Vert\pi_k^{\star,\mathrm{Mean}}).

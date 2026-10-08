@@ -785,7 +785,7 @@ On-policy OPD & 当前 student，$w=1$ & $-(r_\theta+\mathcal K_{k,n}^{T})$ & To
 PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
 PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
 BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$ & Gibbs \\
-MDPO & anchor $\pi_k$，$e^U=\pi_{k,n}/\pi_k$ & $e^U(U/\eta-r_k)$ & Gibbs \\
+MDPO & anchor $\pi_k$，$\omega_{k,n}=\pi_{k,n}/\pi_k$ & $\omega_{k,n}(U/\eta-r_k)$ & Gibbs \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -847,6 +847,89 @@ PMD-Mean 使用 teacher KL 作为 reward center；BPO 还需要 student KL cente
 MDPO 则通过 $\pi_{k,n}/\pi_k$ 完成 student 测度校正。四式共同使用 anchor rollout，
 而 Token-IS/On-policy baseline 使用下面的 $r_\theta$ 和 $\mathcal K_{k,n}^{T}$，两组系数不能
 混写。
+
+为避免把同一个比值写成两个对象，后文统一使用
+\begin{equation}
+\label{eq:ch2-omega-exp-u}
+\omega_{k,n}(s,a)
+:=\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+=\exp\!\left(U_{k,n}(s,a)\right).
+\end{equation}
+因此 $\omega_{k,n}$ 与 $e^{U_{k,n}}$ 在数学上完全相同：前者强调它是
+importance ratio，后者强调它是 log-ratio 的指数表示。Token-IS 使用一般行为策略
+$\beta_k$ 时另记 $w_{k,n}=\pi_{k,n}/\beta_k$；只有 $\beta_k=\pi_k$ 时才有
+$w_{k,n}=\omega_{k,n}$。
+
+\subsection{$\eta=1$ 时 BPO、PMD-Mean 与 Token-IS vOPD 的比较}
+\label{subsec:ch2-opd-eta-one-vopd}
+
+令 $q=\pi_k(\cdot\mid s)$、$p=\pi_{k,n}(\cdot\mid s)$、$T=\pi_T(\cdot\mid s)$，并写
+\begin{equation}
+\rho_{k,n}(s,a):=\log\frac{T(a)}{p(a)}=r_k(s,a)-U_{k,n}(s,a),
+\quad
+\mathcal K_{k,n}^{T}(s):=\operatorname{KL}(p\Vert T),
+\quad
+\mathcal K_k^{T}(s):=\operatorname{KL}(q\Vert T).
+\end{equation}
+Token-IS vOPD 的 sampled-token 系数（负号对应最小化 reverse KL）是
+\begin{equation}
+\label{eq:ch2-vopd-token-is-coef}
+c_{\mathrm{vOPD}}(s,a)
+=-\operatorname{sg}\!\left[
+w_{k,n}(s,a)\bigl(\rho_{k,n}(s,a)+\mathcal K_{k,n}^{T}(s)\bigr)
+\right].
+\end{equation}
+其中 $w_{k,n}=p/\beta_k$；它把行为测度 $\beta_k$ 变成当前 student 测度 $p$。
+
+把四个 mirror 系数中的 $\eta$ 设为 $1$，BPO 与 PMD-Mean 分别变成
+\begin{align}
+c_{\mathrm{BPO}}(s,a)
+&=U_{k,n}+\mathcal K_{k,n}^{S}-r_k-\mathcal K_k^{T}
+ =-\rho_{k,n}+\mathcal K_{k,n}^{S}-\mathcal K_k^{T},
+\label{eq:ch2-bpo-eta-one}\\
+c_{\mathrm{PMD\text{-}Mean}}(s,a)
+&=U_{k,n}-r_k-\mathcal K_k^{T}
+ =-\rho_{k,n}-\mathcal K_k^{T},
+\label{eq:ch2-pmd-mean-eta-one}
+\end{align}
+并且
+\begin{equation}
+c_{\mathrm{BPO}}-c_{\mathrm{PMD\text{-}Mean}}=\mathcal K_{k,n}^{S}.
+\end{equation}
+这个差值对 action 不变，但它乘的是在 $q$ 下取样、在 $p$ 上求 score 的梯度；
+因此只有在 $p=q$ 时才能直接用 $\mathbb E_p[\nabla\log p]=0$ 把它删掉。
+
+当第一个 inner step 使用刚刚 rollout 的策略作为 student 时，$p=q$，于是
+\begin{equation}
+U_{k,0}=0,\quad \omega_{k,0}=1,\quad
+\mathcal K_{k,0}^{S}=0,\quad \mathcal K_{k,0}^{T}=\mathcal K_k^{T},
+\end{equation}
+从而 BPO、PMD-Mean 和 Token-IS vOPD 的逐 token 系数都退化为
+\begin{equation}
+c(s,a)=-\bigl(r_k(s,a)+\mathcal K_k^{T}(s)\bigr).
+\end{equation}
+这解释了为什么三者在首个 on-anchor 更新上看起来等价。
+
+对于后续 stale-rollout inner step，等价性消失。取 $\beta_k=q$，即
+$w_{k,n}=\omega_{k,n}$，有
+\begin{align}
+c_{\mathrm{PMD\text{-}Mean}}-c_{\mathrm{vOPD}}
+&=(\omega_{k,n}-1)\rho_{k,n}
+ +\omega_{k,n}\mathcal K_{k,n}^{T}-\mathcal K_k^{T},\\
+c_{\mathrm{BPO}}-c_{\mathrm{vOPD}}
+&=(\omega_{k,n}-1)\rho_{k,n}
+ +\omega_{k,n}\mathcal K_{k,n}^{T}-\mathcal K_k^{T}
+ +\mathcal K_{k,n}^{S}.
+\end{align}
+第一项来自测度：vOPD 需要 $\omega_{k,n}$，而 PMD-Mean 与 BPO 的固定 anchor
+梯度直接在 $q$ 下计算。第二项来自中心：vOPD 使用当前 $p\Vert T$ 的 KL，
+mirror 方法使用固定 $q\Vert T$ 的 KL；BPO 还多出 $q\Vert p$ 的中心化项。
+所以 $\eta=1$ 并不把 BPO 或 PMD-Mean 变成 Token-IS OPD；它们只有在
+$p=q$ 的首步，或在精确收敛点 $p=T$ 的零梯度条件下相交。
+
+另一方面，PMD-Part、BPO 和 MDPO 的共同 Gibbs 解在 $\eta=1$ 时满足
+$p=T$。PMD-Mean 仍然是 Lambert-$W$ 投影，不能由上述代数恒等式改写成 vOPD，
+其有限 inner 轨迹与固定点都应单独记录。
 
 令 $q=\pi_k(\cdot\mid s)$、$p_\theta=\pi_\theta(\cdot\mid s)$、
 $T=\pi_T(\cdot\mid s)$。在固定 prefix 上，OPD 的 reverse-KL 目标为
@@ -949,11 +1032,11 @@ ratio $\prod_{t\leq l}p_\theta(a_t\mid s_t)/q(a_t\mid s_t)$ 才能修正到新�
 \Ensure $\theta_{k+1}$
 \State initialize $\theta\gets\theta_k$
 \For{$j=0,\ldots,J-1$}
-    \State evaluate $\log p_\theta(a_i\mid s_i)$ and frozen-support $\widehat \mathcal K_{k,n}^{T}(s_i)$ for all $(s_i,a_i)\in\mathcal B_k$
+    \State evaluate $\log p_\theta(a_i\mid s_i)$ and frozen-support $\widehat{\mathcal K}_{k,n}^{T}(s_i)$ for all $(s_i,a_i)\in\mathcal B_k$
     \State $u_i\gets\log p_\theta(a_i\mid s_i)-\log q(a_i\mid s_i)$
     \State $r_i\gets\log\pi_T(a_i\mid s_i)-\log p_\theta(a_i\mid s_i)$
     \State $w_i\gets\operatorname{sg}(\exp u_i)$
-    \State $g_j\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(w_i(r_i+\widehat \mathcal K_{k,n}^{T}(s_i)))\nabla_\theta\log p_\theta(a_i\mid s_i)$
+    \State $g_j\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(w_i(r_i+\widehat{\mathcal K}_{k,n}^{T}(s_i)))\nabla_\theta\log p_\theta(a_i\mid s_i)$
     \State $\theta\gets\operatorname{OptimizerStep}(\theta,g_j;\alpha_j)$
 \EndFor
 \State \Return $\theta_{k+1}\gets\theta$
@@ -961,7 +1044,7 @@ ratio $\prod_{t\leq l}p_\theta(a_t\mid s_t)/q(a_t\mid s_t)$ 才能修正到新�
 \end{algorithm}
 
 这里的 \texttt{mirror\_opd\_is} 使用 $J=4$ 作为 stale-rollout 对照，且每一步重新计算
-$u_i$ 与中心；\texttt{mirror\_opd\_is\_no\_baseline} 则令 $\widehat \mathcal K_{k,n}^{T}=0$，用于隔离
+$u_i$ 与中心；\texttt{mirror\_opd\_is\_no\_baseline} 则令 $\widehat{\mathcal K}_{k,n}^{T}=0$，用于隔离
 控制变量的作用。重要性权重必须 stop-gradient，否则 surrogate 会多出
 $\nabla w_i$ 项而不再是式~\eqref{eq:ch2-opd-baseline-gradient} 的 score
 估计器。实际训练记录 \texttt{importance\_ess} 和 \texttt{importance\_ess\_fraction}；当
