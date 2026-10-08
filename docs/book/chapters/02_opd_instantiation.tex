@@ -757,12 +757,12 @@ mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射�
 
 完整 vocabulary 与 sampled-token 两条路径的区别是信息论上的：前者能精确知道整个 categorical mirror target，后者只能无偏知道在 anchor 下抽到的一个 action 的 reward。对每个给定方法，两条信息访问路径在无限样本、无函数类误差且 center/partition 估计一致时具有相同总体解；PMD-Mean 的解是 Lambert-$W$ 分布，另外三种方法的解是 Gibbs 分布。有限 batch 下，full-vocabulary 的主要误差是参数优化和 prefix coverage，sampled-token 额外承担 reward、center、KL ratio 和 prefix reuse 的估计方差。
 
-\section{OPD 的六种可运行算法与统一 outer--inner pipeline}
+\section{OPD 的七种可运行算法与统一 outer--inner pipeline}
 \label{sec:ch2-opd-baselines}
 
-本节把实际实现中的六种算法放在同一个 outer--inner pipeline 中。前两种是无
-mirror 正则的 OPD baseline，后四种是固定 anchor 的 mirror inner：
-Token-IS OPD、On-policy OPD、PMD-Part、PMD-Mean、BPO 和 MDPO。这样命名后，
+本节把实际实现中的七种算法放在同一个 outer--inner pipeline 中。前两种是无
+mirror 正则的 OPD baseline，第三种是删除 mirror 项后的冻结 reward baseline，后四种是固定 anchor 的 mirror inner：
+Token-IS OPD、On-policy OPD、Frozen-reward OPD、PMD-Part、PMD-Mean、BPO 和 MDPO。这样命名后，
 ``on-policy'' 只描述 rollout 测度，``mirror'' 只描述目标中是否保留
 $\eta^{-1}\operatorname{KL}(p\Vert\pi_k)$；两者不能互相替代。
 
@@ -774,14 +774,15 @@ mirror inner 的 sampled-token PG 系数已经在第~\ref{sec:ch2-four-methods}
 
 \begin{table}[ht]
 \centering
-\caption{OPD 六种算法的训练测度、PG 系数与精确 inner 固定点}
-\label{tab:ch2-opd-six-algorithms}
+\caption{OPD 七种算法的训练测度、PG 系数与精确 inner 固定点}
+\label{tab:ch2-opd-seven-algorithms}
 \begin{tabular}{p{0.18\linewidth}p{0.24\linewidth}p{0.31\linewidth}p{0.18\linewidth}}
 \toprule
 算法 & rollout / inner 测度 & sampled-token PG 系数 & 精确固定点 \\
 \midrule
 Token-IS OPD & anchor $\pi_k$，token-IS $w=\pi_{k,n}/\pi_k$ & $-w(r_\theta+\mathcal K_{k,n}^{T})$ & teacher-directed OPD \\
 On-policy OPD & 当前 student，$w=1$ & $-(r_\theta+\mathcal K_{k,n}^{T})$ & Token-IS 的特例 \\
+Frozen-reward OPD ($\eta=+\infty$) & anchor $\pi_k$，$w=\pi_{k,n}/\pi_k$ & $-w r_k$ & $\arg\max r_k$ 上的分布 \\
 PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
 PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
 BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$ & Gibbs \\
@@ -801,7 +802,9 @@ MDPO & anchor $\pi_k$，$\omega_{k,n}=\pi_{k,n}/\pi_k$ & $\omega_{k,n}(U/\eta-r_
 \end{equation}
 PMD-Mean 的固定点是 Lambert-$W$ 投影，通常不等于式
 ~\eqref{eq:ch2-opd-common-mirror-solution}。当 $\eta=1$ 时 Gibbs 解等于 teacher；
-当 $\eta\to\infty$ 时，mirror 项消失的极限才与 On-policy OPD 的 score 目标一致。
+当 $\eta\to\infty$ 时，mirror 项消失；它只有在首个 $p=\pi_k$ 的 inner step
+上与 On-policy OPD 的 score 系数相同，后续仍然优化冻结的 $r_k$，因此不是
+On-policy OPD 的整体训练过程。
 因此“MDPO 一直 on-policy”只会去掉 MDPO 的 token-IS 测度校正，不会在有限
 $\eta$ 下自动变成 On-policy OPD。
 
@@ -930,6 +933,55 @@ $p=q$ 的首步，或在精确收敛点 $p=T$ 的零梯度条件下相交。
 另一方面，PMD-Part、BPO 和 MDPO 的共同 Gibbs 解在 $\eta=1$ 时满足
 $p=T$。PMD-Mean 仍然是 Lambert-$W$ 投影，不能由上述代数恒等式改写成 vOPD，
 其有限 inner 轨迹与固定点都应单独记录。
+
+\subsection{$\eta=+\infty$：删除 Mirror Descent KL 项的 baseline}
+\label{subsec:ch2-opd-eta-infinity}
+
+有限 $\eta$ 的共同 mirror 目标为
+\begin{equation}
+\label{eq:ch2-opd-mirror-objective-eta}
+F_{k,\eta}(p)=\frac{1}{\eta}\operatorname{KL}(p\Vert q)-\mathbb E_{a\sim p}[r_k(s,a)],
+\qquad q=\pi_k(\cdot\mid s),\quad r_k=\log\frac{\pi_T}{q}.
+\end{equation}
+第一项就是 Mirror Descent 的 proximal KL。取 $\eta\to+\infty$ 后，$1/\eta$ 为零，
+得到冻结 reward 目标
+\begin{equation}
+\label{eq:ch2-opd-frozen-reward-objective}
+F_{k,\infty}(p)=-\mathbb E_{a\sim p}[r_k(s,a)].
+\end{equation}
+这不是一个很弱的 mirror step，而是删除 anchor KL 后的另一个优化问题；其中
+$r_k=\log(\pi_T/\pi_k)$ 在整个 outer 内冻结。
+
+令当前 student 为 $p_\theta$，并从 anchor $q$ 的 rollout 取样。写
+$\omega_\theta=p_\theta/q$，则冻结 reward 的 token-level score 梯度为
+\begin{equation}
+\label{eq:ch2-opd-frozen-reward-gradient}
+\nabla_\theta F_{k,\infty}(p_\theta)
+=-\mathbb E_{s\sim d_k,\,a\sim q}
+\left[\operatorname{sg}\!\left(\omega_\theta(s,a)r_k(s,a)\right)
+\nabla_\theta\log p_\theta(a\mid s)\right].
+\end{equation}
+因此 MDPO 的 $\omega_\theta(U_\theta/\eta-r_k)$ 在 $\eta=+\infty$ 时只剩
+$-\omega_\theta r_k$。Token-IS vOPD 则使用当前 reward
+$\rho_\theta=\log(\pi_T/p_\theta)=r_k-U_\theta$；两者只有第一个 inner step
+相同，之后冻结 reward 不随 student 改变。
+
+在完整词表和 inner 完全收敛时，令
+\begin{equation}
+m_k(s)=\max_{a:q(a)>0}r_k(s,a),\qquad
+A_k(s)=\{a:r_k(s,a)=m_k(s)\}.
+\end{equation}
+有 $F_{k,\infty}(p)\geq-m_k(s)$，等号当且仅当 $p$ 的全部质量落在
+$A_k(s)$ 上。因此其最优集合是支持在最高 reward token 上的分布；若最大值唯一，
+最优策略退化为确定性 token。这正是有限 $\eta$ Gibbs 解
+$p_{k,\eta}^\star\propto q\exp(\eta r_k)$ 在 $\eta\to\infty$ 时的极限，
+通常不等于 teacher。
+
+删除 proximal 项后，student 没有 anchor 约束，$\omega_\theta$ 更容易重尾，
+Token-IS ESS 会下降，固定 reward 的 mode-seeking 还会导致 entropy collapse。
+有限学习率、gradient clipping 和有限 inner steps 只能减弱这些现象，不能改变
+目标本身。实验中应同时记录 $\max\omega_\theta$、ESS fraction、student entropy、
+$\operatorname{KL}(p_\theta\Vert q)$ 和 reward top-1 mass，不能只比较 teacher KL。
 
 令 $q=\pi_k(\cdot\mid s)$、$p_\theta=\pi_\theta(\cdot\mid s)$、
 $T=\pi_T(\cdot\mid s)$。在固定 prefix 上，OPD 的 reverse-KL 目标为
