@@ -95,10 +95,14 @@ def compute_mirror_opd_token_loss(
         # optimization drift.  Here the frozen rollout support is the anchor
         # Top-K; compare it with the current policy Top-K after every inner
         # forward.  This is a pure diagnostic and carries no gradient.
-        current_ids = log_p.topk(anchor_ids.shape[-1], dim=-1).indices
-        support_overlap = (
-            current_ids.unsqueeze(-1).eq(anchor_ids.unsqueeze(-2)).any(-1).float().mean(-1)
-        )
+        support_k = anchor_ids.shape[-1]
+        if support_k:
+            current_ids = log_p.topk(support_k, dim=-1).indices
+            support_overlap = (
+                current_ids.unsqueeze(-1).eq(anchor_ids.unsqueeze(-2)).any(-1).float().mean(-1)
+            )
+        else:
+            support_overlap = torch.zeros_like(coefficient)
     return {
         "distillation_losses": coefficient * action_lp,
         "mirror_student_center": center,
