@@ -289,7 +289,99 @@ $\mathscr E^\star$ 满足
 \section{四种 inner 的统一推导}
 \label{sec:ch2-four-methods}
 
-下面保留各方法特有的归一化、采样校正与更新几何。直接对原始损失反向传播时，student 的全部参数依赖均保留；使用解析 policy-gradient surrogate 时，权重整体停止梯度。
+本节先固定算法地图，再给出四种 inner 的可执行 policy-gradient (PG) 形式。这样可以把
+“优化哪个总体目标”“从哪个分布取样”和“反向传播时哪些量停止梯度”分开。OPD 的两个
+无镜像 baseline 放在表~\ref{tab:ch2-opd-baseline-map} 中；它们不是第五、第六种
+mirror 解，而是令镜像项消失后的共同极限。
+
+\begin{table}[ht]
+\centering
+\caption{本章算法与实现的统一地图}
+\label{tab:ch2-opd-baseline-map}
+\begin{tabular}{p{0.18\linewidth}p{0.23\linewidth}p{0.27\linewidth}p{0.22\linewidth}}
+\toprule
+方法 & 训练测度与权重 & token 级 PG 系数（乘在 $\nabla_\theta\log\pi_{k,n}$ 上） & 精确 inner 解 \\
+\midrule
+Token-IS OPD & 行为测度 $\beta_k$，$w=\pi_{k,n}/\beta_k$ & $-w(r_k+D_{k,n})$ & 无镜像 OPD；$D$ 为冻结 teacher KL baseline \\
+On-policy OPD & $\beta_k=\pi_{k,n}$，$w=1$ & $-(r_k+D_{k,n})$ & Token-IS 的 on-policy 特例 \\
+PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
+PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
+BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$（含 score 中心化） & Gibbs \\
+MDPO & anchor $\pi_k$，$e^U=\pi_{k,n}/\pi_k$ & $e^U(U/\eta-f)$ & Gibbs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+在 tabular policy、完整词表、精确期望和足够 inner 优化的条件下，PMD-Part、BPO
+和 MDPO 都满足同一个 Gibbs 固定点
+\begin{equation}
+\label{eq:ch2-four-methods-common-gibbs}
+\pi_{k,n}^{\star}(a\mid s)
+=\frac{\pi_k(a\mid s)e^{\eta f(s,a)}}{\mathbb E_{v\sim\pi_k(\cdot\mid s)}e^{\eta f(s,v)}}.
+\end{equation}
+它们的区别在于残差是否中心化、是否显式使用 $e^U$ 测度校正以及采用普通梯度还是
+自然梯度，因此有限 inner steps 的轨迹和方差并不相同。PMD-Mean 拟合
+$\eta(f-\bar f_k)$ 并另外施加指数归一化，其固定点是 Lambert-$W$ 投影；除非
+$f$ 在该 prefix 上为常数，它不等于式~\eqref{eq:ch2-four-methods-common-gibbs}。
+对 OPD 的 $f=r_k$，式~\eqref{eq:ch2-four-methods-common-gibbs} 进一步化为
+\begin{equation}
+\pi_{k,n}^{\star}(a\mid s)
+\propto \pi_k(a\mid s)^{1-\eta}\pi_T(a\mid s)^{\eta},
+\end{equation}
+并在 $\eta=1$ 时到达 teacher 分布。这个结论是四个 mirror inner 的总体收敛解，
+不适用于没有 $U/\eta$ 项的 Token-IS/On-policy OPD baseline。
+
+这里 $r_k(s,a)=\log\pi_T(a\mid s)-\log\pi_k(a\mid s)$ 是 OPD 的 sampled
+reward，$D_{k,n}$ 是对同一 prefix 的 teacher--student KL baseline。Token-IS
+的 $w$ 只修正采样测度；它没有 $U/\eta$ 镜像项。因而 On-policy OPD 是 Token-IS
+的严格特例，而不是 PMD 的另一个有限-$\eta$ 解。
+
+对 MDPO 要作一个精确限定：若每个 outer step 都重新用当前策略 rollout，确实有
+$\pi_k=\beta_k$，从而 $e^U$ 不再承担跨策略的 importance correction；但有限
+$\eta$ 时系数仍包含 $U/\eta$，所以得到的是 on-policy MDPO。只有取
+$\eta\to\infty$（或显式删除镜像项）时，它才退化为本章的 On-policy OPD
+baseline。这个区分解释了实验中 \texttt{mdpo + on-policy} 与 \texttt{opd\_onpolicy}
+不能仅凭采样方式视为同一个算法。
+
+\subsection{OPD baseline：Token-IS 与 On-policy 的共同 PG 形式}
+\label{subsec:ch2-opd-baselines-in-map}
+
+设 rollout 行为策略为 $\beta_k$，训练时的 student 为 $\pi_{k,n}$，并定义
+\begin{equation}
+\label{eq:ch2-opd-is-pg}
+w_{k,n}(s,a)=\frac{\pi_{k,n}(a\mid s)}{\beta_k(a\mid s)},
+\qquad
+\rho_{k,n}(s,a)=\log\pi_T(a\mid s)-\log\pi_{k,n}(a\mid s).
+\end{equation}
+对 teacher--student KL 使用冻结的 prefix baseline
+$D_{k,n}(s)=\operatorname{KL}(\pi_{k,n}(\cdot\mid s)\Vert\pi_T(\cdot\mid s))$，
+Token-IS OPD 的 score gradient 是
+\begin{equation}
+\label{eq:ch2-token-is-opd-pg}
+\nabla_\theta\mathcal L_{\mathrm{Token\text{-}IS\text{-}OPD}}
+=-\mathbb E_{s\sim d_k,a\sim\beta_k}
+\left[\operatorname{sg}\!\left(w_{k,n}(s,a)[\rho_{k,n}(s,a)+D_{k,n}(s)]\right)
+\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\end{equation}
+这里 $D_{k,n}$ 只作 control variate；它不改变 exact full-vocabulary policy gradient，
+但会改变有限样本方差。若 $\beta_k=\pi_{k,n}$，则 $w_{k,n}=1$，得到
+\begin{equation}
+\label{eq:ch2-onpolicy-opd-pg}
+\nabla_\theta\mathcal L_{\mathrm{On\text{-}policy\text{-}OPD}}
+=-\mathbb E_{s\sim d_k,a\sim\pi_{k,n}}
+\left[\operatorname{sg}\!\left(\rho_{k,n}(s,a)+D_{k,n}(s)\right)
+\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\end{equation}
+当 rollout 与当前 student 完全同步时，$\rho_{k,n}$ 可直接由 sampled token 的
+teacher/student log-prob 得到；不需要额外的 token-IS ratio。实现中
+\texttt{opd\_is} 使用式~\eqref{eq:ch2-token-is-opd-pg}，\texttt{opd\_onpolicy} 使用式
+~\eqref{eq:ch2-onpolicy-opd-pg}，两者都不含 $U/\eta$ 镜像项。
+
+下面的四个 PG 式都在 $\theta=\theta_{k,n}$ 处计算。所有 reward、anchor
+log-prob、KL center、importance ratio 和 residual 都使用
+$\operatorname{sg}(\cdot)$ 作为权重；只有最后的
+$\nabla_\theta\log\pi_{k,n}(a\mid s)$ 接收梯度。这样写出的式子正是当前训练
+代码的 score surrogate，而非把一个会随 student 改变的系数再次反向传播。
 
 \subsection{PMD-Part：回归完整 Gibbs log-ratio}
 \label{sec:ch2-pmd-part}
@@ -309,6 +401,25 @@ PMD-Part 的损失已在式~\eqref{eq:ch2-regression-from-mirror} 定义。
 \label{eq:ch2-part-gradient}
 \end{align}
 梯度下降方向为 $-\mathbb E_{\pi_k}[R_{k,n}^{\mathrm{Part}}\psi_{k,n}\mid s]$。这是固定 anchor 下的 log-ratio regression，不使用 student-to-anchor 的 action-level importance ratio。
+
+因此 PMD-Part 的纯 PG 形式（用于 sampled token 的实现）为
+\begin{equation}
+\label{eq:ch2-part-pg}
+\nabla_\theta\mathcal L_{\mathrm{Part}}(s)
+=\mathbb E_{a\sim\pi_k(\cdot\mid s)}\left[
+\operatorname{sg}\!\left(
+\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\eta f(s,a)+\log Z_f(s)
+\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\end{equation}
+在 OPD 中直接代入 $f=r_k=\log\pi_T-\log\pi_k$，得到
+\begin{equation}
+\label{eq:ch2-part-opd-pg}
+\operatorname{sg}\!\left[
+U_{k,n}(s,a)-\eta\bigl(\log\pi_T(a\mid s)-\log\pi_k(a\mid s)\bigr)
++\log\mathbb E_{v\sim\pi_k}\exp\!\left(\eta[\log\pi_T(v\mid s)-\log\pi_k(v\mid s)]\right)
+\right]\nabla_\theta\log\pi_{k,n}(a\mid s).
+\end{equation}
 
 若实际 rollout 来自行为测度 $\beta_k$，而目标仍是 $L_2(\pi_k)$ 投影，则每个 sampled 平方损失项乘以冻结权重 $\operatorname{sg}(\pi_k(a\mid s)/\beta_k(a\mid s))$。不加这个权重时，算法仍然有清晰含义，但求解的是 $L_2(\beta_k)$ 投影。
 
@@ -432,6 +543,23 @@ $\xi=(1-\lambda_k)/\eta-\bar f_k$ 即满足上式。混合目标中的负 KL 严
 student log-ratio $U_{k,n}(s,a_j)$ 保持原值，不计算或减去 $\bar U_{k,n}$。因为该 center 不依赖 student，leave-one-out reward center 的有限样本平方损失与总体损失只相差一个参数无关的条件方差项，其梯度无偏。
 若 $m=1$，需要外部同 prefix 的 reward center；使用不准确的冻结 baseline 会改变回归目标，必须单独记录该误差。
 
+PMD-Mean 的 PG surrogate 只保留 student log-ratio 对应的 score：
+\begin{equation}
+\label{eq:ch2-mean-pg}
+\nabla_\theta\mathcal L_{\mathrm{Mean}}(s)
+=\mathbb E_{a\sim\pi_k(\cdot\mid s)}\left[
+\operatorname{sg}\!\left(U_{k,n}(s,a)-\eta\bigl(f(s,a)-\bar f_k(s)\bigr)\right)
+\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\end{equation}
+在 OPD 中 $\bar f_k(s)=\mathbb E_{v\sim\pi_k}r_k(s,v)=-\operatorname{KL}(\pi_k\Vert\pi_T)$，所以
+\begin{equation}
+\label{eq:ch2-mean-opd-pg}
+\operatorname{sg}\!\left[
+U_{k,n}(s,a)-\eta\left(\log\pi_T(a\mid s)-\log\pi_k(a\mid s)
++\operatorname{KL}(\pi_k(\cdot\mid s)\Vert\pi_T(\cdot\mid s))\right)
+\right]\nabla_\theta\log\pi_{k,n}(a\mid s).
+\end{equation}
+
 \begin{algorithm}[ht]
 \caption{PMD-Mean inner update\\{\small\textit{Semantics: 中心化 target 在指数归一化集合上的投影}}}
 \begin{algorithmic}[1]
@@ -469,6 +597,28 @@ R_{k,n}^{\mathrm{BPO}}=U_{k,n}-G_k+\mathcal K_{k,n}^{S},\qquad
 =\frac1\eta\mathbb E_{d_k,\pi_k}[R_{k,n}^{\mathrm{BPO}}(\psi_{k,n}-\bar\psi_{k,n})].
 \label{eq:ch2-bpo-gradient}
 \end{equation}
+逐 token 的 PG 展开式为
+\begin{equation}
+\label{eq:ch2-bpo-pg}
+\nabla_\theta\mathcal L_{\mathrm{BPO}}(s)
+=\mathbb E_{a\sim\pi_k}\left[
+\operatorname{sg}\!\left(\frac{U_{k,n}(s,a)+\mathcal K_{k,n}^{S}(s)}\eta-f(s,a)+\bar f_k(s)\right)
+\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\end{equation}
+这里使用 $\mathbb E_{\pi_k}[R^{\mathrm{BPO}}\mid s]=0$ 将
+$-\bar\psi_{k,n}$ 项吸收到同一个 score expectation 中。OPD 代入后，四个量全部
+可直接由 prefix、sampled token 以及 teacher/student log-prob 得到：
+\begin{equation}
+\label{eq:ch2-bpo-opd-pg}
+\operatorname{sg}\!\left[
+\frac{U_{k,n}(s,a)+\operatorname{KL}(\pi_k\Vert\pi_{k,n})}{\eta}
+-\bigl(\log\pi_T(a\mid s)-\log\pi_k(a\mid s)\bigr)
+-\operatorname{KL}(\pi_k\Vert\pi_T)
+\right]\nabla_\theta\log\pi_{k,n}(a\mid s).
+\end{equation}
+式中两个 KL 均条件于同一个 $s$，且都停止梯度；前者是 student center，后者是
+OPD reward center。生产实现的 ``bpo`` 系数正是式~\eqref{eq:ch2-bpo-opd-pg} 的
+括号部分。
 centered score 来自 student center 的导数。令 $z(s,a)=U_{k,n}(s,a)-\eta f(s,a)$，用一个主 action $a_i$ 和 $m$ 个独立辅助 actions $b_{i\ell}$ 估计 center，则
 \[
 \mathbb E\left[\left(z(s,a_i)-\frac1m\sum_{\ell=1}^m z(s,b_{i\ell})\right)^2\right]
@@ -521,6 +671,27 @@ MDPO 的损失见式~\eqref{eq:ch2-mdpo-objective-bridge}。完整词表计算
 =\mathbb E_{\pi_k}\left[\operatorname{sg}\!\left(e^{U_{k,n}}\left(\frac{U_{k,n}}\eta-f\right)\right)\psi_{k,n}\mid s\right].
 \label{eq:ch2-mdpo-generic-gradient}
 \end{equation}
+也就是说，MDPO 的完整 sampled-token PG 形式已经是
+\begin{equation}
+\label{eq:ch2-mdpo-pg}
+\mathbb E_{a\sim\pi_k(\cdot\mid s)}\left[
+\operatorname{sg}\!\left(
+\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+\left[\frac1\eta\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}-f(s,a)\right]
+\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\end{equation}
+OPD 的代入式为
+\begin{equation}
+\label{eq:ch2-mdpo-opd-pg}
+\operatorname{sg}\!\left[
+\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+\left(\frac1\eta\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)}\right)
+\right]\nabla_\theta\log\pi_{k,n}(a\mid s).
+\end{equation}
+当 rollout 策略就是当前 student，即 $\pi_k=\pi_{k,n}$，ratio 等于 $1$；有限
+$\eta$ 仍留下 $U/\eta$，而 $\eta\to\infty$ 时式~\eqref{eq:ch2-mdpo-opd-pg}
+退化为 $-r_k\nabla_\theta\log\pi_{k,n}$，这才是 On-policy OPD 的 PG 形式。
 额外的 $\eta^{-1}$ score 项在完整求和时由 $\mathbb E_{\pi_{k,n}}[\psi_{k,n}]=0$ 抵消。
 
 自然梯度只改变更新几何。令 $h_{k,n}=\nabla_\theta\mathcal L_{\mathrm{MDPO}}$，Fisher 信息矩阵为
@@ -614,6 +785,11 @@ R_{k,n}^{\mathrm{BPO}}
 \end{proof}
 
 PMD-Part 回归完整镜像方程，BPO 消去 action-independent 常数再回归中心化方程。二者总体最优分布相同，而 residual、积分后的梯度和有限步轨迹不同。
+
+本书的实际 OPD baseline 定义、Pythia-14M/70M 的训练配置、固定 prefix 的 full-vocabulary
+评估以及 final KL/ESS 记录见第~\ref{sec:ch2-opd-baselines} 节。那组实验对应表
+~\ref{tab:ch2-opd-baseline-map} 的前两行；它们提供了比较四个 mirror inner 时的
+无镜像参照线，而不应被当作有限-$\eta$ mirror inner 的收敛证据。
 
 \section{镜像系数、数值步长与内层收敛的精确关系}
 \label{sec:ch2-eta-step-audit}
