@@ -13,6 +13,14 @@ if [[ -e "$run_dir" ]]; then
   exit 2
 fi
 mkdir -p "$run_dir"
+method=${MIRROR_METHOD:-mirror_mdpo}
+case "$method" in
+mirror_pmd_mean | mirror_bpo | mirror_mdpo | mirror_opd_onpolicy | mirror_opd_is | mirror_opd_is_no_baseline) ;;
+*)
+  echo "Unsupported MIRROR_METHOD=$method" >&2
+  exit 2
+  ;;
+esac
 task_python="$task_root/.venv/bin/python"
 export MIRROR_INNER_METRICS_PATH="$run_dir/inner.jsonl"
 export VERL_FILE_LOGGER_PATH="$run_dir/outer.jsonl"
@@ -39,10 +47,11 @@ PY
 cp "$script_dir/configs/pythia-mdpo.json" "$run_dir/setting.json"
 cp "$data_dir/manifest.json" "$run_dir/data-manifest.json"
 printf '%s\n' "${setting_args[@]}" "$@" >"$run_dir/overrides.txt"
+printf '%s\n' "$method" >"$run_dir/method.txt"
 git -C "$repo_root" rev-parse HEAD >"$run_dir/source-commit.txt" 2>/dev/null || true
 "$task_python" "$script_dir/record_training_provenance.py" --repo "$repo_root" \
   --upstream "$task_root" --output "$run_dir/source-provenance.json"
-bash "$script_dir/run_upstream_mirror_training.sh" mirror_mdpo \
+bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
   "$data_dir/train.parquet" "$data_dir/validation.parquet" \
   "${setting_args[@]}" "$@" --cfg job --resolve >"$run_dir/resolved-config.yaml" 2>"$run_dir/config.stderr"
 nvidia-smi --query-gpu=timestamp,memory.used,utilization.gpu,power.draw,temperature.gpu \
@@ -50,11 +59,11 @@ nvidia-smi --query-gpu=timestamp,memory.used,utilization.gpu,power.draw,temperat
 monitor_pid=$!
 trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
 set +e
-bash "$script_dir/run_upstream_mirror_training.sh" mirror_mdpo \
+bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
   "$data_dir/train.parquet" "$data_dir/validation.parquet" \
   "${setting_args[@]}" "$@" >"$run_dir/console.log" 2>&1
 status=$?
 set -e
 printf '%s\n' "$status" >"$run_dir/exit-code.txt"
-echo "MDPO exit=$status; records: $run_dir"
+echo "$method exit=$status; records: $run_dir"
 exit "$status"

@@ -16,6 +16,8 @@ def compute_mirror_opd_token_loss(
     teacher_center: torch.Tensor,
     method: str,
     eta: float,
+    teacher_head_log_probs: torch.Tensor | None = None,
+    teacher_tail_log_prob: torch.Tensor | None = None,
 ) -> dict[str, torch.Tensor]:
     """Token score surrogate on frozen anchor actions (no PPO clipping).
 
@@ -28,8 +30,11 @@ def compute_mirror_opd_token_loss(
     if (
         math.isnan(eta)
         or eta <= 0
-        or method not in ("pmd_mean", "bpo", "mdpo")
-        or (math.isinf(eta) and method != "mdpo")
+        or method not in ("pmd_mean", "bpo", "mdpo", "opd_onpolicy", "opd_is", "opd_is_no_baseline")
+        or (
+            math.isinf(eta)
+            and method not in ("mdpo", "opd_onpolicy", "opd_is", "opd_is_no_baseline")
+        )
     ):
         raise ValueError("positive eta required; infinity is supported only for MDPO")
     expected = student_logits.shape[:-1]
@@ -67,14 +72,29 @@ def compute_mirror_opd_token_loss(
             coefficient = u - eta * (reward + kt)
         elif method == "bpo":
             coefficient = (u + center) / eta - reward - kt
-        else:
+        elif method == "mdpo":
             coefficient = (u / eta - reward) * u.exp()
+        else:
+            if teacher_head_log_probs is None or teacher_tail_log_prob is None:
+                raise ValueError("OPD baseline needs teacher head and tail probabilities")
+            current_reward = teacher_action_log_prob.detach() - action_lp.detach()
+            baseline = (p_head.exp() * (p_head - teacher_head_log_probs.detach())).sum(-1)
+            tail_valid = torch.isfinite(p_tail_lp)
+            baseline[tail_valid] += p_tail_lp[tail_valid].exp() * (
+                p_tail_lp[tail_valid] - teacher_tail_log_prob.detach()[tail_valid]
+            )
+            if method == "opd_is_no_baseline":
+                baseline = torch.zeros_like(baseline)
+            weight = torch.ones_like(u) if method == "opd_onpolicy" else u.exp()
+            coefficient = -(current_reward + baseline) * weight
+            reward = current_reward
+            kt = baseline
         if not torch.isfinite(coefficient).all():
             raise FloatingPointError("nonfinite MirrorOPD weight; no silent ratio clipping")
     return {
         "distillation_losses": coefficient * action_lp,
         "mirror_student_center": center,
-        "mirror_teacher_center": teacher_center.detach(),
+        "mirror_teacher_center": kt,
         "mirror_importance_ratio": u.exp(),
         "mirror_score_coefficient": coefficient,
         "mirror_sampled_reward": reward,

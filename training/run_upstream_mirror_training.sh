@@ -14,9 +14,9 @@ task_root=${MIRROR_UPSTREAM_ROOT:-"$HOME/src/mirroropd-taopd"}
 mode=${1:-mirror_bpo}
 if (($#)); then shift; fi
 case "$mode" in
-mirror_pmd_mean | mirror_bpo | mirror_mdpo) ;;
+mirror_pmd_mean | mirror_bpo | mirror_mdpo | mirror_opd_onpolicy | mirror_opd_is | mirror_opd_is_no_baseline) ;;
 *)
-  echo "Expected mirror_pmd_mean, mirror_bpo, or mirror_mdpo" >&2
+  echo "Expected a registered MirrorOPD loss mode" >&2
   exit 2
   ;;
 esac

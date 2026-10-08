@@ -756,3 +756,163 @@ mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射�
 \end{algorithm}
 
 完整 vocabulary 与 sampled-token 两条路径的区别是信息论上的：前者能精确知道整个 categorical mirror target，后者只能无偏知道在 anchor 下抽到的一个 action 的 reward。对每个给定方法，两条信息访问路径在无限样本、无函数类误差且 center/partition 估计一致时具有相同总体解；PMD-Mean 的解是 Lambert-$W$ 分布，另外三种方法的解是 Gibbs 分布。有限 batch 下，full-vocabulary 的主要误差是参数优化和 prefix coverage，sampled-token 额外承担 reward、center、KL ratio 和 prefix reuse 的估计方差。
+
+\section{两个可运行的 OPD baseline}
+\label{sec:ch2-opd-baselines}
+
+本节固定 baseline 的语义，避免把 ``on-policy''、``off-policy'' 和 mirror descent
+混在同一个名称里。两种 baseline 都使用逐 token 的 OPD reward，但都不使用
+$\eta^{-1}\operatorname{KL}(p\Vert\pi_k)$ 这个 mirror 正则项。它们的区别只有
+动作测度：第一种要求当前 student 重新 rollout，第二种复用冻结 anchor 的 rollout，
+并用 token-level importance sampling 修正条件动作分布。
+
+令 $q=\pi_k(\cdot\mid s)$、$p_\theta=\pi_\theta(\cdot\mid s)$、
+$T=\pi_T(\cdot\mid s)$。在固定 prefix 上，OPD 的 reverse-KL 目标为
+\begin{equation}
+\label{eq:ch2-opd-baseline-objective}
+J_s(\theta)=\operatorname{KL}(p_\theta\Vert T)
+ =\mathbb E_{a\sim p_\theta}
+ \left[\log p_\theta(a\mid s)-\log T(a\mid s)\right].
+\end{equation}
+写 $r_\theta(s,a)=\log T(a\mid s)-\log p_\theta(a\mid s)$，则对任意
+$p_\theta$-可积的 prefix，完整梯度是
+\begin{equation}
+\label{eq:ch2-opd-baseline-gradient}
+\nabla_\theta J_s(\theta)
+ =-\mathbb E_{a\sim p_\theta}
+ \left[r_\theta(s,a)\nabla_\theta\log p_\theta(a\mid s)\right].
+\end{equation}
+常数 $1$ 因为 $\mathbb E_{p_\theta}[\nabla\log p_\theta]=0$ 而消失。
+
+vOPD 风格的 baseline 取当前 student 与 teacher 的条件 reverse KL，记为
+\begin{equation}
+\label{eq:ch2-opd-vopd-center}
+ D_\theta(s)=\operatorname{KL}(p_\theta\Vert T).
+\end{equation}
+它与 action 无关，因此不会改变总体梯度：
+\begin{equation}
+\mathbb E_{p_\theta}[(r_\theta+D_\theta)\nabla\log p_\theta]
+ =\mathbb E_{p_\theta}[r_\theta\nabla\log p_\theta].
+\end{equation}
+这个中心是控制变量，不是额外的 mirror penalty。实际实现用固定的 top-$J$
+anchor support 加尾部聚合近似 $D_\theta$；$J=|\mathcal V|$ 时它是 exact。
+
+\subsection{On-policy OPD：每次 outer step 重新采样}
+\label{subsec:ch2-opd-onpolicy-baseline}
+
+第 $k$ 个 outer step 先令 $\theta_{k,0}=\theta_k$，从当前 student
+$p_{\theta_{k,0}}=\pi_k$ 生成 rollout。每个 sampled token 都来自当前测度，
+所以用
+\begin{equation}
+\widehat\ell_{\mathrm{on}}(\theta;s,a)
+ =-\operatorname{sg}\!\left(r_\theta(s,a)+D_\theta(s)\right)
+ \log p_\theta(a\mid s)
+\end{equation}
+进行 score-function 更新。这里 $r_\theta$ 和 $D_\theta$ 在构造该步梯度后
+整体停止梯度；它们不是再对同一个 surrogate 反向一次。若 inner 中做 $J>1$
+个 optimizer step 而不重新 rollout，后续 step 已经是 stale-data 更新，不能继续
+称作严格 on-policy；本书实验将严格 on-policy baseline 定义为 $J=1$。
+
+\begin{algorithm}[ht]
+\caption{On-policy OPD baseline\\{\small\textit{Semantics: 每个 outer step 用当前 student 重新 rollout；无 mirror 正则}}}
+\begin{algorithmic}[1]
+\Require prompt distribution $\mathcal D$, teacher $\pi_T$, initial policy $\pi_0$, outer steps $K_{\mathrm{out}}$, rollout batch $B$, horizon $H$
+\Ensure $\pi_{K_{\mathrm{out}}}$
+\For{$k=0,\ldots,K_{\mathrm{out}}-1$}
+    \State set $\pi_k\gets\pi_{\theta_k}$ and generate $(s_i,a_i)$ with $a_i\sim\pi_k(\cdot\mid s_i)$
+    \State evaluate $\log\pi_k(a_i\mid s_i)$, $\log\pi_T(a_i\mid s_i)$ and the frozen-support estimate $\widehat D_{\theta_k}(s_i)$
+    \State $r_i\gets\log\pi_T(a_i\mid s_i)-\log\pi_k(a_i\mid s_i)$
+    \State $g_k\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(r_i+\widehat D_{\theta_k}(s_i))\nabla_{\theta_k}\log\pi_{\theta_k}(a_i\mid s_i)$
+    \State $\theta_{k+1}\gets\operatorname{OptimizerStep}(\theta_k,g_k)$
+\EndFor
+\State \Return $\pi_{K_{\mathrm{out}}}$
+\end{algorithmic}
+\end{algorithm}
+
+算法中的负号对应最小化 $\operatorname{KL}(p\Vert T)$。它只使用一个 sampled
+action 的 reward；$\widehat D$ 只作为 baseline，不能把它与 reward 相加后再把
+其梯度传回 teacher 或 student。实现中的 \texttt{mirror\_opd\_onpolicy} 正是这个形式，
+并将 anchor support 的 head 与 aggregate tail 缓存到 CPU/NVMe 可复用的 batch。
+
+\subsection{Token-IS OPD：复用 anchor rollout}
+\label{subsec:ch2-opd-is-baseline}
+
+若 rollout 来自 $q=\pi_k$，但 inner 当前 policy 是 $p_\theta$，则对固定 prefix
+的测度变换为
+\begin{equation}
+\label{eq:ch2-opd-token-is}
+\mathbb E_{a\sim p_\theta}[h(a)]
+ =\mathbb E_{a\sim q}
+ \left[\frac{p_\theta(a\mid s)}{q(a\mid s)}h(a)\right].
+\end{equation}
+因此 token-IS baseline 使用
+\begin{equation}
+\widehat\ell_{\mathrm{IS}}(\theta;s,a)
+ =-\operatorname{sg}\!\left[
+ \frac{p_\theta(a\mid s)}{q(a\mid s)}
+ \left(r_\theta(s,a)+D_\theta(s)\right)\right]
+ \log p_\theta(a\mid s).
+\end{equation}
+当 $q(a\mid s)>0$ 且 prefix $s$ 的访问测度固定时，式
+\eqref{eq:ch2-opd-token-is} 对 action 条件分布是无偏的。它没有修正 outer
+rollout 的 prefix occupancy：若 student 在 inner 中改变了前缀分布，整条序列的
+ratio $\prod_{t\leq l}p_\theta(a_t\mid s_t)/q(a_t\mid s_t)$ 才能修正到新的
+轨迹测度，而 token-IS 只修正当前 prefix 下的下一个 token。这是本实验 baseline
+的有意限定，避免长序列乘积带来的极端方差。
+
+\begin{algorithm}[ht]
+\caption{Token-IS OPD baseline\\{\small\textit{Semantics: 复用 anchor rollout；仅修正 prefix 条件下的 token 测度}}}
+\begin{algorithmic}[1]
+\Require frozen anchor $q=\pi_k$, teacher $\pi_T$, rollout batch $\mathcal B_k$, inner steps $J$, learning rates $\{\alpha_j\}$
+\Ensure $\theta_{k+1}$
+\State initialize $\theta\gets\theta_k$
+\For{$j=0,\ldots,J-1$}
+    \State evaluate $\log p_\theta(a_i\mid s_i)$ and frozen-support $\widehat D_\theta(s_i)$ for all $(s_i,a_i)\in\mathcal B_k$
+    \State $u_i\gets\log p_\theta(a_i\mid s_i)-\log q(a_i\mid s_i)$
+    \State $r_i\gets\log\pi_T(a_i\mid s_i)-\log p_\theta(a_i\mid s_i)$
+    \State $w_i\gets\operatorname{sg}(\exp u_i)$
+    \State $g_j\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(w_i(r_i+\widehat D_\theta(s_i)))\nabla_\theta\log p_\theta(a_i\mid s_i)$
+    \State $\theta\gets\operatorname{OptimizerStep}(\theta,g_j;\alpha_j)$
+\EndFor
+\State \Return $\theta_{k+1}\gets\theta$
+\end{algorithmic}
+\end{algorithm}
+
+这里的 \texttt{mirror\_opd\_is} 使用 $J=4$ 作为 stale-rollout 对照，且每一步重新计算
+$u_i$ 与中心；\texttt{mirror\_opd\_is\_no\_baseline} 则令 $\widehat D_\theta=0$，用于隔离
+控制变量的作用。重要性权重必须 stop-gradient，否则 surrogate 会多出
+$\nabla w_i$ 项而不再是式~\eqref{eq:ch2-opd-baseline-gradient} 的 score
+估计器。实际训练记录 \texttt{importance\_ess} 和 \texttt{importance\_ess\_fraction}；当
+$w_i$ 重尾时，token-IS 的方差会随 $\mathbb E_q[w_i^2]$ 增长，即使其条件期望
+仍然无偏。
+
+\subsection{Pythia baseline 实验记录}
+\label{subsec:ch2-opd-baseline-results}
+
+实验使用 Pythia-14M student、Pythia-70M teacher、WikiText validation prefixes、
+top-$J=32$ anchor support、温度 $1.0$、response length $64$、batch 中 $1024$
+有效 token、learning rate $10^{-6}$ 和 seed $42$。两条训练均运行 $32$ 个 outer
+step；on-policy 每轮只更新一次，token-IS 每轮复用同一 rollout 做 $4$ 个 inner
+step。评估在固定的 $8128$ 个 prefix 上使用 float32 full-vocabulary teacher forcing，
+因此评估噪声与训练时的 sampled action 噪声分开。
+
+\begin{center}
+\begin{tabular}{lrrrrrr}
+\toprule
+方法 & inner $J$ & 初始 $\KL(p\Vert T)$ & 最终 $\KL(p\Vert T)$ & 初始 $\KL(T\Vert p)$ & 最终 $\KL(T\Vert p)$ & 最终 ESS fraction\\
+\midrule
+On-policy OPD & $1$ & 0.9873 & 0.9356 & 0.8907 & 0.8921 & 1.0000\\
+Token-IS OPD & $4$ & 0.9873 & 0.9094 & 0.8907 & 0.9387 & 0.9335\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+两种方法都降低了 $\KL(p\Vert T)$，所以 baseline 路径和缓存、同步逻辑是可运行的。
+token-IS 的 teacher-directed reverse KL 降得更多，但 forward KL 上升，且 ESS
+降至约 $93.35\%$；这正是用 stale rollout 换取每轮更多 inner 更新的代价。
+训练日志中的 score coefficient RMS 约为 $2.9$--$3.1$，而梯度裁剪前的 norm
+约为 $1.6\times10^3$--$2.1\times10^3$，说明当前短实验首先受优化尺度和
+混合精度路径影响，不能仅凭 32 步断言 token-IS 在长期一定优于 on-policy。
+此外，旧配置里的 \texttt{model\_dtype=float32} 只约束权重加载；若未显式设置 FSDP
+\texttt{mixed\_precision}，前向仍可能采用 BF16 autocast。正式比较应把这一项写入 resolved
+config，并同时记录 \texttt{dtype}、梯度裁剪、ESS 和 full-vocabulary 固定前缀指标。

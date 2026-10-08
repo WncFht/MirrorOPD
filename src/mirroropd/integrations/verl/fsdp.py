@@ -52,6 +52,8 @@ def compute_mirror_cache_from_logits(
             for key in (
                 "mirror_teacher_action_log_prob",
                 "mirror_teacher_center",
+                "mirror_teacher_head_log_probs",
+                "mirror_teacher_tail_log_prob",
             )
         }
     raise ValueError(f"unknown mirror_cache_stage: {stage}")
@@ -88,6 +90,10 @@ def compute_mirror_opd_from_cache(
             raise ValueError(f"{key} must align with full prediction positions")
         cache[key] = value
     valid = cache["mirror_valid"].bool()
+    for key in ("mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob"):
+        if key in data:
+            value = data[key]
+            cache[key] = value.values().unsqueeze(0) if value.is_nested else value
     result = {
         key: student_logits.new_zeros(valid.shape, dtype=torch.float32)
         for key in (
@@ -117,6 +123,12 @@ def compute_mirror_opd_from_cache(
             teacher_center=cache["mirror_teacher_center"][valid],
             method=config.distillation_loss.loss_mode.removeprefix("mirror_"),
             eta=config.distillation_loss.mirror_eta,
+            teacher_head_log_probs=cache["mirror_teacher_head_log_probs"][valid]
+            if "mirror_teacher_head_log_probs" in cache
+            else None,
+            teacher_tail_log_prob=cache["mirror_teacher_tail_log_prob"][valid]
+            if "mirror_teacher_tail_log_prob" in cache
+            else None,
         )
         for key, value in outputs.items():
             result[key][valid] = value

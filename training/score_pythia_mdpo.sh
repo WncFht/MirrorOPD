@@ -18,7 +18,13 @@ print(paths["student"])
 print(paths["teacher"])
 PY
 )
-for step in 0 8 16 24 32; do
+steps=(0)
+while IFS= read -r checkpoint_dir; do
+  step=${checkpoint_dir##*_}
+  [[ $step =~ ^[0-9]+$ ]] && steps+=("$step")
+done < <(find "$run_dir/checkpoints" -mindepth 1 -maxdepth 1 -type d -name 'global_step_*' | sort -V)
+
+for step in "${steps[@]}"; do
   output="$run_dir/evaluation/step-$step"
   mkdir -p "$output"
   checkpoint_args=()
