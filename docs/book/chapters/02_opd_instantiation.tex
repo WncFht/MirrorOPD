@@ -757,14 +757,96 @@ mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射�
 
 完整 vocabulary 与 sampled-token 两条路径的区别是信息论上的：前者能精确知道整个 categorical mirror target，后者只能无偏知道在 anchor 下抽到的一个 action 的 reward。对每个给定方法，两条信息访问路径在无限样本、无函数类误差且 center/partition 估计一致时具有相同总体解；PMD-Mean 的解是 Lambert-$W$ 分布，另外三种方法的解是 Gibbs 分布。有限 batch 下，full-vocabulary 的主要误差是参数优化和 prefix coverage，sampled-token 额外承担 reward、center、KL ratio 和 prefix reuse 的估计方差。
 
-\section{两个可运行的 OPD baseline}
+\section{OPD 的六种可运行算法与统一 outer--inner pipeline}
 \label{sec:ch2-opd-baselines}
 
-本节固定 baseline 的语义，避免把 ``on-policy''、``off-policy'' 和 mirror descent
-混在同一个名称里。两种 baseline 都使用逐 token 的 OPD reward，但都不使用
-$\eta^{-1}\operatorname{KL}(p\Vert\pi_k)$ 这个 mirror 正则项。它们的区别只有
-动作测度：第一种要求当前 student 重新 rollout，第二种复用冻结 anchor 的 rollout，
-并用 token-level importance sampling 修正条件动作分布。
+本节把实际实现中的六种算法放在同一个 outer--inner pipeline 中。前两种是无
+mirror 正则的 OPD baseline，后四种是固定 anchor 的 mirror inner：
+Token-IS OPD、On-policy OPD、PMD-Part、PMD-Mean、BPO 和 MDPO。这样命名后，
+``on-policy'' 只描述 rollout 测度，``mirror'' 只描述目标中是否保留
+$\eta^{-1}\operatorname{KL}(p\Vert\pi_k)$；两者不能互相替代。
+
+每个 outer step 都遵循相同顺序：冻结 $\pi_k$ 和 teacher，生成或读取 rollout，
+在固定 prefix 测度 $d_k$ 上做 $J$ 次 inner 更新，最后执行一次 outer sync。
+On-policy OPD 在每轮重新 rollout 且 $J=1$ 时是 Token-IS OPD 的严格特例。四个
+mirror inner 的 sampled-token PG 系数已经在第~\ref{sec:ch2-four-methods}
+节完全展开；本节把它们与可运行 baseline、收敛解和实现入口对应起来。
+
+\begin{table}[ht]
+\centering
+\caption{OPD 六种算法的训练测度、PG 系数与精确 inner 固定点}
+\label{tab:ch2-opd-six-algorithms}
+\begin{tabular}{p{0.18\linewidth}p{0.24\linewidth}p{0.31\linewidth}p{0.18\linewidth}}
+\toprule
+算法 & rollout / inner 测度 & sampled-token PG 系数 & 精确固定点 \\
+\midrule
+Token-IS OPD & anchor $\pi_k$，token-IS $w=\pi_{k,n}/\pi_k$ & $-w(r_\theta+D_\theta)$ & teacher-directed OPD \\
+On-policy OPD & 当前 student，$w=1$ & $-(r_\theta+D_\theta)$ & Token-IS 的特例 \\
+PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
+PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
+BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$ & Gibbs \\
+MDPO & anchor $\pi_k$，$e^U=\pi_{k,n}/\pi_k$ & $e^U(U/\eta-r_k)$ & Gibbs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+在 tabular policy、完整词表、精确期望和 inner 完全收敛时，后三个 mirror
+方法 PMD-Part、BPO、MDPO 的共同 OPD 解为
+\begin{equation}
+\label{eq:ch2-opd-common-mirror-solution}
+\pi^{\star}_{k+1}(a\mid s)
+=\frac{\pi_k(a\mid s)\exp(\eta r_k(s,a))}
+{\mathbb E_{v\sim\pi_k}\exp(\eta r_k(s,v))}
+\propto \pi_k(a\mid s)^{1-\eta}\pi_T(a\mid s)^{\eta}.
+\end{equation}
+PMD-Mean 的固定点是 Lambert-$W$ 投影，通常不等于式
+~\eqref{eq:ch2-opd-common-mirror-solution}。当 $\eta=1$ 时 Gibbs 解等于 teacher；
+当 $\eta\to\infty$ 时，mirror 项消失的极限才与 On-policy OPD 的 score 目标一致。
+因此“MDPO 一直 on-policy”只会去掉 MDPO 的 token-IS 测度校正，不会在有限
+$\eta$ 下自动变成 On-policy OPD。
+
+\subsection{四个 mirror inner 的 OPD policy-gradient 形式}
+\label{subsec:ch2-opd-four-inner-pg}
+
+以下所有期望均为 $s\sim d_k$、$a\sim\pi_k(\cdot\mid s)$，并且括号中的整项
+都使用停止梯度。记
+\begin{equation}
+U_{k,n}(s,a)=\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)},
+\quad
+r_k(s,a)=\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)},
+\quad
+\mathcal K^T_k(s)=\operatorname{KL}(\pi_k\Vert\pi_T),
+\quad
+\mathcal K^S_{k,n}(s)=\operatorname{KL}(\pi_k\Vert\pi_{k,n}).
+\end{equation}
+由于 $\mathbb E_{\pi_k}[r_k\mid s]=-\mathcal K^T_k(s)$，四个系数完全写成：
+\begin{align}
+\nabla_\theta\mathcal L_{\mathrm{PMD\text{-}Part}}
+&=\mathbb E\!\left[\operatorname{sg}\!\left(
+U_{k,n}-\eta r_k+\log\mathbb E_{v\sim\pi_k}e^{\eta r_k(s,v)}
+\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right],
+\label{eq:ch2-opd-pg-pmd-part}\\
+\\
+\nabla_\theta\mathcal L_{\mathrm{PMD\text{-}Mean}}
+&=\mathbb E\!\left[\operatorname{sg}\!\left(
+U_{k,n}-\eta[r_k+\mathcal K^T_k]\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right],
+\label{eq:ch2-opd-pg-pmd-mean}\\
+\nabla_\theta\mathcal L_{\mathrm{BPO}}
+&=\mathbb E\!\left[\operatorname{sg}\!\left(
+\frac{U_{k,n}+\mathcal K^S_{k,n}}\eta-r_k-\mathcal K^T_k\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right],
+\label{eq:ch2-opd-pg-bpo}\\
+\nabla_\theta\mathcal L_{\mathrm{MDPO}}
+&=\mathbb E\!\left[\operatorname{sg}\!\left(
+\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+\left[\frac{U_{k,n}}\eta-r_k\right]\right)
+\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\label{eq:ch2-opd-pg-mdpo}
+\end{align}
+PMD-Part 的 log-partition 项是 action-independent，但必须保留在 residual 中；
+PMD-Mean 使用 teacher KL 作为 reward center；BPO 还需要 student KL center；
+MDPO 则通过 $\pi_{k,n}/\pi_k$ 完成 student 测度校正。四式共同使用 anchor rollout，
+而 Token-IS/On-policy baseline 使用下面的 $r_\theta$ 和 $D_\theta$，两组系数不能
+混写。
 
 令 $q=\pi_k(\cdot\mid s)$、$p_\theta=\pi_\theta(\cdot\mid s)$、
 $T=\pi_T(\cdot\mid s)$。在固定 prefix 上，OPD 的 reverse-KL 目标为
