@@ -6,6 +6,7 @@ archives/
 experiments/**/raw/
 experiments/**/cache/
 results/**/*.json
+results/**/resolved-config.yaml
 data/**/*.json
 runs/
 package-lock.json

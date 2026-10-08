@@ -21,6 +21,29 @@ index 24d305f..ca629a4 100644
          if self.distillation_enabled:
              from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
  
+diff --git c/verl/verl/models/transformers/monkey_patch.py w/verl/verl/models/transformers/monkey_patch.py
+index 7a5d6f0..26527fd 100644
+--- c/verl/verl/models/transformers/monkey_patch.py
++++ w/verl/verl/models/transformers/monkey_patch.py
+@@ -327,13 +327,11 @@ def apply_monkey_patch(
+     """Replace _flash_attention_forward to _ulysses_flash_attention_forward"""
+     module = sys.modules[model.__module__]
+ 
+-    try:
+-        num_attention_heads, num_key_value_heads = model.config.num_attention_heads, model.config.num_key_value_heads
+-    except AttributeError:
+-        num_attention_heads, num_key_value_heads = (
+-            model.config.text_config.num_attention_heads,
+-            model.config.text_config.num_key_value_heads,
+-        )
++    # GPT-NeoX uses ordinary multi-head attention and has no separate KV-head
++    # attribute. Multimodal models keep attention metadata in text_config.
++    attention_config = getattr(model.config, "text_config", model.config)
++    num_attention_heads = attention_config.num_attention_heads
++    num_key_value_heads = getattr(attention_config, "num_key_value_heads", num_attention_heads)
+ 
+     assert num_attention_heads % ulysses_sp_size == 0, (
+         f"num_attention_heads {num_attention_heads} must be divisible by ulysses_sp_size {ulysses_sp_size}"
 diff --git c/verl/verl/trainer/config/distillation/distillation.yaml w/verl/verl/trainer/config/distillation/distillation.yaml
 index a2f1871..07888a9 100644
 --- c/verl/verl/trainer/config/distillation/distillation.yaml
@@ -681,6 +704,21 @@ index 876eaad..d40cea2 100644
  
  
  def need_reward_model(
+diff --git c/verl/verl/utils/vllm/patch.py w/verl/verl/utils/vllm/patch.py
+index 951c5ca..4162c6a 100644
+--- c/verl/verl/utils/vllm/patch.py
++++ w/verl/verl/utils/vllm/patch.py
+@@ -115,6 +115,10 @@ def patch_vllm_moe_model_weight_loader(model):
+     # Get inner model (either model.model or model.language_model)
+     inner_model = getattr(model, "model", None) or getattr(model, "language_model", None)
+     if inner_model is None:
++        # Dense architectures such as GPT-NeoX have differently named trunks
++        # and do not need the MoE-specific weight loader patch.
++        if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)):
++            return
+         raise ValueError("The provided model does not have a valid 'model' or 'language_model' attribute.")
+ 
+     if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)) and not isinstance(inner_model, tuple(SUPPORTED_MOE_MODELS)):
 diff --git c/verl/verl/workers/config/distillation.py w/verl/verl/workers/config/distillation.py
 index 2bfd200..9ff66f7 100644
 --- c/verl/verl/workers/config/distillation.py

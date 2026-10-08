@@ -12,6 +12,7 @@ data:
 	python3 scripts/restore-data.py
 
 test:
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_training_metrics.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mean_bpo.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_kl_estimators.py
