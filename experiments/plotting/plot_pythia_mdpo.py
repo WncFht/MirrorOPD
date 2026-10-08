@@ -1,7 +1,9 @@
 """Plot measured Pythia dynamics with the figure-viz paper theme.
 
-Semantic ledger: one line is one learning rate in validation plots, and one
-pre-update inner index in training plots. Validation dots use identical 64
+Semantic ledger: one line is one learning rate or eta setting in validation
+plots, and one pre-update inner index in individual training plots. Eta scan
+inner plots average each pre-update index across outer batches by token count.
+Validation dots use identical 64
 texts, 127 prefixes/text; NLL uses 64 continuation tokens/text. No bands imply
 multiple training seeds. Geometry ledger: x is completed outer updates in
 validation, current outer batch in inner diagnostics; y units are nats,
@@ -44,6 +46,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--control", type=Path)
+    parser.add_argument("--eta-scan", type=Path, help="root containing the five fixed eta runs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
@@ -51,6 +54,17 @@ def main():
     runs = [(args.run, "LR 1e-5", fv.HUES["vteal"])]
     if args.control:
         runs.append((args.control, "LR 1e-6", fv.HUES["vorange"]))
+    if args.eta_scan:
+        runs = [
+            (args.eta_scan / name, label, color)
+            for name, label, color in (
+                ("pythia-mdpo-eta-0p03", "eta=0.03", fv.HUES["vteal"]),
+                ("pythia-mdpo-low-lr", "eta=0.1", fv.HUES["vorange"]),
+                ("pythia-mdpo-eta-0p3", "eta=0.3", fv.HUES["vcoral"]),
+                ("pythia-mdpo-eta-1", "eta=1", fv.HUES["vviolet"]),
+                ("pythia-mdpo-eta-inf", "eta=infinity", fv.NEUTRALS["vink"]),
+            )
+        ]
     fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.3))
     for run, label, color in runs:
         rows = read_csv(run / "checkpoint-metrics.csv")
@@ -71,8 +85,38 @@ def main():
     axes[1].set_ylabel("NLL, nats/token")
     for ax in axes:
         fv.apply_grid(ax, "y-only")
-    fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", ncol=len(runs))
+    fig.legend(
+        *axes[0].get_legend_handles_labels(),
+        loc="lower center",
+        ncol=3 if args.eta_scan else len(runs),
+    )
+    if args.eta_scan:
+        fig.set_size_inches(5.5, 2.7)
     finish(fig, args.output, "validation-dynamics")
+
+    if args.eta_scan:
+        fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.7))
+        for run, label, color in runs:
+            with (run / "analysis.json").open() as stream:
+                stats = json.load(stream)["inner_step_token_weighted"]
+            for ax, field in zip(axes, ("log_ratio_rms", "importance_ess_fraction"), strict=True):
+                ax.plot(
+                    range(1, 5),
+                    [stats[str(n)][field] for n in range(4)],
+                    "o-",
+                    label=label,
+                    color=color,
+                )
+                ax.set_xlabel("Before inner update")
+                ax.set_xticks([1, 2, 3, 4])
+                fv.apply_grid(ax, "y-only")
+        axes[0].set_ylabel("Sampled log-ratio RMS")
+        axes[1].set_ylabel("ESS / valid response tokens")
+        axes[0].set_title("(a) Departure from frozen anchor")
+        axes[1].set_title("(b) Importance weight efficiency")
+        fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", ncol=3)
+        finish(fig, args.output, "eta-inner-comparison")
+        return
 
     inner = read_csv(args.run / "inner-metrics.csv")
     fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.3))

@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 for label in inf 0p3 0p03; do
   case "$label" in
-  inf) eta=.inf ;;
+  inf) eta=1e309 ;;
   0p3) eta=0.3 ;;
   0p03) eta=0.03 ;;
   esac

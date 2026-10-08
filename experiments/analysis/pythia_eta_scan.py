@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 import numpy as np
-from pythia_mdpo_report import read_jsonl, write_csv
+from pythia_mdpo_report import per_example, read_jsonl, write_csv
 
 RUNS = (
     ("0.03", "pythia-mdpo-eta-0p03"),
@@ -25,14 +25,36 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     checkpoint_rows = []
     dynamics_rows = []
+    paired_rows = []
+    baseline_rows = read_jsonl(
+        args.results / "pythia-mdpo-low-lr/evaluation/step-32/prefixes.jsonl"
+    )
+    rng = np.random.default_rng(20261008)
+    indices = rng.integers(0, 64, (5000, 64))
     for eta, name in RUNS:
         root = args.results / name
         overrides = (root / "overrides.txt").read_text().splitlines()
         assert "actor_rollout_ref.actor.optim.lr=1e-6" in overrides
-        expected_eta = ".inf" if eta == "infinity" else eta
+        expected_eta = "1e309" if eta == "infinity" else eta
         assert f"distillation.distillation_loss.mirror_eta={expected_eta}" in overrides
         with (root / "checkpoint-metrics.csv").open() as stream:
             checkpoint_rows.extend({"eta": eta, **row} for row in csv.DictReader(stream))
+        final_rows = read_jsonl(root / "evaluation/step-32/prefixes.jsonl")
+        assert [(r["example_index"], r["prefix_length"]) for r in final_rows] == [
+            (r["example_index"], r["prefix_length"]) for r in baseline_rows
+        ]
+        for field in ("student_teacher_kl", "teacher_student_kl", "student_continuation_nll"):
+            delta = per_example(final_rows, field) - per_example(baseline_rows, field)
+            lo, hi = np.quantile(delta[indices].mean(1), (0.025, 0.975))
+            paired_rows.append(
+                {
+                    "eta": eta,
+                    "metric": field,
+                    "difference_to_eta_0p1": float(delta.mean()),
+                    "ci_low": float(lo),
+                    "ci_high": float(hi),
+                }
+            )
         for n in range(4):
             records = [r for r in read_jsonl(root / "inner.jsonl") if r["inner_step"] == n]
             assert len(records) == 32
@@ -51,6 +73,7 @@ def main():
             dynamics_rows.append(row)
     write_csv(args.output / "checkpoint-comparison.csv", checkpoint_rows)
     write_csv(args.output / "inner-comparison.csv", dynamics_rows)
+    write_csv(args.output / "paired-comparison.csv", paired_rows)
     (args.output / "setting.json").write_text(
         json.dumps(
             {
