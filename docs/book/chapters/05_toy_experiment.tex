@@ -2,7 +2,7 @@
 
 \section{实验设置}
 
-实验脚本位于 \texttt{experiments/toy\_token\_inner.py}。它只包含一个固定 history 和四个 token：
+实验脚本位于 \texttt{experiments/toy/toy\_token\_inner.py}。它只包含一个固定 history 和四个 token：
 \[
  \pi_0=(0.62,0.23,0.10,0.05),
  \qquad
@@ -101,17 +101,17 @@ $\eta$ 同时影响 Gibbs target、Mean 的 Lambert-$W$ target 以及各损失�
 \end{enumerate}
 
 这些检查完成前不运行大型模型 sweep。当前仓库中的 toy 输出由
-\texttt{toy\_token\_inner.py}（从本目录用 \texttt{uv run --with torch python} 运行）生成，结果保存在\path{experiments/toy_token_inner.csv}。独立的
-\path{experiments/test_kl_estimators.py} 使用 200,000 个 token 样本检查 K4 的 value 与 autograd gradient；本次运行的绝对 value 误差为 $5.6\times10^{-5}$，gradient 的 $\ell_2$ 误差为 $1.5\times10^{-3}$。
+\texttt{toy\_token\_inner.py}（从仓库根用 \texttt{PYTHONPATH=src uv run --with torch python} 运行）生成，结果保存在\path{results/toy/toy_token_inner.csv}。独立的
+\path{tests/test_kl_estimators.py} 使用 200,000 个 token 样本检查 K4 的 value 与 autograd gradient；本次运行的绝对 value 误差为 $5.6\times10^{-5}$，gradient 的 $\ell_2$ 误差为 $1.5\times10^{-3}$。
 
-\path{experiments/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和有限样本尺度修正；它与 toy 实验分别检验推导正确性和有限步优化行为。
+\path{tests/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和有限样本尺度修正；它与 toy 实验分别检验推导正确性和有限步优化行为。
 
 \section{真实语言模型上的四种 Top-$J$ 对照}
 
 为了把上一章的四个数学对象放回 OPD 场景，我们使用 GSM8K test 的全部 1,319 个 prompt。Student 为 Qwen3-1.7B，Teacher 为 Qwen3-4B，温度固定为 $1.0$；每个 prompt 生成一条完整 student rollout。对 rollout 的每个 prefix，打分阶段计算 student 与 teacher 的完整词表分布，随后只保存汇总量和审计样本。打分采用 NF4 权重量化、bf16 计算，因此这里的 full-vocabulary KL 是该量化模型对的 oracle。生成采用 bf16 vLLM，其 sampled token 来自与 NF4 打分略有不同的 proposal；EMA 的理论方差严格按 NF4 student 分布计算，观测误差另行报告。总计得到 350,166 个 prefix。实验元数据、逐 $J$ 汇总和绘图脚本分别位于
-\path{experiments/qwen3_gsm8k_pair_kl/metadata.json}、
-\path{experiments/qwen3_gsm8k_pair_kl/kl_summary_by_k.csv} 和
-\path{experiments/plot_pair_kl.py}。
+\path{results/qwen3_gsm8k_pair_kl/metadata.json}、
+\path{results/qwen3_gsm8k_pair_kl/kl_summary_by_k.csv} 和
+\path{experiments/plotting/plot_pair_kl.py}。
 
 令 $S_J$ 为 student 概率的 top-$J$ 支持集。表~\ref{tab:qwen-topk-four} 中的 bias 和 RMSE 都相对于同一 prefix 上的完整
 \[
@@ -141,7 +141,7 @@ $J$ & $P_J$ & $\mathrm{bias}_{\mathrm{trunc}}$ & $\mathrm{RMSE}_{\mathrm{trunc}}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.96\textwidth]{../../experiments/qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png}
+\includegraphics[width=0.96\textwidth]{../../results/qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png}
 \caption{真实 GSM8K rollout 上四种 Top-$J$ KL 的误差曲线。bias 保留正负号；variance 是固定 prefix 的条件采样方差，不是不同 prefix 之间的数值方差。EMA observed 使用 bf16 rollout token，与 NF4 打分分布的理论曲线分开。}
 \label{fig:qwen-topk-four}
 \end{figure}

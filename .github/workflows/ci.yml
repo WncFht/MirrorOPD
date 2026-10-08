@@ -43,6 +43,7 @@ jobs:
       - name: Verify numerical identities and upstream integration
         run: |
           for script in test_mean_bpo test_kl_estimators test_opd_outer_inner \
-            test_upstream_opd_semantics test_upstream_mirror_wiring test_upstream_mirror_lm; do
-            python "experiments/$script.py"
+            test_upstream_opd_semantics test_upstream_mirror_wiring test_upstream_mirror_lm \
+            test_opd_mean_analysis test_opd_lm; do
+            PYTHONPATH=src python "tests/$script.py"
           done

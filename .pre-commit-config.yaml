@@ -42,7 +42,7 @@ repos:
         name: prettier JSON (staged content)
         entry: ./node_modules/.bin/git-format-staged --formatter "./node_modules/.bin/prettier --stdin-filepath {}"
         language: system
-        files: '^(?!experiments/).*\.jsonc?$'
+        files: '^(?!(results|data|runs)/).*\.jsonc?$'
       - id: ruff-format
         name: ruff format (staged content)
         entry: ./node_modules/.bin/git-format-staged --formatter "ruff format --stdin-filename {} -"

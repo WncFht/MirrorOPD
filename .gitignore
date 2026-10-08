@@ -16,8 +16,8 @@ __pycache__/
 checkpoints/
 logs/
 scratch/
-experiments/upstream_gpu_logs/
-experiments/pdf_qa/
+/runs/
+
 # LaTeX build intermediates; released PDFs remain tracked
 *.aux
 *.bcf
@@ -39,8 +39,8 @@ experiments/pdf_qa/
 .markdown-findings.txt
 
 # Versioned gzip archives restore these local raw data files with make data.
-/experiments/qwen3_gsm8k_mk/*/prefix_mk.csv
-/experiments/qwen3_gsm8k_m32/prefix_metrics.jsonl
+/data/qwen3_gsm8k_mk/*/prefix_mk.csv
+/data/qwen3_gsm8k_m32/prefix_metrics.jsonl
 
 .gitleaks-local.json
 

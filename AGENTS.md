@@ -6,6 +6,15 @@
 
 实际训练沿用上游框架，不独立重造 trainer。`upstream/` 是本机依赖 checkout，不进入主仓库；可复现改动通过固定上游版本及补丁保存。训练大文件、模型缓存与 scratch 放磁盘目录，archbox 的 `/tmp` 是容量受限的 tmpfs。
 
+## 代码、记录与文档归属
+
+- `src/mirroropd/` 保存可复用数学参考内核；`tests/` 保存正确性与集成验证。
+- `training/` 保存正式训练入口；`patches/` 保存固定上游版本上的源码改动。
+- `experiments/` 只保存实验程序，按 rollout、scoring、analysis、plotting、toy 分组。
+- prefix/prompt 原始记录进入 `data/`，统计表、图与分析 metadata 进入 `results/`，报告进入 `docs/experiments/`。
+- 日志、checkpoint、scratch 和临时验证输出进入忽略的 `runs/` 或远端运行目录，禁止写入程序目录。
+- 移动文件时更新导入、文档相对链接、Makefile、CI、数据 manifest 与 LaTeX 图像路径；通过原数据 SHA-256 和集成测试核对。
+
 ## 格式化工具链
 
 `git commit` 经过 `.githooks/pre-commit` 的 20 MiB 文件守卫与伪代码检查，再调用 pre-commit。formatter 经 git-format-staged 改写暂存内容并同步工作区；check 类 hook 失败才拦。初始化运行 `npm ci`、`brew install autocorrect shfmt shellcheck ruff gitleaks actionlint taplo` 与 `git config core.hooksPath .githooks`。版本以 `package.json` 为唯一事实源。

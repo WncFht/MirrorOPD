@@ -1,20 +1,20 @@
 {
     "files": [
         {
-            "path": "experiments/qwen3_gsm8k_mk/1p7b/prefix_mk.csv",
-            "archive": "experiments/qwen3_gsm8k_mk/1p7b/prefix_mk.csv.gz",
+            "path": "data/qwen3_gsm8k_mk/1p7b/prefix_mk.csv",
+            "archive": "data/qwen3_gsm8k_mk/1p7b/prefix_mk.csv.gz",
             "sha256": "c8d4fb129fec5ad7e051bb178bb4b805d20ffb0b91b9a54ca1c0ba830bae9531",
             "bytes": 35817171
         },
         {
-            "path": "experiments/qwen3_gsm8k_mk/4b/prefix_mk.csv",
-            "archive": "experiments/qwen3_gsm8k_mk/4b/prefix_mk.csv.gz",
+            "path": "data/qwen3_gsm8k_mk/4b/prefix_mk.csv",
+            "archive": "data/qwen3_gsm8k_mk/4b/prefix_mk.csv.gz",
             "sha256": "8570c6c3dcfaf853ef48220ec3021998e4f3911b6509284cad7d6f9d3eadc329",
             "bytes": 31965196
         },
         {
-            "path": "experiments/qwen3_gsm8k_m32/prefix_metrics.jsonl",
-            "archive": "experiments/qwen3_gsm8k_m32/prefix_metrics.jsonl.gz",
+            "path": "data/qwen3_gsm8k_m32/prefix_metrics.jsonl",
+            "archive": "data/qwen3_gsm8k_m32/prefix_metrics.jsonl.gz",
             "sha256": "7bc98fcb0e7bba444052558a5ac0aad214ad8055efb58cb80204bd0c69f10983",
             "bytes": 8504487
         }

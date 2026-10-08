@@ -6,6 +6,7 @@ extend-exclude = [
   ".crossnote",
   ".claude",
   "node_modules",
+  "runs",
 ]
 
 [lint]
@@ -43,7 +44,7 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-"experiments/test_*.py" = [
+"tests/test_*.py" = [
   "SLF001",
   "S102",
   "S607",

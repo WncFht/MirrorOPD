@@ -5,6 +5,7 @@ archives/
 .claude/
 experiments/**/raw/
 experiments/**/cache/
-experiments/upstream_gpu_logs/
-experiments/**/*.json
+results/**/*.json
+data/**/*.json
+runs/
 package-lock.json

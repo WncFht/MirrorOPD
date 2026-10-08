@@ -12,12 +12,14 @@ data:
 	python3 scripts/restore-data.py
 
 test:
-	uv run --with torch --with numpy python experiments/test_mean_bpo.py
-	uv run --with torch --with numpy python experiments/test_kl_estimators.py
-	uv run --with torch --with numpy python experiments/test_opd_outer_inner.py
-	uv run --with torch --with numpy python experiments/test_upstream_opd_semantics.py
-	uv run --with torch --with numpy python experiments/test_upstream_mirror_wiring.py
-	uv run --with torch --with numpy --with transformers python experiments/test_upstream_mirror_lm.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mean_bpo.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_kl_estimators.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_outer_inner.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_upstream_opd_semantics.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_upstream_mirror_wiring.py
+	PYTHONPATH=src uv run --with torch --with numpy --with transformers python tests/test_upstream_mirror_lm.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_mean_analysis.py
+	PYTHONPATH=src uv run --with torch --with numpy --with transformers python tests/test_opd_lm.py
 
 bootstrap:
 	npm ci
