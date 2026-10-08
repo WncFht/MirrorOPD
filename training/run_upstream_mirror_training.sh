@@ -33,7 +33,10 @@ export MKL_NUM_THREADS=1
 export MALLOC_ARENA_MAX=2
 export MALLOC_TRIM_THRESHOLD_=131072
 export TOKENIZERS_PARALLELISM=false
-export WANDB_MODE=disabled
+export WANDB_MODE="${WANDB_MODE:-disabled}"
+export WANDB_DIR="${WANDB_DIR:-$repo_root/runs/wandb}"
+export WANDB_CACHE_DIR="${WANDB_CACHE_DIR:-$HOME/.cache/wandb}"
+mkdir -p "$WANDB_DIR" "$WANDB_CACHE_DIR"
 
 if (($# < 2)); then
   echo "Usage: $0 MODE TRAIN_PARQUET VAL_PARQUET [Hydra overrides...]" >&2

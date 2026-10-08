@@ -60,7 +60,8 @@ index a2f1871..07888a9 100644
  
 @@ -26,6 +29,9 @@ distillation_loss:
    # If distillation loss requires top-k logits, this is the value of k
-   topk: 16
+-  topk: 32
++  topk: 16
  
 +  # Proximal coefficient for mirror_pmd_mean, mirror_bpo, and mirror_mdpo.
 +  mirror_eta: 0.1
