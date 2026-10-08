@@ -155,6 +155,55 @@
       "checkpoint_saved": true,
       "traceback_in_log": false,
       "scope": "two outer batches, two inner epochs; final GPU resident configuration"
+    },
+    {
+      "method": "mirror_bpo_resume_version_guard",
+      "source": "archbox:~/src/mirroropd-taopd/logs/canary-bpo-resume-version.log",
+      "process_exit_code": 0,
+      "restored_global_step": 2,
+      "completed_global_step": 3,
+      "rollout_weight_version": 2,
+      "model_restored": true,
+      "optimizer_restored": true,
+      "rng_restored": true,
+      "scheduler_restored": true,
+      "checkpoint_saved": true,
+      "traceback_in_log": false
+    },
+    {
+      "method": "mirror_pmd_mean_shared_launcher_128",
+      "source": "archbox:~/src/mirroropd-taopd/logs/shared-mean-128.log",
+      "process_exit_code": 0,
+      "response_limit": 128,
+      "steps": [
+        {
+          "step": 1,
+          "server_version": 0,
+          "metrics": {
+            "actor/grad_norm": 2.0924266576766968,
+            "actor/loss": -0.2440086379647255,
+            "actor/perf/max_memory_allocated_gb": 6.334334373474121,
+            "actor/perf/max_memory_reserved_gb": 8.69140625,
+            "response_length/mean": 128.0,
+            "response_length/clip_ratio": 1.0
+          }
+        },
+        {
+          "step": 2,
+          "server_version": 1,
+          "metrics": {
+            "actor/grad_norm": 1.7083140015602112,
+            "actor/loss": -0.19674041122198105,
+            "actor/perf/max_memory_allocated_gb": 6.349719524383545,
+            "actor/perf/max_memory_reserved_gb": 8.708984375,
+            "response_length/mean": 128.0,
+            "response_length/clip_ratio": 1.0
+          }
+        }
+      ],
+      "checkpoint_saved": true,
+      "traceback_in_log": false,
+      "scope": "external Parquet shared launcher; four execution prompts, two outer batches, two inner epochs"
     }
   ]
 }
