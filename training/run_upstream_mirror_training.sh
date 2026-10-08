@@ -102,7 +102,7 @@ cd "$task_root/verl"
   distillation.n_gpus_per_node=0 distillation.nnodes=0 \
   distillation.mirror_teacher_model_path=Qwen/Qwen3-1.7B \
   distillation.distillation_loss.loss_mode="$mode" \
-  distillation.distillation_loss.topk=32 \
+  distillation.distillation_loss.topk=16 \
   distillation.distillation_loss.mirror_eta=0.1 \
   distillation.distillation_loss.use_task_rewards=false \
   distillation.distillation_loss.use_policy_gradient=false \

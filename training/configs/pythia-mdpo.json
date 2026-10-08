@@ -21,7 +21,7 @@
         "actor_rollout_ref.rollout.gpu_memory_utilization=0.25",
         "distillation.mirror_teacher_model_path={teacher_model}",
         "distillation.distillation_loss.mirror_eta=0.1",
-        "distillation.distillation_loss.topk=32",
+        "distillation.distillation_loss.topk=16",
         "data.train_batch_size=16",
         "data.val_batch_size=16",
         "data.max_prompt_length=64",
