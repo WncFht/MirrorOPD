@@ -25,8 +25,13 @@ def compute_mirror_opd_token_loss(
     and residuals here stop gradient after deriving the score formula.
     This primitive operates on a local complete vocabulary, not TP shards.
     """
-    if not math.isfinite(eta) or eta <= 0 or method not in ("pmd_mean", "bpo", "mdpo"):
-        raise ValueError("positive eta and a supported MirrorOPD method required")
+    if (
+        math.isnan(eta)
+        or eta <= 0
+        or method not in ("pmd_mean", "bpo", "mdpo")
+        or (math.isinf(eta) and method != "mdpo")
+    ):
+        raise ValueError("positive eta required; infinity is supported only for MDPO")
     expected = student_logits.shape[:-1]
     if any(
         t.shape != expected
