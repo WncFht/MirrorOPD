@@ -29,7 +29,7 @@ def read_csv(path):
 
 
 def finish(fig, output, name):
-    fig.tight_layout(rect=[0, 0.1, 1, 1])
+    fig.tight_layout(rect=[0, 0.2 if len(fig.legends[0].texts) > 4 else 0.1, 1, 1])
     problems = fv.audit(fig)
     (output / f"{name}-audit.json").write_text(json.dumps(problems, indent=2) + "\n")
     for problem in problems:

@@ -1,0 +1,14 @@
+{
+  "runs": {
+    "0.03": "pythia-mdpo-eta-0p03",
+    "0.1": "pythia-mdpo-low-lr",
+    "0.3": "pythia-mdpo-eta-0p3",
+    "1": "pythia-mdpo-eta-1",
+    "infinity": "pythia-mdpo-eta-inf"
+  },
+  "lr": 1e-06,
+  "eta_infinity": "zero anchor-KL coefficient; frozen reward retained",
+  "validation_unit": "64 held-out texts; 8128 identical prefixes; 4096 NLL tokens",
+  "training_seeds": 1,
+  "bootstrap_unit": "text, paired to initialization"
+}

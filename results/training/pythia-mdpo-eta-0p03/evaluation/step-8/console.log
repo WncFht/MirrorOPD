@@ -1,0 +1,128 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+scored example 1/64: 127 prefixes
+scored example 2/64: 127 prefixes
+scored example 3/64: 127 prefixes
+scored example 4/64: 127 prefixes
+scored example 5/64: 127 prefixes
+scored example 6/64: 127 prefixes
+scored example 7/64: 127 prefixes
+scored example 8/64: 127 prefixes
+scored example 9/64: 127 prefixes
+scored example 10/64: 127 prefixes
+scored example 11/64: 127 prefixes
+scored example 12/64: 127 prefixes
+scored example 13/64: 127 prefixes
+scored example 14/64: 127 prefixes
+scored example 15/64: 127 prefixes
+scored example 16/64: 127 prefixes
+scored example 17/64: 127 prefixes
+scored example 18/64: 127 prefixes
+scored example 19/64: 127 prefixes
+scored example 20/64: 127 prefixes
+scored example 21/64: 127 prefixes
+scored example 22/64: 127 prefixes
+scored example 23/64: 127 prefixes
+scored example 24/64: 127 prefixes
+scored example 25/64: 127 prefixes
+scored example 26/64: 127 prefixes
+scored example 27/64: 127 prefixes
+scored example 28/64: 127 prefixes
+scored example 29/64: 127 prefixes
+scored example 30/64: 127 prefixes
+scored example 31/64: 127 prefixes
+scored example 32/64: 127 prefixes
+scored example 33/64: 127 prefixes
+scored example 34/64: 127 prefixes
+scored example 35/64: 127 prefixes
+scored example 36/64: 127 prefixes
+scored example 37/64: 127 prefixes
+scored example 38/64: 127 prefixes
+scored example 39/64: 127 prefixes
+scored example 40/64: 127 prefixes
+scored example 41/64: 127 prefixes
+scored example 42/64: 127 prefixes
+scored example 43/64: 127 prefixes
+scored example 44/64: 127 prefixes
+scored example 45/64: 127 prefixes
+scored example 46/64: 127 prefixes
+scored example 47/64: 127 prefixes
+scored example 48/64: 127 prefixes
+scored example 49/64: 127 prefixes
+scored example 50/64: 127 prefixes
+scored example 51/64: 127 prefixes
+scored example 52/64: 127 prefixes
+scored example 53/64: 127 prefixes
+scored example 54/64: 127 prefixes
+scored example 55/64: 127 prefixes
+scored example 56/64: 127 prefixes
+scored example 57/64: 127 prefixes
+scored example 58/64: 127 prefixes
+scored example 59/64: 127 prefixes
+scored example 60/64: 127 prefixes
+scored example 61/64: 127 prefixes
+scored example 62/64: 127 prefixes
+scored example 63/64: 127 prefixes
+scored example 64/64: 127 prefixes
+{
+  "measurement": "fixed-prefix teacher-forced full-vocabulary distributions",
+  "units": "nats",
+  "aggregation": "equal-prefix population moments; NLL equal-token",
+  "dataset": "/home/fanghaotian/src/mirroropd/data/pythia-wikitext/validation-prefixes.json",
+  "dataset_sha256": "983c805e03e31297aa2cc15948b165545c234af8279debb35ff72b8e64a608a1",
+  "student_model": "/home/fanghaotian/.cache/huggingface/hub/models--EleutherAI--pythia-14m/snapshots/cf967c0a9a04383db6f7b1108d86b2962634b4ac",
+  "teacher_model": "/home/fanghaotian/.cache/huggingface/hub/models--EleutherAI--pythia-70m/snapshots/a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+  "checkpoint": "/home/fanghaotian/src/mirroropd/runs/pythia-mdpo-eta-0p03/checkpoints/global_step_8/actor/model_world_size_1_rank_0.pt",
+  "checkpoint_sha256": "edf5f5452842ce173c57f206689e9db57f3393665759b85ac438118835650f08",
+  "examples": 64,
+  "prefixes": 8128,
+  "dtype": "float32",
+  "prompt_prefixes": "all",
+  "max_prompt_prefixes": 64,
+  "max_continuation_tokens": 64,
+  "torch_version": "2.8.0+cu128",
+  "statistics": {
+    "student_teacher_kl": {
+      "count": 8128,
+      "mean": 0.9529469492370901,
+      "std": 0.8761539809790013,
+      "min": 0.002199513628303476,
+      "max": 33.48726622290284
+    },
+    "teacher_student_kl": {
+      "count": 8128,
+      "mean": 0.8916835357683264,
+      "std": 0.6682848268334161,
+      "min": 0.0036564641780228307,
+      "max": 7.164051370555412
+    },
+    "student_entropy": {
+      "count": 8128,
+      "mean": 4.891295119529654,
+      "std": 1.714733583652221,
+      "min": 0.013430732153288518,
+      "max": 8.75796002444183
+    },
+    "teacher_entropy": {
+      "count": 8128,
+      "mean": 4.4361210077230036,
+      "std": 1.7888410100765328,
+      "min": 0.0003663839306651428,
+      "max": 8.695625332814283
+    },
+    "student_continuation_nll": {
+      "count": 4096,
+      "mean": 5.0309761412184315,
+      "std": 3.418177294797589,
+      "min": 0.0010503921584351934,
+      "max": 23.368722110605066
+    },
+    "teacher_continuation_nll": {
+      "count": 4096,
+      "mean": 4.193057952488887,
+      "std": 3.217182428590513,
+      "min": 0.00011677330659186685,
+      "max": 24.948575589110416
+    }
+  }
+}

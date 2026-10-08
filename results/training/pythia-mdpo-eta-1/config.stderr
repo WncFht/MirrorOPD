@@ -1,0 +1,4 @@
+/home/fanghaotian/src/mirroropd-taopd/verl/verl/workers/engine/mindspeed/transformer_impl.py:24: UserWarning: NPU not support router replay for now.
+  from verl.utils.megatron.router_replay_patch import RouterReplay
+/home/fanghaotian/src/mirroropd-taopd/verl/verl/trainer/main_ppo.py:385: FutureWarning: Warning: Function '__main__.main' is deprecated. Please use 'main_ppo.py is deprecated, and wil be replaced by main_ppo_sync.py in v0.8.0, please use main_ppo_sync.py instead.' instead.
+  main()

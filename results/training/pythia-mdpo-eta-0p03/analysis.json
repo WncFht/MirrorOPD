@@ -1,0 +1,41 @@
+{
+  "outer_updates": 32,
+  "optimizer_updates": 128,
+  "prompts": 512,
+  "generated_response_tokens": 32478.0,
+  "length_cap_fraction_of_trajectories": 0.98046875,
+  "summed_outer_step_seconds": 126.90032429500206,
+  "gpu_peak_mib": 4265.0,
+  "all_hard_sync_resets_verified": true,
+  "bootstrap": {
+    "unit": "validation text",
+    "draws": 5000,
+    "seed": 20261008
+  },
+  "inner_step_token_weighted": {
+    "0": {
+      "log_ratio_rms": 0.0,
+      "anchor_student_tail_aware_kl": 0.0,
+      "importance_ess_fraction": 1.0,
+      "score_coefficient_rms": 4.310516895625843
+    },
+    "1": {
+      "log_ratio_rms": 0.33861191671504764,
+      "anchor_student_tail_aware_kl": 0.028262549219088825,
+      "importance_ess_fraction": 0.8530091012844869,
+      "score_coefficient_rms": 29.009658285628007
+    },
+    "2": {
+      "log_ratio_rms": 0.34229253625370515,
+      "anchor_student_tail_aware_kl": 0.029239890580493887,
+      "importance_ess_fraction": 0.8575915031815847,
+      "score_coefficient_rms": 25.48465186736188
+    },
+    "3": {
+      "log_ratio_rms": 0.343035506221018,
+      "anchor_student_tail_aware_kl": 0.02903932305444122,
+      "importance_ess_fraction": 0.8457355424818872,
+      "score_coefficient_rms": 29.192132650267745
+    }
+  }
+}

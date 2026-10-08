@@ -1,0 +1,62 @@
+{
+  "measurement": "fixed-prefix teacher-forced full-vocabulary distributions",
+  "units": "nats",
+  "aggregation": "equal-prefix population moments; NLL equal-token",
+  "dataset": "/home/fanghaotian/src/mirroropd/data/pythia-wikitext/validation-prefixes.json",
+  "dataset_sha256": "983c805e03e31297aa2cc15948b165545c234af8279debb35ff72b8e64a608a1",
+  "student_model": "/home/fanghaotian/.cache/huggingface/hub/models--EleutherAI--pythia-14m/snapshots/cf967c0a9a04383db6f7b1108d86b2962634b4ac",
+  "teacher_model": "/home/fanghaotian/.cache/huggingface/hub/models--EleutherAI--pythia-70m/snapshots/a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+  "checkpoint": "/home/fanghaotian/src/mirroropd/runs/pythia-mdpo-eta-0p03/checkpoints/global_step_32/actor/model_world_size_1_rank_0.pt",
+  "checkpoint_sha256": "23339b7696607f4978ae59f4a06193dff15569c28f3123c9aff668e9dbe4b199",
+  "examples": 64,
+  "prefixes": 8128,
+  "dtype": "float32",
+  "prompt_prefixes": "all",
+  "max_prompt_prefixes": 64,
+  "max_continuation_tokens": 64,
+  "torch_version": "2.8.0+cu128",
+  "statistics": {
+    "student_teacher_kl": {
+      "count": 8128,
+      "mean": 0.9269087049432457,
+      "std": 0.8765010051141197,
+      "min": 0.0025369720598044966,
+      "max": 32.362007966174474
+    },
+    "teacher_student_kl": {
+      "count": 8128,
+      "mean": 0.9447578897343076,
+      "std": 0.6958764368682644,
+      "min": 0.00401306637302682,
+      "max": 7.572767314387805
+    },
+    "student_entropy": {
+      "count": 8128,
+      "mean": 4.5284958901973065,
+      "std": 1.73080555667051,
+      "min": 0.014771463657151864,
+      "max": 8.723772743805323
+    },
+    "teacher_entropy": {
+      "count": 8128,
+      "mean": 4.4361210077230036,
+      "std": 1.7888410100765328,
+      "min": 0.0003663839306651428,
+      "max": 8.695625332814283
+    },
+    "student_continuation_nll": {
+      "count": 4096,
+      "mean": 5.179526444933423,
+      "std": 3.5468079683263416,
+      "min": 0.0011573254040800778,
+      "max": 23.434013039809475
+    },
+    "teacher_continuation_nll": {
+      "count": 4096,
+      "mean": 4.193057952488887,
+      "std": 3.217182428590513,
+      "min": 0.00011677330659186685,
+      "max": 24.948575589110416
+    }
+  }
+}
