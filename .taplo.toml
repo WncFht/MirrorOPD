@@ -1,0 +1,2 @@
+include = ["*.toml", "scripts/**/*.toml", "experiments/**/*.toml"]
+exclude = ["upstream/**", "node_modules/**", ".crossnote/**", ".claude/**"]

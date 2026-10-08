@@ -1,0 +1,48 @@
+# Dependencies and local agent/preview links
+/node_modules/
+/.claude/
+/.crossnote/
+/upstream/
+# Python and runtime caches
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.venv/
+.env
+.env.*
+!.env.example
+# Machine-local training outputs
+checkpoints/
+logs/
+scratch/
+experiments/upstream_gpu_logs/
+experiments/pdf_qa/
+# LaTeX build intermediates; released PDFs remain tracked
+*.aux
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+*.bbl
+*-SAVE-ERROR
+.DS_Store
+
+.ruff-findings.txt
+.format-findings.txt
+.markdown-findings.txt
+
+# Versioned gzip archives restore these local raw data files with make data.
+/experiments/qwen3_gsm8k_mk/*/prefix_mk.csv
+/experiments/qwen3_gsm8k_m32/prefix_metrics.jsonl
+
+.gitleaks-local.json
+
+.format-findings.txt
+.markdown-findings.txt

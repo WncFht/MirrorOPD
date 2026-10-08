@@ -1,0 +1,50 @@
+target-version = "py310"
+line-length = 100
+extend-exclude = [
+  "upstream",
+  "archives",
+  ".crossnote",
+  ".claude",
+  "node_modules",
+]
+
+[lint]
+select = ["ALL"]
+ignore = [
+  "COM812",  # Ruff formatter owns trailing commas.
+  "D",       # Research scripts document algorithms in the accompanying LaTeX book.
+  "ANN",     # Tensor dimensions and data schemas are validated by numerical tests.
+  "T201",    # CLI progress and experiment summaries intentionally use print.
+  "RUF001",
+  "RUF002",
+  "RUF003",  # Chinese prose and mathematical Unicode are intentional.
+  "CPY001",  # Project authorship is recorded in Git rather than per-file headers.
+  "PLR2004", # Numeric constants encode experiment grids and mathematical coefficients.
+  "S101",    # Research correctness checks intentionally use assertions.
+  "E501",    # Ruff formatter determines wrapping; immutable citations may exceed width.
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+  "PLR0917",
+  "C901",    # Scientific kernels retain equations and explicit hyperparameters together.
+  "FBT003",  # Plot visibility flags and tensor validation controls are library APIs.
+  "TRY003",
+  "EM101",
+  "EM102",   # CLI validation errors are contextual messages rather than custom exception classes.
+  "PLC0415", # Optional plotting/model packages are imported only by their selected CLI modes.
+  "ICN001",
+  "N812",    # Torch functional F and plotting backends follow scientific package conventions.
+  "S311",
+  "NPY002",  # Seeded pseudorandomness is for reproducible Monte Carlo experiments.
+  "PTH123",  # File-stream APIs intentionally use built-in open for JSONL data.
+  "PD011",   # Numeric CSV array extraction does not rely on extension dtypes.
+  "PERF203", # Per-prefix numerical validation reports failures without losing the experiment batch.
+  "INP001",  # Experiment scripts are executable entry points rather than an import package.
+]
+
+[lint.per-file-ignores]
+"experiments/test_*.py" = [
+  "SLF001",
+  "S102",
+  "S607",
+] # Tests inspect frozen caches and estimator internals.

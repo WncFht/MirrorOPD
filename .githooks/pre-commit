@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+while IFS= read -r -d '' file; do
+  size=$(git cat-file -s ":$file")
+  if ((size > 20 * 1024 * 1024)); then
+    printf 'Artifact exceeds 20 MiB: %s; store raw training data outside Git.\n' "$file" >&2
+    exit 1
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACM -z)
+if [[ -f .crossnote/scripts/check-pseudocode.cjs ]]; then
+  node .crossnote/scripts/check-pseudocode.cjs --staged
+fi
+exec pre-commit run --hook-stage pre-commit

@@ -1,0 +1,10 @@
+node_modules/
+upstream/
+archives/
+.crossnote/
+.claude/
+experiments/**/raw/
+experiments/**/cache/
+experiments/upstream_gpu_logs/
+experiments/**/*.json
+package-lock.json

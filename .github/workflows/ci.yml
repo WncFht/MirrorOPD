@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tooling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install toolchain
+        run: |
+          npm ci
+          brew install shfmt shellcheck ruff gitleaks actionlint taplo
+      - run: npm run format:check
+      - run: npm run lint
+      - run: ruff format --check .
+      - name: Shell formatting
+        run: |
+          while IFS= read -r -d '' file; do
+            head -1 "$file" | grep -q zsh || shfmt -d -i 2 "$file"
+          done < <(git ls-files -z '*.sh' '.githooks/*')
+      - run: taplo fmt --check
+      - run: gitleaks git --redact
+  numerical:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU numerical dependencies
+        run: |
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install numpy transformers==4.57.6
+      - run: bash scripts/bootstrap-upstream.sh
+      - name: Verify numerical identities and upstream integration
+        run: |
+          for script in test_mean_bpo test_kl_estimators test_opd_outer_inner \
+            test_upstream_opd_semantics test_upstream_mirror_wiring test_upstream_mirror_lm; do
+            python "experiments/$script.py"
+          done
