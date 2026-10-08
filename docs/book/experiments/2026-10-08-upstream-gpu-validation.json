@@ -41,5 +41,47 @@
   "student": "Qwen/Qwen3-0.6B",
   "teacher": "Qwen/Qwen3-1.7B",
   "eta": 0.1,
-  "topk": 32
+  "topk": 32,
+  "additional_runs": [
+    {
+      "method": "mirror_pmd_mean",
+      "process_exit_code": 0,
+      "steps": [
+        {
+          "step": 1,
+          "metrics": {
+            "training/rollout_probs_diff_mean": 0.005523397121578455,
+            "training/rollout_actor_probs_pearson_corr": 0.9994128346443176,
+            "actor/loss": 0.003668372053653002,
+            "actor/grad_norm": 1.8139711618423462,
+            "actor/perf/max_memory_allocated_gb": 6.334334373474121,
+            "actor/perf/max_memory_reserved_gb": 8.515625,
+            "actor/perf/cpu_memory_used_gb": 25.566354751586914,
+            "timing_s/update_actor": 2.151456973999302,
+            "timing_s/update_weights": 1.8114993819999654
+          }
+        },
+        {
+          "step": 2,
+          "metrics": {
+            "training/rollout_probs_diff_mean": 0.005463373847305775,
+            "training/rollout_actor_probs_pearson_corr": 0.9992494583129883,
+            "actor/loss": 0.0022910824045538902,
+            "actor/grad_norm": 1.3610963821411133,
+            "actor/perf/max_memory_allocated_gb": 6.349719524383545,
+            "actor/perf/max_memory_reserved_gb": 8.533203125,
+            "actor/perf/cpu_memory_used_gb": 25.63326072692871,
+            "timing_s/update_actor": 1.9885408280006232,
+            "timing_s/update_weights": 1.8207740950001607
+          }
+        }
+      ],
+      "checkpoint_saved": true,
+      "traceback_in_log": false,
+      "actor_param_offload": false,
+      "teacher_param_offload": false,
+      "cpu_threads": 1,
+      "rollout_workers": 1
+    }
+  ]
 }

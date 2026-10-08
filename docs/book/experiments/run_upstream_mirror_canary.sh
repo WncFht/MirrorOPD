@@ -75,12 +75,12 @@ cd "$task_root/verl"
   actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.actor.ppo_epochs=2 \
   actor_rollout_ref.actor.optim.lr=1e-5 \
-  actor_rollout_ref.actor.fsdp_config.param_offload=true \
+  actor_rollout_ref.actor.fsdp_config.param_offload=false \
   actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
   actor_rollout_ref.actor.fsdp_config.use_torch_compile=false \
   actor_rollout_ref.actor.fsdp_config.model_dtype=bfloat16 \
   actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
-  actor_rollout_ref.ref.fsdp_config.param_offload=true \
+  actor_rollout_ref.ref.fsdp_config.param_offload=false \
   actor_rollout_ref.ref.fsdp_config.use_torch_compile=false \
   actor_rollout_ref.ref.fsdp_config.model_dtype=bfloat16 \
   actor_rollout_ref.rollout.name=vllm \
