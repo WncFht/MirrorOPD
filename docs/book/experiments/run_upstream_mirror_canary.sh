@@ -19,6 +19,10 @@ export TMPDIR="$task_root/scratch"
 export RAY_TMPDIR="${MIRROR_RAY_TMPDIR:-$HOME/.cache/mopd-ray}"
 mkdir -p "$RAY_TMPDIR"
 export PYTHONPATH="$task_root/verl${PYTHONPATH:+:$PYTHONPATH}"
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export MALLOC_ARENA_MAX=2
+export MALLOC_TRIM_THRESHOLD_=131072
 export TOKENIZERS_PARALLELISM=false
 export WANDB_MODE=disabled
 
@@ -85,7 +89,7 @@ cd "$task_root/verl"
   actor_rollout_ref.rollout.max_num_seqs=4 \
   actor_rollout_ref.rollout.max_num_batched_tokens=256 \
   actor_rollout_ref.rollout.max_model_len=128 \
-  actor_rollout_ref.rollout.agent.num_workers=2 \
+  actor_rollout_ref.rollout.agent.num_workers=1 \
   actor_rollout_ref.rollout.calculate_log_probs=true \
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.rollout.temperature=1 actor_rollout_ref.rollout.top_p=1 \

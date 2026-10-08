@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-08",
+  "source": "archbox:~/src/mirroropd-taopd/logs/canary-bpo.log",
+  "method": "mirror_bpo",
+  "process_exit_code": 0,
+  "steps": [
+    {
+      "step": 1,
+      "metrics": {
+        "actor/grad_norm": 16.41815948486328,
+        "actor/loss": -1.2377516627311707,
+        "actor/perf/max_memory_allocated_gb": 6.334334373474121,
+        "actor/perf/max_memory_reserved_gb": 8.552734375,
+        "training/rollout_probs_diff_mean": 0.005996555555611849,
+        "training/rollout_actor_probs_pearson_corr": 0.9990918636322021,
+        "timing_s/update_actor": 2.5448780360002274,
+        "timing_s/mirror_teacher_cache": 29.296682023999892,
+        "timing_s/update_weights": 1.9957507780000014,
+        "response_length/clip_ratio": 1.0
+      }
+    },
+    {
+      "step": 2,
+      "metrics": {
+        "actor/grad_norm": 21.89701557159424,
+        "actor/loss": -1.663214087486267,
+        "actor/perf/max_memory_allocated_gb": 6.350203990936279,
+        "actor/perf/max_memory_reserved_gb": 8.552734375,
+        "training/rollout_probs_diff_mean": 0.0055779023095965385,
+        "training/rollout_actor_probs_pearson_corr": 0.9991757869720459,
+        "timing_s/update_actor": 2.1853211500001635,
+        "timing_s/mirror_teacher_cache": 0.5802854089997709,
+        "timing_s/update_weights": 2.322401164999974,
+        "response_length/clip_ratio": 1.0
+      }
+    }
+  ],
+  "checkpoint_saved": true,
+  "shutdown_exception": "DataLoader worker killed by signal after final update/checkpoint",
+  "scope": "two outer batches, two inner epochs each; execution test, not GSM8K performance",
+  "student": "Qwen/Qwen3-0.6B",
+  "teacher": "Qwen/Qwen3-1.7B",
+  "eta": 0.1,
+  "topk": 32
+}
