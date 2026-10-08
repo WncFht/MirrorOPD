@@ -1,34 +1,11 @@
-diff --git c/verl/verl/experimental/agent_loop/agent_loop.py w/verl/verl/experimental/agent_loop/agent_loop.py
-index 24d305f..ca629a4 100644
---- c/verl/verl/experimental/agent_loop/agent_loop.py
-+++ w/verl/verl/experimental/agent_loop/agent_loop.py
-@@ -49,6 +49,7 @@ from verl.experimental.agent_loop.utils import resolve_config_path
- from verl.protocol import DataProto
- from verl.tools.tool_registry import load_all_tools
- from verl.trainer.distillation import is_distillation_enabled
-+from verl.trainer.distillation.losses import is_mirror_opd_enabled
- from verl.utils.chat_template import apply_chat_template, initialize_system_prompt
- from verl.utils.config import omega_conf_to_dataclass
- from verl.utils.dataset.rl_dataset import RLHFDataset, get_dataset_class
-@@ -427,7 +428,9 @@ class AgentLoopWorker:
-         self.mm_processor_kwargs = config.data.get("mm_processor_kwargs", {})
- 
-         # Online policy distillation
--        self.distillation_enabled = is_distillation_enabled(config.distillation)
-+        self.distillation_enabled = is_distillation_enabled(config.distillation) and not is_mirror_opd_enabled(
-+            config.distillation
-+        )
-         if self.distillation_enabled:
-             from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
- 
-diff --git c/verl/verl/models/transformers/monkey_patch.py w/verl/verl/models/transformers/monkey_patch.py
+diff --git i/verl/verl/models/transformers/monkey_patch.py w/verl/verl/models/transformers/monkey_patch.py
 index 7a5d6f0..26527fd 100644
---- c/verl/verl/models/transformers/monkey_patch.py
+--- i/verl/verl/models/transformers/monkey_patch.py
 +++ w/verl/verl/models/transformers/monkey_patch.py
 @@ -327,13 +327,11 @@ def apply_monkey_patch(
      """Replace _flash_attention_forward to _ulysses_flash_attention_forward"""
      module = sys.modules[model.__module__]
- 
+
 -    try:
 -        num_attention_heads, num_key_value_heads = model.config.num_attention_heads, model.config.num_key_value_heads
 -    except AttributeError:
@@ -41,49 +18,17 @@ index 7a5d6f0..26527fd 100644
 +    attention_config = getattr(model.config, "text_config", model.config)
 +    num_attention_heads = attention_config.num_attention_heads
 +    num_key_value_heads = getattr(attention_config, "num_key_value_heads", num_attention_heads)
- 
+
      assert num_attention_heads % ulysses_sp_size == 0, (
          f"num_attention_heads {num_attention_heads} must be divisible by ulysses_sp_size {ulysses_sp_size}"
-diff --git c/verl/verl/trainer/config/distillation/distillation.yaml w/verl/verl/trainer/config/distillation/distillation.yaml
-index a2f1871..07888a9 100644
---- c/verl/verl/trainer/config/distillation/distillation.yaml
-+++ w/verl/verl/trainer/config/distillation/distillation.yaml
-@@ -13,6 +13,9 @@ defaults:
- # Whether to enable distillation.
- enabled: false
- 
-+# Frozen FSDP teacher for MirrorOPD. Set both native teacher pool dimensions to zero.
-+mirror_teacher_model_path: null
-+
- # distillation loss config
- distillation_loss:
- 
-@@ -26,6 +29,9 @@ distillation_loss:
-   # If distillation loss requires top-k logits, this is the value of k
--  topk: 32
-+  topk: 16
- 
-+  # Proximal coefficient for mirror_pmd_mean, mirror_bpo, and mirror_mdpo.
-+  mirror_eta: 0.1
-+
-   # Whether to include task rewards alongside distillation loss.
-   use_task_rewards: true
- 
-@@ -111,4 +117,4 @@ teacher_models:
-       temperature: ${oc.select:actor_rollout_ref.rollout.temperature}
- 
- # Key to route examples to the appropriate teacher model in multi-teacher setups. Should correspond to a field in the data proto, e.g., task.
--teacher_key: data_source
-\ No newline at end of file
-+teacher_key: data_source
-diff --git c/verl/verl/trainer/distillation/fsdp/losses.py w/verl/verl/trainer/distillation/fsdp/losses.py
-index d37c85d..366d385 100644
---- c/verl/verl/trainer/distillation/fsdp/losses.py
+diff --git i/verl/verl/trainer/distillation/fsdp/losses.py w/verl/verl/trainer/distillation/fsdp/losses.py
+index 94d8574..366d385 100644
+--- i/verl/verl/trainer/distillation/fsdp/losses.py
 +++ w/verl/verl/trainer/distillation/fsdp/losses.py
 @@ -16,6 +16,17 @@
  import torch
  import torch.nn.functional as F
- 
+
 +from mirroropd.training.cache import (
 +    build_mirror_anchor_cache,
 +    build_mirror_opd_cache_from_full_logits,
@@ -98,361 +43,332 @@ index d37c85d..366d385 100644
  from verl.utils.ulysses import (
      get_ulysses_sequence_parallel_world_size,
      slice_input_tensor,
-@@ -32,6 +43,20 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
+@@ -32,257 +43,18 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
      return kld.sum(dim=-1)
- 
- 
-+def compute_mirror_cache_from_logits(student_logits, data, stage, topk=None):
+
+
+-def build_mirror_anchor_cache(
+-    anchor_logits: torch.Tensor,
+-    actions: torch.Tensor,
+-    valid: torch.Tensor,
+-    topk: int,
+-) -> dict[str, torch.Tensor]:
+-    """Anchor-worker output: O(prefixes * topk), with no full logits transfer.
+-
+-    Logits already include the rollout temperature. The worker can release
+-    them before a separate teacher forward, retaining this frozen cache only.
+-    """
+-    if anchor_logits.ndim < 2:
+-        raise ValueError("anchor logits must have (..., vocab) shape")
+-    if actions.shape != anchor_logits.shape[:-1] or valid.shape != actions.shape:
+-        raise ValueError("actions and valid must align with prediction positions")
+-    vocab = anchor_logits.shape[-1]
+-    if not 0 <= topk <= vocab:
+-        raise ValueError(f"topk must lie in [0, {vocab}]")
+-    valid = valid.bool()
+-    safe_actions = torch.where(valid, actions, torch.zeros_like(actions))
+-    anchor_logp = torch.log_softmax(anchor_logits.detach().float().masked_fill(~valid.unsqueeze(-1), 0), dim=-1)
+-    anchor_ids = anchor_logp.topk(topk, dim=-1).indices
+-    anchor_head = anchor_logp.gather(-1, anchor_ids).detach()
+-    outside = torch.ones_like(anchor_logp, dtype=torch.bool)
+-    outside.scatter_(-1, anchor_ids, False)
+-    anchor_tail = anchor_logp.masked_fill(~outside, float("-inf")).logsumexp(-1)
+-    anchor_action = anchor_logp.gather(-1, safe_actions.unsqueeze(-1)).squeeze(-1)
+-    result = {
+-        "mirror_valid": valid.bool(),
+-        "mirror_actions": actions,
+-        "mirror_anchor_ids": anchor_ids,
+-        "mirror_anchor_head_log_probs": anchor_head,
+-        "mirror_anchor_tail_log_prob": anchor_tail,
+-        "mirror_anchor_action_log_prob": anchor_action.detach(),
+-        "mirror_vocab_size": torch.full_like(actions, vocab),
+-    }
+-    # Do not allow invalid prompt/terminal locations to leak arbitrary cache
+-    # values into diagnostics; loss adapter still masks them before gather.
+-    for key, value in result.items():
+-        if key == "mirror_valid":
+-            continue
+-        result[key] = torch.where(
+-            valid.unsqueeze(-1) if value.ndim == valid.ndim + 1 else valid, value, torch.zeros_like(value)
+-        )
+-    return result
+-
+-
+-def complete_mirror_teacher_cache(
+-    teacher_logits: torch.Tensor,
+-    anchor_cache: dict[str, torch.Tensor],
+-) -> dict[str, torch.Tensor]:
+-    """Score anchor-selected ids locally and return compact frozen fields.
+-
+-    The teacher must share the anchor's tokenizer and vocabulary semantics.
+-    Native teacher top-k results cannot substitute for these requested ids.
+-    """
+-    valid = anchor_cache["mirror_valid"].bool()
+-    actions = anchor_cache["mirror_actions"]
+-    ids = anchor_cache["mirror_anchor_ids"]
+-    qhead = anchor_cache["mirror_anchor_head_log_probs"].detach().float()
+-    qtail = anchor_cache["mirror_anchor_tail_log_prob"].detach().float()
+-    if teacher_logits.shape[:-1] != valid.shape or actions.shape != valid.shape:
+-        raise ValueError("teacher logits and anchor cache must align with prediction positions")
+-    if ids.shape != qhead.shape or ids.shape[:-1] != valid.shape or qtail.shape != valid.shape:
+-        raise ValueError("anchor head and tail shapes must align with prediction positions")
+-    vocab = teacher_logits.shape[-1]
+-    if ids.shape[-1] > vocab:
+-        raise ValueError("anchor support is larger than the teacher vocabulary")
+-    if ((anchor_cache["mirror_vocab_size"] != vocab) & valid).any():
+-        raise ValueError("anchor and teacher vocabulary sizes must match")
+-    teacher_logp = torch.log_softmax(teacher_logits.detach().float().masked_fill(~valid.unsqueeze(-1), 0), dim=-1)
+-    teacher_head = teacher_logp.gather(-1, ids)
+-    outside = torch.ones_like(teacher_logp, dtype=torch.bool)
+-    outside.scatter_(-1, ids, False)
+-    teacher_tail = teacher_logp.masked_fill(~outside, float("-inf")).logsumexp(-1)
+-    center = (qhead.exp() * (qhead - teacher_head)).sum(-1)
+-    nonempty = torch.isfinite(qtail) & valid
+-    tail = torch.zeros_like(center)
+-    tail[nonempty] = qtail[nonempty].exp() * (qtail[nonempty] - teacher_tail[nonempty])
+-    center = center + tail
+-    safe_actions = torch.where(valid, actions, torch.zeros_like(actions))
+-    action_lp = teacher_logp.gather(-1, safe_actions.unsqueeze(-1)).squeeze(-1)
+-    result = dict(anchor_cache)
+-    result.pop("mirror_vocab_size")
+-    result["mirror_teacher_action_log_prob"] = torch.where(valid, action_lp, 0).detach()
+-    result["mirror_teacher_center"] = torch.where(valid, center, 0).detach()
+-    return result
+-
+-
+-def build_mirror_opd_cache_from_full_logits(
+-    anchor_logits: torch.Tensor,
+-    teacher_logits: torch.Tensor,
+-    actions: torch.Tensor,
+-    valid: torch.Tensor,
+-    topk: int,
+-) -> dict[str, torch.Tensor]:
+-    """Full-logit oracle for the sequential compact worker cache contract."""
+-    if anchor_logits.shape != teacher_logits.shape:
+-        raise ValueError("anchor and teacher logits must have identical (..., vocab) shape")
+-    anchor_cache = build_mirror_anchor_cache(anchor_logits, actions, valid, topk)
+-    return complete_mirror_teacher_cache(teacher_logits, anchor_cache)
+-
+-
+ def compute_mirror_cache_from_logits(student_logits, data, stage, topk=None):
+-    """Compact cache scoring for a no-padding, full-vocabulary inference pass.
+-
+-    The engine supplies temperature-scaled logits of shape (total_tokens, V).
+-    Cache fields remain prediction-position aligned; they are not rolled here.
+-    """
+-    if get_ulysses_sequence_parallel_world_size() != 1:
+-        raise NotImplementedError("MirrorOPD cache scoring requires sequence parallel size 1")
+-    if student_logits.ndim != 2:
+-        raise ValueError("cache inference expects (total_tokens, vocab) logits")
+-
+-    def values(key):
+-        tensor = data[key]
+-        return tensor.values() if tensor.is_nested else tensor
+-
+-    if stage == "anchor":
+-        if topk is None:
+-            raise ValueError("anchor cache inference requires mirror_cache_topk")
+-        return build_mirror_anchor_cache(
+-            student_logits, values("mirror_actions"), values("mirror_valid"), topk
+-        )
+-    if stage == "teacher":
+-        cache = {key: values(key) for key in (
+-            "mirror_valid", "mirror_actions", "mirror_anchor_ids",
+-            "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
+-            "mirror_anchor_action_log_prob", "mirror_vocab_size",
+-        )}
+-        completed = complete_mirror_teacher_cache(student_logits, cache)
+-        return {key: completed[key] for key in (
+-            "mirror_teacher_action_log_prob", "mirror_teacher_center",
+-        )}
+-    raise ValueError(f"unknown mirror_cache_stage: {stage}")
+-
+-
+-def compute_mirror_opd_token_loss(
+-    student_logits: torch.Tensor,
+-    actions: torch.Tensor,
+-    anchor_ids: torch.Tensor,
+-    anchor_head_log_probs: torch.Tensor,
+-    anchor_tail_log_prob: torch.Tensor,
+-    anchor_action_log_prob: torch.Tensor,
+-    teacher_action_log_prob: torch.Tensor,
+-    teacher_center: torch.Tensor,
+-    method: str,
+-    eta: float,
+-) -> dict[str, torch.Tensor]:
+-    """Token score surrogate on frozen anchor actions (no PPO clipping).
+-
+-    Logits must already have the rollout temperature applied. All cache
+-    tensors refer to the same prefix and tokenizer. The anchor support stays
+-    fixed throughout inner updates. Unlike TA-OPD's direct KL loss, centers
+-    and residuals here stop gradient after deriving the score formula.
+-    This primitive operates on a local complete vocabulary, not TP shards.
+-    """
+-    if eta <= 0 or method not in ("pmd_mean", "bpo", "mdpo"):
+-        raise ValueError("positive eta and a supported MirrorOPD method required")
+-    expected = student_logits.shape[:-1]
+-    if any(
+-        t.shape != expected
+-        for t in (actions, anchor_tail_log_prob, anchor_action_log_prob, teacher_action_log_prob, teacher_center)
+-    ):
+-        raise ValueError("all scalar cache fields must align with prefix dimensions")
+-    if anchor_ids.shape != anchor_head_log_probs.shape or anchor_ids.shape[:-1] != expected:
+-        raise ValueError("anchor head ids/log-probs must align with prefixes")
+-    log_p = torch.log_softmax(student_logits.float(), dim=-1)
+-    action_lp = log_p.gather(-1, actions.unsqueeze(-1)).squeeze(-1)
+-    with torch.no_grad():
+-        q_head = anchor_head_log_probs.detach().float()
+-        p_head = log_p.detach().gather(-1, anchor_ids)
+-        head = (q_head.exp() * (q_head - p_head)).sum(-1)
+-        outside = torch.ones_like(log_p, dtype=torch.bool)
+-        outside.scatter_(-1, anchor_ids, False)
+-        p_tail_lp = torch.logsumexp(log_p.detach().masked_fill(~outside, float("-inf")), -1)
+-        q_tail_lp = anchor_tail_log_prob.detach().float()
+-        tail = torch.zeros_like(head)
+-        nonempty = torch.isfinite(q_tail_lp)
+-        tail[nonempty] = q_tail_lp[nonempty].exp() * (q_tail_lp[nonempty] - p_tail_lp[nonempty])
+-        center = head + tail
+-        u = action_lp.detach() - anchor_action_log_prob.detach()
+-        reward = teacher_action_log_prob.detach() - anchor_action_log_prob.detach()
+-        kt = teacher_center.detach()
+-        if method == "pmd_mean":
+-            coefficient = u - eta * (reward + kt)
+-        elif method == "bpo":
+-            coefficient = (u + center) / eta - reward - kt
+-        else:
+-            coefficient = (u / eta - reward) * u.exp()
+-        if not torch.isfinite(coefficient).all():
+-            raise FloatingPointError("nonfinite MirrorOPD weight; no silent ratio clipping")
+-    return {
+-        "distillation_losses": coefficient * action_lp,
+-        "mirror_student_center": center,
+-        "mirror_teacher_center": teacher_center.detach(),
+-        "mirror_importance_ratio": u.exp() if method == "mdpo" else torch.ones_like(u),
+-    }
 +    return mirror_compute_cache_from_logits(
 +        student_logits, data, stage, topk,
 +        sequence_parallel_world_size=get_ulysses_sequence_parallel_world_size(),
 +    )
-+
-+
-+def compute_mirror_opd_from_cache(student_logits, data, config, data_format):
+
+
+ def compute_mirror_opd_from_cache(student_logits, data, config, data_format):
+-    """Consume prediction-position-aligned caches after engine unpadding.
+-
+-    Cache producers must put response token t at its predecessor position.
+-    Prompt and terminal positions have mirror_valid=False and are excluded
+-    before any probability arithmetic. Sequence parallel is not enabled yet.
+-    """
+-    if get_ulysses_sequence_parallel_world_size() != 1:
+-        raise NotImplementedError("MirrorOPD cache adapter requires sequence parallel size 1")
+-    if data_format not in ("thd", "bshd"):
+-        raise ValueError("unsupported MirrorOPD data format")
+-    fields = (
+-        "mirror_valid",
+-        "mirror_actions",
+-        "mirror_anchor_ids",
+-        "mirror_anchor_head_log_probs",
+-        "mirror_anchor_tail_log_prob",
+-        "mirror_anchor_action_log_prob",
+-        "mirror_teacher_action_log_prob",
+-        "mirror_teacher_center",
 +    return mirror_compute_opd_from_cache(
 +        student_logits, data, config, data_format,
 +        sequence_parallel_world_size=get_ulysses_sequence_parallel_world_size(),
-+    )
-+
-+
+     )
+-    cache = {}
+-    for key in fields:
+-        value = data[key]
+-        value = value.values().unsqueeze(0) if value.is_nested else value
+-        if value.shape[:2] != student_logits.shape[:2]:
+-            raise ValueError(f"{key} must align with full prediction positions")
+-        cache[key] = value
+-    valid = cache["mirror_valid"].bool()
+-    result = {
+-        key: student_logits.new_zeros(valid.shape, dtype=torch.float32)
+-        for key in ("distillation_losses", "mirror_student_center", "mirror_teacher_center", "mirror_importance_ratio")
+-    }
+-    if valid.any():
+-        outputs = compute_mirror_opd_token_loss(
+-            student_logits=student_logits[valid],
+-            actions=cache["mirror_actions"][valid],
+-            anchor_ids=cache["mirror_anchor_ids"][valid],
+-            anchor_head_log_probs=cache["mirror_anchor_head_log_probs"][valid],
+-            anchor_tail_log_prob=cache["mirror_anchor_tail_log_prob"][valid],
+-            anchor_action_log_prob=cache["mirror_anchor_action_log_prob"][valid],
+-            teacher_action_log_prob=cache["mirror_teacher_action_log_prob"][valid],
+-            teacher_center=cache["mirror_teacher_center"][valid],
+-            method=config.distillation_loss.loss_mode.removeprefix("mirror_"),
+-            eta=config.distillation_loss.mirror_eta,
+-        )
+-        for key, value in outputs.items():
+-            result[key][valid] = value
+-    else:
+-        result["distillation_losses"] = student_logits.sum(-1) * 0
+-    return result
+
+
  def sample_corrected_ta_opd(
-     taopd_with_sg: torch.Tensor,
-     student_logp_y: torch.Tensor,
-@@ -73,12 +98,7 @@ def sample_corrected_ta_opd(
- 
-     # Tail log-probabilities come directly from log1mexp(logsumexp(top-k)),
-     # so the correction never forms 1 - sum(exp(top-k log-probs)).
--    conditional_log_ratio = (
--        student_logp_y
--        - student_log_p_tail
--        - teacher_logp_y
--        + teacher_log_q_tail
--    ).detach()
-+    conditional_log_ratio = (student_logp_y - student_log_p_tail - teacher_logp_y + teacher_log_q_tail).detach()
- 
-     if behavior_logp_y is None:
-         # On-policy p(y) / sg(p(y)); this avoids exp(log p) underflow and 0/0.
-@@ -95,9 +115,6 @@ def sample_corrected_ta_opd(
-     return taopd_with_sg + sample_correction.to(dtype=taopd_with_sg.dtype)
- 
- 
--
--
--
- def compute_reverse_kl_topk(
-     student_logits: torch.Tensor,
-     teacher_topk_log_probs: torch.Tensor,
-@@ -160,8 +177,6 @@ def compute_reverse_kl_topk(
-     }
- 
- 
--
--
- def compute_mopd_reverse_kl_topk(
-     student_logits: torch.Tensor,
-     teacher_topk_log_probs: torch.Tensor,
-@@ -188,11 +203,7 @@ def compute_mopd_reverse_kl_topk(
-         teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
-         teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
- 
--    assert (
--        teacher_topk_log_probs.shape[:2]
--        == teacher_topk_ids.shape[:2]
--        == student_logits.shape[:2]
--    )
-+    assert teacher_topk_log_probs.shape[:2] == teacher_topk_ids.shape[:2] == student_logits.shape[:2]
- 
-     # Compute only the student log probabilities needed on the teacher support.
-     student_log_z = torch.logsumexp(student_logits, dim=-1).float()
-@@ -205,9 +216,7 @@ def compute_mopd_reverse_kl_topk(
-     student_mass = student_topk_probs.sum(dim=-1)
-     teacher_mass = teacher_topk_probs.sum(dim=-1)
- 
--    support_kl = (
--        student_topk_probs * (student_topk_log_probs - teacher_topk_log_probs)
--    ).sum(dim=-1)
-+    support_kl = (student_topk_probs * (student_topk_log_probs - teacher_topk_log_probs)).sum(dim=-1)
-     distillation_losses = support_kl + teacher_mass - student_mass
- 
-     with torch.no_grad():
-@@ -216,14 +225,10 @@ def compute_mopd_reverse_kl_topk(
-             k=teacher_topk_ids.shape[-1],
-             dim=-1,
-         ).indices
--        overlap_mask = (
--            teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)
--        ).any(dim=-1)
-+        overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
-         overlap_count = overlap_mask.sum(dim=-1)
- 
--        token_kl = teacher_topk_probs * (
--            teacher_topk_log_probs - student_topk_log_probs
--        )
-+        token_kl = teacher_topk_probs * (teacher_topk_log_probs - student_topk_log_probs)
-         overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
-         overlap_token_advantage = torch.where(
-             overlap_count > 0,
-@@ -287,7 +292,6 @@ def compute_normalized_reverse_kl_topk(
-         index=teacher_topk_ids,
-     )
- 
--
-     # original masses before normalization, used for metrics
-     student_mass = student_topk_log_probs.exp().sum(dim=-1)
-     teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
-@@ -308,9 +312,7 @@ def compute_normalized_reverse_kl_topk(
-     overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
-     overlap_count = overlap_mask.sum(dim=-1)
- 
--    token_kl = teacher_topk_log_probs.exp() * (
--        teacher_topk_log_probs - student_topk_log_probs
--    )
-+    token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
- 
-     overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
-     overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
-@@ -343,13 +345,9 @@ def compute_normalized_reverse_kl_topk(
-         cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
- 
-         # Cov_{I~p}(p_I, log p_I - log q_I)
--        cov_student_minus_teacher_residual = (
--                cov_student_log_student - cov_student_log_teacher
--        )
-+        cov_student_minus_teacher_residual = cov_student_log_student - cov_student_log_teacher
- 
--        tail_weighted_cov = (
--                student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
--        )
-+        tail_weighted_cov = student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
- 
-     return {
-         "distillation_losses": distillation_losses,
-@@ -364,7 +362,6 @@ def compute_normalized_reverse_kl_topk(
-     }
- 
- 
--
- def compute_unnormalized_reverse_kl_topk(
-     student_logits: torch.Tensor,
-     teacher_topk_log_probs: torch.Tensor,
-@@ -412,7 +409,6 @@ def compute_unnormalized_reverse_kl_topk(
-         index=teacher_topk_ids,
-     )
- 
--
-     # original masses before normalization, used for metrics
-     student_mass = student_topk_log_probs.exp().sum(dim=-1)
-     teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
-@@ -426,9 +422,7 @@ def compute_unnormalized_reverse_kl_topk(
-     overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
-     overlap_count = overlap_mask.sum(dim=-1)
- 
--    token_kl = teacher_topk_log_probs.exp() * (
--        teacher_topk_log_probs - student_topk_log_probs
--    )
-+    token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
- 
-     overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
-     overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
-@@ -461,13 +455,9 @@ def compute_unnormalized_reverse_kl_topk(
-         cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
- 
-         # Cov_{I~p}(p_I, log p_I - log q_I)
--        cov_student_minus_teacher_residual = (
--                cov_student_log_student - cov_student_log_teacher
--        )
-+        cov_student_minus_teacher_residual = cov_student_log_student - cov_student_log_teacher
- 
--        tail_weighted_cov = (
--                student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
--        )
-+        tail_weighted_cov = student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
- 
-     return {
-         "distillation_losses": distillation_losses,
-@@ -482,13 +472,9 @@ def compute_unnormalized_reverse_kl_topk(
-     }
- 
- 
--
--
--
--
- import math
-+
- import torch
--import torch.nn.functional as F
- 
- _LOG2 = math.log(2.0)
- 
-@@ -498,8 +484,8 @@ def log1mexp(log_x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
-     cond = log_x > -_LOG2
-     a_in = torch.where(cond, log_x, torch.full_like(log_x, -_LOG2))
-     b_in = torch.where(cond, torch.full_like(log_x, -_LOG2), log_x)
--    out_a = torch.log(-torch.expm1(a_in))   # (-log2, 0]
--    out_b = torch.log1p(-torch.exp(b_in))   # (-inf, -log2]
-+    out_a = torch.log(-torch.expm1(a_in))  # (-log2, 0]
-+    out_b = torch.log1p(-torch.exp(b_in))  # (-inf, -log2]
-     return torch.where(cond, out_a, out_b)
- 
- 
-@@ -526,16 +512,10 @@ def compute_taopd_with_sg(
-         teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
-         teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
- 
--    assert (
--        teacher_topk_log_probs.shape[:2]
--        == teacher_topk_ids.shape[:2]
--        == student_logits.shape[:2]
--    )
-+    assert teacher_topk_log_probs.shape[:2] == teacher_topk_ids.shape[:2] == student_logits.shape[:2]
- 
-     student_log_z = torch.logsumexp(student_logits, dim=-1).float()
--    student_topk_logits = torch.gather(
--        student_logits, dim=-1, index=teacher_topk_ids
--    ).float()
-+    student_topk_logits = torch.gather(student_logits, dim=-1, index=teacher_topk_ids).float()
-     student_topk_log_probs = student_topk_logits - student_log_z.unsqueeze(-1)
-     teacher_topk_log_probs = teacher_topk_log_probs.float()
- 
-@@ -544,28 +524,18 @@ def compute_taopd_with_sg(
-     student_log_p_tail = log1mexp(student_log_mass)
-     teacher_log_q_tail = log1mexp(teacher_log_mass)
- 
--    student_augmented_log_probs = torch.cat(
--        [student_topk_log_probs, student_log_p_tail.unsqueeze(-1)], dim=-1
--    )
--    teacher_augmented_log_probs = torch.cat(
--        [teacher_topk_log_probs, teacher_log_q_tail.unsqueeze(-1)], dim=-1
--    )
-+    student_augmented_log_probs = torch.cat([student_topk_log_probs, student_log_p_tail.unsqueeze(-1)], dim=-1)
-+    teacher_augmented_log_probs = torch.cat([teacher_topk_log_probs, teacher_log_q_tail.unsqueeze(-1)], dim=-1)
-     log_ratio = (student_augmented_log_probs - teacher_augmented_log_probs).detach()
-     distillation_losses = (student_augmented_log_probs.exp() * log_ratio).sum(dim=-1)
- 
-     with torch.no_grad():
-         student_mass = student_log_mass.exp()
-         teacher_mass = teacher_log_mass.exp()
--        student_topk_ids = torch.topk(
--            student_logits, k=teacher_topk_ids.shape[-1], dim=-1
--        ).indices
--        overlap_mask = (
--            teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)
--        ).any(dim=-1)
-+        student_topk_ids = torch.topk(student_logits, k=teacher_topk_ids.shape[-1], dim=-1).indices
-+        overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
-         overlap_count = overlap_mask.sum(dim=-1)
--        token_kl = teacher_topk_log_probs.exp() * (
--            teacher_topk_log_probs - student_topk_log_probs
--        )
-+        token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
-         overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
-         overlap_token_advantage = torch.where(
-             overlap_count > 0,
-@@ -584,7 +554,6 @@ def compute_taopd_with_sg(
-     }
- 
- 
--
- def compute_taopd_reverse_kl_topk(
-     student_logits: torch.Tensor,
-     teacher_topk_log_probs: torch.Tensor,
-@@ -680,9 +649,7 @@ def compute_taopd_reverse_kl_topk(
- 
-         # Per-token forward-KL contribution q(v) * log(q(v)/p(v)), a diagnostic only.
-         # only use real teacher top-k tokens here, not the collapsed other token
--        token_kl = teacher_topk_log_probs.exp() * (
--            teacher_topk_log_probs - student_topk_log_probs
--        )
-+        token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
- 
-         # Average of -token_kl over the overlapping tokens; positions with no overlap get 0.
-         overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
-diff --git c/verl/verl/trainer/distillation/losses.py w/verl/verl/trainer/distillation/losses.py
-index 1fb42a8..7ecceed 100644
---- c/verl/verl/trainer/distillation/losses.py
+diff --git i/verl/verl/trainer/distillation/losses.py w/verl/verl/trainer/distillation/losses.py
+index 496116e..2d596a8 100644
+--- i/verl/verl/trainer/distillation/losses.py
 +++ w/verl/verl/trainer/distillation/losses.py
-@@ -36,6 +36,23 @@ DistillationLossFn = Callable[
- ]
- 
- 
+@@ -63,10 +63,24 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
+ def is_mirror_opd_enabled(config: Optional[DistillationConfig]) -> bool:
+     """MirrorOPD uses compact FSDP teacher scoring instead of native teacher RPCs."""
+     return is_distillation_enabled(config) and config.distillation_loss.loss_mode in {
+-        "mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"
++        "mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"
+     }
+
+
++def populate_global_batch_info(config: ActorConfig, data: TensorDict) -> None:
++    """Record the full-batch normalization factors before a loss can return.
 +
-+def validate_mirror_rollout_version(non_tensor_batch, expected_version, batch_size):
-+    """Reject stale/missing server versions before constructing an anchor cache.
-+
-+    The version is set by the upstream server adapter after weight transfer.
-+    This validates synchronization ordering, not bitwise backend equivalence.
++    The upstream PPO path fills these fields inside ``ppo_loss``.  MirrorOPD
++    supplies its own policy-gradient surrogate and therefore returns before
++    entering that function; it still needs the same factors so gradient
++    accumulation is invariant to the chosen micro-batch partition.
 +    """
-+    versions = non_tensor_batch.get("global_steps")
-+    if versions is None or len(versions) != batch_size:
-+        raise ValueError("MirrorOPD rollout must report one server weight version per trajectory")
-+    if any(version is None or version != expected_version for version in versions):
-+        raise ValueError(
-+            f"MirrorOPD stale rollout: expected server version {expected_version}, got {list(versions)}"
-+        )
-+    return {"mirror/rollout_weight_version": expected_version}
++    config.global_batch_info["dp_size"] = data["dp_size"]
++    config.global_batch_info["batch_num_tokens"] = data["batch_num_tokens"]
++    config.global_batch_info["global_batch_size"] = data["global_batch_size"]
++    config.global_batch_info["loss_scale_factor"] = config.loss_scale_factor
 +
 +
- def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
-     """Check if distillation is enabled based on the provided configuration."""
-     if config is None:
-@@ -43,6 +60,12 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
-     return config.enabled
- 
- 
-+def is_mirror_opd_enabled(config: Optional[DistillationConfig]) -> bool:
-+    """MirrorOPD uses compact FSDP teacher scoring instead of native teacher RPCs."""
-+    return is_distillation_enabled(config) and config.distillation_loss.loss_mode in {
-+        "mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"
-+    }
-+
- 
  @dataclass
  class DistillationLossSettings(BaseConfig):
-@@ -156,6 +179,11 @@ def compute_topk_loss(
- 
+     """
+@@ -179,7 +193,7 @@ def compute_topk_loss(
+
              loss_mode = distillation_config.distillation_loss.loss_mode
- 
-+            if loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"):
-+                return fsdp_losses.compute_mirror_opd_from_cache(
-+                    student_logits, data, distillation_config, data_format
-+                )
-+
-             if loss_mode == "reverse_kl_topk":
-                 distillation_loss_fn = fsdp_losses.compute_reverse_kl_topk
-             elif loss_mode in ("mopd_topk", "mopd_reverse_kl_topk"):
-@@ -242,6 +270,12 @@ def distillation_ppo_loss(
-     # Called as final policy loss
-     distillation_loss_config = distillation_config.distillation_loss
-     distill_loss, distill_metrics = distillation_loss(config, distillation_config, model_output, data)
-+    if is_mirror_opd_enabled(distillation_config):
-+        # MirrorOPD already supplies the complete score surrogate. Evaluating
-+        # a discarded PPO objective still imposes unrelated advantage/ratio
-+        # requirements and can produce misleading metrics or numerical errors.
-+        distill_metrics["distillation/loss"] = Metric(value=distill_loss, aggregation=AggregationType.SUM)
-+        return distill_loss, distill_metrics
+
+-            if loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"):
++            if loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"):
+                 return fsdp_losses.compute_mirror_opd_from_cache(
+                     student_logits, data, distillation_config, data_format
+                 )
+@@ -274,6 +288,7 @@ def distillation_ppo_loss(
+         # MirrorOPD already supplies the complete score surrogate. Evaluating
+         # a discarded PPO objective still imposes unrelated advantage/ratio
+         # requirements and can produce misleading metrics or numerical errors.
++        populate_global_batch_info(config, data)
+         distill_metrics["distillation/loss"] = Metric(value=distill_loss, aggregation=AggregationType.SUM)
+         return distill_loss, distill_metrics
      policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
-     if not distillation_loss_config.use_task_rewards:
-         policy_loss = 0.0
-@@ -327,6 +361,34 @@ def distillation_loss(
- 
- 
- 
-+@register_distillation_loss(
-+    DistillationLossSettings(
-+        names=["mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"],
-+        use_topk=True, use_sampled_logprob=True,
-+    )
-+)
-+def compute_mirror_opd_loss(config, distillation_config, model_output, data):
-+    """Aggregate an already differentiated score surrogate, never PPO-wrap it."""
-+    del config
-+    settings = distillation_config.distillation_loss
-+    if (settings.use_policy_gradient or settings.use_task_rewards
-+            or settings.loss_max_clamp is not None or settings.log_prob_min_clamp is not None):
-+        raise ValueError("MirrorOPD requires direct surrogate aggregation without clamps/task rewards")
-+    losses = no_padding_2_padding(model_output["distillation_losses"], data)
+@@ -363,7 +378,7 @@ def distillation_loss(
+
+ @register_distillation_loss(
+     DistillationLossSettings(
+-        names=["mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"],
++        names=["mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"],
+         use_topk=True, use_sampled_logprob=True,
+     )
+ )
+@@ -375,7 +390,18 @@ def compute_mirror_opd_loss(config, distillation_config, model_output, data):
+             or settings.loss_max_clamp is not None or settings.log_prob_min_clamp is not None):
+         raise ValueError("MirrorOPD requires direct surrogate aggregation without clamps/task rewards")
+     losses = no_padding_2_padding(model_output["distillation_losses"], data)
+-    return losses, {}
 +    from mirroropd.training.metrics import token_moments
 +    mask = data["response_mask"]
 +    mask = mask.bool().to_padded_tensor(False) if mask.is_nested else mask.bool()
@@ -465,249 +381,40 @@ index 1fb42a8..7ecceed 100644
 +        for key, (reduction, value) in token_moments(fields, mask).items()
 +    }
 +    return losses, metrics
-+
-+
+
+
  @register_distillation_loss(
-     DistillationLossSettings(names=["kl", "k1", "abs", "mse", "k2", "low_var_kl", "k3"], use_estimator=True)
- )  # type: ignore[arg-type]
-diff --git c/verl/verl/trainer/main_ppo.py w/verl/verl/trainer/main_ppo.py
-index 8f6cd41..c5b36aa 100644
---- c/verl/verl/trainer/main_ppo.py
-+++ w/verl/verl/trainer/main_ppo.py
-@@ -25,6 +25,7 @@ from omegaconf import OmegaConf
- from verl.experimental.reward_loop import migrate_legacy_reward_impl
- from verl.trainer.constants_ppo import get_ppo_ray_runtime_env
- from verl.trainer.distillation import is_distillation_enabled
-+from verl.trainer.distillation.losses import is_mirror_opd_enabled
- from verl.trainer.ppo.ray_trainer import RayPPOTrainer
- from verl.trainer.ppo.utils import need_critic, need_reference_policy
- from verl.utils.config import validate_config
-@@ -135,7 +136,9 @@ class TaskRunner:
-         lora_rank = config.actor_rollout_ref.model.get("lora", {}).get("rank", 0)
-         if lora_rank <= 0:
-             lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
--        ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
-+        ref_in_actor = not is_mirror_opd_enabled(config.get("distillation")) and (
-+            lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
-+        )
-         # Ref policy is fused into ActorRolloutRefWorker unless LoRA is used with a dedicated ref model.
-         if need_reference_policy(config) and not ref_in_actor:
-             role = Role.ActorRolloutRef
-@@ -176,7 +179,7 @@ class TaskRunner:
-             config.reward.reward_model.n_gpus_per_node = config.trainer.n_gpus_per_node
- 
-         distillation_config = config.get("distillation")
--        if is_distillation_enabled(distillation_config):
-+        if is_distillation_enabled(distillation_config) and not is_mirror_opd_enabled(distillation_config):
-             if distillation_config.n_gpus_per_node <= 0:
-                 raise ValueError("config.distillation.n_gpus_per_node must be greater than 0")
-             if distillation_config.nnodes <= 0:
-@@ -206,7 +209,9 @@ class TaskRunner:
-         """Add teacher model worker if enabled."""
-         from verl.trainer.ppo.ray_trainer import Role
- 
--        if is_distillation_enabled(config.get("distillation")):
-+        if is_distillation_enabled(config.get("distillation")) and not is_mirror_opd_enabled(
-+            config.get("distillation")
-+        ):
-             # we do not use teacher model workers, so we only register teacher model in resource pool
-             # without registering a teacher model worker in role-worker mapping
-             self.mapping[Role.TeacherModel] = "teacher_pool"
-diff --git c/verl/verl/trainer/ppo/ray_trainer.py w/verl/verl/trainer/ppo/ray_trainer.py
-index d1eaa7b..44780d7 100644
---- c/verl/verl/trainer/ppo/ray_trainer.py
+diff --git i/verl/verl/trainer/ppo/ray_trainer.py w/verl/verl/trainer/ppo/ray_trainer.py
+index 44780d7..982ddb5 100644
+--- i/verl/verl/trainer/ppo/ray_trainer.py
 +++ w/verl/verl/trainer/ppo/ray_trainer.py
-@@ -38,7 +38,9 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
- from verl.single_controller.ray import RayClassWithInitArgs, RayWorkerGroup, ResourcePoolManager
- from verl.single_controller.ray.base import create_colocated_worker_cls
- from verl.trainer.config import AlgoConfig
--from verl.trainer.distillation.losses import is_distillation_enabled
-+from verl.trainer.distillation.losses import (
-+    is_distillation_enabled, is_mirror_opd_enabled, validate_mirror_rollout_version,
-+)
- from verl.trainer.ppo import core_algos
- from verl.trainer.ppo.core_algos import AdvantageEstimator, agg_loss
- from verl.trainer.ppo.metric_utils import (
-@@ -70,7 +72,10 @@ from verl.utils.torch_functional import masked_mean
- from verl.utils.tracking import ValidationGenerationsLogger
- from verl.workers.config import DistillationConfig, EngineConfig
- from verl.workers.rollout.llm_server import LLMServerManager
--from verl.workers.utils.padding import left_right_2_no_padding, no_padding_2_padding
-+from verl.workers.utils.padding import (
-+    build_mirror_prediction_fields, left_right_2_no_padding,
-+    no_padding_2_full_padding, no_padding_2_padding,
-+)
- 
- 
- def apply_kl_penalty(data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, kl_penalty="kl"):
-@@ -329,6 +334,29 @@ class RayPPOTrainer:
-         self.tokenizer = tokenizer
-         self.processor = processor
-         self.config = config
-+        self.mirror_opd = is_mirror_opd_enabled(config.get("distillation"))
-+        if self.mirror_opd:
-+            rollout = config.actor_rollout_ref.rollout
-+            if not (0 < rollout.temperature < float("inf")):
-+                raise ValueError("MirrorOPD requires a finite positive rollout temperature")
-+            if rollout.top_p != 1 or rollout.top_k not in (-1, 0) or rollout.get("repetition_penalty", 1) != 1:
-+                raise ValueError("MirrorOPD requires untruncated categorical rollout without repetition penalty")
-+            if not rollout.do_sample or rollout.skip.enable or rollout.quantization is not None:
-+                raise ValueError("MirrorOPD requires fresh stochastic rollout without quantization")
-+            agent = rollout.agent
-+            if (rollout.multi_turn.enable or agent.default_agent_loop != "single_turn_agent"
-+                    or agent.agent_loop_config_path or agent.get("agent_loop_manager_class")
-+                    or agent.custom_async_server.path):
-+                raise ValueError("MirrorOPD currently requires the standard single-turn rollout agent")
-+            if config.algorithm.get("adv_estimator") == "remax":
-+                raise ValueError("MirrorOPD cannot use per-prompt greedy REMAX rollout overrides")
-+            correction = config.algorithm.get("rollout_correction")
-+            if correction and any(correction.get(key) for key in ("rollout_is", "rollout_rs", "bypass_mode")):
-+                raise ValueError("MirrorOPD already defines its sampling correction; disable rollout_correction")
-+            if config.algorithm.use_kl_in_reward or config.actor_rollout_ref.actor.use_kl_loss:
-+                raise ValueError("MirrorOPD teacher reference must not add an extra PPO KL objective")
-+            if config.actor_rollout_ref.actor.entropy_coeff != 0:
-+                raise ValueError("MirrorOPD validation requires entropy_coeff=0")
- 
-         self.hybrid_engine = config.actor_rollout_ref.hybrid_engine
-         assert self.hybrid_engine, "Currently, only support hybrid engine"
-@@ -358,6 +386,8 @@ class RayPPOTrainer:
-         if lora_rank <= 0:
-             lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
-         self.ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
-+        if self.mirror_opd:
-+            self.ref_in_actor = False
- 
-         # define in-reward KL control
-         # kl loss control currently not suppoorted
-@@ -926,6 +956,8 @@ class RayPPOTrainer:
-         else:
-             self.teacher_model_manager = None
-             self.distillation_config = None
-+        if self.mirror_opd:
-+            self.distillation_config = omega_conf_to_dataclass(self.config.distillation)
- 
-         # Support custom AgentLoopManager via config
-         manager_class_fqn = self.config.actor_rollout_ref.rollout.get("agent", {}).get("agent_loop_manager_class")
-@@ -1257,6 +1289,9 @@ class RayPPOTrainer:
-         # TODO: remove step 1, 2, 4 after we make the whole training tensordict and padding free
-         # step 1: convert dataproto to tensordict.
-         batch_td = batch.to_tensordict()
-+        if self.mirror_opd:
-+            for key, value in build_mirror_prediction_fields(batch_td).items():
-+                batch_td[key] = value
-         # step 2: convert from padding to nopadding
-         batch_td = left_right_2_no_padding(batch_td)
-         # step 3: add meta info
-@@ -1267,6 +1302,12 @@ class RayPPOTrainer:
-             calculate_sum_pi_squared=calculate_sum_pi_squared,
-             compute_loss=False,
+@@ -1348,7 +1348,7 @@ class RayPPOTrainer:
          )
-+        if self.mirror_opd:
-+            tu.assign_non_tensor(
-+                batch_td, mirror_cache_stage="anchor",
-+                mirror_cache_topk=self.distillation_config.distillation_loss.topk,
-+                temperature=self.config.actor_rollout_ref.rollout.temperature,
-+            )
-         output = self.actor_rollout_wg.compute_log_prob(batch_td)
-         # gather output
-         entropy = tu.get(output, "entropy")
-@@ -1282,6 +1323,13 @@ class RayPPOTrainer:
-             sum_pi_squared = no_padding_2_padding(sum_pi_squared, batch_td)
-         # step 5: rebuild a tensordict and convert to dataproto
-         result = {"old_log_probs": log_probs.float(), "entropys": entropy.float()}
-+        if self.mirror_opd:
-+            for key in (
-+                "mirror_valid", "mirror_actions", "mirror_anchor_ids",
-+                "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
-+                "mirror_anchor_action_log_prob", "mirror_vocab_size",
-+            ):
-+                result[key] = no_padding_2_full_padding(tu.get(output, key), batch_td)
-         if routed_experts is not None:
-             result["routed_experts"] = routed_experts
-         if sum_pi_squared is not None:
-@@ -1290,6 +1338,19 @@ class RayPPOTrainer:
-         old_log_prob = DataProto.from_tensordict(old_log_prob)
-         return old_log_prob, old_log_prob_mfu
- 
-+    def _compute_mirror_teacher_cache(self, batch: DataProto) -> DataProto:
-+        """Frozen teacher scoring on anchor support before any inner update."""
-+        batch_td = left_right_2_no_padding(batch.to_tensordict())
-+        tu.assign_non_tensor(
-+            batch_td, compute_loss=False, calculate_entropy=False,
-+            mirror_cache_stage="teacher",
-+            temperature=self.config.actor_rollout_ref.rollout.temperature,
-+        )
-+        output = self.ref_policy_wg.compute_ref_log_prob(batch_td)
-+        result = {key: no_padding_2_full_padding(tu.get(output, key), batch_td)
-+                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center")}
-+        return DataProto.from_tensordict(tu.get_tensordict(result))
-+
+         output = self.ref_policy_wg.compute_ref_log_prob(batch_td)
+         result = {key: no_padding_2_full_padding(tu.get(output, key), batch_td)
+-                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center")}
++                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center", "mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob")}
+         return DataProto.from_tensordict(tu.get_tensordict(result))
+
      def _update_actor(self, batch: DataProto) -> DataProto:
-         rollout_config = self.config.actor_rollout_ref.rollout
-         batch.meta_info["multi_turn"] = rollout_config.multi_turn.enable
-@@ -1476,6 +1537,12 @@ class RayPPOTrainer:
-                         combined_gen_output.meta_info.pop("timing", None)
- 
-                     gen_batch_output = combined_gen_output.slice(0, num_sampled_prompts)
-+                    if self.mirror_opd:
-+                        metrics.update(validate_mirror_rollout_version(
-+                            gen_batch_output.non_tensor_batch,
-+                            expected_version=self.global_steps - 1,
-+                            batch_size=len(gen_batch_output),
-+                        ))
-                     if "__do_sample__" in gen_batch_output.non_tensor_batch:
-                         gen_batch_output.pop(non_tensor_batch_keys=["__do_sample__"])
- 
-@@ -1573,7 +1640,10 @@ class RayPPOTrainer:
- 
-                     assert "old_log_probs" in batch.batch, f'"old_log_prob" not in {batch.batch.keys()=}'
- 
--                    if self.use_reference_policy:
-+                    if self.mirror_opd:
-+                        with marked_timer("mirror_teacher_cache", timing_raw, color="olive"):
-+                            batch = batch.union(self._compute_mirror_teacher_cache(batch))
-+                    elif self.use_reference_policy:
-                         # compute reference log_prob
-                         with marked_timer(str(Role.RefPolicy), timing_raw, color="olive"):
-                             ref_log_prob = self._compute_ref_log_prob(batch)
-diff --git c/verl/verl/trainer/ppo/utils.py w/verl/verl/trainer/ppo/utils.py
-index 876eaad..d40cea2 100644
---- c/verl/verl/trainer/ppo/utils.py
-+++ w/verl/verl/trainer/ppo/utils.py
-@@ -19,6 +19,7 @@ from omegaconf import DictConfig
- 
- from verl.single_controller.base import Worker
- from verl.trainer.distillation import is_distillation_enabled
-+from verl.trainer.distillation.losses import is_mirror_opd_enabled
- from verl.trainer.ppo.core_algos import AdvantageEstimator
- 
- WorkerType = type[Worker]
-@@ -76,14 +77,20 @@ def need_reference_policy(
-     config: DictConfig,
- ) -> bool:
-     """Given the config, do we need ref policy."""
--    return config.algorithm.get("use_kl_in_reward", False) or config.actor_rollout_ref.actor.use_kl_loss
-+    return (
-+        is_mirror_opd_enabled(config.get("distillation"))
-+        or config.algorithm.get("use_kl_in_reward", False)
-+        or config.actor_rollout_ref.actor.use_kl_loss
-+    )
- 
- 
- def need_teacher_policy(
-     config: DictConfig,
- ) -> bool:
-     """Given the config, do we need distillation policy."""
--    return is_distillation_enabled(config.get("distillation"))
-+    return is_distillation_enabled(config.get("distillation")) and not is_mirror_opd_enabled(
-+        config.get("distillation")
-+    )
- 
- 
- def need_reward_model(
-diff --git c/verl/verl/utils/vllm/patch.py w/verl/verl/utils/vllm/patch.py
+diff --git i/verl/verl/utils/tracking.py w/verl/verl/utils/tracking.py
+index 0fdede9..d79cace 100644
+--- i/verl/verl/utils/tracking.py
++++ w/verl/verl/utils/tracking.py
+@@ -78,7 +78,9 @@ class Tracking:
+                 settings = wandb.Settings(https_proxy=config["trainer"]["wandb_proxy"])
+             entity = os.environ.get("WANDB_ENTITY", None)
+             wandb.init(project=project_name, name=experiment_name, entity=entity, config=config, settings=settings)
+-            self.logger["wandb"] = wandb
++            from mirroropd.training.tracking import WandbLogger
++
++            self.logger["wandb"] = WandbLogger(wandb, config)
+
+         if "trackio" in default_backend:
+             import trackio
+diff --git i/verl/verl/utils/vllm/patch.py w/verl/verl/utils/vllm/patch.py
 index 951c5ca..4162c6a 100644
---- c/verl/verl/utils/vllm/patch.py
+--- i/verl/verl/utils/vllm/patch.py
 +++ w/verl/verl/utils/vllm/patch.py
 @@ -115,6 +115,10 @@ def patch_vllm_moe_model_weight_loader(model):
      # Get inner model (either model.model or model.language_model)
@@ -718,131 +425,66 @@ index 951c5ca..4162c6a 100644
 +        if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)):
 +            return
          raise ValueError("The provided model does not have a valid 'model' or 'language_model' attribute.")
- 
+
      if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)) and not isinstance(inner_model, tuple(SUPPORTED_MOE_MODELS)):
-diff --git c/verl/verl/workers/config/distillation.py w/verl/verl/workers/config/distillation.py
-index 2bfd200..9ff66f7 100644
---- c/verl/verl/workers/config/distillation.py
+diff --git i/verl/verl/workers/config/distillation.py w/verl/verl/workers/config/distillation.py
+index 9ff66f7..280ebf8 100644
+--- i/verl/verl/workers/config/distillation.py
 +++ w/verl/verl/workers/config/distillation.py
-@@ -64,6 +64,7 @@ class DistillationLossConfig(BaseConfig):
- 
-     loss_mode: str = "k3"
-     topk: Optional[int] = 128
-+    mirror_eta: float = 0.1
-     use_task_rewards: bool = True
-     distillation_loss_coef: float = 1.0
-     loss_max_clamp: Optional[float] = 10.0
-@@ -87,6 +88,12 @@ class DistillationLossConfig(BaseConfig):
+@@ -88,7 +88,7 @@ class DistillationLossConfig(BaseConfig):
      loss_settings: Optional[dict] = None
- 
+
      def __post_init__(self):
-+        if self.loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"):
-+            if self.mirror_eta <= 0:
-+                raise ValueError("mirror_eta must be positive")
-+            if (self.use_policy_gradient or self.use_task_rewards
-+                    or self.loss_max_clamp is not None or self.log_prob_min_clamp is not None):
-+                raise ValueError("MirrorOPD needs direct loss, no task reward, and both clamps disabled")
-         self._mutable_fields.add("loss_settings")
-         from verl.trainer.distillation.losses import DistillationLossSettings, get_distillation_loss_settings
- 
-@@ -253,12 +260,28 @@ class DistillationConfig(BaseConfig):
-     nnodes: int = 0
-     teacher_models: dict[str, DistillationTeacherModelConfig] = field(default_factory=dict)
-     teacher_key: str = "data_source"
-+    mirror_teacher_model_path: Optional[str] = None
-     distillation_loss: DistillationLossConfig = field(default_factory=DistillationLossConfig)
- 
-     def __post_init__(self):
+-        if self.loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"):
++        if self.loss_mode in ("mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"):
+             if self.mirror_eta <= 0:
+                 raise ValueError("mirror_eta must be positive")
+             if (self.use_policy_gradient or self.use_task_rewards
+@@ -267,7 +267,7 @@ class DistillationConfig(BaseConfig):
          if not self.enabled:
              return
- 
-+        if self.distillation_loss.loss_mode in {"mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"}:
-+            if not self.mirror_teacher_model_path or not self.mirror_teacher_model_path.strip():
-+                raise ValueError("MirrorOPD requires distillation.mirror_teacher_model_path.")
-+            if self.n_gpus_per_node != 0 or self.nnodes != 0:
-+                raise ValueError(
-+                    "MirrorOPD uses the frozen FSDP reference worker; native teacher pool "
-+                    "distillation.n_gpus_per_node and distillation.nnodes must both be zero."
-+                )
-+            for teacher in self.teacher_models.values():
-+                if teacher.get("model_path") or teacher.get("num_replicas", 0):
-+                    raise ValueError(
-+                        "MirrorOPD requires mirror_teacher_model_path rather than native teacher_models."
-+                    )
-+            return
-+
-         self.teacher_models = self._resolve_teacher_models()
-         teacher_world_size_sum = 0
-         for teacher_model in self.teacher_models.values():
-diff --git c/verl/verl/workers/engine/fsdp/transformer_impl.py w/verl/verl/workers/engine/fsdp/transformer_impl.py
-index afbf7ec..3e3798d 100644
---- c/verl/verl/workers/engine/fsdp/transformer_impl.py
+
+-        if self.distillation_loss.loss_mode in {"mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"}:
++        if self.distillation_loss.loss_mode in {"mirror_pmd_mean", "mirror_bpo", "mirror_mdpo", "mirror_opd_onpolicy", "mirror_opd_is", "mirror_opd_is_no_baseline"}:
+             if not self.mirror_teacher_model_path or not self.mirror_teacher_model_path.strip():
+                 raise ValueError("MirrorOPD requires distillation.mirror_teacher_model_path.")
+             if self.n_gpus_per_node != 0 or self.nnodes != 0:
+diff --git i/verl/verl/workers/engine/fsdp/transformer_impl.py w/verl/verl/workers/engine/fsdp/transformer_impl.py
+index 3e3798d..feaaae7 100644
+--- i/verl/verl/workers/engine/fsdp/transformer_impl.py
 +++ w/verl/verl/workers/engine/fsdp/transformer_impl.py
-@@ -1079,6 +1079,11 @@ class FSDPEngineWithLMHead(FSDPEngine):
-             data=micro_batch, key="calculate_sum_pi_squared", default=False
-         )
-         distillation_use_topk = tu.get_non_tensor_data(data=micro_batch, key="distillation_use_topk", default=False)
-+        mirror_cache_stage = tu.get_non_tensor_data(data=micro_batch, key="mirror_cache_stage", default=None)
-+        if mirror_cache_stage is not None and (use_fused_kernels or self.use_ulysses_sp):
-+            raise NotImplementedError("MirrorOPD cache inference requires full logits and sequence parallel size 1")
-+        if mirror_cache_stage is not None and distillation_use_topk:
-+            raise ValueError("cache scoring and distillation training must be separate passes")
- 
-         if calculate_sum_pi_squared and use_fused_kernels:
-             raise NotImplementedError(
-@@ -1119,13 +1124,22 @@ class FSDPEngineWithLMHead(FSDPEngine):
- 
-                 # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)
-                 inplace_backward = True
--                if calculate_entropy:
-+                if calculate_entropy or distillation_use_topk:
-                     inplace_backward = False
-                 log_probs = logprobs_from_logits(
-                     logits=logits_rmpad,
-                     labels=input_ids_rmpad_rolled,
-                     inplace_backward=inplace_backward,
-                 )
-+                if mirror_cache_stage is not None:
-+                    from verl.trainer.distillation.fsdp.losses import compute_mirror_cache_from_logits
+@@ -111,6 +111,28 @@ class FSDPEngine(BaseEngine):
+         self.optimizer_config = optimizer_config
+         self.checkpoint_config = checkpoint_config
+
++        # FlashAttention kernels accept fp16/bf16 inputs only.  A control run
++        # may deliberately request fp32 weights for numerical diagnostics;
++        # select PyTorch SDPA for that combination while preserving FlashAttention
++        # for the normal bf16 training path.
++        from verl.utils.torch_dtypes import PrecisionType
 +
-+                    outputs = compute_mirror_cache_from_logits(
-+                        logits_rmpad, micro_batch, mirror_cache_stage,
-+                        tu.get_non_tensor_data(micro_batch, key="mirror_cache_topk", default=None),
-+                    )
-+                    for key, value in outputs.items():
-+                        model_output[key] = torch.nested.nested_tensor_from_jagged(value, input_ids.offsets())
- 
-                 # compute entropy
-                 if calculate_entropy:
-@@ -1218,6 +1232,15 @@ class FSDPEngineWithLMHead(FSDPEngine):
-                     logits_rmpad = torch.cat([t for t in logits.unbind()])
-                     input_ids_rmpad_rolled = output_args["input_ids_rmpad_rolled"]
-                     log_probs = logprobs_from_logits(logits=logits_rmpad, labels=input_ids_rmpad_rolled)
-+                    if mirror_cache_stage is not None:
-+                        from verl.trainer.distillation.fsdp.losses import compute_mirror_cache_from_logits
++        model_dtype = PrecisionType.to_dtype(self.engine_config.model_dtype)
++        mixed_precision = self.engine_config.mixed_precision
++        mixed_param_dtype = None
++        if isinstance(mixed_precision, dict):
++            mixed_param_dtype = mixed_precision.get("param_dtype")
++        forward_dtype = model_dtype
++        if mixed_param_dtype is not None:
++            forward_dtype = PrecisionType.to_dtype(mixed_param_dtype)
++        attention_impl = getattr(self.model_config.hf_config, "_attn_implementation", None)
++        if forward_dtype == torch.float32 and attention_impl in {None, "flash_attention_2", "flash_attention_3"}:
++            self.model_config.hf_config._attn_implementation = "sdpa"
++            logger.warning(
++                "Switching attention implementation from %s to sdpa for fp32 FSDP forward",
++                attention_impl,
++            )
 +
-+                        outputs = compute_mirror_cache_from_logits(
-+                            logits_rmpad, micro_batch, mirror_cache_stage,
-+                            tu.get_non_tensor_data(micro_batch, key="mirror_cache_topk", default=None),
-+                        )
-+                        for key, value in outputs.items():
-+                            model_output[key] = torch.nested.nested_tensor_from_jagged(value, cu_seqlens)
- 
-                     # Mirror the use_remove_padding=True branch (see verl#6293).
-                     # No Ulysses SP gather here: this branch is the no-SP path
-@@ -1258,6 +1281,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
- 
-     def forward_step(self, micro_batch: TensorDict, loss_function, forward_only):
-         device_name = get_device_name()
-+        if tu.get_non_tensor_data(micro_batch, key="mirror_cache_stage", default=None) is not None:
-+            if not forward_only or loss_function is not None:
-+                raise ValueError("MirrorOPD cache scoring must run inference with compute_loss=False")
-         # actually, we should avoid assigning like this...
-         micro_batch = micro_batch.to(get_device_id())
-         model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
-diff --git c/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
-index c4c7d8f..13d4bd5 100644
---- c/verl/verl/workers/engine_workers.py
+         self.mode = None
+
+         self.rank = torch.distributed.get_rank()
+diff --git i/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
+index 3d859d0..13d4bd5 100644
+--- i/verl/verl/workers/engine_workers.py
 +++ w/verl/verl/workers/engine_workers.py
 @@ -304,7 +304,9 @@ class TrainingWorker(Worker, DistProfilerExtension):
              if self.engine.is_mp_src_rank_with_outputs():
@@ -870,125 +512,19 @@ index c4c7d8f..13d4bd5 100644
                      append_to_dict(metrics, output)
 +                if has_mirror:
 +                    self._mirror_outer_call = mirror_outer_call + 1
- 
+
                  output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
              else:
-@@ -514,7 +526,27 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
-             ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
- 
-             # The ref model does not need to enable MTP; force it to false.
--            ref_config.model_config = deepcopy(model_config)
-+            from verl.trainer.distillation.losses import is_mirror_opd_enabled
-+
-+            if is_mirror_opd_enabled(self.distillation_config):
-+                # Construct a fresh HF config: copying the actor then replacing
-+                # only its path retains cached tokenizer/config metadata.
-+                ref_config.model_config = HFModelConfig(
-+                    path=self.distillation_config.mirror_teacher_model_path,
-+                    trust_remote_code=model_config.trust_remote_code,
-+                    use_remove_padding=model_config.use_remove_padding,
-+                    enable_gradient_checkpointing=False,
-+                    use_fused_kernels=False,
-+                )
-+                if model_config.tokenizer.get_vocab() != ref_config.model_config.tokenizer.get_vocab():
-+                    raise ValueError("MirrorOPD anchor and teacher token-to-id vocabularies must match")
-+                if model_config.hf_config.vocab_size != ref_config.model_config.hf_config.vocab_size:
-+                    raise ValueError("MirrorOPD anchor and teacher output vocabularies must match")
-+                if not ref_config.engine.forward_only:
-+                    raise ValueError("MirrorOPD teacher reference engine must be forward_only")
-+                ref_config.engine.use_fused_kernels = False
-+            else:
-+                ref_config.model_config = deepcopy(model_config)
-             ref_config.model_config.mtp = MtpConfig(enable=False)
- 
-             # construct TrainingWorkerConfig
-diff --git c/verl/verl/workers/utils/padding.py w/verl/verl/workers/utils/padding.py
-index 6d537ea..61f4779 100644
---- c/verl/verl/workers/utils/padding.py
+diff --git i/verl/verl/workers/utils/padding.py w/verl/verl/workers/utils/padding.py
+index 61f4779..ff76b4d 100644
+--- i/verl/verl/workers/utils/padding.py
 +++ w/verl/verl/workers/utils/padding.py
-@@ -107,9 +107,73 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
-         data["teacher_sampled_logprob"] = teacher_sampled_logprob_nested
-         # print(f"padding: {teacher_sampled_logprob.shape}")
- 
-+    # MirrorOPD fields are full-sequence prediction-position caches, not
-+    # response arrays. Preserve their trailing head dimension when unpadding.
-+    for key in (
-+        "mirror_valid", "mirror_actions", "mirror_anchor_ids",
-+        "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
-+        "mirror_anchor_action_log_prob", "mirror_teacher_action_log_prob",
-+        "mirror_teacher_center",
-+        "mirror_vocab_size",
-+    ):
-+        value = data.get(key, None)
-+        if value is None:
-+            continue
-+        if value.shape[:2] != attention_mask.shape:
-+            raise ValueError(f"{key} must be aligned to the full padded sequence")
-+        flattened = value.flatten(0, 1)
-+        # FlashAttention's index_first_axis requires a channel dimension.
-+        scalar_field = flattened.ndim == 1
-+        if scalar_field:
-+            flattened = flattened.unsqueeze(-1)
-+        unpadded = index_first_axis(flattened, indices)
-+        if scalar_field:
-+            unpadded = unpadded.squeeze(-1)
-+        data[key] = torch.nested.nested_tensor_from_jagged(unpadded, offsets=cu_seqlens)
-+
-     return data
- 
- 
-+def build_mirror_prediction_fields(data: TensorDict) -> dict[str, torch.Tensor]:
-+    """Align sampled response actions to their preceding logit positions.
-+
-+    Prompts are left padded and responses right padded. The response mask can
-+    exclude tokens, while the attention mask determines real sequence tokens.
-+    """
-+    ids = data["input_ids"]
-+    attention = data["attention_mask"].bool()
-+    response_mask = data["response_mask"].bool()
-+    if ids.ndim != 2 or attention.shape != ids.shape or response_mask.ndim != 2:
-+        raise ValueError("MirrorOPD requires padded 2D input ids and masks")
-+    if response_mask.shape[0] != ids.shape[0] or response_mask.shape[1] >= ids.shape[1]:
-+        raise ValueError("MirrorOPD requires a nonempty prompt before response tokens")
-+    action_mask = torch.zeros_like(attention)
-+    action_mask[:, -response_mask.shape[1]:] = response_mask
-+    valid = torch.zeros_like(attention)
-+    valid[:, :-1] = action_mask[:, 1:] & attention[:, :-1] & attention[:, 1:]
-+    actions = torch.where(valid, ids.roll(-1, dims=1), 0)
-+    return {"mirror_valid": valid, "mirror_actions": actions}
-+
-+
-+def no_padding_2_full_padding(tensor: torch.Tensor, data: TensorDict) -> torch.Tensor:
-+    """Restore complete prediction-position arrays, preserving head dimensions.
-+
-+    This differs from response-only slicing: no one-token shift is applied,
-+    because cache actions have already been aligned to predictor positions.
-+    """
-+    values = tensor.values() if tensor.is_nested else tensor
-+    mask = data["attention_mask"]
-+    indices = tu.get_non_tensor_data(data, key="indices", default=None)
-+    if indices is None:
-+        raise ValueError("full-sequence restoration requires unpadding indices")
-+    if values.shape[0] != indices.numel():
-+        raise ValueError("cache output token count differs from unpadding indices")
-+    indices = indices.to(values.device)
-+    padded = values.new_zeros((mask.numel(), *values.shape[1:]))
-+    padded.index_copy_(0, indices, values)
-+    return padded.reshape(*mask.shape, *values.shape[1:])
-+
-+
- def no_padding_2_padding(tensor: torch.Tensor, data: TensorDict) -> torch.Tensor:
-     """Slice response from unpad model output.
- 
-diff --git a/verl/verl/utils/tracking.py b/verl/verl/utils/tracking.py
-index 0fdede9..d79cace 100644
---- a/verl/verl/utils/tracking.py
-+++ b/verl/verl/utils/tracking.py
-@@ -78,4 +78,6 @@ class Tracking:
-                 settings = wandb.Settings(https_proxy=config["trainer"]["wandb_proxy"])
-             entity = os.environ.get("WANDB_ENTITY", None)
-             wandb.init(project=project_name, name=experiment_name, entity=entity, config=config, settings=settings)
--            self.logger["wandb"] = wandb
-+            from mirroropd.training.tracking import WandbLogger
-+
-+            self.logger["wandb"] = WandbLogger(wandb, config)
+@@ -113,7 +113,7 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
+         "mirror_valid", "mirror_actions", "mirror_anchor_ids",
+         "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
+         "mirror_anchor_action_log_prob", "mirror_teacher_action_log_prob",
+-        "mirror_teacher_center",
++        "mirror_teacher_center", "mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob",
+         "mirror_vocab_size",
+     ):
+         value = data.get(key, None)

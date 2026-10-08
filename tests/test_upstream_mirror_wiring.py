@@ -184,7 +184,12 @@ def check_mode_routing(root):
     }
     load_functions(
         root / "trainer/distillation/losses.py",
-        ["is_distillation_enabled", "is_mirror_opd_enabled", "distillation_ppo_loss"],
+        [
+            "is_distillation_enabled",
+            "is_mirror_opd_enabled",
+            "populate_global_batch_info",
+            "distillation_ppo_loss",
+        ],
         ns,
     )
     load_functions(
@@ -220,12 +225,25 @@ def check_mode_routing(root):
             distillation=distill,
             algorithm={"use_kl_in_reward": False},
             actor_rollout_ref=SimpleNamespace(actor=SimpleNamespace(use_kl_loss=False)),
+            global_batch_info={},
+            loss_scale_factor=None,
         )
         assert ns["need_reference_policy"](config)
         assert not ns["need_teacher_policy"](config)
-        loss, metrics = ns["distillation_ppo_loss"](None, distill)
+        data = {
+            "dp_size": 1,
+            "batch_num_tokens": 37,
+            "global_batch_size": 8,
+        }
+        loss, metrics = ns["distillation_ppo_loss"](config, distill, data=data)
         assert loss is expected
         assert "distillation/loss" in metrics
+        assert config.global_batch_info == {
+            "dp_size": 1,
+            "batch_num_tokens": 37,
+            "global_batch_size": 8,
+            "loss_scale_factor": None,
+        }
         for field, bad in (
             ("mirror_teacher_model_path", ""),
             ("n_gpus_per_node", 1),
