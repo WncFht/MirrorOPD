@@ -3,6 +3,13 @@
 # Defaults are the validated 12 GB configuration; extend with Hydra overrides.
 set -euo pipefail
 
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+mirror_src=${MIRROROPD_SRC_ROOT:-"$repo_root/src"}
+if [[ ! -f "$mirror_src/mirroropd/training/losses.py" ]]; then
+  echo "MirrorOPD production package missing: $mirror_src; deploy the repository or set MIRROROPD_SRC_ROOT" >&2
+  exit 2
+fi
+
 task_root=${MIRROR_UPSTREAM_ROOT:-"$HOME/src/mirroropd-taopd"}
 mode=${1:-mirror_bpo}
 if (($#)); then shift; fi
@@ -19,7 +26,7 @@ export TMPDIR="$task_root/scratch"
 # Ray creates long session/socket names; keep the disk-backed prefix short.
 export RAY_TMPDIR="${MIRROR_RAY_TMPDIR:-$HOME/.cache/mopd-ray}"
 mkdir -p "$RAY_TMPDIR"
-export PYTHONPATH="$task_root/verl${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH="$mirror_src:$task_root/verl${PYTHONPATH:+:$PYTHONPATH}"
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export MALLOC_ARENA_MAX=2

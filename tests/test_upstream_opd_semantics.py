@@ -1,6 +1,7 @@
 """Execute upstream pure tensor functions without loading GPU/Ray services.
 
-AST extraction retains original function bodies. It is a mathematical audit,
+AST extraction retains upstream adapter/audit bodies and imports the actual
+first-party production kernels. It is a mathematical audit,
 not a substitute for importing and testing the complete production worker.
 """
 
@@ -15,8 +16,14 @@ import torch
 def load_functions(path, names, namespace):
     tree = ast.parse(path.read_text())
     found = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in names]
-    assert {n.name for n in found} == set(names)
-    exec(compile(ast.Module(body=found, type_ignores=[]), str(path), "exec"), namespace)
+    imports = [
+        n
+        for n in tree.body
+        if isinstance(n, ast.ImportFrom) and (n.module or "").startswith("mirroropd.")
+    ]
+    provided = {alias.asname or alias.name for node in imports for alias in node.names}
+    assert set(names) <= {n.name for n in found} | provided
+    exec(compile(ast.Module(body=imports + found, type_ignores=[]), str(path), "exec"), namespace)
     return namespace
 
 
@@ -51,6 +58,11 @@ def main():
         ],
         {"torch": torch, "_LOG2": math.log(2)},
     )
+    from mirroropd.training.cache import build_mirror_anchor_cache
+    from mirroropd.training.losses import compute_mirror_opd_token_loss
+
+    assert ns["build_mirror_anchor_cache"] is build_mirror_anchor_cache
+    assert ns["compute_mirror_opd_token_loss"] is compute_mirror_opd_token_loss
     tails = torch.tensor([1e-3, 1e-6, 1e-8, 1e-12], dtype=torch.float64)
     actual = ns["log1mexp"](torch.log1p(-tails)).exp()
     print("TA-OPD true tails:", tails.tolist())

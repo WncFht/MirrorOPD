@@ -9,6 +9,7 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 .venv/
+*.egg-info/
 .env
 .env.*
 !.env.example
