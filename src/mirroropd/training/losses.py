@@ -1,5 +1,7 @@
 """Production PMD-mean, BPO and MDPO token-score surrogates."""
 
+import math
+
 import torch
 
 
@@ -23,7 +25,7 @@ def compute_mirror_opd_token_loss(
     and residuals here stop gradient after deriving the score formula.
     This primitive operates on a local complete vocabulary, not TP shards.
     """
-    if eta <= 0 or method not in ("pmd_mean", "bpo", "mdpo"):
+    if not math.isfinite(eta) or eta <= 0 or method not in ("pmd_mean", "bpo", "mdpo"):
         raise ValueError("positive eta and a supported MirrorOPD method required")
     expected = student_logits.shape[:-1]
     if any(
@@ -68,5 +70,13 @@ def compute_mirror_opd_token_loss(
         "distillation_losses": coefficient * action_lp,
         "mirror_student_center": center,
         "mirror_teacher_center": teacher_center.detach(),
-        "mirror_importance_ratio": u.exp() if method == "mdpo" else torch.ones_like(u),
+        "mirror_importance_ratio": u.exp(),
+        "mirror_score_coefficient": coefficient,
+        "mirror_sampled_reward": reward,
+        "mirror_sampled_log_ratio": u,
+        "mirror_student_entropy": -(log_p.detach().exp() * log_p.detach()).sum(-1),
+        "mirror_anchor_head_mass": q_head.exp().sum(-1),
+        "mirror_student_head_mass": p_head.exp().sum(-1),
+        "mirror_anchor_tail_mass": q_tail_lp.exp(),
+        "mirror_student_tail_mass": p_tail_lp.exp(),
     }

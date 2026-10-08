@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-08",
+  "evidence": "GPU execution canary; not a GSM8K benchmark or convergence proof",
+  "upstream_base": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+  "device": "RTX 4070 SUPER 12 GB",
+  "student": {
+    "name": "Qwen/Qwen3-0.6B",
+    "revision": "c1899de289a04d12100db370d81485cdf75e47ca"
+  },
+  "teacher": {
+    "name": "Qwen/Qwen3-1.7B",
+    "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e"
+  },
+  "settings": {
+    "eta": 0.1,
+    "anchor_topk": 32,
+    "optimizer": "AdamW",
+    "lr": 1e-05,
+    "clip_grad": 1.0,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "model_dtype": "bfloat16",
+    "prompt_batch": 2,
+    "rollouts_per_prompt": 1,
+    "mini_batch": 2,
+    "micro_batch": 1,
+    "inner_epochs": 4,
+    "outer_steps": 2,
+    "prompt_cap": 64,
+    "response_cap": 64,
+    "vllm_context_cap": 128,
+    "temperature": 1,
+    "top_p": 1,
+    "sampling_top_k": -1,
+    "actor_seed": 42,
+    "data_loader_seed": 42,
+    "vllm_seed": 0,
+    "task_rewards_in_loss": false,
+    "save_checkpoints": false,
+    "sync": "hard"
+  },
+  "data": {
+    "source": "four arithmetic prompts in training/run_upstream_mirror_canary.sh",
+    "is_gsm8k": false,
+    "response_clip_ratio": 1.0
+  },
+  "measurement": "pre-update; last record is before fourth update",
+  "index_semantics": "zero-based worker invocation and optimizer update within invocation; not resume global_step",
+  "framework_sha256": {
+    "verl/verl/experimental/agent_loop/agent_loop.py": "f1b6db17f0ed10529f2c7c692149cda3fed1ab34660f649003a367ff2ac93b22",
+    "verl/verl/trainer/config/distillation/distillation.yaml": "139a06b9e97165fba58dd70b46248ab2ea00a47d4812439ebfb90a4efa453ab3",
+    "verl/verl/trainer/distillation/fsdp/losses.py": "64803a832a6dbd4a5ac6737933191ecf9d29bd19e6ca3509b2404a156089dac3",
+    "verl/verl/trainer/distillation/losses.py": "28681f4761fc623603ff4ff462b3874868698602ecab98285ca1e9585b2511c7",
+    "verl/verl/trainer/main_ppo.py": "7683f7cafb4a78b69e00a37c1cf6a152ac6549a26004fa388371918b7ee443bc",
+    "verl/verl/trainer/ppo/ray_trainer.py": "a32bb03dd71e408fd290dca2ba6a8daaa393ee2edb932fd0af38e91d85a1f6ae",
+    "verl/verl/trainer/ppo/utils.py": "98ada29b64f315b336f64c03884866529a03ff93f1a82211efd2c5c554a814c2",
+    "verl/verl/workers/config/distillation.py": "8360cd0b1c8aa7f6c1f5fee638b1faadfdf1923e7e391c4e09b177c37ff56d8b",
+    "verl/verl/workers/engine/fsdp/transformer_impl.py": "b48d0fb8ee66b81e52c9d974312fb34eaa3ff94430554a7a8d4044d906e84802",
+    "verl/verl/workers/engine_workers.py": "d6da0a9fce8828e7184cca8a99806ea3675b93ebd6ccea094cd8bc20e783785f",
+    "verl/verl/workers/utils/padding.py": "d714edc1baf071ec44c9d0b726f5225c47d47df7035b6a20f1a155fc93cfd9bf"
+  },
+  "patch_sha256": "558ad0e35bc9cfc7cda5f49b1a0b9a06e8736bcf698a74a17fa4ae5310987ec0",
+  "source_hashes": "source-hashes.json",
+  "results": {
+    "bpo": {
+      "exit_code": 0,
+      "records": 8,
+      "reported_peak_actor_memory_gb": 6.349719524383545,
+      "log_sha256": "2371c7c3df68d3ec968385fa282148ba4dcdf08ee99e3380c1a4d8a2a6c5baa7",
+      "command": "MIRROR_INNER_METRICS_PATH=$HOME/src/mirroropd-taopd/logs/metrics-bpo-inner.jsonl bash ~/src/mirroropd/training/run_upstream_mirror_canary.sh mirror_bpo actor_rollout_ref.actor.ppo_epochs=4 trainer.save_freq=-1 trainer.total_training_steps=2 trainer.experiment_name=metrics-bpo"
+    },
+    "mean": {
+      "exit_code": 0,
+      "records": 8,
+      "reported_peak_actor_memory_gb": 6.349719524383545,
+      "log_sha256": "50851a7a9ddfd2912412db5d9176f56f111a0cfa887c73bc1ddb6429d29444a3",
+      "command": "MIRROR_INNER_METRICS_PATH=$HOME/src/mirroropd-taopd/logs/metrics-mean-inner.jsonl bash ~/src/mirroropd/training/run_upstream_mirror_canary.sh mirror_pmd_mean actor_rollout_ref.actor.ppo_epochs=4 trainer.save_freq=-1 trainer.total_training_steps=2 trainer.experiment_name=metrics-mean"
+    },
+    "mdpo": {
+      "exit_code": 0,
+      "records": 8,
+      "reported_peak_actor_memory_gb": 6.349719524383545,
+      "log_sha256": "e338681fde132d390455989d00f2119663a0a02bf5ac853194dc76efb67033ed",
+      "command": "MIRROR_INNER_METRICS_PATH=$HOME/src/mirroropd-taopd/logs/metrics-mdpo-inner.jsonl bash ~/src/mirroropd/training/run_upstream_mirror_canary.sh mirror_mdpo actor_rollout_ref.actor.ppo_epochs=4 trainer.save_freq=-1 trainer.total_training_steps=2 trainer.experiment_name=metrics-mdpo"
+    }
+  }
+}

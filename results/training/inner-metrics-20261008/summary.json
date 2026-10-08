@@ -1,0 +1,80 @@
+{
+  "bpo": [
+    {
+      "outer_call": 0,
+      "updates": 4,
+      "teacher_center_mean": 1.3275575225126501,
+      "initial_student_center_mean": 4.634197177937257e-11,
+      "final_pre_update_student_center_mean": 0.000743663790454942,
+      "coefficient_rms_first": 1.7791193621158452,
+      "coefficient_rms_last": 1.5585672349830346,
+      "grad_norm_first": 18.911527633666992,
+      "grad_norm_last": 15.79041862487793,
+      "min_importance_ess_fraction": 0.9980745067060778
+    },
+    {
+      "outer_call": 1,
+      "updates": 4,
+      "teacher_center_mean": 0.7336942454848173,
+      "initial_student_center_mean": 2.9679347968527593e-12,
+      "final_pre_update_student_center_mean": 0.0007336228321393936,
+      "coefficient_rms_first": 1.4259542114981307,
+      "coefficient_rms_last": 1.2603125188330764,
+      "grad_norm_first": 14.29871940612793,
+      "grad_norm_last": 12.04287338256836,
+      "min_importance_ess_fraction": 0.9982206649422062
+    }
+  ],
+  "mean": [
+    {
+      "outer_call": 0,
+      "updates": 4,
+      "teacher_center_mean": 1.3275575225126501,
+      "initial_student_center_mean": 4.634197177937257e-11,
+      "final_pre_update_student_center_mean": 0.0008213981852905139,
+      "coefficient_rms_first": 0.17791193872332645,
+      "coefficient_rms_last": 0.15210578787916854,
+      "grad_norm_first": 1.7821069955825806,
+      "grad_norm_last": 1.484400749206543,
+      "min_importance_ess_fraction": 0.9983787730505989
+    },
+    {
+      "outer_call": 1,
+      "updates": 4,
+      "teacher_center_mean": 0.7279803619582317,
+      "initial_student_center_mean": -2.5194757846853932e-14,
+      "final_pre_update_student_center_mean": 0.0006234738986721568,
+      "coefficient_rms_first": 0.14294859090309514,
+      "coefficient_rms_last": 0.13190827922756523,
+      "grad_norm_first": 1.3612947463989258,
+      "grad_norm_last": 1.1407668590545654,
+      "min_importance_ess_fraction": 0.998751537392834
+    }
+  ],
+  "mdpo": [
+    {
+      "outer_call": 0,
+      "updates": 4,
+      "teacher_center_mean": 1.0229239248398883,
+      "initial_student_center_mean": -1.5162745128495047e-10,
+      "final_pre_update_student_center_mean": 0.0009340616308005489,
+      "coefficient_rms_first": 3.348746754897152,
+      "coefficient_rms_last": 2.8528709140677395,
+      "grad_norm_first": 32.64167404174805,
+      "grad_norm_last": 28.230636596679688,
+      "min_importance_ess_fraction": 0.9974227385428998
+    },
+    {
+      "outer_call": 1,
+      "updates": 4,
+      "teacher_center_mean": 0.7266235947956892,
+      "initial_student_center_mean": -3.793570877122329e-12,
+      "final_pre_update_student_center_mean": 0.000760314209687592,
+      "coefficient_rms_first": 1.9046865158789519,
+      "coefficient_rms_last": 1.5485013559322154,
+      "grad_norm_first": 15.86976146697998,
+      "grad_norm_last": 12.2896146774292,
+      "min_importance_ess_fraction": 0.9983978844244076
+    }
+  ]
+}

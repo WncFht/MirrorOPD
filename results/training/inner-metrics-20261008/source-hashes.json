@@ -1,0 +1,10 @@
+{
+  "src/mirroropd/training/metrics.py": "6245e7ef8aa2d6a4d37a1681cb9c95dd6d67849544f90804e0cfcbfe7dba3990",
+  "src/mirroropd/training/cache.py": "cee04a69fdbbce287d772a4b17a90a2a1a134f2eb6564e256ee8e44f4f68e6b1",
+  "src/mirroropd/training/__init__.py": "bd253c8d30ead9acaecef90f17198943480e09df2bb5269be3d41d2ac94af878",
+  "src/mirroropd/training/losses.py": "7085eb34d8cf94e417954d5a2b664c3d8468f4e5286a7ff52eb853ab1efad782",
+  "src/mirroropd/integrations/verl/fsdp.py": "4169a751c669d534d216283bb8289f45afdaea93c7fd55d2b500848d7f70803a",
+  "src/mirroropd/integrations/verl/__init__.py": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+  "training/run_upstream_mirror_training.sh": "3dc6cc63de5f9e2a6e61ef98a5da57f8683e04ccdde9b81b6f61ae67558ea726",
+  "training/run_upstream_mirror_canary.sh": "0f3fdae8a487f3c69a6d648c59769dcfb0ff1c33d932d3466aab84a749b0aa08"
+}

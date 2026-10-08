@@ -95,6 +95,14 @@ def compute_mirror_opd_from_cache(
             "mirror_student_center",
             "mirror_teacher_center",
             "mirror_importance_ratio",
+            "mirror_score_coefficient",
+            "mirror_sampled_reward",
+            "mirror_sampled_log_ratio",
+            "mirror_student_entropy",
+            "mirror_anchor_head_mass",
+            "mirror_student_head_mass",
+            "mirror_anchor_tail_mass",
+            "mirror_student_tail_mass",
         )
     }
     if valid.any():

@@ -346,7 +346,7 @@ index d37c85d..366d385 100644
          # Average of -token_kl over the overlapping tokens; positions with no overlap get 0.
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
 diff --git c/verl/verl/trainer/distillation/losses.py w/verl/verl/trainer/distillation/losses.py
-index 1fb42a8..496116e 100644
+index 1fb42a8..7ecceed 100644
 --- c/verl/verl/trainer/distillation/losses.py
 +++ w/verl/verl/trainer/distillation/losses.py
 @@ -36,6 +36,23 @@ DistillationLossFn = Callable[
@@ -411,7 +411,7 @@ index 1fb42a8..496116e 100644
      policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
      if not distillation_loss_config.use_task_rewards:
          policy_loss = 0.0
-@@ -327,6 +361,23 @@ def distillation_loss(
+@@ -327,6 +361,34 @@ def distillation_loss(
  
  
  
@@ -429,7 +429,18 @@ index 1fb42a8..496116e 100644
 +            or settings.loss_max_clamp is not None or settings.log_prob_min_clamp is not None):
 +        raise ValueError("MirrorOPD requires direct surrogate aggregation without clamps/task rewards")
 +    losses = no_padding_2_padding(model_output["distillation_losses"], data)
-+    return losses, {}
++    from mirroropd.training.metrics import token_moments
++    mask = data["response_mask"]
++    mask = mask.bool().to_padded_tensor(False) if mask.is_nested else mask.bool()
++    fields = {
++        key: no_padding_2_padding(value, data)
++        for key, value in model_output.items() if key.startswith("mirror_")
++    }
++    metrics = {
++        key: Metric(aggregation=reduction, value=value)
++        for key, (reduction, value) in token_moments(fields, mask).items()
++    }
++    return losses, metrics
 +
 +
  @register_distillation_loss(
@@ -791,10 +802,39 @@ index afbf7ec..3e3798d 100644
          micro_batch = micro_batch.to(get_device_id())
          model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
 diff --git c/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
-index c4c7d8f..3d859d0 100644
+index c4c7d8f..13d4bd5 100644
 --- c/verl/verl/workers/engine_workers.py
 +++ w/verl/verl/workers/engine_workers.py
-@@ -514,7 +514,27 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+@@ -304,7 +304,9 @@ class TrainingWorker(Worker, DistProfilerExtension):
+             if self.engine.is_mp_src_rank_with_outputs():
+                 actor_output = [tu.get(output, "metrics") for output in output_lst]
+                 metrics = {}
+-                for output in actor_output:
++                mirror_outer_call = getattr(self, "_mirror_outer_call", 0)
++                has_mirror = any(key.startswith("mirror/raw/") for item in actor_output for key in item)
++                for inner_index, output in enumerate(actor_output):
+                     for key, val in output.items():
+                         # flattn dp and micro batch
+                         if isinstance(val, list):
+@@ -313,7 +315,17 @@ class TrainingWorker(Worker, DistProfilerExtension):
+                                 if isinstance(val[0], Metric)
+                                 else list(chain.from_iterable(val))
+                             )
++                    if has_mirror:
++                        from mirroropd.training.metrics import finalize_token_moments, append_inner_record
++                        output = finalize_token_moments(output, self.engine.get_data_parallel_size())
++                        record_path = os.environ.get("MIRROR_INNER_METRICS_PATH")
++                        if record_path:
++                            append_inner_record(record_path, output, outer_call=mirror_outer_call,
++                                                inner_step=inner_index,
++                                                metadata={"epochs": epochs, "mini_batch_size": mini_batch_size})
+                     append_to_dict(metrics, output)
++                if has_mirror:
++                    self._mirror_outer_call = mirror_outer_call + 1
+ 
+                 output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
+             else:
+@@ -514,7 +526,27 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
              ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
  
              # The ref model does not need to enable MTP; force it to false.
