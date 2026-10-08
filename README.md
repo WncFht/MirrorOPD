@@ -54,7 +54,9 @@ MIRROR_UPSTREAM_ROOT="$HOME/src/mirroropd-taopd" \
 
 已跑过 Qwen3-0.6B student / Qwen3-1.7B teacher 的 LoRA GPU 验证，包含两个 outer step、每轮两个 inner epoch、硬同步权重版本检查与 checkpoint 恢复。这些验证证明训练链路能够运行；正式 GSM8K 效果比较尚未完成。更长 GSM8K prompt/response 必须在入口中覆盖长度、token budget 和训练步数，默认值是 12 GB GPU 验证配置。环境与已完成运行见 [训练说明](docs/experiments/2026-10-08-%E4%B8%8A%E6%B8%B8%E8%AE%AD%E7%BB%83%E8%BF%90%E8%A1%8C%E8%AF%B4%E6%98%8E.md) 和 [GPU 验证记录](results/training/2026-10-08-upstream-gpu-validation.json)。
 
-实验统计图与汇总 CSV 保存在 `results/`，prefix/prompt 原始记录保存在 `data/`。已有的三份大数据文件以 gzip 压缩后版本化，`make data` 根据 SHA-256 校验并恢复原文件；本地原文件保留并由 Git 忽略。训练日志和 checkpoint 只保留在本地，对应 metadata、生成脚本、图和汇总结果继续跟踪。迁移范围和数据校验记录见 [独立仓库迁移](docs/operations/2026-10-08-独立仓库迁移.md)。
+Pythia-14M student / Pythia-70M teacher 已完成两组全参数 MDPO 动力学实验：每组 512 条 WikiText prompt、32 outer × 4 inner。固定验证前缀的全词表 KL 与真实续写 NLL 揭示了对齐和语言质量的分歧，详见 [Pythia 实测报告](docs/experiments/2026-10-08-Pythia-MDPO训练设置与实测.md)。固定入口为 `training/run_pythia_mdpo.sh`，checkpoint 评价入口为 `training/score_pythia_mdpo.sh`；这两组运行的 checkpoint 在 archbox 的 `~/src/mirroropd/runs/`，完整可引用日志和评分归档在 `results/training/pythia-mdpo*/`。
+
+实验统计图与汇总 CSV 保存在 `results/`，prefix/prompt 原始记录保存在 `data/`。已有的三份大数据文件以 gzip 压缩后版本化，`make data` 根据 SHA-256 校验并恢复原文件；本地原文件保留并由 Git 忽略。checkpoint 和临时训练日志留在忽略的运行目录；正式实验需要引用的日志、metadata、图和汇总结果归档后跟踪。迁移范围和数据校验记录见 [独立仓库迁移](docs/operations/2026-10-08-独立仓库迁移.md)。
 
 目录边界、输入输出和复现命令见 [实验组织说明](docs/operations/2026-10-08-实验目录组织与训练代码导航.md)。运行需要参考内核的独立脚本时，在仓库根添加 `PYTHONPATH=src`；`make test` 已设置该路径。也可以用 `python -m pip install -e . --no-deps` 安装本地包。
 

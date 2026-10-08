@@ -18,3 +18,14 @@ useDefault = true
 # [rules.allowlist]
 # regexTarget = "line"
 # regexes = ['''your-placeholder-''']
+
+# Provenance files contain SHA-256 digests, not credentials. The generic-api-key
+# detector misclassifies three digest lines because their filenames contain
+# ``token``; keep the exception limited to the generated provenance artifact.
+[[allowlists]]
+description = "Generated source SHA-256 provenance"
+paths = ['''^results/training/pythia-mdpo(-low-lr)?/source-provenance\.json$''']
+regexTarget = "line"
+regexes = [
+  '''"(?:first_party/src/mirroropd/token_inner|framework/verl/utils/tokenizer|framework/verl/workers/rollout/tokenizer)\.py": "[0-9a-f]{64}"''',
+]

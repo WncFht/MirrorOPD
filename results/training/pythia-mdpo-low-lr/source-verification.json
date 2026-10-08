@@ -1,0 +1,7 @@
+{
+  "verified_runtime_python_files": 24,
+  "mismatches": [],
+  "framework_base_commit": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+  "training_entry_code_commit": "15223d5",
+  "recording_note": "Pilot provenance captured after training; low-LR provenance captured before training. Compare runtime Python files, not subsequently formatted launcher/config files."
+}
