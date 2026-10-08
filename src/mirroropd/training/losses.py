@@ -91,12 +91,23 @@ def compute_mirror_opd_token_loss(
             kt = baseline
         if not torch.isfinite(coefficient).all():
             raise FloatingPointError("nonfinite MirrorOPD weight; no silent ratio clipping")
+        # One-Shot-OPD reports support overlap to distinguish signal drift from
+        # optimization drift.  Here the frozen rollout support is the anchor
+        # Top-K; compare it with the current policy Top-K after every inner
+        # forward.  This is a pure diagnostic and carries no gradient.
+        current_ids = log_p.topk(anchor_ids.shape[-1], dim=-1).indices
+        support_overlap = (
+            current_ids.unsqueeze(-1).eq(anchor_ids.unsqueeze(-2)).any(-1).float().mean(-1)
+        )
     return {
         "distillation_losses": coefficient * action_lp,
         "mirror_student_center": center,
         "mirror_teacher_center": kt,
         "mirror_importance_ratio": u.exp(),
         "mirror_score_coefficient": coefficient,
+        "mirror_token_advantage": coefficient,
+        "mirror_support_overlap": support_overlap,
+        "mirror_action_nll": -action_lp.detach(),
         "mirror_sampled_reward": reward,
         "mirror_sampled_log_ratio": u,
         "mirror_student_entropy": -(log_p.detach().exp() * log_p.detach()).sum(-1),
