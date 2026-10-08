@@ -95,6 +95,14 @@ def main():
             true_kl = float((pt * lt).sum())
             entropy = float(-(pt * p_log[t]).sum())
             _, top_indices = torch.topk(pt, k=32)
+            tail_mask = torch.ones_like(pt, dtype=torch.bool)
+            tail_mask[top_indices] = False
+            p_tail32 = float(pt[tail_mask].double().sum())
+            q_tail32 = float(qt[tail_mask].double().exp().sum())
+            p_head_values = pt[top_indices].double().numpy()
+            q_head_values = qt[top_indices].double().exp().numpy()
+            p_tails = np.r_[np.cumsum(p_head_values[::-1])[::-1], 0.0] + p_tail32
+            q_tails = np.r_[np.cumsum(q_head_values[::-1])[::-1], 0.0] + q_tail32
             rank = int((pt > pt[tok]).sum()) + 1
             row_base = {"example_id": ex_idx, "step": t, "true_kl": true_kl,
                         "entropy_nats": entropy, "sampled_prob": float(pt[tok]),
@@ -119,7 +127,16 @@ def main():
                 # The normalized Top-K objective renormalizes both policies on
                 # the same student-defined support S_K.  It is undefined at K=0.
                 normalized = (head / mass + np.log(teacher_head_mass / mass)) if k else float("nan")
-                sums[k].append((head, true_kl, variance, corrected_observed, mass, normalized))
+                # Sum tail probabilities directly: 1 - accumulated float32
+                # head mass loses precision for highly concentrated prefixes.
+                p_tail = float(p_tails[k])
+                q_tail = float(q_tails[k])
+                tail_aware = head + (p_tail * math.log(p_tail / q_tail) if p_tail > 0 else 0.0)
+                if k == 0:
+                    tail_aware = 0.0  # One aggregate token has KL exactly zero.
+                sums[k].append((head, true_kl, variance, corrected_observed, mass, normalized, tail_aware))
+                row_base[f"teacher_mass{k}"] = teacher_head_mass
+                row_base[f"tail_aware_kl{k}"] = tail_aware
                 row_base[f"m{k}"] = mass
                 row_base[f"trunc_bias{k}"] = head - true_kl
                 row_base[f"corr_observed_error{k}"] = corrected_observed - true_kl
@@ -136,7 +153,7 @@ def main():
     summary = []
     for k in range(33):
         arr = np.asarray(sums[k], dtype=np.float64)
-        head, true, variance, corrected, mass, normalized = arr.T
+        head, true, variance, corrected, mass, normalized, tail_aware = arr.T
         trunc_error = head - true
         # Conditional MSE averages over prefixes; correction is unbiased
         # conditionally, while the observed one-token error is retained too.
@@ -162,6 +179,10 @@ def main():
             "bias_normalized": bias_normalized,
             "variance_normalized": 0.0,
             "rmse_normalized": rmse_normalized,
+            "mean_tail_aware_kl": float(tail_aware.mean()),
+            "bias_tail_aware": float((tail_aware - true).mean()),
+            "variance_tail_aware": 0.0,
+            "rmse_tail_aware": float(np.sqrt(np.mean((tail_aware - true) ** 2))),
         })
     write_rows(out / "kl_summary_by_k.csv", summary)
     write_rows(out / "prefix_audit_sample.csv", example_rows)
@@ -169,9 +190,10 @@ def main():
         "student": args.student, "teacher": args.teacher,
         "rollouts": str(args.rollouts), "n_examples": len(examples),
         "n_prefixes": prefix_count, "temperature": 1.0,
-        "definition": "reverse KL KL(student||teacher), exact full-vocabulary reference; sampled token is the student rollout token",
+        "definition": "reverse KL KL(student||teacher), exact full-vocabulary reference of NF4-scored policies; sampled token is the bf16-vLLM student rollout token (different from the scoring proposal)",
         "scoring_quantization": args.quantization,
-        "topk": "student probability top-K; corrected estimator adds log student/teacher ratio only when sampled token is outside the head; normalized estimator renormalizes both policies on the same student-defined support",
+        "topk": "student probability top-K; EMA = head + masked sampled tail; normalized = conditional support KL; tail-aware = head + aggregate-tail mass KL",
+        "tail_numerics": "sum outside Top-32 in float64, then add omitted head probabilities for smaller K; avoid subtracting head mass from one",
     }, indent=2))
     print(json.dumps({"n_examples": len(examples), "n_prefixes": prefix_count}, indent=2))
 

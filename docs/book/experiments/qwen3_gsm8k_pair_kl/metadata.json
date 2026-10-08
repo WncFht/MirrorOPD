@@ -7,5 +7,7 @@
   "temperature": 1.0,
   "definition": "reverse KL KL(student||teacher), exact full-vocabulary reference of the NF4-scored Student/Teacher models; sampled token is the bf16-vLLM student rollout token",
   "scoring_quantization": "4bit",
-  "topk": "student probability top-K; corrected estimator adds log student/teacher ratio only when sampled token is outside the head"
+  "topk": "same student probability top-K support for all four objects: truncated head, normalized conditional KL, EMA masked sampled-tail correction, tail-aware aggregate-tail KL",
+  "tail_numerics": "float64 direct tail summation outside Top-32 plus omitted head tokens; K=0 aggregate KL fixed to exact zero",
+  "tail_aware_scope": "scalar student-support comparison, not a reproduction of teacher-support OPD training"
 }

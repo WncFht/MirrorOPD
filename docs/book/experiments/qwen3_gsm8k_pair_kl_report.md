@@ -85,6 +85,32 @@ $$
 
 原图 [pair_kl_topk_metrics.png](qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png) 已加入归一化 Top-$K$ 的绝对 bias、RMSE 和条件 variance 曲线；逐 $K$ 的全部列（`mean_normalized_kl`、`bias_normalized`、`variance_normalized`、`rmse_normalized`）见 [kl_summary_by_k.csv](qwen3_gsm8k_pair_kl/kl_summary_by_k.csv)。
 
+## Tail-aware Top-$K$ 的全量补充
+
+在相同的 350,166 个 prefix、相同 student Top-$K$ 支持集上，重新打分并计算
+
+$$
+K_K^{\mathrm{TA}}=H_K+P_{\mathrm{tail}}\log\frac{P_{\mathrm{tail}}}{Q_{\mathrm{tail}}}.
+$$
+
+尾部概率直接用 float64 累加，再合并小于 32 的支持集外头部 token，避免通过 $1-P_K$ 相减丢失精度。这里测试的是 student-support 的 Tail-aware 标量变体；没有复现原论文使用 teacher-support 的训练实验。
+
+| $K$ | mean Tail-aware KL | bias | conditional variance | RMSE |
+|---:|---:|---:|---:|---:|
+| 0 | 0 | -0.269321 | 0 | 1.039683 |
+| 1 | 0.209759 | -0.059561 | 0 | 0.295078 |
+| 2 | 0.248413 | -0.020907 | 0 | 0.131407 |
+| 4 | 0.263978 | -0.005343 | 0 | 0.045886 |
+| 8 | 0.268091 | -0.001230 | 0 | 0.015303 |
+| 16 | 0.269006 | -0.000315 | 0 | 0.005493 |
+| 32 | 0.269220 | -0.000101 | 0 | 0.002391 |
+
+Tail-aware 是完整 KL 的下界，偏差等于负的尾部条件 KL 贡献。嵌套支持集每增加一个 token，都细化了尾部聚合，因此 Tail-aware 单调上升，RMSE 单调下降。全量汇总和 2,000 个审计 prefix 通过了下界与单调性核对，允许 $2\times10^{-5}$ 的浮点容差。$K=0$ 时只剩一个虚拟 token，KL 严格为零。
+
+Tail-aware 在 $K=1,2,4$ 的 RMSE 小于 Trunc；在 $K=8,16,32$ 略大。令尾部质量项为 $m$，尾部形状项为 $b\geq0$，则 Trunc 和 Tail-aware 的误差分别为 $-(m+b)$ 与 $-b$。当 $m<0$ 时，Trunc 的两项可以抵消，因而其标量 RMSE 可以更小。$K=32$ 时，Tail-aware RMSE 为 0.002391，Trunc 为 0.002175，EMA 单 token correction 的理论 RMSE 为 0.022486，Normalized 为 0.054377。这个排序针对固定分布上的 KL 数值估计，不能外推为训练性能排序。
+
+原图和 CSV 已原地补入 Tail-aware，bias 面板使用 signed bias；没有创建新的版本目录。
+
 ## Top-$K$ KL reward 的有效样本数
 
 若把每个 prefix 视为一个 sample，并把一个非负的 top-$K$ KL 标量 $R_i$ 当作样本权重，可以使用标准的权重有效样本数
