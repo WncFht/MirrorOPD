@@ -14,7 +14,7 @@ from pathlib import Path
 import torch
 from token_inner import (
     bpo_loss,
-    mdpo_objective,
+    mdpo_loss,
     mean_target,
     pmd_mean_loss,
     pmd_part_loss,
@@ -53,13 +53,13 @@ def run(
             loss.backward()
             logits = logits - lr * logits.grad
         elif method == "mdpo":
-            objective = mdpo_objective(logits, q, reward, eta)
-            objective.backward()
+            loss = mdpo_loss(logits, q, reward, eta)
+            loss.backward()
             # Exact categorical Fisher natural gradient in centered logit coordinates.
             g = logits.grad
             fisher = torch.diag(p) - p[:, None] * p[None, :]
             nat = torch.linalg.pinv(fisher) @ g
-            logits = logits + min(lr, 0.5) * nat
+            logits = logits - min(lr, 0.5) * nat
         else:
             raise ValueError(method)
     p = softmax(logits.detach())

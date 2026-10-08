@@ -2,36 +2,35 @@
 
 \section{K4 的无偏性}
 
-固定 history，记 $p=\pi_\theta(\cdot\mid s)$、$q=\mu_k(\cdot\mid s)$，并从 $p$ 采样 $a$。定义
+本节固定 prefix $s$，记 $p=\pi_{k,n}(\cdot\mid s)$、$q=\pi_k(\cdot\mid s)$，并从 $p$ 采样 $a$。定义
 \[
- w(a)=\frac{q(a)}{p(a)},
- \qquad r_\theta(a)=\frac{p(a)}{\sg(p(a))}.
+ c_{k,n}(s,a)=\frac{p(a)}{\sg(p(a))},\qquad U_{k,n}(s,a)=\log\frac{p(a)}{q(a)}.
 \]
-数值上 $r_\theta=1$，但其导数为 $\nabla\log p(a)$。
+数值上 $c_{k,n}=1$，但其导数为 $\nabla\log p(a)$。
 
 \begin{theorem}[K4 value and gradient]
 \label{thm:k4}
 若 $p\ll q$ 且二阶矩有限，则
 \[
- \E_{a\sim p}[r_\theta(a)(-\log w(a))]=\KL(p\Vert q),
+ \E_{a\sim p}[c_{k,n}(s,a)U_{k,n}(s,a)]=\KL(p\Vert q),
 \]
 并且自动微分意义下
 \[
- \E_{a\sim p}[\nabla_\theta\{r_\theta(a)(-\log w(a))\}]
- =\nabla_\theta\KL(p\Vert q).
+ \E_{a\sim p}[\nabla_{\theta_{k,n}}\{c_{k,n}(s,a)U_{k,n}(s,a)\}]
+ =\nabla_{\theta_{k,n}}\KL(p\Vert q).
 \]
 \end{theorem}
 
 \begin{proof}
-数值 value 中 $r_\theta=1$，所以第一式是
+数值 value 中 $c_{k,n}=1$，所以第一式是
 \[
 \E_p[-\log(q/p)]=\sum_a p(a)\log(p(a)/q(a)).
 \]
-对 stop-gradient 构造求导时，$-\log w=\log p-\log q$ 的 derivative 与 $r_\theta$ 的 derivative 共同给出
+对 stop-gradient 构造求导时，$U_{k,n}=\log p-\log q$ 的 derivative 与 $c_{k,n}$ 的 derivative 共同给出
 \[
- \nabla_\theta\{r_\theta(-\log w)\}
- =\nabla_\theta\log p(a)\,[\log p(a)-\log q(a)]
- +\nabla_\theta\log p(a).
+ \nabla_{\theta_{k,n}}\{c_{k,n}U_{k,n}\}
+ =\nabla_{\theta_{k,n}}\log p(a)\,[\log p(a)-\log q(a)]
+ +\nabla_{\theta_{k,n}}\log p(a).
 \]
 最后一项在 $p$ 下期望为零，第一项正是 KL 的 score-function derivative。\hfill$\square$
 \end{proof}
@@ -40,73 +39,89 @@ K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应
 
 \section{固定 anchor 测度上的重要性校正}
 
-若工程上必须从 $q=\mu_k$ 采样，令 $\rho_\theta(a)=p(a)/q(a)$，并在积分权重上停止梯度。对于任意可积向量 $h$，
+若工程上必须从 $q=\pi_k$ 采样，令 $\omega_{k,n}(s,a)=p(a)/q(a)$，并在积分权重上停止梯度。对于任意可积向量 $h$，
 \[
- \E_q[\sg(\rho_\theta)h(a)]=\E_p[h(a)].
+ \E_q[\sg(\omega_{k,n})h(a)]=\E_p[h(a)].
 \]
-因此 MDPO 的固定 anchor 测度梯度可直接写为
+对于 OPD，MDPO 的损失为原始 mirror objective 的负值。其固定 anchor 测度梯度估计为
 \[
 \widehat g_i^{\mathrm{MDPO}}
-=\sg\!\left(\frac{p(a_i)}{q(a_i)}\right)
-\sg\!\left[f(a_i)-\frac1\eta\log\frac{p(a_i)}{q(a_i)}\right]
-\nabla_\theta\log p(a_i),\qquad a_i\sim q.
+=\sg\!\left(\omega_{k,n}(s,a_i)\right)
+\sg\!\left[\frac1\eta U_{k,n}(s,a_i)-r_k(s,a_i)\right]
+\nabla_{\theta_{k,n}}\log p(a_i),\qquad a_i\sim q.
 \]
-reward、log-ratio 与 score 的乘积二阶可积时，它无偏；若该乘积范数由 $C$ 上界，则
-\begin{equation}\label{eq:bpo-variance}
+此处 $p=\pi_{k,n}(\cdot\mid s)$、$q=\pi_k(\cdot\mid s)$。梯度权重与 score 的乘积二阶可积时，估计量无偏；若该乘积范数由 $C$ 上界，则
+\begin{equation}\label{eq:mdpo-variance}
 \mathbb E_q\|\widehat g_i^{\mathrm{MDPO}}\|^2
 \le C^2\mathbb E_q[(p/q)^2]
 =C^2\bigl(1+\chi^2(p\Vert q)\bigr).
 \end{equation}
 这里的 $p/q$ 测度校正属于 MDPO；不能据此为 PMD-Mean 或 BPO 添加 student importance ratio。它们原本就在冻结 anchor 下定义，action 从 $q$ 采样时无需这种校正。
 
-对 BPO，完整 conditional center 已知时的实际下降方向为
+对 BPO，完整 conditional center 已知时的损失梯度为
 \[
--\nabla\mathcal L_{\mathrm{BPO}}
-=\mathbb E_q\left[
-\left(f-\mathbb E_q[f]-\frac{U-\mathbb E_q[U]}\eta\right)
-\nabla\log p\right],\qquad U=\log(p/q).
+\nabla_{\theta_{k,n}}\mathcal L_{\mathrm{BPO}}
+=\mathbb E_{\pi_k}\left[
+\frac{R^{\mathrm{BPO}}_{k,n}(s,a)}{\eta}\,
+\nabla_{\theta_{k,n}}\log\pi_{k,n}(a\mid s)\right].
 \]
-对 PMD-Mean，则为
+对 PMD-Mean，损失梯度为
 \[
--\nabla\mathcal L_{\mathrm{Mean}}
-=\mathbb E_q\left[
-\bigl(\eta(f-\mathbb E_q[f])-U\bigr)\nabla\log p\right].
+\nabla_{\theta_{k,n}}\mathcal L_{\mathrm{Mean}}
+=\mathbb E_{\pi_k}\left[
+R^{\mathrm{Mean}}_{k,n}(s,a)\,
+\nabla_{\theta_{k,n}}\log\pi_{k,n}(a\mid s)\right].
 \]
 估计 center 时须区分解析 policy-gradient 权重与 sampled 原始平方损失：前者使用停止梯度的权重，后者的 BPO student center 保留梯度，并采用第二章给出的有限样本系数校正。单个 center 估计量的无偏性不自动保证它嵌入平方损失后的梯度无偏。
 
-\section{Top-$K$ 与完整词表的关系}
+\section{Top-$J$ 与完整词表的关系}
 
-如果保存当前策略和 anchor 的 top-$K$ logits，完整 reverse KL 可以拆成
+如果保存当前策略和 anchor 的 top-$J$ logits，完整 reverse KL 可以拆成
 \[
- \sum_{a\in Q_K}p(a)\log\frac{p(a)}{q(a)}
- +\sum_{a\notin Q_K}p(a)\log\frac{p(a)}{q(a)}.
+ \sum_{a\in S_J}p(a)\log\frac{p(a)}{q(a)}
+ +\sum_{a\notin S_J}p(a)\log\frac{p(a)}{q(a)}.
 \]
-第一项可精确计算；第二项不能被简单删除，否则得到截断 KL 而非完整 KL。2602.04417 的 Top-$K$ 估计量在尾部使用 masked sampled K4：若采样 token 不在 $Q_K$，加入
+第一项可精确计算；第二项不能被简单删除，否则得到截断 KL 而非完整 KL。2602.04417 的 Top-$J$ 估计量在尾部使用 masked sampled K4：固定头部集合 $S_J$，若采样 token 不在 $S_J$，加入
 \[
- \mathbf 1(a\notin Q_K)\,\sg\!\left(\frac{p(a)}{\pi_{\rm sampling}(a)}\right)
- r_\theta(a)(-\log w(a)).
+ \mathbf 1(a\notin S_J)\,\sg\!\left(\frac{p(a)}{\pi_{\rm sampling}(a)}\right)
+ c_{k,n}(s,a)U_{k,n}(s,a).
 \]
-它同时保持 value 和 gradient 无偏。对本项目而言，第一版小实验不使用 top-$K$ reward，而先验证 full-vocabulary oracle 和 sampled K4 两条路径；否则无法判断误差来自 mirror target 还是 tail estimator。
+它同时保持 value 和 gradient 无偏。完整词表 oracle 与 sampled K4 分别核对 mirror target 和尾部估计误差，二者在实验中单独报告。
 
 \section{有限 inner 更新的误差}
 
-设方法自己的总体最优分布为 $p_k^{*,M}$，inner 算法在固定 $s$ 上得到 $p_{k,m}$。PMD-Mean 使用 Lambert-$W$ target，另外三种方法使用 Gibbs target $p_k^+$。定义优化误差
+设方法 $M$ 的总体最优分布为 $\pi_k^{\star,M}$，inner 算法在固定 $s$ 上得到 $\pi_{k,n}$。PMD-Mean 使用 Lambert-$W$ target，另外三种方法使用 Gibbs target $\pi_k^{\star,\mathrm{Gibbs}}$。定义优化误差
 \[
- e_{k,m}(s)=\frac12\|p_{k,m}(\cdot\mid s)-p_k^{*,M}(\cdot\mid s)\|_1.
+e_{k,n}(s)=\operatorname{TV}\!\left(\pi_{k,n}(\cdot\mid s),\pi_k^{\star,M}(\cdot\mid s)\right).
 \]
-若 loss gradient 是 $L$-smooth，且使用 unbiased gradient with variance at most $\sigma^2/B$，标准 projected SGD 给出
+
+对参数化损失，假设梯度是 $L_{\mathrm{sm}}$-Lipschitz，随机梯度 $\widehat g_n$ 条件无偏且满足
 \[
-\frac1M\sum_{m=0}^{M-1}\E\|\nabla\mathcal L(\theta_m)\|^2
-\leq
-\frac{2(\mathcal L_0-\mathcal L_*)}{\alpha M}
- +\frac{L\alpha\sigma^2}{B}.
+\mathbb E[\widehat g_n\mid\theta_{k,n}]=\nabla\mathcal L(\theta_{k,n}),\qquad
+\mathbb E\!\left[\|\widehat g_n-\nabla\mathcal L(\theta_{k,n})\|^2\mid\theta_{k,n}\right]\le\frac{\sigma^2}{B}.
 \]
-对采用 student/anchor importance ratio 的 MDPO estimator，方差界包含 $1+\chi^2(p_{k,m}\Vert\mu_k)$。PMD-Mean 和 BPO 的 anchor-measure estimator 应直接分析其 residual、score 与 center 的联合二阶矩，不能套用这个 importance-ratio 结论。
+普通 SGD 取 $\theta_{k,n+1}=\theta_{k,n}-\alpha\widehat g_n$，$0<\alpha\le 1/L_{\mathrm{sm}}$。由光滑性不等式及条件无偏性，
+\begin{align*}
+\mathbb E[\mathcal L(\theta_{k,n+1})\mid\theta_{k,n}]
+&\le\mathcal L(\theta_{k,n})-\alpha\|\nabla\mathcal L(\theta_{k,n})\|^2
++\frac{L_{\mathrm{sm}}\alpha^2}{2}\mathbb E[\|\widehat g_n\|^2\mid\theta_{k,n}]\\
+&\le\mathcal L(\theta_{k,n})-\frac\alpha2\|\nabla\mathcal L(\theta_{k,n})\|^2
++\frac{L_{\mathrm{sm}}\alpha^2\sigma^2}{2B}.
+\end{align*}
+设 $\mathcal L_*$ 是损失下界，对 $n=0,\ldots,N-1$ 求和得到
+\[
+\frac1N\sum_{n=0}^{N-1}\mathbb E\|\nabla\mathcal L(\theta_{k,n})\|^2
+\le\frac{2(\mathcal L(\theta_{k,0})-\mathcal L_*)}{\alpha N}
++\frac{L_{\mathrm{sm}}\alpha\sigma^2}{B}.
+\]
+此式控制平均梯度范数。将它转成 $e_{k,n}$ 的分布误差界还需要局部曲率或梯度与分布距离之间的定量关系。
+
+对采用 student/anchor importance ratio 的 MDPO estimator，方差界包含 $1+\chi^2(\pi_{k,n}\Vert\pi_k)$。PMD-Mean 和 BPO 的 anchor-measure estimator 直接分析 residual、score 与 center 的联合二阶矩。
 
 PMD-Mean 到 Gibbs 分布的差异还包含总体目标偏差：
 \[
-\TV(p_{k,m},p_k^+)
-\le \TV(p_{k,m},p_k^{*,\mathrm{Mean}})
-+\TV(p_k^{*,\mathrm{Mean}},p_k^+).
+\operatorname{TV}(\pi_{k,n},\pi_k^{\star,\mathrm{Gibbs}})
+\le\operatorname{TV}(\pi_{k,n},\pi_k^{\star,\mathrm{Mean}})
++\operatorname{TV}(\pi_k^{\star,\mathrm{Mean}},\pi_k^{\star,\mathrm{Gibbs}}).
 \]
 增加 inner steps 只能降低第一项，第二项由均值近似决定。

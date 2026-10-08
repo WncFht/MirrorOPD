@@ -27,20 +27,15 @@ def pmd_mean_loss(logits, anchor, reward, eta):
 def bpo_loss(logits, anchor, reward, eta):
     """Unlinearized BPO: centered optimality residual under frozen anchor."""
     u = torch.log_softmax(logits, -1) - torch.log(anchor)
-    z = eta * reward - u
+    z = u - eta * reward
     residual = z - torch.sum(anchor * z)
     return torch.sum(anchor * residual.square()) / (2 * eta)
 
 
-def bpo_objective(logits, anchor, reward, eta):
-    """BPO ascent objective, retained for callers using the previous name."""
-    return -bpo_loss(logits, anchor, reward, eta)
-
-
-def mdpo_objective(logits, anchor, reward, eta):
+def mdpo_loss(logits, anchor, reward, eta):
     logp = torch.log_softmax(logits, -1)
     p = logp.exp()
-    return torch.sum(p * reward) - torch.sum(p * (logp - torch.log(anchor))) / eta
+    return torch.sum(p * (logp - torch.log(anchor))) / eta - torch.sum(p * reward)
 
 
 def mean_target(anchor, reward, eta):
@@ -92,9 +87,9 @@ def mean_target(anchor, reward, eta):
 def mdpo_step(logits, anchor, reward, eta, step_size=1.0):
     """One exact categorical natural-gradient step on the common objective."""
     logits = logits.detach().requires_grad_(True)
-    objective = mdpo_objective(logits, anchor, reward, eta)
-    grad = torch.autograd.grad(objective, logits)[0]
+    loss = mdpo_loss(logits, anchor, reward, eta)
+    grad = torch.autograd.grad(loss, logits)[0]
     p = torch.softmax(logits, -1)
     fisher = torch.diag(p) - torch.outer(p, p)
     nat = torch.linalg.pinv(fisher) @ grad
-    return (logits + step_size * nat).detach()
+    return (logits - step_size * nat).detach()

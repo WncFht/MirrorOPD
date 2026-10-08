@@ -4,11 +4,11 @@
 
 实验脚本位于 \texttt{experiments/toy\_token\_inner.py}。它只包含一个固定 history 和四个 token：
 \[
- \mu=(0.62,0.23,0.10,0.05),
+ \pi_0=(0.62,0.23,0.10,0.05),
  \qquad
- T=(0.08,0.17,0.25,0.50).
+ \pi_T=(0.08,0.17,0.25,0.50).
 \]
-每个方法从同一个初始策略 $p_0=(0.70,0.15,0.10,0.05)$ 开始，使用 $400$ 步、学习率 $0.15$，完整枚举 vocabulary，不使用 rollout，不使用 sequence-level reward。这样可以单独检查 token-level inner 的数学对象。PMD-Part 和 PMD-Mean 用 exact weighted squared residual；BPO 使用完整词表下的中心化 residual 平方损失；MDPO 使用 exact categorical Fisher preconditioner。
+每个方法从同一个初始策略 $\pi_{0,0}=(0.70,0.15,0.10,0.05)$ 开始，使用 $400$ 步、学习率 $0.15$，完整枚举 vocabulary，不使用 rollout，不使用 sequence-level reward。为核对离开 anchor 后的梯度，这个固定 anchor 实验采用偏离 anchor 的初始化。正式 OPD outer--inner 算法从 $\pi_{k,0}=\pi_k$ 开始。PMD-Part 和 PMD-Mean 用 exact weighted squared residual；BPO 使用完整词表下的中心化 residual 平方损失；MDPO 使用 exact categorical Fisher preconditioner。
 
 \subsection{画图实验的输入数据与三层数据集}
 
@@ -16,7 +16,7 @@
 
 第一层是可枚举的 categorical oracle。固定一个 prefix $s$，直接生成 anchor、teacher 和 student 的完整 logits，并通过 softmax 得到 $\pi_k(\cdot\mid s)$、$\pi_T(\cdot\mid s)$ 和 $\pi_{k,n}(\cdot\mid s)$。anchor 可以用随机 logits 加温度生成，teacher 可以通过独立随机 logits 或与 anchor 具有指定 KL 的混合分布生成。每个 prefix 保存完整的概率向量、两个 log-prob 向量以及 exact
 \[
-K_k^T(s)=\operatorname{KL}(\pi_k\Vert\pi_T),\qquad K_{k,n}^\theta(s)=\operatorname{KL}(\pi_k\Vert\pi_{k,n}),
+\mathcal K_k^T(s)=\operatorname{KL}(\pi_k\Vert\pi_T),\qquad \mathcal K_{k,n}^S(s)=\operatorname{KL}(\pi_k\Vert\pi_{k,n}),
 \]
 和
 \[
@@ -32,14 +32,14 @@ s_{i,t}=(x_i,y_{i,<t}),\qquad a_{i,t}=y_{i,t},\qquad a_{i,t}\sim\pi_k(\cdot\mid 
 
 第三层才是完整的 OPD outer loop。第 $k$ 轮只使用 $\pi_k$ 生成 rollout，缓存该轮的 prefix 集合和 anchor/teacher 的 token-level log-prob；随后固定这些数据运行 $N$ 个 inner steps，得到 $\pi_{k,N}$，再执行 hard sync 或 soft sync 得到 $\pi_{k+1}$。同步后必须重新 rollout，不能把上一轮的 prefix 和旧 anchor log-prob 继续当作新一轮数据。这样得到的序列
 \[
-\{(\widehat d_k,\pi_k,\pi_{k,n},\pi_T): k=0,\ldots,K_{\mathrm{outer}}-1,\ n=0,\ldots,N\}
+\{(\widehat d_k,\pi_k,\pi_{k,n},\pi_T): k=0,\ldots,K_{\mathrm{out}}-1,\ n=0,\ldots,N\}
 \]
 才是 outer 动力学图的输入。
 
-为避免 top-$K$ 的整数与 KL 记号冲突，图中把保留的头部大小记为 $J$。对每个固定 prefix，同时记录 full-vocabulary oracle、sampled-token、top-$J$ 三条估计路径。建议先画以下三组图：
+图中以 $J$ 表示保留的头部 token 数量。对每个固定 prefix，同时记录 full-vocabulary oracle、sampled-token、top-$J$ 三条估计路径。建议先画以下三组图：
 
 \begin{enumerate}
-\item 在第一层 oracle 上，以 $J$ 或同 prefix 样本数 $m$ 为横轴，画 $K_k^T$、$K_{k,n}^\theta$ 和 $\log Z_k$ 的 bias、standard deviation、RMSE；
+\item 在第一层 oracle 上，以 $J$ 或同 prefix 样本数 $m$ 为横轴，画 $\mathcal K_k^T$、$\mathcal K_{k,n}^S$ 和 $\log Z_k$ 的 bias、standard deviation、RMSE；
 \item 在第二层真实 prefix 上，以 inner step $n$ 为横轴，画 exact-oracle 可用部分的 KL、sampled estimator 的方差、anchor--student 的 $\chi^2$ 或有效样本量；
 \item 在第三层 outer loop 上，以 $k$ 为横轴，分别画 teacher KL、mirror-target KL、policy--anchor KL、token-level loss、rollout reward，以及 hard sync 与 soft sync 的差异。
 \end{enumerate}
@@ -48,7 +48,13 @@ s_{i,t}=(x_i,y_{i,<t}),\qquad a_{i,t}=y_{i,t},\qquad a_{i,t}\sim\pi_k(\cdot\mid 
 
 \section{结果}
 
-表~\ref{tab:toy-results} 区分三种距离。$p^+$ 是原始 mirror objective 的 Gibbs 解，$p_m^\star$ 是各方法自己的总体最优解。PMD-Mean 的 $p_m^\star$ 由 Lambert-$W$ 归一化方程求得；其余三种方法的 $p_m^\star=p^+$。第一列距离衡量有限步优化误差，最后一列衡量总体目标差异。
+表~\ref{tab:toy-results} 区分有限步优化误差、到 Gibbs 分布的距离和总体目标差异。方法 $M$ 的自身最优分布为 $\pi_0^{\star,M}$，400 步后的 student 为 $\pi_{0,N}$，$N=400$。PMD-Mean 的最优分布由 Lambert-$W$ 归一化方程求得，其余三种方法的最优分布为 $\pi_0^{\star,\mathrm{Gibbs}}$。定义
+\begin{align*}
+e^{\mathrm{opt}}_M&=\operatorname{TV}(\pi_{0,N},\pi_0^{\star,M}),\\
+e^{\mathrm{Gibbs}}_M&=\operatorname{TV}(\pi_{0,N},\pi_0^{\star,\mathrm{Gibbs}}),\\
+e^{\mathrm{target}}_M&=\operatorname{TV}(\pi_0^{\star,M},\pi_0^{\star,\mathrm{Gibbs}}).
+\end{align*}
+第一项衡量有限步优化误差，第三项衡量方法总体目标的差异。
 
 \begin{table}[ht]
 \centering
@@ -56,7 +62,7 @@ s_{i,t}=(x_i,y_{i,<t}),\qquad a_{i,t}=y_{i,t},\qquad a_{i,t}\sim\pi_k(\cdot\mid 
 \label{tab:toy-results}
 \begin{tabular}{llrrr}
 \toprule
-$\eta$ & 方法 & $\TV(p,p_m^\star)$ & $\TV(p,p^+)$ & $\TV(p_m^\star,p^+)$\\
+$\eta$ & 方法 & $e^{\mathrm{opt}}_M$ & $e^{\mathrm{Gibbs}}_M$ & $e^{\mathrm{target}}_M$\\
 \midrule
 0.25 & PMD-Part & 1.11e-03 & 1.11e-03 & 0.00e+00\\
 0.25 & PMD-Mean & 6.81e-04 & 9.26e-03 & 9.12e-03\\
@@ -90,12 +96,12 @@ $\eta$ 同时影响 Gibbs target、Mean 的 Lambert-$W$ target 以及各损失�
 \item 对随机 $p,q$，用大量样本检查 K4 value 与 exact $\KL(p\Vert q)$ 的误差按 $O(B^{-1/2})$ 下降；
 \item 用 autograd finite difference 检查 K4 gradient，而不是只检查 value；
 \item 检查固定 anchor 采样的 importance correction 在 $p/q$ 接近一时无偏；
-\item 人为增加 inner steps，确认 current-anchor $\chi^2$ 和估计方差同时上升；
+\item 人为改变 student 与 anchor 的偏离程度，测量 $\chi^2$ 与重要性加权估计方差；增加 inner steps 不保证二者单调上升；
 \item hard sync 后重新 rollout，确认新一轮 residual 使用新的 anchor，而不是上一轮缓存的 log-prob。
 \end{enumerate}
 
 这些检查完成前不运行大型模型 sweep。当前仓库中的 toy 输出由
 \texttt{toy\_token\_inner.py}（从本目录用 \texttt{uv run --with torch python} 运行）生成，结果保存在\path{experiments/toy_token_inner.csv}。独立的
-\path{experiments/test_kl_estimators.py} 使用 200,000 个 token 样本检查 K4 的 value 与 autograd gradient；本次运行的绝对 value 误差为 $5.6\times10^{-5}$，gradient 的 $ell_2$ 误差为 $1.5\times10^{-3}$。
+\path{experiments/test_kl_estimators.py} 使用 200,000 个 token 样本检查 K4 的 value 与 autograd gradient；本次运行的绝对 value 误差为 $5.6\times10^{-5}$，gradient 的 $\ell_2$ 误差为 $1.5\times10^{-3}$。
 
 \path{experiments/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和有限样本尺度修正；它与 toy 实验分别检验推导正确性和有限步优化行为。
