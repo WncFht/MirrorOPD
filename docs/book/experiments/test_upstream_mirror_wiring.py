@@ -56,6 +56,7 @@ def main():
     )
     check_mode_routing(root)
     check_rollout_guards(root)
+    check_rollout_versions(root)
     tu = SimpleNamespace(
         assign_non_tensor_data=lambda data, key, value: data.__setitem__(key, value),
         get_non_tensor_data=lambda data, key, default: data.get(key, default),
@@ -331,6 +332,28 @@ def check_rollout_guards(root):
             raise AssertionError(f"Accepted invalid rollout {field}={bad}")
         rollout[field] = original
     print("PASS upstream rollout guard defaults and invalid sampling rejection")
+
+
+def check_rollout_versions(root):
+    namespace = {}
+    load_functions(
+        root / "trainer/distillation/losses.py",
+        ["validate_mirror_rollout_version"], namespace,
+    )
+    validate = namespace["validate_mirror_rollout_version"]
+    for version in (0, 1, 2):
+        assert validate({"global_steps": [version, version]}, version, 2) == {
+            "mirror/rollout_weight_version": version
+        }
+    for fields in ({}, {"global_steps": [None, 2]}, {"global_steps": [1, 2]},
+                   {"global_steps": [2]}, {"global_steps": [3, 3]}):
+        try:
+            validate(fields, 2, 2)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"stale/missing version accepted: {fields}")
+    print("PASS rollout server versions: fresh, stale, absent, mixed, resumed")
 
 
 if __name__ == "__main__":

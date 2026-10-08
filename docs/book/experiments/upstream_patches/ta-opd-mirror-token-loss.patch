@@ -1,7 +1,7 @@
-diff --git a/verl/experimental/agent_loop/agent_loop.py b/verl/experimental/agent_loop/agent_loop.py
+diff --git a/verl/verl/experimental/agent_loop/agent_loop.py b/verl/verl/experimental/agent_loop/agent_loop.py
 index 24d305f..ca629a4 100644
---- a/verl/experimental/agent_loop/agent_loop.py
-+++ b/verl/experimental/agent_loop/agent_loop.py
+--- a/verl/verl/experimental/agent_loop/agent_loop.py
++++ b/verl/verl/experimental/agent_loop/agent_loop.py
 @@ -49,6 +49,7 @@ from verl.experimental.agent_loop.utils import resolve_config_path
  from verl.protocol import DataProto
  from verl.tools.tool_registry import load_all_tools
@@ -21,10 +21,10 @@ index 24d305f..ca629a4 100644
          if self.distillation_enabled:
              from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
  
-diff --git a/verl/trainer/config/distillation/distillation.yaml b/verl/trainer/config/distillation/distillation.yaml
+diff --git a/verl/verl/trainer/config/distillation/distillation.yaml b/verl/verl/trainer/config/distillation/distillation.yaml
 index a2f1871..07888a9 100644
---- a/verl/trainer/config/distillation/distillation.yaml
-+++ b/verl/trainer/config/distillation/distillation.yaml
+--- a/verl/verl/trainer/config/distillation/distillation.yaml
++++ b/verl/verl/trainer/config/distillation/distillation.yaml
 @@ -13,6 +13,9 @@ defaults:
  # Whether to enable distillation.
  enabled: false
@@ -52,10 +52,10 @@ index a2f1871..07888a9 100644
 -teacher_key: data_source
 \ No newline at end of file
 +teacher_key: data_source
-diff --git a/verl/trainer/distillation/fsdp/losses.py b/verl/trainer/distillation/fsdp/losses.py
+diff --git a/verl/verl/trainer/distillation/fsdp/losses.py b/verl/verl/trainer/distillation/fsdp/losses.py
 index d37c85d..94d8574 100644
---- a/verl/trainer/distillation/fsdp/losses.py
-+++ b/verl/trainer/distillation/fsdp/losses.py
+--- a/verl/verl/trainer/distillation/fsdp/losses.py
++++ b/verl/verl/trainer/distillation/fsdp/losses.py
 @@ -32,6 +32,259 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
      return kld.sum(dim=-1)
  
@@ -566,11 +566,35 @@ index d37c85d..94d8574 100644
  
          # Average of -token_kl over the overlapping tokens; positions with no overlap get 0.
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
-diff --git a/verl/trainer/distillation/losses.py b/verl/trainer/distillation/losses.py
-index 1fb42a8..a420d0a 100644
---- a/verl/trainer/distillation/losses.py
-+++ b/verl/trainer/distillation/losses.py
-@@ -43,6 +43,12 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
+diff --git a/verl/verl/trainer/distillation/losses.py b/verl/verl/trainer/distillation/losses.py
+index 1fb42a8..496116e 100644
+--- a/verl/verl/trainer/distillation/losses.py
++++ b/verl/verl/trainer/distillation/losses.py
+@@ -36,6 +36,23 @@ DistillationLossFn = Callable[
+ ]
+ 
+ 
++
++def validate_mirror_rollout_version(non_tensor_batch, expected_version, batch_size):
++    """Reject stale/missing server versions before constructing an anchor cache.
++
++    The version is set by the upstream server adapter after weight transfer.
++    This validates synchronization ordering, not bitwise backend equivalence.
++    """
++    versions = non_tensor_batch.get("global_steps")
++    if versions is None or len(versions) != batch_size:
++        raise ValueError("MirrorOPD rollout must report one server weight version per trajectory")
++    if any(version is None or version != expected_version for version in versions):
++        raise ValueError(
++            f"MirrorOPD stale rollout: expected server version {expected_version}, got {list(versions)}"
++        )
++    return {"mirror/rollout_weight_version": expected_version}
++
++
+ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
+     """Check if distillation is enabled based on the provided configuration."""
+     if config is None:
+@@ -43,6 +60,12 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
      return config.enabled
  
  
@@ -583,7 +607,7 @@ index 1fb42a8..a420d0a 100644
  
  @dataclass
  class DistillationLossSettings(BaseConfig):
-@@ -156,6 +162,11 @@ def compute_topk_loss(
+@@ -156,6 +179,11 @@ def compute_topk_loss(
  
              loss_mode = distillation_config.distillation_loss.loss_mode
  
@@ -595,7 +619,7 @@ index 1fb42a8..a420d0a 100644
              if loss_mode == "reverse_kl_topk":
                  distillation_loss_fn = fsdp_losses.compute_reverse_kl_topk
              elif loss_mode in ("mopd_topk", "mopd_reverse_kl_topk"):
-@@ -242,6 +253,12 @@ def distillation_ppo_loss(
+@@ -242,6 +270,12 @@ def distillation_ppo_loss(
      # Called as final policy loss
      distillation_loss_config = distillation_config.distillation_loss
      distill_loss, distill_metrics = distillation_loss(config, distillation_config, model_output, data)
@@ -608,7 +632,7 @@ index 1fb42a8..a420d0a 100644
      policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
      if not distillation_loss_config.use_task_rewards:
          policy_loss = 0.0
-@@ -327,6 +344,23 @@ def distillation_loss(
+@@ -327,6 +361,23 @@ def distillation_loss(
  
  
  
@@ -632,10 +656,10 @@ index 1fb42a8..a420d0a 100644
  @register_distillation_loss(
      DistillationLossSettings(names=["kl", "k1", "abs", "mse", "k2", "low_var_kl", "k3"], use_estimator=True)
  )  # type: ignore[arg-type]
-diff --git a/verl/trainer/main_ppo.py b/verl/trainer/main_ppo.py
+diff --git a/verl/verl/trainer/main_ppo.py b/verl/verl/trainer/main_ppo.py
 index 8f6cd41..c5b36aa 100644
---- a/verl/trainer/main_ppo.py
-+++ b/verl/trainer/main_ppo.py
+--- a/verl/verl/trainer/main_ppo.py
++++ b/verl/verl/trainer/main_ppo.py
 @@ -25,6 +25,7 @@ from omegaconf import OmegaConf
  from verl.experimental.reward_loop import migrate_legacy_reward_impl
  from verl.trainer.constants_ppo import get_ppo_ray_runtime_env
@@ -675,20 +699,22 @@ index 8f6cd41..c5b36aa 100644
              # we do not use teacher model workers, so we only register teacher model in resource pool
              # without registering a teacher model worker in role-worker mapping
              self.mapping[Role.TeacherModel] = "teacher_pool"
-diff --git a/verl/trainer/ppo/ray_trainer.py b/verl/trainer/ppo/ray_trainer.py
-index d1eaa7b..b2b3427 100644
---- a/verl/trainer/ppo/ray_trainer.py
-+++ b/verl/trainer/ppo/ray_trainer.py
-@@ -38,7 +38,7 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
+diff --git a/verl/verl/trainer/ppo/ray_trainer.py b/verl/verl/trainer/ppo/ray_trainer.py
+index d1eaa7b..44780d7 100644
+--- a/verl/verl/trainer/ppo/ray_trainer.py
++++ b/verl/verl/trainer/ppo/ray_trainer.py
+@@ -38,7 +38,9 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
  from verl.single_controller.ray import RayClassWithInitArgs, RayWorkerGroup, ResourcePoolManager
  from verl.single_controller.ray.base import create_colocated_worker_cls
  from verl.trainer.config import AlgoConfig
 -from verl.trainer.distillation.losses import is_distillation_enabled
-+from verl.trainer.distillation.losses import is_distillation_enabled, is_mirror_opd_enabled
++from verl.trainer.distillation.losses import (
++    is_distillation_enabled, is_mirror_opd_enabled, validate_mirror_rollout_version,
++)
  from verl.trainer.ppo import core_algos
  from verl.trainer.ppo.core_algos import AdvantageEstimator, agg_loss
  from verl.trainer.ppo.metric_utils import (
-@@ -70,7 +70,10 @@ from verl.utils.torch_functional import masked_mean
+@@ -70,7 +72,10 @@ from verl.utils.torch_functional import masked_mean
  from verl.utils.tracking import ValidationGenerationsLogger
  from verl.workers.config import DistillationConfig, EngineConfig
  from verl.workers.rollout.llm_server import LLMServerManager
@@ -700,7 +726,7 @@ index d1eaa7b..b2b3427 100644
  
  
  def apply_kl_penalty(data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, kl_penalty="kl"):
-@@ -329,6 +332,29 @@ class RayPPOTrainer:
+@@ -329,6 +334,29 @@ class RayPPOTrainer:
          self.tokenizer = tokenizer
          self.processor = processor
          self.config = config
@@ -730,7 +756,7 @@ index d1eaa7b..b2b3427 100644
  
          self.hybrid_engine = config.actor_rollout_ref.hybrid_engine
          assert self.hybrid_engine, "Currently, only support hybrid engine"
-@@ -358,6 +384,8 @@ class RayPPOTrainer:
+@@ -358,6 +386,8 @@ class RayPPOTrainer:
          if lora_rank <= 0:
              lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
          self.ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
@@ -739,7 +765,7 @@ index d1eaa7b..b2b3427 100644
  
          # define in-reward KL control
          # kl loss control currently not suppoorted
-@@ -926,6 +954,8 @@ class RayPPOTrainer:
+@@ -926,6 +956,8 @@ class RayPPOTrainer:
          else:
              self.teacher_model_manager = None
              self.distillation_config = None
@@ -748,7 +774,7 @@ index d1eaa7b..b2b3427 100644
  
          # Support custom AgentLoopManager via config
          manager_class_fqn = self.config.actor_rollout_ref.rollout.get("agent", {}).get("agent_loop_manager_class")
-@@ -1257,6 +1287,9 @@ class RayPPOTrainer:
+@@ -1257,6 +1289,9 @@ class RayPPOTrainer:
          # TODO: remove step 1, 2, 4 after we make the whole training tensordict and padding free
          # step 1: convert dataproto to tensordict.
          batch_td = batch.to_tensordict()
@@ -758,7 +784,7 @@ index d1eaa7b..b2b3427 100644
          # step 2: convert from padding to nopadding
          batch_td = left_right_2_no_padding(batch_td)
          # step 3: add meta info
-@@ -1267,6 +1300,12 @@ class RayPPOTrainer:
+@@ -1267,6 +1302,12 @@ class RayPPOTrainer:
              calculate_sum_pi_squared=calculate_sum_pi_squared,
              compute_loss=False,
          )
@@ -771,7 +797,7 @@ index d1eaa7b..b2b3427 100644
          output = self.actor_rollout_wg.compute_log_prob(batch_td)
          # gather output
          entropy = tu.get(output, "entropy")
-@@ -1282,6 +1321,13 @@ class RayPPOTrainer:
+@@ -1282,6 +1323,13 @@ class RayPPOTrainer:
              sum_pi_squared = no_padding_2_padding(sum_pi_squared, batch_td)
          # step 5: rebuild a tensordict and convert to dataproto
          result = {"old_log_probs": log_probs.float(), "entropys": entropy.float()}
@@ -785,7 +811,7 @@ index d1eaa7b..b2b3427 100644
          if routed_experts is not None:
              result["routed_experts"] = routed_experts
          if sum_pi_squared is not None:
-@@ -1290,6 +1336,19 @@ class RayPPOTrainer:
+@@ -1290,6 +1338,19 @@ class RayPPOTrainer:
          old_log_prob = DataProto.from_tensordict(old_log_prob)
          return old_log_prob, old_log_prob_mfu
  
@@ -805,7 +831,20 @@ index d1eaa7b..b2b3427 100644
      def _update_actor(self, batch: DataProto) -> DataProto:
          rollout_config = self.config.actor_rollout_ref.rollout
          batch.meta_info["multi_turn"] = rollout_config.multi_turn.enable
-@@ -1573,7 +1632,10 @@ class RayPPOTrainer:
+@@ -1476,6 +1537,12 @@ class RayPPOTrainer:
+                         combined_gen_output.meta_info.pop("timing", None)
+ 
+                     gen_batch_output = combined_gen_output.slice(0, num_sampled_prompts)
++                    if self.mirror_opd:
++                        metrics.update(validate_mirror_rollout_version(
++                            gen_batch_output.non_tensor_batch,
++                            expected_version=self.global_steps - 1,
++                            batch_size=len(gen_batch_output),
++                        ))
+                     if "__do_sample__" in gen_batch_output.non_tensor_batch:
+                         gen_batch_output.pop(non_tensor_batch_keys=["__do_sample__"])
+ 
+@@ -1573,7 +1640,10 @@ class RayPPOTrainer:
  
                      assert "old_log_probs" in batch.batch, f'"old_log_prob" not in {batch.batch.keys()=}'
  
@@ -817,10 +856,10 @@ index d1eaa7b..b2b3427 100644
                          # compute reference log_prob
                          with marked_timer(str(Role.RefPolicy), timing_raw, color="olive"):
                              ref_log_prob = self._compute_ref_log_prob(batch)
-diff --git a/verl/trainer/ppo/utils.py b/verl/trainer/ppo/utils.py
+diff --git a/verl/verl/trainer/ppo/utils.py b/verl/verl/trainer/ppo/utils.py
 index 876eaad..d40cea2 100644
---- a/verl/trainer/ppo/utils.py
-+++ b/verl/trainer/ppo/utils.py
+--- a/verl/verl/trainer/ppo/utils.py
++++ b/verl/verl/trainer/ppo/utils.py
 @@ -19,6 +19,7 @@ from omegaconf import DictConfig
  
  from verl.single_controller.base import Worker
@@ -852,10 +891,10 @@ index 876eaad..d40cea2 100644
  
  
  def need_reward_model(
-diff --git a/verl/workers/config/distillation.py b/verl/workers/config/distillation.py
+diff --git a/verl/verl/workers/config/distillation.py b/verl/verl/workers/config/distillation.py
 index 2bfd200..9ff66f7 100644
---- a/verl/workers/config/distillation.py
-+++ b/verl/workers/config/distillation.py
+--- a/verl/verl/workers/config/distillation.py
++++ b/verl/verl/workers/config/distillation.py
 @@ -64,6 +64,7 @@ class DistillationLossConfig(BaseConfig):
  
      loss_mode: str = "k3"
@@ -906,10 +945,10 @@ index 2bfd200..9ff66f7 100644
          self.teacher_models = self._resolve_teacher_models()
          teacher_world_size_sum = 0
          for teacher_model in self.teacher_models.values():
-diff --git a/verl/workers/engine/fsdp/transformer_impl.py b/verl/workers/engine/fsdp/transformer_impl.py
+diff --git a/verl/verl/workers/engine/fsdp/transformer_impl.py b/verl/verl/workers/engine/fsdp/transformer_impl.py
 index afbf7ec..3e3798d 100644
---- a/verl/workers/engine/fsdp/transformer_impl.py
-+++ b/verl/workers/engine/fsdp/transformer_impl.py
+--- a/verl/verl/workers/engine/fsdp/transformer_impl.py
++++ b/verl/verl/workers/engine/fsdp/transformer_impl.py
 @@ -1079,6 +1079,11 @@ class FSDPEngineWithLMHead(FSDPEngine):
              data=micro_batch, key="calculate_sum_pi_squared", default=False
          )
@@ -972,10 +1011,10 @@ index afbf7ec..3e3798d 100644
          # actually, we should avoid assigning like this...
          micro_batch = micro_batch.to(get_device_id())
          model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
-diff --git a/verl/workers/engine_workers.py b/verl/workers/engine_workers.py
+diff --git a/verl/verl/workers/engine_workers.py b/verl/verl/workers/engine_workers.py
 index c4c7d8f..3d859d0 100644
---- a/verl/workers/engine_workers.py
-+++ b/verl/workers/engine_workers.py
+--- a/verl/verl/workers/engine_workers.py
++++ b/verl/verl/workers/engine_workers.py
 @@ -514,7 +514,27 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
              ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
  
@@ -1005,10 +1044,10 @@ index c4c7d8f..3d859d0 100644
              ref_config.model_config.mtp = MtpConfig(enable=False)
  
              # construct TrainingWorkerConfig
-diff --git a/verl/workers/utils/padding.py b/verl/workers/utils/padding.py
+diff --git a/verl/verl/workers/utils/padding.py b/verl/verl/workers/utils/padding.py
 index 6d537ea..61f4779 100644
---- a/verl/workers/utils/padding.py
-+++ b/verl/workers/utils/padding.py
+--- a/verl/verl/workers/utils/padding.py
++++ b/verl/verl/workers/utils/padding.py
 @@ -107,9 +107,73 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
          data["teacher_sampled_logprob"] = teacher_sampled_logprob_nested
          # print(f"padding: {teacher_sampled_logprob.shape}")

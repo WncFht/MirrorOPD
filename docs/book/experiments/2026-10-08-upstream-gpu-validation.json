@@ -123,6 +123,20 @@
       "teacher_param_offload": false,
       "cpu_threads": 1,
       "rollout_workers": 1
+    },
+    {
+      "method": "mirror_bpo_resume",
+      "source": "archbox:~/src/mirroropd-taopd/logs/canary-bpo-resume.log",
+      "process_exit_code": 0,
+      "restored_global_step": 2,
+      "completed_global_step": 3,
+      "model_restored": true,
+      "optimizer_restored": true,
+      "rng_restored": true,
+      "scheduler_restored": true,
+      "checkpoint_saved": true,
+      "traceback_in_log": false,
+      "scope": "one outer batch after resume, two inner epochs; no performance claim"
     }
   ]
 }
