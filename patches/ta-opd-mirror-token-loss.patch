@@ -980,3 +980,15 @@ index 6d537ea..61f4779 100644
  def no_padding_2_padding(tensor: torch.Tensor, data: TensorDict) -> torch.Tensor:
      """Slice response from unpad model output.
  
+diff --git a/verl/verl/utils/tracking.py b/verl/verl/utils/tracking.py
+index 0fdede9..d79cace 100644
+--- a/verl/verl/utils/tracking.py
++++ b/verl/verl/utils/tracking.py
+@@ -78,4 +78,6 @@ class Tracking:
+                 settings = wandb.Settings(https_proxy=config["trainer"]["wandb_proxy"])
+             entity = os.environ.get("WANDB_ENTITY", None)
+             wandb.init(project=project_name, name=experiment_name, entity=entity, config=config, settings=settings)
+-            self.logger["wandb"] = wandb
++            from mirroropd.training.tracking import WandbLogger
++
++            self.logger["wandb"] = WandbLogger(wandb, config)

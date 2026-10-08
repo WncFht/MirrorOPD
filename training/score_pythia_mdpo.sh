@@ -8,6 +8,12 @@ data_dir=${MIRROR_TEXT_DATA:-"$repo_root/data/pythia-wikitext"}
 run_dir="$repo_root/runs/${1:-pythia-mdpo-pilot}"
 task_python="$task_root/.venv/bin/python"
 [[ $(cat "$run_dir/exit-code.txt") == 0 ]]
+if [[ ! -d "$run_dir/checkpoints" ]] || ! find "$run_dir/checkpoints" \
+  -name model_world_size_1_rank_0.pt -print -quit | grep -q .; then
+  echo "No saved model to evaluate. Checkpoint-free runs retain training diagnostics only." >&2
+  echo "For independent final evaluation, explicitly enable model-only saving with trainer.save_freq>0." >&2
+  exit 2
+fi
 mapfile -t models < <(
   "$task_python" - "$data_dir/manifest.json" <<'PY'
 import json

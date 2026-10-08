@@ -1,0 +1,21 @@
+{
+  "run_url": "https://wandb.ai/wncfht/mirror-opd-pythia/runs/r12v1tw2",
+  "exit_code": 0,
+  "save_freq": -1,
+  "checkpoint_files": 0,
+  "inner_records_uploaded": 1,
+  "metric_groups": [
+    "00_axes",
+    "02_offpolicy",
+    "03_optimization",
+    "04_kl_centers",
+    "05_entropy",
+    "06_support_mass",
+    "07_reward",
+    "08_rollout",
+    "09_resources",
+    "90_detail_extrema",
+    "99_framework",
+    "diagnostics"
+  ]
+}

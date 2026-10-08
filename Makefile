@@ -12,6 +12,7 @@ data:
 	python3 scripts/restore-data.py
 
 test:
+	PYTHONPATH=src python3 tests/test_tracking_layout.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_training_metrics.py

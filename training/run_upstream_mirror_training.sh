@@ -80,6 +80,7 @@ cd "$task_root/verl"
   actor_rollout_ref.actor.ppo_mini_batch_size=2 \
   actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
   actor_rollout_ref.actor.ppo_epochs=2 \
+  'actor_rollout_ref.actor.checkpoint.save_contents=[model]' \
   actor_rollout_ref.actor.optim.lr=1e-5 \
   actor_rollout_ref.actor.fsdp_config.param_offload=false \
   actor_rollout_ref.actor.fsdp_config.optimizer_offload=true \
@@ -115,7 +116,8 @@ cd "$task_root/verl"
   trainer.n_gpus_per_node=1 trainer.nnodes=1 \
   trainer.total_training_steps=2 trainer.total_epochs=1 \
   trainer.val_before_train=false trainer.test_freq=-1 \
-  trainer.save_freq=2 trainer.resume_mode=disable \
+  trainer.save_freq=-1 trainer.resume_mode=disable \
+  trainer.max_actor_ckpt_to_keep=1 \
   trainer.default_local_dir="$task_root/checkpoints/$mode" \
   trainer.project_name=mirror-opd trainer.experiment_name="$mode" \
   'trainer.logger=[console]' \

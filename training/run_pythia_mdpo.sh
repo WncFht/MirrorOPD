@@ -24,6 +24,8 @@ esac
 task_python="$task_root/.venv/bin/python"
 export MIRROR_INNER_METRICS_PATH="$run_dir/inner.jsonl"
 export VERL_FILE_LOGGER_PATH="$run_dir/outer.jsonl"
+export MIRROR_WANDB_RUN_PATH="$run_dir/wandb-run.json"
+export WANDB_RUN_GROUP="${WANDB_RUN_GROUP:-budget-calibration}"
 
 # Only path placeholders are replaced; Jinja braces remain literal text.
 mapfile -d '' -t setting_args < <(
@@ -65,5 +67,10 @@ bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
 status=$?
 set -e
 printf '%s\n' "$status" >"$run_dir/exit-code.txt"
+if [[ $status == 0 && -f "$run_dir/wandb-run.json" ]]; then
+  PYTHONPATH="$repo_root/src${PYTHONPATH:+:$PYTHONPATH}" "$task_python" \
+    "$script_dir/publish_wandb_diagnostics.py" --run "$run_dir" --include-outer \
+    >"$run_dir/wandb-publish.log" 2>&1 || echo "W&B diagnostic publish failed; local JSONL retained" >&2
+fi
 echo "$method exit=$status; records: $run_dir"
 exit "$status"
