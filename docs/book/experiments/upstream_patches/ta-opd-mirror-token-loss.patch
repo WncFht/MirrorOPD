@@ -1,8 +1,41 @@
+diff --git a/verl/experimental/agent_loop/agent_loop.py b/verl/experimental/agent_loop/agent_loop.py
+index 24d305f..ca629a4 100644
+--- a/verl/experimental/agent_loop/agent_loop.py
++++ b/verl/experimental/agent_loop/agent_loop.py
+@@ -49,6 +49,7 @@ from verl.experimental.agent_loop.utils import resolve_config_path
+ from verl.protocol import DataProto
+ from verl.tools.tool_registry import load_all_tools
+ from verl.trainer.distillation import is_distillation_enabled
++from verl.trainer.distillation.losses import is_mirror_opd_enabled
+ from verl.utils.chat_template import apply_chat_template, initialize_system_prompt
+ from verl.utils.config import omega_conf_to_dataclass
+ from verl.utils.dataset.rl_dataset import RLHFDataset, get_dataset_class
+@@ -427,7 +428,9 @@ class AgentLoopWorker:
+         self.mm_processor_kwargs = config.data.get("mm_processor_kwargs", {})
+ 
+         # Online policy distillation
+-        self.distillation_enabled = is_distillation_enabled(config.distillation)
++        self.distillation_enabled = is_distillation_enabled(config.distillation) and not is_mirror_opd_enabled(
++            config.distillation
++        )
+         if self.distillation_enabled:
+             from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
+ 
 diff --git a/verl/trainer/config/distillation/distillation.yaml b/verl/trainer/config/distillation/distillation.yaml
-index a2f1871..86681f0 100644
+index a2f1871..07888a9 100644
 --- a/verl/trainer/config/distillation/distillation.yaml
 +++ b/verl/trainer/config/distillation/distillation.yaml
-@@ -26,6 +26,9 @@ distillation_loss:
+@@ -13,6 +13,9 @@ defaults:
+ # Whether to enable distillation.
+ enabled: false
+ 
++# Frozen FSDP teacher for MirrorOPD. Set both native teacher pool dimensions to zero.
++mirror_teacher_model_path: null
++
+ # distillation loss config
+ distillation_loss:
+ 
+@@ -26,6 +29,9 @@ distillation_loss:
    # If distillation loss requires top-k logits, this is the value of k
    topk: 32
  
@@ -12,7 +45,7 @@ index a2f1871..86681f0 100644
    # Whether to include task rewards alongside distillation loss.
    use_task_rewards: true
  
-@@ -111,4 +114,4 @@ teacher_models:
+@@ -111,4 +117,4 @@ teacher_models:
        temperature: ${oc.select:actor_rollout_ref.rollout.temperature}
  
  # Key to route examples to the appropriate teacher model in multi-teacher setups. Should correspond to a field in the data proto, e.g., task.
@@ -20,10 +53,10 @@ index a2f1871..86681f0 100644
 \ No newline at end of file
 +teacher_key: data_source
 diff --git a/verl/trainer/distillation/fsdp/losses.py b/verl/trainer/distillation/fsdp/losses.py
-index d37c85d..94d8574 100644
+index d37c85d..1a3b62e 100644
 --- a/verl/trainer/distillation/fsdp/losses.py
 +++ b/verl/trainer/distillation/fsdp/losses.py
-@@ -32,6 +32,259 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
+@@ -32,6 +32,268 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
      return kld.sum(dim=-1)
  
  
@@ -148,19 +181,28 @@ index d37c85d..94d8574 100644
 +    if stage == "anchor":
 +        if topk is None:
 +            raise ValueError("anchor cache inference requires mirror_cache_topk")
-+        return build_mirror_anchor_cache(
-+            student_logits, values("mirror_actions"), values("mirror_valid"), topk
-+        )
++        return build_mirror_anchor_cache(student_logits, values("mirror_actions"), values("mirror_valid"), topk)
 +    if stage == "teacher":
-+        cache = {key: values(key) for key in (
-+            "mirror_valid", "mirror_actions", "mirror_anchor_ids",
-+            "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
-+            "mirror_anchor_action_log_prob", "mirror_vocab_size",
-+        )}
++        cache = {
++            key: values(key)
++            for key in (
++                "mirror_valid",
++                "mirror_actions",
++                "mirror_anchor_ids",
++                "mirror_anchor_head_log_probs",
++                "mirror_anchor_tail_log_prob",
++                "mirror_anchor_action_log_prob",
++                "mirror_vocab_size",
++            )
++        }
 +        completed = complete_mirror_teacher_cache(student_logits, cache)
-+        return {key: completed[key] for key in (
-+            "mirror_teacher_action_log_prob", "mirror_teacher_center",
-+        )}
++        return {
++            key: completed[key]
++            for key in (
++                "mirror_teacher_action_log_prob",
++                "mirror_teacher_center",
++            )
++        }
 +    raise ValueError(f"unknown mirror_cache_stage: {stage}")
 +
 +
@@ -283,7 +325,7 @@ index d37c85d..94d8574 100644
  def sample_corrected_ta_opd(
      taopd_with_sg: torch.Tensor,
      student_logp_y: torch.Tensor,
-@@ -73,12 +326,7 @@ def sample_corrected_ta_opd(
+@@ -73,12 +335,7 @@ def sample_corrected_ta_opd(
  
      # Tail log-probabilities come directly from log1mexp(logsumexp(top-k)),
      # so the correction never forms 1 - sum(exp(top-k log-probs)).
@@ -297,7 +339,7 @@ index d37c85d..94d8574 100644
  
      if behavior_logp_y is None:
          # On-policy p(y) / sg(p(y)); this avoids exp(log p) underflow and 0/0.
-@@ -95,9 +343,6 @@ def sample_corrected_ta_opd(
+@@ -95,9 +352,6 @@ def sample_corrected_ta_opd(
      return taopd_with_sg + sample_correction.to(dtype=taopd_with_sg.dtype)
  
  
@@ -307,7 +349,7 @@ index d37c85d..94d8574 100644
  def compute_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -160,8 +405,6 @@ def compute_reverse_kl_topk(
+@@ -160,8 +414,6 @@ def compute_reverse_kl_topk(
      }
  
  
@@ -316,7 +358,7 @@ index d37c85d..94d8574 100644
  def compute_mopd_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -188,11 +431,7 @@ def compute_mopd_reverse_kl_topk(
+@@ -188,11 +440,7 @@ def compute_mopd_reverse_kl_topk(
          teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
          teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
  
@@ -329,7 +371,7 @@ index d37c85d..94d8574 100644
  
      # Compute only the student log probabilities needed on the teacher support.
      student_log_z = torch.logsumexp(student_logits, dim=-1).float()
-@@ -205,9 +444,7 @@ def compute_mopd_reverse_kl_topk(
+@@ -205,9 +453,7 @@ def compute_mopd_reverse_kl_topk(
      student_mass = student_topk_probs.sum(dim=-1)
      teacher_mass = teacher_topk_probs.sum(dim=-1)
  
@@ -340,7 +382,7 @@ index d37c85d..94d8574 100644
      distillation_losses = support_kl + teacher_mass - student_mass
  
      with torch.no_grad():
-@@ -216,14 +453,10 @@ def compute_mopd_reverse_kl_topk(
+@@ -216,14 +462,10 @@ def compute_mopd_reverse_kl_topk(
              k=teacher_topk_ids.shape[-1],
              dim=-1,
          ).indices
@@ -357,7 +399,7 @@ index d37c85d..94d8574 100644
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
          overlap_token_advantage = torch.where(
              overlap_count > 0,
-@@ -287,7 +520,6 @@ def compute_normalized_reverse_kl_topk(
+@@ -287,7 +529,6 @@ def compute_normalized_reverse_kl_topk(
          index=teacher_topk_ids,
      )
  
@@ -365,7 +407,7 @@ index d37c85d..94d8574 100644
      # original masses before normalization, used for metrics
      student_mass = student_topk_log_probs.exp().sum(dim=-1)
      teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
-@@ -308,9 +540,7 @@ def compute_normalized_reverse_kl_topk(
+@@ -308,9 +549,7 @@ def compute_normalized_reverse_kl_topk(
      overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
      overlap_count = overlap_mask.sum(dim=-1)
  
@@ -376,7 +418,7 @@ index d37c85d..94d8574 100644
  
      overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
      overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
-@@ -343,13 +573,9 @@ def compute_normalized_reverse_kl_topk(
+@@ -343,13 +582,9 @@ def compute_normalized_reverse_kl_topk(
          cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
  
          # Cov_{I~p}(p_I, log p_I - log q_I)
@@ -392,7 +434,7 @@ index d37c85d..94d8574 100644
  
      return {
          "distillation_losses": distillation_losses,
-@@ -364,7 +590,6 @@ def compute_normalized_reverse_kl_topk(
+@@ -364,7 +599,6 @@ def compute_normalized_reverse_kl_topk(
      }
  
  
@@ -400,7 +442,7 @@ index d37c85d..94d8574 100644
  def compute_unnormalized_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -412,7 +637,6 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -412,7 +646,6 @@ def compute_unnormalized_reverse_kl_topk(
          index=teacher_topk_ids,
      )
  
@@ -408,7 +450,7 @@ index d37c85d..94d8574 100644
      # original masses before normalization, used for metrics
      student_mass = student_topk_log_probs.exp().sum(dim=-1)
      teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
-@@ -426,9 +650,7 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -426,9 +659,7 @@ def compute_unnormalized_reverse_kl_topk(
      overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
      overlap_count = overlap_mask.sum(dim=-1)
  
@@ -419,7 +461,7 @@ index d37c85d..94d8574 100644
  
      overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
      overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
-@@ -461,13 +683,9 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -461,13 +692,9 @@ def compute_unnormalized_reverse_kl_topk(
          cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
  
          # Cov_{I~p}(p_I, log p_I - log q_I)
@@ -435,7 +477,7 @@ index d37c85d..94d8574 100644
  
      return {
          "distillation_losses": distillation_losses,
-@@ -482,13 +700,9 @@ def compute_unnormalized_reverse_kl_topk(
+@@ -482,13 +709,9 @@ def compute_unnormalized_reverse_kl_topk(
      }
  
  
@@ -450,7 +492,7 @@ index d37c85d..94d8574 100644
  
  _LOG2 = math.log(2.0)
  
-@@ -498,8 +712,8 @@ def log1mexp(log_x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
+@@ -498,8 +721,8 @@ def log1mexp(log_x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
      cond = log_x > -_LOG2
      a_in = torch.where(cond, log_x, torch.full_like(log_x, -_LOG2))
      b_in = torch.where(cond, torch.full_like(log_x, -_LOG2), log_x)
@@ -461,7 +503,7 @@ index d37c85d..94d8574 100644
      return torch.where(cond, out_a, out_b)
  
  
-@@ -526,16 +740,10 @@ def compute_taopd_with_sg(
+@@ -526,16 +749,10 @@ def compute_taopd_with_sg(
          teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
          teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
  
@@ -480,7 +522,7 @@ index d37c85d..94d8574 100644
      student_topk_log_probs = student_topk_logits - student_log_z.unsqueeze(-1)
      teacher_topk_log_probs = teacher_topk_log_probs.float()
  
-@@ -544,28 +752,18 @@ def compute_taopd_with_sg(
+@@ -544,28 +761,18 @@ def compute_taopd_with_sg(
      student_log_p_tail = log1mexp(student_log_mass)
      teacher_log_q_tail = log1mexp(teacher_log_mass)
  
@@ -514,7 +556,7 @@ index d37c85d..94d8574 100644
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
          overlap_token_advantage = torch.where(
              overlap_count > 0,
-@@ -584,7 +782,6 @@ def compute_taopd_with_sg(
+@@ -584,7 +791,6 @@ def compute_taopd_with_sg(
      }
  
  
@@ -522,7 +564,7 @@ index d37c85d..94d8574 100644
  def compute_taopd_reverse_kl_topk(
      student_logits: torch.Tensor,
      teacher_topk_log_probs: torch.Tensor,
-@@ -680,9 +877,7 @@ def compute_taopd_reverse_kl_topk(
+@@ -680,9 +886,7 @@ def compute_taopd_reverse_kl_topk(
  
          # Per-token forward-KL contribution q(v) * log(q(v)/p(v)), a diagnostic only.
          # only use real teacher top-k tokens here, not the collapsed other token
@@ -534,10 +576,23 @@ index d37c85d..94d8574 100644
          # Average of -token_kl over the overlapping tokens; positions with no overlap get 0.
          overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
 diff --git a/verl/trainer/distillation/losses.py b/verl/trainer/distillation/losses.py
-index 1fb42a8..a8330bb 100644
+index 1fb42a8..a420d0a 100644
 --- a/verl/trainer/distillation/losses.py
 +++ b/verl/trainer/distillation/losses.py
-@@ -156,6 +156,11 @@ def compute_topk_loss(
+@@ -43,6 +43,12 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
+     return config.enabled
+ 
+ 
++def is_mirror_opd_enabled(config: Optional[DistillationConfig]) -> bool:
++    """MirrorOPD uses compact FSDP teacher scoring instead of native teacher RPCs."""
++    return is_distillation_enabled(config) and config.distillation_loss.loss_mode in {
++        "mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"
++    }
++
+ 
+ @dataclass
+ class DistillationLossSettings(BaseConfig):
+@@ -156,6 +162,11 @@ def compute_topk_loss(
  
              loss_mode = distillation_config.distillation_loss.loss_mode
  
@@ -549,7 +604,20 @@ index 1fb42a8..a8330bb 100644
              if loss_mode == "reverse_kl_topk":
                  distillation_loss_fn = fsdp_losses.compute_reverse_kl_topk
              elif loss_mode in ("mopd_topk", "mopd_reverse_kl_topk"):
-@@ -327,6 +332,23 @@ def distillation_loss(
+@@ -242,6 +253,12 @@ def distillation_ppo_loss(
+     # Called as final policy loss
+     distillation_loss_config = distillation_config.distillation_loss
+     distill_loss, distill_metrics = distillation_loss(config, distillation_config, model_output, data)
++    if is_mirror_opd_enabled(distillation_config):
++        # MirrorOPD already supplies the complete score surrogate. Evaluating
++        # a discarded PPO objective still imposes unrelated advantage/ratio
++        # requirements and can produce misleading metrics or numerical errors.
++        distill_metrics["distillation/loss"] = Metric(value=distill_loss, aggregation=AggregationType.SUM)
++        return distill_loss, distill_metrics
+     policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
+     if not distillation_loss_config.use_task_rewards:
+         policy_loss = 0.0
+@@ -327,6 +344,23 @@ def distillation_loss(
  
  
  
@@ -573,8 +641,228 @@ index 1fb42a8..a8330bb 100644
  @register_distillation_loss(
      DistillationLossSettings(names=["kl", "k1", "abs", "mse", "k2", "low_var_kl", "k3"], use_estimator=True)
  )  # type: ignore[arg-type]
+diff --git a/verl/trainer/main_ppo.py b/verl/trainer/main_ppo.py
+index 8f6cd41..c5b36aa 100644
+--- a/verl/trainer/main_ppo.py
++++ b/verl/trainer/main_ppo.py
+@@ -25,6 +25,7 @@ from omegaconf import OmegaConf
+ from verl.experimental.reward_loop import migrate_legacy_reward_impl
+ from verl.trainer.constants_ppo import get_ppo_ray_runtime_env
+ from verl.trainer.distillation import is_distillation_enabled
++from verl.trainer.distillation.losses import is_mirror_opd_enabled
+ from verl.trainer.ppo.ray_trainer import RayPPOTrainer
+ from verl.trainer.ppo.utils import need_critic, need_reference_policy
+ from verl.utils.config import validate_config
+@@ -135,7 +136,9 @@ class TaskRunner:
+         lora_rank = config.actor_rollout_ref.model.get("lora", {}).get("rank", 0)
+         if lora_rank <= 0:
+             lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
+-        ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
++        ref_in_actor = not is_mirror_opd_enabled(config.get("distillation")) and (
++            lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
++        )
+         # Ref policy is fused into ActorRolloutRefWorker unless LoRA is used with a dedicated ref model.
+         if need_reference_policy(config) and not ref_in_actor:
+             role = Role.ActorRolloutRef
+@@ -176,7 +179,7 @@ class TaskRunner:
+             config.reward.reward_model.n_gpus_per_node = config.trainer.n_gpus_per_node
+ 
+         distillation_config = config.get("distillation")
+-        if is_distillation_enabled(distillation_config):
++        if is_distillation_enabled(distillation_config) and not is_mirror_opd_enabled(distillation_config):
+             if distillation_config.n_gpus_per_node <= 0:
+                 raise ValueError("config.distillation.n_gpus_per_node must be greater than 0")
+             if distillation_config.nnodes <= 0:
+@@ -206,7 +209,9 @@ class TaskRunner:
+         """Add teacher model worker if enabled."""
+         from verl.trainer.ppo.ray_trainer import Role
+ 
+-        if is_distillation_enabled(config.get("distillation")):
++        if is_distillation_enabled(config.get("distillation")) and not is_mirror_opd_enabled(
++            config.get("distillation")
++        ):
+             # we do not use teacher model workers, so we only register teacher model in resource pool
+             # without registering a teacher model worker in role-worker mapping
+             self.mapping[Role.TeacherModel] = "teacher_pool"
+diff --git a/verl/trainer/ppo/ray_trainer.py b/verl/trainer/ppo/ray_trainer.py
+index d1eaa7b..7a3da58 100644
+--- a/verl/trainer/ppo/ray_trainer.py
++++ b/verl/trainer/ppo/ray_trainer.py
+@@ -38,7 +38,7 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
+ from verl.single_controller.ray import RayClassWithInitArgs, RayWorkerGroup, ResourcePoolManager
+ from verl.single_controller.ray.base import create_colocated_worker_cls
+ from verl.trainer.config import AlgoConfig
+-from verl.trainer.distillation.losses import is_distillation_enabled
++from verl.trainer.distillation.losses import is_distillation_enabled, is_mirror_opd_enabled
+ from verl.trainer.ppo import core_algos
+ from verl.trainer.ppo.core_algos import AdvantageEstimator, agg_loss
+ from verl.trainer.ppo.metric_utils import (
+@@ -70,7 +70,10 @@ from verl.utils.torch_functional import masked_mean
+ from verl.utils.tracking import ValidationGenerationsLogger
+ from verl.workers.config import DistillationConfig, EngineConfig
+ from verl.workers.rollout.llm_server import LLMServerManager
+-from verl.workers.utils.padding import left_right_2_no_padding, no_padding_2_padding
++from verl.workers.utils.padding import (
++    build_mirror_prediction_fields, left_right_2_no_padding,
++    no_padding_2_full_padding, no_padding_2_padding,
++)
+ 
+ 
+ def apply_kl_penalty(data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, kl_penalty="kl"):
+@@ -329,6 +332,29 @@ class RayPPOTrainer:
+         self.tokenizer = tokenizer
+         self.processor = processor
+         self.config = config
++        self.mirror_opd = is_mirror_opd_enabled(config.get("distillation"))
++        if self.mirror_opd:
++            rollout = config.actor_rollout_ref.rollout
++            if not (0 < rollout.temperature < float("inf")):
++                raise ValueError("MirrorOPD requires a finite positive rollout temperature")
++            if rollout.top_p != 1 or rollout.top_k not in (-1, 0) or rollout.repetition_penalty != 1:
++                raise ValueError("MirrorOPD requires untruncated categorical rollout without repetition penalty")
++            if not rollout.do_sample or rollout.skip.enable or rollout.quantization is not None:
++                raise ValueError("MirrorOPD requires fresh stochastic rollout without quantization")
++            agent = rollout.agent
++            if (rollout.multi_turn.enable or agent.default_agent_loop != "single_turn_agent"
++                    or agent.agent_loop_config_path or agent.agent_loop_manager_class
++                    or agent.custom_async_server.path):
++                raise ValueError("MirrorOPD currently requires the standard single-turn rollout agent")
++            if config.algorithm.get("adv_estimator") == "remax":
++                raise ValueError("MirrorOPD cannot use per-prompt greedy REMAX rollout overrides")
++            correction = config.algorithm.get("rollout_correction")
++            if correction and any(correction.get(key) for key in ("rollout_is", "rollout_rs", "bypass_mode")):
++                raise ValueError("MirrorOPD already defines its sampling correction; disable rollout_correction")
++            if config.algorithm.use_kl_in_reward or config.actor_rollout_ref.actor.use_kl_loss:
++                raise ValueError("MirrorOPD teacher reference must not add an extra PPO KL objective")
++            if config.actor_rollout_ref.actor.entropy_coeff != 0:
++                raise ValueError("MirrorOPD validation requires entropy_coeff=0")
+ 
+         self.hybrid_engine = config.actor_rollout_ref.hybrid_engine
+         assert self.hybrid_engine, "Currently, only support hybrid engine"
+@@ -358,6 +384,8 @@ class RayPPOTrainer:
+         if lora_rank <= 0:
+             lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
+         self.ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
++        if self.mirror_opd:
++            self.ref_in_actor = False
+ 
+         # define in-reward KL control
+         # kl loss control currently not suppoorted
+@@ -926,6 +954,8 @@ class RayPPOTrainer:
+         else:
+             self.teacher_model_manager = None
+             self.distillation_config = None
++        if self.mirror_opd:
++            self.distillation_config = omega_conf_to_dataclass(self.config.distillation)
+ 
+         # Support custom AgentLoopManager via config
+         manager_class_fqn = self.config.actor_rollout_ref.rollout.get("agent", {}).get("agent_loop_manager_class")
+@@ -1257,6 +1287,9 @@ class RayPPOTrainer:
+         # TODO: remove step 1, 2, 4 after we make the whole training tensordict and padding free
+         # step 1: convert dataproto to tensordict.
+         batch_td = batch.to_tensordict()
++        if self.mirror_opd:
++            for key, value in build_mirror_prediction_fields(batch_td).items():
++                batch_td[key] = value
+         # step 2: convert from padding to nopadding
+         batch_td = left_right_2_no_padding(batch_td)
+         # step 3: add meta info
+@@ -1267,6 +1300,12 @@ class RayPPOTrainer:
+             calculate_sum_pi_squared=calculate_sum_pi_squared,
+             compute_loss=False,
+         )
++        if self.mirror_opd:
++            tu.assign_non_tensor(
++                batch_td, mirror_cache_stage="anchor",
++                mirror_cache_topk=self.distillation_config.distillation_loss.topk,
++                temperature=self.config.actor_rollout_ref.rollout.temperature,
++            )
+         output = self.actor_rollout_wg.compute_log_prob(batch_td)
+         # gather output
+         entropy = tu.get(output, "entropy")
+@@ -1282,6 +1321,13 @@ class RayPPOTrainer:
+             sum_pi_squared = no_padding_2_padding(sum_pi_squared, batch_td)
+         # step 5: rebuild a tensordict and convert to dataproto
+         result = {"old_log_probs": log_probs.float(), "entropys": entropy.float()}
++        if self.mirror_opd:
++            for key in (
++                "mirror_valid", "mirror_actions", "mirror_anchor_ids",
++                "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
++                "mirror_anchor_action_log_prob", "mirror_vocab_size",
++            ):
++                result[key] = no_padding_2_full_padding(tu.get(output, key), batch_td)
+         if routed_experts is not None:
+             result["routed_experts"] = routed_experts
+         if sum_pi_squared is not None:
+@@ -1290,6 +1336,19 @@ class RayPPOTrainer:
+         old_log_prob = DataProto.from_tensordict(old_log_prob)
+         return old_log_prob, old_log_prob_mfu
+ 
++    def _compute_mirror_teacher_cache(self, batch: DataProto) -> DataProto:
++        """Frozen teacher scoring on anchor support before any inner update."""
++        batch_td = left_right_2_no_padding(batch.to_tensordict())
++        tu.assign_non_tensor(
++            batch_td, compute_loss=False, calculate_entropy=False,
++            mirror_cache_stage="teacher",
++            temperature=self.config.actor_rollout_ref.rollout.temperature,
++        )
++        output = self.ref_policy_wg.compute_ref_log_prob(batch_td)
++        result = {key: no_padding_2_full_padding(tu.get(output, key), batch_td)
++                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center")}
++        return DataProto.from_tensordict(tu.get_tensordict(result))
++
+     def _update_actor(self, batch: DataProto) -> DataProto:
+         rollout_config = self.config.actor_rollout_ref.rollout
+         batch.meta_info["multi_turn"] = rollout_config.multi_turn.enable
+@@ -1573,7 +1632,10 @@ class RayPPOTrainer:
+ 
+                     assert "old_log_probs" in batch.batch, f'"old_log_prob" not in {batch.batch.keys()=}'
+ 
+-                    if self.use_reference_policy:
++                    if self.mirror_opd:
++                        with marked_timer("mirror_teacher_cache", timing_raw, color="olive"):
++                            batch = batch.union(self._compute_mirror_teacher_cache(batch))
++                    elif self.use_reference_policy:
+                         # compute reference log_prob
+                         with marked_timer(str(Role.RefPolicy), timing_raw, color="olive"):
+                             ref_log_prob = self._compute_ref_log_prob(batch)
+diff --git a/verl/trainer/ppo/utils.py b/verl/trainer/ppo/utils.py
+index 876eaad..d40cea2 100644
+--- a/verl/trainer/ppo/utils.py
++++ b/verl/trainer/ppo/utils.py
+@@ -19,6 +19,7 @@ from omegaconf import DictConfig
+ 
+ from verl.single_controller.base import Worker
+ from verl.trainer.distillation import is_distillation_enabled
++from verl.trainer.distillation.losses import is_mirror_opd_enabled
+ from verl.trainer.ppo.core_algos import AdvantageEstimator
+ 
+ WorkerType = type[Worker]
+@@ -76,14 +77,20 @@ def need_reference_policy(
+     config: DictConfig,
+ ) -> bool:
+     """Given the config, do we need ref policy."""
+-    return config.algorithm.get("use_kl_in_reward", False) or config.actor_rollout_ref.actor.use_kl_loss
++    return (
++        is_mirror_opd_enabled(config.get("distillation"))
++        or config.algorithm.get("use_kl_in_reward", False)
++        or config.actor_rollout_ref.actor.use_kl_loss
++    )
+ 
+ 
+ def need_teacher_policy(
+     config: DictConfig,
+ ) -> bool:
+     """Given the config, do we need distillation policy."""
+-    return is_distillation_enabled(config.get("distillation"))
++    return is_distillation_enabled(config.get("distillation")) and not is_mirror_opd_enabled(
++        config.get("distillation")
++    )
+ 
+ 
+ def need_reward_model(
 diff --git a/verl/workers/config/distillation.py b/verl/workers/config/distillation.py
-index 2bfd200..973a8fc 100644
+index 2bfd200..9ff66f7 100644
 --- a/verl/workers/config/distillation.py
 +++ b/verl/workers/config/distillation.py
 @@ -64,6 +64,7 @@ class DistillationLossConfig(BaseConfig):
@@ -598,6 +886,35 @@ index 2bfd200..973a8fc 100644
          self._mutable_fields.add("loss_settings")
          from verl.trainer.distillation.losses import DistillationLossSettings, get_distillation_loss_settings
  
+@@ -253,12 +260,28 @@ class DistillationConfig(BaseConfig):
+     nnodes: int = 0
+     teacher_models: dict[str, DistillationTeacherModelConfig] = field(default_factory=dict)
+     teacher_key: str = "data_source"
++    mirror_teacher_model_path: Optional[str] = None
+     distillation_loss: DistillationLossConfig = field(default_factory=DistillationLossConfig)
+ 
+     def __post_init__(self):
+         if not self.enabled:
+             return
+ 
++        if self.distillation_loss.loss_mode in {"mirror_pmd_mean", "mirror_bpo", "mirror_mdpo"}:
++            if not self.mirror_teacher_model_path or not self.mirror_teacher_model_path.strip():
++                raise ValueError("MirrorOPD requires distillation.mirror_teacher_model_path.")
++            if self.n_gpus_per_node != 0 or self.nnodes != 0:
++                raise ValueError(
++                    "MirrorOPD uses the frozen FSDP reference worker; native teacher pool "
++                    "distillation.n_gpus_per_node and distillation.nnodes must both be zero."
++                )
++            for teacher in self.teacher_models.values():
++                if teacher.get("model_path") or teacher.get("num_replicas", 0):
++                    raise ValueError(
++                        "MirrorOPD requires mirror_teacher_model_path rather than native teacher_models."
++                    )
++            return
++
+         self.teacher_models = self._resolve_teacher_models()
+         teacher_world_size_sum = 0
+         for teacher_model in self.teacher_models.values():
 diff --git a/verl/workers/engine/fsdp/transformer_impl.py b/verl/workers/engine/fsdp/transformer_impl.py
 index afbf7ec..3e3798d 100644
 --- a/verl/workers/engine/fsdp/transformer_impl.py
@@ -664,6 +981,39 @@ index afbf7ec..3e3798d 100644
          # actually, we should avoid assigning like this...
          micro_batch = micro_batch.to(get_device_id())
          model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
+diff --git a/verl/workers/engine_workers.py b/verl/workers/engine_workers.py
+index c4c7d8f..3d859d0 100644
+--- a/verl/workers/engine_workers.py
++++ b/verl/workers/engine_workers.py
+@@ -514,7 +514,27 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+             ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
+ 
+             # The ref model does not need to enable MTP; force it to false.
+-            ref_config.model_config = deepcopy(model_config)
++            from verl.trainer.distillation.losses import is_mirror_opd_enabled
++
++            if is_mirror_opd_enabled(self.distillation_config):
++                # Construct a fresh HF config: copying the actor then replacing
++                # only its path retains cached tokenizer/config metadata.
++                ref_config.model_config = HFModelConfig(
++                    path=self.distillation_config.mirror_teacher_model_path,
++                    trust_remote_code=model_config.trust_remote_code,
++                    use_remove_padding=model_config.use_remove_padding,
++                    enable_gradient_checkpointing=False,
++                    use_fused_kernels=False,
++                )
++                if model_config.tokenizer.get_vocab() != ref_config.model_config.tokenizer.get_vocab():
++                    raise ValueError("MirrorOPD anchor and teacher token-to-id vocabularies must match")
++                if model_config.hf_config.vocab_size != ref_config.model_config.hf_config.vocab_size:
++                    raise ValueError("MirrorOPD anchor and teacher output vocabularies must match")
++                if not ref_config.engine.forward_only:
++                    raise ValueError("MirrorOPD teacher reference engine must be forward_only")
++                ref_config.engine.use_fused_kernels = False
++            else:
++                ref_config.model_config = deepcopy(model_config)
+             ref_config.model_config.mtp = MtpConfig(enable=False)
+ 
+             # construct TrainingWorkerConfig
 diff --git a/verl/workers/utils/padding.py b/verl/workers/utils/padding.py
 index 6d537ea..cc41e92 100644
 --- a/verl/workers/utils/padding.py
