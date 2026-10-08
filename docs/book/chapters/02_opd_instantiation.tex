@@ -532,13 +532,13 @@ $\widehat g_{\mathrm{BPO}}(s)$ 为替换成 Tail-aware 中心并对整个权重
 \end{align}
 相应的 BPO 近似残差
 \begin{equation}
- \widehat D_\theta(a)
+ \widehat R_{k,n}^{\mathrm{BPO}}(a)
  =\log\frac{p(a)}{q(a)}+\widehat{\mathcal K}_{k,n}^S
  -\eta\left(\log\frac{T(a)}{q(a)}+\widehat{\mathcal K}_k^T\right)
 \end{equation}
 满足
 \begin{equation}
- \mathbb E_q[\widehat D_\theta]=-b_{J,n}^S+\eta b_J^T.
+ \mathbb E_q[\widehat R_{k,n}^{\mathrm{BPO}}]=-b_{J,n}^S+\eta b_J^T.
 \end{equation}
 对任意固定 prefix 测度 $d$，总体偏差是上述条件偏差关于 $d$ 的期望。
 \end{theorem}
@@ -553,11 +553,11 @@ $A_\theta(a)=\log(p(a)/q(a))-\eta(\log(T(a)/q(a))+\mathcal K_k^T)$。
 两者分别乘以 $\nabla_\theta\log p(a)$，在同一冻结分布 $q$ 下取期望，
 即得 Mean 的偏差公式。对于 BPO，两个中心的替换给出
 \[
- \widehat D_\theta(a)=D_\theta(a)-b_{J,n}^S+\eta b_J^T.
+ \widehat R_{k,n}^{\mathrm{BPO}}(a)=R_{k,n}^{\mathrm{BPO}}(a)-b_{J,n}^S+\eta b_J^T.
 \]
 精确残差的均值为
 \[
- \mathbb E_q[D_\theta]
+ \mathbb E_q[R_{k,n}^{\mathrm{BPO}}]
  =-\mathcal K_{k,n}^S+\mathcal K_{k,n}^S
  -\eta(-\mathcal K_k^T+\mathcal K_k^T)=0.
 \]
@@ -582,7 +582,7 @@ $\mathbb E_q[\nabla_\theta\log p]=\nabla_\theta\sum_a p(a)=0$，
 \begin{proposition}[Tail-aware BPO 平方损失与 SG 更新的区别]
 \label{prop:ch2-ta-square-versus-sg}
 若 student Tail-aware 中心保留梯度，近似平方目标
-$\widehat{\mathcal L}_{\mathrm{BPO}}(s)=\mathbb E_q[\widehat D_\theta^2]/(2\eta)$
+ $\widehat{\mathcal L}_{\mathrm{BPO}}(s)=\mathbb E_q[(\widehat R_{k,n}^{\mathrm{BPO}})^2]/(2\eta)$
 的完整梯度为
 \begin{equation}
  \nabla_\theta\widehat{\mathcal L}_{\mathrm{BPO}}(s)
@@ -597,14 +597,14 @@ Algorithm~5 使用第一项，即对原始 BPO 解析梯度的近似；它一般
 \begin{proof}
 $q,T,S_J$ 均冻结，因此
 \[
- \nabla_\theta\widehat D_\theta(a)
+ \nabla_\theta\widehat R_{k,n}^{\mathrm{BPO}}(a)
  =\nabla_\theta\log p(a)+\nabla_\theta\widehat{\mathcal K}_{k,n}^S.
 \]
 对平方目标使用链式法则，得到
 \[
  \nabla_\theta\widehat{\mathcal L}_{\mathrm{BPO}}
- =\frac1\eta\mathbb E_q[\widehat D_\theta\nabla_\theta\log p]
- +\frac1\eta\mathbb E_q[\widehat D_\theta]
+ =\frac1\eta\mathbb E_q[\widehat R_{k,n}^{\mathrm{BPO}}\nabla_\theta\log p]
+ +\frac1\eta\mathbb E_q[\widehat R_{k,n}^{\mathrm{BPO}}]
    \nabla_\theta\widehat{\mathcal K}_{k,n}^S.
 \]
 第一项是 SG 权重的 score-function 更新；将上一条定理的残差均值
@@ -780,8 +780,8 @@ mirror inner 的 sampled-token PG 系数已经在第~\ref{sec:ch2-four-methods}
 \toprule
 算法 & rollout / inner 测度 & sampled-token PG 系数 & 精确固定点 \\
 \midrule
-Token-IS OPD & anchor $\pi_k$，token-IS $w=\pi_{k,n}/\pi_k$ & $-w(r_\theta+D_\theta)$ & teacher-directed OPD \\
-On-policy OPD & 当前 student，$w=1$ & $-(r_\theta+D_\theta)$ & Token-IS 的特例 \\
+Token-IS OPD & anchor $\pi_k$，token-IS $w=\pi_{k,n}/\pi_k$ & $-w(r_\theta+\mathcal K_{k,n}^{T})$ & teacher-directed OPD \\
+On-policy OPD & 当前 student，$w=1$ & $-(r_\theta+\mathcal K_{k,n}^{T})$ & Token-IS 的特例 \\
 PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
 PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
 BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$ & Gibbs \\
@@ -845,7 +845,7 @@ U_{k,n}-\eta[r_k+\mathcal K^T_k]\right)\nabla_\theta\log\pi_{k,n}(a\mid s)\right
 PMD-Part 的 log-partition 项是 action-independent，但必须保留在 residual 中；
 PMD-Mean 使用 teacher KL 作为 reward center；BPO 还需要 student KL center；
 MDPO 则通过 $\pi_{k,n}/\pi_k$ 完成 student 测度校正。四式共同使用 anchor rollout，
-而 Token-IS/On-policy baseline 使用下面的 $r_\theta$ 和 $D_\theta$，两组系数不能
+而 Token-IS/On-policy baseline 使用下面的 $r_\theta$ 和 $\mathcal K_{k,n}^{T}$，两组系数不能
 混写。
 
 令 $q=\pi_k(\cdot\mid s)$、$p_\theta=\pi_\theta(\cdot\mid s)$、
@@ -869,15 +869,15 @@ $p_\theta$-可积的 prefix，完整梯度是
 vOPD 风格的 baseline 取当前 student 与 teacher 的条件 reverse KL，记为
 \begin{equation}
 \label{eq:ch2-opd-vopd-center}
- D_\theta(s)=\operatorname{KL}(p_\theta\Vert T).
+ \mathcal K_{k,n}^{T}(s)=\operatorname{KL}(p_\theta\Vert T).
 \end{equation}
 它与 action 无关，因此不会改变总体梯度：
 \begin{equation}
-\mathbb E_{p_\theta}[(r_\theta+D_\theta)\nabla\log p_\theta]
+\mathbb E_{p_\theta}[(r_\theta+\mathcal K_{k,n}^{T})\nabla\log p_\theta]
  =\mathbb E_{p_\theta}[r_\theta\nabla\log p_\theta].
 \end{equation}
 这个中心是控制变量，不是额外的 mirror penalty。实际实现用固定的 top-$J$
-anchor support 加尾部聚合近似 $D_\theta$；$J=|\mathcal V|$ 时它是 exact。
+anchor support 加尾部聚合近似 $\mathcal K_{k,n}^{T}$；$J=|\mathcal V|$ 时它是 exact。
 
 \subsection{On-policy OPD：每次 outer step 重新采样}
 \label{subsec:ch2-opd-onpolicy-baseline}
@@ -887,10 +887,10 @@ $p_{\theta_{k,0}}=\pi_k$ 生成 rollout。每个 sampled token 都来自当前�
 所以用
 \begin{equation}
 \widehat\ell_{\mathrm{on}}(\theta;s,a)
- =-\operatorname{sg}\!\left(r_\theta(s,a)+D_\theta(s)\right)
+ =-\operatorname{sg}\!\left(r_\theta(s,a)+\mathcal K_{k,n}^{T}(s)\right)
  \log p_\theta(a\mid s)
 \end{equation}
-进行 score-function 更新。这里 $r_\theta$ 和 $D_\theta$ 在构造该步梯度后
+进行 score-function 更新。这里 $r_\theta$ 和 $\mathcal K_{k,n}^{T}$ 在构造该步梯度后
 整体停止梯度；它们不是再对同一个 surrogate 反向一次。若 inner 中做 $J>1$
 个 optimizer step 而不重新 rollout，后续 step 已经是 stale-data 更新，不能继续
 称作严格 on-policy；本书实验将严格 on-policy baseline 定义为 $J=1$。
@@ -902,9 +902,9 @@ $p_{\theta_{k,0}}=\pi_k$ 生成 rollout。每个 sampled token 都来自当前�
 \Ensure $\pi_{K_{\mathrm{out}}}$
 \For{$k=0,\ldots,K_{\mathrm{out}}-1$}
     \State set $\pi_k\gets\pi_{\theta_k}$ and generate $(s_i,a_i)$ with $a_i\sim\pi_k(\cdot\mid s_i)$
-    \State evaluate $\log\pi_k(a_i\mid s_i)$, $\log\pi_T(a_i\mid s_i)$ and the frozen-support estimate $\widehat D_{\theta_k}(s_i)$
+    \State evaluate $\log\pi_k(a_i\mid s_i)$, $\log\pi_T(a_i\mid s_i)$ and the frozen-support estimate $\widehat{\mathcal K}_{k,0}^{T}(s_i)$
     \State $r_i\gets\log\pi_T(a_i\mid s_i)-\log\pi_k(a_i\mid s_i)$
-    \State $g_k\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(r_i+\widehat D_{\theta_k}(s_i))\nabla_{\theta_k}\log\pi_{\theta_k}(a_i\mid s_i)$
+    \State $g_k\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(r_i+\widehat{\mathcal K}_{k,0}^{T}(s_i))\nabla_{\theta_k}\log\pi_{\theta_k}(a_i\mid s_i)$
     \State $\theta_{k+1}\gets\operatorname{OptimizerStep}(\theta_k,g_k)$
 \EndFor
 \State \Return $\pi_{K_{\mathrm{out}}}$
@@ -912,7 +912,7 @@ $p_{\theta_{k,0}}=\pi_k$ 生成 rollout。每个 sampled token 都来自当前�
 \end{algorithm}
 
 算法中的负号对应最小化 $\operatorname{KL}(p\Vert T)$。它只使用一个 sampled
-action 的 reward；$\widehat D$ 只作为 baseline，不能把它与 reward 相加后再把
+action 的 reward；$\widehat{\mathcal K}_{k,0}^{T}$ 只作为 baseline，不能把它与 reward 相加后再把
 其梯度传回 teacher 或 student。实现中的 \texttt{mirror\_opd\_onpolicy} 正是这个形式，
 并将 anchor support 的 head 与 aggregate tail 缓存到 CPU/NVMe 可复用的 batch。
 
@@ -932,7 +932,7 @@ action 的 reward；$\widehat D$ 只作为 baseline，不能把它与 reward 相
 \widehat\ell_{\mathrm{IS}}(\theta;s,a)
  =-\operatorname{sg}\!\left[
  \frac{p_\theta(a\mid s)}{q(a\mid s)}
- \left(r_\theta(s,a)+D_\theta(s)\right)\right]
+ \left(r_\theta(s,a)+\mathcal K_{k,n}^{T}(s)\right)\right]
  \log p_\theta(a\mid s).
 \end{equation}
 当 $q(a\mid s)>0$ 且 prefix $s$ 的访问测度固定时，式
@@ -949,11 +949,11 @@ ratio $\prod_{t\leq l}p_\theta(a_t\mid s_t)/q(a_t\mid s_t)$ 才能修正到新�
 \Ensure $\theta_{k+1}$
 \State initialize $\theta\gets\theta_k$
 \For{$j=0,\ldots,J-1$}
-    \State evaluate $\log p_\theta(a_i\mid s_i)$ and frozen-support $\widehat D_\theta(s_i)$ for all $(s_i,a_i)\in\mathcal B_k$
+    \State evaluate $\log p_\theta(a_i\mid s_i)$ and frozen-support $\widehat \mathcal K_{k,n}^{T}(s_i)$ for all $(s_i,a_i)\in\mathcal B_k$
     \State $u_i\gets\log p_\theta(a_i\mid s_i)-\log q(a_i\mid s_i)$
     \State $r_i\gets\log\pi_T(a_i\mid s_i)-\log p_\theta(a_i\mid s_i)$
     \State $w_i\gets\operatorname{sg}(\exp u_i)$
-    \State $g_j\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(w_i(r_i+\widehat D_\theta(s_i)))\nabla_\theta\log p_\theta(a_i\mid s_i)$
+    \State $g_j\gets-|\mathcal B_k|^{-1}\sum_i\operatorname{sg}(w_i(r_i+\widehat \mathcal K_{k,n}^{T}(s_i)))\nabla_\theta\log p_\theta(a_i\mid s_i)$
     \State $\theta\gets\operatorname{OptimizerStep}(\theta,g_j;\alpha_j)$
 \EndFor
 \State \Return $\theta_{k+1}\gets\theta$
@@ -961,7 +961,7 @@ ratio $\prod_{t\leq l}p_\theta(a_t\mid s_t)/q(a_t\mid s_t)$ 才能修正到新�
 \end{algorithm}
 
 这里的 \texttt{mirror\_opd\_is} 使用 $J=4$ 作为 stale-rollout 对照，且每一步重新计算
-$u_i$ 与中心；\texttt{mirror\_opd\_is\_no\_baseline} 则令 $\widehat D_\theta=0$，用于隔离
+$u_i$ 与中心；\texttt{mirror\_opd\_is\_no\_baseline} 则令 $\widehat \mathcal K_{k,n}^{T}=0$，用于隔离
 控制变量的作用。重要性权重必须 stop-gradient，否则 surrogate 会多出
 $\nabla w_i$ 项而不再是式~\eqref{eq:ch2-opd-baseline-gradient} 的 score
 估计器。实际训练记录 \texttt{importance\_ess} 和 \texttt{importance\_ess\_fraction}；当

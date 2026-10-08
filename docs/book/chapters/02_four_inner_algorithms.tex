@@ -302,8 +302,8 @@ mirror 解，而是令镜像项消失后的共同极限。
 \toprule
 方法 & 训练测度与权重 & token 级 PG 系数（乘在 $\nabla_\theta\log\pi_{k,n}$ 上） & 精确 inner 解 \\
 \midrule
-Token-IS OPD & 行为测度 $\beta_k$，$w=\pi_{k,n}/\beta_k$ & $-w(r_k+D_{k,n})$ & 无镜像 OPD；$D$ 为冻结 teacher KL baseline \\
-On-policy OPD & $\beta_k=\pi_{k,n}$，$w=1$ & $-(r_k+D_{k,n})$ & Token-IS 的 on-policy 特例 \\
+Token-IS OPD & 行为测度 $\beta_k$，$w=\pi_{k,n}/\beta_k$ & $-w(r_k+\mathcal K_{k,n}^{T})$ & 无镜像 OPD；$\mathcal K_{k,n}^{T}$ 为 teacher KL baseline \\
+On-policy OPD & $\beta_k=\pi_{k,n}$，$w=1$ & $-(r_k+\mathcal K_{k,n}^{T})$ & Token-IS 的 on-policy 特例 \\
 PMD-Part & anchor $\pi_k$ & $R^{\mathrm{Part}}$ & Gibbs \\
 PMD-Mean & anchor $\pi_k$ & $R^{\mathrm{Mean}}$ & Lambert-$W$ 投影 \\
 BPO & anchor $\pi_k$ & $R^{\mathrm{BPO}}/\eta$（含 score 中心化） & Gibbs \\
@@ -332,7 +332,7 @@ $f$ 在该 prefix 上为常数，它不等于式~\eqref{eq:ch2-four-methods-comm
 不适用于没有 $U/\eta$ 项的 Token-IS/On-policy OPD baseline。
 
 这里 $r_k(s,a)=\log\pi_T(a\mid s)-\log\pi_k(a\mid s)$ 是 OPD 的 sampled
-reward，$D_{k,n}$ 是对同一 prefix 的 teacher--student KL baseline。Token-IS
+reward，$\mathcal K_{k,n}^{T}$ 是对同一 prefix 的 student--teacher KL baseline。Token-IS
 的 $w$ 只修正采样测度；它没有 $U/\eta$ 镜像项。因而 On-policy OPD 是 Token-IS
 的严格特例，而不是 PMD 的另一个有限-$\eta$ 解。
 
@@ -354,22 +354,22 @@ w_{k,n}(s,a)=\frac{\pi_{k,n}(a\mid s)}{\beta_k(a\mid s)},
 \rho_{k,n}(s,a)=\log\pi_T(a\mid s)-\log\pi_{k,n}(a\mid s).
 \end{equation}
 对 teacher--student KL 使用冻结的 prefix baseline
-$D_{k,n}(s)=\operatorname{KL}(\pi_{k,n}(\cdot\mid s)\Vert\pi_T(\cdot\mid s))$，
+$\mathcal K_{k,n}^{T}(s)=\operatorname{KL}(\pi_{k,n}(\cdot\mid s)\Vert\pi_T(\cdot\mid s))$，
 Token-IS OPD 的 score gradient 是
 \begin{equation}
 \label{eq:ch2-token-is-opd-pg}
 \nabla_\theta\mathcal L_{\mathrm{Token\text{-}IS\text{-}OPD}}
 =-\mathbb E_{s\sim d_k,a\sim\beta_k}
-\left[\operatorname{sg}\!\left(w_{k,n}(s,a)[\rho_{k,n}(s,a)+D_{k,n}(s)]\right)
+\left[\operatorname{sg}\!\left(w_{k,n}(s,a)[\rho_{k,n}(s,a)+\mathcal K_{k,n}^{T}(s)]\right)
 \nabla_\theta\log\pi_{k,n}(a\mid s)\right].
 \end{equation}
-这里 $D_{k,n}$ 只作 control variate；它不改变 exact full-vocabulary policy gradient，
+这里 $\mathcal K_{k,n}^{T}$ 只作 control variate；它不改变 exact full-vocabulary policy gradient，
 但会改变有限样本方差。若 $\beta_k=\pi_{k,n}$，则 $w_{k,n}=1$，得到
 \begin{equation}
 \label{eq:ch2-onpolicy-opd-pg}
 \nabla_\theta\mathcal L_{\mathrm{On\text{-}policy\text{-}OPD}}
 =-\mathbb E_{s\sim d_k,a\sim\pi_{k,n}}
-\left[\operatorname{sg}\!\left(\rho_{k,n}(s,a)+D_{k,n}(s)\right)
+\left[\operatorname{sg}\!\left(\rho_{k,n}(s,a)+\mathcal K_{k,n}^{T}(s)\right)
 \nabla_\theta\log\pi_{k,n}(a\mid s)\right].
 \end{equation}
 当 rollout 与当前 student 完全同步时，$\rho_{k,n}$ 可直接由 sampled token 的
