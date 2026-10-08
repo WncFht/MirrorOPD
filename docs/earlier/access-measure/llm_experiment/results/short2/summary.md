@@ -6,11 +6,11 @@ The metrics are sampled-continuation diagnostics. `kl_student_teacher` is the em
 
 Final outer rows:
 
-| method | student NLL | teacher NLL on same tokens | sampled KL(student\|teacher) | residual RMS |
-|---|---:|---:|---:|---:|
-| PMD-Part | 3.1120 | 3.5190 | 0.4070 | 0.2459 |
-| PMD-Mean | 2.6458 | 3.4465 | 0.8007 | 0.5051 |
-| BPO | 3.6251 | 3.7619 | 0.1368 | 0.2483 |
-| MDPO | 3.5624 | 3.7974 | 0.2350 | 0.3148 |
+| method   | student NLL | teacher NLL on same tokens | sampled KL(student\|teacher) | residual RMS |
+| -------- | ----------: | -------------------------: | ---------------------------: | -----------: |
+| PMD-Part |      3.1120 |                     3.5190 |                       0.4070 |       0.2459 |
+| PMD-Mean |      2.6458 |                     3.4465 |                       0.8007 |       0.5051 |
+| BPO      |      3.6251 |                     3.7619 |                       0.1368 |       0.2483 |
+| MDPO     |      3.5624 |                     3.7974 |                       0.2350 |       0.3148 |
 
 These four steps are an implementation audit, not a claim of convergence or superiority. MDPO was first found to diverge under an incorrectly signed sampled surrogate; the corrected estimator is the one reported above.

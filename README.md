@@ -4,15 +4,15 @@ MirrorOPD 的独立研究与实现仓库。理论文档、KL 估计量实验、�
 
 ## 文件组织
 
-| 路径 | 内容 |
-| --- | --- |
-| `docs/book/` | 当前 ElegantBook 文档、章节源文件与编译后的 PDF |
-| `experiments/` | 数值验证、rollout/scoring/绘图脚本、实验报告与汇总数据 |
-| `experiments/upstream_patches/` | 在原始训练项目上的可重放修改 |
-| `upstream-manifest.json` | 上游 URL、基线提交、迁移时 HEAD 与补丁对应关系 |
-| `upstream/` | 本地上游 checkout，Git 忽略；通过 bootstrap 重建 |
-| `docs/earlier/` | 早期访问测度、统一理论工程与原始笔记，完整保留 |
-| `scripts/` | 上游获取、格式化、提交检查与预览环境接线 |
+| 路径                            | 内容                                                   |
+| ------------------------------- | ------------------------------------------------------ |
+| `docs/book/`                    | 当前 ElegantBook 文档、章节源文件与编译后的 PDF        |
+| `experiments/`                  | 数值验证、rollout/scoring/绘图脚本、实验报告与汇总数据 |
+| `experiments/upstream_patches/` | 在原始训练项目上的可重放修改                           |
+| `upstream-manifest.json`        | 上游 URL、基线提交、迁移时 HEAD 与补丁对应关系         |
+| `upstream/`                     | 本地上游 checkout，Git 忽略；通过 bootstrap 重建       |
+| `docs/earlier/`                 | 早期访问测度、统一理论工程与原始笔记，完整保留         |
+| `scripts/`                      | 上游获取、格式化、提交检查与预览环境接线               |
 
 当前正文是 [固定测度 Token 级 MirrorOPD](docs/book/2026-10-08-固定测度Token级MirrorOPD.tex)，对应 [PDF](docs/book/2026-10-08-固定测度Token级MirrorOPD.pdf)。第二章的 OPD 展开和完整 Algorithm 5 位于 [02_opd_instantiation.tex](docs/book/chapters/02_opd_instantiation.tex)。正文讨论固定 anchor、固定 history 的 inner 目标、有限 inner 与 outer 同步动力学，以及四类 Top-k KL 的偏差、方差与实测结果。
 
@@ -23,6 +23,7 @@ MirrorOPD 的独立研究与实现仓库。理论文档、KL 估计量实验、�
 ```bash
 make bootstrap
 make upstream
+make data
 make test
 make book
 make check
@@ -47,4 +48,4 @@ MIRROR_UPSTREAM_ROOT="$HOME/src/mirroropd-taopd" \
 
 已跑过 Qwen3-0.6B student / Qwen3-1.7B teacher 的 LoRA GPU 验证，包含两个 outer step、每轮两个 inner epoch、硬同步权重版本检查与 checkpoint 恢复。这些验证证明训练链路能够运行；正式 GSM8K 效果比较尚未完成。更长 GSM8K prompt/response 必须在入口中覆盖长度、token budget 和训练步数，默认值是 12 GB GPU 验证配置。环境与已完成运行见 [训练说明](experiments/2026-10-08-上游训练运行说明.md) 和 [GPU 验证记录](experiments/2026-10-08-upstream-gpu-validation.json)。
 
-实验汇总图与 CSV 保留在 `experiments/`。原始轨迹、逐 prefix 大文件、日志和 checkpoint 保留在本地并由 Git 忽略，避免 Git 承载训练运行数据；对应 metadata、生成脚本、图和汇总结果继续跟踪。迁移范围和数据校验记录见 [独立仓库迁移](docs/operations/2026-10-08-独立仓库迁移.md)。
+实验汇总图与 CSV 保留在 `experiments/`。已有的三份大数据文件以 gzip 压缩后版本化，`make data` 根据 SHA-256 校验并恢复原文件；本地原文件保留并由 Git 忽略。训练日志和 checkpoint 只保留在本地，对应 metadata、生成脚本、图和汇总结果继续跟踪。迁移范围和数据校验记录见 [独立仓库迁移](docs/operations/2026-10-08-独立仓库迁移.md)。

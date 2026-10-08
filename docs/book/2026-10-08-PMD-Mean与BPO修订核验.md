@@ -2,7 +2,7 @@
 
 ## 原始目标与近似目标
 
-修订依据是 [2602.05933 的本地中文 LaTeX 源](../pmd-theory/2602.05933_zh_CN/main_arxiv.tex) 中的 $\mathcal L_{\mathrm{mean}}$ 定义与附录约束优化。固定一个 history，令 $q$ 为 anchor，$p$ 为 student，$f$ 为冻结信号，$\eta>0$。原始 mirror 问题为
+修订依据是 [2602.05933 论文](https://arxiv.org/abs/2602.05933) 中的 $\mathcal L_{\mathrm{mean}}$ 定义与附录约束优化。固定一个 history，令 $q$ 为 anchor，$p$ 为 student，$f$ 为冻结信号，$\eta>0$。原始 mirror 问题为
 
 $$
 \max_p\;\mathbb E_p[f]-\eta^{-1}\operatorname{KL}(p\Vert q).

@@ -535,13 +535,13 @@ MDPO 把 PMD 的一轮写成可用神经网络执行的 inner 优化。第 $k$ �
 1. 当前 student 是 $\pi_k=\pi_{\theta_k}$。从它采样一批 trajectories，得到访问状态和 advantage 估计 $\widehat A^{\pi_k}$。
 2. 保存并冻结 old policy $\pi_k$，同时固定这批 trajectories、advantage 和 state measure。
 3. 初始化 $\theta_k^{(0)}=\theta_k$，在同一个目标
-   $$
-   \Psi_k(\theta)=
-   \mathbb E_{s\sim\rho_{\pi_k},a\sim\pi_\theta}
-   \left[\widehat A^{\pi_k}(s,a)
-   -\frac1\eta\operatorname{KL}(\pi_\theta\Vert\pi_k)\right]
-   $$
-   上做 $m$ 个普通 SGD steps。
+    $$
+    \Psi_k(\theta)=
+    \mathbb E_{s\sim\rho_{\pi_k},a\sim\pi_\theta}
+    \left[\widehat A^{\pi_k}(s,a)
+    -\frac1\eta\operatorname{KL}(\pi_\theta\Vert\pi_k)\right]
+    $$
+    上做 $m$ 个普通 SGD steps。
 4. 令 $\theta_{k+1}=\theta_k^{(m)}$，丢弃或标记这批 on-policy 数据过期，重新从 $\pi_{k+1}$ 采样下一轮。
 
 MDPO 论文中 $m=10$ 是其 on-policy 实验的经验选择；它不是 outer 迭代次数，也不是“固定数据训练到全局最优”的要求。$m$ 只是近似求解第 $k$ 个固定-reference 子问题的计算预算。论文还强调，$m=1$ 时 anchor KL 的一阶梯度在初始化点为零，更新退化成 vanilla policy gradient。[^mdpo]

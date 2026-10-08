@@ -10,13 +10,11 @@
 if config.mdpo_kl_loss:
     mdpo_log_ratio = log_prob - old_log_prob.detach()
     mdpo_k1 = mdpo_log_ratio
-    mdpo_k3 = kl_penalty(logprob=log_prob,
-                         ref_logprob=old_log_prob.detach(),
-                         kl_penalty="k3")
+    mdpo_k3 = kl_penalty(logprob=log_prob, ref_logprob=old_log_prob.detach(), kl_penalty="k3")
     mdpo_kl_loss = agg_loss(
-        loss_mat=kl_penalty(logprob=log_prob,
-                            ref_logprob=old_log_prob.detach(),
-                            kl_penalty=config.kl_loss_type),
+        loss_mat=kl_penalty(
+            logprob=log_prob, ref_logprob=old_log_prob.detach(), kl_penalty=config.kl_loss_type
+        ),
         loss_mask=response_mask,
         loss_agg_mode=config.loss_agg_mode,
         **config.global_batch_info,
@@ -56,9 +54,12 @@ resid = anchor_eb_logp + (gap - eblogb) - (log_prob - teacher_lp)
 if eta != 1.0:
     resid = resid + (eta - 1.0) * (teacher_lp - anchor_lp + gap)
 loss_mat = resid.square() + floor_mat
-pg_loss = agg_loss(loss_mat=loss_mat, loss_mask=response_mask,
-                   loss_agg_mode=loss_agg_mode,
-                   **config.global_batch_info)
+pg_loss = agg_loss(
+    loss_mat=loss_mat,
+    loss_mask=response_mask,
+    loss_agg_mode=loss_agg_mode,
+    **config.global_batch_info,
+)
 ```
 
 自动微分时 `anchor_eb_logp=E_b[log pi_theta]` 与 sampled `log_prob` 同时保留梯度，因而 logits 梯度为 `2*resid*(b-e_y)`。`teacher_lp`、`anchor_lp`、`gap`、`eblogb` 都是冻结量。该实现不支持 rollout IS。
@@ -70,16 +71,18 @@ pg_loss = agg_loss(loss_mat=loss_mat, loss_mask=response_mask,
 ```python
 adv = teacher_lp - anchor_lp + gap
 loss_mat = -2.0 * eta * adv.detach() * log_prob
-pg_loss = agg_loss(loss_mat=loss_mat, loss_mask=response_mask,
-                   loss_agg_mode=loss_agg_mode,
-                   **config.global_batch_info)
+pg_loss = agg_loss(
+    loss_mat=loss_mat,
+    loss_mask=response_mask,
+    loss_agg_mode=loss_agg_mode,
+    **config.global_batch_info,
+)
 ```
 
 完整实现还定义
 
 ```python
-omega = ((1 + eps - exp(anchor_lp)) /
-         (1 + eps - exp(log_prob).detach()).clamp_min(1e-8)).detach()
+omega = ((1 + eps - exp(anchor_lp)) / (1 + eps - exp(log_prob).detach()).clamp_min(1e-8)).detach()
 weight = omega.clamp_max(cap)
 ```
 

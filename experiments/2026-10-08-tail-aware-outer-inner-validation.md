@@ -8,11 +8,11 @@
 
 四动作案例初始 teacher KL 为 0.917008。支持集大小为 2，8 个 outer step，每轮 40 个 inner step，学习率 0.08，mirror 参数 0.5。末端 inner student 的 teacher KL 如下。
 
-| 方法 | Hard sync | Soft sync，概率混合系数 0.5 |
-|---|---:|---:|
-| PMD-Mean | 0.015269 | 0.112451 |
-| BPO | 0.000745 | 0.022309 |
-| MDPO | 0.000620 | 0.017448 |
+| 方法     | Hard sync | Soft sync，概率混合系数 0.5 |
+| -------- | --------: | --------------------------: |
+| PMD-Mean |  0.015269 |                    0.112451 |
+| BPO      |  0.000745 |                    0.022309 |
+| MDPO     |  0.000620 |                    0.017448 |
 
 这些是可枚举动作期望上的结果。rollout token 当前只验证 outer 采样契约，尚未用于 Monte Carlo inner 更新，不能称为真实 LLM 管线已经验证。
 

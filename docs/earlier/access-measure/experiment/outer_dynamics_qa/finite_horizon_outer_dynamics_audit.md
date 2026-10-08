@@ -16,13 +16,13 @@ The four methods share teacher, samples, initialization, and hyperparameters. Di
 
 ## Final rows
 
-| method | schedule | value | KL(policy\|teacher) | KL(policy\|target) |
-|---|---|---:|---:|---:|
-| bpo | fixed | 0.573786 | 0.000055 | 0.000000 |
-| bpo | linear | 0.574824 | 0.000000 | 0.000000 |
-| mdpo | fixed | 0.574137 | 0.000024 | 0.000000 |
-| mdpo | linear | 0.574828 | 0.000000 | 0.000000 |
-| pmd_mean | fixed | 0.573784 | 0.000055 | 0.000000 |
-| pmd_mean | linear | 0.574824 | 0.000000 | 0.000000 |
-| pmd_part | fixed | 0.573791 | 0.000054 | 0.000000 |
-| pmd_part | linear | 0.574824 | 0.000000 | 0.000000 |
+| method   | schedule |    value | KL(policy\|teacher) | KL(policy\|target) |
+| -------- | -------- | -------: | ------------------: | -----------------: |
+| bpo      | fixed    | 0.573786 |            0.000055 |           0.000000 |
+| bpo      | linear   | 0.574824 |            0.000000 |           0.000000 |
+| mdpo     | fixed    | 0.574137 |            0.000024 |           0.000000 |
+| mdpo     | linear   | 0.574828 |            0.000000 |           0.000000 |
+| pmd_mean | fixed    | 0.573784 |            0.000055 |           0.000000 |
+| pmd_mean | linear   | 0.574824 |            0.000000 |           0.000000 |
+| pmd_part | fixed    | 0.573791 |            0.000054 |           0.000000 |
+| pmd_part | linear   | 0.574824 |            0.000000 |           0.000000 |

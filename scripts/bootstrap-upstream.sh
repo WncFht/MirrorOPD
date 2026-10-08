@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 mkdir -p upstream
-while IFS=$'\t' read -r name url revision patch; do
+while IFS=$'\t' read -r name url revision patch module_paths; do
   checkout="upstream/$name"
   if [[ ! -d "$checkout/.git" ]]; then
     if [[ -e "$checkout" ]]; then
@@ -19,6 +19,10 @@ while IFS=$'\t' read -r name url revision patch; do
     echo "Unexpected origin for $checkout: $actual_url" >&2
     exit 1
   fi
+  if [[ "$module_paths" != "-" ]]; then
+    IFS=',' read -r -a modules <<<"$module_paths"
+    git -C "$checkout" submodule update --init -- "${modules[@]}"
+  fi
   if [[ "$patch" != "-" ]]; then
     if git -C "$checkout" apply --reverse --check "$repo_root/$patch" 2>/dev/null; then
       echo "$name: patch already present"
@@ -30,11 +34,13 @@ while IFS=$'\t' read -r name url revision patch; do
       exit 1
     fi
   fi
-done < <(python3 - <<'PY'
+done < <(
+  python3 - <<'PY'
 import json
 from pathlib import Path
 
 for item in json.loads(Path("upstream-manifest.json").read_text())["checkouts"]:
-    print("\t".join([item["name"], item["url"], item["base_commit"], item["patch"] or "-"]))
+    modules = ",".join(item.get("submodules", [])) or "-"
+    print("\t".join([item["name"], item["url"], item["base_commit"], item["patch"] or "-", modules]))
 PY
 )
