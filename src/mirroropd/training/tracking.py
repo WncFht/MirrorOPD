@@ -53,7 +53,6 @@ def configure_wandb(run, config: dict) -> None:
     run.define_metric("00_axes/outer_step")
     run.define_metric("00_axes/inner_update")
     run.define_metric("00_axes/evaluation_outer")
-    run.define_metric("*", step_metric="00_axes/outer_step")
     for category in (
         "02_offpolicy",
         "03_optimization",
@@ -64,7 +63,10 @@ def configure_wandb(run, config: dict) -> None:
         "08_rollout",
         "90_detail_extrema",
     ):
+        run.define_metric(f"{category}/outer_*", step_metric="00_axes/outer_step")
         run.define_metric(f"{category}/inner_*", step_metric="00_axes/inner_update")
+    run.define_metric("09_resources/*", step_metric="00_axes/outer_step")
+    run.define_metric("99_framework/*", step_metric="00_axes/outer_step")
     run.define_metric("01_quality/*", step_metric="00_axes/evaluation_outer")
     loss = config.get("distillation", {}).get("distillation_loss", {})
     if loss:
