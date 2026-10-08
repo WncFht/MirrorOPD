@@ -983,6 +983,102 @@ Token-IS ESS 会下降，固定 reward 的 mode-seeking 还会导致 entropy col
 目标本身。实验中应同时记录 $\max\omega_\theta$、ESS fraction、student entropy、
 $\operatorname{KL}(p_\theta\Vert q)$ 和 reward top-1 mass，不能只比较 teacher KL。
 
+\paragraph{BPO 与 PMD-Mean 的 $\eta\to+\infty$ 极限。}
+前面的 argmax 结论是共同 Gibbs 型目标的结论，不能直接套到所有 inner 算法。
+BPO 与 PMD-Mean 的 residual 中含有 $\eta$，而 BPO 的平方损失还含有
+$1/\eta$；因此需要区分“固定有限 $\eta$ 先完成 inner 收敛，再令 $\eta\to+\infty$”
+和“固定当前 student 后直接取梯度系数极限”。
+
+对 BPO，任意有限 $\eta>0$ 的精确总体最优解仍是式
+~\eqref{eq:ch2-opd-common-mirror-solution} 的 Gibbs 分布。零 residual 条件给出
+\begin{equation}
+U^\star_\eta(s,a)=\eta r_k(s,a)-\log Z_k(s),
+\qquad
+Z_k(s)=\mathbb E_{v\sim q}\left[e^{\eta r_k(s,v)}\right].
+\end{equation}
+令 $m_k(s)=\max_a r_k(s,a)$，则有限词表下
+\begin{equation}
+\lim_{\eta\to+\infty}p^\star_{\eta}(a\mid s)
+=\frac{q(a\mid s)\,\mathbf 1\{r_k(s,a)=m_k(s)\}}
+{q(A_k(s)\mid s)},
+\qquad A_k(s)=\{a:r_k(s,a)=m_k(s)\}.
+\label{eq:ch2-opd-bpo-infinity-target}
+\end{equation}
+所以 BPO 的“先 inner 收敛、后取极限”与 Frozen-reward OPD、PMD-Part 和
+MDPO 的固定点相同：只保留最高 frozen reward 的 token；最大值唯一时退化为
+确定性 token。
+
+另一方面，在当前 $p_\theta$ 固定且 $U_{k,n}$、$\mathcal K^S_{k,n}$ 不随
+$\eta$ 发散的局部极限下，BPO 的下降方向满足
+\begin{equation}
+-\nabla_\theta\mathcal L_{\mathrm{BPO}}
+\sim
+\mathbb E_{s\sim d_k,\,a\sim q}
+\left[(r_k(s,a)+\mathcal K_k^T(s))
+\nabla_\theta\log p_\theta(a\mid s)\right].
+\label{eq:ch2-opd-bpo-infinity-gradient}
+\end{equation}
+这里整体学习率需要按 $1/\eta$ 重标度。系数是 centered frozen reward，而非
+未中心化的 $r_k$；常数 $\mathcal K_k^T$ 只有在 $p_\theta=q$ 的首个 inner
+step 上因 score 均值为零而消失。因此局部梯度极限与精确 Gibbs 极限描述的是
+同一条有限-$\eta$ 轨迹的不同取极限方式，不能用前者替代后者。
+
+PMD-Mean 的固定点不同。令
+\begin{equation}
+h_k(s,a)=r_k(s,a)+\mathcal K_k^T(s),
+\qquad \mathbb E_{a\sim q}[h_k(s,a)]=0.
+\end{equation}
+其精确有限-$\eta$ 解为 Lambert-$W$ 投影
+\begin{equation}
+p^\star_{\eta}(a\mid s)
+=\frac{q(a\mid s)}{\lambda_\eta(s)}
+W_0\!\left(\lambda_\eta(s)e^{\eta h_k(s,a)}\right),
+\qquad
+\lambda_\eta(s)=\mathbb E_{v\sim q}
+\left[W_0\!\left(\lambda_\eta(s)e^{\eta h_k(s,v)}\right)\right].
+\label{eq:ch2-opd-pmd-mean-infinity-prelimit}
+\end{equation}
+
+\begin{proposition}[PMD-Mean 的无限温度极限]
+\label{prop:ch2-opd-pmd-mean-infinity}
+固定 prefix $s$，假设词表有限、$q(a)>0$，且 $h_k$ 非恒定。令
+$H_+(s)=\mathbb E_{v\sim q}[h_k(s,v)_+]>0$。则
+\begin{equation}
+\lim_{\eta\to+\infty}p^\star_{\eta}(a\mid s)
+=\frac{q(a\mid s)\,h_k(s,a)_+}{H_+(s)}.
+\label{eq:ch2-opd-pmd-mean-infinity-target}
+\end{equation}
+当 $q=t$ 时 $h_k\equiv0$，所有 $\eta$ 的解均为 $q$，该式按退化情形单独理解。
+\end{proposition}
+
+\begin{proof}
+记 $W_\eta(a)=W_0(\lambda_\eta e^{\eta h_k(a)})$。由
+~\eqref{eq:ch2-opd-pmd-mean-infinity-prelimit}，$\lambda_\eta=\mathbb E_qW_\eta$。
+当 $h_k(a)>0$ 时，Lambert--$W$ 的渐近式
+$W_0(x)=\log x-\log\log x+o(1)$ 给出 $W_\eta(a)/\eta\to h_k(a)$；
+当 $h_k(a)\leq0$ 时，$W_\eta(a)/\eta\to0$。有限词表允许逐项取极限，故
+\begin{equation}
+\frac{\lambda_\eta}{\eta}
+=\mathbb E_q\left[\frac{W_\eta}{\eta}\right]
+\longrightarrow\mathbb E_q[h_k{}_+]=H_+.
+\end{equation}
+代回 $p^\star_\eta=qW_\eta/\lambda_\eta$ 即得结论。
+\end{proof}
+
+因此 PMD-Mean 在 $\eta\to+\infty$ 时不执行 hard argmax。它保留所有
+$h_k>0$ 的 token，并按 $q(a)h_k(a)$ 分配质量；由于
+$h_k=r_k+\mathcal K_k^T$，阈值是 $r_k>-\mathcal K_k^T$。在固定 student 上，
+PMD-Mean 的 residual 梯度除以 $\eta$ 也形式上趋于
+\begin{equation}
+\frac1\eta\nabla_\theta\mathcal L_{\mathrm{Mean}}
+\longrightarrow
+-\mathbb E_{s\sim d_k,\,a\sim q}
+\left[h_k(s,a)\nabla_\theta\log p_\theta(a\mid s)\right],
+\end{equation}
+但其精确 fixed point 仍由上述 Lambert-$W$ 极限决定。BPO 的 fixed-point 极限
+是最高 reward 支持集上的分布，而 PMD-Mean 的 fixed-point 极限是正部加权分布；
+这解释了两者在有限 $\eta$ 时都用于 mirror OPD、在无限 $\eta$ 时却不再相同。
+
 令 $q=\pi_k(\cdot\mid s)$、$p_\theta=\pi_\theta(\cdot\mid s)$、
 $T=\pi_T(\cdot\mid s)$。在固定 prefix 上，OPD 的 reverse-KL 目标为
 \begin{equation}
