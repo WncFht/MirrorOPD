@@ -20,13 +20,116 @@ index a2f1871..86681f0 100644
 \ No newline at end of file
 +teacher_key: data_source
 diff --git a/verl/trainer/distillation/fsdp/losses.py b/verl/trainer/distillation/fsdp/losses.py
-index d37c85d..2712d72 100644
+index d37c85d..988392c 100644
 --- a/verl/trainer/distillation/fsdp/losses.py
 +++ b/verl/trainer/distillation/fsdp/losses.py
-@@ -32,6 +32,113 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
+@@ -32,6 +32,225 @@ def kl_divergence(log_q: torch.Tensor, log_p: torch.Tensor) -> torch.Tensor:
      return kld.sum(dim=-1)
  
  
++def build_mirror_anchor_cache(
++    anchor_logits: torch.Tensor,
++    actions: torch.Tensor,
++    valid: torch.Tensor,
++    topk: int,
++) -> dict[str, torch.Tensor]:
++    """Anchor-worker output: O(prefixes * topk), with no full logits transfer.
++
++    Logits already include the rollout temperature. The worker can release
++    them before a separate teacher forward, retaining this frozen cache only.
++    """
++    if anchor_logits.ndim < 2:
++        raise ValueError("anchor logits must have (..., vocab) shape")
++    if actions.shape != anchor_logits.shape[:-1] or valid.shape != actions.shape:
++        raise ValueError("actions and valid must align with prediction positions")
++    vocab = anchor_logits.shape[-1]
++    if not 0 <= topk <= vocab:
++        raise ValueError(f"topk must lie in [0, {vocab}]")
++    valid = valid.bool()
++    safe_actions = torch.where(valid, actions, torch.zeros_like(actions))
++    anchor_logp = torch.log_softmax(anchor_logits.detach().float().masked_fill(~valid.unsqueeze(-1), 0), dim=-1)
++    anchor_ids = anchor_logp.topk(topk, dim=-1).indices
++    anchor_head = anchor_logp.gather(-1, anchor_ids).detach()
++    outside = torch.ones_like(anchor_logp, dtype=torch.bool)
++    outside.scatter_(-1, anchor_ids, False)
++    anchor_tail = anchor_logp.masked_fill(~outside, float("-inf")).logsumexp(-1)
++    anchor_action = anchor_logp.gather(-1, safe_actions.unsqueeze(-1)).squeeze(-1)
++    result = {
++        "mirror_valid": valid.bool(),
++        "mirror_actions": actions,
++        "mirror_anchor_ids": anchor_ids,
++        "mirror_anchor_head_log_probs": anchor_head,
++        "mirror_anchor_tail_log_prob": anchor_tail,
++        "mirror_anchor_action_log_prob": anchor_action.detach(),
++        "mirror_vocab_size": torch.full_like(actions, vocab),
++    }
++    # Do not allow invalid prompt/terminal locations to leak arbitrary cache
++    # values into diagnostics; loss adapter still masks them before gather.
++    for key, value in result.items():
++        if key == "mirror_valid":
++            continue
++        result[key] = torch.where(
++            valid.unsqueeze(-1) if value.ndim == valid.ndim + 1 else valid, value, torch.zeros_like(value)
++        )
++    return result
++
++
++def complete_mirror_teacher_cache(
++    teacher_logits: torch.Tensor,
++    anchor_cache: dict[str, torch.Tensor],
++) -> dict[str, torch.Tensor]:
++    """Score anchor-selected ids locally and return compact frozen fields.
++
++    The teacher must share the anchor's tokenizer and vocabulary semantics.
++    Native teacher top-k results cannot substitute for these requested ids.
++    """
++    valid = anchor_cache["mirror_valid"].bool()
++    actions = anchor_cache["mirror_actions"]
++    ids = anchor_cache["mirror_anchor_ids"]
++    qhead = anchor_cache["mirror_anchor_head_log_probs"].detach().float()
++    qtail = anchor_cache["mirror_anchor_tail_log_prob"].detach().float()
++    if teacher_logits.shape[:-1] != valid.shape or actions.shape != valid.shape:
++        raise ValueError("teacher logits and anchor cache must align with prediction positions")
++    if ids.shape != qhead.shape or ids.shape[:-1] != valid.shape or qtail.shape != valid.shape:
++        raise ValueError("anchor head and tail shapes must align with prediction positions")
++    vocab = teacher_logits.shape[-1]
++    if ids.shape[-1] > vocab:
++        raise ValueError("anchor support is larger than the teacher vocabulary")
++    if ((anchor_cache["mirror_vocab_size"] != vocab) & valid).any():
++        raise ValueError("anchor and teacher vocabulary sizes must match")
++    teacher_logp = torch.log_softmax(teacher_logits.detach().float().masked_fill(~valid.unsqueeze(-1), 0), dim=-1)
++    teacher_head = teacher_logp.gather(-1, ids)
++    outside = torch.ones_like(teacher_logp, dtype=torch.bool)
++    outside.scatter_(-1, ids, False)
++    teacher_tail = teacher_logp.masked_fill(~outside, float("-inf")).logsumexp(-1)
++    center = (qhead.exp() * (qhead - teacher_head)).sum(-1)
++    nonempty = torch.isfinite(qtail) & valid
++    tail = torch.zeros_like(center)
++    tail[nonempty] = qtail[nonempty].exp() * (qtail[nonempty] - teacher_tail[nonempty])
++    center = center + tail
++    safe_actions = torch.where(valid, actions, torch.zeros_like(actions))
++    action_lp = teacher_logp.gather(-1, safe_actions.unsqueeze(-1)).squeeze(-1)
++    result = dict(anchor_cache)
++    result.pop("mirror_vocab_size")
++    result["mirror_teacher_action_log_prob"] = torch.where(valid, action_lp, 0).detach()
++    result["mirror_teacher_center"] = torch.where(valid, center, 0).detach()
++    return result
++
++
++def build_mirror_opd_cache_from_full_logits(
++    anchor_logits: torch.Tensor,
++    teacher_logits: torch.Tensor,
++    actions: torch.Tensor,
++    valid: torch.Tensor,
++    topk: int,
++) -> dict[str, torch.Tensor]:
++    """Full-logit oracle for the sequential compact worker cache contract."""
++    if anchor_logits.shape != teacher_logits.shape:
++        raise ValueError("anchor and teacher logits must have identical (..., vocab) shape")
++    anchor_cache = build_mirror_anchor_cache(anchor_logits, actions, valid, topk)
++    return complete_mirror_teacher_cache(teacher_logits, anchor_cache)
++
++
 +def compute_mirror_opd_token_loss(
 +    student_logits: torch.Tensor,
 +    actions: torch.Tensor,
@@ -50,8 +153,10 @@ index d37c85d..2712d72 100644
 +    if eta <= 0 or method not in ("pmd_mean", "bpo", "mdpo"):
 +        raise ValueError("positive eta and a supported MirrorOPD method required")
 +    expected = student_logits.shape[:-1]
-+    if any(t.shape != expected for t in (actions, anchor_tail_log_prob,
-+            anchor_action_log_prob, teacher_action_log_prob, teacher_center)):
++    if any(
++        t.shape != expected
++        for t in (actions, anchor_tail_log_prob, anchor_action_log_prob, teacher_action_log_prob, teacher_center)
++    ):
 +        raise ValueError("all scalar cache fields must align with prefix dimensions")
 +    if anchor_ids.shape != anchor_head_log_probs.shape or anchor_ids.shape[:-1] != expected:
 +        raise ValueError("anchor head ids/log-probs must align with prefixes")
@@ -80,10 +185,12 @@ index d37c85d..2712d72 100644
 +            coefficient = (u / eta - reward) * u.exp()
 +        if not torch.isfinite(coefficient).all():
 +            raise FloatingPointError("nonfinite MirrorOPD weight; no silent ratio clipping")
-+    return {"distillation_losses": coefficient * action_lp,
-+            "mirror_student_center": center,
-+            "mirror_teacher_center": teacher_center.detach(),
-+            "mirror_importance_ratio": u.exp() if method == "mdpo" else torch.ones_like(u)}
++    return {
++        "distillation_losses": coefficient * action_lp,
++        "mirror_student_center": center,
++        "mirror_teacher_center": teacher_center.detach(),
++        "mirror_importance_ratio": u.exp() if method == "mdpo" else torch.ones_like(u),
++    }
 +
 +
 +def compute_mirror_opd_from_cache(student_logits, data, config, data_format):
@@ -98,9 +205,13 @@ index d37c85d..2712d72 100644
 +    if data_format not in ("thd", "bshd"):
 +        raise ValueError("unsupported MirrorOPD data format")
 +    fields = (
-+        "mirror_valid", "mirror_actions", "mirror_anchor_ids",
-+        "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
-+        "mirror_anchor_action_log_prob", "mirror_teacher_action_log_prob",
++        "mirror_valid",
++        "mirror_actions",
++        "mirror_anchor_ids",
++        "mirror_anchor_head_log_probs",
++        "mirror_anchor_tail_log_prob",
++        "mirror_anchor_action_log_prob",
++        "mirror_teacher_action_log_prob",
 +        "mirror_teacher_center",
 +    )
 +    cache = {}
@@ -111,9 +222,10 @@ index d37c85d..2712d72 100644
 +            raise ValueError(f"{key} must align with full prediction positions")
 +        cache[key] = value
 +    valid = cache["mirror_valid"].bool()
-+    result = {key: student_logits.new_zeros(valid.shape, dtype=torch.float32)
-+              for key in ("distillation_losses", "mirror_student_center",
-+                          "mirror_teacher_center", "mirror_importance_ratio")}
++    result = {
++        key: student_logits.new_zeros(valid.shape, dtype=torch.float32)
++        for key in ("distillation_losses", "mirror_student_center", "mirror_teacher_center", "mirror_importance_ratio")
++    }
 +    if valid.any():
 +        outputs = compute_mirror_opd_token_loss(
 +            student_logits=student_logits[valid],
@@ -137,6 +249,256 @@ index d37c85d..2712d72 100644
  def sample_corrected_ta_opd(
      taopd_with_sg: torch.Tensor,
      student_logp_y: torch.Tensor,
+@@ -73,12 +292,7 @@ def sample_corrected_ta_opd(
+ 
+     # Tail log-probabilities come directly from log1mexp(logsumexp(top-k)),
+     # so the correction never forms 1 - sum(exp(top-k log-probs)).
+-    conditional_log_ratio = (
+-        student_logp_y
+-        - student_log_p_tail
+-        - teacher_logp_y
+-        + teacher_log_q_tail
+-    ).detach()
++    conditional_log_ratio = (student_logp_y - student_log_p_tail - teacher_logp_y + teacher_log_q_tail).detach()
+ 
+     if behavior_logp_y is None:
+         # On-policy p(y) / sg(p(y)); this avoids exp(log p) underflow and 0/0.
+@@ -95,9 +309,6 @@ def sample_corrected_ta_opd(
+     return taopd_with_sg + sample_correction.to(dtype=taopd_with_sg.dtype)
+ 
+ 
+-
+-
+-
+ def compute_reverse_kl_topk(
+     student_logits: torch.Tensor,
+     teacher_topk_log_probs: torch.Tensor,
+@@ -160,8 +371,6 @@ def compute_reverse_kl_topk(
+     }
+ 
+ 
+-
+-
+ def compute_mopd_reverse_kl_topk(
+     student_logits: torch.Tensor,
+     teacher_topk_log_probs: torch.Tensor,
+@@ -188,11 +397,7 @@ def compute_mopd_reverse_kl_topk(
+         teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
+         teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
+ 
+-    assert (
+-        teacher_topk_log_probs.shape[:2]
+-        == teacher_topk_ids.shape[:2]
+-        == student_logits.shape[:2]
+-    )
++    assert teacher_topk_log_probs.shape[:2] == teacher_topk_ids.shape[:2] == student_logits.shape[:2]
+ 
+     # Compute only the student log probabilities needed on the teacher support.
+     student_log_z = torch.logsumexp(student_logits, dim=-1).float()
+@@ -205,9 +410,7 @@ def compute_mopd_reverse_kl_topk(
+     student_mass = student_topk_probs.sum(dim=-1)
+     teacher_mass = teacher_topk_probs.sum(dim=-1)
+ 
+-    support_kl = (
+-        student_topk_probs * (student_topk_log_probs - teacher_topk_log_probs)
+-    ).sum(dim=-1)
++    support_kl = (student_topk_probs * (student_topk_log_probs - teacher_topk_log_probs)).sum(dim=-1)
+     distillation_losses = support_kl + teacher_mass - student_mass
+ 
+     with torch.no_grad():
+@@ -216,14 +419,10 @@ def compute_mopd_reverse_kl_topk(
+             k=teacher_topk_ids.shape[-1],
+             dim=-1,
+         ).indices
+-        overlap_mask = (
+-            teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)
+-        ).any(dim=-1)
++        overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
+         overlap_count = overlap_mask.sum(dim=-1)
+ 
+-        token_kl = teacher_topk_probs * (
+-            teacher_topk_log_probs - student_topk_log_probs
+-        )
++        token_kl = teacher_topk_probs * (teacher_topk_log_probs - student_topk_log_probs)
+         overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
+         overlap_token_advantage = torch.where(
+             overlap_count > 0,
+@@ -287,7 +486,6 @@ def compute_normalized_reverse_kl_topk(
+         index=teacher_topk_ids,
+     )
+ 
+-
+     # original masses before normalization, used for metrics
+     student_mass = student_topk_log_probs.exp().sum(dim=-1)
+     teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
+@@ -308,9 +506,7 @@ def compute_normalized_reverse_kl_topk(
+     overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
+     overlap_count = overlap_mask.sum(dim=-1)
+ 
+-    token_kl = teacher_topk_log_probs.exp() * (
+-        teacher_topk_log_probs - student_topk_log_probs
+-    )
++    token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
+ 
+     overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
+     overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
+@@ -343,13 +539,9 @@ def compute_normalized_reverse_kl_topk(
+         cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
+ 
+         # Cov_{I~p}(p_I, log p_I - log q_I)
+-        cov_student_minus_teacher_residual = (
+-                cov_student_log_student - cov_student_log_teacher
+-        )
++        cov_student_minus_teacher_residual = cov_student_log_student - cov_student_log_teacher
+ 
+-        tail_weighted_cov = (
+-                student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
+-        )
++        tail_weighted_cov = student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
+ 
+     return {
+         "distillation_losses": distillation_losses,
+@@ -364,7 +556,6 @@ def compute_normalized_reverse_kl_topk(
+     }
+ 
+ 
+-
+ def compute_unnormalized_reverse_kl_topk(
+     student_logits: torch.Tensor,
+     teacher_topk_log_probs: torch.Tensor,
+@@ -412,7 +603,6 @@ def compute_unnormalized_reverse_kl_topk(
+         index=teacher_topk_ids,
+     )
+ 
+-
+     # original masses before normalization, used for metrics
+     student_mass = student_topk_log_probs.exp().sum(dim=-1)
+     teacher_mass = teacher_topk_log_probs.exp().sum(dim=-1)
+@@ -426,9 +616,7 @@ def compute_unnormalized_reverse_kl_topk(
+     overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
+     overlap_count = overlap_mask.sum(dim=-1)
+ 
+-    token_kl = teacher_topk_log_probs.exp() * (
+-        teacher_topk_log_probs - student_topk_log_probs
+-    )
++    token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
+ 
+     overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
+     overlap_token_advantage = overlap_token_advantage_sum / overlap_count.clamp_min(1)
+@@ -461,13 +649,9 @@ def compute_unnormalized_reverse_kl_topk(
+         cov_student_log_teacher = e_student_log_teacher - e_student * e_log_teacher
+ 
+         # Cov_{I~p}(p_I, log p_I - log q_I)
+-        cov_student_minus_teacher_residual = (
+-                cov_student_log_student - cov_student_log_teacher
+-        )
++        cov_student_minus_teacher_residual = cov_student_log_student - cov_student_log_teacher
+ 
+-        tail_weighted_cov = (
+-                student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
+-        )
++        tail_weighted_cov = student_mass * (1.0 - student_mass) * cov_student_minus_teacher_residual
+ 
+     return {
+         "distillation_losses": distillation_losses,
+@@ -482,13 +666,9 @@ def compute_unnormalized_reverse_kl_topk(
+     }
+ 
+ 
+-
+-
+-
+-
+ import math
++
+ import torch
+-import torch.nn.functional as F
+ 
+ _LOG2 = math.log(2.0)
+ 
+@@ -498,8 +678,8 @@ def log1mexp(log_x: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
+     cond = log_x > -_LOG2
+     a_in = torch.where(cond, log_x, torch.full_like(log_x, -_LOG2))
+     b_in = torch.where(cond, torch.full_like(log_x, -_LOG2), log_x)
+-    out_a = torch.log(-torch.expm1(a_in))   # (-log2, 0]
+-    out_b = torch.log1p(-torch.exp(b_in))   # (-inf, -log2]
++    out_a = torch.log(-torch.expm1(a_in))  # (-log2, 0]
++    out_b = torch.log1p(-torch.exp(b_in))  # (-inf, -log2]
+     return torch.where(cond, out_a, out_b)
+ 
+ 
+@@ -526,16 +706,10 @@ def compute_taopd_with_sg(
+         teacher_topk_log_probs = slice_input_tensor(teacher_topk_log_probs, dim=1)
+         teacher_topk_ids = slice_input_tensor(teacher_topk_ids, dim=1)
+ 
+-    assert (
+-        teacher_topk_log_probs.shape[:2]
+-        == teacher_topk_ids.shape[:2]
+-        == student_logits.shape[:2]
+-    )
++    assert teacher_topk_log_probs.shape[:2] == teacher_topk_ids.shape[:2] == student_logits.shape[:2]
+ 
+     student_log_z = torch.logsumexp(student_logits, dim=-1).float()
+-    student_topk_logits = torch.gather(
+-        student_logits, dim=-1, index=teacher_topk_ids
+-    ).float()
++    student_topk_logits = torch.gather(student_logits, dim=-1, index=teacher_topk_ids).float()
+     student_topk_log_probs = student_topk_logits - student_log_z.unsqueeze(-1)
+     teacher_topk_log_probs = teacher_topk_log_probs.float()
+ 
+@@ -544,28 +718,18 @@ def compute_taopd_with_sg(
+     student_log_p_tail = log1mexp(student_log_mass)
+     teacher_log_q_tail = log1mexp(teacher_log_mass)
+ 
+-    student_augmented_log_probs = torch.cat(
+-        [student_topk_log_probs, student_log_p_tail.unsqueeze(-1)], dim=-1
+-    )
+-    teacher_augmented_log_probs = torch.cat(
+-        [teacher_topk_log_probs, teacher_log_q_tail.unsqueeze(-1)], dim=-1
+-    )
++    student_augmented_log_probs = torch.cat([student_topk_log_probs, student_log_p_tail.unsqueeze(-1)], dim=-1)
++    teacher_augmented_log_probs = torch.cat([teacher_topk_log_probs, teacher_log_q_tail.unsqueeze(-1)], dim=-1)
+     log_ratio = (student_augmented_log_probs - teacher_augmented_log_probs).detach()
+     distillation_losses = (student_augmented_log_probs.exp() * log_ratio).sum(dim=-1)
+ 
+     with torch.no_grad():
+         student_mass = student_log_mass.exp()
+         teacher_mass = teacher_log_mass.exp()
+-        student_topk_ids = torch.topk(
+-            student_logits, k=teacher_topk_ids.shape[-1], dim=-1
+-        ).indices
+-        overlap_mask = (
+-            teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)
+-        ).any(dim=-1)
++        student_topk_ids = torch.topk(student_logits, k=teacher_topk_ids.shape[-1], dim=-1).indices
++        overlap_mask = (teacher_topk_ids.unsqueeze(-1) == student_topk_ids.unsqueeze(-2)).any(dim=-1)
+         overlap_count = overlap_mask.sum(dim=-1)
+-        token_kl = teacher_topk_log_probs.exp() * (
+-            teacher_topk_log_probs - student_topk_log_probs
+-        )
++        token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
+         overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
+         overlap_token_advantage = torch.where(
+             overlap_count > 0,
+@@ -584,7 +748,6 @@ def compute_taopd_with_sg(
+     }
+ 
+ 
+-
+ def compute_taopd_reverse_kl_topk(
+     student_logits: torch.Tensor,
+     teacher_topk_log_probs: torch.Tensor,
+@@ -680,9 +843,7 @@ def compute_taopd_reverse_kl_topk(
+ 
+         # Per-token forward-KL contribution q(v) * log(q(v)/p(v)), a diagnostic only.
+         # only use real teacher top-k tokens here, not the collapsed other token
+-        token_kl = teacher_topk_log_probs.exp() * (
+-            teacher_topk_log_probs - student_topk_log_probs
+-        )
++        token_kl = teacher_topk_log_probs.exp() * (teacher_topk_log_probs - student_topk_log_probs)
+ 
+         # Average of -token_kl over the overlapping tokens; positions with no overlap get 0.
+         overlap_token_advantage_sum = (-token_kl * overlap_mask).sum(dim=-1)
 diff --git a/verl/trainer/distillation/losses.py b/verl/trainer/distillation/losses.py
 index 1fb42a8..a8330bb 100644
 --- a/verl/trainer/distillation/losses.py
@@ -202,6 +564,19 @@ index 2bfd200..973a8fc 100644
          self._mutable_fields.add("loss_settings")
          from verl.trainer.distillation.losses import DistillationLossSettings, get_distillation_loss_settings
  
+diff --git a/verl/workers/engine/fsdp/transformer_impl.py b/verl/workers/engine/fsdp/transformer_impl.py
+index afbf7ec..8176c72 100644
+--- a/verl/workers/engine/fsdp/transformer_impl.py
++++ b/verl/workers/engine/fsdp/transformer_impl.py
+@@ -1119,7 +1119,7 @@ class FSDPEngineWithLMHead(FSDPEngine):
+ 
+                 # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)
+                 inplace_backward = True
+-                if calculate_entropy:
++                if calculate_entropy or distillation_use_topk:
+                     inplace_backward = False
+                 log_probs = logprobs_from_logits(
+                     logits=logits_rmpad,
 diff --git a/verl/workers/utils/padding.py b/verl/workers/utils/padding.py
 index 6d537ea..38c29dc 100644
 --- a/verl/workers/utils/padding.py
@@ -227,3 +602,5 @@ index 6d537ea..38c29dc 100644
 +        data[key] = torch.nested.nested_tensor_from_jagged(unpadded, offsets=cu_seqlens)
 +
      return data
+ 
+ 
