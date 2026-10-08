@@ -551,7 +551,7 @@ index 3e3798d..feaaae7 100644
  
          self.rank = torch.distributed.get_rank()
 diff --git i/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
-index 3d859d0..13d4bd5 100644
+index 3d859d0..6b4d440 100644
 --- i/verl/verl/workers/engine_workers.py
 +++ w/verl/verl/workers/engine_workers.py
 @@ -304,7 +304,9 @@ class TrainingWorker(Worker, DistProfilerExtension):
@@ -565,7 +565,7 @@ index 3d859d0..13d4bd5 100644
                      for key, val in output.items():
                          # flattn dp and micro batch
                          if isinstance(val, list):
-@@ -313,7 +315,17 @@ class TrainingWorker(Worker, DistProfilerExtension):
+@@ -313,7 +315,18 @@ class TrainingWorker(Worker, DistProfilerExtension):
                                  if isinstance(val[0], Metric)
                                  else list(chain.from_iterable(val))
                              )
@@ -576,7 +576,8 @@ index 3d859d0..13d4bd5 100644
 +                        if record_path:
 +                            append_inner_record(record_path, output, outer_call=mirror_outer_call,
 +                                                inner_step=inner_index,
-+                                                metadata={"epochs": epochs, "mini_batch_size": mini_batch_size})
++                                                metadata={"epochs": epochs, "mini_batch_size": mini_batch_size,
++                                                         "clip_grad": self.engine.optimizer_config.clip_grad})
                      append_to_dict(metrics, output)
 +                if has_mirror:
 +                    self._mirror_outer_call = mirror_outer_call + 1

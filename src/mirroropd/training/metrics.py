@@ -81,6 +81,14 @@ def append_inner_record(path, metrics, *, outer_call, inner_step, metadata=None)
     record["metrics"] = {
         k: float(v) for k, v in metrics.items() if k.startswith("mirror/") or k == "grad_norm"
     }
+    # verl reports the norm before the configured global-norm clip.  Keep the
+    # clip effect explicit so a large logged norm is not mistaken for a large
+    # applied update.
+    grad_norm = record["metrics"].get("grad_norm")
+    clip_grad = float((metadata or {}).get("clip_grad", 1.0))
+    if grad_norm is not None and clip_grad > 0:
+        record["metrics"]["grad_clip_scale"] = min(1.0, clip_grad / max(grad_norm, 1e-12))
+        record["metrics"]["grad_was_clipped"] = float(grad_norm > clip_grad)
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("a", encoding="utf-8") as handle:
