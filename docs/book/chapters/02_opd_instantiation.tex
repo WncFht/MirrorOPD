@@ -709,7 +709,17 @@ mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射�
 
 如果每个 prefix 只有 rollout 中的下一个 token $a\sim\pi_k(\cdot\mid s)$，仍然可以无偏观测 $r_k(s,a)$，但不能从一个样本无偏得到 $\log Z_k(s)$：先估计 $Z_k$ 再取对数会产生 plug-in bias。因此 sampled-token 路径不应把 PMD-Part 的 exact $\log Z_k$ 假装已知。可行选择如下。
 
-第一，使用 BPO 或 PMD-Mean，以同一个 prefix 的多条 sampled actions 估计 conditional center；它们不需要显式的 $\log Z_k$。第二，使用 MDPO 的 action-sampled objective，并用 K4/K3$^{++}$ 估计 KL 项；这要求保留 student/anchor 的 sampled log-prob。第三，如果只有一条 action，却仍想做 PMD-Part，只能使用外部 baseline、跨 batch center 或 self-normalized $\widehat{\log Z}$，并在理论和日志中标记其 bias。
+第一，使用 BPO 或 PMD-Mean，以同一个 prefix 的多条 sampled actions 估计 conditional center；它们不需要显式的 $\log Z_k$。跨 prefix 的平均值一般不等于这个条件中心，不能替代它。第二，MDPO 直接使用 anchor 采样下的重要性加权 score，所需信息仅为同一个 sampled token 的 teacher、anchor 和当前 student log-prob。第三，如果只有一条 action，却仍想做 PMD-Part，只能使用外部 baseline 或 self-normalized $\widehat{\log Z}$，并在理论和日志中标记其 bias。MDPO 的解析梯度为
+\[
+\nabla_\theta\mathcal L_{\mathrm{MDPO}}(s)
+=\mathbb E_{a\sim\pi_k}\!\left[
+\operatorname{sg}\!\left\{
+\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+\left(\frac{1}{\eta}\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)}
+-\log\frac{\pi_T(a\mid s)}{\pi_k(a\mid s)}\right)
+\right\}\nabla_\theta\log\pi_{k,n}(a\mid s)\right].
+\]
+该等式先在完整分布上微分，再用 $\pi_{k,n}/\pi_k$ 换测度；student 下常数 $1/\eta$ 的 score 项期望为零。因而这里无需额外选择 KL 数值估计器。整个乘数停止梯度，实现的是已解析的梯度；这个 surrogate 的数值不是 mirror objective 的数值。有限冻结数据上的重要性加权结果仍有采样误差，不能把总体无偏性解释为任意数据复用后的条件无偏性。
 
 对单个 sampled token，PMD-Part 的可实现 loss 是带 baseline 的近似
 \[
@@ -733,8 +743,8 @@ mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射�
         \State form a centered residual loss with the $1/(2\eta)$ factor; retain the student center's derivative
         \State use the finite-sample correction specified in the BPO inner algorithm
     \ElsIf{$M=\mathrm{MDPO}$}
-        \State form $w_i=\exp(\log\pi_{k,n}(a_i\mid s_i)-\operatorname{stopgrad}(\log\pi_k(a_i\mid s_i)))$
-        \State $\ell_i\gets-w_i r_i+\eta^{-1}\widehat{\mathrm{KL}}_i$ with K4/K3$^{++}$ and retain correct autograd paths
+        \State $w_i\gets\operatorname{stopgrad}\!\left(\pi_{k,n}(a_i\mid s_i)/\pi_k(a_i\mid s_i)\right)$
+        \State $\ell_i\gets\operatorname{stopgrad}\!\left(w_i[\eta^{-1}\log(\pi_{k,n}(a_i\mid s_i)/\pi_k(a_i\mid s_i))-r_i]\right)\log\pi_{k,n}(a_i\mid s_i)$
     \ElsIf{$M=\mathrm{Part}$}
         \State estimate or load a prefix baseline $\widehat{\log Z_i}$; record its bias source
         \State update $\frac12[\eta r_i-\widehat{\log Z_i}-U_{k,n}(s_i,a_i)]^2$

@@ -4,7 +4,7 @@ import itertools
 
 import torch
 
-from mirroropd.token_inner import bpo_loss, mean_target, pmd_mean_loss, pmd_part_loss
+from mirroropd.token_inner import bpo_loss, mdpo_loss, mean_target, pmd_mean_loss, pmd_part_loss
 
 
 def close(actual, expected, atol=2e-10):
@@ -82,6 +82,33 @@ def check_sample_correction():
     close(torch.autograd.grad(weighted, logits)[0], torch.autograd.grad(exact, logits)[0])
 
 
+def check_inner_geometry():
+    q = torch.tensor([0.6, 0.3, 0.1], dtype=torch.float64)
+    teacher = torch.tensor([0.1, 0.3, 0.6], dtype=torch.float64)
+    reward = teacher.log() - q.log()
+    x = torch.tensor([0.2, -0.4, 0.8], dtype=q.dtype, requires_grad=True)
+    projector = torch.eye(3, dtype=q.dtype) - torch.ones(3, 3, dtype=q.dtype) / 3
+    anchor_fisher = torch.diag(q) - q[:, None] * q[None, :]
+    for eta in (0.1, 0.3, 1.0, 1.5):
+        target_logits = q.log() + eta * reward
+        hessian = torch.autograd.functional.hessian(
+            lambda z, step_eta=eta: bpo_loss(z, q, reward, step_eta), x
+        )
+        close(hessian, anchor_fisher / eta)
+        p = x.softmax(-1)
+        current_fisher = torch.diag(p) - p[:, None] * p[None, :]
+        for objective, fisher in ((bpo_loss, anchor_fisher), (mdpo_loss, current_fisher)):
+            gradient = torch.autograd.grad(objective(x, q, reward, eta), x)[0]
+            natural = torch.linalg.pinv(fisher) @ gradient
+            error = projector @ (x - target_logits)
+            for ratio in (0.5, 1.0, 1.9, 2.0, 2.2):
+                updated_error = projector @ (x - eta * ratio * natural - target_logits)
+                close(updated_error, (1 - ratio) * error)
+    mean, _ = mean_target(q, reward, 1.0)
+    assert float((mean - teacher).abs().sum()) > 0.47
+    print("PASS: BPO Hessian and exact Fisher dynamics, stable/oscillating/divergent step regimes")
+
+
 def main():
     torch.manual_seed(20261008)
     cases = 0
@@ -97,6 +124,7 @@ def main():
     close(target[0], torch.tensor(0.729186955209, dtype=q.dtype), atol=1e-10)
     close(mean_target(q, torch.ones_like(q), 0.7)[0], q)
     check_sample_correction()
+    check_inner_geometry()
     print(
         f"PASS: {cases} random cases; analytic gradients, finite differences, loss/gradient identities,"
     )
