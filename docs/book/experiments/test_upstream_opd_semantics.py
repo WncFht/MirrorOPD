@@ -49,6 +49,7 @@ def main():
             "build_mirror_opd_cache_from_full_logits",
             "build_mirror_anchor_cache",
             "complete_mirror_teacher_cache",
+            "compute_mirror_cache_from_logits",
         ],
         {"torch": torch, "_LOG2": math.log(2)},
     )
@@ -313,6 +314,73 @@ def main():
         "PASS: full-logit cache producer: anchor support, Tail-aware teacher center, full-tail case"
     )
     print("PASS: upstream normalized-weight identity and small-tail floor verified")
+    padding = load_functions(
+        root / "TA-OPD/verl/verl/workers/utils/padding.py",
+        [
+            "build_mirror_prediction_fields",
+            "no_padding_2_full_padding",
+            "no_padding_2_padding",
+        ],
+        {
+            "torch": torch,
+            "TensorDict": dict,
+            "F": torch.nn.functional,
+            "tu": SimpleNamespace(
+                get_non_tensor_data=lambda data, key, default=None: data.get(
+                    key, default
+                )
+            ),
+        },
+    )
+    ids = torch.tensor([[0, 1, 2, 3, 4, 0, 0], [5, 6, 7, 8, 9, 10, 11]])
+    attention = torch.tensor([[0, 1, 1, 1, 1, 0, 0], [1, 1, 1, 1, 1, 1, 1]])
+    response_mask = torch.tensor([[1, 1, 0, 0], [1, 1, 1, 1]])
+    indices = attention.flatten().nonzero().flatten()
+    data = {
+        "input_ids": ids,
+        "attention_mask": attention,
+        "response_mask": response_mask,
+        "prompts": ids[:, :3],
+        "responses": ids[:, 3:],
+        "indices": indices,
+    }
+    prediction = padding["build_mirror_prediction_fields"](data)
+    assert prediction["mirror_valid"].sum().item() == 6
+    lengths = attention.sum(-1)
+    offsets = torch.cat([torch.zeros(1, dtype=torch.long), lengths.cumsum(0)])
+    nested = {
+        key: torch.nested.nested_tensor_from_jagged(value.flatten()[indices], offsets)
+        for key, value in prediction.items()
+    }
+    torch.manual_seed(37)
+    qlogits = torch.randn(len(indices), 16)
+    tlogits = torch.randn(len(indices), 16)
+    anchor = ns["compute_mirror_cache_from_logits"](qlogits, nested, "anchor", topk=3)
+    nested_anchor = {
+        key: torch.nested.nested_tensor_from_jagged(value, offsets)
+        for key, value in anchor.items()
+    }
+    teacher = ns["compute_mirror_cache_from_logits"](tlogits, nested_anchor, "teacher")
+    oracle = ns["build_mirror_opd_cache_from_full_logits"](
+        qlogits,
+        tlogits,
+        nested["mirror_actions"].values(),
+        nested["mirror_valid"].values(),
+        3,
+    )
+    for key, value in teacher.items():
+        torch.testing.assert_close(value, oracle[key])
+    for key, value in {**anchor, **teacher}.items():
+        restored = padding["no_padding_2_full_padding"](value, data)
+        torch.testing.assert_close(restored.flatten(0, 1)[indices], value)
+        assert restored[~attention.bool()].eq(0).all()
+    restored_actions = padding["no_padding_2_padding"](anchor["mirror_actions"], data)
+    torch.testing.assert_close(
+        restored_actions, torch.where(response_mask.bool(), ids[:, 3:], 0)
+    )
+    print(
+        "PASS: worker cache inference and padding: ragged prompts/responses, predecessor alignment, vector fields"
+    )
 
 
 if __name__ == "__main__":
