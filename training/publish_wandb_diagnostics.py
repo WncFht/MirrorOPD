@@ -23,7 +23,10 @@ def main():
     # separate (outer_step vs inner_update), but their writes still need a
     # monotonically increasing internal step or later inner rows overwrite
     # earlier outer rows in the web UI.
-    internal_step = max(int(getattr(run, "step", 0) or 0), 0)
+    # Resumed native trainer runs already have history steps (usually 1--5),
+    # while older publisher versions may have written a different sequence.
+    # A large monotone offset makes this repair append-only for every run.
+    internal_step = max(int(getattr(run, "step", 0) or 0), 1_000_000)
     if args.include_outer:
         for line in (args.run / "outer.jsonl").read_text().splitlines():
             record = json.loads(line)
