@@ -88,6 +88,191 @@ R^{\mathrm{Mean}}_{k,n}(s,a)\,
 \]
 它同时保持 value 和 gradient 无偏。完整词表 oracle 与 sampled K4 分别核对 mirror target 和尾部估计误差，二者在实验中单独报告。
 
+\section{四种 Top-$J$ KL 对象的统一定义}
+
+本节分析 student--teacher KL。固定一个 prefix $s$，局部记号为
+\[
+ p(v)=\pi_{k,n}(v\mid s),\qquad q(v)=\pi_T(v\mid s),
+ \qquad \ell(v)=\log\frac{p(v)}{q(v)}.
+\]
+所有结论都是逐 prefix 的；外层 OPD 再对 rollout 诱导的访问测度 $d_k$ 取期望。设 $S_J\subseteq\mathcal V$ 是选定的 $J$ 个 token 的支持集，通常取 student 或 teacher 的 top-$J$。定义
+\[
+ P_J=\sum_{v\in S_J}p(v),\qquad Q_J=\sum_{v\in S_J}q(v),
+ \qquad P_\tail=1-P_J,\qquad Q_\tail=1-Q_J.
+\]
+
+完整 reverse KL 的精确分解为
+\begin{equation}\label{eq:full-kl-tail-decomposition}
+ \KL(p\Vert q)
+ =\underbrace{\sum_{v\in S_J}p(v)\ell(v)}_{H_J}
+ +P_\tail\log\frac{P_\tail}{Q_\tail}
+ +P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail),
+\end{equation}
+其中 $\widetilde p_\tail(v)=p(v)/P_\tail$、$\widetilde q_\tail(v)=q(v)/Q_\tail$ 只在 $\mathcal V\setminus S_J$ 上定义。式~\eqref{eq:full-kl-tail-decomposition} 是后面区分四种方法的核心：它把误差明确分成头部、尾部总质量和尾部内部形状三部分。
+
+\subsection{Normalized Top-$J$ KL：局部条件分布目标}
+
+Normalized Top-$J$ 先把两个分布限制到同一个支持集，再分别归一化：
+\[
+ \bar p_J(v)=\frac{p(v)}{P_J},\qquad
+ \bar q_J(v)=\frac{q(v)}{Q_J},\qquad v\in S_J.
+\]
+其目标定义为
+\begin{equation}\label{eq:normalized-topk-definition}
+ \mathcal K_J^{\mathrm{norm}}
+ =\KL(\bar p_J\Vert\bar q_J)
+ =\frac{H_J}{P_J}+\log\frac{Q_J}{P_J}.
+\end{equation}
+
+\begin{proposition}[Normalized Top-$J$ 的语义]
+\label{prop:normalized-topk-semantic}
+ $\mathcal K_J^{\mathrm{norm}}$ 是支持集条件分布的 KL，而不是完整 KL 的无偏估计量。对固定 prefix，它是确定性的；其条件采样方差为零。只有在额外满足尾部质量和尾部形状误差均可忽略时，它才近似完整 KL。
+\end{proposition}
+
+\begin{proof}
+ 将 $\bar p_J$ 和 $\bar q_J$ 代入 KL 定义，得到
+\[
+ \sum_{v\in S_J}\frac{p(v)}{P_J}
+ \left(\log\frac{p(v)}{q(v)}+\log\frac{Q_J}{P_J}\right)
+ =\frac{H_J}{P_J}+\log\frac{Q_J}{P_J}.
+\]
+ 该式只依赖 $S_J$ 内的概率以及两个头部质量，不包含式~\eqref{eq:full-kl-tail-decomposition} 中的尾部条件 KL。由于给定 $p,q,S_J$ 后没有随机变量，条件方差为零。它的目标分布本身已经由 $(p,q)$ 改成了 $(\bar p_J,\bar q_J)$，所以不能称为完整 KL 的无偏估计量。
+\end{proof}
+
+归一化的必要性是目标稳定性，而不是无偏性。若直接优化未归一化的 $H_J$，对一个保留 token 的概率求导得到
+\[
+ \frac{\partial}{\partial p(v)}p(v)\log\frac{p(v)}{q(v)}
+ =\log\frac{p(v)}{q(v)}+1.
+\]
+在尾部可以吸收剩余质量的参数化下，驻点满足 $p(v)=e^{-1}q(v)$。因此未归一化的局部目标会通过整体压低头部概率来降低损失；归一化后，头部内部的共同缩放被消除，目标只比较相对形状。这个稳定性修复同时带来尾部盲区：$\mathcal K_J^{\mathrm{norm}}$ 对 top-$J$ 外的 logit 没有直接梯度，且 top-$J$ 内梯度总和为零。
+
+\subsection{Truncated Top-$J$：有偏的头部项}
+
+Truncated Top-$J$ 保留完整 KL 分解中的第一项：
+\begin{equation}\label{eq:truncated-topk-definition}
+ \mathcal K_J^{\mathrm{trunc}}=H_J
+ =\sum_{v\in S_J}p(v)\log\frac{p(v)}{q(v)}.
+\end{equation}
+它不是 KL，因为头部质量通常不等于一。由式~\eqref{eq:full-kl-tail-decomposition}，其逐 prefix 偏差为
+\begin{equation}\label{eq:truncated-topk-bias}
+ \mathcal K_J^{\mathrm{trunc}}-\KL(p\Vert q)
+ =-P_\tail\log\frac{P_\tail}{Q_\tail}
+  -P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail).
+\end{equation}
+尾部条件 KL 非负，因此未归一化截断项总是遗漏一个非负的尾部形状项，但尾部总质量项的符号可以正也可以负。它没有 sampled-token 随机性，固定 prefix 下方差为零；因此在样本很少、尾部 log-ratio 很重时，可能比无偏估计量有更低 RMSE。
+
+\subsection{EMA Top-$J$：精确头部加 sampled tail correction}
+
+EMA-PG 的 Top-$J$ 估计器把 $H_J$ 和尾部的 sampled-token 修正相加。令 $A\sim p$，定义
+\begin{equation}\label{eq:ema-topk-definition}
+ \widehat{\mathcal K}_J^{\mathrm{EMA}}
+ =H_J+\mathbf 1\{A\notin S_J\}\ell(A).
+\end{equation}
+
+\begin{theorem}[EMA Top-$J$ 的无偏性]
+\label{thm:ema-topk-unbiased}
+ 在 $A\sim p$ 且 $p\ll q$ 时，若 $\E_p[|\ell(A)|]<\infty$，则
+\[
+ \E[\widehat{\mathcal K}_J^{\mathrm{EMA}}\mid s]=\KL(p\Vert q).
+\]
+ 若二阶矩有限，其条件方差为
+\begin{equation}\label{eq:ema-topk-variance}
+ \Var(\widehat{\mathcal K}_J^{\mathrm{EMA}}\mid s)
+ =\sum_{v\notin S_J}p(v)\ell(v)^2
+ -\left(\sum_{v\notin S_J}p(v)\ell(v)\right)^2.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+ 由采样分布为 $p$，
+\[
+ \E\left[\mathbf 1\{A\notin S_J\}\ell(A)\right]
+ =\sum_{v\notin S_J}p(v)\ell(v).
+\]
+ 与 $H_J$ 相加后正好得到完整词表 KL。因为 $H_J$ 对固定 prefix 是常数，方差只来自尾部随机变量 $\mathbf 1\{A\notin S_J\}\ell(A)$，展开其二阶矩即得式~\eqref{eq:ema-topk-variance}。
+\end{proof}
+
+当 $J=0$ 时，式~\eqref{eq:ema-topk-definition} 是 sampled-token KL；当 $J=|\mathcal V|$ 时，它退化为完整 KL。它估计的是完整目标，因此不能把头部重新归一化；归一化会改变期望目标并破坏上述无偏性。
+
+\subsection{Tail-Aware Top-$J$：把尾部聚合为虚拟 token}
+
+Tail-Aware Top-$J$ 只需要头部概率以及头部总质量，就把尾部聚合成一个虚拟 token：
+\begin{equation}\label{eq:tail-aware-topk-definition}
+ \mathcal K_J^{\mathrm{TA}}
+ =H_J+P_\tail\log\frac{P_\tail}{Q_\tail}.
+\end{equation}
+
+\begin{proposition}[Tail-Aware Top-$J$ 是完整 KL 的下界]
+\label{prop:tail-aware-lower-bound}
+\[
+ \mathcal K_J^{\mathrm{TA}}
+ =\KL(p\Vert q)-P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail)
+ \le \KL(p\Vert q).
+\]
+ 等号当且仅当尾部条件分布相等，或 $P_\tail=0$。
+\end{proposition}
+
+\begin{proof}
+ 将式~\eqref{eq:full-kl-tail-decomposition} 中的尾部形状项移到右侧即可。KL 非负性给出不等式；等号条件来自 $P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail)=0$。
+\end{proof}
+
+Tail-Aware 与 normalized Top-$J$ 的差别在于：前者保留 $P_\tail$ 和 $Q_\tail$ 的质量差，后者把质量都重新缩放成一。Tail-Aware 仍然有尾部形状偏差，但不会允许 student 通过把质量整体移出 $S_J$ 来逃避 KL 惩罚；它因此是一个有结构的下界，而 normalized Top-$J$ 是条件分布目标。
+
+\subsection{Tail-Aware 的误差及其与截断项的比较}
+
+记尾部质量项为 $m_J=P_\tail\log(P_\tail/Q_\tail)$，尾部形状项为
+$b_J=P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail)\geq0$。
+由完整分解，四种对象中两个确定性近似的误差分别为
+\[
+ \mathcal K_J^{\mathrm{trunc}}-\KL(p\Vert q)=-(m_J+b_J),
+ \qquad
+ \mathcal K_J^{\mathrm{TA}}-\KL(p\Vert q)=-b_J.
+\]
+因此在经验 prefix 测度 $\widehat d$ 上，Tail-Aware 的平均 bias、条件采样方差与 RMSE 为
+\[
+ \operatorname{Bias}_{\widehat d}(\mathrm{TA})=-\E_{\widehat d}[b_J],
+ \qquad \E_{\widehat d}[\Var(\mathcal K_J^{\mathrm{TA}}\mid s)]=0,
+ \qquad \operatorname{RMSE}_{\widehat d}(\mathrm{TA})
+ =\sqrt{\E_{\widehat d}[b_J^2]}.
+\]
+平均 bias 的平方一般小于逐 prefix bias 平方的平均，因而零条件方差不意味着
+$\operatorname{RMSE}=|\operatorname{Bias}_{\widehat d}|$。
+Tail-Aware 与 Truncated 的逐 prefix 平方误差差为
+\[
+ (m_J+b_J)^2-b_J^2=m_J(m_J+2b_J).
+\]
+当 $P_\tail\geq Q_\tail$ 时，$m_J\geq0$，Tail-Aware 的平方误差不大于截断项；
+当 $P_\tail<Q_\tail$ 时，$m_J<0$，截断遗漏的质量项与形状项可能相互抵消，
+此时 Tail-Aware 的 RMSE 不保证小于 Truncated。这个抵消降低的是标量估计误差，
+不能说明未归一化截断项是更合适的训练目标。
+
+对同一 prefix 上嵌套的支持集 $S_J\subseteq S_{J+1}$，增加一个保留 token 相当于把
+Tail-Aware 的虚拟尾部 token 分裂成该 token 与剩余尾部。KL 的链式分解给出
+\[
+ \mathcal K_{J+1}^{\mathrm{TA}}-\mathcal K_J^{\mathrm{TA}}
+ =P_\tail\KL\left(
+ \left(\frac{p(v)}{P_\tail},\frac{P_\tail-p(v)}{P_\tail}\right)
+ \Big\Vert
+ \left(\frac{q(v)}{Q_\tail},\frac{Q_\tail-q(v)}{Q_\tail}\right)
+ \right)\geq0.
+\]
+这里的 $P_\tail,Q_\tail$ 属于分裂前的支持集，$v$ 是新增 token。因此 Tail-Aware
+随 $J$ 单调逼近完整 KL，其 bias 的绝对值和 RMSE 也单调不增；这可以直接用于
+检查真实模型统计中的实现错误。该单调性不要求 teacher 的概率排序与 student 相同。
+
+\section{四种方法在 OPD 中的选择}
+
+如果 OPD 的目标是训练一个稳定的局部 dense reward，$\mathcal K_J^{\mathrm{norm}}$ 合理，因为它在可获得的支持集上是合法 KL，且固定 prefix 下无额外采样方差。它必须被解释为局部条件蒸馏，而不能写成完整 KL 的估计量。
+
+如果目标是 vanilla OPD 的完整 reward 或完整 reverse KL，应该使用 $\mathcal K_J^{\mathrm{EMA}}$，或者使用 $\mathcal K_J^{\mathrm{TA}}$ 作为低方差下界。$\mathcal K_J^{\mathrm{trunc}}$ 适合做低方差基线，但需要显式报告尾部偏差。
+
+对本项目的符号约定，使用
+\[
+ \mathcal K_J^{\mathrm{norm}},\quad \mathcal K_J^{\mathrm{trunc}},\quad
+ \widehat{\mathcal K}_J^{\mathrm{EMA}},\quad \mathcal K_J^{\mathrm{TA}}
+\]
+分别表示上述四个对象。它们不能共用一个 $\mathcal K_J$，否则会把“改变训练目标”和“估计同一个完整 KL”混为一谈。
+
 \section{有限 inner 更新的误差}
 
 设方法 $M$ 的总体最优分布为 $\pi_k^{\star,M}$，inner 算法在固定 $s$ 上得到 $\pi_{k,n}$。PMD-Mean 使用 Lambert-$W$ target，另外三种方法使用 Gibbs target $\pi_k^{\star,\mathrm{Gibbs}}$。定义优化误差
