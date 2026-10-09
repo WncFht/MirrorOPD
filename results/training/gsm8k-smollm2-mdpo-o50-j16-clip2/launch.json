@@ -1,0 +1,11 @@
+{
+  "status": "started",
+  "host": "archbox",
+  "systemd_unit": "mirroropd-gsm8k-o50-clip2.service",
+  "run_directory": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-j16-clip2",
+  "configuration_commit": "3eee8f2",
+  "outer_steps": 50,
+  "expected_inner_updates": 800,
+  "test_examples": 1319,
+  "save_checkpoints": false
+}

@@ -1,0 +1,40 @@
+{
+  "shared_vocab": true,
+  "shared_special_ids": true,
+  "native_chat_checked": true,
+  "model_configs": {
+    "HuggingFaceTB/SmolLM2-360M-Instruct": {
+      "revision": "a10cc1512eabd3dde888204e902eca88bddb4951",
+      "max_position_embeddings": 8192
+    },
+    "HuggingFaceTB/SmolLM2-1.7B-Instruct": {
+      "revision": "31b70e2e869a7173562077fd711b654946d38674",
+      "max_position_embeddings": 8192
+    }
+  },
+  "native_template_sha256": "872be49dbb638044ad01b60388f48d469ff2980e5f0dccdc22ec907db54d0788",
+  "student": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "teacher": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+  "context": 2560,
+  "splits": {
+    "train": {
+      "available_examples": 7473,
+      "configured_max_samples": -1,
+      "prompt_tokens_mean": 124.96601097283555,
+      "prompt_tokens_max": 288,
+      "sha256": {
+        "/home/fanghaotian/src/mirroropd/data/gsm8k-full/train.parquet": "6a986e24b684d270ccc94ee1e84173bdb0bf910b9f2f19a90ee6517e0322f16b"
+      }
+    },
+    "test": {
+      "available_examples": 1319,
+      "configured_max_samples": -1,
+      "prompt_tokens_mean": 126.68612585291888,
+      "prompt_tokens_max": 253,
+      "sha256": {
+        "/home/fanghaotian/src/mirroropd/data/gsm8k-full/test.parquet": "98c38ff7959a8a7fb59cdd9f40587e1de9c45cd3ac1a83fc5c97c68254b340b0"
+      }
+    }
+  },
+  "serialized_test_prompt": "<|im_start|>system\nYou are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>\n<|im_start|>user\nSolve this math word problem. Show your reasoning, then put only the final numeric answer on a final line in exactly this format: #### <number>.\n\nProblem: Janet\u2019s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?<|im_end|>\n<|im_start|>assistant\n"
+}
