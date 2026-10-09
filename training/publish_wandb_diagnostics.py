@@ -15,6 +15,24 @@ def main():
     reference = json.loads((args.run / "wandb-run.json").read_text())
     import wandb
 
+    history = list(
+        wandb.Api()
+        .run(f"{reference['entity']}/{reference['project']}/{reference['id']}")
+        .scan_history()
+    )
+    seen_inner = {row["00_axes/inner_update"] for row in history if "00_axes/inner_update" in row}
+    seen_outer = {row["00_axes/outer_step"] for row in history if "00_axes/outer_step" in row}
+    seen_independent = {
+        row["00_axes/evaluation_outer"]
+        for row in history
+        if "00_axes/evaluation_outer" in row
+        and any(
+            key.startswith("01_quality/")
+            and "/val-" not in key
+            and key != "01_quality/generated_examples"
+            for key in row
+        )
+    }
     run = wandb.init(
         **{k: reference[k] for k in ("entity", "project", "id")}, resume="must", mode="online"
     )
@@ -30,13 +48,25 @@ def main():
     if args.include_outer:
         for line in (args.run / "outer.jsonl").read_text().splitlines():
             record = json.loads(line)
+            if record["step"] in seen_outer:
+                continue
             internal_step += 1
+            payload = {
+                "00_axes/outer_step": record["step"],
+                **grouped_metrics(record["data"], "outer"),
+            }
+            if any(
+                key.startswith(("val-core/", "val-aux/", "evaluation/")) for key in record["data"]
+            ):
+                payload["00_axes/evaluation_outer"] = record["step"]
             run.log(
-                {"00_axes/outer_step": record["step"], **grouped_metrics(record["data"], "outer")},
+                payload,
                 step=internal_step,
             )
     records = [json.loads(line) for line in (args.run / "inner.jsonl").read_text().splitlines()]
     for index, record in enumerate(records):
+        if index in seen_inner:
+            continue
         internal_step += 1
         run.log(
             {
@@ -52,6 +82,8 @@ def main():
         key=lambda p: int(p.parent.name.removeprefix("step-")),
     )
     for path in evaluations:
+        if int(path.parent.name.removeprefix("step-")) in seen_independent:
+            continue
         result = json.loads(path.read_text())
         internal_step += 1
         run.log(
@@ -66,7 +98,10 @@ def main():
         )
     run.summary["diagnostics/inner_records"] = len(records)
     run.summary["diagnostics/independent_evaluations"] = len(evaluations)
-    run.finish()
+    exit_file = args.run / "exit-code.txt"
+    exit_code = int(exit_file.read_text()) if exit_file.exists() else 0
+    run.summary["training/process_exit_code"] = exit_code
+    run.finish(exit_code=exit_code)
 
 
 if __name__ == "__main__":
