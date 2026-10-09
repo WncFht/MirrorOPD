@@ -38,9 +38,13 @@ def test_inner_records_are_uploaded_incrementally(tmp_path: Path):
     path.write_text(
         json.dumps(
             {
-                "outer_call": 0,
+                "outer_call": 1,
                 "inner_step": 0,
-                "metrics": {"mirror/importance_ess_fraction": 0.9},
+                "epochs": 16,
+                "metrics": {
+                    "mirror/importance_ess_fraction": 0.9,
+                    "mirror/teacher_center/mean": 0.4,
+                },
             }
         )
         + "\n",
@@ -50,7 +54,9 @@ def test_inner_records_are_uploaded_incrementally(tmp_path: Path):
     assert logger.log_inner_records(path) == 0
     logger.log({"actor/lr": 1e-6}, step=1)
     assert [step for step, _ in wandb.run.logged] == [1, 2]
-    assert wandb.run.logged[0][1]["00_axes/inner_update"] == 0
+    assert wandb.run.logged[0][1]["00_axes/inner_update"] == 16
+    assert wandb.run.logged[0][1]["00_axes/outer_rollout_step"] == 1
+    assert wandb.run.logged[0][1]["04_kl_centers/outer_teacher_center/mean"] == 0.4
     assert wandb.run.logged[1][1]["00_axes/outer_step"] == 1
 
 

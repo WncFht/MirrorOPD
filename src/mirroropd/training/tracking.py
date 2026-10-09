@@ -65,6 +65,7 @@ def configure_wandb(run, config: dict) -> None:
     run.define_metric("00_axes/evaluation_outer")
     run.define_metric("00_axes/inner_outer")
     run.define_metric("00_axes/inner_epoch_index")
+    run.define_metric("00_axes/outer_rollout_step")
     for category in (
         "02_offpolicy",
         "03_optimization",
@@ -81,6 +82,12 @@ def configure_wandb(run, config: dict) -> None:
     run.define_metric("99_framework/*", step_metric="00_axes/outer_step")
     run.define_metric("01_quality/*", step_metric="00_axes/evaluation_outer")
     run.define_metric("03_optimization/learning_rate", step_metric="00_axes/outer_step")
+    run.define_metric(
+        "04_kl_centers/outer_teacher_center/*", step_metric="00_axes/outer_rollout_step"
+    )
+    run.define_metric(
+        "04_kl_centers/outer_student_center/*", step_metric="00_axes/outer_rollout_step"
+    )
     loss = config.get("distillation", {}).get("distillation_loss", {})
     if loss:
         run.summary["setting/method"] = loss.get("loss_mode")
@@ -147,13 +154,27 @@ class WandbLogger:
             except json.JSONDecodeError:
                 break
             self._internal_step += 1
+            outer_call = int(record.get("outer_call", 0))
+            inner_step = int(record.get("inner_step", 0))
+            epochs = int(record.get("epochs", 1))
+            inner_update = outer_call * epochs + inner_step
+            payload = {
+                "00_axes/inner_update": inner_update,
+                "00_axes/inner_outer": outer_call,
+                "00_axes/inner_epoch_index": inner_step,
+                **grouped_metrics(record.get("metrics", {}), "inner"),
+            }
+            # The first inner record is evaluated against the frozen rollout
+            # cache before the update. Keep this outer snapshot on its own
+            # axis, including outer=0, instead of making it an inner-only point.
+            if inner_step == 0:
+                metrics = record.get("metrics", {})
+                payload["00_axes/outer_rollout_step"] = outer_call
+                for key, value in metrics.items():
+                    if key.startswith(("mirror/teacher_center/", "mirror/student_center/")):
+                        payload[metric_name(key, "outer")] = value
             self.wandb.log(
-                {
-                    "00_axes/inner_update": index,
-                    "00_axes/inner_outer": record.get("outer_call"),
-                    "00_axes/inner_epoch_index": record.get("inner_step"),
-                    **grouped_metrics(record.get("metrics", {}), "inner"),
-                },
+                payload,
                 step=self._internal_step,
             )
             uploaded += 1
