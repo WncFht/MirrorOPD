@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-10",
+  "repositories": {
+    "TA-OPD": {"commit": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc", "paper": "arXiv:2608.14728"},
+    "OPD": {"commit": "ac26e38d6f1572eb027597b48a9f4e01f6915ef8", "paper": "arXiv:2604.13016"}
+  },
+  "cpu_enumeration": {
+    "p": [0.5, 0.25, 0.15, 0.1],
+    "q": [0.4, 0.3, 0.2, 0.1],
+    "teacher_support": [0, 1],
+    "full": {"value": 0.022839075590849092, "gradient": [0.10015223786168026, -0.05129015809620091, -0.04657817220639453, -0.0022839075590849194]},
+    "ta": {"value": 0.020411014556884766, "gradient": [0.10136627405881882, -0.050683144479990005, -0.030409877747297285, -0.02027325183153153]},
+    "normalized": {"value": 0.018995650112628937, "gradient": [0.09010337789853418, -0.09010337789853418, 0.0, 0.0]},
+    "truncated": {"value": 0.06599140167236328, "gradient": [0.20357608795166016, 0.00042176246643066406, -0.12239871025085448, -0.08159914016723635]},
+    "mopd_topk": {"value": 0.01599133014678955, "gradient": [0.07857608795166016, -0.062078237533569336, -0.00989871016723633, -0.00659914016723633]},
+    "sample_corrected": {"expected_value": 0.02283909320831299, "expected_gradient": [0.1001522421836853, -0.05129015669226647, -0.046578172445297245, -0.002283909320831303]}
+  },
+  "hard_findings": [
+    "TA trainer/distillation/losses.py:178-183 dispatches every Megatron top-k mode to forward KL.",
+    "TA trainer/distillation/losses.py:514-526 sets behavior_logp_y=None for policy-gradient but unconditionally calls detach at line 526.",
+    "TA fsdp compute_mopd_reverse_kl_topk is H + teacher_mass - student_mass, not reverse KL or MirrorOPD residual.",
+    "OPD actor dp_actor.py:451-624 produces explicit support IDs and union masks; update_policy consumes the same IDs to avoid support drift."
+  ],
+  "assumptions": ["teacher top-k IDs are unique", "student logits use full-vocabulary logsumexp", "sample correction token is drawn from current p for unbiased on-policy result"]
+}
