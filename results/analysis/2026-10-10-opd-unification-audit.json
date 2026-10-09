@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-10",
+  "scope": "CPU finite-vocabulary semantic audit; no training implementation or GPU benchmark",
+  "source_versions": {
+    "mirroropd": "c0496084ba2415e0ea3d0a7a8ae488e0571ff7f1",
+    "md_opd": "f043a754c3d0992b4cab7dff93c80d362bc1d65a"
+  },
+  "questions": [
+    "Does the fixed-index backward of a KL value estimator match the intended KL gradient under its actual proposal?",
+    "Does MOPD live-center residual share the BPO population objective while retaining a distinct per-action gradient?",
+    "Do stale proposals or coarse centers invalidate the full-center equivalence?"
+  ],
+  "criteria": {
+    "float64_enumeration_max_abs_error": 1e-10,
+    "float32_production_equivalence_atol": 1e-6,
+    "distinct_per_action_gradient": "Report the difference rather than requiring equality"
+  },
+  "kl_backward_audit": {
+    "host": "fht-mba",
+    "device": "cpu",
+    "dtype": "float64",
+    "implementation": "AST extraction of actual MD-OPD core_algos.py kl_penalty and kl_penalty_forward; torch autograd with detached enumeration weights",
+    "student": [0.8, 0.2],
+    "teacher": [0.6, 0.4],
+    "stale_behavior": [0.3, 0.7],
+    "reverse_kl_gradient": [0.1569326804818763, -0.1569326804818762],
+    "current_proposal_gradients": {
+      "k1": [1.1102230246251565e-16, 0.0],
+      "k2": [0.1569326804818762, -0.1569326804818762],
+      "k3": [0.2, -0.2],
+      "k3_plus": [0.1569326804818762, -0.1569326804818762],
+      "stopped_score": [0.1569326804818762, -0.1569326804818762]
+    },
+    "stale_uncorrected_k2_or_score_gradient": [0.40542334546067615, -0.40542334546067615],
+    "stale_is_score_gradient": [0.1569326804818762, -0.1569326804818762],
+    "teacher_top1_partial": {
+      "value": -0.17260924347106857,
+      "raw_gradient": [-0.12000000000000005, 0.12],
+      "nonnegative_clamped_gradient": [0.0, 0.0]
+    }
+  },
+  "proposal_sweep": {
+    "host": "fht-mba",
+    "device": "cpu",
+    "dtype": "float64",
+    "seed": 20261010,
+    "cases": 200,
+    "vocabulary": 9,
+    "distribution_generation": "Three independent torch.randn(9, generator=seeded_generator, dtype=float64).softmax(-1) per case, in student/teacher/behavior order",
+    "oracle": "autograd of sum p*(log(p)-log(teacher))",
+    "estimator": "sum behavior*stopgrad((p/behavior)*(log(p)-log(teacher)))*log(p)",
+    "is_score_max_abs_error": 4.440892098500626e-16,
+    "uncorrected_max_abs_error": 1.4357089500778502,
+    "uncorrected_mean_case_max_abs_error": 0.36105337252759384
+  },
+  "mopd_bpo_audit": {
+    "host": "archbox",
+    "device": "cpu",
+    "interpreter": "~/src/MD-OPD/.venv/bin/python",
+    "implementation": "AST extraction of actual MOPD residual/floor functions; actual MirrorOPD production cache/loss and independent token_inner.bpo_loss; state terms exactly enumerated",
+    "reduction": "Same detached action measure in each comparison; token aggregation supplied for the mathematical audit, not a test of distributed agg_loss",
+    "anchor": [0.5, 0.3, 0.2],
+    "student": [0.2, 0.5, 0.3],
+    "teacher": [0.6, 0.1, 0.3],
+    "floor_lambda": 0.0,
+    "center_resolution": "full vocabulary",
+    "eta_cases": [
+      {
+        "eta": 0.7,
+        "population_value_scaled_max_abs_error": 1.19e-7,
+        "population_gradient_scaled_max_abs_error": 5.96e-8,
+        "per_action_gradient_max_abs_difference": 0.836117
+      },
+      {
+        "eta": 1.0,
+        "population_value_scaled_max_abs_error": 1.19e-7,
+        "population_gradient_scaled_max_abs_error": 1.19e-7,
+        "per_action_gradient_max_abs_difference": 1.005548
+      },
+      {
+        "eta": 2.0,
+        "population_value_scaled_max_abs_error": 0.0,
+        "population_gradient_scaled_max_abs_error": 1.19e-7,
+        "per_action_gradient_max_abs_difference": 1.570317
+      }
+    ],
+    "scale": "MOPD residual value/expected gradient = 2*eta times exact BPO",
+    "per_action_difference_identity": "g_residual - 2*eta*g_mirror = 2*R*(student-anchor)",
+    "per_action_difference_identity_max_abs_error": 3.13e-7,
+    "stale_proposal": {
+      "behavior": [0.2, 0.2, 0.6],
+      "eta": 0.7,
+      "expected_gradient_difference": [-0.140307, 0.093538, 0.046769],
+      "identity": "2*E_behavior[R]*(student-anchor)"
+    },
+    "coarse_center": {
+      "eta": 0.7,
+      "head_k": 1,
+      "anchor_mean_approximate_residual": 0.0951822,
+      "mirror_surrogate_minus_full_bpo_gradient": [0.0407924, -0.0271949, -0.0135975],
+      "identity": "E_anchor[Rhat]/eta*(anchor-student)",
+      "singleton_tail_note": "In this three-action example K=2 gives a singleton tail and recovers exact centers; this is not a general partial-K equivalence"
+    }
+  },
+  "reproduction": {
+    "existing_reference_checks": [
+      "PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py",
+      "PYTHONPATH=src uv run --with torch --with numpy python tests/test_upstream_opd_semantics.py",
+      "PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_baselines.py"
+    ],
+    "note": "The listed existing tests corroborate identities. The 200-case sweep is defined above and was run as an inline CPU audit, not added as a production test or benchmark suite. MOPD values here retain the reported float32 precision."
+  }
+}
