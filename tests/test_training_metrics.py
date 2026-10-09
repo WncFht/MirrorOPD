@@ -86,6 +86,48 @@ def main():
     assert loss is x
     assert loss.requires_grad
     assert metrics["mirror/raw/sampled_reward/sum"].aggregate() == -3
+    # Exercise the actual entry-point ordering, not only metric reduction.
+    entry = next(
+        n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "distillation_ppo_loss"
+    )
+    entry.decorator_list = []
+    entry.args = (
+        ast.parse(
+            'def probe(config, distillation_config, model_output=None, data=None, dp_group=None, student_logits=None, data_format="thd"): pass'
+        )
+        .body[0]
+        .args
+    )
+    entry.returns = None
+    config = SimpleNamespace(global_batch_info={}, loss_scale_factor=None)
+
+    def populate(c, d):
+        c.global_batch_info.update(batch_num_tokens=d["batch_num_tokens"])
+
+    def compute(c, _dc, outputs, _data):
+        return outputs.sum() / c.global_batch_info.get("batch_num_tokens", outputs.numel()), {}
+
+    ns = {
+        "is_mirror_opd_enabled": lambda _c: True,
+        "populate_global_batch_info": populate,
+        "distillation_loss": compute,
+        "Metric": metric_class,
+        "AggregationType": metric_class.__init__.__globals__["AggregationType"],
+    }
+    exec(compile(ast.Module(body=[entry], type_ignores=[]), str(path), "exec"), ns)
+    value = torch.arange(1.0, 8.0, requires_grad=True)
+    for partitions in ([value], [value[:1], value[1:3], value[3:]]):
+        config.global_batch_info = {"batch_num_tokens": 999}
+        total = sum(
+            ns["distillation_ppo_loss"](
+                config, SimpleNamespace(distillation_loss=settings), piece, {"batch_num_tokens": 7}
+            )[0]
+            for piece in partitions
+        )
+        torch.testing.assert_close(total, value.mean())
+        torch.testing.assert_close(
+            torch.autograd.grad(total, value)[0], torch.full_like(value, 1 / 7)
+        )
     print("PASS: token-weighted micro/DP moments, ESS, masking, JSONL and trainer callback")
 
 

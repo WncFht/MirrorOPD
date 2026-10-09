@@ -309,7 +309,7 @@ index 94d8574..366d385 100644
  
  def sample_corrected_ta_opd(
 diff --git i/verl/verl/trainer/distillation/losses.py w/verl/verl/trainer/distillation/losses.py
-index 496116e..2d596a8 100644
+index 496116e..64f109d 100644
 --- i/verl/verl/trainer/distillation/losses.py
 +++ w/verl/verl/trainer/distillation/losses.py
 @@ -63,10 +63,24 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
@@ -347,15 +347,16 @@ index 496116e..2d596a8 100644
                  return fsdp_losses.compute_mirror_opd_from_cache(
                      student_logits, data, distillation_config, data_format
                  )
-@@ -274,6 +288,7 @@ def distillation_ppo_loss(
-         # MirrorOPD already supplies the complete score surrogate. Evaluating
-         # a discarded PPO objective still imposes unrelated advantage/ratio
-         # requirements and can produce misleading metrics or numerical errors.
+@@ -269,6 +283,8 @@ def distillation_ppo_loss(
+ 
+     # Called as final policy loss
+     distillation_loss_config = distillation_config.distillation_loss
++    if is_mirror_opd_enabled(distillation_config):
 +        populate_global_batch_info(config, data)
-         distill_metrics["distillation/loss"] = Metric(value=distill_loss, aggregation=AggregationType.SUM)
-         return distill_loss, distill_metrics
-     policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
-@@ -363,7 +378,7 @@ def distillation_loss(
+     distill_loss, distill_metrics = distillation_loss(config, distillation_config, model_output, data)
+     if is_mirror_opd_enabled(distillation_config):
+         # MirrorOPD already supplies the complete score surrogate. Evaluating
+@@ -363,7 +379,7 @@ def distillation_loss(
  
  @register_distillation_loss(
      DistillationLossSettings(
@@ -364,7 +365,7 @@ index 496116e..2d596a8 100644
          use_topk=True, use_sampled_logprob=True,
      )
  )
-@@ -375,7 +390,18 @@ def compute_mirror_opd_loss(config, distillation_config, model_output, data):
+@@ -375,7 +391,18 @@ def compute_mirror_opd_loss(config, distillation_config, model_output, data):
              or settings.loss_max_clamp is not None or settings.log_prob_min_clamp is not None):
          raise ValueError("MirrorOPD requires direct surrogate aggregation without clamps/task rewards")
      losses = no_padding_2_padding(model_output["distillation_losses"], data)
