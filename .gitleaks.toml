@@ -31,3 +31,14 @@ regexTarget = "line"
 regexes = [
   '''"(?:first_party/src/mirroropd/token_inner|framework/verl/utils/tokenizer|framework/verl/workers/rollout/tokenizer)\.py": "[0-9a-f]{64}"''',
 ]
+
+# These exact fields record source digests in the GSM8K execution evidence.
+[[allowlists]]
+description = "GSM8K source SHA-256 provenance fields"
+paths = [
+  '''^results/training/gsm8k-smollm2-mdpo-(b64-j16-clip5|launcher-check|offload-check)/source-provenance\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''"(?:first_party/src/mirroropd/training/tokenization|framework/verl/trainer/distillation/token_inner)\.py": "[0-9a-f]{64}"''',
+]

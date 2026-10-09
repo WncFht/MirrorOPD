@@ -1,0 +1,16 @@
+{
+  "state": "finished",
+  "url": "https://wandb.ai/wncfht/mirror-opd-gsm8k/runs/94exlzw6",
+  "history_rows": 35,
+  "inner_rows": 32,
+  "evaluation_outer": [
+    0,
+    2
+  ],
+  "generated_examples": [
+    16,
+    16
+  ],
+  "exit_code": 0,
+  "saved_weights": []
+}

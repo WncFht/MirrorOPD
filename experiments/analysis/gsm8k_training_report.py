@@ -16,6 +16,7 @@ def report(run, output):
     evaluation = [row for row in outer if "evaluation/generated_examples" in row["data"]]
     first = [row for row in inner if row["inner_step"] == 0]
     norms = [row["metrics"]["grad_norm"] for row in inner]
+    training = [row["data"] for row in outer if "timing_s/step" in row["data"]]
     with (run / "gpu.csv").open() as stream:
         memory = [float(row[" memory.used [MiB]"].split()[0]) for row in csv.DictReader(stream)]
     summary = {
@@ -36,7 +37,24 @@ def report(run, output):
             row["metrics"]["mirror/sampled_log_ratio/rms"] for row in first
         ),
         "gpu_peak_mib": max(memory),
-        "evaluation": [{"outer_step": row["step"], **row["data"]} for row in evaluation],
+        "importance_ess_fraction_min": min(
+            row["metrics"]["mirror/importance_ess_fraction"] for row in inner
+        ),
+        "outer_seconds_mean": sum(row["timing_s/step"] for row in training) / len(training),
+        "actor_peak_reserved_gib": max(
+            row["actor/perf/max_memory_reserved_gb"] for row in training
+        ),
+        "evaluation": [
+            {
+                "outer_step": row["step"],
+                **{
+                    key: value
+                    for key, value in row["data"].items()
+                    if key.startswith(("val-core/", "val-aux/", "evaluation/"))
+                },
+            }
+            for row in evaluation
+        ],
         "interpretation": "Execution evidence; small test subsets are not GSM8K benchmarks.",
     }
     output.mkdir(parents=True, exist_ok=True)

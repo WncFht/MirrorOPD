@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "completed_inner_updates": 16,
+  "completed_post_update_evaluations": 0,
+  "phase": "actor-to-vLLM synchronization; wake_up(weights)",
+  "error": "CUDA out of memory in cumem_allocator",
+  "setting": "B=64, J=16, response=2048; parameter offload disabled",
+  "followup": "Enable actor and ref FSDP parameter offload; validate two outer steps."
+}

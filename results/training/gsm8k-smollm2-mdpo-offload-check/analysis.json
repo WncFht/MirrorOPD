@@ -1,0 +1,57 @@
+{
+  "run_name": "gsm8k-smollm2-mdpo-offload-check",
+  "exit_code": 0,
+  "completed_outer_calls": 2,
+  "inner_updates": 32,
+  "actual_clip_thresholds": [
+    5.0
+  ],
+  "grad_norm_min": 1.6875,
+  "grad_norm_max": 24.75,
+  "clipped_fraction": 0.03125,
+  "sync_student_center_max_abs": 0.0,
+  "sync_sampled_log_ratio_rms_max": 0.0,
+  "gpu_peak_mib": 10865.0,
+  "importance_ess_fraction_min": 0.9979978231886398,
+  "outer_seconds_mean": 171.3394199520044,
+  "actor_peak_reserved_gib": 9.599609375,
+  "evaluation": [
+    {
+      "outer_step": 0,
+      "evaluation/generated_examples": 16,
+      "val-aux/openai/gsm8k/reward/mean@1": 0.0,
+      "val-aux/openai/gsm8k/response_tokens/mean@1": 400.625,
+      "val-aux/openai/gsm8k/eos_terminated/mean@1": 0.875,
+      "val-aux/openai/gsm8k/budget_exhausted/mean@1": 0.125,
+      "val-aux/openai/gsm8k/score/mean@1": 0.0,
+      "val-core/openai/gsm8k/acc/mean@1": 0.0,
+      "val-aux/openai/gsm8k/acc_strict/mean@1": 0.0,
+      "val-aux/openai/gsm8k/acc_explicit/mean@1": 0.0,
+      "val-aux/openai/gsm8k/format_hash/mean@1": 0.4375,
+      "val-aux/openai/gsm8k/format_boxed/mean@1": 0.0,
+      "val-aux/openai/gsm8k/parse_failure/mean@1": 0.0,
+      "val-aux/num_turns/min": 2,
+      "val-aux/num_turns/max": 2,
+      "val-aux/num_turns/mean": 2.0
+    },
+    {
+      "outer_step": 2,
+      "evaluation/generated_examples": 16,
+      "val-aux/openai/gsm8k/reward/mean@1": 0.0625,
+      "val-aux/openai/gsm8k/response_tokens/mean@1": 416.75,
+      "val-aux/openai/gsm8k/eos_terminated/mean@1": 0.875,
+      "val-aux/openai/gsm8k/budget_exhausted/mean@1": 0.125,
+      "val-aux/openai/gsm8k/score/mean@1": 0.0625,
+      "val-core/openai/gsm8k/acc/mean@1": 0.0625,
+      "val-aux/openai/gsm8k/acc_strict/mean@1": 0.0625,
+      "val-aux/openai/gsm8k/acc_explicit/mean@1": 0.0625,
+      "val-aux/openai/gsm8k/format_hash/mean@1": 0.4375,
+      "val-aux/openai/gsm8k/format_boxed/mean@1": 0.0,
+      "val-aux/openai/gsm8k/parse_failure/mean@1": 0.0,
+      "val-aux/num_turns/min": 2,
+      "val-aux/num_turns/max": 2,
+      "val-aux/num_turns/mean": 2.0
+    }
+  ],
+  "interpretation": "Execution evidence; small test subsets are not GSM8K benchmarks."
+}

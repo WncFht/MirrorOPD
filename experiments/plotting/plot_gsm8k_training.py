@@ -81,7 +81,7 @@ def main():
     axes[1].set_ylabel("Budget-exhausted fraction")
     for ax in axes:
         ax.set_xlabel("Completed outer updates")
-        ax.set_ylim(-0.02, 1.02)
+        ax.set_ylim(-0.05, 1.05)
         ax.set_xticks(x)
         fv.apply_grid(ax, "y-only")
     count = sorted({row["evaluation/generated_examples"] for row in evaluations})
