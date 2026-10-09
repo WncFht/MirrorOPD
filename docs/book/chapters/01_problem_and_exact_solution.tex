@@ -9,6 +9,8 @@
 \end{equation}
 教师统一记为 $\pi_T$，在本轮 inner 内冻结。$d_k$ 表示由 $\pi_k$ rollout 诱导的 prefix 访问测度，$\widehat d_k$ 表示当前 rollout batch 的经验测度。inner 固定 prefix batch、anchor 和教师，只更新 student 参数。
 
+\input{sections/01_prefix_measure_and_reduction}
+
 全篇使用同一组 log-ratio 和 KL 记号：
 \begin{align}
 U_{k,n}(s,a)&\coloneqq\log\frac{\pi_{k,n}(a\mid s)}{\pi_k(a\mid s)},\\
