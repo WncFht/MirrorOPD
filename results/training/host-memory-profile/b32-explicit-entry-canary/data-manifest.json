@@ -1,0 +1,18 @@
+{
+  "dataset": "openai/gsm8k",
+  "dataset_config": "main",
+  "selection": "complete official train and test; no validation split",
+  "prompt": "single user message; answer exists only in reward_model.ground_truth",
+  "splits": {
+    "train": {
+      "count": 7473,
+      "dataset_fingerprint": "c6f812ae33c9159d",
+      "parquet_sha256": "6a986e24b684d270ccc94ee1e84173bdb0bf910b9f2f19a90ee6517e0322f16b"
+    },
+    "test": {
+      "count": 1319,
+      "dataset_fingerprint": "59ec1b7f9357c7a2",
+      "parquet_sha256": "98c38ff7959a8a7fb59cdd9f40587e1de9c45cd3ac1a83fc5c97c68254b340b0"
+    }
+  }
+}
