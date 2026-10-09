@@ -43,7 +43,7 @@ make check
 
 正式训练使用 **TA-OPD/verl** 调度，MirrorOPD 算法源码由本仓库直接维护。核心 loss 位于 [training/losses.py](src/mirroropd/training/losses.py)，冻结缓存位于 [training/cache.py](src/mirroropd/training/cache.py)，prediction-position 与 nested-tensor 适配位于 [integrations/verl/fsdp.py](src/mirroropd/integrations/verl/fsdp.py)。上游只保留导入、薄包装和框架接入；outer rollout 与权重版本检查仍在 `upstream/TA-OPD/verl/verl/trainer/ppo/ray_trainer.py`。本仓库的 [训练入口](training/run_upstream_mirror_training.sh) 调用该框架，没有另外实现分布式训练器。
 
-archbox 上已验证的运行目录是 `~/src/mirroropd-taopd`，虚拟环境、checkpoint、日志和 scratch 都在该目录。此次本机 Git 拆分保留这个运行目录。支持 `mirror_pmd_mean`、`mirror_bpo`、`mirror_mdpo`：
+三机源码目录统一为 `~/src/mirroropd` 和 `~/src/MD-OPD`，后续开发与训练在 archbox 进行；运行产物留在 archbox。MirrorOPD 已验证的 TA-OPD 后端仍位于 `~/src/mirroropd-taopd`，保留其虚拟环境和运行依赖，第一方核心从 `~/src/mirroropd/src` 加载。路径、版本及本地修改见 [三机仓库路径与同步](docs/operations/2026-10-10-三机仓库路径与同步.md)。支持 `mirror_pmd_mean`、`mirror_bpo`、`mirror_mdpo`：
 
 ```bash
 MIRROR_UPSTREAM_ROOT="$HOME/src/mirroropd-taopd" \
@@ -60,4 +60,4 @@ Pythia-14M student / Pythia-70M teacher 已完成两组全参数 MDPO 动力学�
 
 目录边界、输入输出和复现命令见 [实验组织说明](docs/operations/2026-10-08-实验目录组织与训练代码导航.md)。运行需要参考内核的独立脚本时，在仓库根添加 `PYTHONPATH=src`；`make test` 已设置该路径。也可以用 `python -m pip install -e . --no-deps` 安装本地包。
 
-仓库维护规则见 [AGENTS.md](AGENTS.md) 和 [维护规范](docs/operations/2026-10-08-仓库维护规范.md)。主文档固定维护在现有 TeX 路径；新推导、算法和实验结论更新到对应章节，PDF 由源文件编译。
+仓库维护规则见 [AGENTS.md](AGENTS.md) 和 [维护规范](docs/operations/2026-10-08-仓库维护规范.md)。MD-OPD 的接入设计见 [MirrorOPD 接入 MD-OPD 代码审查](docs/operations/2026-10-10-MirrorOPD接入MD-OPD代码审查.md)，本次尚未实现该接入。主文档固定维护在现有 TeX 路径；新推导、算法和实验结论更新到对应章节，PDF 由源文件编译。

@@ -33,7 +33,7 @@
 
 实验先记录问题、判定标准和配置。结果记录数据与 split、模型版本、温度、top-p/top-k、长度限制、种子、样本数、估计量、误差定义、代码版本和复现命令。CPU 验证、GPU canary、完整训练和正式 benchmark 分别报告；截断 rollout 和小样本结果不能冒充完整 GSM8K 效果。
 
-archbox 现有运行目录是 `~/src/mirroropd-taopd`。本机提交不等于远端部署；同步核心包、集成补丁及启动入口后记录远端实际版本。模型缓存和大 scratch 放磁盘，禁止把容量受限的 `/tmp` 当实验数据盘。
+三机源码目录统一为 `~/src/mirroropd` 和 `~/src/MD-OPD`，后续开发与训练在 archbox 直接进行，运行产物留在 archbox。MirrorOPD 现有 TA-OPD 后端环境保留在 `~/src/mirroropd-taopd`。本机提交不等于远端部署；同步核心包、集成补丁及启动入口后记录远端实际版本。模型缓存和大 scratch 放磁盘，禁止把容量受限的 `/tmp` 当实验数据盘。路径与保留状态见 `docs/operations/2026-10-10-三机仓库路径与同步.md`。
 
 ## 检查与工具链
 
