@@ -33,7 +33,7 @@ def main():
     tok = AutoTokenizer.from_pretrained(args.model)
     ds = load_dataset("openai/gsm8k", "main", split=args.split)
 
-    def format_prompt(question: str) -> str:
+    def format_prompt(question: str):
         if args.prompt_style == "answer-format":
             question = (
                 "Solve this math word problem. Show your reasoning, then put only "
@@ -47,11 +47,14 @@ def main():
                 "with the final answer in the form #### number.\n\n"
                 f"Question: {question}\n\nAnswer:"
             )
-        return tok.apply_chat_template(
+        # Passing token ids avoids adding a second BOS when a template already
+        # emits one (DeepSeek-R1-Distill-Qwen is an example).
+        prompt_token_ids = tok.apply_chat_template(
             [{"role": "user", "content": question}],
-            tokenize=False,
+            tokenize=True,
             add_generation_prompt=True,
         )
+        return {"prompt_token_ids": prompt_token_ids}
 
     prompts = [format_prompt(x["question"]) for x in ds]
     llm = LLM(
