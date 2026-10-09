@@ -55,7 +55,12 @@ def report(run, output):
             }
             for row in evaluation
         ],
-        "interpretation": "Execution evidence; small test subsets are not GSM8K benchmarks.",
+        "interpretation": (
+            "Full fixed GSM8K test, single training run; no paired per-example outcomes retained."
+            if evaluation
+            and all(row["data"]["evaluation/generated_examples"] == 1319 for row in evaluation)
+            else "Execution evidence; small test subsets are not GSM8K benchmarks."
+        ),
     }
     output.mkdir(parents=True, exist_ok=True)
     (output / "analysis.json").write_text(json.dumps(summary, indent=2) + "\n")

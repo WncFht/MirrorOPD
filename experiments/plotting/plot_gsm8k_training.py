@@ -81,7 +81,8 @@ def main():
     axes[1].set_ylabel("Budget-exhausted fraction")
     for ax in axes:
         ax.set_xlabel("Completed outer updates")
-        ax.set_ylim(-0.05, 1.05)
+        visible_max = max(max(line.get_ydata()) for line in ax.lines)
+        ax.set_ylim(-0.005, max(0.12, visible_max * 1.15))
         ax.set_xticks(x)
         fv.apply_grid(ax, "y-only")
     count = sorted({row["evaluation/generated_examples"] for row in evaluations})
@@ -89,7 +90,7 @@ def main():
         fig,
         root,
         "test-dynamics",
-        f"Greedy test; examples per evaluation: {count}. Execution check.",
+        f"Greedy test; examples per evaluation: {count}. Single training run.",
     )
 
 

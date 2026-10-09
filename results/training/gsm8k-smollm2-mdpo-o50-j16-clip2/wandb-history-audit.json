@@ -1,0 +1,19 @@
+{
+  "state": "finished",
+  "history_rows": 851,
+  "inner_rows": 800,
+  "evaluation_rows": 11,
+  "evaluation_steps": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50
+  ]
+}
