@@ -38,6 +38,18 @@ def audit(config):
     if config.actor_rollout_ref.actor.ppo_mini_batch_size != data.train_batch_size:
         raise ValueError("MDPO full-batch setting requires mini batch = prompt batch")
     actor = config.actor_rollout_ref.actor
+    report["optimizer_precision"] = {
+        "parameter_storage_dtype": actor.fsdp_config.model_dtype,
+        "optimizer": actor.optim.optimizer,
+        "optimizer_impl": actor.optim.optimizer_impl,
+        "learning_rate": actor.optim.lr,
+        "warning": (
+            "BF16 parameter storage with ordinary AdamW can round away small updates; use FP32 storage."
+            if actor.fsdp_config.model_dtype in ("bf16", "bfloat16")
+            and actor.optim.optimizer_impl == "torch.optim"
+            else None
+        ),
+    }
     if actor.optim.clip_grad != actor.grad_clip:
         raise ValueError(
             "FSDP engine uses optim.clip_grad; it must match the declared actor.grad_clip"
