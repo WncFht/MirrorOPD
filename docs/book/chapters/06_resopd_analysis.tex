@@ -1,0 +1,128 @@
+\chapter{ResOPD：HETS、尾部残差化与开源实现}
+\label{ch:resopd}
+
+本章将 ResOPD 论文中的符号改写为本书的固定 prefix 记号，并把理论 estimator、无偏性证明、方差分解和代码调用链放在同一框架下。固定一个 prefix $s$，令
+$p(v)$ 为当前 student 的 next-token 分布，$q(v)$ 为 teacher 分布，
+$S=S_J$ 为 teacher Top-$J$ 支持集。求导时 $q$ 与 $S$ 冻结，定义
+\[
+r_v=\log\frac{p(v)}{q(v)},\qquad
+\psi_v=\nabla_\theta\log p(v),\qquad
+P=p(S),\quad Q=q(S),\quad
+\tau_p=1-P,\quad \tau_q=1-Q.
+\]
+本章的核心目标是完整 reverse KL 的 student 梯度
+\begin{equation}
+g=\nabla_\theta\KL(p\Vert q)=\sum_v p(v)r_v\psi_v.
+\label{eq:resopd-full-gradient}
+\end{equation}
+标量 KL 的估计量与梯度估计量必须分开讨论。
+
+\section{HETS 与统一控制族}
+
+定义头部梯度和尾部条件均值
+\[
+h=\sum_{v\in S}p(v)r_v\psi_v,
+\qquad
+\mu_{\tail}=\E_p[r_A\psi_A\mid A\notin S],\quad A\sim p.
+\]
+于是 $g=h+\tau_p\mu_{\tail}$。直接 sampled-token OPD 使用 $r_A\psi_A$，数值上对式~\eqref{eq:resopd-full-gradient} 无偏，但方差包含所有 token 的随机性。
+
+HETS（Head-Exact Tail-Sampled）把头部解析积分，只对尾部抽样：
+\begin{equation}
+\widehat g_{\mathrm{HETS}}=h+Jr_A\psi_A,
+\qquad J=\mathbf 1\{A\notin S\}.
+\label{eq:resopd-hets}
+\end{equation}
+在 $A\sim p$ 且二阶矩有限时，
+\begin{align}
+\E[\widehat g_{\mathrm{HETS}}\mid s]&=h+\tau_p\mu_{\tail}=g,\\
+\mathcal V(\widehat g_{\mathrm{HETS}}\mid s)
+ &=\tau_p\mathcal V_{\tail}(r_A\psi_A)+P\tau_p\lVert\mu_{\tail}\rVert_2^2.
+\label{eq:resopd-hets-var}
+\end{align}
+第二项是头部/尾部事件间方差。它解释了 HETS 的尾部梯度尖峰：尾部命中时必须一次性补上整个未知尾部均值。
+
+Top-$J$ payload 还给出尾部总质量。把尾部聚合成一个伪 token，定义可计算控制向量
+\begin{equation}
+\mu_B=\log\frac{\tau_p}{\tau_q}\,\nabla_\theta\log\tau_p.
+\label{eq:resopd-bucket}
+\end{equation}
+它是粗粒度 $(J+1)$-way 分布的尾部梯度，不要求等于 $\mu_{\tail}$。对任意在抽样前冻结、只依赖 prefix 的向量 $B$，定义
+\begin{equation}
+\widehat g(B)=h+\tau_pB+J(r_A\psi_A-B).
+\label{eq:resopd-control-family}
+\end{equation}
+条件期望直接给出
+\begin{align}
+\E[\widehat g(B)\mid s]
+ &=h+\tau_pB+\tau_p(\mu_{\tail}-B)\notag\\
+ &=g.
+\label{eq:resopd-unbiased}
+\end{align}
+HETS 是 $B=0$ 的特例；ResOPD 取 $B=\mu_B$：
+\begin{equation}
+\widehat g_{\mathrm{ResOPD}}
+ =h+\tau_p\mu_B+J(r_A\psi_A-\mu_B).
+\label{eq:resopd-estimator}
+\end{equation}
+因此 ResOPD 的无偏对象是完整 reverse-KL 梯度，不是一个确定性 KL 标量。
+
+对固定 $B$，全协方差分解为
+\begin{equation}
+\mathcal V(\widehat g(B)\mid s)
+ =\tau_p\mathcal V_{\tail}(r_A\psi_A)+P\tau_p\lVert\mu_{\tail}-B\rVert_2^2.
+\label{eq:resopd-var}
+\end{equation}
+从而
+\begin{equation}
+\mathcal V(\widehat g_{\mathrm{HETS}})-\mathcal V(\widehat g_{\mathrm{ResOPD}})
+ =P\tau_p\left(2\langle\mu_{\tail},\mu_B\rangle-\lVert\mu_B\rVert_2^2\right).
+\label{eq:resopd-hets-gap}
+\end{equation}
+ResOPD 严格优于 HETS 当且仅当
+$\lVert\mu_{\tail}-\mu_B\rVert_2<\lVert\mu_{\tail}\rVert_2$。这是分布依赖的条件，不是无条件排序。
+
+\section{与本书 KL 估计量的关系}
+
+本书的 EMA Top-$J$ 数值估计量是
+\begin{equation}
+\widehat{\mathcal K}^{\mathrm{EMA}}_J
+ =\sum_{v\in S}p(v)r_v+Jr_A.
+\label{eq:resopd-ema-value}
+\end{equation}
+在 $A\sim p$ 时，$\E[\widehat{\mathcal K}^{\mathrm{EMA}}_J\mid s]=\KL(p\Vert q)$。它与 HETS 共享“精确头部加尾部 sampled correction”的结构，但 HETS/ResOPD 论文主要估计式~\eqref{eq:resopd-full-gradient} 的 score 梯度。因而必须区分：
+\begin{itemize}
+\item sampled-token 的 $r_A$ 是 KL 数值的无偏单点样本；裸 autograd 不自动给出完整 KL 梯度。
+\item K4 与 EMA Top-$J$ 分别在正确的 stop-gradient 语义下同时保证相应的 value/gradient 结论。
+\item ResOPD 的 forward value 是条件头部/采样值，代码明确允许其为负；训练依赖的是 stopped-coefficient surrogate 的 backward。
+\end{itemize}
+Top-$J$ 重归一化、截断 rKL 和仅保留头部停止系数，都是相对于完整 rKL 梯度的有偏替代；它们不能因为条件方差为零就称为无偏 estimator。
+
+\section{代码调用链与停止梯度}
+
+开源仓库没有单独的 ``HETS'' loss mode；HETS 是论文中的比较基线。发布代码注册的唯一新模式是 ``resopd''，而 sampled-token、Top-$k$ 和普通 ``k1/k2/k3'' 路径属于其他 loss mode。
+
+teacher 路径从 \path{verl/experimental/teacher_loop/teacher_manager.py} 开始。选择 ``loss\_mode=resopd'' 后，vLLM 必须返回 teacher Top-$J$ 的 token ids/log-probs，以及实际 student token 的 teacher log-prob。\path{verl/workers/rollout/vllm_rollout/prompt_logprobs.py} 将它们分别保存为
+\texttt{prompt\_ids/prompt\_logprobs} 与
+\texttt{sampled\_prompt\_ids/sampled\_prompt\_logprobs}；后者即使动作落在 Top-$J$ 之外也必须保留。
+
+student logits 经 \path{verl/trainer/distillation/fsdp/losses.py} 对齐后，\path{verl/trainer/distillation/losses.py} 将四个 payload 送入 \path{verl/trainer/distillation/resopd.py} 的 \texttt{resopd\_loss}。该 kernel 的数学对应关系如下：
+\begin{enumerate}
+\item 完整 student logits 做 log-softmax，得到头部 $p(v)$、$r_v$ 和 $P$；teacher Top-$J$ log-prob 在进入计算时 detach。
+\item 从实际 token 得到 $r_A$，并用 \texttt{student\_tail\_mass}、\texttt{teacher\_tail\_mass} 构造 $\log(\tau_p/\tau_q)$。
+\item 用 \texttt{support\_score} 计算 $\mu_B$，并令 $\texttt{centered\_event}=\mathbf 1\{A\in S\}-P$。
+\item 通过 \texttt{surrogate - surrogate.detach()} 保留 forward 数值、替换 backward，得到式~\eqref{eq:resopd-estimator}。
+\end{enumerate}
+实现中的 teacher 数值、事件系数和控制项均停止梯度。仓库 docstring 明确说明返回值不是确定性 KL 目标，单个 forward value 可以为负；应审计 backward 梯度、期望和协方差，而不是把 loss 平均值解释成完整 KL。
+
+无偏性要求 $A$ 来自当前完整 student 分布。发布脚本使用温度 $1$、\texttt{top\_p=1}、\texttt{top\_k=-1}，每个 fresh rollout batch 只做一个 PPO epoch。截断采样、旧 rollout 重复优化或其他改变动作测度的 logits processor 都需要重新推导。
+
+\section{公开实验与 baseline}
+
+论文的基线可按目标分成三组。第一组是有偏确定性 Top-$k$ 方法：Teacher Top-$k$ fKL、Teacher Top-$k$ rKL 和 TA-OPD（尾部伪 token 的粗粒度 KL）。第二组是无偏 reverse-KL 梯度 estimator：Sampled-token OPD、教师 Top-$k$ 支持上的 vOPD、HETS 和 ResOPD。第三组是机制消融：支持大小 $k\in\{1,4,16,32,64\}$、完整祖先采样与 top-$p$/top-$k$ 截断、学习率敏感性，以及统一双控制族中的 SC-TA（$\gamma=1$；ResOPD 为 $\gamma=0$）。
+
+冻结 prefix 审计在 GSM8K、HMMT26 和 DeepMath 上枚举完整动作，报告梯度协方差迹和 NSR。Top-$4$ 下，论文报告 ResOPD 相对 sampled-token OPD 降低 $52.5\%$--$75.0\%$ 的协方差迹，并在五个面板中优于 HETS。端到端数学实验使用 Qwen3.5-27B 教师和 Qwen3.5-4B 学生，评估 DeepMath、AIME26、HMMT26、OlymMATH；科学/代码迁移使用 Qwen3-30B-A3B-Instruct 到 Qwen3-4B，评估 GPQA-D、SuperGPQA、LiveCodeBench v5/v6。论文报告数学平均分 ResOPD $50.12\%$、HETS $45.72\%$，迁移平均分 ResOPD $44.15\%$、HETS $43.63\%$。
+
+仓库公开了可直接运行的 DeepMath 子集：1,024 条训练样本和 252 条 held-out 样本；入口为 \path{examples/resopd/run_resopd.sh}，默认 FSDP2 student、vLLM teacher、Top-$4$、full-support rollout。\path{tests/resopd} 包含 estimator、teacher payload 和 verl integration 检查，发布验证记录 22 个 standalone 与 13 个 integration checks。
+
+需要避免的概念混淆是：HETS 是稀疏 rKL 梯度基线，不是 PPO 的 value baseline；ResOPD 的 $\mu_B$ 是 control variate。仓库中普通 verl 的 ``k1/k2/k3'' KL penalty、GRPO、RLOO、ReMax 等属于框架通用路径，并非论文中同一 teacher payload 下的 HETS/ResOPD 方差基线。
