@@ -43,8 +43,12 @@ def main():
     # earlier outer rows in the web UI.
     # Resumed native trainer runs already have history steps (usually 1--5),
     # while older publisher versions may have written a different sequence.
-    # A large monotone offset makes this repair append-only for every run.
-    internal_step = max(int(getattr(run, "step", 0) or 0), 1_000_000)
+    # Continue from the actual server history, including resumed sessions.
+    # An arbitrary offset pollutes the default Step axis and hides progress.
+    internal_step = max(
+        int(getattr(run, "step", 0) or 0),
+        max((int(row.get("_step", -1)) + 1 for row in history), default=0),
+    )
     if args.include_outer:
         for line in (args.run / "outer.jsonl").read_text().splitlines():
             record = json.loads(line)

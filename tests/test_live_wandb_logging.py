@@ -78,7 +78,7 @@ def test_failure_recovery_skips_uploaded_rows_and_preserves_failure(tmp_path, mo
     run = FakeRun()
     finished = []
     run.finish = lambda **kwargs: finished.append(kwargs)
-    history = [{"00_axes/inner_update": 0}, {"00_axes/outer_step": 5}]
+    history = [{"00_axes/inner_update": 0, "_step": 10}, {"00_axes/outer_step": 5, "_step": 11}]
     fake = SimpleNamespace(
         Api=lambda: SimpleNamespace(
             run=lambda _path: SimpleNamespace(scan_history=lambda: iter(history))
@@ -107,6 +107,7 @@ def test_failure_recovery_skips_uploaded_rows_and_preserves_failure(tmp_path, mo
     publisher.main()
     payloads = [payload for _, payload in run.logged]
     assert len(payloads) == 2
+    assert [step for step, _ in run.logged] == [13, 14]
     assert payloads[0]["00_axes/evaluation_outer"] == 0
     assert payloads[1]["00_axes/inner_update"] == 1
     assert run.summary["training/process_exit_code"] == 1
