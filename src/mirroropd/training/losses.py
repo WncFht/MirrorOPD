@@ -57,9 +57,21 @@ def compute_mirror_opd_token_loss(
         q_head = anchor_head_log_probs.detach().float()
         p_head = log_p.detach().gather(-1, anchor_ids)
         head = (q_head.exp() * (q_head - p_head)).sum(-1)
-        outside = torch.ones_like(log_p, dtype=torch.bool)
-        outside.scatter_(-1, anchor_ids, False)
-        p_tail_lp = torch.logsumexp(log_p.detach().masked_fill(~outside, float("-inf")), -1)
+        # Bound diagnostic scratch space independently of response length.
+        flat_lp = log_p.detach().reshape(-1, log_p.shape[-1])
+        flat_ids = anchor_ids.reshape(flat_lp.shape[0], anchor_ids.shape[-1])
+        flat_tail = torch.empty(flat_lp.shape[0], device=log_p.device)
+        flat_entropy = torch.empty_like(flat_tail)
+        for start in range(0, flat_lp.shape[0], 64):
+            stop = start + 64
+            block = flat_lp[start:stop]
+            tail_block = block.clone()
+            tail_block.scatter_(-1, flat_ids[start:stop], float("-inf"))
+            flat_tail[start:stop] = torch.logsumexp(tail_block, -1)
+            del tail_block
+            flat_entropy[start:stop] = -(block.exp() * block).sum(-1)
+        p_tail_lp = flat_tail.reshape(expected)
+        entropy = flat_entropy.reshape(expected)
         q_tail_lp = anchor_tail_log_prob.detach().float()
         tail = torch.zeros_like(head)
         nonempty = torch.isfinite(q_tail_lp)
@@ -114,7 +126,7 @@ def compute_mirror_opd_token_loss(
         "mirror_action_nll": -action_lp.detach(),
         "mirror_sampled_reward": reward,
         "mirror_sampled_log_ratio": u,
-        "mirror_student_entropy": -(log_p.detach().exp() * log_p.detach()).sum(-1),
+        "mirror_student_entropy": entropy,
         "mirror_anchor_head_mass": q_head.exp().sum(-1),
         "mirror_student_head_mass": p_head.exp().sum(-1),
         "mirror_anchor_tail_mass": q_tail_lp.exp(),
