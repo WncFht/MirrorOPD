@@ -1,0 +1,9 @@
+{
+  "input": [
+    1,
+    256
+  ],
+  "token_id": 42,
+  "manual_vs_cpuoffload_max_abs": 0.0,
+  "compared": "all vocab logits at final prefix, first forward"
+}

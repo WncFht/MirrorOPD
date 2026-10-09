@@ -545,7 +545,7 @@ index 9ff66f7..280ebf8 100644
                  raise ValueError("MirrorOPD requires distillation.mirror_teacher_model_path.")
              if self.n_gpus_per_node != 0 or self.nnodes != 0:
 diff --git i/verl/verl/workers/engine/fsdp/transformer_impl.py w/verl/verl/workers/engine/fsdp/transformer_impl.py
-index 3e3798d..feaaae7 100644
+index 3e3798d..ed4f953 100644
 --- i/verl/verl/workers/engine/fsdp/transformer_impl.py
 +++ w/verl/verl/workers/engine/fsdp/transformer_impl.py
 @@ -111,6 +111,28 @@ class FSDPEngine(BaseEngine):
@@ -577,8 +577,71 @@ index 3e3798d..feaaae7 100644
          self.mode = None
  
          self.rank = torch.distributed.get_rank()
+@@ -379,14 +401,17 @@ class FSDPEngine(BaseEngine):
+             # cpu_offload:
+             # - actor: None
+             # - critic: None
+-            # - ref: CPUOffload(offload_params=True)
++            # - ref: explicit parameter offload at inference phase boundaries
+ 
+-            # We force reference policy to use CPUOffload to save memory.
+             # We force turn off CPUOffload for actor because it causes incorrect results when using grad accumulation
+             cpu_offload = None
+             if self.engine_config.forward_only:
+-                cpu_offload = CPUOffload(offload_params=True)
+-                self._is_offload_param = False
++                if os.environ.get("MIRROR_INFERENCE_EXPLICIT_OFFLOAD", "0") == "1":
++                    module.requires_grad_(False)
++                    self._is_offload_param = True
++                else:
++                    cpu_offload = CPUOffload(offload_params=True)
++                    self._is_offload_param = False
+                 self._is_offload_optimizer = False
+ 
+             module = FSDP(
+@@ -731,7 +756,10 @@ class FSDPEngine(BaseEngine):
+         """
+         super().to(device=device, model=model, optimizer=optimizer, grad=grad)
+ 
+-        if self.engine_config.forward_only:
++        if self.engine_config.forward_only and not (
++            self.engine_config.strategy == "fsdp"
++            and os.environ.get("MIRROR_INFERENCE_EXPLICIT_OFFLOAD", "0") == "1"
++        ):
+             # force cpu_offload
+             return
+ 
+@@ -886,7 +914,10 @@ class EngineEvalModeCtx(BaseEngineCtx):
+ 
+     def __enter__(self):
+         assert isinstance(self.engine, FSDPEngine)
++        from mirroropd.training.host_memory import phase_memory
++        phase_memory("before_eval_enter", engine=self.engine)
+         super().__enter__()
++        phase_memory("after_eval_enter", engine=self.engine)
+         self.prev_sp_group = get_ulysses_sequence_parallel_group()
+         set_ulysses_sequence_parallel_group(self.engine.ulysses_parallel_group)
+         self.engine.module.eval()
+@@ -904,6 +935,8 @@ class EngineEvalModeCtx(BaseEngineCtx):
+                 self.engine.module.reshard()
+ 
+         super().__exit__(exc_type, exc_value, traceback)
++        from mirroropd.training.host_memory import phase_memory
++        phase_memory("after_eval_offload", trim=True, engine=self.engine)
+ 
+ 
+ class EngineTrainModeCtx(BaseEngineCtx):
+@@ -922,6 +955,8 @@ class EngineTrainModeCtx(BaseEngineCtx):
+         set_ulysses_sequence_parallel_group(self.prev_sp_group)
+         self.engine.optimizer_zero_grad()
+         super().__exit__(exc_type, exc_value, traceback)
++        from mirroropd.training.host_memory import phase_memory
++        phase_memory("after_train_offload", trim=True, engine=self.engine)
+ 
+ 
+ @EngineRegistry.register(model_type="language_model", backend=["fsdp", "fsdp2"], device=["cuda", "npu"])
 diff --git i/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
-index 3d859d0..17b3216 100644
+index 3d859d0..071e730 100644
 --- i/verl/verl/workers/engine_workers.py
 +++ w/verl/verl/workers/engine_workers.py
 @@ -304,7 +304,9 @@ class TrainingWorker(Worker, DistProfilerExtension):
@@ -628,6 +691,22 @@ index 3d859d0..17b3216 100644
                  if model_config.hf_config.vocab_size != ref_config.model_config.hf_config.vocab_size:
                      raise ValueError("MirrorOPD anchor and teacher output vocabularies must match")
                  if not ref_config.engine.forward_only:
+@@ -727,12 +746,15 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+             return
+ 
+         set_expandable_segments(False)
++        from mirroropd.training.host_memory import phase_memory
++        phase_memory("before_rollout_wake", trim=True)
+         log_gpu_memory_usage("Before resume weights", logger=logger)
+ 
+         # 1. resume rollout memory (weights were released during sleep)
+         if self.config.rollout.free_cache_engine:
+             await self.rollout.resume(tags=["weights"])
+         log_gpu_memory_usage("After resume weights", logger=logger)
++        phase_memory("after_rollout_wake")
+ 
+         # 2. determine if we need a base weight sync (adapter path only)
+         per_tensor_param, peft_config = self.actor.engine.get_per_tensor_param(
 diff --git i/verl/verl/workers/utils/padding.py w/verl/verl/workers/utils/padding.py
 index 61f4779..ff76b4d 100644
 --- i/verl/verl/workers/utils/padding.py

@@ -1,0 +1,352 @@
+[
+  {
+    "name": "_local_shard",
+    "bytes": 201330688,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 201330688,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  },
+  {
+    "name": "_cpu_grad",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": true,
+    "device": "cpu"
+  }
+]

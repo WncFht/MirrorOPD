@@ -17,12 +17,18 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", type=Path, required=True)
+    parser.add_argument("--first-run", default="gsm8k-smollm2-mdpo-o50-global-token-fixed")
+    parser.add_argument("--first-unit", default="mirroropd-gsm8k-normalized-o50")
+    parser.add_argument("--second-run", default="gsm8k-smollm2-mdpo-o50-global-token-fp32")
     args = parser.parse_args()
-    first = args.repo / "runs/gsm8k-smollm2-mdpo-o50-global-token-fixed"
+    for value in (args.first_run, args.first_unit, args.second_run):
+        if not value or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-_" for c in value):
+            parser.error("run and unit names must contain only lowercase ASCII, digits, - and _")
+    first = args.repo / "runs" / args.first_run
     status_path = first / "followup-decision.json"
     while not (first / "exit-code.txt").exists():
-        active = subprocess.run(
-            ["/usr/bin/systemctl", "--user", "is-active", "mirroropd-gsm8k-normalized-o50"],
+        active = subprocess.run(  # noqa: S603 -- fixed executable, validated unit argument
+            ["/usr/bin/systemctl", "--user", "is-active", args.first_unit],
             capture_output=True,
             text=True,
             check=False,
@@ -71,7 +77,7 @@ def main():
         )
         status_path.write_text(json.dumps(result, indent=2) + "\n")
         return
-    second = args.repo / "runs/gsm8k-smollm2-mdpo-o50-global-token-fp32"
+    second = args.repo / "runs" / args.second_run
     if second.exists():
         raise FileExistsError(second)
     result.update(state="second_running", second_started=True, second_run=second.name)

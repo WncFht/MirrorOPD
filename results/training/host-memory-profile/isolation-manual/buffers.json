@@ -1,0 +1,177 @@
+[
+  {
+    "name": "_local_shard",
+    "bytes": 201330688,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  },
+  {
+    "name": "_local_shard",
+    "bytes": 134225920,
+    "rounded_bytes": 268435456,
+    "pinned": false,
+    "device": "cuda:0"
+  }
+]
