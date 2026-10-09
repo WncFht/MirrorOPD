@@ -5,6 +5,7 @@ script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 repo_root=$(cd -- "$script_dir/.." && pwd)
 task_root=${MIRROR_UPSTREAM_ROOT:-"$HOME/src/mirroropd-taopd"}
 data_dir=${MIRROR_TEXT_DATA:-"$repo_root/data/pythia-wikitext"}
+test_file=${MIRROR_TEST_FILE:-"$data_dir/validation.parquet"}
 run_name=${1:-pythia-mdpo-pilot}
 if (($#)); then shift; fi
 run_dir="$repo_root/runs/$run_name"
@@ -26,6 +27,11 @@ export MIRROR_INNER_METRICS_PATH="$run_dir/inner.jsonl"
 export VERL_FILE_LOGGER_PATH="$run_dir/outer.jsonl"
 export MIRROR_WANDB_RUN_PATH="$run_dir/wandb-run.json"
 export WANDB_RUN_GROUP="${WANDB_RUN_GROUP:-budget-calibration}"
+if [[ "${MIRROR_ENABLE_WANDB:-0}" == "1" ]]; then
+  logger_override='trainer.logger=[console,wandb]'
+else
+  logger_override='trainer.logger=[console,file]'
+fi
 
 # Only path placeholders are replaced; Jinja braces remain literal text.
 mapfile -d '' -t setting_args < <(
@@ -54,7 +60,7 @@ git -C "$repo_root" rev-parse HEAD >"$run_dir/source-commit.txt" 2>/dev/null || 
 "$task_python" "$script_dir/record_training_provenance.py" --repo "$repo_root" \
   --upstream "$task_root" --output "$run_dir/source-provenance.json"
 bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
-  "$data_dir/train.parquet" "$data_dir/validation.parquet" \
+  "$data_dir/train.parquet" "$test_file" \
   "${setting_args[@]}" "$@" --cfg job --resolve >"$run_dir/resolved-config.yaml" 2>"$run_dir/config.stderr"
 nvidia-smi --query-gpu=timestamp,memory.used,utilization.gpu,power.draw,temperature.gpu \
   --format=csv -lms 1000 >"$run_dir/gpu.csv" &
@@ -62,8 +68,11 @@ monitor_pid=$!
 trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
 set +e
 bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
-  "$data_dir/train.parquet" "$data_dir/validation.parquet" \
-  "${setting_args[@]}" "$@" >"$run_dir/console.log" 2>&1
+  "$data_dir/train.parquet" "$test_file" \
+  "${setting_args[@]}" "$@" "$logger_override" \
+  trainer.save_freq=-1 trainer.test_freq=5 \
+  trainer.validation_data_dir=null trainer.rollout_data_dir=null \
+  >"$run_dir/console.log" 2>&1
 status=$?
 set -e
 printf '%s\n' "$status" >"$run_dir/exit-code.txt"

@@ -5,8 +5,13 @@ import os
 from pathlib import Path
 
 
-def metric_name(key: str, scope: str) -> str:
+def metric_name(key: str, scope: str) -> str:  # noqa: PLR0911
     """Partition diagnostics without losing the measured field or its scope."""
+    if key.startswith(("val-core/", "val-aux/")):
+        # RayPPOTrainer emits GSM8K validation metrics under val-core/ and
+        # val-aux/. Keep them on the evaluation axis instead of mixing them
+        # with optimization and rollout histories.
+        return "01_quality/" + key
     name = key.removeprefix("actor/").removeprefix("mirror/")
     category = {
         "importance_ess": "02_offpolicy",
@@ -106,8 +111,14 @@ class WandbLogger:
 
     def log(self, data, step):
         self._internal_step += 1
+        evaluation_keys = tuple(
+            key for key in data if key.startswith(("val-core/", "val-aux/", "evaluation/"))
+        )
+        payload = {"00_axes/outer_step": step, **grouped_metrics(data, "outer")}
+        if evaluation_keys:
+            payload["00_axes/evaluation_outer"] = step
         self.wandb.log(
-            {"00_axes/outer_step": step, **grouped_metrics(data, "outer")},
+            payload,
             step=self._internal_step,
         )
 
