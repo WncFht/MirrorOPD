@@ -25,10 +25,16 @@ def audit(config):
     context = config.actor_rollout_ref.rollout.max_model_len
     if context < data.max_prompt_length + data.max_response_length:
         raise ValueError("max_model_len must cover prompt budget + full response budget")
+    report["model_configs"] = {}
     for name in (model.path, teacher_path):
         hf = AutoConfig.from_pretrained(name)
         if hf.max_position_embeddings < context:
             raise ValueError(f"{name}: context exceeds max_position_embeddings")
+        report["model_configs"][name] = {
+            "revision": hf._commit_hash,  # noqa: SLF001
+            "max_position_embeddings": hf.max_position_embeddings,
+        }
+    report["native_template_sha256"] = hashlib.sha256(student.chat_template.encode()).hexdigest()
     if config.actor_rollout_ref.actor.ppo_mini_batch_size != data.train_batch_size:
         raise ValueError("MDPO full-batch setting requires mini batch = prompt batch")
     actor = config.actor_rollout_ref.actor

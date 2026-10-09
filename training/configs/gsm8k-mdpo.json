@@ -10,6 +10,8 @@
         "actor_rollout_ref.actor.optim.weight_decay=0.0",
         "actor_rollout_ref.actor.optim.clip_grad=5.0",
         "actor_rollout_ref.actor.grad_clip=5.0",
+        "actor_rollout_ref.actor.fsdp_config.param_offload=true",
+        "actor_rollout_ref.ref.fsdp_config.param_offload=true",
         "actor_rollout_ref.actor.ppo_mini_batch_size=64",
         "actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1",
         "actor_rollout_ref.actor.ppo_epochs=16",
