@@ -1,0 +1,179 @@
+\section{双控制族：事件间方差与尾部内部方差}
+\label{sec:kl-two-controls}
+
+单控制 ResOPD 只改变头部与尾部两个事件的条件均值差。本节进一步保留论文的双控制推导，并使用同一套 $r_v,s_v,J_A,\tau_p,\mu_g,\mu_B$ 记号。定义尾部平均 score
+\[
+ \bar s_{\tail}=\E_p[s_A\mid J_A=1]
+ =\frac{1}{\tau_p}\sum_{v\notin S}p(v)s_v
+ =\nabla_\theta\log\tau_p.
+\]
+沿用 $b_0=\log(\tau_p/\tau_q)$，于是 $\mu_B=b_0\bar s_{\tail}$。定义向量
+\[
+ z_v=r_vs_v,\qquad
+ f_v=b_0(s_v-\bar s_{\tail}),\qquad
+ e_v=(r_v-b_0)s_v,\qquad v\notin S.
+\]
+其中 $z_v$ 只是前文 $r_vs_v$ 的缩写；$f_v$ 是尾部条件零均值波动，$e_v$ 是尾部形状残差。逐点恒等式为
+\begin{equation}
+ z_v=\mu_B+f_v+e_v,\qquad
+ \E_p[f_A\mid J_A=1]=0.
+ \label{eq:kl-tail-fine-decomposition}
+\end{equation}
+这些定义没有改变目标或采样分布。
+
+\begin{theorem}[双控制估计量及其精确协方差]
+\label{thm:kl-two-controls}
+对抽样前固定的向量 $b$ 与标量 $\gamma$，定义
+\[
+ \widehat g(b,\gamma)
+ =h_g+\tau_pb+J_A(z_A-b-\gamma f_A),\qquad A\sim p.
+\]
+则 $\E_p[\widehat g(b,\gamma)]=g$，并且
+\begin{align}
+ \operatorname{Cov}(\widehat g(b,\gamma))
+ &=\tau_p\operatorname{Cov}_{\tail}(z_A-\gamma f_A)
+   +P\tau_p(\mu_g-b)(\mu_g-b)^\top, \label{eq:kl-two-control-cov}\\
+ \Var(\widehat g(b,\gamma))
+ &=\tau_p\Var_{\tail}(z_A-\gamma f_A)
+   +P\tau_p\lVert\mu_g-b\rVert^2. \label{eq:kl-two-control-var}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+尾部条件下 $f_A$ 的均值为零，所以
+\[
+ \E_p[J_A(z_A-b-\gamma f_A)]
+ =\tau_p(\mu_g-b).
+\]
+加上确定性部分 $h_g+\tau_pb$ 就是 $g$。给定 $J_A=0$ 时，估计量是常向量 $h_g+\tau_pb$；给定 $J_A=1$ 时，均值为 $h_g+\tau_pb+\mu_g-b$，协方差为 $\operatorname{Cov}_{\tail}(z_A-\gamma f_A)$。两分支均值差为 $\mu_g-b$。将这两个条件协方差与条件均值协方差相加，得到式~\eqref{eq:kl-two-control-cov}；取迹得到式~\eqref{eq:kl-two-control-var}。
+\end{proof}
+
+\begin{theorem}[双控制的最优值与精确代价]
+令
+\[
+ V_f=\Var_{\tail}(f_A),\qquad
+ C_{zf}=\E_{\tail}\langle z_A-\mu_g,f_A\rangle.
+\]
+当 $V_f>0$ 时，迹方差最优控制为
+\[
+ b^*=\mu_g,\qquad \gamma^*=\frac{C_{zf}}{V_f}.
+\]
+任意 $b,\gamma$ 相对最优值的方差差恰好为
+\begin{equation}
+ \Var(\widehat g(b,\gamma))-\Var(\widehat g(b^*,\gamma^*))
+ =P\tau_p\lVert b-\mu_g\rVert^2
+  +\tau_pV_f(\gamma-\gamma^*)^2.
+ \label{eq:kl-two-control-regret}
+\end{equation}
+当 $V_f=0$ 时，$\gamma$ 不影响估计量的方差。
+\end{theorem}
+
+\begin{proof}
+由 $\E_{\tail}f_A=0$，
+\[
+ \Var_{\tail}(z_A-\gamma f_A)
+ =\Var_{\tail}(z_A)-2\gamma C_{zf}+\gamma^2V_f.
+\]
+对 $\gamma$ 配方，得到
+\[
+ \Var_{\tail}(z_A-\gamma f_A)
+ =\Var_{\tail}(z_A)-\frac{C_{zf}^2}{V_f}
+  +V_f(\gamma-\gamma^*)^2.
+\]
+再代入式~\eqref{eq:kl-two-control-var}，两个非负平方项分别由 $b=\mu_g$ 与 $\gamma=\gamma^*$ 消去。若 $V_f=0$，则 $f_A=0$ 在尾部条件分布下几乎处处成立。
+\end{proof}
+
+\subsection{HETS、ResOPD 与 SC-TA 的统一分类}
+
+样本修正 Tail-aware（Sample-Corrected Tail-Aware，SC-TA）与 ResOPD 的区别在尾部内部控制。双控制族中的坐标为
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+估计量 & $b$ & $\gamma$\\
+\midrule
+HETS & $0$ & $0$\\
+ResOPD & $\mu_B$ & $0$\\
+SC-TA & $\mu_B$ & $1$\\
+不可计算的联合最优值 & $\mu_g$ & $\gamma^*$\\
+\bottomrule
+\end{tabular}
+\end{center}
+三种可计算估计量在 $A\sim p$ 下均无偏。令 $g_{\mathrm{TA}}=h_g+\tau_p\mu_B$，则逐样本有
+\begin{align*}
+ \widehat g^{\mathrm{ResOPD}}&=g_{\mathrm{TA}}+J_A(e_A+f_A),\\
+ \widehat g^{\mathrm{SC\text{-}TA}}&=g_{\mathrm{TA}}+J_Ae_A,\\
+ \widehat g^{\mathrm{SC\text{-}TA}}-\widehat g^{\mathrm{ResOPD}}&=-J_Af_A.
+\end{align*}
+这个差的期望为零，逐样本一般不为零。
+
+\begin{proposition}[SC-TA 与 ResOPD 的方差排序]
+当 $V_f>0$ 时，
+\[
+ \Var(\widehat g^{\mathrm{ResOPD}})
+ -\Var(\widehat g^{\mathrm{SC\text{-}TA}})
+ =\tau_p(2C_{zf}-V_f)
+ =\tau_pV_f(2\gamma^*-1).
+\]
+因此 SC-TA 方差更小当且仅当 $\gamma^*>1/2$。一个充分条件为
+\[
+ \Var_{\tail}(e_A)<\frac14\Var_{\tail}(f_A).
+\]
+\end{proposition}
+
+\begin{proof}
+在同一个 $b=\mu_B$ 下，事件间方差相同。将 $\gamma=0,1$ 代入尾部内部二次式并相减，得到第一式。由 $z_A=\mu_B+e_A+f_A$，
+\[
+ C_{zf}=V_f+\E_{\tail}\langle e_A-\E_{\tail}e_A,f_A\rangle.
+\]
+Cauchy--Schwarz 不等式给出交叉项的下界
+\[
+ \E_{\tail}\langle e_A-\E_{\tail}e_A,f_A\rangle
+ \geq-\sqrt{\Var_{\tail}(e_A)V_f}.
+\]
+给定充分条件时，右侧严格大于 $-V_f/2$，故 $2C_{zf}-V_f>0$。
+\end{proof}
+
+当尾部条件形状完全相同，$r_v=b_0$ 对所有尾部 token 成立，此时 $e_A=0$，SC-TA 等于确定性的完整梯度；ResOPD 仍保留 $J_Af_A$ 的零均值波动。因此即使尾部桶已经完全描述 KL 数值，ResOPD 的梯度估计也可以有非零方差。若 $V_f=0$，两者逐样本相同。这是区分标量 KL 与向量梯度的一个直接例子。
+
+上述所有排序针对协方差迹。较小的迹不推出协方差矩阵在半正定序下更小；事件间协方差之差是两个秩一矩阵之差，某些方向上的方差仍可增大。
+
+\section{K4 尾部反传与 HETS 的精确关系}
+\label{sec:kl-k4-hets}
+
+前文 EMA 标量为 $\widehat K^{\mathrm{EMA}}=H+J_Ar_A$。若头部按真实数值 $H$ 求导，而尾部使用本章明确命名的 K4$^{\mathrm{live}}$ 构造，则自动微分得到
+\[
+ \widehat g^{\mathrm{EMA\text{-}K4}}
+ =h_g+d_P+J_A(r_A+1)s_A,\qquad d_P=\nabla_\theta P.
+\]
+这与 HETS 的 $h_g+J_Ar_As_A$ 相差 $d_P+J_As_A$。因为 $\E_p[J_As_A]=\nabla_\theta\tau_p=-d_P$，差值期望为零，但样本和方差均不同。
+
+\begin{theorem}[头尾 score 常数的匹配]
+对固定实数 $\alpha$，定义
+\[
+ \widehat g_\alpha
+ =h_g+\alpha d_P+J_A(r_A+\alpha)s_A.
+\]
+则它对 $g$ 无偏，且
+\begin{equation}
+ \Var(\widehat g_\alpha)
+ =\sum_{v\notin S}p(v)(r_v+\alpha)^2\lVert s_v\rVert^2
+  -\lVert\tau_p\mu_g-\alpha d_P\rVert^2.
+ \label{eq:kl-alpha-var}
+\end{equation}
+$\alpha=0$ 是 HETS，$\alpha=1$ 是真实头部数值加 masked K4$^{\mathrm{live}}$ 尾部的反传。
+\end{theorem}
+
+\begin{proof}
+期望为
+\[
+ h_g+\alpha d_P+\tau_p\mu_g+\alpha\sum_{v\notin S}p(v)s_v
+ =h_g+\tau_p\mu_g=g.
+\]
+确定性头部不贡献协方差；随机尾部的均值为 $\tau_p\mu_g-\alpha d_P$，二阶矩为式~\eqref{eq:kl-alpha-var} 的求和项，两者相减得到方差。
+\end{proof}
+
+如果误把真实头部梯度 $h_g+d_P$ 与尾部的 $J_Ar_As_A$ 拼接，得到的期望为 $g+d_P$，偏差为 $d_P$。若头部停止系数为 $h_g$，尾部却使用 $J_A(r_A+1)s_A$，偏差为 $-d_P$。两端的 score 常数必须匹配；仅凭“精确头部加 sampled tail”这句话无法判断无偏性。
+
+EMA-PG 固定版本的 \texttt{compute\_memory\_efficient\_kl} 在 \texttt{full\_reverse} 路径中直接反传头部 $H$，尾部使用停止 log-ratio 的 K4。因此在共同固定支持、无 clipping 且尾部测度校正正确时，forward 无偏，backward 的偏差为 $d_P$。actor 传入的 log-importance weight 已 detach，不能通过它的导数消掉 $d_P$。\footnote{同一固定版本的 actor 路径见 \href{https://github.com/LunjunZhang/ema-pg/blob/f9b977632ad948ce935432a517c22291bfaba562/search/verl/workers/actor/dp_actor.py}{\texttt{dp\_actor.py}}。}本章所证明的无偏 EMA 数值结构与论文 HETS 的向量结构，不能据名称相近就认定为该路径的逐样本反传行为。
+
+本仓库的 \path{tests/test_kl_estimators.py} 核验单 token K4$^{\mathrm{live}}$ 的数值与梯度，对应 $(r_A+1)s_A$。\path{experiments/analysis/ema_topk_k_analysis.py} 中的结构统计采用 $h_g+d_P$ 头部与 $r_As_A$ 尾部，其期望具有上述 $d_P$ 偏差；这些统计不能作为正确匹配头尾常数的估计量或 HETS 的无偏性证据。\path{src/mirroropd/training/losses.py} 的 OPD baseline 使用停止梯度的 Tail-aware 标量，属于 scalar baseline 路径。本章的数学分类分别描述这三个实际对象。

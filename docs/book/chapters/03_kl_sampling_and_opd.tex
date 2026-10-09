@@ -1,0 +1,280 @@
+\section{实际采样测度与重要性校正}
+\label{sec:kl-sampling}
+
+前面的 $P\tau_p$ 方差分解要求动作确实来自 $p$。真实训练中，冻结 rollout、温度变换和 top-$p$/top-$k$ 过滤使实际分布成为 $\rho$。本节始终保持 $p$ 为当前 student、$q$ 为冻结参考、$\rho$ 为抽样分布。
+
+\begin{theorem}[重要性校正的均值、偏差与方差]
+\label{thm:kl-importance}
+令 $A\sim\rho$，$w_v=p(v)/\rho(v)$。对可积标量或向量函数 $u_v$，若 $\rho(v)>0$ 覆盖 $p(v)u_v$ 的非零支持，则
+\[
+ \E_\rho[w_Au_A]=\sum_vp(v)u_v,\qquad
+ \Var_\rho(w_Au_A)
+ =\sum_v\frac{p(v)^2}{\rho(v)}\lVert u_v\rVert^2
+  -\left\lVert\sum_vp(v)u_v\right\rVert^2.
+\]
+标量情形将范数解释为绝对值。若不作校正，$\E_\rho[u_A]$ 相对 $\E_p[u_A]$ 的偏差为 $\sum_v(\rho(v)-p(v))u_v$。
+\end{theorem}
+
+\begin{proof}
+将 $w_v=p(v)/\rho(v)$ 代入期望求和，$\rho(v)$ 逐项抵消，得到第一式。二阶矩中只抵消一个 $\rho(v)$，所以得到 $p(v)^2/\rho(v)$；减去均值范数平方即是方差。不校正时直接将两个期望求和相减即可。
+\end{proof}
+
+对 KL 数值，取 $u_v=r_v$；对 KL 梯度，取 $u_v=r_vs_v$。二者的无偏估计分别为
+\[
+ \widehat K_\rho=w_Ar_A,\qquad
+ \widehat g_\rho=w_Ar_As_A.
+\]
+若用 surrogate 反传梯度，应停止 $w_A r_A$ 的梯度；若将 $w_A$ 看作可求导的损失组成部分，则必须另行计算整体导数。重要性校正的作用是更换积分测度，停止系数的作用是规定反传路径，两者是不同步骤。
+
+\subsection{精确头部下的尾部重要性控制}
+
+只对尾部抽样时，支持覆盖条件可弱化为 $\rho(v)>0$ 覆盖所有 $v\notin S$ 且 $p(v)>0$ 的 token；已精确求和的头部不要求采到。对标量控制 $\beta$ 与向量控制 $b$，定义
+\begin{align}
+ \widehat K_\rho(\beta)&=H+\tau_p\beta+J_Aw_A(r_A-\beta), \label{eq:kl-is-scalar}\\
+ \widehat g_\rho(b)&=h_g+\tau_pb+J_Aw_A(r_As_A-b). \label{eq:kl-is-vector}
+\end{align}
+只要控制在抽样前固定，两者分别对 $K,g$ 无偏。其精确方差为
+\begin{align}
+ \Var_\rho(\widehat K_\rho(\beta))
+ &=\sum_{v\notin S}\frac{p(v)^2}{\rho(v)}(r_v-\beta)^2
+   -\tau_p^2(\mu_r-\beta)^2, \label{eq:kl-is-scalar-var}\\
+ \Var_\rho(\widehat g_\rho(b))
+ &=\sum_{v\notin S}\frac{p(v)^2}{\rho(v)}\lVert r_vs_v-b\rVert^2
+   -\tau_p^2\lVert\mu_g-b\rVert^2. \label{eq:kl-is-vector-var}
+\end{align}
+这些等式由定理~\ref{thm:kl-importance} 限制在尾部直接得到。仅在 $\rho=p$ 时，它们化为前文的 $\tau_p$ 条件方差加 $P\tau_p$ 事件间方差。
+
+\begin{proposition}[非 on-policy 下的最优尾部控制]
+记
+\[
+ W=\sum_{v\notin S}\frac{p(v)^2}{\rho(v)},\quad
+ U=\sum_{v\notin S}\frac{p(v)^2}{\rho(v)}r_vs_v,\quad
+ T=\tau_p\mu_g.
+\]
+当 $W>\tau_p^2$ 时，式~\eqref{eq:kl-is-vector-var} 的最优向量为
+\[
+ b_\rho^*=\frac{U-\tau_pT}{W-\tau_p^2}.
+\]
+标量控制最优值由同式将 $r_vs_v$ 替换成 $r_v$ 得到。
+\end{proposition}
+
+\begin{proof}
+将式~\eqref{eq:kl-is-vector-var} 展开：
+\[
+ V(b)=C-2\langle U-\tau_pT,b\rangle
+          +(W-\tau_p^2)\lVert b\rVert^2.
+\]
+对 $b$ 求导令零即可。由 Cauchy--Schwarz，
+\[
+ \tau_p^2
+ =\left(\sum_{v\notin S}\frac{p(v)}{\sqrt{\rho(v)}}\sqrt{\rho(v)}\right)^2
+ \leq W\sum_{v\notin S}\rho(v)\leq W.
+\]
+若 $\rho=p$，则 $W=\tau_p$、$U=T$，最优值化为 $\mu_g$。若 $W=\tau_p^2$，两次不等式均为等号，意味着 $\rho$ 完全集中于尾部且其条件形状与 $p$ 尾部相同；此时 $J_Aw_A=\tau_p$ 几乎处处成立，控制项逐样本抵消，方差与 $b$ 无关。
+\end{proof}
+
+\subsection{截断 rollout 与旧策略 rollout 的精确偏差}
+
+若实现仍使用未校正的控制族
+\[
+ \widehat g(b)=h_g+\tau_pb+J_A(r_As_A-b),\qquad A\sim\rho,
+\]
+令 $\tau_\rho=\sum_{v\notin S}\rho(v)$、$\mu_{g,\rho}=\E_\rho[r_As_A\mid J_A=1]$。直接求和给出
+\begin{align}
+ \E_\rho[\widehat g(b)]-g
+ &=\sum_{v\notin S}(\rho(v)-p(v))(r_vs_v-b), \label{eq:kl-wrong-measure-bias}\\
+ \Var_\rho(\widehat g(b))
+ &=\tau_\rho\Var_{\rho,\tail}(r_As_A)
+  +(1-\tau_\rho)\tau_\rho\lVert\mu_{g,\rho}-b\rVert^2. \label{eq:kl-wrong-measure-var}
+\end{align}
+标量版本将 $r_vs_v$ 替换为 $r_v$、$b$ 替换为 $\beta$。因此在实际 rollout 测度下方差更小，仍可同时存在相对于完整 KL 梯度的非零偏差。
+
+如果温度变换保留全支持且 $\rho$ 已知，可以用式~\eqref{eq:kl-is-vector} 校正。top-$p$/top-$k$ 过滤通常使一部分未知尾部满足 $\rho(v)=0<p(v)$；此时有限重要性权重不能恢复被删除项。重新对样本做完整 softmax 只恢复当前目标 $p$ 的数值，不能改变该动作已由 $\rho$ 生成的事实。旧 rollout 也需要对实际生成概率作校正，而不能假定 student 更新后动作自动变成当前 on-policy 样本。
+
+若把 $w_A$ 截断成 $\bar w_A$，估计 $\E_p[u_A]$ 的额外偏差为
+\[
+ \sum_v\rho(v)(\bar w_v-w_v)u_v.
+\]
+在尾部控制族中只对尾部求和，并取 $u_v=r_vs_v-b$ 或 $r_v-c$。clipping 的方差降低必须与这个偏差共同报告。
+
+\section{KL 方向与 OPD 中的具体用途}
+\label{sec:kl-opd-roles}
+
+\subsection{反向 KL 与正向 KL}
+
+本章默认反向 KL（reverse KL）为 $K=\KL(p\Vert q)$。正向 KL（forward KL）固定为
+\[
+ K^{\mathrm F}=\KL(q\Vert p)=-\sum_vq(v)r_v,\qquad
+ g^{\mathrm F}=\nabla_\theta K^{\mathrm F}=-\sum_vq(v)s_v.
+\]
+这里仍然只有 $p$ 可求导；交换 KL 的两个参数不能同时交换谁是 student。对 $A\sim\rho$，
+\[
+ \widehat K^{\mathrm F}=-\frac{q(A)}{\rho(A)}r_A,\qquad
+ \widehat g^{\mathrm F}=-\frac{q(A)}{\rho(A)}s_A
+\]
+分别无偏，方差为
+\[
+ \Var(\widehat K^{\mathrm F})
+ =\sum_v\frac{q(v)^2}{\rho(v)}r_v^2-(K^{\mathrm F})^2,
+ \quad
+ \Var(\widehat g^{\mathrm F})
+ =\sum_v\frac{q(v)^2}{\rho(v)}\lVert s_v\rVert^2-\lVert g^{\mathrm F}\rVert^2.
+\]
+证明沿用定理~\ref{thm:kl-importance}，只是积分权重变成 $q$。当 $\rho=q$ 时，$-r_A$ 的裸反传 $-s_A$ 已是正确梯度；当 $\rho=p$ 时，正向 KL 的数值和梯度需相应的 $q/p$ 权重。
+
+\subsection{正向 Top-$J$ 数值与梯度}
+
+使用完全相同的 $p,q,S,\tau_p,\tau_q$，定义正向头部
+\[
+ H^{\mathrm F}=-\sum_{v\in S}q(v)r_v,\qquad
+ B^{\mathrm F}=\tau_q\KL(q_{\tail}\Vert p_{\tail}).
+\]
+逐项将尾部 log-ratio 拆成质量与条件形状，得到
+\[
+ K^{\mathrm F}=H^{\mathrm F}-\tau_qb_0+B^{\mathrm F}.
+\]
+因此正向 Truncated、Tail-aware、Normalized 三个数值目标分别为
+\[
+ H^{\mathrm F},\qquad
+ H^{\mathrm F}-\tau_qb_0,\qquad
+ \frac{H^{\mathrm F}}{Q}+\log\frac{P}{Q}.
+\]
+相对完整正向 $K^{\mathrm F}$ 的偏差分别为
+\[
+ \tau_qb_0-B^{\mathrm F},\qquad
+ -B^{\mathrm F},\qquad
+ \frac{H^{\mathrm F}}{Q}+\log\frac{P}{Q}-K^{\mathrm F},
+\]
+且固定 prefix 下方差均为零。这里 $B^{\mathrm F}$ 与前文 $B$ 分别对应不同方向的尾部条件 KL，上标始终保留。
+
+对标量尾部控制 $\beta$，完整正向 KL 的无偏校正为
+\[
+ \widehat K^{\mathrm F}_\rho(\beta)
+ =H^{\mathrm F}+\tau_q\beta
+   +J_A\frac{q(A)}{\rho(A)}(-r_A-\beta).
+\]
+令 $\mu_r^{\mathrm F}=\E_{q_{\tail}}[-r_A]$，则其方差为
+\[
+ \Var_\rho(\widehat K^{\mathrm F}_\rho(\beta))
+ =\sum_{v\notin S}\frac{q(v)^2}{\rho(v)}(-r_v-\beta)^2
+   -\tau_q^2(\mu_r^{\mathrm F}-\beta)^2.
+\]
+证明是定理~\ref{thm:kl-importance} 在尾部对积分分布 $q$ 的直接应用：修正项均值是 $\tau_q(\mu_r^{\mathrm F}-\beta)$，恰好补齐尾部。
+
+梯度方面，定义 $h_g^{\mathrm F}=-\sum_{v\in S}q(v)s_v$。因为 $q$ 固定，逐项求导给出
+\begin{align*}
+ \nabla H^{\mathrm F}&=h_g^{\mathrm F},\\
+ \nabla(H^{\mathrm F}-\tau_qb_0)
+ &=h_g^{\mathrm F}-\tau_q\bar s_{\tail},\\
+ \nabla\left(\frac{H^{\mathrm F}}{Q}+\log\frac P Q\right)
+ &=\frac{h_g^{\mathrm F}}{Q}+\frac{d_P}{P}.
+\end{align*}
+三者的梯度偏差分别是上述向量减去 $g^{\mathrm F}$，梯度方差均为零。这里 $\bar s_{\tail}=\nabla\log\tau_p$ 是 student 尾部平均 score；它不能替换为未知的 teacher 尾部平均 score。特别地，正向 Tail-aware 梯度偏差为
+\[
+ \sum_{v\notin S}q(v)s_v-\tau_q\bar s_{\tail}.
+\]
+正向头部梯度与反向头部梯度的差异来自积分权重：$H^{\mathrm F}$ 的权重 $q$ 冻结，因此没有反向 $\nabla H$ 中的 $d_P$ 项。
+
+正向无偏向量控制同样使用原来的向量符号 $b$：
+\[
+ \widehat g^{\mathrm F}_\rho(b)
+ =h_g^{\mathrm F}+\tau_qb
+   +J_A\frac{q(A)}{\rho(A)}(-s_A-b).
+\]
+令 $\mu_g^{\mathrm F}=\E_{q_{\tail}}[-s_A]$，有
+\[
+ \Var_\rho(\widehat g^{\mathrm F}_\rho(b))
+ =\sum_{v\notin S}\frac{q(v)^2}{\rho(v)}\lVert-s_v-b\rVert^2
+  -\tau_q^2\lVert\mu_g^{\mathrm F}-b\rVert^2.
+\]
+所有正向估计的支持覆盖要求作用于未知的 $q$ 尾部。这样，BPO 的正向 student--anchor center 与 OPD 的反向 student--teacher KL 都使用同一套采样与误差定义。
+
+\subsection{Sampled OPD 与 vOPD}
+
+固定 teacher 作为 $q$，sampled OPD 取停止系数 $r_A$，其最小化梯度为 $r_As_A$；若使用 reward 最大化记号，reward 是 $-r_A$，两种表述符号相反而更新方向相同。vOPD 取 $(r_A-c(x))s_A$，其中 $c(x)$ 可取完整 $K$、Tail-aware 下界或独立随机 KL baseline。第三章已经证明：action-independent baseline 的数值偏差不产生梯度偏差；同 action 的无偏 KL 估计反而可以产生梯度偏差。
+
+本仓库生产 OPD baseline 对 $q=\pi_T$ 使用 $H+\tau_p\log(\tau_p/\tau_q)$，并在梯度系数中停止。它是完整 KL 的有偏数值下界，但作为 action-independent baseline，在正确采样测度或正确重要性校正下保持 OPD 梯度无偏。若 rollout 来自冻结 $\pi_k$，则此处 $\rho=\pi_k$，需要 $p/\rho$；baseline 本身使用 teacher 作为 $q$，二者不可混用。
+
+\subsection{Mirror 目标中的 student--anchor KL}
+
+对 MDPO，令本节参考 $q=\pi_k$，固定 reward 为前两章的 $r_k(x,v)$。负 mirror 目标为
+\[
+ \mathcal L_{\mathrm{MDPO}}
+ =\eta^{-1}K-\E_p[r_k(x,A)].
+\]
+逐项求导并利用 score 均值为零，得到
+\[
+ \nabla\mathcal L_{\mathrm{MDPO}}
+ =\E_p[\phi_As_A],\qquad
+ \phi_v=\eta^{-1}r_v-r_k(x,v).
+\]
+在冻结 rollout $\rho=\pi_k$ 下，无偏估计为
+\[
+ \widehat g_{\mathrm{MDPO}}=\frac{p(A)}{\rho(A)}\phi_As_A,\qquad
+ \Var_\rho(\widehat g_{\mathrm{MDPO}})
+ =\sum_v\frac{p(v)^2}{\rho(v)}\phi_v^2\lVert s_v\rVert^2
+  -\lVert\nabla\mathcal L_{\mathrm{MDPO}}\rVert^2.
+\]
+如果 $\lVert\phi_vs_v\rVert\leq C$，则二阶矩满足
+\begin{equation}
+ \E_\rho\lVert\widehat g_{\mathrm{MDPO}}\rVert^2
+ \leq C^2\sum_v\frac{p(v)^2}{\rho(v)}
+ =C^2\{1+\chi^2(p\Vert\rho)\}.
+ \label{eq:mdpo-variance}
+\end{equation}
+这说明 stale rollout 与当前 student 分离时的重要性权重代价。
+
+BPO 的 student center 是相反方向的 $\KL(\pi_k\Vert p)$，在本节 $q=\rho=\pi_k$ 下就是 $K^{\mathrm F}$；teacher center 是冻结的 $\KL(\pi_k\Vert\pi_T)$。PMD-Mean 的目标使用冻结 reward 中心而不含同样的 student KL center。它们的原目标就在 anchor 测度下定义，不能因 MDPO 需要 $p/\rho$，便给 Mean 或 BPO 机械乘上该比率。center 放入平方损失后还会出现同样本相关项，须使用第二章的有限样本与留一修正；一个 KL scalar estimator 的无偏性不替代整个目标梯度的证明。
+
+\section{确定性代理的误差、细分单调性与总体统计}
+
+记 $M=\tau_pb_0$、$B=\tau_p\KL(p_{\tail}\Vert q_{\tail})$。Tail-aware 与截断的平方误差差为
+\[
+ (K-H)^2-\{K-(H+M)\}^2=(M+B)^2-B^2=M(M+2B).
+\]
+因此 $M\geq0$ 时 Tail-aware 的标量平方误差不大于截断；$M<0$ 时删除的质量项与形状项可抵消，零方差确定性 proxy 的排序不能只按是否保留更多项判断。
+
+\begin{proposition}[Tail-aware 支持细分的单调性]
+令 $S'=S\cup\{v\}$，其中 $v\notin S$。在分裂前的尾部质量 $\tau_p,\tau_q$ 下，
+\begin{align*}
+ K^{\mathrm{TA}}(S')-K^{\mathrm{TA}}(S)
+ &=p(v)\log\frac{p(v)}{q(v)}
+  +(\tau_p-p(v))\log\frac{\tau_p-p(v)}{\tau_q-q(v)}
+  -\tau_p\log\frac{\tau_p}{\tau_q}\\
+ &=\tau_p\KL\left(
+ \left(\frac{p(v)}{\tau_p},1-\frac{p(v)}{\tau_p}\right)
+ \middle\Vert
+ \left(\frac{q(v)}{\tau_q},1-\frac{q(v)}{\tau_q}\right)\right)\geq0.
+\end{align*}
+所以嵌套支持下 Tail-aware 单调上升到完整 KL，其偏差绝对值和逐 prefix 平方误差单调下降。
+\end{proposition}
+
+\begin{proof}
+将分裂前尾部类别替换为新 token 与剩余尾部两类，写出新增的两项并减去旧桶项，提取 $\tau_p$ 就得到二元 KL。KL 非负性给出结论；全词表支持时误差为零。
+\end{proof}
+
+\subsection{Normalized 与 Truncated 的 logit 行为}
+
+令 $p=\operatorname{softmax}(\theta)$，其 score 为 $s_{v,j}=\mathbf1\{v=j\}-p(j)$。Normalized Top-$J$ 只依赖头部相对 logits，故对 $j\notin S$ 有
+\[
+ \frac{\partial K^{\mathrm{norm}}_J}{\partial\theta_j}=0.
+\]
+截断数值的真实梯度则满足
+\[
+ \frac{\partial H}{\partial\theta_j}=-p(j)(H+P),\qquad j\notin S.
+\]
+这由 $\nabla H=\sum_{v\in S}p(v)(r_v+1)s_v$ 逐坐标代入得到。当 $H+P>0$ 时，梯度下降增加尾部 logits。停止系数的头部梯度 $h_g$ 省去了 $P$ 对应的边界项，但仍缺失完整尾部。因此这两种截断训练路径也必须分别报告。
+
+\subsection{固定 prefix 误差与访问测度下误差}
+
+令 $x\sim d$，条件偏差为 $\beta(x)=\E[\widehat K\mid x]-K(x)$，条件方差为 $V(x)$。则
+\[
+ \E_{x,A}[\widehat K-K]=\E_d[\beta(x)],\qquad
+ \E_{x,A}[(\widehat K-K)^2]=\E_d[\beta(x)^2+V(x)].
+\]
+而原始 estimator 的总体方差是
+\[
+ \Var_{x,A}(\widehat K)
+ =\E_d[V(x)]+\Var_d(K(x)+\beta(x)).
+\]
+这三个统计量分别回答总体有符号误差、逐 prefix 均方误差和 estimator 自身的总体波动。确定性 Tail-aware 有 $V(x)=0$，但 $\operatorname{RMSE}=\sqrt{\E_d[B(x)^2]}$，一般不等于 $|\E_d[-B(x)]|$。向量估计量将平方替换为范数平方、方差替换为协方差迹，结论保持相同形式。访问测度 $d$ 在不同 outer 轮次的变化由第四章单独处理。

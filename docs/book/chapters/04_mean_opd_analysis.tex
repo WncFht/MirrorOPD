@@ -1,7 +1,7 @@
 \section{PMD-Mean 的逐 prefix OPD 动力学}
 \label{sec:mean-prefix-analysis}
 
-本节固定一个 prefix $s$，在有限词表 $\mathcal V$ 上分析 PMD-Mean 的总体最优解。假设 teacher 与当前 anchor 在每个 token 上均有正概率。每轮 inner 精确求解后执行 hard sync。以下结论描述这一分布空间更新；参数共享、有限 inner、采样误差与 prefix 测度变化需要另外控制。
+本节固定一个 prefix $x$，在有限词表 $\mathcal V$ 上分析 PMD-Mean 的总体最优解。假设 teacher 与当前 anchor 在每个 token 上均有正概率。每轮 inner 精确求解后执行 hard sync。以下结论描述这一分布空间更新；参数共享、有限 inner、采样误差与 prefix 测度变化需要另外控制。
 
 原始 PMD-Mean 论文的三个相关结论在本地源文件中对应以下标签：
 \begin{quote}
@@ -13,9 +13,9 @@
 
 \subsection{代入 OPD reward 后的 Lambert-$W$ 更新}
 
-固定第 $k$ 轮与 prefix $s$，局部记
+固定第 $k$ 轮与 prefix $x$，局部记
 \begin{align}
- q_a&=\pi_k(a\mid s), & t_a&=\pi_T(a\mid s),\notag\\
+ q_a&=\pi_k(a\mid x), & t_a&=\pi_T(a\mid x),\notag\\
  r_a&=\log\frac{t_a}{q_a}, &
  \kappa&=\KL(q\Vert t)=-\E_q r,\notag\\
  h_a&=r_a+\kappa, & G_a&=\eta h_a.
@@ -102,7 +102,7 @@ $W_0$ 在非负实轴上严格递增，因此 $\Phi$ 连续且严格递减。当
 将 $h$ 展开即可得到式~\eqref{eq:mean-opd-W-substituted}。
 \end{proof}
 
-恢复全局记号时，$p^\star=\pi_k^{\star,\mathrm{Mean}}(\cdot\mid s)$，$\kappa=\mathcal K_k^T(s)$，而乘子是逐 prefix 的 $\lambda_k(s)$。hard sync 更新为 $\pi_{k+1}=\pi_k^{\star,\mathrm{Mean}}$。式~\eqref{eq:mean-opd-W-substituted} 展示了 teacher--anchor 概率比如何进入 Lambert-$W$；$W_0$ 中的修正随动作变化，不能吸收到一个公共配分常数中。
+恢复全局记号时，$p^\star=\pi_k^{\star,\mathrm{Mean}}(\cdot\mid x)$，$\kappa=\mathcal K_k^T(x)$，而乘子是逐 prefix 的 $\lambda_k(x)$。hard sync 更新为 $\pi_{k+1}=\pi_k^{\star,\mathrm{Mean}}$。式~\eqref{eq:mean-opd-W-substituted} 展示了 teacher--anchor 概率比如何进入 Lambert-$W$；$W_0$ 中的修正随动作变化，不能吸收到一个公共配分常数中。
 
 \subsection{归一化乘子的 R\'enyi 界}
 
@@ -224,16 +224,16 @@ Mean 的 KKT 为 $U_a^\star+\lambda p_a^\star/q_a=\eta(r_a+\kappa)$。取 $\xi=\
  \le\left(1-\frac{\eta}{1+\eta b(q,t)}\right)b(q,t).
  \label{eq:mean-opd-span-step}
 \end{equation}
-固定正 teacher、正初始策略和常数 $0<\eta\le1$，每轮精确 Mean inner 后 hard sync。令 $b_k(s)=b(\pi_k(\cdot\mid s),\pi_T(\cdot\mid s))$，则
+固定正 teacher、正初始策略和常数 $0<\eta\le1$，每轮精确 Mean inner 后 hard sync。令 $b_k(x)=b(\pi_k(\cdot\mid x),\pi_T(\cdot\mid x))$，则
 \begin{equation}
- b_k(s)\le
- \left(1-\frac{\eta}{1+\eta b_0(s)}\right)^k b_0(s)
+ b_k(x)\le
+ \left(1-\frac{\eta}{1+\eta b_0(x)}\right)^k b_0(x)
  \longrightarrow0.
  \label{eq:mean-opd-span-geometric}
 \end{equation}
-因此 $\pi_k(\cdot\mid s)\to\pi_T(\cdot\mid s)$。当 $\eta=1$ 时，单步还满足
+因此 $\pi_k(\cdot\mid x)\to\pi_T(\cdot\mid x)$。当 $\eta=1$ 时，单步还满足
 \begin{equation}
- b_{k+1}(s)\le\frac{b_k(s)^2}{1+b_k(s)}.
+ b_{k+1}(x)\le\frac{b_k(x)^2}{1+b_k(x)}.
  \label{eq:mean-opd-span-quadratic}
 \end{equation}
 \end{theorem}
@@ -275,14 +275,14 @@ Mean 的 KKT 为 $U_a^\star+\lambda p_a^\star/q_a=\eta(r_a+\kappa)$。取 $\xi=\
 
 逐轮应用单步界，先得到 $b_{k+1}\le b_k\le b_0$。函数 $x\mapsto1-\eta/(1+\eta x)$ 递增，因此每轮收缩因子都不超过 $1-\eta/(1+\eta b_0)<1$，归纳得到式~\eqref{eq:mean-opd-span-geometric}。概率归一化同时保证
 \[
- \min_a\log\frac{\pi_k(a\mid s)}{\pi_T(a\mid s)}
+ \min_a\log\frac{\pi_k(a\mid x)}{\pi_T(a\mid x)}
  \le0\le
- \max_a\log\frac{\pi_k(a\mid s)}{\pi_T(a\mid s)}.
+ \max_a\log\frac{\pi_k(a\mid x)}{\pi_T(a\mid x)}.
 \]
-所以每个动作的 log-ratio 绝对值不超过 $b_k(s)$；跨度趋零推出逐动作概率收敛。最后令 $\eta=1$ 即得到式~\eqref{eq:mean-opd-span-quadratic}。
+所以每个动作的 log-ratio 绝对值不超过 $b_k(x)$；跨度趋零推出逐动作概率收敛。最后令 $\eta=1$ 即得到式~\eqref{eq:mean-opd-span-quadratic}。
 \end{proof}
 
-$\eta=1$ 的二次上界描述接近 teacher 时的精确 outer 收敛；一般起点上的一次更新仍是 Lambert-$W$ 分布。不同 prefix 的 $b_0(s)$ 可以不同，因此上述逐 prefix 结论不自动给出全 prefix 的统一收敛率。
+$\eta=1$ 的二次上界描述接近 teacher 时的精确 outer 收敛；一般起点上的一次更新仍是 Lambert-$W$ 分布。不同 prefix 的 $b_0(x)$ 可以不同，因此上述逐 prefix 结论不自动给出全 prefix 的统一收敛率。
 
 \subsection{一般 OPD reward 的大步长极限}
 

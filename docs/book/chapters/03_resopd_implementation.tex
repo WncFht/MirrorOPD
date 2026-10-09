@@ -1,7 +1,7 @@
 \section{ResOPD 实现与论文实验}
 \label{sec:resopd-implementation}
 
-本节沿用前文的 $r_v$、score $s_v$、头部向量 $h_g$、尾部均值 $\mu_g$ 与事件 $J_A$，将控制族对应到公开训练实现。
+本节沿用前文的 $r_v$、score $s_v$、头部向量 $h_g$、尾部均值 $\mu_g$ 与事件 $J_A$，将控制族对应到公开训练实现。\footnote{论文来源为 \href{https://arxiv.org/abs/2610.04882}{ResOPD}；本仓库保存的全文为 \path{docs/papers/2610.04882_zh_CN/}。代码来源为 \href{https://github.com/InternLM/ResOPD}{InternLM/ResOPD}。}
 
 \subsection{代码调用链与停止梯度}
 
@@ -21,11 +21,11 @@ student logits 经 \path{verl/trainer/distillation/fsdp/losses.py} 对齐后，\
 \item 完整 student logits 做 log-softmax，得到头部 $p(v)$、$r_v$ 和 $P$；teacher Top-$J$ log-prob 在进入计算时 detach。
 \item 从实际 token 得到 $r_A$，并用 \texttt{student\_tail\_mass}、\texttt{teacher\_tail\_mass} 构造 $\log(\tau_p/\tau_q)$。
 \item 用 \texttt{support\_score} 计算 $\mu_B$，并令 $\texttt{centered\_event}=\mathbf 1\{A\in S\}-P$。
-\item 通过 \texttt{surrogate - surrogate.detach()} 保留 forward 数值、替换 backward，得到式~\eqref{eq:chapter4-control-family} 中 $b=\mu_B$ 的特例。
+\item 通过 \texttt{surrogate - surrogate.detach()} 保留 forward 数值、替换 backward，得到式~\eqref{eq:chapter3-control-family} 中 $b=\mu_B$ 的特例。
 \end{enumerate}
 实现中的 teacher 数值、事件系数和控制项均停止梯度。仓库 docstring 明确说明返回值不是确定性 KL 目标，单个 forward value 可以为负；应审计 backward 梯度、期望和协方差，而不是把 loss 平均值解释成完整 KL。
 
-无偏性要求 $A$ 来自当前完整 student 分布。发布脚本使用温度 $1$、\texttt{top\_p=1}、\texttt{top\_k=-1}，每个 fresh rollout batch 只做一个 PPO epoch。截断采样、旧 rollout 重复优化或其他改变动作测度的 logits processor 都需要重新推导。
+无偏性要求 $A$ 来自当前完整 student 分布，或按本章给出的重要性权重校正。发布脚本使用温度 $1$、\texttt{top\_p=1}、\texttt{top\_k=-1}。论文的主要数学实验使用温度 $1$、\texttt{top\_p=0.95}、\texttt{top\_k=20}；全支持审计与跨领域实验采用完整祖先采样。这些设置必须分别报告：重新计算未截断 logits 能恢复目标概率 $p$，不能把已生成动作的测度 $\rho$ 改回 $p$。
 
 \subsection{公开实验与 baseline}
 

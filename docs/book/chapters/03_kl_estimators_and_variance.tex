@@ -1,312 +1,663 @@
-\chapter{KL 估计量、无偏性与方差}
+\chapter{KL 数值与梯度的估计理论}
+\label{chap:kl-estimation}
 
-\section{K4 的无偏性}
+本章统一讨论两类容易混淆的随机对象：完整 KL 数值本身的估计量，以及 KL 对参数梯度的估计量。本章估计量部分固定一个 prefix $x$，记
+\[
+ p(v)=\pi_{\mathrm{student}}(v\mid x),\qquad
+ q(v)=\pi_{\mathrm{ref}}(v\mid x),\qquad
+ r_v=\log\frac{p(v)}{q(v)},\qquad
+ s_v=\nabla_\theta\log p(v).
+\]
+以下所有条件期望和方差都在固定 $x$ 下，动作 $A$ 默认服从 $p$。设 $S\subseteq\mathcal V$ 是冻结的 teacher Top-$J$ 支持，定义
+\[
+ P=\sum_{v\in S}p(v),\qquad Q=\sum_{v\in S}q(v),\qquad
+ \tau_p=1-P,\qquad \tau_q=1-Q,\qquad J_A=\mathbf 1\{A\notin S\}.
+\]
+为避免把 token score $s_v$ 与支持集 $S$ 混淆，下文用 $J_A$ 表示尾部事件。
 
-本节固定 prefix $s$，记 $p=\pi_{k,n}(\cdot\mid s)$、$q=\pi_k(\cdot\mid s)$，并从 $p$ 采样 $a$。定义
+本章假设词表有限，$p(v),q(v)>0$，参考 $q$ 与支持集 $S$ 在求导时固定，且 $0<P,Q<1$。这些条件保证所有矩存在，并允许交换求导与求和。对标量 $X$，偏差定义为 $\E[X]-K$；对向量 $X$，偏差定义为 $\E[X]-g$，其中 $K=\KL(p\Vert q)$、$g=\nabla_\theta K$。向量方差统一指协方差迹：
 \[
- c_{k,n}(s,a)=\frac{p(a)}{\sg(p(a))},\qquad U_{k,n}(s,a)=\log\frac{p(a)}{q(a)}.
+ \Var(X)=\operatorname{tr}\operatorname{Cov}(X)
+ =\E\lVert X-\E X\rVert_2^2.
 \]
-数值上 $c_{k,n}=1$，但其导数为 $\nabla\log p(a)$。
+以下先计算固定 prefix 的动作抽样误差；随机 prefix 的方差须再加上 prefix 间条件均值的方差。文中的 EMA 名称沿用本书的头部精确、尾部抽样估计器，不额外引入时间上的指数滑动平均。
 
-\begin{theorem}[K4 value and gradient]
-\label{thm:k4}
-若 $p\ll q$ 且二阶矩有限，则
-\[
- \E_{a\sim p}[c_{k,n}(s,a)U_{k,n}(s,a)]=\KL(p\Vert q),
-\]
-并且自动微分意义下
-\[
- \E_{a\sim p}[\nabla_{\theta_{k,n}}\{c_{k,n}(s,a)U_{k,n}(s,a)\}]
- =\nabla_{\theta_{k,n}}\KL(p\Vert q).
-\]
-\end{theorem}
+\begin{definition}[本章唯一的分布与导数记号]
+$p=p_\theta$ 始终是当前 student 分布；$q$ 始终是冻结参考分布，默认是 teacher。讨论 student--anchor KL 时只作代入 $q=\pi_k$，不改变公式。实际动作采样分布统一记为 $\rho$；默认 on-policy 情形为 $\rho=p$，冻结 rollout 为 $\rho=\pi_k$。$q$ 与 $\rho$ 具有不同职责，二者相等须显式说明。$r_v=\log(p(v)/q(v))$ 始终是 KL log-ratio；OPD reward 使用前两章的 $r_k(x,v)$，不省略下标而写成 $r_v$。score function（得分函数）始终写作 $s_v=\nabla_\theta\log p(v)$，$\sg$ 表示停止梯度。
+\end{definition}
 
-\begin{proof}
-数值 value 中 $c_{k,n}=1$，所以第一式是
-\[
-\E_p[-\log(q/p)]=\sum_a p(a)\log(p(a)/q(a)).
-\]
-对 stop-gradient 构造求导时，$U_{k,n}=\log p-\log q$ 的 derivative 与 $c_{k,n}$ 的 derivative 共同给出
-\[
- \nabla_{\theta_{k,n}}\{c_{k,n}U_{k,n}\}
- =\nabla_{\theta_{k,n}}\log p(a)\,[\log p(a)-\log q(a)]
- +\nabla_{\theta_{k,n}}\log p(a).
-\]
-最后一项在 $p$ 下期望为零，第一项正是 KL 的 score-function derivative。\hfill$\square$
-\end{proof}
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+对象 & 符号 & 固定与随机性的约定\\
+\midrule
+prefix 与动作 & $x,A$ & 条件于 $x$；$A\sim\rho$\\
+目标分布与参考分布 & $p,q$ & 只对 $p$ 求导\\
+log-ratio 与 score & $r_v,s_v$ & 均由当前完整 $p$ 计算\\
+头部支持与尾部事件 & $S,J_A$ & $S$ 冻结；$J_A=\mathbf1\{A\notin S\}$\\
+头部、尾部概率质量 & $P,Q,\tau_p,\tau_q$ & 均使用完整归一化概率\\
+KL 与 KL 梯度 & $K,g$ & 目标为完整词表 $\KL(p\Vert q)$\\
+头部质量梯度 & $d_P=\nabla P$ & 向量，不是访问测度 $d$\\
+K4 求导因子 & $\kappa_A$ & forward 为一，反传给出 score\\
+标量与向量尾控制 & $\beta,b$ & 相对当前动作固定\\
+vOPD baseline & $c(x),C$ & 分别为固定标量与随机标量\\
+\bottomrule
+\end{tabular}
+\end{center}
 
-K1 的数值也无偏，但其 autograd gradient 为零；K3 的 gradient 对应 $\KL(q\Vert p)$ 的方向；K2 梯度正确但 value 有偏。上述构造针对 MDPO 中的 $\KL(p\Vert q)$。BPO 的 student center 是相反方向的 $\KL(q\Vert p)$，应在冻结 anchor $q$ 下估计 $\log(q/p)$；PMD-Mean 不含这个 student KL center。
+本章按四个层次组织：先定义完整 KL 的头尾分解，再计算标量数值估计误差，然后计算向量梯度估计误差，最后处理双控制、非 on-policy 测度与 OPD 使用方式。一个 forward 数值和一个 backward 梯度分别对应两个随机对象；同一段代码同时返回二者时，仍须分别证明。
 
-\section{固定 anchor 测度上的重要性校正}
+\section{完整 KL 的头尾分解}
 
-若工程上必须从 $q=\pi_k$ 采样，令 $\omega_{k,n}(s,a)=p(a)/q(a)$，并在积分权重上停止梯度。对于任意可积向量 $h$，
+令
 \[
- \E_q[\sg(\omega_{k,n})h(a)]=\E_p[h(a)].
+ K=\KL(p\Vert q)=\sum_vp(v)r_v,
+ \qquad H=\sum_{v\in S}p(v)r_v,
+ \]
+并令尾部条件分布为
+\[
+ p_\tail(v)=\frac{p(v)}{\tau_p},\qquad
+ q_\tail(v)=\frac{q(v)}{\tau_q},\qquad v\notin S.
 \]
-对于 OPD，MDPO 的损失为原始 mirror objective 的负值。其固定 anchor 测度梯度估计为
+定义尾部质量项和尾部形状项
 \[
-\widehat g_i^{\mathrm{MDPO}}
-=\sg\!\left(\omega_{k,n}(s,a_i)\right)
-\sg\!\left[\frac1\eta U_{k,n}(s,a_i)-r_k(s,a_i)\right]
-\nabla_{\theta_{k,n}}\log p(a_i),\qquad a_i\sim q.
-\]
-此处 $p=\pi_{k,n}(\cdot\mid s)$、$q=\pi_k(\cdot\mid s)$。梯度权重与 score 的乘积二阶可积时，估计量无偏；若该乘积范数由 $C$ 上界，则
-\begin{equation}\label{eq:mdpo-variance}
-\mathbb E_q\|\widehat g_i^{\mathrm{MDPO}}\|^2
-\le C^2\mathbb E_q[(p/q)^2]
-=C^2\bigl(1+\chi^2(p\Vert q)\bigr).
-\end{equation}
-这里的 $p/q$ 测度校正属于 MDPO；不能据此为 PMD-Mean 或 BPO 添加 student importance ratio。它们原本就在冻结 anchor 下定义，action 从 $q$ 采样时无需这种校正。
-
-对 BPO，完整 conditional center 已知时的损失梯度为
-\[
-\nabla_{\theta_{k,n}}\mathcal L_{\mathrm{BPO}}
-=\mathbb E_{\pi_k}\left[
-\frac{R^{\mathrm{BPO}}_{k,n}(s,a)}{\eta}\,
-\nabla_{\theta_{k,n}}\log\pi_{k,n}(a\mid s)\right].
-\]
-对 PMD-Mean，损失梯度为
-\[
-\nabla_{\theta_{k,n}}\mathcal L_{\mathrm{Mean}}
-=\mathbb E_{\pi_k}\left[
-R^{\mathrm{Mean}}_{k,n}(s,a)\,
-\nabla_{\theta_{k,n}}\log\pi_{k,n}(a\mid s)\right].
-\]
-估计 center 时须区分解析 policy-gradient 权重与 sampled 原始平方损失：前者使用停止梯度的权重，后者的 BPO student center 保留梯度，并采用第二章给出的有限样本系数校正。单个 center 估计量的无偏性不自动保证它嵌入平方损失后的梯度无偏。
-
-\section{Top-$J$ 与完整词表的关系}
-
-如果保存当前策略和 anchor 的 top-$J$ logits，完整 reverse KL 可以拆成
-\[
- \sum_{a\in S_J}p(a)\log\frac{p(a)}{q(a)}
- +\sum_{a\notin S_J}p(a)\log\frac{p(a)}{q(a)}.
-\]
-第一项可精确计算；第二项不能被简单删除，否则得到截断 KL 而非完整 KL。2602.04417 的 Top-$J$ 估计量在尾部使用 masked sampled K4：固定头部集合 $S_J$，若采样 token 不在 $S_J$，加入
-\[
- \mathbf 1(a\notin S_J)\,\sg\!\left(\frac{p(a)}{\pi_{\rm sampling}(a)}\right)
- c_{k,n}(s,a)U_{k,n}(s,a).
-\]
-它同时保持 value 和 gradient 无偏。完整词表 oracle 与 sampled K4 分别核对 mirror target 和尾部估计误差，二者在实验中单独报告。
-
-\section{四种 Top-$J$ KL 对象的统一定义}
-
-本节分析 student--teacher KL。固定一个 prefix $s$，局部记号为
-\[
- p(v)=\pi_{k,n}(v\mid s),\qquad q(v)=\pi_T(v\mid s),
- \qquad \ell(v)=\log\frac{p(v)}{q(v)}.
-\]
-所有结论都是逐 prefix 的；外层 OPD 再对 rollout 诱导的访问测度 $d_k$ 取期望。设 $S_J\subseteq\mathcal V$ 是选定的 $J$ 个 token 的支持集，通常取 student 或 teacher 的 top-$J$。定义
-\[
- P_J=\sum_{v\in S_J}p(v),\qquad Q_J=\sum_{v\in S_J}q(v),
- \qquad P_\tail=1-P_J,\qquad Q_\tail=1-Q_J.
+ M=\tau_p\log\frac{\tau_p}{\tau_q},\qquad
+ B=\tau_p\KL(p_\tail\Vert q_\tail)\geq0.
 \]
 
-完整 reverse KL 的精确分解为
-\begin{equation}\label{eq:full-kl-tail-decomposition}
- \KL(p\Vert q)
- =\underbrace{\sum_{v\in S_J}p(v)\ell(v)}_{H_J}
- +P_\tail\log\frac{P_\tail}{Q_\tail}
- +P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail),
-\end{equation}
-其中 $\widetilde p_\tail(v)=p(v)/P_\tail$、$\widetilde q_\tail(v)=q(v)/Q_\tail$ 只在 $\mathcal V\setminus S_J$ 上定义。式~\eqref{eq:full-kl-tail-decomposition} 是后面区分四种方法的核心：它把误差明确分成头部、尾部总质量和尾部内部形状三部分。
-
-\subsection{Normalized Top-$J$ KL：局部条件分布目标}
-
-Normalized Top-$J$ 先把两个分布限制到同一个支持集，再分别归一化：
-\[
- \bar p_J(v)=\frac{p(v)}{P_J},\qquad
- \bar q_J(v)=\frac{q(v)}{Q_J},\qquad v\in S_J.
-\]
-其目标定义为
-\begin{equation}\label{eq:normalized-topk-definition}
- \mathcal K_J^{\mathrm{norm}}
- =\KL(\bar p_J\Vert\bar q_J)
- =\frac{H_J}{P_J}+\log\frac{Q_J}{P_J}.
-\end{equation}
-
-\begin{proposition}[Normalized Top-$J$ 的语义]
-\label{prop:normalized-topk-semantic}
- $\mathcal K_J^{\mathrm{norm}}$ 是支持集条件分布的 KL，而不是完整 KL 的无偏估计量。对固定 prefix，它是确定性的；其条件采样方差为零。只有在额外满足尾部质量和尾部形状误差均可忽略时，它才近似完整 KL。
-\end{proposition}
-
-\begin{proof}
- 将 $\bar p_J$ 和 $\bar q_J$ 代入 KL 定义，得到
-\[
- \sum_{v\in S_J}\frac{p(v)}{P_J}
- \left(\log\frac{p(v)}{q(v)}+\log\frac{Q_J}{P_J}\right)
- =\frac{H_J}{P_J}+\log\frac{Q_J}{P_J}.
-\]
- 该式只依赖 $S_J$ 内的概率以及两个头部质量，不包含式~\eqref{eq:full-kl-tail-decomposition} 中的尾部条件 KL。由于给定 $p,q,S_J$ 后没有随机变量，条件方差为零。它的目标分布本身已经由 $(p,q)$ 改成了 $(\bar p_J,\bar q_J)$，所以不能称为完整 KL 的无偏估计量。
-\end{proof}
-
-归一化的必要性是目标稳定性，而不是无偏性。若直接优化未归一化的 $H_J$，对一个保留 token 的概率求导得到
-\[
- \frac{\partial}{\partial p(v)}p(v)\log\frac{p(v)}{q(v)}
- =\log\frac{p(v)}{q(v)}+1.
-\]
-在尾部可以吸收剩余质量的参数化下，驻点满足 $p(v)=e^{-1}q(v)$。因此未归一化的局部目标会通过整体压低头部概率来降低损失；归一化后，头部内部的共同缩放被消除，目标只比较相对形状。这个稳定性修复同时带来尾部盲区：$\mathcal K_J^{\mathrm{norm}}$ 对 top-$J$ 外的 logit 没有直接梯度，且 top-$J$ 内梯度总和为零。
-
-\subsection{Truncated Top-$J$：有偏的头部项}
-
-Truncated Top-$J$ 保留完整 KL 分解中的第一项：
-\begin{equation}\label{eq:truncated-topk-definition}
- \mathcal K_J^{\mathrm{trunc}}=H_J
- =\sum_{v\in S_J}p(v)\log\frac{p(v)}{q(v)}.
-\end{equation}
-它不是 KL，因为头部质量通常不等于一。由式~\eqref{eq:full-kl-tail-decomposition}，其逐 prefix 偏差为
-\begin{equation}\label{eq:truncated-topk-bias}
- \mathcal K_J^{\mathrm{trunc}}-\KL(p\Vert q)
- =-P_\tail\log\frac{P_\tail}{Q_\tail}
-  -P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail).
-\end{equation}
-尾部条件 KL 非负，因此未归一化截断项总是遗漏一个非负的尾部形状项，但尾部总质量项的符号可以正也可以负。它没有 sampled-token 随机性，固定 prefix 下方差为零；因此在样本很少、尾部 log-ratio 很重时，可能比无偏估计量有更低 RMSE。
-
-\subsection{EMA Top-$J$：精确头部加 sampled tail correction}
-
-EMA-PG 的 Top-$J$ 估计器把 $H_J$ 和尾部的 sampled-token 修正相加。令 $A\sim p$，定义
-\begin{equation}\label{eq:ema-topk-definition}
- \widehat{\mathcal K}_J^{\mathrm{EMA}}
- =H_J+\mathbf 1\{A\notin S_J\}\ell(A).
-\end{equation}
-
-\begin{theorem}[EMA Top-$J$ 的无偏性]
-\label{thm:ema-topk-unbiased}
- 在 $A\sim p$ 且 $p\ll q$ 时，若 $\E_p[|\ell(A)|]<\infty$，则
-\[
- \E[\widehat{\mathcal K}_J^{\mathrm{EMA}}\mid s]=\KL(p\Vert q).
-\]
- 若二阶矩有限，其条件方差为
-\begin{equation}\label{eq:ema-topk-variance}
- \Var(\widehat{\mathcal K}_J^{\mathrm{EMA}}\mid s)
- =\sum_{v\notin S_J}p(v)\ell(v)^2
- -\left(\sum_{v\notin S_J}p(v)\ell(v)\right)^2.
+\begin{theorem}[KL 链式分解]
+\label{thm:chapter3-kl-chain}
+在 $p\ll q$ 且 $0<\tau_p,\tau_q<1$ 时，
+\begin{equation}
+ K=H+M+B.
+\label{eq:chapter3-kl-chain}
 \end{equation}
 \end{theorem}
 
 \begin{proof}
- 由采样分布为 $p$，
+对 $v\notin S$，有
 \[
- \E\left[\mathbf 1\{A\notin S_J\}\ell(A)\right]
- =\sum_{v\notin S_J}p(v)\ell(v).
+ \log\frac{p(v)}{q(v)}
+ =\log\frac{\tau_p}{\tau_q}
+  +\log\frac{p_\tail(v)}{q_\tail(v)}.
 \]
- 与 $H_J$ 相加后正好得到完整词表 KL。因为 $H_J$ 对固定 prefix 是常数，方差只来自尾部随机变量 $\mathbf 1\{A\notin S_J\}\ell(A)$，展开其二阶矩即得式~\eqref{eq:ema-topk-variance}。
+将尾部求和并加上头部 $H$，得到
+\[
+ K=H+\tau_p\log\frac{\tau_p}{\tau_q}
+   +\tau_p\sum_{v\notin S}p_\tail(v)
+       \log\frac{p_\tail(v)}{q_\tail(v)}=H+M+B.
+\]
 \end{proof}
 
-当 $J=0$ 时，式~\eqref{eq:ema-topk-definition} 是 sampled-token KL；当 $J=|\mathcal V|$ 时，它退化为完整 KL。它估计的是完整目标，因此不能把头部重新归一化；归一化会改变期望目标并破坏上述无偏性。
+该分解说明 sparse teacher payload 能够知道 $H$、$P$、$Q$，因而知道 $M$，但不知道尾部形状项 $B$。所有 Top-$J$ scalar estimator 的差异都可以直接归结为是否丢弃、聚合或抽样估计 $B$。
 
-\subsection{Tail-Aware Top-$J$：把尾部聚合为虚拟 token}
+\section{KL 数值估计量：定义、偏差与方差}
 
-Tail-Aware Top-$J$ 只需要头部概率以及头部总质量，就把尾部聚合成一个虚拟 token：
-\begin{equation}\label{eq:tail-aware-topk-definition}
- \mathcal K_J^{\mathrm{TA}}
- =H_J+P_\tail\log\frac{P_\tail}{Q_\tail}.
-\end{equation}
+\subsection{单 token KL 估计器的基准族}
 
-\begin{proposition}[Tail-Aware Top-$J$ 是完整 KL 的下界]
-\label{prop:tail-aware-lower-bound}
+先记录不依赖 Top-$J$ 的单 token 族。令 $A\sim p$，$r=r_A$，并假设相应矩存在。反向 KL 的直接 estimator 为
 \[
- \mathcal K_J^{\mathrm{TA}}
- =\KL(p\Vert q)-P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail)
- \le \KL(p\Vert q).
+ \widehat K_1=r.
 \]
- 等号当且仅当尾部条件分布相等，或 $P_\tail=0$。
-\end{proposition}
-
-\begin{proof}
- 将式~\eqref{eq:full-kl-tail-decomposition} 中的尾部形状项移到右侧即可。KL 非负性给出不等式；等号条件来自 $P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail)=0$。
-\end{proof}
-
-Tail-Aware 与 normalized Top-$J$ 的差别在于：前者保留 $P_\tail$ 和 $Q_\tail$ 的质量差，后者把质量都重新缩放成一。Tail-Aware 仍然有尾部形状偏差，但不会允许 student 通过把质量整体移出 $S_J$ 来逃避 KL 惩罚；它因此是一个有结构的下界，而 normalized Top-$J$ 是条件分布目标。
-
-\subsection{Tail-Aware 的误差及其与截断项的比较}
-
-记尾部质量项为 $m_J=P_\tail\log(P_\tail/Q_\tail)$，尾部形状项为
-$b_J=P_\tail\KL(\widetilde p_\tail\Vert\widetilde q_\tail)\geq0$。
-由完整分解，四种对象中两个确定性近似的误差分别为
+它满足
 \[
- \mathcal K_J^{\mathrm{trunc}}-\KL(p\Vert q)=-(m_J+b_J),
+ \E[\widehat K_1]=K,\qquad
+ \operatorname{Bias}(\widehat K_1)=0,\qquad
+ \Var(\widehat K_1)=\Var_p(r).
+\]
+常用的平方 estimator 为
+\[
+ \widehat K_2=\frac12r^2,
+\]
+其相对于 $K$ 的偏差和方差为
+\begin{equation}
+ \operatorname{Bias}(\widehat K_2)=\frac12\E_p[r^2]-K,
  \qquad
- \mathcal K_J^{\mathrm{TA}}-\KL(p\Vert q)=-b_J.
-\]
-因此在经验 prefix 测度 $\widehat d$ 上，Tail-Aware 的平均 bias、条件采样方差与 RMSE 为
+ \Var(\widehat K_2)=\frac14\left(\E_p[r^4]-\E_p[r^2]^2\right).
+ \label{eq:chapter3-k2-bias-var}
+\end{equation}
+非负修正 estimator 为
 \[
- \operatorname{Bias}_{\widehat d}(\mathrm{TA})=-\E_{\widehat d}[b_J],
- \qquad \E_{\widehat d}[\Var(\mathcal K_J^{\mathrm{TA}}\mid s)]=0,
- \qquad \operatorname{RMSE}_{\widehat d}(\mathrm{TA})
- =\sqrt{\E_{\widehat d}[b_J^2]}.
+ \widehat K_3=e^{-r}+r-1.
 \]
-平均 bias 的平方一般小于逐 prefix bias 平方的平均，因而零条件方差不意味着
-$\operatorname{RMSE}=|\operatorname{Bias}_{\widehat d}|$。
-Tail-Aware 与 Truncated 的逐 prefix 平方误差差为
+因为 $e^{-r}=q(A)/p(A)$，有
 \[
- (m_J+b_J)^2-b_J^2=m_J(m_J+2b_J).
+ \E_p[e^{-r}]=\sum_vq(v)=1,
 \]
-当 $P_\tail\geq Q_\tail$ 时，$m_J\geq0$，Tail-Aware 的平方误差不大于截断项；
-当 $P_\tail<Q_\tail$ 时，$m_J<0$，截断遗漏的质量项与形状项可能相互抵消，
-此时 Tail-Aware 的 RMSE 不保证小于 Truncated。这个抵消降低的是标量估计误差，
-不能说明未归一化截断项是更合适的训练目标。
-
-对同一 prefix 上嵌套的支持集 $S_J\subseteq S_{J+1}$，增加一个保留 token 相当于把
-Tail-Aware 的虚拟尾部 token 分裂成该 token 与剩余尾部。KL 的链式分解给出
+故 $\E[\widehat K_3]=K$，且
+\begin{equation}
+ \Var(\widehat K_3)=\Var_p(e^{-r}+r-1).
+ \label{eq:chapter3-k3-var}
+\end{equation}
+K1 与 K3 的数值都无偏；K2 是以二阶矩换取局部稳定性的有偏 proxy。若需要同时让数值和自动微分梯度对应同一个 $K$，使用停止 log-ratio 系数的 K4：
 \[
- \mathcal K_{J+1}^{\mathrm{TA}}-\mathcal K_J^{\mathrm{TA}}
- =P_\tail\KL\left(
- \left(\frac{p(v)}{P_\tail},\frac{P_\tail-p(v)}{P_\tail}\right)
- \Big\Vert
- \left(\frac{q(v)}{Q_\tail},\frac{Q_\tail-q(v)}{Q_\tail}\right)
- \right)\geq0.
+ \kappa_A=\frac{p(A)}{\operatorname{sg}(p(A))},\qquad
+ \widehat K_4=\kappa_A\sg(r_A).
 \]
-这里的 $P_\tail,Q_\tail$ 属于分裂前的支持集，$v$ 是新增 token。因此 Tail-Aware
-随 $J$ 单调逼近完整 KL，其 bias 的绝对值和 RMSE 也单调不增；这可以直接用于
-检查真实模型统计中的实现错误。该单调性不要求 teacher 的概率排序与 student 相同。
-
-\section{四种方法在 OPD 中的选择}
-
-如果 OPD 的目标是训练一个稳定的局部 dense reward，$\mathcal K_J^{\mathrm{norm}}$ 合理，因为它在可获得的支持集上是合法 KL，且固定 prefix 下无额外采样方差。它必须被解释为局部条件蒸馏，而不能写成完整 KL 的估计量。
-
-如果目标是 vanilla OPD 的完整 reward 或完整 reverse KL，应该使用 $\mathcal K_J^{\mathrm{EMA}}$，或者使用 $\mathcal K_J^{\mathrm{TA}}$ 作为低方差下界。$\mathcal K_J^{\mathrm{trunc}}$ 适合做低方差基线，但需要显式报告尾部偏差。
-
-对本项目的符号约定，使用
+数值上 $\kappa_A=1$，所以 $\E[\widehat K_4]=K$；反传时
 \[
- \mathcal K_J^{\mathrm{norm}},\quad \mathcal K_J^{\mathrm{trunc}},\quad
- \widehat{\mathcal K}_J^{\mathrm{EMA}},\quad \mathcal K_J^{\mathrm{TA}}
+ \nabla_\theta\widehat K_4=r_As_A,
 \]
-分别表示上述四个对象。它们不能共用一个 $\mathcal K_J$，否则会把“改变训练目标”和“估计同一个完整 KL”混为一谈。
-
-\section{有限 inner 更新的误差}
-
-设方法 $M$ 的总体最优分布为 $\pi_k^{\star,M}$，inner 算法在固定 $s$ 上得到 $\pi_{k,n}$。PMD-Mean 使用 Lambert-$W$ target，另外三种方法使用 Gibbs target $\pi_k^{\star,\mathrm{Gibbs}}$。定义优化误差
+因此
 \[
-e_{k,n}(s)=\operatorname{TV}\!\left(\pi_{k,n}(\cdot\mid s),\pi_k^{\star,M}(\cdot\mid s)\right).
+ \E_p[\nabla_\theta\widehat K_4]=\nabla_\theta K=g.
+\]
+K4 与 K1 的 forward 值逐样本相同，故 K4 的数值偏差为零，数值方差也为 $\Var_p(r)$。stop-gradient 只改变求导规则。另定义本项目单 token 测试采用的 live-log-ratio 变体
+\[
+ \widehat K_4^{\mathrm{live}}=\kappa_A r_A,\qquad
+ \nabla\widehat K_4^{\mathrm{live}}=(r_A+1)s_A.
+\]
+它的数值仍与 K4 相同，梯度期望也相同，但梯度方差不同。后文始终保留上标 $\mathrm{live}$，不将两种反传路径共用一个名称。
+
+\begin{theorem}[K4 的数值与梯度无偏性]
+\label{thm:k4}
+在本章正支持与固定参考假设下，$\widehat K_4$ 和 $\widehat K_4^{\mathrm{live}}$ 的数值均对 $K$ 无偏，自动微分梯度均对 $g$ 无偏。
+\end{theorem}
+\begin{proof}
+两者的数值为 $r_A$，期望是 $\sum_vp(v)r_v=K$。两者的梯度分别为 $r_As_A$ 与 $(r_A+1)s_A$，期望之差为 $\sum_vp(v)s_v=0$，因此都等于 $g$。
+\end{proof}
+
+K3 的方差还可展开为
+\[
+ \Var(\widehat K_3)
+ =\Var_p(r)+\Var_p(e^{-r})+2\operatorname{Cov}_p(r,e^{-r}).
+\]
+因此 K3 比 K1 方差小的充要条件是
+\[
+ \Var_p(e^{-r})+2\operatorname{Cov}_p(r,e^{-r})<0.
+\]
+K3 的逐样本非负性来自 $e^{-r}\geq1-r$，并不推出全局方差排序。对 $q(v)=p(v)(1+\varepsilon u_v)$、$\E_p[u]=0$ 的局部扰动，逐项 Taylor 展开给出
+\[
+ r_v=-\varepsilon u_v+\frac{\varepsilon^2u_v^2}{2}+O(\varepsilon^3),
+ \quad K=\frac{\varepsilon^2}{2}\E_p[u^2]+O(\varepsilon^3),
+\]
+\[
+ \widehat K_2=\frac{\varepsilon^2u_A^2}{2}+O(\varepsilon^3),
+ \quad \widehat K_3=\frac{\varepsilon^2u_A^2}{2}+O(\varepsilon^3).
+\]
+这解释了 K2 的局部二阶正确性，以及 K3 在两分布接近时将单点波动从一阶降到二阶的机制。
+这些单 token estimator 与后文 Top-$J$ estimator 的关系是：Top-$J$ 只把 $S$ 内项从 Monte Carlo 改为精确求和，尾部仍采用 K1 或 K4 型修正。
+
+\subsection{K3$^{++}$ 与正向 KL 的 K5}
+
+EMA-PG 的公开实现使用上述停止系数 K4，并定义 K3$^{++}$ 与 K5；以下公式先去掉 clipping，单独分析数学对象。\footnote{代码版本固定为 EMA-PG \texttt{f9b9776}，定义见该版本的 \href{https://github.com/LunjunZhang/ema-pg/blob/f9b977632ad948ce935432a517c22291bfaba562/search/verl/trainer/ppo/core_algos.py}{\texttt{core\_algos.py}}。}
+\[
+ \widehat K_{3^{++}}=\kappa_A(e^{-r_A}+r_A-1).
+\]
+它的数值与 K3 相同，因此对反向 $K$ 无偏，数值方差也与 K3 相同。其反传为
+\[
+ \nabla\widehat K_{3^{++}}
+ =\{e^{-r_A}+r_A-1+1-e^{-r_A}\}s_A=r_As_A.
+\]
+因此它与 K4 的 backward 逐样本相同，梯度偏差为零，梯度方差也完全相同；数值方差的差异不能解释成梯度方差的差异。
+
+K5 对应正向目标 $K^{\mathrm F}=\KL(q\Vert p)$，定义为
+\[
+ \widehat K_5=-\sg(e^{-r_A})r_A+\log p(A)-\sg(\log p(A)).
+\]
+其 forward 值为 $-e^{-r_A}r_A$。在 $A\sim p$ 下，
+\[
+ \E_p[\widehat K_5]=-\sum_vq(v)r_v=K^{\mathrm F},\qquad
+ \Var(\widehat K_5)=\E_p[e^{-2r_A}r_A^2]-(K^{\mathrm F})^2.
+\]
+它相对本章默认反向目标 $K$ 的数值偏差是 $K^{\mathrm F}-K$，不能与 K1--K4 按同一个无偏目标直接并列。反传为
+\[
+ \nabla\widehat K_5=(1-e^{-r_A})s_A,\qquad
+ \E_p[\nabla\widehat K_5]=-\sum_vq(v)s_v=\nabla K^{\mathrm F}.
+\]
+其梯度方差为
+\[
+ \E_p[(1-e^{-r_A})^2\lVert s_A\rVert^2]
+ -\left\lVert\sum_vq(v)s_v\right\rVert^2.
+\]
+这里正向目标只改变 KL 的积分方向，student 与 score 的定义保持不变。
+
+若数值稳定化把 K3 的函数 $\phi(r)=e^{-r}+r-1$ 改成分段可导的 $\widetilde\phi(r)$，K3$^{++}$ 的数值偏差和梯度偏差分别变成
+\[
+ \E_p[\widetilde\phi(r_A)]-K,\qquad
+ \E_p[(\widetilde\phi(r_A)+\widetilde\phi'(r_A)-r_A)s_A].
+\]
+公开代码对 log-ratio 与输出均有 clamp，因此无 clipping 恒等式的适用条件是相关 clamp 未激活，或相关偏差项经额外核验为零。
+
+\subsection{确定性估计量}
+
+截断 Top-$J$ 估计量定义为
+\[
+ \widehat K^{\mathrm{trunc}}=H.
+\]
+由式~\eqref{eq:chapter3-kl-chain}，其条件偏差和方差为
+\begin{equation}
+ \operatorname{Bias}(\widehat K^{\mathrm{trunc}})=-M-B,
+ \qquad
+ \Var(\widehat K^{\mathrm{trunc}})=0.
+ \label{eq:chapter3-trunc-bias-var}
+\end{equation}
+它删除了尾部贡献；偏差 $-M-B$ 可正可负，因为 $M$ 的符号可以正也可以负，而 $B$ 总是非负。
+
+Tail-aware scalar 估计量把尾部聚合为一个伪 token：
+\[
+ \widehat K^{\mathrm{TA}}=H+M.
 \]
 
-对参数化损失，假设梯度是 $L_{\mathrm{sm}}$-Lipschitz，随机梯度 $\widehat g_n$ 条件无偏且满足
+\begin{proposition}[Tail-aware scalar 的偏差]
+\label{prop:chapter3-ta-scalar}
 \[
-\mathbb E[\widehat g_n\mid\theta_{k,n}]=\nabla\mathcal L(\theta_{k,n}),\qquad
-\mathbb E\!\left[\|\widehat g_n-\nabla\mathcal L(\theta_{k,n})\|^2\mid\theta_{k,n}\right]\le\frac{\sigma^2}{B}.
+ \operatorname{Bias}(\widehat K^{\mathrm{TA}})=-B,
+ \qquad
+ \Var(\widehat K^{\mathrm{TA}})=0.
 \]
-普通 SGD 取 $\theta_{k,n+1}=\theta_{k,n}-\alpha\widehat g_n$，$0<\alpha\le 1/L_{\mathrm{sm}}$。由光滑性不等式及条件无偏性，
+因此它是完整 KL 的确定性下界，且当且仅当尾部条件分布相等时达到完整 KL。
+\end{proposition}
+
+\begin{proof}
+将 $\widehat K^{\mathrm{TA}}=H+M$ 与 $K=H+M+B$ 相减即可。$B\geq0$ 来自 KL 非负性。
+\end{proof}
+
+Normalized Top-$J$ 不是完整 KL 的估计量，而是头部条件分布的另一个目标：
+\[
+ K^{\mathrm{norm}}_J
+ =\KL\left(\frac{p|_S}{P}\middle\|\frac{q|_S}{Q}\right)
+ =\frac{H}{P}+\log\frac{Q}{P}.
+\]
+它的条件方差为零，但相对完整 KL 的确定性偏差为
+\begin{equation}
+ \operatorname{Bias}(K^{\mathrm{norm}}_J)
+ =\frac{H}{P}+\log\frac{Q}{P}-(H+M+B).
+ \label{eq:chapter3-normalized-bias}
+\end{equation}
+这个偏差没有固定符号，因为 Normalized Top-$J$ 同时改变了头部权重并删除了尾部形状。
+
+\subsection{采样尾部的无偏 scalar 估计量}
+
+令
+\[
+ \mu_r=\E[r_A\mid A\notin S]
+ =\log\frac{\tau_p}{\tau_q}+\KL(p_\tail\Vert q_\tail).
+\]
+则 $\tau_p\mu_r=M+B$。EMA scalar estimator 为
+\begin{equation}
+ \widehat K^{\mathrm{EMA}}=H+J_A r_A.
+ \label{eq:chapter3-ema-scalar}
+\end{equation}
+它采用头部精确、尾部采样（Head-Exact Tail-Sampled，HETS）的积分结构；论文的 HETS 名称具体对应后文的向量梯度估计量。
+
+\begin{theorem}[EMA scalar 的无偏性与方差]
+\label{thm:chapter3-ema-scalar}
+若 $A\sim p$ 且 $\E_p[r_A^2]<\infty$，则
+\[
+ \E[\widehat K^{\mathrm{EMA}}]=K,
+\]
+并且
+\begin{align}
+ \Var(\widehat K^{\mathrm{EMA}})
+ &=\tau_p\Var(r_A\mid A\notin S)+P\tau_p\mu_r^2\\
+ &=\sum_{v\notin S}p(v)r_v^2
+   -\left(\sum_{v\notin S}p(v)r_v\right)^2.
+ \label{eq:chapter3-ema-scalar-var}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+尾部修正的期望为
+\[
+ \E[J_A r_A]=\sum_{v\notin S}p(v)r_v=\tau_p\mu_r=M+B.
+\]
+加上 $H$ 得到 $K$。对随机变量 $J_A r_A$ 按 $J_A$ 使用全方差公式：头部条件下它为零，尾部条件下它为 $r_A$，因此
+\[
+ \Var(J_A r_A)=\tau_p\Var(r_A\mid A\notin S)+P\tau_p\mu_r^2.
+\]
+\end{proof}
+
+还可以用尾部桶 scalar
+\[
+ b_0=\log\frac{\tau_p}{\tau_q}
+\]
+作残差化：
+\begin{equation}
+ \widehat K^{\mathrm{Res\text{-}scalar}}
+ =H+\tau_pb_0+J_A(r_A-b_0).
+ \label{eq:chapter3-res-scalar}
+\end{equation}
+它满足
+\[
+ \E[\widehat K^{\mathrm{Res\text{-}scalar}}]=K,
+\]
+且
+\begin{equation}
+ \Var(\widehat K^{\mathrm{Res\text{-}scalar}})
+ =\tau_p\Var(r_A\mid A\notin S)+P\tau_p(\mu_r-b_0)^2.
+ \label{eq:chapter3-res-scalar-var}
+\end{equation}
+所以 scalar 残差化相对 EMA 的方差差为
+\begin{equation}
+ \Var(\widehat K^{\mathrm{EMA}})-\Var(\widehat K^{\mathrm{Res\text{-}scalar}})
+ =P\tau_p(2\mu_rb_0-b_0^2).
+ \label{eq:chapter3-res-scalar-gap}
+\end{equation}
+它严格降低方差当且仅当 $|\mu_r-b_0|<|\mu_r|$。当固定的 $b_0\ne0$ 且尾部内部形状 KL 足够小时，$\mu_r$ 足够接近 $b_0$，严格降方差条件成立；若 $b_0=0$，两估计量逐样本相同。
+
+\begin{proposition}[标量尾部控制族]
+对任意在抽样前固定的实数 $\beta$，令
+\[
+ \widehat K(\beta)=H+\tau_p\beta+J_A(r_A-\beta).
+\]
+则它对 $K$ 无偏，且
+\[
+ \Var(\widehat K(\beta))
+ =\tau_p\Var_{\tail}(r_A)+P\tau_p(\mu_r-\beta)^2.
+\]
+因此最优标量控制为 $\beta^*=\mu_r$；EMA 取 $\beta=0$，式~\eqref{eq:chapter3-res-scalar} 取 $\beta=b_0$。
+\end{proposition}
+
+\begin{proof}
+先计算均值：
+\[
+ \E[\widehat K(\beta)]=H+\tau_p\beta+\tau_p(\mu_r-\beta)=H+\tau_p\mu_r=K.
+\]
+再计算中心化随机项的二阶矩：
 \begin{align*}
-\mathbb E[\mathcal L(\theta_{k,n+1})\mid\theta_{k,n}]
-&\le\mathcal L(\theta_{k,n})-\alpha\|\nabla\mathcal L(\theta_{k,n})\|^2
-+\frac{L_{\mathrm{sm}}\alpha^2}{2}\mathbb E[\|\widehat g_n\|^2\mid\theta_{k,n}]\\
-&\le\mathcal L(\theta_{k,n})-\frac\alpha2\|\nabla\mathcal L(\theta_{k,n})\|^2
-+\frac{L_{\mathrm{sm}}\alpha^2\sigma^2}{2B}.
+ \Var(\widehat K(\beta))
+ &=\E[J_A(r_A-\beta)^2]-\{\E[J_A(r_A-\beta)]\}^2\\
+ &=\tau_p\{\Var_{\tail}(r_A)+(\mu_r-\beta)^2\}
+   -\tau_p^2(\mu_r-\beta)^2\\
+ &=\tau_p\Var_{\tail}(r_A)+P\tau_p(\mu_r-\beta)^2.
 \end{align*}
-设 $\mathcal L_*$ 是损失下界，对 $n=0,\ldots,N-1$ 求和得到
-\[
-\frac1N\sum_{n=0}^{N-1}\mathbb E\|\nabla\mathcal L(\theta_{k,n})\|^2
-\le\frac{2(\mathcal L(\theta_{k,0})-\mathcal L_*)}{\alpha N}
-+\frac{L_{\mathrm{sm}}\alpha\sigma^2}{B}.
-\]
-此式控制平均梯度范数。将它转成 $e_{k,n}$ 的分布误差界还需要局部曲率或梯度与分布距离之间的定量关系。
+最后一项非负并在 $\beta=\mu_r$ 时为零，给出最优值。将 $\beta=0$ 与 $\beta=b_0$ 代入并相减即得式~\eqref{eq:chapter3-res-scalar-gap}。
+\end{proof}
 
-对采用 student/anchor importance ratio 的 MDPO estimator，方差界包含 $1+\chi^2(\pi_{k,n}\Vert\pi_k)$。PMD-Mean 和 BPO 的 anchor-measure estimator 直接分析 residual、score 与 center 的联合二阶矩。
-
-PMD-Mean 到 Gibbs 分布的差异还包含总体目标偏差：
+这个 scalar 构造是本章从控制族导出的 KL 数值估计量，应与论文中以向量梯度为目标的 ResOPD 算法区别命名。因为 $\mu_r=b_0+D_{\tail}$，其中 $D_{\tail}=\KL(p_\tail\Vert q_\tail)$，方差改变量也等于
 \[
-\operatorname{TV}(\pi_{k,n},\pi_k^{\star,\mathrm{Gibbs}})
-\le\operatorname{TV}(\pi_{k,n},\pi_k^{\star,\mathrm{Mean}})
-+\operatorname{TV}(\pi_k^{\star,\mathrm{Mean}},\pi_k^{\star,\mathrm{Gibbs}}).
+ P\tau_p\{b_0^2+2b_0D_{\tail}\}.
 \]
-增加 inner steps 只能降低第一项，第二项由均值近似决定。
+当 $b_0\geq0$ 时它非负；当 $b_0<0$ 时，它在 $D_{\tail}>-b_0/2$ 下为负。这给出 scalar 残差化反而增大方差的明确条件。
+
+\section{KL 梯度估计量：统一的 score 记号}
+
+完整 reverse-KL 梯度为
+\begin{equation}
+ g=\nabla_\theta K=\E_p[r_A s_A],
+ \qquad s_A=\nabla_\theta\log p(A).
+ \label{eq:chapter3-gradient-target}
+\end{equation}
+这里使用 $\E_p[s_A]=0$。定义头部向量和尾部条件均值
+\[
+ h_g=\sum_{v\in S}p(v)r_vs_v,
+ \qquad
+ \mu_g=\E_p[r_As_A\mid A\notin S].
+\]
+于是 $g=h_g+\tau_p\mu_g$。
+
+上述恒等式可以直接逐项推导：
+\begin{align*}
+ \nabla_\theta K
+ &=\sum_v\{(\nabla_\theta p(v))r_v+p(v)\nabla_\theta r_v\}\\
+ &=\sum_vp(v)(r_v+1)s_v
+ =\sum_vp(v)r_vs_v,
+\end{align*}
+最后一步使用 $\sum_vp(v)s_v=\nabla_\theta\sum_vp(v)=0$。score 始终记为 $s_v$；prefix $x$ 在这一求导中固定。
+
+\subsection{数值 estimator 的自动微分梯度}
+
+把已经抽到的动作视为固定索引，对 K1--K4 直接反传，得到
+\[
+ G_1=s_A,\quad G_2=r_As_A,\quad
+ G_3=(1-e^{-r_A})s_A,\quad G_4=r_As_A.
+\]
+令 $u_q=\E_q[s_A]$，则这些随机梯度相对于 $g$ 的偏差为
+\[
+ \operatorname{Bias}(G_1)=-g,\quad
+ \operatorname{Bias}(G_2)=0,\quad
+ \operatorname{Bias}(G_3)=-u_q-g,\quad
+ \operatorname{Bias}(G_4)=0.
+\]
+对应方差逐项为
+\begin{align*}
+ \Var(G_1)&=\E_p\lVert s_A\rVert^2,\\
+ \Var(G_2)&=\E_p[r_A^2\lVert s_A\rVert^2]-\lVert g\rVert^2,\\
+ \Var(G_3)&=\E_p[(1-e^{-r_A})^2\lVert s_A\rVert^2]-\lVert u_q\rVert^2,\\
+ \Var(G_4)&=\E_p[r_A^2\lVert s_A\rVert^2]-\lVert g\rVert^2.
+\end{align*}
+例如 $\E_p[G_3]=\E_p[s_A]-\E_p[(q(A)/p(A))s_A]=-u_q$。由此得到两个明确区别：K2 的数值有偏但其固定样本反传梯度无偏；K1 与 K3 的数值无偏但其裸反传梯度通常有偏。这些期望在每次抽样均使用当前 $p$ 时成立；不能将固定样本的导数与包含采样测度导数的 $\nabla_\theta\E_{p_\theta}$ 混用。
+
+确定性 Top-$J$ 数值目标的梯度也可以显式计算。记
+\[
+ d_P=\nabla_\theta P=\sum_{v\in S}p(v)s_v,
+ \qquad b_0=\log(\tau_p/\tau_q).
+\]
+由乘积法则与 $\nabla_\theta\tau_p=-d_P$，有
+\begin{align*}
+ \nabla_\theta H&=h_g+d_P,\\
+ \nabla_\theta(H+M)&=h_g-b_0d_P=h_g+\tau_p\mu_B,\\
+ \nabla_\theta K_J^{\mathrm{norm}}
+ &=\frac{h_g}{P}-\frac{H}{P^2}d_P.
+\end{align*}
+所以三者相对于完整 KL 梯度的偏差依次为
+\[
+ d_P-\tau_p\mu_g,\qquad
+ \tau_p(\mu_B-\mu_g),\qquad
+ \frac{h_g}{P}-\frac{H}{P^2}d_P-g,
+\]
+方差均为零。尤其 $h_g$ 是停止系数的头部 score 梯度，$\nabla H=h_g+d_P$ 是头部数值的真实梯度；两者必须分别命名。
+
+\subsection{Sampled-token、vOPD 与头部截断}
+
+Sampled-token estimator 为
+\[
+ \widehat g^{\mathrm{sample}}=r_As_A.
+\]
+它无偏，且
+\begin{equation}
+ \Var(\widehat g^{\mathrm{sample}})
+ =\E_p[r_A^2\lVert s_A\rVert_2^2]-\lVert g\rVert_2^2.
+ \label{eq:chapter3-sample-grad-var}
+\end{equation}
+
+对任意在抽样前固定的 scalar $c(x)$，vOPD 型 estimator 为
+\begin{equation}
+ \widehat g^{\mathrm{vOPD}}_c=(r_A-c)s_A.
+ \label{eq:chapter3-vopd}
+\end{equation}
+
+\begin{proposition}[固定 scalar baseline 的无偏性与最优值]
+\label{prop:chapter3-vopd}
+对任意 action-independent $c(x)$，$\widehat g^{\mathrm{vOPD}}_c$ 无偏。其二阶矩为
+\[
+ \E\lVert\widehat g^{\mathrm{vOPD}}_c\rVert_2^2
+ =\E_p[(r_A-c)^2\lVert s_A\rVert_2^2],
+\]
+当 $\E_p\lVert s_A\rVert^2>0$ 时，使该二阶矩最小的 scalar 是
+\begin{equation}
+ c^*=\frac{\E_p[r_A\lVert s_A\rVert_2^2]}{\E_p[\lVert s_A\rVert_2^2]}.
+ \label{eq:chapter3-optimal-score-baseline}
+\end{equation}
+一般 $c^*\neq K$，因此用 KL 数值 $K$ 作为 vOPD baseline 是合法的中心化，但不必是 score-gradient 方差最优的 baseline。
+若 $\E_p\lVert s_A\rVert^2=0$，score 在 $p$ 下几乎处处为零，所有 baseline 对应的梯度均为零。
+\end{proposition}
+
+\begin{proof}
+\[
+ \E_p[(r_A-c)s_A]=\E_p[r_As_A]-c\E_p[s_A]=g.
+\]
+对二阶矩关于 $c$ 求导并令其为零，得到式~\eqref{eq:chapter3-optimal-score-baseline}。
+\end{proof}
+
+进一步记 $a=\E_p\lVert s_A\rVert^2>0$，展开平方并配方，得到精确的方差表达式
+\begin{align*}
+ \Var(\widehat g_c^{\mathrm{vOPD}})
+ &=\E_p[r_A^2\lVert s_A\rVert^2]
+   -2c\E_p[r_A\lVert s_A\rVert^2]+c^2a-\lVert g\rVert^2\\
+ &=\Var(\widehat g_{c^*}^{\mathrm{vOPD}})+a(c-c^*)^2.
+\end{align*}
+这给出任意固定 KL proxy 作为 baseline 的代价，而无需假定该 proxy 对 $K$ 无偏。
+
+\begin{proposition}[独立随机 KL baseline 的误差传递]
+令 $C$ 与当前动作 $A$ 条件独立，$m=\E[C]$、$\sigma_C^2=\Var(C)$，且反传时停止 $C$ 的梯度。则 $(r_A-C)s_A$ 对 $g$ 无偏，且
+\[
+ \Var((r_A-C)s_A)
+ =\Var((r_A-m)s_A)+a\sigma_C^2.
+\]
+若写 $m=K+\delta$，则
+\[
+ \Var((r_A-C)s_A)
+ =\Var(\widehat g_{c^*}^{\mathrm{vOPD}})
+  +a\{(K+\delta-c^*)^2+\sigma_C^2\}.
+\]
+\end{proposition}
+
+\begin{proof}
+条件于 $A$，$\E_C[(r_A-C)^2]=(r_A-m)^2+\sigma_C^2$。乘以 $\lVert s_A\rVert^2$ 后取 $A$ 的期望，并减去相同的 $\lVert g\rVert^2$，即可得到结论。
+\end{proof}
+
+所以在 vOPD 中只改进后面的 KL 数值估计时，应比较 scalar baseline 的均值与方差；当两个 baseline 均对 $K$ 无偏且独立时，梯度方差之差恰好是 $a$ 乘以 scalar 方差之差。ResOPD 的向量控制方差结论不能直接用于这个比较。
+
+如果 baseline 是与当前 action 共同随机化的 $C_A$，则上述证明失效：偏差为
+\begin{equation}
+ \operatorname{Bias}(\widehat g_C)=-\E[C_As_A].
+ \label{eq:chapter3-random-baseline-bias}
+\end{equation}
+因此随机 baseline 保持无偏的充要条件是 $\E[C_As_A]=0$。独立样本或 leave-one-out/cross-fitting 是保证这个条件的构造方式；仅有 $\E[C_A]=K$ 不够。
+
+同样本 K1 baseline 提供一个极端反例：取 $C_A=r_A$，则 $(r_A-C_A)s_A=0$，偏差恰好为 $-g$，尽管 $\E[C_A]=K$。数值无偏不能消除 baseline 与 score 的相关性。
+
+头部截断梯度为 $h_g$，其偏差和方差为
+\begin{equation}
+ \operatorname{Bias}(h_g)=-\tau_p\mu_g,
+ \qquad \Var(h_g)=0.
+ \label{eq:chapter3-head-grad-bias}
+\end{equation}
+
+\subsection{HETS 与 ResOPD 的向量残差化}
+
+尾部残差化在线策略蒸馏（On-Policy Distillation with Tail Residualization，ResOPD）从 HETS 的尾部梯度中减去可计算控制向量，再解析加回同一控制的期望。
+
+HETS 梯度 estimator 定义为
+\begin{equation}
+ \widehat g^{\mathrm{HETS}}=h_g+J_A r_As_A.
+ \label{eq:chapter3-hets-grad}
+\end{equation}
+它无偏，且
+\begin{equation}
+ \Var(\widehat g^{\mathrm{HETS}})
+ =\tau_p\Var_{\tail}(r_As_A)+P\tau_p\lVert\mu_g\rVert_2^2.
+ \label{eq:chapter3-hets-var}
+\end{equation}
+
+将尾部聚合为伪 token，定义
+\begin{equation}
+ \mu_B=\log\frac{\tau_p}{\tau_q}\,\nabla_\theta\log\tau_p.
+ \label{eq:chapter3-resopd-control}
+\end{equation}
+这个控制向量来自粗粒度 KL 的真实梯度。将尾部合并为一个类别，粗粒度目标为 $K_{\mathrm{bucket}}=H+\tau_pb_0$。逐项求导得
+\begin{align*}
+ \nabla K_{\mathrm{bucket}}
+ &=h_g+\nabla P+(b_0+1)\nabla\tau_p\\
+ &=h_g+b_0\nabla\tau_p
+ =h_g+\tau_p\mu_B.
+\end{align*}
+其中 $\nabla P+\nabla\tau_p=0$ 消去了常数 $1$ 的 score 项。由完整梯度 $g=h_g+\tau_p\mu_g$，残差梯度为 $\tau_p(\mu_g-\mu_B)$。使用 $J_A(r_As_A-\mu_B)$ 对该残差作无偏抽样，再加上粗粒度精确梯度，便得到 ResOPD。
+对任意 action-independent 向量 $b$（与标量尾部形状项 $B$ 区分），定义统一控制族
+\begin{equation}
+ \widehat g(b)=h_g+\tau_pb+J_A(r_As_A-b).
+ \label{eq:chapter3-control-family}
+\end{equation}
+
+\begin{theorem}[ResOPD 控制族的无偏性与方差]
+\label{thm:chapter3-resopd}
+在 $A\sim p$ 且 $b$ 在抽样前冻结时，
+\[
+ \E[\widehat g(b)]=g,
+\]
+并且
+\begin{equation}
+ \Var(\widehat g(b))
+ =\tau_p\Var_{\tail}(r_As_A)
+  +P\tau_p\lVert\mu_g-b\rVert_2^2.
+ \label{eq:chapter3-control-var}
+\end{equation}
+HETS 是 $b=0$；ResOPD 是 $b=\mu_B$。
+\end{theorem}
+
+\begin{proof}
+条件期望为
+\[
+ \E[\widehat g(b)]
+ =h_g+\tau_pb+\tau_p(\mu_g-b)=g.
+\]
+给定 $J_A=0$ 时 estimator 为 $h_g+\tau_pb$，给定 $J_A=1$ 时其条件均值为 $h_g+\tau_pb+\mu_g-b$，两者均值差为 $\mu_g-b$。尾部条件下的随机部分为 $r_As_A-b$，其协方差与 $r_As_A$ 相同。对事件 $J_A$ 使用全协方差公式，得到式~\eqref{eq:chapter3-control-var}。
+\end{proof}
+
+ResOPD 与 HETS 的方差差为
+\begin{equation}
+ \Var(\widehat g^{\mathrm{HETS}})-\Var(\widehat g^{\mathrm{ResOPD}})
+ =P\tau_p\left(2\langle\mu_g,\mu_B\rangle-\lVert\mu_B\rVert_2^2\right).
+ \label{eq:chapter3-hets-resopd-gap}
+\end{equation}
+因此 ResOPD 的优势条件是
+$\lVert\mu_g-\mu_B\rVert_2<\lVert\mu_g\rVert_2$。这正是 ResOPD 与 scalar KL 残差化的共同结构，区别只在于 scalar 的尾部均值是 $\mu_r$，向量梯度的尾部均值是 $\mu_g$。
+
+该方差结论也有完整的协方差版本。记 $\Sigma_{\tail}=\operatorname{Cov}_{\tail}(r_As_A)$，则
+\[
+ \operatorname{Cov}(\widehat g(b))
+ =\tau_p\Sigma_{\tail}
+  +P\tau_p(\mu_g-b)(\mu_g-b)^\top.
+\]
+取迹即得到前面的方差公式。最优的无约束向量控制是 $b^*=\mu_g$，此时只剩 $\tau_p\Sigma_{\tail}$；该向量需要未知尾部，因此理论最优值不能作为 sparse payload 下的可计算算法。ResOPD 使用可计算的 $\mu_B$ 逼近它。
+
+HETS 也不保证对每个分布都比直接 sampled-token 方差小。令 $\mu_{g,H}=\E[r_As_A\mid A\in S]$、$V_H=\Var(r_As_A\mid A\in S)$，全方差公式给出
+\begin{align*}
+ \Var(r_As_A)&=PV_H+\tau_p\Var_{\tail}(r_As_A)
+ +P\tau_p\lVert\mu_{g,H}-\mu_g\rVert^2,\\
+ \Var(r_As_A)-\Var(\widehat g^{\mathrm{HETS}})
+ &=PV_H+P\tau_p\{\lVert\mu_{g,H}\rVert^2
+ -2\langle\mu_{g,H},\mu_g\rangle\}.
+\end{align*}
+头部精确求和删除了头部内部方差，但同时改变了事件间均值差，因此应使用这个差值判断排序。
+
+\subsection{多样本、均方误差与支持集边界}
+
+以上随机 estimator 均按单个动作计算。对固定 prefix 下 $n$ 个独立动作，使用同一确定性头部和控制项、对随机修正取平均，则偏差保持不变、协方差除以 $n$。标量均方误差为
+\[
+ \operatorname{MSE}(\widehat K)=\operatorname{Bias}(\widehat K)^2+\Var(\widehat K),
+\]
+向量均方误差为
+\[
+ \E\lVert\widehat g-g\rVert^2
+ =\lVert\operatorname{Bias}(\widehat g)\rVert^2+\Var(\widehat g).
+\]
+因此确定性截断的零抽样方差不等于零估计误差；增加样本也无法消除它的偏差。这里的 $1/n$ 结论要求条件独立，同一条 trajectory 上不同 prefix 的 token 不能直接视为同一固定分布的独立重复。
+
+当 $S=\mathcal V$ 时，所有尾部修正按连续延拓取零，头部求和等于完整 KL 或其完整 score 梯度，方差为零；当 $S=\varnothing$ 时，HETS 退化为直接 sampled-token，$\tau_p=\tau_q=1$ 使 ResOPD 控制为零。存在零概率时必须先检查绝对连续性及矩条件；尤其 K3 的 $\E_p[q(A)/p(A)]=1$ 要求 $q$ 的质量全部落在 $p$ 的支持上。
+
+\subsection{两类估计量不能互换}
+
+scalar KL estimator 的 control $b_0=\log(\tau_p/\tau_q)$ 不能直接替代向量 control $\mu_B$；反之，ResOPD 的 $\mu_B$ 也不是一个 KL 数值。若目标只是记录 KL，使用式~\eqref{eq:chapter3-res-scalar}；若目标是训练 reverse-KL score gradient，使用式~\eqref{eq:chapter3-control-family}。若 scalar KL 还要进入 vOPD 的 $(r_A-C)s_A$，应验证式~\eqref{eq:chapter3-random-baseline-bias} 中的 score 正交条件；固定 baseline 与独立/留一估计是直接保证该条件的方式。
+
+\subsection{停止梯度 surrogate 的显式构造}
+
+为把数学上的梯度向量对应到可反传的标量，记 $\operatorname{sg}$ 为停止梯度算子。固定抽样动作和事件，定义
+\begin{align*}
+ L_{\mathrm{HETS}}
+ &=\sum_{v\in S}\operatorname{sg}(p(v)r_v)\log p(v)
+   +J_A\operatorname{sg}(r_A)\log p(A),\\
+ L_{\mathrm{Res}}
+ &=L_{\mathrm{HETS}}
+   +\operatorname{sg}((\tau_p-J_A)b_0)\log\tau_p.
+\end{align*}
+逐项反传，得到
+\begin{align*}
+ \nabla L_{\mathrm{HETS}}&=h_g+J_Ar_As_A,\\
+ \nabla L_{\mathrm{Res}}
+ &=h_g+J_Ar_As_A+(\tau_p-J_A)b_0\nabla\log\tau_p\\
+ &=h_g+\tau_p\mu_B+J_A(r_As_A-\mu_B).
+\end{align*}
+这两条等式依赖停止整个系数的梯度，包括其中的 $p(v)$、$r_v$、$\tau_p$ 和 $b_0$；若遗漏停止操作，就会引入额外导数。
+
+若希望 forward 展示某个数值估计量 $F$，同时 backward 使用 $L$ 的梯度，可定义
+\[
+ \widetilde L=\operatorname{sg}(F)+L-\operatorname{sg}(L).
+\]
+逐样本有 $\widetilde L=F$，但 $\nabla\widetilde L=\nabla L$。因此 forward 的数值偏差和 backward 的梯度偏差可以独立设计，审计时必须同时给出 $F$ 和 $L$。
+
+\input{chapters/03_kl_two_controls}
+\input{chapters/03_kl_sampling_and_opd}
+\input{chapters/03_resopd_implementation}
