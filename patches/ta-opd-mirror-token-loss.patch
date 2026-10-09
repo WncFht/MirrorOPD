@@ -385,10 +385,36 @@ index 496116e..2d596a8 100644
  
  @register_distillation_loss(
 diff --git i/verl/verl/trainer/ppo/ray_trainer.py w/verl/verl/trainer/ppo/ray_trainer.py
-index 44780d7..298862e 100644
+index 44780d7..5490aab 100644
 --- i/verl/verl/trainer/ppo/ray_trainer.py
 +++ w/verl/verl/trainer/ppo/ray_trainer.py
-@@ -1348,7 +1348,7 @@ class RayPPOTrainer:
+@@ -709,6 +709,16 @@ class RayPPOTrainer:
+             sample_scores.extend(scores)
+ 
+             reward_extra_infos_dict["reward"].extend(scores)
++            if self.config.distillation.enabled and self.config.distillation.distillation_loss.loss_mode.startswith("mirror_"):
++                from mirroropd.training.gsm8k import response_diagnostics
++
++                response_attention = test_output_gen_batch.batch["attention_mask"][:, -output_ids.shape[1]:]
++                for ids, mask in zip(output_ids.cpu().tolist(), response_attention.cpu().tolist(), strict=True):
++                    diagnostics = response_diagnostics(
++                        ids, mask, self.tokenizer.eos_token_id, self.config.data.max_response_length
++                    )
++                    for key, value in diagnostics.items():
++                        reward_extra_infos_dict[key].append(value)
+             for key, values in reward_extra_info.items():
+                 if key not in reward_extra_infos_dict:
+                     reward_extra_infos_dict[key] = []
+@@ -753,7 +763,7 @@ class RayPPOTrainer:
+ 
+     def _val_metrics_update(self, data_sources, sample_uids, reward_extra_infos_dict, sample_turns):
+         data_src2var2metric2val = process_validation_metrics(data_sources, sample_uids, reward_extra_infos_dict)
+-        metric_dict = {}
++        metric_dict = {"evaluation/generated_examples": len(sample_uids)}
+         for data_source, var2metric2val in data_src2var2metric2val.items():
+             core_var = "acc" if "acc" in var2metric2val else "reward"
+             for var_name, metric2val in var2metric2val.items():
+@@ -1348,7 +1358,7 @@ class RayPPOTrainer:
          )
          output = self.ref_policy_wg.compute_ref_log_prob(batch_td)
          result = {key: no_padding_2_full_padding(tu.get(output, key), batch_td)
@@ -397,7 +423,7 @@ index 44780d7..298862e 100644
          return DataProto.from_tensordict(tu.get_tensordict(result))
  
      def _update_actor(self, batch: DataProto) -> DataProto:
-@@ -1458,6 +1458,7 @@ class RayPPOTrainer:
+@@ -1458,6 +1468,7 @@ class RayPPOTrainer:
              logger.log(data=val_metrics, step=self.global_steps)
              if self.config.trainer.get("val_only", False):
                  self._shutdown_dump_executor()
@@ -405,7 +431,7 @@ index 44780d7..298862e 100644
                  return
  
          if self.config.actor_rollout_ref.rollout.skip.get("enable", False):
-@@ -1717,6 +1718,11 @@ class RayPPOTrainer:
+@@ -1717,6 +1728,11 @@ class RayPPOTrainer:
                          # update actor
                          with marked_timer("update_actor", timing_raw, color="red"):
                              actor_output = self._update_actor(batch)
@@ -417,7 +443,7 @@ index 44780d7..298862e 100644
  
                          # Check if the ESI (Elastic Server Instance)/training plan is close to expiration.
                          esi_close_to_expiration = should_save_ckpt_esi(
-@@ -1828,6 +1834,7 @@ class RayPPOTrainer:
+@@ -1828,6 +1844,7 @@ class RayPPOTrainer:
                      self._shutdown_dump_executor()
                      pprint(f"Final validation metrics: {last_val_metrics}")
                      progress_bar.close()
@@ -551,7 +577,7 @@ index 3e3798d..feaaae7 100644
  
          self.rank = torch.distributed.get_rank()
 diff --git i/verl/verl/workers/engine_workers.py w/verl/verl/workers/engine_workers.py
-index 3d859d0..6b4d440 100644
+index 3d859d0..17b3216 100644
 --- i/verl/verl/workers/engine_workers.py
 +++ w/verl/verl/workers/engine_workers.py
 @@ -304,7 +304,9 @@ class TrainingWorker(Worker, DistProfilerExtension):
@@ -584,6 +610,23 @@ index 3d859d0..6b4d440 100644
  
                  output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
              else:
+@@ -526,8 +539,14 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+                     enable_gradient_checkpointing=False,
+                     use_fused_kernels=False,
+                 )
+-                if model_config.tokenizer.get_vocab() != ref_config.model_config.tokenizer.get_vocab():
+-                    raise ValueError("MirrorOPD anchor and teacher token-to-id vocabularies must match")
++                from mirroropd.training.tokenization import assert_shared_tokenization
++
++                assert_shared_tokenization(
++                    model_config.tokenizer,
++                    ref_config.model_config.tokenizer,
++                    require_chat=bool(model_config.tokenizer.chat_template)
++                    and model_config.custom_chat_template is None,
++                )
+                 if model_config.hf_config.vocab_size != ref_config.model_config.hf_config.vocab_size:
+                     raise ValueError("MirrorOPD anchor and teacher output vocabularies must match")
+                 if not ref_config.engine.forward_only:
 diff --git i/verl/verl/workers/utils/padding.py w/verl/verl/workers/utils/padding.py
 index 61f4779..ff76b4d 100644
 --- i/verl/verl/workers/utils/padding.py

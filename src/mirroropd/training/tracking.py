@@ -19,6 +19,8 @@ def metric_name(key: str, scope: str) -> str:  # noqa: PLR0911
         "importance_ratio": "02_offpolicy",
         "sampled_log_ratio": "02_offpolicy",
         "grad_norm": "03_optimization",
+        "grad_clip_scale": "03_optimization",
+        "grad_was_clipped": "03_optimization",
         "score_coefficient": "03_optimization",
         "token_advantage": "03_optimization",
         "action_nll": "03_optimization",

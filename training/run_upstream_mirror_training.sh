@@ -68,7 +68,7 @@ cd "$task_root/verl"
 "$task_python" -m verl.trainer.main_ppo \
   data.train_files="$train_file" \
   data.val_files="$val_file" \
-  data.train_batch_size=2 data.max_prompt_length=512 data.max_response_length=2048 \
+  data.train_batch_size=2 data.max_prompt_length=64 data.max_response_length=8 \
   data.dataloader_num_workers=0 \
   reward.custom_reward_function.path="$task_root/data/gsm8k_reward.py" \
   reward.custom_reward_function.name=compute_score \
@@ -94,8 +94,8 @@ cd "$task_root/verl"
   actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
   actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
   actor_rollout_ref.rollout.max_num_seqs=4 \
-  actor_rollout_ref.rollout.max_num_batched_tokens=8192 \
-  actor_rollout_ref.rollout.max_model_len=2048 \
+  actor_rollout_ref.rollout.max_num_batched_tokens=1024 \
+  actor_rollout_ref.rollout.max_model_len=1024 \
   actor_rollout_ref.rollout.agent.num_workers=1 \
   actor_rollout_ref.rollout.calculate_log_probs=true \
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
@@ -115,7 +115,7 @@ cd "$task_root/verl"
   algorithm.adv_estimator=reinforce_plus_plus \
   trainer.n_gpus_per_node=1 trainer.nnodes=1 \
   trainer.total_training_steps=2 trainer.total_epochs=1 \
-  trainer.val_before_train=false trainer.test_freq=5 \
+  trainer.val_before_train=false trainer.test_freq=-1 \
   trainer.save_freq=-1 trainer.resume_mode=disable \
   trainer.max_actor_ckpt_to_keep=1 \
   trainer.default_local_dir="$task_root/checkpoints/$mode" \

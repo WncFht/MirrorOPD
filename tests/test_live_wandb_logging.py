@@ -11,9 +11,10 @@ class FakeRun:
         self.step = 0
         self.summary = {}
         self.logged = []
+        self.axes = []
 
-    def define_metric(self, _name, **_kwargs):
-        pass
+    def define_metric(self, name, **kwargs):
+        self.axes.append((name, kwargs))
 
     def log(self, data, step):
         self.logged.append((step, data))
@@ -49,3 +50,21 @@ def test_inner_records_are_uploaded_incrementally(tmp_path: Path):
     assert [step for step, _ in wandb.run.logged] == [1, 2]
     assert wandb.run.logged[0][1]["00_axes/inner_update"] == 0
     assert wandb.run.logged[1][1]["00_axes/outer_step"] == 1
+
+
+def test_test_metrics_keep_outer_axis_after_inner_uploads(tmp_path: Path):
+    del tmp_path
+    wandb = FakeWandb()
+    logger = WandbLogger(wandb, {})
+    key = "val-core/openai/gsm8k/acc/mean@1"
+    logger.log({key: 0.2, "evaluation/generated_examples": 1319}, step=0)
+    logger.log({"actor/grad_norm": 4.0}, step=1)
+    logger.log({key: 0.3}, step=5)
+    first, training, last = [payload for _, payload in wandb.run.logged]
+    assert first["00_axes/evaluation_outer"] == 0
+    assert first["01_quality/" + key] == 0.2
+    assert first["01_quality/generated_examples"] == 1319
+    assert "00_axes/evaluation_outer" not in training
+    assert last["00_axes/evaluation_outer"] == 5
+    assert ("01_quality/*", {"step_metric": "00_axes/evaluation_outer"}) in wandb.run.axes
+    assert [step for step, _ in wandb.run.logged] == [1, 2, 3]

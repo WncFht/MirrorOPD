@@ -12,6 +12,8 @@ data:
 	python3 scripts/restore-data.py
 
 test:
+	PYTHONPATH=src python3 tests/test_gsm8k_evaluation.py
+	PYTHONPATH=src uv run --with pytest python -m pytest tests/test_live_wandb_logging.py -q
 	PYTHONPATH=src python3 tests/test_tracking_layout.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py

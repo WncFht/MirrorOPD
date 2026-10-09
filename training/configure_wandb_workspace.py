@@ -11,6 +11,7 @@ def main():
     parser.add_argument("--entity", default="wncfht")
     parser.add_argument("--project", default="mirror-opd-pythia")
     parser.add_argument("--url", help="Update this saved workspace instead of creating a view")
+    parser.add_argument("--quality", choices=("independent", "gsm8k"), default="independent")
     args = parser.parse_args()
     groups = [
         (
@@ -36,6 +37,7 @@ def main():
             "00_axes/inner_update",
             [
                 "03_optimization/inner_grad_norm",
+                "03_optimization/inner_grad_clip_scale",
                 "03_optimization/inner_score_coefficient/rms",
             ],
         ),
@@ -91,6 +93,19 @@ def main():
             ],
         ),
     ]
+    if args.quality == "gsm8k":
+        groups[0] = (
+            "01 Quality - GSM8K test accuracy and generation",
+            "00_axes/evaluation_outer",
+            [
+                "01_quality/val-core/openai/gsm8k/acc/mean@1",
+                "01_quality/val-aux/openai/gsm8k/acc_explicit/mean@1",
+                "01_quality/val-aux/openai/gsm8k/acc_strict/mean@1",
+                "01_quality/val-aux/openai/gsm8k/budget_exhausted/mean@1",
+                "01_quality/val-aux/openai/gsm8k/response_tokens/mean@1",
+                "01_quality/generated_examples",
+            ],
+        )
     workspace = (
         Workspace.from_url(args.url)
         if args.url

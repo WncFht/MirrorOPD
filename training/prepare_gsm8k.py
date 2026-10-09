@@ -8,6 +8,8 @@ GSM8K test set, which makes curves comparable across outer steps.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -22,13 +24,14 @@ def answer_from_solution(solution: str) -> str:
     return match[-1].replace(",", "")
 
 
-def convert(split: str, output: Path) -> None:
+def convert(split: str, output: Path) -> dict:
     rows = []
-    for index, example in enumerate(load_dataset("openai/gsm8k", "main", split=split)):
+    dataset = load_dataset("openai/gsm8k", "main", split=split)
+    for index, example in enumerate(dataset):
         question = example["question"].strip()
         prompt = (
-            "Solve this math word problem. Show your reasoning, then put the final "
-            "numeric answer on the last line in exactly this format: #### <number>.\n\n"
+            "Solve this math word problem. Show your reasoning, then put only the final "
+            "numeric answer on a final line in exactly this format: #### <number>.\n\n"
             f"Problem: {question}"
         )
         rows.append(
@@ -46,14 +49,28 @@ def convert(split: str, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_parquet(output, index=False)
     print(f"{split}: {len(rows)} rows -> {output}")
+    return {
+        "count": len(rows),
+        "dataset_fingerprint": dataset._fingerprint,  # noqa: SLF001
+        "parquet_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+    }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
-    convert("train", args.output_dir / "train.parquet")
-    convert("test", args.output_dir / "test.parquet")
+    splits = {
+        split: convert(split, args.output_dir / f"{split}.parquet") for split in ("train", "test")
+    }
+    manifest = {
+        "dataset": "openai/gsm8k",
+        "dataset_config": "main",
+        "selection": "complete official train and test; no validation split",
+        "prompt": "single user message; answer exists only in reward_model.ground_truth",
+        "splits": splits,
+    }
+    (args.output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 
 if __name__ == "__main__":
