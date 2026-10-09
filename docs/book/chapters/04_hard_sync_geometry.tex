@@ -1,0 +1,344 @@
+\section{Hard sync 的精确几何与稳定区间}
+\label{sec:hard-sync-geometry}
+
+本节固定一个 prefix，省略条件变量。沿用 $\pi_k$ 表示第 $k$ 轮冻结 anchor，$\pi_T$ 表示固定 teacher。词表 $\mathcal V$ 有限，$\pi_0(v)>0$、$\pi_T(v)>0$ 对所有 token 成立。假设 inner 优化确实得到 Gibbs target，随后将这个 target 完整复制为下一轮 anchor。这个假设同时排除了有限 inner 误差、模型表达能力不足和参数同步与分布同步之间的差异。
+
+\begin{definition}[精确 Gibbs hard sync]
+对任意 $\eta>0$ 和严格正分布 $\pi$，定义
+\[
+ T_\eta(\pi)(v)
+ =\frac{\pi(v)^{1-\eta}\pi_T(v)^\eta}{Z_\eta(\pi)},
+ \qquad
+ Z_\eta(\pi)=\sum_{w\in\mathcal V}\pi(w)^{1-\eta}\pi_T(w)^\eta.
+\]
+精确 hard sync 是 $\pi_{k+1}=T_{\eta_k}(\pi_k)$。$\eta_k$ 是 mirror 更新的步长；它与优化器学习率及每轮 inner steps 是不同量。
+\end{definition}
+
+严格正性使负指数也有定义。因此本节先分析所有 $\eta>0$ 的数学更新，再区分通常采用的 $0<\eta\leq1$ 区间。若初始分布有零概率，$0<\eta<1$ 的更新会一直保留这些零概率，不能恢复 teacher 的完整支持集；$\eta>1$ 的负幂则在这些 token 上失去定义。有限 logits 的 softmax 满足正性，而显式截断后的采样分布不能直接代入本节结论。
+
+\subsection{归一化常数消去后的精确收缩}
+
+\begin{definition}[Log-ratio 跨度与 Hilbert 距离]
+对 token 函数 $f$，定义
+\[
+ \operatorname{osc}_v f_v=\max_v f_v-\min_v f_v.
+\]
+对两个严格正概率分布，定义
+\[
+ d_H(\pi,\widetilde\pi)
+ =\operatorname{osc}_v\log\frac{\pi(v)}{\widetilde\pi(v)},
+ \qquad b_k=d_H(\pi_k,\pi_T).
+\]
+$d_H$ 是正概率单纯形上的 Hilbert 距离。它忽略 log-density 中与 token 无关的加性常数，恰好对应概率归一化所消除的自由度。
+\end{definition}
+
+这个定义确实给出距离。非负性来自最大值减最小值；对称性来自 $\operatorname{osc}(-f)=\operatorname{osc}(f)$；三角不等式来自 $\operatorname{osc}(f+g)\leq\operatorname{osc}(f)+\operatorname{osc}(g)$。若 $d_H(\pi,\widetilde\pi)=0$，则两个分布的概率比是常数，归一化迫使这个常数等于一。
+
+\begin{theorem}[两条 hard-sync 轨迹的精确收缩]
+\label{thm:hs-pairwise-contraction}
+相同 teacher 和相同步长下，任意严格正分布满足
+\begin{equation}\label{eq:hs-pairwise-contraction}
+ d_H(T_\eta(\pi),T_\eta(\widetilde\pi))
+ =|1-\eta|d_H(\pi,\widetilde\pi).
+\end{equation}
+特别地，$\pi_T$ 是不动点，而且
+\[
+ b_{k+1}=|1-\eta_k|b_k.
+\]
+\end{theorem}
+
+\begin{proof}
+先逐 token 相除，再取对数：
+\[
+ \log\frac{T_\eta(\pi)(v)}{T_\eta(\widetilde\pi)(v)}
+ =(1-\eta)\log\frac{\pi(v)}{\widetilde\pi(v)}
+ -\log Z_\eta(\pi)+\log Z_\eta(\widetilde\pi).
+\]
+最后两个项与 token 无关，在跨度中抵消。对任意实数 $c$，$\operatorname{osc}(cf)=|c|\operatorname{osc}(f)$，从而得到式~\eqref{eq:hs-pairwise-contraction}。将 $\widetilde\pi=\pi_T$ 代入，并使用 $T_\eta(\pi_T)=\pi_T$，得到第二个结论。
+\end{proof}
+
+\begin{theorem}[常步长与变步长的精确解]
+\label{thm:hard-sync}
+记
+\[
+ A_0=1,\qquad A_k=\prod_{j=0}^{k-1}(1-\eta_j),
+ \qquad u_v=\log\frac{\pi_0(v)}{\pi_T(v)}.
+\]
+任意正步长序列的精确解为
+\begin{equation}\label{eq:hard-closed}
+ \pi_k(v)=\frac{\pi_T(v)e^{A_k u_v}}
+ {\sum_w\pi_T(w)e^{A_k u_w}},
+ \qquad b_k=|A_k|b_0.
+\end{equation}
+常步长时 $A_k=(1-\eta)^k$，也可以写成
+\[
+ \pi_k(v)=\frac{\pi_0(v)^{(1-\eta)^k}
+ \pi_T(v)^{1-(1-\eta)^k}}
+ {\sum_w\pi_0(w)^{(1-\eta)^k}
+ \pi_T(w)^{1-(1-\eta)^k}}.
+\]
+\end{theorem}
+
+\begin{proof}
+$k=0$ 时 $\pi_T(v)e^{u_v}=\pi_0(v)$，配分函数等于一。假设第 $k$ 轮公式成立，其归一化常数记为 $C_k$。下一轮未归一化权重为
+\begin{align*}
+ \pi_k(v)^{1-\eta_k}\pi_T(v)^{\eta_k}
+ &=C_k^{-(1-\eta_k)}\pi_T(v)
+       e^{(1-\eta_k)A_k u_v}\\
+ &=C_k^{-(1-\eta_k)}\pi_T(v)e^{A_{k+1}u_v}.
+\end{align*}
+第一项不依赖 token，归一化后消失。由归纳得到分布闭式。取相对 teacher 的 log-ratio 后，归一化常数同样在跨度中抵消，得到 $b_k=|A_k|b_0$。
+\end{proof}
+
+\begin{corollary}[常步长的完整稳定分类]
+对非 teacher 初值，精确 hard sync 的行为如下。
+\begin{enumerate}
+ \item $0<\eta<1$ 时，$A_k>0$ 且趋于零，策略从同一侧趋向 teacher。
+ \item $\eta=1$ 时，第一轮更新等于 teacher，此后保持不变。
+ \item $1<\eta<2$ 时，$A_k$ 正负交替并趋于零，策略在 teacher 两侧交替收敛。
+ \item $\eta=2$ 时，$A_k=(-1)^k$，形成精确二周期。
+ \item $\eta>2$ 时，$|A_k|$ 发散，log-ratio 跨度发散，策略不能趋向 teacher。
+\end{enumerate}
+因此完整的全局渐近稳定区间是 $0<\eta<2$。teacher KL 的每步单调下降需要另外分析。
+\end{corollary}
+
+\begin{proof}
+前四项直接由式~\eqref{eq:hard-closed} 得到。第五项中，偶数轮的 $A_k$ 趋于正无穷，奇数轮趋于负无穷。偶数轮的概率质量集中到 $u_v$ 最大的 token 集合，奇数轮集中到最小的 token 集合；各集合内部的极限概率与 $\pi_T$ 成比例。非 teacher 初值使 $u$ 非常数，所以两个集合互不相交。
+
+有限正 teacher 下仍有
+\[
+ \KL(\pi_k\Vert\pi_T)\leq\log\frac1{\min_v\pi_T(v)}.
+\]
+因此这里发散的是 log-ratio 跨度和反向 KL，而正向 teacher KL 保持有界。反向 KL 发散，是因为上述集中使某些具有正 teacher 质量的 token 概率趋于零。
+\end{proof}
+
+\begin{proposition}[变步长的充要条件]
+非 teacher 初值下，$\pi_k\to\pi_T$ 当且仅当 $A_k\to0$。若每个 $\eta_k\in(0,2)$，且没有任何一步等于一，则这个条件等价于
+\[
+ \sum_{k=0}^{\infty}\eta_k(2-\eta_k)=\infty.
+\]
+若某一步等于一，则此后 $A_k=0$，直接收敛。
+\end{proposition}
+
+\begin{proof}
+$A_k\to0$ 时由有限词表闭式得到逐 token 收敛。反过来，概率趋向严格正 teacher 时 $b_k\to0$；因为 $b_0>0$，故 $|A_k|\to0$。对 $a_k=|1-\eta_k|\in(0,1)$，无限乘积 $\prod_k a_k$ 为零，当且仅当 $\sum_k(1-a_k)$ 发散。这个标准乘积判据可以由 $-\log a\geq1-a$，以及 $a$ 接近一时 $-\log a\leq2(1-a)$ 推出。最后使用
+\[
+ 1-a_k\leq1-a_k^2\leq2(1-a_k),
+ \qquad 1-a_k^2=\eta_k(2-\eta_k),
+\]
+得到等价条件。
+\end{proof}
+
+例如 $\eta_k=1/(k+2)$ 给出 $A_K=1/(K+1)\to0$。若改成 $\eta_k=1/(k+2)^2$，则
+\[
+ A_K=\prod_{n=2}^{K+1}\frac{(n-1)(n+1)}{n^2}
+ =\frac{K+2}{2(K+1)}\longrightarrow\frac12.
+\]
+第二种步长虽然每轮都执行正确方向的 hard sync，但总更新量有限，最终仍保留初始 log-ratio 的一半。
+
+\subsection{配分函数与两个方向的 KL 路径}
+
+沿用上节 $u_v$，定义一条由初始策略和 teacher 唯一确定的路径：
+\[
+ \psi(a)=\log\sum_v\pi_T(v)e^{a u_v},\qquad
+ \pi^{[a]}(v)=\pi_T(v)e^{a u_v-\psi(a)}.
+\]
+这里 $a$ 是路径坐标，实际第 $k$ 轮取 $a=A_k$；它不代表新的策略变量。归一化给出 $\psi(0)=\psi(1)=0$，以及 $\pi^{[0]}=\pi_T$、$\pi^{[1]}=\pi_0$。
+
+\begin{theorem}[KL 路径的精确积分]
+\label{thm:hs-kl-path}
+配分函数满足
+\[
+ \psi'(a)=\E_{\pi^{[a]}}u,
+ \qquad\psi''(a)=\Var_{\pi^{[a]}}(u).
+\]
+沿路径的正向与反向 KL 分别为
+\begin{align}
+ \KL(\pi^{[a]}\Vert\pi_T)
+ &=a\psi'(a)-\psi(a)
+ =\int_0^a z\psi''(z)\,\mathrm dz,
+ \label{eq:hs-forward-kl-path}\\
+ \KL(\pi_T\Vert\pi^{[a]})
+ &=\psi(a)-a\psi'(0)
+ =\int_0^a(a-z)\psi''(z)\,\mathrm dz.
+ \label{eq:hs-reverse-kl-path}
+\end{align}
+任意路径两点之间还有
+\[
+ \KL(\pi^{[a]}\Vert\pi^{[c]})
+ =(a-c)\psi'(a)-\psi(a)+\psi(c).
+\]
+\end{theorem}
+
+\begin{proof}
+有限词表允许逐项微分。令 $C(a)=\sum_v\pi_T(v)e^{au_v}$，则
+\[
+ \psi'(a)=\frac{C'(a)}{C(a)}=\sum_v\pi^{[a]}(v)u_v,
+ \qquad
+ \psi''(a)=\frac{C''(a)}{C(a)}-
+          \left(\frac{C'(a)}{C(a)}\right)^2.
+\]
+右侧正好是 $u$ 的方差。正向 log-ratio 是 $au_v-\psi(a)$，在 $\pi^{[a]}$ 下取期望得到第一式。其关于 $a$ 的导数为 $a\psi''(a)$，在零点的值为零，积分得到式~\eqref{eq:hs-forward-kl-path}。反向 log-ratio 是 $\psi(a)-au_v$，在 teacher 下取期望得到第二式；再对 $\psi$ 在零点使用带积分余项的二阶展开，得到式~\eqref{eq:hs-reverse-kl-path}。最后两条路径分布的 log-ratio 为 $(a-c)u_v-\psi(a)+\psi(c)$，取期望即得。
+\end{proof}
+
+由于 $\psi''(a)\geq0$，正向 KL 在 $a>0$ 上随 $a$ 增大而增大，在 $a<0$ 上随 $a$ 增大而减小。反向 KL 的导数 $\psi'(a)-\psi'(0)$ 也具有相同符号。因此 $0<\eta\leq1$ 下，两个方向的 KL 都逐轮下降。$1<\eta<2$ 时，连续两轮的 $a$ 符号不同，跨度收缩本身不能比较它们的 KL 大小。
+
+\begin{corollary}[局部 KL 速率与全局绝对界]
+非 teacher 初值、固定 $0<\eta<2$ 且 $\eta\neq1$ 时，
+\[
+ \lim_{k\to\infty}
+ \frac{\KL(\pi_{k+1}\Vert\pi_T)}{\KL(\pi_k\Vert\pi_T)}
+ =(1-\eta)^2.
+\]
+对所有实数 $A_k$，还有
+\[
+ \KL(\pi_k\Vert\pi_T)\leq\frac{A_k^2b_0^2}{8}.
+\]
+\end{corollary}
+
+\begin{proof}
+在零点展开得到
+\[
+ \KL(\pi^{[a]}\Vert\pi_T)
+ =\frac{a^2}{2}\Var_{\pi_T}(u)+O(|a|^3).
+\]
+非 teacher 初值使该方差严格正；将 $a=A_k$ 与 $A_{k+1}=(1-\eta)A_k$ 代入并相除，得到极限。任意支撑在长度为 $b_0$ 的区间内的随机变量，方差不超过 $b_0^2/4$。把这个界代入式~\eqref{eq:hs-forward-kl-path}，得到 $a^2b_0^2/8$；当 $a<0$ 时反向积分同样给出正的 $a^2/2$ 因子。
+\end{proof}
+
+这个全局绝对界以初始跨度衡量误差；它没有把当前 KL 与初始 KL 作比例比较。局部极限 $(1-\eta)^2$ 也不能提升为全局单步收缩因子。
+
+\subsection{精确三点恒等式与单步下降}
+
+\begin{theorem}[Hard sync 的三点 KL 恒等式]
+\label{thm:hs-three-point}
+记 $\pi^+=T_\eta(\pi)$。对任意 $\eta>0$，
+\begin{equation}\label{eq:hs-three-point}
+ \eta\KL(\pi\Vert\pi_T)
+ =\eta\KL(\pi^+\Vert\pi_T)
+ +(1-\eta)\KL(\pi^+\Vert\pi)
+ +\KL(\pi\Vert\pi^+).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+从更新定义分别减去 anchor 和 teacher 的 log-density：
+\begin{align*}
+ \log\frac{\pi^+}{\pi}
+ &=-\eta\log\frac{\pi}{\pi_T}-\log Z_\eta(\pi),\\
+ \log\frac{\pi^+}{\pi_T}
+ &=(1-\eta)\log\frac{\pi}{\pi_T}-\log Z_\eta(\pi).
+\end{align*}
+第一式在 $\pi$ 下取负期望，得到
+\[
+ \KL(\pi\Vert\pi^+)
+ =\eta\KL(\pi\Vert\pi_T)+\log Z_\eta(\pi).
+\]
+第二式在 $\pi^+$ 下取期望，并与第一式在 $\pi^+$ 下的期望组合，得到
+\[
+ \eta\KL(\pi^+\Vert\pi_T)
+ +(1-\eta)\KL(\pi^+\Vert\pi)
+ =-\log Z_\eta(\pi).
+\]
+两式相加，配分函数消去，即为所需恒等式。
+\end{proof}
+
+当 $0<\eta\leq1$ 时，式~\eqref{eq:hs-three-point} 的最后两个项非负。常步长的下降量和累计更新量因此满足
+\begin{align*}
+ \KL(\pi_k\Vert\pi_T)-\KL(\pi_{k+1}\Vert\pi_T)
+ &=\frac{1-\eta}{\eta}\KL(\pi_{k+1}\Vert\pi_k)
+ +\frac1\eta\KL(\pi_k\Vert\pi_{k+1}),\\
+ \sum_{k=0}^{\infty}\KL(\pi_k\Vert\pi_{k+1})
+ &\leq\eta\KL(\pi_0\Vert\pi_T).
+\end{align*}
+后一式由前式对有限轮数求和、去掉非负项，再令轮数趋于无穷得到。它控制整个 hard-sync 轨迹的累计 KL 移动量。
+
+Gibbs target 对任意正步长仍是一个严格凸目标的唯一最优点。具体地，定义
+\[
+ F_\eta(p)=\KL(p\Vert\pi_T)
+ +(\eta^{-1}-1)\KL(p\Vert\pi).
+\]
+直接代入 $\pi^+$ 的 log-density，得到
+\[
+ F_\eta(p)=\eta^{-1}\KL(p\Vert\pi^+)
+ -\eta^{-1}\log Z_\eta(\pi).
+\]
+所以 $\eta>1$ 时虽然第二个 KL 的系数为负，整个目标的熵系数仍为 $1/\eta>0$，最优点仍唯一。最优点存在、hard-sync 稳定和 teacher KL 单步下降是三个不同结论。
+
+\subsection{KL 收缩的两个数值反例}
+
+取二元词表，$\pi_0=(10^{-12},1-10^{-12})$、$\pi_T=(0.1,0.9)$、$\eta=1.1$。直接代入更新得到
+\[
+ \pi_1=(0.5856848855168,\;0.4143151144832),
+\]
+\[
+ \KL(\pi_0\Vert\pi_T)=0.1053605156314,
+ \qquad\KL(\pi_1\Vert\pi_T)=0.7138510884672.
+\]
+跨度严格缩小到初值的 $0.1$，正向 KL 却增加到约 $6.7753$ 倍。这说明 $1<\eta<2$ 的稳定性不能表述为每一步 teacher KL 下降。
+
+取 $\pi_0=(1-10^{-12},10^{-12})$、$\pi_T=(0.01,0.99)$、$\eta=0.5$，得到
+\[
+ \pi_1=(0.9999900502246,\;0.0000099497753721),
+\]
+\[
+ \KL(\pi_0\Vert\pi_T)=4.6051701859549,
+ \qquad\KL(\pi_1\Vert\pi_T)=4.6049999147314.
+\]
+此时 KL 的比值约为 $0.9999630$，超过 $1-\eta=0.5$ 与 $(1-\eta)^2=0.25$。这一次 KL 确实下降，但远处的下降速度不能套用 teacher 附近的二阶渐近速率。
+
+\subsection{从跨度到分布误差的最优 TV 界}
+
+\begin{theorem}[Hilbert 距离控制 TV 的 sharp 界]
+\label{thm:hs-sharp-tv}
+任意严格正概率分布 $p,q$ 满足
+\begin{equation}\label{eq:hs-sharp-tv}
+ \TV(p,q)\leq\tanh\!\left(\frac{d_H(p,q)}4\right).
+\end{equation}
+对每个给定正跨度，都存在二元分布达到等号。
+\end{theorem}
+
+\begin{proof}
+令 $L_v=p(v)/q(v)$、$m=\min L_v$、$M=\max L_v$、$\delta=d_H(p,q)$。归一化给出 $\E_qL=1$，所以 $m\leq1\leq M$，且 $M/m=e^\delta$。$\delta=0$ 时两个分布相等，结论成立。以下设 $\delta>0$。
+
+凸函数 $|L-1|$ 在 $[m,M]$ 上不超过端点连接的弦线，因此
+\[
+ |L-1|\leq\frac{M-L}{M-m}(1-m)
+ +\frac{L-m}{M-m}(M-1).
+\]
+在 $q$ 下取期望，再除以二，得到
+\[
+ \TV(p,q)=\tfrac12\E_q|L-1|
+ \leq\frac{(M-1)(1-m)}{M-m}.
+\]
+记 $h=e^\delta$，代入 $M=hm$ 将右侧化为
+\[
+ \frac{h+1-hm-m^{-1}}{h-1}.
+\]
+由 $hm+m^{-1}\geq2\sqrt h$，继续得到
+\[
+ \TV(p,q)\leq\frac{\sqrt h-1}{\sqrt h+1}
+ =\tanh(\delta/4).
+\]
+为了达到等号，取两个 token 的概率比分别为 $M=e^{\delta/2}$ 和 $m=e^{-\delta/2}$，在 $q$ 下赋予质量
+\[
+ q(L=M)=\frac1{1+e^{\delta/2}},\qquad
+ q(L=m)=\frac{e^{\delta/2}}{1+e^{\delta/2}}.
+\]
+这些质量满足 $\E_qL=1$。随机变量只取端点值，使弦线界取等号；$hm=m^{-1}$ 又使算术--几何均值界取等号。故整个界达到等号。
+\end{proof}
+
+结合 hard-sync 闭式立即得到
+\[
+ \TV(\pi_k,\pi_T)\leq\tanh(|A_k|b_0/4).
+\]
+对于常步长 $0<\eta<2$，若要求 TV 不超过 $\delta\in(0,1)$，充分条件是
+\[
+ |1-\eta|^k b_0\leq4\operatorname{artanh}(\delta).
+\]
+当 $b_0$ 已不超过右侧时，初始策略就满足要求；否则取 $\eta\neq1$，可解出所需 outer 轮数
+\[
+ k\geq
+ \frac{\log\!\left(b_0/[4\operatorname{artanh}(\delta)]\right)}
+ {-\log|1-\eta|}.
+\]
+这个保证以逐 prefix 的精确 Gibbs 更新为前提。它没有把有限 inner、参数共享或 rollout 测度变化隐藏到精确公式中。

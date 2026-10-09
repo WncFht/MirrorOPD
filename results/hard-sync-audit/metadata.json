@@ -1,0 +1,22 @@
+{
+  "seed": 20261010,
+  "source_commit": "26cc1518ee5661bba89a00e5247e44fcb639a63d",
+  "script_sha256": "157c3380ed09cf717097503b67384a02daa8c3a09add33303166c60d74e3cdee",
+  "dtype": "float64",
+  "teacher": [
+    0.2,
+    0.3,
+    0.5
+  ],
+  "direction": [
+    -1,
+    0.2,
+    0.8
+  ],
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "command": "PYTHONPATH=src uv run --with numpy --with scipy --with torch --with matplotlib python experiments/toy/hard_sync_audit.py --plot-style ~/.agents/skills/figure-viz/assets/mpl",
+  "max_three_point_residual": 1.7763568394002505e-15,
+  "max_mean_core_difference": 2.7755575615628914e-16,
+  "max_mean_kkt_residual": 3.552713678800501e-15
+}

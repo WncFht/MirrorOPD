@@ -3,80 +3,10 @@
 
 第三章给出固定 prefix 下 KL 数值与梯度估计的条件误差。本章分析 inner 优化如何把这种误差传到 outer 同步后的策略，依次讨论精确 Gibbs 更新、PMD-Mean 更新、有限 inner、soft sync 和访问测度变化。沿用前两章的 $\pi_k$、$\pi_{k,n}$ 与 $\pi_T$；它们分别是冻结 anchor、inner student 和 teacher。
 
-\section{Hard sync 的精确动力学}
-
-先考虑每个 history 的 teacher 分布 $\pi_T$ 不随 outer 改变，并且 PMD-Part、未线性化 BPO 或 MDPO 的 inner 精确收敛到式~\eqref{eq:token-target} 的 Gibbs 分布。hard sync 定义为
-\[
- \pi_{k+1}=\frac{\pi_k^{1-\eta}\pi_T^\eta}{Z_k}.
-\]
-
-\begin{theorem}[Hard-sync geometric interpolation]
-\label{thm:hard-sync}
-若 $0<\eta\leq1$，词表有限，且初始策略与 $\pi_T$ 在所有 token 上具有正概率，则
-\begin{equation}\label{eq:hard-closed}
- \pi_k(a\mid x)=
- \frac{\pi_0(a\mid x)^{(1-\eta)^k}
- \pi_T(a\mid x)^{1-(1-\eta)^k}}
- {\sum_b\pi_0(b\mid x)^{(1-\eta)^k}\pi_T(b\mid x)^{1-(1-\eta)^k}}.
-\end{equation}
-并且
-\[
- \log\frac{\pi_k(a\mid x)}{\pi_T(a\mid x)}
- =(1-\eta)^k\log\frac{\pi_0(a\mid x)}{\pi_T(a\mid x)}-\log C_k(x),
-\]
-其中 $C_k(x)$ 是归一化常数。$\eta=1$ 时一个 exact inner 将策略直接变成 teacher；$0<\eta<1$ 时每一轮只消除比例 $\eta$ 的 log-density mismatch。
-\end{theorem}
-
-\begin{proof}
-归纳证明。$k=0$ 显然成立。假设式~\eqref{eq:hard-closed} 成立，则
-\[
- \pi_{k+1}\propto\pi_k^{1-\eta}\pi_T^\eta
- \propto \pi_0^{(1-\eta)^{k+1}}
- \pi_T^{(1-\eta)(1-(1-\eta)^k)+\eta}.
-\]
-指数合并为 $1-(1-\eta)^{k+1}$，归一化后得到结论。\hfill$\square$
-\end{proof}
-
-\begin{corollary}[跨度收缩与分布距离]
-固定 prefix $x$，定义
-\[
- b_k=\max_v\log\frac{\pi_k(v\mid x)}{\pi_T(v\mid x)}
-     -\min_v\log\frac{\pi_k(v\mid x)}{\pi_T(v\mid x)}.
-\]
-则精确 Gibbs hard sync 满足
-\[
- b_k=(1-\eta)^k b_0,\qquad
- \TV(\pi_k,\pi_T)\leq\min\left\{1,\frac12(e^{b_k}-1)\right\}.
-\]
-\end{corollary}
-
-\begin{proof}
-式~\eqref{eq:hard-closed} 的归一化常数与动作无关，在最大值减最小值时抵消，所以跨度恰好乘以 $1-\eta$。归一化分布的 log-ratio 必有最小值不大于零、最大值不小于零，否则两分布的总质量不能同时为一。因此每个绝对 log-ratio 不超过 $b_k$，进而
-\[
- \TV(\pi_k,\pi_T)
- =\frac12\E_{\pi_T}\left|\frac{\pi_k}{\pi_T}-1\right|
- \leq\frac12(e^{b_k}-1).
-\]
-再结合 $\TV\leq1$ 得到结论。小 $\eta$ 将每轮跨度变化减小，同时增加达到同一 teacher proximity 所需的 outer 次数。
-\end{proof}
-
-\begin{proposition}[Gibbs 更新的 teacher KL 下降]
-记 $p^*=\pi_k^{\star,\mathrm{Gibbs}}$、$q=\pi_k$、$t=\pi_T$。当 $0<\eta\leq1$ 时，
-\[
- \KL(p^*\Vert t)+(\eta^{-1}-1)\KL(p^*\Vert q)
- \leq\KL(q\Vert t).
-\]
-\end{proposition}
-
-\begin{proof}
-固定 prefix 下 Gibbs 更新最小化
-\[
- F(p)=\KL(p\Vert t)+(\eta^{-1}-1)\KL(p\Vert q),
-\]
-因为其与 MDPO 负 mirror 目标仅相差固定的 reward/anchor 常数。用可行点 $p=q$ 比较，$F(p^*)\leq F(q)=\KL(q\Vert t)$。将 $F(p^*)$ 展开即得结论；$\eta\leq1$ 保证第二项非负。
-\end{proof}
+\input{chapters/04_hard_sync_geometry}
 
 \input{chapters/04_mean_opd_analysis}
+\input{chapters/04_mean_hard_sync_refinement}
 
 \section{有限 inner 更新的误差}
 
@@ -145,14 +75,14 @@ Part 在其零 residual 的 Gibbs 最优点处同样满足该平方恒等式。�
 
 \section{有限 inner 与扰动 Outer 递推}
 
-本节先以 Gibbs inner 方法为对象。实际第 $k$ 轮只运行 $N_k$ 个 inner steps，得到 $\widehat\pi_{k+1}$。假设在每个 history 上有 log-density 误差
+本节先在 $0<\eta\leq1$ 下以 Gibbs inner 方法为对象，随后给出整个稳定区间的推广。实际第 $k$ 轮只运行 $N_k$ 个 inner steps，得到 $\widehat\pi_{k+1}$。假设在每个 history 上有 log-density 误差
 \[
  \left|\log\frac{\widehat\pi_{k+1}(a\mid x)}{\pi_k^{\star,\mathrm{Gibbs}}(a\mid x)}\right|\leq\varepsilon_k
 \]
-对未归一化的正权重成立（若已是归一化策略，则直接使用该假设）。归一化至多使逐 token 的 log-ratio 误差从 $\varepsilon_k$ 增至 $2\varepsilon_k$，因此
+对未归一化的正权重成立（若已是归一化策略，则直接使用该假设）。归一化至多使逐 token 的 log-ratio 误差从 $\varepsilon_k$ 增至 $2\varepsilon_k$，但不改变误差跨度，其值至多为 $2\varepsilon_k$。由定理~\ref{thm:hs-sharp-tv}，
 \begin{equation}\label{eq:finite-inner-tv}
  \TV(\widehat\pi_{k+1},\pi_k^{\star,\mathrm{Gibbs}})
- \leq \frac12(e^{2\varepsilon_k}-1).
+ \leq \tanh(\varepsilon_k/2).
 \end{equation}
 几何插值在 log-ratio 振幅上收缩，不能据此前的推论直接宣称 TV 每步以 $1-\eta$ 收缩。定义
 \[
@@ -168,9 +98,9 @@ b_{k+1}\le(1-\eta)b_k+2\varepsilon_k,
 b_{K_{\mathrm{out}}}\le(1-\eta)^{K_{\mathrm{out}}} b_0
 +2\sum_{j=0}^{K_{\mathrm{out}}-1}(1-\eta)^{K_{\mathrm{out}}-1-j}\varepsilon_j.
 \]
-归一化分布的 log-ratio 最小值不大于零，最大值不小于零，故 $|\log(\pi_{K_{\mathrm{out}}}/\pi_T)|\le b_{K_{\mathrm{out}}}$。由 $\TV(\pi_{K_{\mathrm{out}}},\pi_T)=\frac12\mathbb E_{\pi_T}[|\pi_{K_{\mathrm{out}}}/\pi_T-1|]$ 得
+归一化分布的 log-ratio 最小值不大于零，最大值不小于零，故 $|\log(\pi_{K_{\mathrm{out}}}/\pi_T)|\le b_{K_{\mathrm{out}}}$。进一步由定理~\ref{thm:hs-sharp-tv} 得到更紧的分布距离界：
 \[
-\TV(\pi_{K_{\mathrm{out}}},\pi_T)\le\min\left\{1,\frac12(e^{b_{K_{\mathrm{out}}}}-1)\right\}.
+\TV(\pi_{K_{\mathrm{out}}},\pi_T)\le\tanh(b_{K_{\mathrm{out}}}/4).
 \]
 若 $\varepsilon_j\le\bar\varepsilon$，振幅的稳态上界为 $2\bar\varepsilon/\eta$。这给出 Gibbs 方法有限 inner 误差的几何累积关系。
 
@@ -226,6 +156,8 @@ b_{K_{\mathrm{out}}}\le c_0^{K_{\mathrm{out}}}b_0
 \]
 因此对当前 target 的总跨度误差，至多是相对旧 target 的优化跨度误差加上右侧的 stale-anchor 项。teacher 与 $\eta$ 在这两个 target 间固定是该等式的前提。这个 target 漂移与第三章中旧 rollout 的采样测度偏差是两个独立问题，分别进入 outer 递推和梯度估计。
 
+\input{chapters/04_hard_sync_noise}
+
 \section{Soft sync 的耦合动力学}
 
 若 anchor 使用指数滑动平均（exponential moving average，EMA），其概率空间理想化更新率记为 $\zeta$（第三章的 $\rho$ 专用于采样分布）。令
@@ -276,3 +208,5 @@ q_{\mathrm{new}}/t
  \varepsilon_k^{\mathrm{visit}}=\TV(d_{k+1},d_k).
 \]
 若 token loss 在所有 history 上有上界 $C$，则访问测度改变使目标值的期望变化至多 $2C\varepsilon_k^{\mathrm{visit}}$；若要控制梯度的期望变化，需另行假设逐 prefix 梯度向量的范数不超过 $C_g$，此时界为 $2C_g\varepsilon_k^{\mathrm{visit}}$。因而“固定测度下求解 token 子问题”和“outer 重新 rollout”是两个严格分开的步骤。
+
+\input{chapters/04_hard_sync_experiments}

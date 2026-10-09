@@ -282,7 +282,7 @@ Mean 的 KKT 为 $U_a^\star+\lambda p_a^\star/q_a=\eta(r_a+\kappa)$。取 $\xi=\
 所以每个动作的 log-ratio 绝对值不超过 $b_k(x)$；跨度趋零推出逐动作概率收敛。最后令 $\eta=1$ 即得到式~\eqref{eq:mean-opd-span-quadratic}。
 \end{proof}
 
-$\eta=1$ 的二次上界描述接近 teacher 时的精确 outer 收敛；一般起点上的一次更新仍是 Lambert-$W$ 分布。不同 prefix 的 $b_0(x)$ 可以不同，因此上述逐 prefix 结论不自动给出全 prefix 的统一收敛率。
+$\eta=1$ 的二次上界保证超线性收敛；第~\ref{sec:mean-hard-sync-cubic-span} 节进一步利用归一化乘子的二阶性质，得到真实局部三次阶数。一般起点上的一次更新仍是 Lambert-$W$ 分布。不同 prefix 的 $b_0(x)$ 可以不同，因此上述逐 prefix 结论不自动给出全 prefix 的统一收敛率。
 
 \subsection{一般 OPD reward 的大步长极限}
 
