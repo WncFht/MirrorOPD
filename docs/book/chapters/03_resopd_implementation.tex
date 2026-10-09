@@ -20,8 +20,8 @@ student logits 经 \path{verl/trainer/distillation/fsdp/losses.py} 对齐后，\
 \begin{enumerate}
 \item 完整 student logits 做 log-softmax，得到头部 $p(v)$、$r_v$ 和 $P$；teacher Top-$J$ log-prob 在进入计算时 detach。
 \item 从实际 token 得到 $r_A$，并用 \texttt{student\_tail\_mass}、\texttt{teacher\_tail\_mass} 构造 $\log(\tau_p/\tau_q)$。
-\item 用 \texttt{support\_score} 计算 $\mu_B$，并令 $\texttt{centered\_event}=\mathbf 1\{A\in S\}-P$。
-\item 通过 \texttt{surrogate - surrogate.detach()} 保留 forward 数值、替换 backward，得到式~\eqref{eq:chapter3-control-family} 中 $b=\mu_B$ 的特例。
+\item 用 \texttt{support\_score} 计算 $b_{\mathrm{TA}}$，并令 $\texttt{centered\_event}=\mathbf 1\{A\in S\}-P$。
+\item 通过 \texttt{surrogate - surrogate.detach()} 保留 forward 数值、替换 backward，得到式~\eqref{eq:chapter3-control-family} 中 $b=b_{\mathrm{TA}}$ 的特例。
 \end{enumerate}
 实现中的 teacher 数值、事件系数和控制项均停止梯度。仓库 docstring 明确说明返回值不是确定性 KL 目标，单个 forward value 可以为负；应审计 backward 梯度、期望和协方差，而不是把 loss 平均值解释成完整 KL。
 
@@ -35,4 +35,4 @@ student logits 经 \path{verl/trainer/distillation/fsdp/losses.py} 对齐后，\
 
 仓库公开了可直接运行的 DeepMath 子集：1,024 条训练样本和 252 条 held-out 样本；入口为 \path{examples/resopd/run_resopd.sh}，默认 FSDP2 student、vLLM teacher、Top-$4$、full-support rollout。\path{tests/resopd} 包含 estimator、teacher payload 和 verl integration 检查，发布验证记录 22 个 standalone 与 13 个 integration checks。
 
-需要避免的概念混淆是：HETS 是稀疏 rKL 梯度基线，不是 PPO 的 value baseline；ResOPD 的 $\mu_B$ 是 control variate。仓库中普通 verl 的 ``k1/k2/k3'' KL penalty、GRPO、RLOO、ReMax 等属于框架通用路径，并非论文中同一 teacher payload 下的 HETS/ResOPD 方差基线。
+需要避免的概念混淆是：HETS 是稀疏 rKL 梯度基线，不是 PPO 的 value baseline；ResOPD 的 $b_{\mathrm{TA}}$ 是 control variate。仓库中普通 verl 的 ``k1/k2/k3'' KL penalty、GRPO、RLOO、ReMax 等属于框架通用路径，并非论文中同一 teacher payload 下的 HETS/ResOPD 方差基线。

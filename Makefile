@@ -13,6 +13,7 @@ data:
 
 test:
 	python3 tests/test_kl_theory_identities.py
+	python3 tests/test_kl_unified_framework.py
 	PYTHONPATH=src python3 tests/test_gsm8k_evaluation.py
 	PYTHONPATH=src uv run --with pytest python -m pytest tests/test_live_wandb_logging.py -q
 	PYTHONPATH=src python3 tests/test_tracking_layout.py

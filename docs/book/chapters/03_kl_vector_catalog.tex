@@ -1,0 +1,108 @@
+\section{KL 梯度：相同积分下的不同控制}
+\label{sec:kl-vector}
+本节固定目标 $g=I_p(rs)$，总定理中的 $f_v=r_vs_v$ 是向量，随机估计量默认使用 $\rho=p$。数值估计量的分类逐项迁移到这个目标，但其控制函数和最优系数须在向量二阶矩下重新计算。沿用前节的 $h_g,\bar s_\tail,b_{\mathrm{TA}}$，并定义
+\[
+ \mu_g=\E_p[r_As_A\mid J_A=1],\qquad
+ d_P=\nabla P=\sum_{v\in S}p(v)s_v,\qquad g=h_g+\tau_p\mu_g.
+\]
+头部截断梯度为 $h_g$，其偏差和方差为
+\begin{equation}
+ \operatorname{Bias}(h_g)=-\tau_p\mu_g,
+ \qquad \Var(h_g)=0.
+ \label{eq:chapter3-head-grad-bias}
+\end{equation}
+
+\subsection{HETS 与 ResOPD 的向量残差化}
+
+尾部残差化在线策略蒸馏（On-Policy Distillation with Tail Residualization，ResOPD）从 HETS 的尾部梯度中减去可计算控制向量，再解析加回同一控制的期望。
+
+HETS 梯度 estimator 定义为
+\begin{equation}
+ \widehat g^{\mathrm{HETS}}=h_g+J_A r_As_A.
+ \label{eq:chapter3-hets-grad}
+\end{equation}
+它无偏，且
+\begin{equation}
+ \Var(\widehat g^{\mathrm{HETS}})
+ =\tau_p\Var_{\tail}(r_As_A)+P\tau_p\lVert\mu_g\rVert_2^2.
+ \label{eq:chapter3-hets-var}
+\end{equation}
+
+将尾部聚合为伪 token，定义
+\begin{equation}
+ b_{\mathrm{TA}}=\log\frac{\tau_p}{\tau_q}\,\nabla_\theta\log\tau_p.
+ \label{eq:chapter3-resopd-control}
+\end{equation}
+这个控制向量来自定理~\ref{thm:kl-partition-gradient} 的粗粒度梯度。对头尾分区直接代入该定理，得到 $\nabla(H+\tau_p\ell_{\tail})=h_g+\tau_pb_{\mathrm{TA}}$。因此完整梯度与粗粒度梯度之差为 $\tau_p(\mu_g-b_{\mathrm{TA}})$。使用 $J_A(r_As_A-b_{\mathrm{TA}})$ 对该残差作无偏抽样，再加上粗粒度精确梯度，便得到 ResOPD。
+对任意 action-independent 向量 $b$（与标量尾部形状项 $B$ 区分），定义统一控制族
+\begin{equation}
+ \widehat g(b)=h_g+\tau_pb+J_A(r_As_A-b).
+ \label{eq:chapter3-control-family}
+\end{equation}
+
+\begin{theorem}[ResOPD 控制族的无偏性与方差]
+\label{thm:chapter3-resopd}
+在 $A\sim p$ 且 $b$ 在抽样前冻结时，
+\[
+ \E[\widehat g(b)]=g,
+\]
+并且
+\begin{equation}
+ \Var(\widehat g(b))
+ =\tau_p\Var_{\tail}(r_As_A)
+  +P\tau_p\lVert\mu_g-b\rVert_2^2.
+ \label{eq:chapter3-control-var}
+\end{equation}
+HETS 是 $b=0$；ResOPD 是 $b=b_{\mathrm{TA}}$。
+\end{theorem}
+
+\begin{proof}
+条件期望为
+\[
+ \E[\widehat g(b)]
+ =h_g+\tau_pb+\tau_p(\mu_g-b)=g.
+\]
+给定 $J_A=0$ 时 estimator 为 $h_g+\tau_pb$，给定 $J_A=1$ 时其条件均值为 $h_g+\tau_pb+\mu_g-b$，两者均值差为 $\mu_g-b$。尾部条件下的随机部分为 $r_As_A-b$，其协方差与 $r_As_A$ 相同。对事件 $J_A$ 使用全协方差公式，得到式~\eqref{eq:chapter3-control-var}。
+\end{proof}
+
+ResOPD 与 HETS 的方差差为
+\begin{equation}
+ \Var(\widehat g^{\mathrm{HETS}})-\Var(\widehat g^{\mathrm{ResOPD}})
+ =P\tau_p\left(2\langle\mu_g,b_{\mathrm{TA}}\rangle-\lVert b_{\mathrm{TA}}\rVert_2^2\right).
+ \label{eq:chapter3-hets-resopd-gap}
+\end{equation}
+因此 ResOPD 的优势条件是
+$\lVert\mu_g-b_{\mathrm{TA}}\rVert_2<\lVert\mu_g\rVert_2$。这正是 ResOPD 与 scalar KL 残差化的共同结构，区别只在于 scalar 的尾部均值是 $\mu_r$，向量梯度的尾部均值是 $\mu_g$。
+
+该方差结论也有完整的协方差版本。记 $\Sigma_{\tail}=\operatorname{Cov}_{\tail}(r_As_A)$，则
+\[
+ \operatorname{Cov}(\widehat g(b))
+ =\tau_p\Sigma_{\tail}
+  +P\tau_p(\mu_g-b)(\mu_g-b)^\top.
+\]
+取迹即得到前面的方差公式。最优的无约束向量控制是 $b^*=\mu_g$，此时只剩 $\tau_p\Sigma_{\tail}$；该向量需要未知尾部，因此理论最优值不能作为 sparse payload 下的可计算算法。ResOPD 使用可计算的 $b_{\mathrm{TA}}$ 逼近它。
+
+HETS 也不保证对每个分布都比直接 sampled-token 方差小。令 $\mu_{g,H}=\E[r_As_A\mid A\in S]$、$V_H=\Var(r_As_A\mid A\in S)$，全方差公式给出
+\begin{align*}
+ \Var(r_As_A)&=PV_H+\tau_p\Var_{\tail}(r_As_A)
+ +P\tau_p\lVert\mu_{g,H}-\mu_g\rVert^2,\\
+ \Var(r_As_A)-\Var(\widehat g^{\mathrm{HETS}})
+ &=PV_H+P\tau_p\{\lVert\mu_{g,H}\rVert^2
+ -2\langle\mu_{g,H},\mu_g\rangle\}.
+\end{align*}
+头部精确求和删除了头部内部方差，但同时改变了事件间均值差，因此应使用这个差值判断排序。
+
+\subsection{多样本、均方误差与支持集边界}
+
+以上随机 estimator 均按单个动作计算。对固定 prefix 下 $n$ 个独立动作，使用同一确定性头部和控制项、对随机修正取平均，则偏差保持不变、协方差除以 $n$。标量均方误差为
+\[
+ \operatorname{MSE}(\widehat K)=\operatorname{Bias}(\widehat K)^2+\Var(\widehat K),
+\]
+向量均方误差为
+\[
+ \E\lVert\widehat g-g\rVert^2
+ =\lVert\operatorname{Bias}(\widehat g)\rVert^2+\Var(\widehat g).
+\]
+因此确定性截断的零抽样方差不等于零估计误差；增加样本也无法消除它的偏差。这里的 $1/n$ 结论要求条件独立，同一条 trajectory 上不同 prefix 的 token 不能直接视为同一固定分布的独立重复。
+
+当 $S=\mathcal V$ 时，所有尾部修正按连续延拓取零，头部求和等于完整 KL 或其完整 score 梯度，方差为零；当 $S=\varnothing$ 时，HETS 退化为直接 sampled-token，$\tau_p=\tau_q=1$ 使 ResOPD 控制为零。存在零概率时必须先检查绝对连续性及矩条件；尤其 K3 的 $\E_p[q(A)/p(A)]=1$ 要求 $q$ 的质量全部落在 $p$ 的支持上。
