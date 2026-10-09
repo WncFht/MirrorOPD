@@ -1,0 +1,27 @@
+[
+  {
+    "key": ".actor_rollout_ref.rollout.trace.experiment_name",
+    "previous": "gsm8k-smollm2-mdpo-o50-j16-clip2",
+    "current": "gsm8k-smollm2-mdpo-o50-global-token-fixed"
+  },
+  {
+    "key": ".trainer.default_local_dir",
+    "previous": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-j16-clip2/checkpoints",
+    "current": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-global-token-fixed/checkpoints"
+  },
+  {
+    "key": ".trainer.experiment_name",
+    "previous": "gsm8k-smollm2-mdpo-o50-j16-clip2",
+    "current": "gsm8k-smollm2-mdpo-o50-global-token-fixed"
+  },
+  {
+    "key": ".ray_kwargs.ray_init.runtime_env.env_vars.VERL_FILE_LOGGER_PATH",
+    "previous": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-j16-clip2/outer.jsonl",
+    "current": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-global-token-fixed/outer.jsonl"
+  },
+  {
+    "key": ".ray_kwargs.ray_init.runtime_env.env_vars.MIRROR_INNER_METRICS_PATH",
+    "previous": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-j16-clip2/inner.jsonl",
+    "current": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-mdpo-o50-global-token-fixed/inner.jsonl"
+  }
+]
