@@ -36,9 +36,11 @@ else
 fi
 
 # Only path placeholders are replaced; Jinja braces remain literal text.
-mapfile -d '' -t setting_args < <(
-  "$task_python" - "$setting_file" \
-    "$data_dir/manifest.json" "$run_dir" "$run_name" "$reward_script" <<'PY'
+# A failed producer inside process substitution does not fail mapfile. Write
+# arguments first so malformed configuration aborts before the base run starts.
+"$task_python" - "$setting_file" \
+  "$data_dir/manifest.json" "$run_dir" "$run_name" "$reward_script" \
+  >"$run_dir/setting-args.nul" <<'PY'
 import json
 import os
 import sys
@@ -54,7 +56,7 @@ for argument in setting["hydra_overrides"]:
         argument = argument.replace("{" + key + "}", value)
     sys.stdout.write(argument + "\0")
 PY
-)
+mapfile -d '' -t setting_args <"$run_dir/setting-args.nul"
 setting_args+=("$logger_override")
 cp "$setting_file" "$run_dir/setting.json"
 cp "$data_dir/manifest.json" "$run_dir/data-manifest.json"
