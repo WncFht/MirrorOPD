@@ -21,6 +21,12 @@ def main():
     ap.add_argument("--max-new-tokens", type=int, default=512)
     ap.add_argument("--gpu-memory-utilization", type=float, default=0.90)
     ap.add_argument("--max-model-len", type=int, default=4096)
+    ap.add_argument(
+        "--prompt-style",
+        choices=("plain", "answer-format"),
+        default="plain",
+        help="Use a shared GSM8K instruction that requests a final #### answer.",
+    )
     args = ap.parse_args()
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
@@ -28,6 +34,13 @@ def main():
     ds = load_dataset("openai/gsm8k", "main", split=args.split)
 
     def format_prompt(question: str) -> str:
+        if args.prompt_style == "answer-format":
+            question = (
+                "Solve this math word problem. Show your reasoning, then put only "
+                "the final numeric answer on a final line in exactly this format: "
+                "#### <number>.\n\n"
+                f"Problem: {question}"
+            )
         if tok.chat_template is None:
             return (
                 "Solve the following math problem. Show your work and finish "
@@ -38,7 +51,6 @@ def main():
             [{"role": "user", "content": question}],
             tokenize=False,
             add_generation_prompt=True,
-            enable_thinking=False,
         )
 
     prompts = [format_prompt(x["question"]) for x in ds]
@@ -82,6 +94,11 @@ def main():
                 "temperature": args.temperature,
                 "top_p": 1.0,
                 "max_new_tokens": args.max_new_tokens,
+                "prompt_style": args.prompt_style,
+                "chat_template": "native"
+                if tok.chat_template is not None
+                else "plain-text-fallback",
+                "thinking_mode": "model-template-default",
                 "engine": "vllm",
                 "definition": "one sampled trajectory per GSM8K test prompt; generation is complete up to EOS or max_new_tokens",
             },

@@ -27,3 +27,18 @@ SmolLM2-135M/360M-Instruct 的同协议结果分别为严格 0.23%/1.29%，宽�
 ## 解读
 
 Qwen2.5-0.5B base 在没有 instruction tuning 的情况下出现长循环，因此不能作为当前 OPD rollout 的可用 student。Qwen2.5-0.5B-Instruct 与 SmolLM2-1.7B-Instruct 都能稳定结束生成；前者更适合在 1B 教师上限下做同 tokenizer 的 base→instruct 对照，后者的模型能力更强但 tokenizer 与 Qwen 系列不兼容。
+
+## 统一答案格式复测
+
+为消除旧实验中不同答案格式造成的评分偏差，新增复测使用同一条用户指令：要求最后一行输出 `#### <number>`。所有模型均使用原生 chat template；DeepSeek-R1-Distill-Qwen-1.5B 保持默认 reasoning 行为，生成预算为 2048，其余模型为 1024。
+
+| 模型                          | 严格 `####` 准确率 | `####` 出现率 | 格式无关 exact numeric | 平均生成 token |  P95 |           截断率 |
+| ----------------------------- | -----------------: | ------------: | ---------------------: | -------------: | ---: | ---------------: |
+| SmolLM2-360M-Instruct         |              3.18% |        31.08% |                  4.47% |          207.0 | 1024 |            5.61% |
+| SmolLM2-1.7B-Instruct         |             32.98% |        70.58% |                 39.04% |          217.1 |  393 |            1.29% |
+| Qwen2.5-0.5B-Instruct         |              1.44% |         2.65% |                 35.86% |          314.3 |  525 |            1.67% |
+| DeepSeek-R1-Distill-Qwen-1.5B |              0.00% |         0.00% |                 73.77% |          419.4 |  652 | 0.15%（按 2048） |
+
+格式无关 extractor 依次尝试 `####`、最后一个 `\\boxed{number}` 和显式的 final-answer 数字。它只用于跨模型能力比较；训练数据和 OPD reward 仍应保留原始完整文本及 token 序列。
+
+该复测表明，DeepSeek-R1-Distill-Qwen-1.5B 的数学能力明显高于 SmolLM2-1.7B-Instruct 和 Qwen2.5-0.5B-Instruct，但它的 reasoning 轨迹更长。SmolLM2-1.7B-Instruct 是容量更大的同族 teacher，适合与 SmolLM2-360M-Instruct 做 teacher–student 实验；Qwen2.5-0.5B-Instruct 与 DeepSeek-R1-Distill-Qwen-1.5B 共享 Qwen vocabulary，适合当前 full-vocabulary token-KL 实现。
