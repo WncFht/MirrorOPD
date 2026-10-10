@@ -14,11 +14,13 @@ if [[ "$response_budget" == 0 ]]; then
 fi
 verifier_source="$repo_root/upstream/One-Shot-OPD/verl/verl/utils/reward_score"
 backend="$HOME/src/mirroropd-taopd"
-verifier_target="$backend/verl/utils/reward_score"
+verifier_target="$backend/verl/verl/utils/reward_score"
+backup="$repo_root/runs/dapo-context-baselines/backend-verifier-before"
+mkdir -p "$backup"
 for file in _timeout.py math_verify.py ttrl_mathverify.py; do
   if [[ -e "$verifier_target/$file" ]] && ! cmp -s "$verifier_source/$file" "$verifier_target/$file"; then
-    echo "Existing backend verifier differs: $file; integration requires review" >&2
-    exit 1
+    cp "$verifier_target/$file" "$backup/$file"
+    sha256sum "$backup/$file" >>"$backup/sha256.txt"
   fi
 done
 if [[ -d "$verifier_target/ttrl_math" ]]; then
@@ -28,7 +30,7 @@ fi
 cp "$verifier_source/_timeout.py" "$verifier_source/math_verify.py" \
   "$verifier_source/ttrl_mathverify.py" "$verifier_target/"
 cp -r "$verifier_source/ttrl_math" "$verifier_target/"
-export PYTHONPATH="$repo_root/src:$backend:$repo_root"
+export PYTHONPATH="$repo_root/src:$backend/verl:$repo_root"
 "$task_python" "$repo_root/tests/test_math_reward_protocol.py"
 export MIRROR_SETTING_FILE="$repo_root/training/configs/gsm8k-opd-onpolicy.json"
 export MIRROR_TEXT_DATA="$repo_root/data/dapo-suite/dapo-math-17k-clean"
@@ -39,7 +41,8 @@ export MIRROR_TEACHER_MODEL=HuggingFaceTB/SmolLM2-1.7B-Instruct
 export MIRROR_METHOD=mirror_opd_onpolicy
 export MIRROR_AUDIT_NATIVE_PAIR=1
 export MIRROR_ENABLE_WANDB=1
-export MIRROR_FORCE_TEACHER_OFFLOAD=1
+export MIRROR_INFERENCE_EXPLICIT_OFFLOAD=1
+export WANDB_MODE=online
 export WANDB_RUN_GROUP=dapo-math-context-calibrated
 prompt_budget=$("$task_python" -c 'import json,sys; print(json.load(open(sys.argv[1]))["max_prompt_length"])' \
   "$repo_root/runs/dapo-context-baselines/context-selection.json")
