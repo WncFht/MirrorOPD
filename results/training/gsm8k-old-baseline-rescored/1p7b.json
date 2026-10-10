@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+    "split": "test",
+    "n_examples": 1319,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "max_new_tokens": 1024,
+    "prompt_style": "answer-format",
+    "chat_template": "native",
+    "thinking_mode": "model-template-default",
+    "engine": "vllm",
+    "definition": "one sampled trajectory per GSM8K test prompt; generation is complete up to EOS or max_new_tokens"
+  },
+  "source": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-1p7b-instruct-answer-format-test-greedy-1024",
+  "source_sha256": "6f7198cb1dc4500c249d1bd8c999b5a9e18b785e42f3b8deb3fb3975f6c2feda",
+  "scorer": "mirroropd.training.gsm8k.score_response",
+  "correct_counts": {
+    "score": 623.0,
+    "acc": 623.0,
+    "acc_strict": 437.0,
+    "acc_explicit": 506.0,
+    "format_hash": 931.0,
+    "format_boxed": 153.0,
+    "parse_failure": 0.0
+  },
+  "means": {
+    "score": 0.4723275208491281,
+    "acc": 0.4723275208491281,
+    "acc_strict": 0.33131159969673996,
+    "acc_explicit": 0.38362395754359363,
+    "format_hash": 0.7058377558756633,
+    "format_boxed": 0.11599696739954511,
+    "parse_failure": 0.0
+  }
+}
