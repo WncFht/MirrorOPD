@@ -1,0 +1,25 @@
+\chapter*{阅读路径与统一记号}
+本书从固定 prefix 测度下的条件 KL 优化出发。负熵镜像步产生一个 Gibbs 分布；归一化坐标决定怎样拟合它；查询接口决定哪些量可计算；采样和停止梯度决定实际更新；同步与有限内层误差共同决定外层行为。八章按这条依赖关系组织，实验用于检验其中可计算的恒等式与边界条件。
+
+全书的冻结锚点、当前学生与教师分别记为 $q_k$、$p_{k,n}$ 与 $t$。在固定 prefix 的局部推导中省略索引，写作 $q,p,t$。原始接口和第三方代码中的 $\pi$ 命名只出现在代码标识或明确标注的来源记号中。一般 KL 估计使用 $P_\theta,Q$，其角色必须由有序表达式 $\KL(P_\theta\Vert Q)$ 指明。
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+记号 & 固定含义\\
+\midrule
+$d_k,\widehat d_k$ & 总体与经验 token-prefix 访问测度\\
+$\eta,\alpha_{k,n},\zeta$ & 镜像系数、内层优化步长、概率空间同步系数\\
+$\beta$ & 行为策略或采样提议分布\\
+$C_\mu h=h-\E_\mu h$ & 条件中心化算子\\
+$\psi=\nabla_\theta\log p$ & 当前学生 score\\
+$U=\log(p/q),\quad r=\log(t/q)$ & 学生对锚点的 log-ratio、冻结 OPD 信号\\
+$r^{\mathrm{cur}}=\log(t/p)$ & 当前 OPD 信号\\
+$G=\eta C_q f,\quad p^{\mathrm G}$ & 中心化冻结 target、Gibbs target\\
+$\Delta=\KL(q\Vert p^{\mathrm G})$ & 完整配分函数与均值近似之间的修正\\
+$N,B,m,J$ & inner 次数、轨迹批量、辅助 action 样本数、头部大小\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+定理中的精确词表期望、完整支持和独立 logits 是明确的假设。它们在神经网络共享参数、有限 rollout、Top-$J$ 接口和复用样本中需要分别核对。每个实验保留配置、统计定义和来源；全词表评估、CPU 数学核验与训练效果各自承担对应证据。

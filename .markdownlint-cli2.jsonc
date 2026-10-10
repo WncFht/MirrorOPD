@@ -3,6 +3,7 @@
         "node_modules/**",
         "upstream/**",
         "archives/**",
+        "docs/book-old/**",
         "runs/**",
         ".crossnote/**",
         ".claude/**",

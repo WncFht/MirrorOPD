@@ -1,0 +1,192 @@
+\section{采样设计：on-policy、尾部条件采样与旧 rollout}
+\label{est:sec:kl-sampling}
+
+总定理从一开始区分 $\nu$ 与 $\beta$。本节把已有结论用于实际采样设计，所有积分目标和 log-ratio 保持不变。
+
+\subsection{重要性校正与最优尾部常控制}
+\begin{corollary}[直接重要性采样]\label{est:thm:kl-importance}
+总定理取 $a=0$，便得到
+\begin{equation*}
+ \widehat I=\frac{\nu(A)}{\beta(A)}f_A,\qquad
+ \E_\beta\widehat I=I_\nu(f),\qquad
+ \Var_\beta(\widehat I)
+ =\sum_v\frac{\nu(v)^2}{\beta(v)}\|f_v\|^2-\|I_\nu(f)\|^2,
+\end{equation*}
+其中求和只作用于 $\beta(v)>0$ 的非零贡献。对$\KL(P\Vert Q)$ 的数值和梯度，分别取 $(\nu,f)=(P,\ell)$、$(P,\ell\psi)$；对$\KL(Q\Vert P)$ 目标，分别取 $(Q,-\ell)$、$(Q,-\psi)$。
+\end{corollary}
+
+以下先取非空头部和尾部，即 $0<P_S,Q_S<1$。尾部常控制的近似函数为头部 $a_v=f_v$、尾部 $a_v=b$。本小节比较所有可能的常控制，统一要求 $\beta(v)>0$ 对每个尾部动作成立；精确头部允许 $\beta(v)=0$。这个条件保证二次型对任意 $b$ 都有定义。完整头部时直接返回完整积分，不计算尾部对数或条件均值。定义
+\begin{equation*}
+ h_f=\sum_{v\in S}P(v)f_v,\qquad
+ \mu_f=\E_{P^{\tail}}f_A,\qquad w_v=P(v)/\beta(v).
+\end{equation*}
+总定理直接给出
+\begin{equation}\label{est:eq:kl-is-generic}
+ \widehat I_\beta(b)=h_f+\tau_Pb+J_Aw_A(f_A-b),
+\end{equation}
+\begin{equation}\label{est:eq:kl-is-generic-var}
+ \Var_\beta(\widehat I_\beta(b))
+ =\sum_{v\notin S}\frac{P(v)^2}{\beta(v)}\|f_v-b\|^2
+   -\tau_P^2\|\mu_f-b\|^2.
+\end{equation}
+为了与各估计量的标签对应，标量代入 $f=\ell,b=c$ 的式子记为
+\begin{equation}\label{est:eq:kl-is-scalar}
+ \widehat K_\beta(c)=H+\tau_Pc+J_Aw_A(\ell_A-c),
+\end{equation}
+向量代入 $f=\ell\psi$ 的式子记为
+\begin{equation}\label{est:eq:kl-is-vector}
+ \widehat g_\beta(b)=h_g+\tau_Pb+J_Aw_A(\ell_A\psi_A-b).
+\end{equation}
+式~\eqref{est:eq:kl-is-generic-var} 的两次代入就是它们各自的方差；两种值域无需再证明两遍重要性采样。
+
+\begin{proposition}[任意采样测度下的最优尾部常控制]
+记
+\begin{equation*}
+ W=\sum_{v\notin S}\frac{P(v)^2}{\beta(v)},\qquad
+ U_f=\sum_{v\notin S}\frac{P(v)^2}{\beta(v)}f_v,\qquad T_f=\tau_P\mu_f.
+\end{equation*}
+若 $W>\tau_P^2$，则
+\begin{equation*}
+ b_\beta^*=\frac{U_f-\tau_PT_f}{W-\tau_P^2}.
+\end{equation*}
+若 $W=\tau_P^2$，尾部控制逐样本抵消，方差与 $b$ 无关。
+\end{proposition}
+\begin{proof}
+展开式~\eqref{est:eq:kl-is-generic-var}，与 $b$ 有关的项为
+\begin{equation*}
+ -2\langle U_f-\tau_PT_f,b\rangle+(W-\tau_P^2)\|b\|^2.
+\end{equation*}
+当二次项系数严格为正时配方即得最优值。由 Cauchy--Schwarz，
+\begin{equation*}
+ \tau_P^2
+ \le\left(\sum_{v\notin S}\frac{P(v)^2}{\beta(v)}\right)
+      \left(\sum_{v\notin S}\beta(v)\right)\le W.
+\end{equation*}
+等号要求 $\beta$ 全部质量在尾部，且与 $P^{\tail}$ 成比例，此时 $\beta=P^{\tail}$、$J_Aw_A=\tau_P$，式~\eqref{est:eq:kl-is-generic} 的控制项直接抵消。当 $\beta=P$ 时，$W=\tau_P$、$U_f=T_f$，最优控制退化为 $\mu_f$。
+\end{proof}
+
+\subsection{尾部条件采样与真正的分层方差减少}
+若能够单独从 $P^{\tail}$ 采样 $B_1,\ldots,B_m$，则
+\begin{equation*}
+ \widehat I_\tail=h_f+\frac{\tau_P}{m}\sum_{i=1}^m f_{B_i},
+ \qquad
+ \Var(\widehat I_\tail)=\frac{\tau_P^2}{m}\Var_{P^{\tail}}(f).
+\end{equation*}
+证明是在总定理中取 $\beta=P^{\tail}$，再独立平均。常控制 $c$ 或 $b$ 逐样本完全抵消，故此时 ResOPD 型的尾部常量控制没有额外作用。相同 $m$ 下，on-policy 头尾控制的方差为
+\begin{equation*}
+ \frac1m\{\tau_P\Var_{P^{\tail}}(f)+P_S\tau_P\|\mu_f-b\|^2\}.
+\end{equation*}
+它与条件尾部采样的差为
+\begin{equation*}
+ \frac{P_S\tau_P}{m}\{\Var_{P^{\tail}}(f)+\|\mu_f-b\|^2\}\ge0.
+\end{equation*}
+这是数学上的同样本数比较。实际采样器是否能取得尾部条件样本、是否需要额外 teacher 查询和拒绝采样，决定成本比较。
+
+更一般地，若对每个分区单元独立抽样 $m_C$ 次，则
+\begin{equation*}
+ \widehat I_{\mathrm{strat}}
+ =\sum_CP_C\frac1{m_C}\sum_{i=1}^{m_C}f_{B_{C,i}},\qquad
+ \Var(\widehat I_{\mathrm{strat}})
+ =\sum_C\frac{P_C^2}{m_C}\Var_{P^C}(f).
+\end{equation*}
+这类分层积分直接消去了单元之间的抽样质量波动。给定连续预算 $\sum_Cm_C=M_{\mathrm{samp}}$、定义 $\sigma_C^2=\Var_{P^C}(f)$，Cauchy--Schwarz 给出
+\begin{equation*}
+ \sum_C\frac{P_C^2\sigma_C^2}{m_C}
+ \ge\frac{(\sum_CP_C\sigma_C)^2}{M_{\mathrm{samp}}},
+ \qquad m_C^*=\frac{M_{\mathrm{samp}}P_C\sigma_C}{\sum_DP_D\sigma_D}.
+\end{equation*}
+该分配式要求 $\sum_CP_C\sigma_C>0$，且对 $\sigma_C>0$ 的单元分配正预算。若全部 $\sigma_C=0$，每个桶内 integrand 为常值，直接返回确定积分，不使用含零分母的公式。零方差单元可以精确返回其常值；整数预算需另外取整。这里优化的是协方差迹，向量情形也使用相同 $\sigma_C$。
+
+\subsection{截断与旧 rollout 的偏差由残差决定}
+若仍以单位权重使用头尾控制，实际 $A\sim\beta$，总偏差定理给出
+\begin{equation}\label{est:eq:kl-wrong-measure-bias}
+ \E_\beta[\widehat I(b)]-I_P(f)
+ =\sum_{v\notin S}(\beta(v)-P(v))(f_v-b).
+\end{equation}
+令 $\tau_\beta=\beta(S^c)$。当 $\tau_\beta>0$ 时定义 $\mu_{f,\beta}=\E_\beta[f_A\mid J_A=1]$，条件协方差分解给出
+\begin{equation}\label{est:eq:kl-wrong-measure-var}
+ \Var_\beta(\widehat I(b))
+ =\tau_\beta\Var_{\beta,\tail}(f_A)
+ +(1-\tau_\beta)\tau_\beta\|\mu_{f,\beta}-b\|^2.
+\end{equation}
+因此更低的实际抽样方差与非零目标偏差可以同时出现。
+当 $\tau_\beta=0$ 时没有随机尾部，估计量方差直接为零；该情况下不定义尾部条件均值，支持缺失产生的偏差仍由前一式给出。
+
+旧 rollout 应使用实际生成概率 $\beta$ 校正；当前完整 softmax 只定义目标 $P$。温度变换保留支持时，若 $\beta$ 已知便可校正。top-$p$/top-$k$ 删除未知尾部动作时，总定理中的缺失支持项
+\begin{equation*}
+ -\sum_{v:\beta(v)=0}P(v)(f_v-a_v)
+\end{equation*}
+给出无法由有限重要性权重恢复的贡献。只有已精确覆盖的动作残差为零时，支持缺失才不影响该目标。
+
+若把正确权重 $w_v$ 截断为 $\bar w_v$，额外偏差为
+\begin{equation*}
+ \sum_{v:\beta(v)>0}\beta(v)(\bar w_v-w_v)(f_v-a_v).
+\end{equation*}
+这也是同一个偏差定理的特例。通过近似减小未知动作上的残差，是缓解权重误差的方法；它不改变对支持和生成测度的要求。
+
+\subsection{$\KL(Q\Vert P)$ 的 Top-$J$ 估计}
+
+使用完全相同的 $P,Q,S,\tau_P,\tau_Q$，定义正向头部
+\begin{equation*}
+ H^{\mathrm F}=-\sum_{v\in S}Q(v)\ell_v,\qquad
+ B^{\mathrm F}=\tau_Q\KL(Q^{\tail}\Vert P^{\tail}).
+\end{equation*}
+逐项将尾部 log-ratio 拆成质量与条件形状，得到
+\begin{equation*}
+ K^{\mathrm F}=H^{\mathrm F}-\tau_Q\ell_{\mathrm{mass}}+B^{\mathrm F}.
+\end{equation*}
+因此正向 Truncated、Tail-aware、Normalized 三个数值目标分别为
+\begin{equation*}
+ H^{\mathrm F},\qquad
+ H^{\mathrm F}-\tau_Q\ell_{\mathrm{mass}},\qquad
+ \frac{H^{\mathrm F}}{Q_S}+\log\frac{P_S}{Q_S}.
+\end{equation*}
+相对完整正向 $K^{\mathrm F}$ 的偏差分别为
+\begin{equation*}
+ \tau_Q\ell_{\mathrm{mass}}-B^{\mathrm F},\qquad
+ -B^{\mathrm F},\qquad
+ \frac{H^{\mathrm F}}{Q_S}+\log\frac{P_S}{Q_S}-K^{\mathrm F},
+\end{equation*}
+且固定 prefix 下方差均为零。这里 $B^{\mathrm F}$ 与前文 $B$ 分别对应不同方向的尾部条件 KL，上标始终保留。
+
+对标量尾部控制 $c$，完整$\KL(Q\Vert P)$ 的无偏校正为
+\begin{equation*}
+ \widehat K^{\mathrm F}_\beta(c)
+ =H^{\mathrm F}+\tau_Qc
+   +J_A\frac{Q(A)}{\beta(A)}(-\ell_A-c).
+\end{equation*}
+令 $\mu_\ell^{\mathrm F}=\E_{Q^{\tail}}[-\ell_A]$，则其方差为
+\begin{equation*}
+ \Var_\beta(\widehat K^{\mathrm F}_\beta(c))
+ =\sum_{v\notin S}\frac{Q(v)^2}{\beta(v)}(-\ell_v-c)^2
+   -\tau_Q^2(\mu_\ell^{\mathrm F}-c)^2.
+\end{equation*}
+证明是定理~\ref{est:thm:kl-importance} 在尾部对积分分布 $Q$ 的直接应用：修正项均值是 $\tau_Q(\mu_\ell^{\mathrm F}-c)$，恰好补齐尾部。
+
+梯度方面，定义 $h_g^{\mathrm F}=-\sum_{v\in S}Q(v)\psi_v$。因为 $Q$ 固定，逐项求导给出
+\begin{align*}
+ \nabla H^{\mathrm F}&=h_g^{\mathrm F},\\
+ \nabla(H^{\mathrm F}-\tau_Q\ell_{\mathrm{mass}})
+ &=h_g^{\mathrm F}-\tau_Q\bar\psi_{\tail},\\
+ \nabla\left(\frac{H^{\mathrm F}}{Q_S}+\log\frac{P_S}{Q_S}\right)
+ &=\frac{h_g^{\mathrm F}}{Q_S}+\frac{d_{P_S}}{P_S}.
+\end{align*}
+三者的梯度偏差分别是上述向量减去 $g^{\mathrm F}$，梯度方差均为零。这里 $\bar\psi_{\tail}=\nabla\log\tau_P$ 是 student 尾部平均 score；它不能替换为未知的 teacher 尾部平均 score。特别地，正向 Tail-aware 梯度偏差为
+\begin{equation*}
+ \sum_{v\notin S}Q(v)\psi_v-\tau_Q\bar\psi_{\tail}.
+\end{equation*}
+正向头部梯度与反向头部梯度的差异来自积分权重：$H^{\mathrm F}$ 的权重 $Q$ 冻结，因此没有反向 $\nabla H$ 中的 $d_{P_S}$ 项。
+
+正向无偏向量控制同样使用原来的向量符号 $b$：
+\begin{equation*}
+ \widehat g^{\mathrm F}_\beta(b)
+ =h_g^{\mathrm F}+\tau_Qb
+   +J_A\frac{Q(A)}{\beta(A)}(-\psi_A-b).
+\end{equation*}
+令 $\mu_g^{\mathrm F}=\E_{Q^{\tail}}[-\psi_A]$，有
+\begin{equation*}
+ \Var_\beta(\widehat g^{\mathrm F}_\beta(b))
+ =\sum_{v\notin S}\frac{Q(v)^2}{\beta(v)}\lVert-\psi_v-b\rVert^2
+  -\tau_Q^2\lVert\mu_g^{\mathrm F}-b\rVert^2.
+\end{equation*}
+所有 $\KL(Q\Vert P)$ 估计的支持覆盖要求作用于未知的 $Q$ 尾部。这样，BPO 的 $\KL(q\Vert p)$ center 与 OPD 的 $\KL(p\Vert t)$ 都使用同一套采样与误差定义。

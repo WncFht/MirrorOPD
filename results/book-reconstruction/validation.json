@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-10",
+  "scope": "book reconstruction; CPU mathematical and existing integration verification",
+  "archive_bytewise": "passed against 3a89c77",
+  "source_assembly": "52 files; 361 unique labels; 130 references; no missing references or orphan sources",
+  "mathematical_oracles": "360 configurations; maximum absolute residual 4.440892098500626e-15",
+  "make_test": "passed all targets",
+  "make_book": "passed; 111 pages; final LaTeX log has no warnings, undefined references or overfull boxes",
+  "pdf_review": "rendered all pages; inspected six contact sheets and enlarged cover, quotient derivation, algorithms and baseline table",
+  "pre_commit_staged": "passed",
+  "pre_commit_all_files": "passed",
+  "markdownlint": "passed",
+  "ruff_check_and_format": "passed",
+  "yaml_comment_width": "passed",
+  "make_check": "blocked at global Prettier check by unrelated docs/experiments/2026-10-10-基础OPD百步结果与千步实验.md; file preserved",
+  "targeted_prettier": "passed for reconstruction documents and configuration",
+  "gpu_training": "not run; no training-performance claim"
+}

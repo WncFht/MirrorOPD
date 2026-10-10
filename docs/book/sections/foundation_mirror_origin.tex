@@ -1,0 +1,66 @@
+\section{从条件 KL 优化到负熵镜像步}
+\label{sec:foundation-origin}
+固定 prefix $s$，令有限词表大小为 $V$，并假设 $q_a,t_a>0$。概率单纯形内部为 $\Delta_V^\circ=\{p:p_a>0,\sum_a p_a=1\}$。定义条件蒸馏目标与负熵势函数
+\begin{equation}
+J_s(p)=\KL(p\Vert t)=\sum_a p_a\log\frac{p_a}{t_a},\qquad
+\Phi(p)=\sum_a p_a\log p_a.
+\end{equation}
+对内部点 $q$，负熵的 Bregman 散度逐步展开为
+\begin{align}
+D_\Phi(p,q)
+&=\Phi(p)-\Phi(q)-\langle\nabla\Phi(q),p-q\rangle\\
+&=\sum_a p_a\log p_a-\sum_a q_a\log q_a
+-\sum_a(\log q_a+1)(p_a-q_a)\\
+&=\sum_a p_a\log\frac{p_a}{q_a}-\sum_a(p_a-q_a)
+=\KL(p\Vert q).
+\end{align}
+因此在 $q$ 处对 $J_s$ 做一阶线性化、加入镜像近端项，得到
+\begin{align}
+p^{\mathrm G}
+&=\argmin_{p\in\Delta_V}\left\{
+\langle\nabla J_s(q),p-q\rangle+\frac1\eta D_\Phi(p,q)\right\}\\
+&=\argmin_{p\in\Delta_V}\left\{
+\sum_a p_a\left(\log\frac{q_a}{t_a}+1\right)
++\frac1\eta\KL(p\Vert q)\right\}\\
+&=\argmin_{p\in\Delta_V}\left\{-\E_p r+\frac1\eta\KL(p\Vert q)\right\},
+\qquad r_a=\log\frac{t_a}{q_a}.
+\label{eq:foundation-md-origin}
+\end{align}
+第二行省去了与 $p$ 无关的 $-\langle\nabla J_s(q),q\rangle$；第三行使用 $\sum_a p_a=1$ 省去常数一。此处 $r$ 来自冻结点 $q$ 的梯度，整个 inner 期间保持不变。
+
+\begin{proposition}[固定信号目标与条件 KL 的精确联系]
+\label{prop:foundation-kl-objective}
+对任意 $\eta>0$ 和 $p\in\Delta_V$，负镜像目标满足
+\begin{equation}
+\frac1\eta\KL(p\Vert q)-\E_p\log\frac tq
+=\KL(p\Vert t)+\left(\frac1\eta-1\right)\KL(p\Vert q).
+\label{eq:foundation-kl-mixture}
+\end{equation}
+特别地，$\eta=1$ 时，MDPO 的精确总体目标在每个 $p$ 处都等于 $\KL(p\Vert t)$。
+\end{proposition}
+\begin{proof}
+将左侧的每个 token 项展开，得到
+\begin{align}
+\frac1\eta\sum_a p_a\log\frac{p_a}{q_a}
+-\sum_a p_a\log\frac{t_a}{q_a}
+&=\sum_a p_a\log\frac{p_a}{t_a}
++\left(\frac1\eta-1\right)\sum_a p_a\log\frac{p_a}{q_a}.
+\end{align}
+令 $\eta=1$ 即得后一个结论。即使 $\eta>1$，整个目标对 $p$ 的 Hessian 仍是
+\begin{equation}
+\nabla_p^2\left[\frac1\eta\KL(p\Vert q)-\E_p r\right]
+=\frac1\eta\operatorname{diag}(1/p_a)\succ0.
+\end{equation}
+因而第二项系数为负并不破坏这个总目标的严格凸性。
+\end{proof}
+
+固定 $d_k$ 后，上述推导对每个 prefix 成立，可以对 $s\sim d_k$ 积分。若每个 prefix 的 $p(\cdot\mid s)$ 可独立变化，积分与逐 prefix 优化具有相同的最优条件。共享参数时，所有 prefix 的切向扰动受到同一个参数映射约束，结果变成该模型族中的投影。
+
+固定 prefix 目标与整条生成轨迹的目标有不同的微分。令 $\tau=(a_1,\ldots,a_H)$，$P_\theta(\tau)=\prod_jp_\theta(a_j\mid s_j)$，$C_\theta(\tau)=\sum_j\log[p_\theta(a_j\mid s_j)/t(a_j\mid s_j)]$。在固定长度和可交换微分的条件下，轨迹 KL 的梯度为
+\begin{align}
+\nabla_\theta\E_{\tau\sim P_\theta}C_\theta(\tau)
+&=\E_{P_\theta}\left[C_\theta(\tau)\sum_i\psi_i+\sum_i\psi_i\right]\\
+&=\E_{P_\theta}\left[\sum_i\psi_i\sum_{j\ge i}
+\log\frac{p_\theta(a_j\mid s_j)}{t(a_j\mid s_j)}\right].
+\end{align}
+这里 $\E[\psi_i\mid s_i]=0$ 消去第二项和过去的 $j<i$ 成本；未来的 $j>i$ 项保留。固定 $d_k$ 的条件目标只对当前位置的条件分布求导，因此不能直接替代上述轨迹梯度。变长轨迹、终止与长度归一化的测度已经在第一个访问测度定义中明确。

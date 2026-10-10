@@ -1,0 +1,121 @@
+{
+  "entry": "docs/book/2026-10-08-固定测度Token级MirrorOPD.tex",
+  "assembled_files": 52,
+  "body_lines": 6476,
+  "labels": 361,
+  "references": 130,
+  "images": [
+    "../../results/book-reconstruction/identities.pdf",
+    "../../results/qwen3_gsm8k_pair_kl/pair_kl_topk_metrics.png",
+    "../../results/hard-sync-audit/hard-sync.pdf"
+  ],
+  "missing_references": [],
+  "orphan_sources": [],
+  "archive_baseline": "3a89c77",
+  "archive": [
+    {
+      "path": "docs/book-old/2026-10-08-PMD-Mean与BPO修订核验.md",
+      "sha256": "a50305c25730b305a68479281f88f4fa4d9dab966c862ffb48c05643c23bcd48"
+    },
+    {
+      "path": "docs/book-old/2026-10-08-固定测度Token级MirrorOPD.pdf",
+      "sha256": "0f9b61ccc8de3a19ade4f2761016e0c021e350658092604dd16ebd49c046505d"
+    },
+    {
+      "path": "docs/book-old/2026-10-08-固定测度Token级MirrorOPD.tex",
+      "sha256": "8db477c491aebbfe3a6bebb193d0c1be845131fbe5a0366e17051dc6dd421649"
+    },
+    {
+      "path": "docs/book-old/README.md",
+      "sha256": "3c263070eb5b47604e4ac3791e5824dbea5a9be5228a11ce6fc3db761c5ad919"
+    },
+    {
+      "path": "docs/book-old/chapters/01_problem_and_exact_solution.tex",
+      "sha256": "4233511298341c2d869291a759f5a1275a7e993c0be71599311fb7ae4220e4c0"
+    },
+    {
+      "path": "docs/book-old/chapters/02_four_inner_algorithms.tex",
+      "sha256": "76bf143a9dc7ae765dc4cfcf399a8871cb9cc6f8ccc0a26d13bf8f0962decfe9"
+    },
+    {
+      "path": "docs/book-old/chapters/02_opd_instantiation.tex",
+      "sha256": "7469e843875b19383b5cc967bd2b8f89f207a5be7f86afd8f5e24d294bb86503"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_autodiff.tex",
+      "sha256": "abb620bc016532dd130ae3760fbae368d3fa253b8a6ecccb252bdb386708bb2c"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_estimators_and_variance.tex",
+      "sha256": "9871403c183141cdd478ea903bfbe923e6c00c83ad147739d8b1d4e247c3bc7a"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_opd_and_statistics.tex",
+      "sha256": "12e36ed375119b603667f987ec90a904e847ecb725507705719ad78a2458735c"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_partition_geometry.tex",
+      "sha256": "f38e32690b5ca59a0f10d5087fcd79828d47f0b294e292535885e76e2ef767bd"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_residual_framework.tex",
+      "sha256": "98df38323b201bda5f7cf4058e0f6647bf25930f1dba66f69a1edd66ad75b177"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_sampling_and_opd.tex",
+      "sha256": "13c34e693904a2fa98ca6e8537767c1b05e66932b93ee982cc60778b313d88dc"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_scalar_catalog.tex",
+      "sha256": "99a908701bd203c135afc65cbf1b714d8c76f0d55b0beb110ea9e5da7f48b5a9"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_two_controls.tex",
+      "sha256": "2f24f157acddead8337baa3f2fdb3620c29f6e089a9ae84c41f54c459c33e56c"
+    },
+    {
+      "path": "docs/book-old/chapters/03_kl_vector_catalog.tex",
+      "sha256": "2d70acaff35d4f1da9e7d509844516f3e2f01385fa52f2bd3d75c52a4d5b058f"
+    },
+    {
+      "path": "docs/book-old/chapters/03_resopd_implementation.tex",
+      "sha256": "f1f2ddb997417a319ceb76a43ce629416e431d7a4bbdbe6b6073680749041be5"
+    },
+    {
+      "path": "docs/book-old/chapters/04_hard_sync_experiments.tex",
+      "sha256": "56c9385b2814255db63998125b52f290b665540fba70231e5bfecf7e6bb44cf5"
+    },
+    {
+      "path": "docs/book-old/chapters/04_hard_sync_geometry.tex",
+      "sha256": "4508185f9228cab619b9b1ef515c664ef023798d3f3d460bb31c47648b8e8279"
+    },
+    {
+      "path": "docs/book-old/chapters/04_hard_sync_noise.tex",
+      "sha256": "a7d0d590a418721e7835ab9d45402d7342cdda005011f20d60d4dae648fbb3f7"
+    },
+    {
+      "path": "docs/book-old/chapters/04_mean_hard_sync_refinement.tex",
+      "sha256": "e51ae176b7aa02f9b86830507af68dcd6a96cd4c3b2f4101c17ad792da1bad5d"
+    },
+    {
+      "path": "docs/book-old/chapters/04_mean_opd_analysis.tex",
+      "sha256": "f24ad2c01452984ec26cab2ec9494207e9c481a0ec8c5e3b73e988c949bb9c60"
+    },
+    {
+      "path": "docs/book-old/chapters/04_outer_dynamics_and_finite_inner.tex",
+      "sha256": "fb6d917fa487e9aceef6400ab9901cb5e38718d5963cd15ad50e1237ecf9e134"
+    },
+    {
+      "path": "docs/book-old/chapters/05_toy_experiment.tex",
+      "sha256": "ff733778d1be070588c2c08142c319179ca6bfbcc12fef7fd98410ecf4e36b3e"
+    },
+    {
+      "path": "docs/book-old/elegantbook.cls",
+      "sha256": "d2cdb802b3de46b1d659d1a8eb36979aecd761402d3e95296936f433f97549eb"
+    },
+    {
+      "path": "docs/book-old/sections/01_prefix_measure_and_reduction.tex",
+      "sha256": "ee5e85f0f362d3fb65e783722358d50a106d7a91e34c8a232fb1fc1de02b2a50"
+    }
+  ]
+}

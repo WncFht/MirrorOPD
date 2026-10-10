@@ -1,0 +1,103 @@
+\section{相同固定点与不同曲率}
+\label{sec:geometry-curvature}
+令 $p=\operatorname{softmax}(z)$，$F_p=\operatorname{diag}(p)-pp^\top$。对每个 action 的 log-prob 微分为
+\begin{equation}
+\nabla_z\log p_a=\mathbf e_a-p,\qquad
+\nabla_z^2\log p_a=-F_p.
+\end{equation}
+这里 $\mathbf e_a$ 是坐标基向量，与中心化误差 $e$ 区分。令 $R$ 是完整 Part 或 Mean 残差，$m_R=\E_qR$，其梯度及 Hessian 逐项为
+\begin{align}
+\nabla_z\tfrac12\E_qR^2
+&=\sum_a q_aR_a(\mathbf e_a-p)=q\odot R-m_Rp,\\
+\nabla_z^2\tfrac12\E_qR^2
+&=\sum_a q_a(\mathbf e_a-p)(\mathbf e_a-p)^\top-m_RF_p.
+\label{eq:geometry-regression-hessian}
+\end{align}
+第一项来自残差的平方，第二项来自 log-softmax 的二阶导数。BPO 中常数被中心化后，两项组合为固定 $F_q/\eta$。
+
+\begin{proposition}[锚点处的梯度与曲率]
+\label{prop:geometry-anchor}
+在 $p=q$ 处，有
+\begin{align}
+\nabla_z\mathcal L_{\mathrm{Part}}
+&=\nabla_z\mathcal L_{\mathrm{Mean}}
+=\eta\nabla_z\mathcal L_{\mathrm{BPO}}=-\eta F_qf,\\
+\nabla_z^2\mathcal L_{\mathrm{Mean}}&=F_q,\qquad
+\eta\nabla_z^2\mathcal L_{\mathrm{BPO}}=F_q,\\
+\nabla_z^2\mathcal L_{\mathrm{Part}}&=(1-\Delta)F_q.
+\end{align}
+当 $\Delta>1$，Part 在锚点的每个非常数方向上具有负二阶曲率。
+\end{proposition}
+\begin{proof}
+此处 $U=0$，$R^{\mathrm{Mean}}=-G$，$R^{\mathrm{Part}}=-G+\Delta$，故残差均值分别为零和 $\Delta$。因为
+\begin{equation}
+\sum_aq_a(\mathbf e_a-q)(\mathbf e_a-q)^\top=F_q,
+\end{equation}
+将这些量代入式~\eqref{eq:geometry-regression-hessian} 得到两个回归目标的 Hessian。梯度中的常数 $\Delta$ 贡献为 $\Delta(q-p)=0$，而 $q\odot G=\eta F_qf$。BPO Hessian 使用后文的精确二次式。对非常数 $v$，$v^\top F_qv=\Var_q(v)>0$，从而 $\Delta>1$ 时二阶型为负。
+\end{proof}
+
+二元反例取 $q=(1/2,1/2)$，$f=(2,-2)$，$\eta=1$。此时
+\begin{equation}
+\Delta=\log\cosh2=1.325002747\ldots>1.
+\end{equation}
+固定第二个 logit 为零、以第一个 logit 为变量，在锚点处三个同尺度 Hessian 为
+\begin{equation}
+\frac{d^2\mathcal L_{\mathrm{Part}}}{dz_1^2}
+=\frac{1-\Delta}{4}=-0.0812506868\ldots,
+\quad \frac{d^2\mathcal L_{\mathrm{Mean}}}{dz_1^2}
+=\eta\frac{d^2\mathcal L_{\mathrm{BPO}}}{dz_1^2}=\frac14.
+\end{equation}
+这个例子在共同梯度、共同 Gibbs target 与不同曲率之间给出可直接计算的区别。
+
+\begin{proposition}[Part 的唯一有限内部驻点]
+\label{prop:geometry-part-stationary}
+若 $q,p^{\mathrm G}>0$，则独立 logits 中 PMD-Part 的唯一概率内部驻点为 $p=p^{\mathrm G}$。
+\end{proposition}
+\begin{proof}
+记 $R_a=\log(p_a/p_a^{\mathrm G})$，$m=\sum_aq_aR_a$。驻点条件为
+\begin{equation}
+q_aR_a=mp_a\quad\text{对每个 }a.
+\end{equation}
+若 $m>0$，正概率给出 $R_a>0$，于是 $p_a>p_a^{\mathrm G}$ 对全部 $a$ 成立，求和得到 $1>1$ 的矛盾。若 $m<0$，同理 $p_a<p_a^{\mathrm G}$ 导致 $1<1$。故 $m=0$，再由 $q_a>0$ 得每个 $R_a=0$，即 $p=p^{\mathrm G}$。反向代入 $R=0$ 得梯度为零。
+\end{proof}
+
+该驻点结论与 Part 的全局非凸性并存。它限定在有限、独立且完整支持的 logits 中；概率趋近边界时，score 与参数 Jacobian 可以使更新很小，共享参数则改变可行切空间。这些情形不能用内部驻点唯一性推导数值收敛。
+
+\section{表达受限时共同目标也不保证共同投影}
+\label{sec:geometry-restricted}
+设模型族 $\mathcal P$ 不含 $p^{\mathrm G}$。在商坐标集合 $\mathcal E=\{C_q\log(p/p^{\mathrm G}):p\in\mathcal P\}$ 中，Part 与同尺度 BPO 分别优化
+\begin{equation}
+\min_{e\in\mathcal E}\left[\frac12\E_qe^2+\frac12A(e)^2\right],
+\qquad \min_{e\in\mathcal E}\frac12\E_qe^2.
+\end{equation}
+对光滑可行曲线 $e(u)$，两个一阶条件之差为
+\begin{equation}
+\frac d{du}\mathcal L_{\mathrm{Part}}
+-\eta\frac d{du}\mathcal L_{\mathrm{BPO}}
+=A(e)\frac d{du}A(e)
+=A(e)\E_{p(e)}e'(u).
+\end{equation}
+因此即使每个方法都充分优化，受限投影也仅在这个额外项同时为零等条件下重合。完整支持的 tabular 零误差证明不能覆盖这一情形。
+
+\begin{example}[共享 logits 约束改变 Part 与 BPO 的最优点]
+令 $q=(1/3,1/3,1/3)$，$t=(0.1,0.7,0.2)$，$f=\log(t/q)$，$\eta=1$。学生族限定为 $p(z)=\operatorname{softmax}(z,0,0)$，即第二、第三个 token 的 logit 共享。写 $a=\log0.1$、$b=\log0.7$、$c=\log0.2$，则同尺度 BPO 是
+\begin{equation}
+L_B(z)=\frac12\Var_q(z-a,-b,-c).
+\end{equation}
+逐项微分得
+\begin{equation}
+L_B'(z)=\frac13\left[z-a-\frac{z-a-b-c}{3}\right]
+=\frac29\left[z-a+\frac{b+c}{2}\right].
+\end{equation}
+因此唯一最小点为 $z_B=a-(b+c)/2=-1.3195286648\ldots$。令 $m(z)=\E_q\log[p(z)/t]$，Part 恒等式给出
+\begin{equation}
+L_P'(z_B)=L_B'(z_B)+m(z_B)m'(z_B)
+=m(z_B)\left(\frac13-p_1(z_B)\right).
+\end{equation}
+这里
+\begin{equation}
+m(z)=\frac z3-\log(e^z+2)-\frac{a+b+c}{3},\qquad
+m'(z)=\frac13-\frac{e^z}{e^z+2}.
+\end{equation}
+代入 $z_B$ 得 $L_P'(z_B)=0.03543884357\ldots\ne0$。两个目标均在同一个严格正学生族中优化；BPO 的最优点甚至不是 Part 的驻点。因而表达受限足以使两者充分优化后的分布不同，无需引入采样噪声或归一化估计误差。
+\end{example}

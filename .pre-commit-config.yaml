@@ -1,4 +1,4 @@
-exclude: ^(upstream/|archives/|node_modules/)
+exclude: ^(upstream/|archives/|node_modules/|docs/book-old/|experiments/plotting/vendor/)
 repos:
   # 顺序即语义：原地改写型 fixer（markdownlint --fix）在前，改了就 fail 一次
   # 让你 re-add；git-format-staged 链式 formatter 只写 index 收尾——commit

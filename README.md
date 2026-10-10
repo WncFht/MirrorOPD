@@ -20,7 +20,7 @@ MirrorOPD 的独立研究与实现仓库。理论文档、KL 估计量实验、�
 | `runs/`             | 本机日志、构建检查与临时输出，Git 忽略                      |
 | `scripts/`          | 仓库维护、数据恢复与工具链入口                              |
 
-**项目主文档与理论唯一入口**是 [固定测度 Token 级 MirrorOPD](docs/book/2026-10-08-固定测度Token级MirrorOPD.tex)，对应 [PDF](docs/book/2026-10-08-固定测度Token级MirrorOPD.pdf)。第二章的 OPD 展开和完整 Algorithm 5 位于 [02_opd_instantiation.tex](docs/book/chapters/02_opd_instantiation.tex)。正文讨论固定 anchor、固定 history 的 inner 目标、有限 inner 与 outer 同步动力学，以及四类 Top-k KL 的偏差、方差与实测结果。
+项目主文档与理论唯一入口是 [固定测度 Token 级 MirrorOPD](docs/book/2026-10-08-固定测度Token级MirrorOPD.tex)，对应 [PDF](docs/book/2026-10-08-固定测度Token级MirrorOPD.pdf)。八章从条件 KL 与负熵镜像步出发，依次推导归一化投影、梯度几何、信息接口、估计与自动微分、OPD 实例化、同步动力学和实验证据。实现与 outer--inner 伪代码由 [OPD 章](docs/book/chapters/06_opd.tex) 组织。重构前完整书稿保存在 [book-old](docs/book-old/README.md)。
 
 ## 获取代码与检查
 

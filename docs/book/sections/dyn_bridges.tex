@@ -1,0 +1,120 @@
+\section{从总体损失到同步输出的四方法接口}
+\label{dyn:bridges}
+
+SGD 不等式控制参数梯度，扰动递推控制分布的 log-ratio 跨度。本节给出总体 excess loss 到输出误差的确定性接口；将 SGD 界转换为 excess loss 界仍需另行验证的曲率或误差界条件。以下固定 prefix，$q$ 为严格正 anchor，$p^{\mathrm G}$ 为 Gibbs target，$p^{\mathrm M}$ 为 Mean target。
+
+\begin{lemma}[加权平方控制动作间的差值]
+\label{dyn:contrast}
+若 $q_i,q_j>0$，任意 token 函数 $v$ 满足
+\begin{equation}
+(v_i-v_j)^2\le(q_i^{-1}+q_j^{-1})\E_q[v^2].
+\end{equation}
+若所有 $q_a\ge m_0>0$，则 $(\operatorname{osc}v)^2\le2\E_q[v^2]/m_0$。
+\end{lemma}
+\begin{proof}
+将差值写成加权坐标的内积，再应用 Cauchy--Schwarz：
+\begin{align*}
+v_i-v_j&=(\sqrt{q_i}v_i,\sqrt{q_j}v_j)
+\begin{pmatrix}q_i^{-1/2}\\-q_j^{-1/2}\end{pmatrix},\\
+(v_i-v_j)^2&\le(q_iv_i^2+q_jv_j^2)(q_i^{-1}+q_j^{-1})
+\le\E_q[v^2](q_i^{-1}+q_j^{-1}).
+\end{align*}
+有限词表中选择达到最大值和最小值的 action，再用 $q_i^{-1}+q_j^{-1}\le2/m_0$ 即得跨度界。单 action 词表跨度恒为零。
+\end{proof}
+
+\begin{proposition}[Part、Mean、BPO 的总体误差接口]
+\label{dyn:regression-gap}
+设 $q_a\ge m_0>0$。Part 或 Mean 相对各自正确 target 的总体 excess loss 不超过 $\delta$，则
+\begin{equation}
+d_H(p,p^{\star,M})\le2\sqrt{\delta/m_0},
+\qquad M\in\{\mathrm{Part},\mathrm{Mean}\}.
+\end{equation}
+若 BPO 的总体 loss 不超过 $\delta$，则
+\begin{equation}
+d_H(p,p^{\mathrm G})\le2\sqrt{\eta\delta/m_0}.
+\end{equation}
+两种跨度界分别给出 TV 上界 $\tanh(\sqrt{\delta/m_0}/2)$ 与 $\tanh(\sqrt{\eta\delta/m_0}/2)$。
+\end{proposition}
+\begin{proof}
+Part 在 Gibbs target 上 residual 为零，Mean 的精细恒等式包含非负 KL 项，因此
+\begin{align*}
+L_{\mathrm{Part}}(p)-L_{\mathrm{Part}}(p^{\mathrm G})
+&=\frac12\E_q\left[\left(\log\frac p{p^{\mathrm G}}\right)^2\right],\\
+L_{\mathrm{Mean}}(p)-L_{\mathrm{Mean}}(p^{\mathrm M})
+&=\frac12\E_q\left[\left(\log\frac p{p^{\mathrm M}}\right)^2\right]
++\lambda\KL(p^{\mathrm M}\Vert p).
+\end{align*}
+两者均有 $\E_q[v^2]\le2\delta$，$v=\log(p/p^{\star,M})$。应用引理得到 $(\operatorname{osc}v)^2\le4\delta/m_0$。
+
+BPO 在 Gibbs target 上 loss 为零。定义 quotient residual
+\begin{equation*}
+e=C_q\log\frac p{p^{\mathrm G}}
+=\log\frac p{p^{\mathrm G}}-\E_q\log\frac p{p^{\mathrm G}}.
+\end{equation*}
+其损失为 $\E_q[e^2]/(2\eta)$，所以 $\E_q[e^2]\le2\eta\delta$。引理给出 $(\operatorname{osc}e)^2\le4\eta\delta/m_0$；中心化不改变跨度，所以 $\operatorname{osc}e=d_H(p,p^{\mathrm G})$。分别开平方，再应用 Hilbert 距离到 TV 的 sharp 界即可。
+\end{proof}
+
+\begin{proposition}[MDPO 的总体误差接口与尾部限制]
+\label{dyn:mdpo-gap}
+负 mirror 目标的总体 excess loss 为 $\delta$ 时，
+\begin{equation}
+\KL(p\Vert p^{\mathrm G})=\eta\delta,\qquad
+\TV(p,p^{\mathrm G})\le\sqrt{\eta\delta/2}.
+\end{equation}
+这个结论不给出逐 token 的 uniform log-ratio 界。若另有 $p_a,p^{\mathrm G}_a\ge m_1>0$，则
+\begin{equation}
+d_H(p,p^{\mathrm G})\le\sqrt{2\eta\delta}/m_1.
+\end{equation}
+\end{proposition}
+\begin{proof}
+记负 mirror 目标为 $F(p)=\eta^{-1}\KL(p\Vert q)-\E_pf$。从 $\log(p^{\mathrm G}/q)=\eta f-\log Z$ 得到
+\begin{equation*}
+F(p)=\eta^{-1}\KL(p\Vert p^{\mathrm G})-\eta^{-1}\log Z,
+\qquad F(p^{\mathrm G})=-\eta^{-1}\log Z.
+\end{equation*}
+相减后应用 Pinsker 不等式给出前两个结论。
+
+取 $p^{\mathrm G}=(1-\epsilon,\epsilon)$、$p=(1-\epsilon^2,\epsilon^2)$。当 $\epsilon\downarrow0$ 时，
+\begin{equation*}
+\KL(p\Vert p^{\mathrm G})
+=(1-\epsilon^2)\log\frac{1-\epsilon^2}{1-\epsilon}
++\epsilon^2\log\epsilon\longrightarrow0,
+\end{equation*}
+第二个 action 的 log-ratio 却是 $\log\epsilon\to-\infty$。所以只靠该 KL 无法统一控制尾部密度比。
+
+有附加下界时，$\log$ 在 $[m_1,1]$ 上的导数不超过 $1/m_1$。均值定理给
+\begin{equation*}
+\left|\log\frac{p_a}{p^{\mathrm G}_a}\right|
+\le\frac{|p_a-p^{\mathrm G}_a|}{m_1}
+\le\frac{\TV(p,p^{\mathrm G})}{m_1}.
+\end{equation*}
+跨度至多为绝对值界的两倍，再用 Pinsker 得到最后一式。
+\end{proof}
+
+\subsection{总体、经验目标与复用 rollout 的条件}
+\label{dyn:replay}
+
+令 $\mathcal F_n$ 描述第 $n$ 步前的全部数据。若每步重新独立抽取 actions，固定参数无偏恒等式可在给定 $\mathcal F_n$ 后使用：
+\begin{equation}
+\E[\widehat g_n\mid\mathcal F_n]=\nabla L(\theta_n).
+\end{equation}
+固定 rollout 反复训练时，$\theta_n$ 已依赖这批 actions。固定候选 $\theta$ 下的 $\E\widehat g(\theta)=\nabla L(\theta)$ 不能将 $\theta$ 替换成数据依赖的 $\theta_n$。这时应先分析经验损失或明确定义的 surrogate，再控制它与总体目标的差异。
+
+这种差别在平方回归中已经存在。单个标签 $X$ 均值为零，样本梯度为 $\widehat g(\theta)=\theta-X$，总体梯度为 $g(\theta)=\theta$。从零开始复用 $X$ 更新一步，得到 $\theta_1=\alpha X$。当 $\alpha\ne0$，给定 $\theta_1$ 即可确定 $X=\theta_1/\alpha$，因此
+\begin{equation}
+\E[\widehat g(\theta_1)\mid\theta_1]
+=(1-\alpha^{-1})\theta_1\ne g(\theta_1).
+\end{equation}
+LOO 或独立辅助中心修正固定参数下的 action--center 相关项，也不能自动消除跨优化步的数据适应性。实际输出的 log-density 误差必须由求解器分析或测量提供，不能直接等同 KL estimator 的数值误差或梯度方差。
+
+\subsection{聚合 prefix 误差与统一保证}
+\label{dyn:coverage-gap}
+
+平均控制 $\E_{d_k}\delta(x)\le\bar\delta$ 不能推出逐 prefix 统一控制。取两个 prefix，令 $d_k(x_1)=\epsilon$、$\delta(x_1)=1$、$\delta(x_2)=0$。平均误差为 $\epsilon$，最坏 prefix 误差始终为一。
+
+有限 prefix 集合上，若另有 $d_k(x)\ge d_0>0$，才有
+\begin{equation}
+d_0\delta(x)\le d_k(x)\delta(x)\le\E_{d_k}\delta\le\bar\delta,
+\qquad\delta(x)\le\bar\delta/d_0.
+\end{equation}
+把它与 $q_k(a\mid s)\ge m_0$ 一起使用，才能得到训练访问集合上的统一跨度界。访问概率下界控制 prefix coverage，action 概率下界控制词表尾部，两者不相互替代。

@@ -1,0 +1,251 @@
+\section{Mean 的 OPD 单轮实例与精细误差结构}
+\label{dyn:mean-static}
+
+以下固定 prefix，记 $q=q_k(\cdot\mid s)$、$t=t(\cdot\mid s)$、$r_a=\log(t_a/q_a)$、$\kappa=\KL(q\Vert t)$、$\widetilde r=C_qr=r+\kappa$、$g=\eta\widetilde r$ 和 $U=\log(p/q)$。这些是一般冻结信号问题的 OPD 实例；本节研究单轮目标，outer 动力学在同步章节展开。
+
+\subsection{代入 OPD reward 后的 Lambert-$W$ 更新}
+
+固定第 $k$ 轮与 prefix $s$，局部记
+\begin{align}
+ q_a&=q_k(a\mid s), & t_a&=t(a\mid s),\notag\\
+ r_a&=\log\frac{t_a}{q_a}, &
+ \kappa&=\KL(q\Vert t)=-\E_q r,\notag\\
+ \widetilde r_a&=r_a+\kappa, & g_a&=\eta \widetilde r_a.
+ \label{dyn:eq:mean-local-opd-definitions}
+\end{align}
+因此 $\E_q\widetilde r=\E_qg=0$。待求 student 分布记为 $p$，其 log-ratio 为 $U_a=\log(p_a/q_a)$。PMD-Mean 的单轮问题是
+\begin{equation}
+ \min_{p_a>0,\ \sum_a p_a=1}
+ L_{\mathrm{Mean}}(p),
+ \qquad
+ L_{\mathrm{Mean}}(p)=\frac12\sum_aq_a(U_a-\eta \widetilde r_a)^2.
+ \label{dyn:eq:mean-opd-local-problem}
+\end{equation}
+
+\begin{theorem}[OPD 下 PMD-Mean 的精确单轮解]
+\label{dyn:thm:mean-opd-explicit}
+式~\eqref{dyn:eq:mean-opd-local-problem} 有唯一全局最优分布 $p^\star$。它满足
+\begin{align}
+ U_a^\star
+ &=\eta\left(\log\frac{t_a}{q_a}+\kappa\right)
+   -W_0\left(\lambda e^{\eta\kappa}
+                      \left(\frac{t_a}{q_a}\right)^\eta\right),\notag\\
+ p_a^\star
+ &=q_a\exp\left\{\eta\left(\log\frac{t_a}{q_a}+\kappa\right)
+   -W_0\left(\lambda e^{\eta\kappa}
+                      \left(\frac{t_a}{q_a}\right)^\eta\right)\right\}.
+ \label{dyn:eq:mean-opd-W-substituted}
+\end{align}
+这里 $\lambda\ge0$ 由 $\sum_a p_a^\star=1$ 唯一确定，并且
+\begin{equation}
+ \lambda=\KL(q\Vert p^\star).
+ \label{dyn:eq:mean-opd-multiplier-kl}
+\end{equation}
+若 $q\ne t$，则 $\lambda>0$，还可以写成
+\begin{equation}
+ p_a^\star=\frac{q_a}{\lambda}
+ W_0\left(\lambda e^{\eta\kappa}
+                \left(\frac{t_a}{q_a}\right)^\eta\right).
+ \label{dyn:eq:mean-opd-W-ratio}
+\end{equation}
+若 $q=t$，则 $\lambda=0$ 且 $p^\star=q=t$。
+\end{theorem}
+
+\begin{proof}
+将一般冻结信号的 Mean 单轮解代入 $f_a=r_a=\log(t_a/q_a)$、$C_qr=r+\KL(q\Vert t)$，即得到上述 Lambert-$W$ 表达式与唯一性。为核对 OPD 乘子尺度，对 KKT 取 anchor 均值：
+\begin{equation*}
+U_a^\star-\eta(r_a+\kappa)+\lambda e^{U_a^\star}=0,
+\qquad \E_qU^\star+\lambda=0.
+\end{equation*}
+因此 $\lambda=-\E_q\log(p^\star/q)=\KL(q\Vert p^\star)$。当 $q=t$ 时信号恒为零，最优点是 $q$ 且乘子为零；当 $q\ne t$ 时严格 Jensen 不等式使零乘子的未归一化质量大于一，故归一化乘子严格为正。最后使用 $e^{z-W_0(\lambda e^z)}=W_0(\lambda e^z)/\lambda$ 得到比率式。
+\end{proof}
+
+恢复全局记号时，$p^\star=p_k^{\mathrm M}(\cdot\mid s)$，$\kappa=\KL(q_k(\cdot\mid s)\Vert t(\cdot\mid s))$，而乘子是逐 prefix 的 $\lambda_k(s)$。hard sync 更新为 $q_{k+1}=p_k^{\mathrm M}$。式~\eqref{dyn:eq:mean-opd-W-substituted} 展示了 teacher--anchor 概率比如何进入 Lambert-$W$；$W_0$ 中的修正随动作变化，不能吸收到一个公共配分常数中。
+
+\subsection{归一化乘子的 R\'enyi 界}
+
+定义 teacher 与 anchor 的混合矩
+\begin{equation}
+ Z_\nu(q,t)=\sum_a q_a^{1-\nu}t_a^\nu,
+ \qquad \nu>0.
+ \label{dyn:eq:mean-opd-renyi-Z}
+\end{equation}
+当 $\nu\ne1$ 时，R\'enyi 散度满足 $\log Z_\nu=(\nu-1)D_\nu(t\Vert q)$。$Z_1=1$，相关表达式在 $\nu=1$ 处按连续延拓理解。
+
+\begin{proposition}[OPD 归一化界]
+\label{dyn:prop:mean-opd-renyi-bounds}
+对任意 $\eta>0$，
+\begin{equation}
+ \frac{Z_\eta(Z_\eta-e^{-\eta\kappa})}{Z_{2\eta}}
+ \le\lambda\le\eta\kappa+\log Z_\eta.
+ \label{dyn:eq:mean-opd-renyi-bounds}
+\end{equation}
+特别地，$\eta=1$ 时
+\begin{equation}
+ \frac{1-e^{-\kappa}}{1+\chi^2(t\Vert q)}
+ \le\lambda\le\kappa.
+ \label{dyn:eq:mean-opd-eta-one-bounds}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+令 $X_a=e^{\eta \widetilde r_a}$，$A=\E_qX$，$B=\E_qX^2$。式~\eqref{dyn:eq:mean-opd-W-ratio} 的归一化条件为
+\begin{equation*}
+ \lambda=\E_qW_0(\lambda X).
+\end{equation*}
+先考虑 $\lambda>0$。利用 $W_0$ 的凹性，
+\begin{equation*}
+ \lambda\le W_0(\lambda A).
+\end{equation*}
+函数 $w\mapsto we^w$ 在非负轴递增，故
+\begin{equation*}
+ \lambda e^\lambda\le\lambda A,
+ \qquad \lambda\le\log A.
+\end{equation*}
+另一方面，$W_0(z)\ge z/(1+z)$。此不等式可以由 $z=we^w$ 与 $(1-w)e^w\le1$ 验证；$w\ge1$ 时右侧验证直接成立。再用 Cauchy--Schwarz 得到
+\begin{align*}
+ \lambda
+ &\ge\E_q\frac{\lambda X}{1+\lambda X}\\
+ &\ge\frac{(\E_q[\lambda X])^2}
+            {\E_q[\lambda X(1+\lambda X)]}
+ =\frac{\lambda A^2}{A+\lambda B}.
+\end{align*}
+消去 $\lambda$ 并整理，得到 $\lambda\ge A(A-1)/B$。当 $\lambda=0$ 时，$q=t$，$A=B=1$，两个界均成立。
+
+OPD reward 的代入给出
+\begin{equation*}
+ A=e^{\eta\kappa}Z_\eta,
+ \qquad B=e^{2\eta\kappa}Z_{2\eta}.
+\end{equation*}
+将它们代回即可得到式~\eqref{dyn:eq:mean-opd-renyi-bounds}。当 $\eta=1$ 时，$Z_1=1$，且
+\begin{equation*}
+ Z_2=\sum_a\frac{t_a^2}{q_a}=1+\chi^2(t\Vert q),
+\end{equation*}
+因此得到式~\eqref{dyn:eq:mean-opd-eta-one-bounds}。
+\end{proof}
+
+\subsection{一般 OPD reward 的大步长极限}
+
+原论文对二元 reward 分析 $\tau\to0$。OPD reward 通常有多个取值，可以直接在其完整取值分布上推广这一极限。以下固定 $q,t$，只令单轮步长 $\eta\to\infty$。
+
+\begin{proposition}[正中心化 log-ratio 的极限分布]
+\label{dyn:prop:mean-opd-large-eta}
+若 $q\ne t$，定义 $[x]_+=\max\{x,0\}$ 与
+\begin{equation*}
+ c=\sum_aq_a[\widetilde r_a]_+>0.
+\end{equation*}
+则
+\begin{equation}
+ \frac{\lambda}{\eta}\longrightarrow c,
+ \qquad
+ p_a^\star\longrightarrow\frac{q_a[\widetilde r_a]_+}{c}.
+ \label{dyn:eq:mean-opd-large-eta}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+$\E_q\widetilde r=0$ 且  $\widetilde r$ 非恒定，所以 $\widetilde r_{\max}>0$，并且 $c>0$。乘子上界给出
+\begin{equation*}
+ \lambda\le\log\E_qe^{\eta\widetilde r}\le\eta \widetilde r_{\max}.
+\end{equation*}
+选择满足 $\widetilde r_a=\widetilde r_{\max}$ 的动作 $a_+$。概率归一化意味着 $w(r_{a_+})=p_{a_+}^\star/q_{a_+}\le1/q_{a_+}$。于是 KKT 给出
+\begin{equation*}
+ \eta \widetilde r_{\max}
+ =\log w(r_{a_+})+\lambda w(r_{a_+})
+ \le\log(1/q_{a_+})+\lambda/q_{a_+}.
+\end{equation*}
+故
+\begin{equation*}
+ q_{a_+}\widetilde r_{\max}-\frac{q_{a_+}\log(1/q_{a_+})}{\eta}
+ \le\frac{\lambda}{\eta}\le \widetilde r_{\max}.
+\end{equation*}
+$\lambda/\eta$ 的任意序列都有收敛子列，其极限 $c'$ 严格为正。沿该子列，当 $\widetilde r_a>0$ 时，令 $z_a=\lambda e^{\eta \widetilde r_a}$。由 $W_0(z)=\log z-\log\log z+o(1)$，
+\begin{equation*}
+ \frac{W_0(z_a)}{\eta}\to \widetilde r_a,
+ \qquad w(r_a)=\frac{W_0(z_a)}{\lambda}\to\frac{\widetilde r_a}{c'}.
+\end{equation*}
+当 $\widetilde r_a=0$ 时，$w(r_a)=W_0(\lambda)/\lambda=O(\log\eta/\eta)\to0$。当 $\widetilde r_a<0$ 时，$z_a\to0$，由 $W_0(z)=z(1+o(1))$ 得到 $w(r_a)=e^{\eta \widetilde r_a}(1+o(1))\to0$。有限词表允许逐项取极限，归一化因此要求
+\begin{equation*}
+ 1=\lim\sum_aq_aw(r_a)=\frac{\sum_aq_a[\widetilde r_a]_+}{c'}.
+\end{equation*}
+所以所有子列极限都等于 $c$，证明了乘子与分布的整个序列收敛。
+\end{proof}
+
+二元 reward $r\in\{0,1\}$、成功率 $p=\E_qr$ 时，$\E_q[r-p]_+=p(1-p)$，因此该一般结论恢复原论文的 $\lambda/\eta\to p(1-p)$。对 OPD，它给出
+\begin{equation*}
+ p_a^\star\longrightarrow
+ \frac{q_a[\log(t_a/q_a)+\KL(q\Vert t)]_+}
+ {\E_q[\log(t/q)+\KL(q\Vert t)]_+}.
+\end{equation*}
+Gibbs 在大步长下集中到 $t_a/q_a$ 最大的动作，而 Mean 的极限给所有正中心化 reward 的动作分配质量。这个固定 anchor 的大步长极限与 $0<\eta\le1$ 下的 outer teacher 收敛是两个不同结论。
+
+\subsection{有限 inner 的精细损失恒等式}
+
+\begin{proposition}[Mean excess loss 的精确分解]
+\label{dyn:prop:mean-opd-excess-identity}
+对任意正概率分布 $p$，
+\begin{equation}
+ L_{\mathrm{Mean}}(p)-L_{\mathrm{Mean}}(p^\star)
+ =\frac12\E_q\left[\left(\log\frac p{p^\star}\right)^2\right]
+       +\lambda\KL(p^\star\Vert p).
+ \label{dyn:eq:mean-opd-excess-identity}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+记 $U=\log(p/q)$、$U^\star=\log(p^\star/q)$。展开平方得到
+\begin{align*}
+ L_{\mathrm{Mean}}(p)-L_{\mathrm{Mean}}(p^\star)
+ &=\frac12\E_q(U-U^\star)^2
+   +\E_q[(U-U^\star)(U^\star-g)].
+\end{align*}
+KKT 给出 $U^\star-g=-\lambda p^\star/q$，所以第二项等于
+\begin{equation*}
+ -\lambda\E_{p^\star}\log\frac p{p^\star}
+ =\lambda\KL(p^\star\Vert p).
+\end{equation*}
+代回即得所需恒等式。
+\end{proof}
+
+例如，总体 inner excess loss 不超过 $\epsilon$ 时，$\E_q[\log(p/p^\star)^2]\le2\epsilon$；若 $q\ne t$，还有 $\KL(p^\star\Vert p)\le\epsilon/\lambda$。接近 teacher 时 $\lambda$ 趋零，后一个界会变松，因此不能据此声称所有轮次都有统一的 KL 误差控制。
+
+\subsection{LOO 中心估计与二元分析的迁移范围}
+
+\begin{proposition}[逐 prefix LOO Mean 的期望损失]
+\label{dyn:prop:mean-opd-loo-expectation}
+固定 prefix、anchor 和候选 student $p$，令 $A_1,\ldots,A_m\overset{\mathrm{iid}}\sim q$，$m\ge2$。定义
+\begin{equation*}
+ \widehat{\bar r}_{-i}=\frac1{m-1}\sum_{j\ne i}r(A_j),
+ \qquad
+ \widehat L_{\mathrm{Mean}}(p)
+ =\frac1{2m}\sum_{i=1}^m
+ \left[U(A_i)-\eta\bigl(r(A_i)-\widehat{\bar r}_{-i}\bigr)\right]^2.
+\end{equation*}
+则
+\begin{equation}
+ \E\widehat L_{\mathrm{Mean}}(p)
+ =L_{\mathrm{Mean}}(p)
+  +\frac{\eta^2}{2(m-1)}\Var_q[r].
+ \label{dyn:eq:mean-opd-loo-expectation}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+令 $\bar r=\E_qr$ 与 $e_{-i}=\widehat{\bar r}_{-i}-\bar r$。第 $i$ 项 residual 为
+\begin{equation*}
+ U(A_i)-\eta(r(A_i)-\bar r)+\eta e_{-i}.
+\end{equation*}
+LOO 保证 $e_{-i}$ 与 $A_i$ 独立，且 $\E e_{-i}=0$、$\E e_{-i}^2=\Var_q[r]/(m-1)$。展开平方取期望，交叉项为零，因此
+\begin{equation*}
+ \E\left[U(A_i)-\eta(r(A_i)-\widehat{\bar r}_{-i})\right]^2
+ =\E_q[U-\eta(r-\bar r)]^2
+  +\frac{\eta^2\Var_q[r]}{m-1}.
+\end{equation*}
+对 $i$ 求均值并乘 $1/2$ 即得结论。不同 LOO residual 之间的依赖不影响这个期望恒等式。
+\end{proof}
+
+附加项与候选 student 无关。因而在有限词表的可微参数化中，冻结 anchor 与 reward 后，LOO Mean 梯度是总体 Mean 梯度的无偏估计。这里的 $\Var_q[r]$ 是完整 prefix OPD log-ratio 的方差。若对整个词表求和，可以直接计算 reward 均值，此时不产生这项中心采样误差。
+
+原论文二元分析中的 $p(1-p)$、成功率 $J(q)$ 和 $1-J(q)$ 分别依赖 Bernoulli reward 的方差与成功事件解释。OPD 的 reward 通常连续取值且每轮随 anchor 改变，应使用 $\Var_{q_k}[\log(t/q_k)]$、teacher KL 与 log-ratio 跨度。总体 Lambert-$W$ 解、混合 KL--$\chi^2$ 解释、归一化界和 excess-loss 恒等式均无需二元假设；二元成功率递推及其统计常数需要重新证明。
+
+式~\eqref{dyn:eq:mean-opd-loo-expectation} 是固定候选分布的期望恒等式，不能直接替代数据依赖 ERM 的高概率界。要控制训练得到的 student，仍需给出可实现性或逼近误差、策略类复杂度、优化误差以及 reward/log-ratio 的界。逐 prefix 的有限正概率分布给出有限 reward 范围，但这个范围不一定在所有 prefix 与 outer 轮次上一致。式~\eqref{dyn:eq:mean-opd-excess-identity} 则说明：统计分析应围绕约束最优分布的 excess loss 展开；将 Lambert-$W$ 修正本身算作不可消失的 target-estimation 误差，会掩盖 Mean 的总体一致性。

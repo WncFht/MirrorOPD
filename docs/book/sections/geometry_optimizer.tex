@@ -1,0 +1,133 @@
+\section{镜像系数、数值步长与内层收敛的精确关系}
+\label{sec:ch2-eta-step-audit}
+
+共同子问题确定 Gibbs target，但不能据此把不同训练损失视为同一个参数目标。PMD-Part 与 BPO 回归不同形式的最优性方程，MDPO 直接优化原始子问题；PMD-Mean 进一步近似归一化项，因而改变总体 target。以下在完整有限词表上推导可验证的数值动力学，再说明神经网络实现需要保留哪些区别。
+
+\begin{proposition}[BPO 在 categorical logits 中是凸二次目标]
+\label{prop:ch2-bpo-logit-quadratic}
+固定历史 $s$，记 $q_a= q_k(a\mid s)>0$，以无约束 logits $z_a$ 参数化 $p_a=e^{z_a}/\sum_b e^{z_b}$。令
+\begin{equation*}
+ F_q=\operatorname{diag}(q)-qq^\top,\qquad
+ h_a=z_a-\log q_a-\eta f_a.
+\end{equation*}
+精确 BPO 损失、梯度和 Hessian 分别是
+\begin{equation}
+ \mathcal L_{\mathrm{BPO}}=\frac{h^\top F_qh}{2\eta},\qquad
+ \nabla_z\mathcal L_{\mathrm{BPO}}=\frac{F_qh}{\eta},\qquad
+ \nabla_z^2\mathcal L_{\mathrm{BPO}}=\frac{F_q}{\eta}.
+ \label{eq:ch2-bpo-logit-quadratic}
+\end{equation}
+其最小 logits 为 $z^\star=\log q+\eta f+c\mathbf1$，其中 $c$ 是任意归一化冗余常数；最优概率分布唯一。
+\end{proposition}
+
+\begin{proof}
+将 student 的 log-softmax 展开为 $U_a=z_a-\log\sum_b e^{z_b}-\log q_a$，有
+\begin{equation*}
+ U_a-\eta f_a=h_a-\log\sum_b e^{z_b}.
+\end{equation*}
+对整个量按 $q$ 中心化时，log-softmax 的归一化常数精确消去，所以
+\begin{equation*}
+ R_a^{\mathrm{BPO}}=h_a-\sum_bq_bh_b.
+\end{equation*}
+平方并按 $q$ 求和，得到
+\begin{equation*}
+ \sum_aq_a(R_a^{\mathrm{BPO}})^2
+ =\sum_aq_ah_a^2-\left(\sum_aq_ah_a\right)^2=h^\top F_qh.
+\end{equation*}
+$h$ 对 $z$ 的导数是单位矩阵，故直接求导得到式~\eqref{eq:ch2-bpo-logit-quadratic}。对任意向量 $v$，
+\begin{equation*}
+ v^\top F_qv=\operatorname{Var}_{a\sim q}(v_a)\ge0.
+\end{equation*}
+严格正的 $q$ 使方差为零当且仅当 $v$ 在所有 action 上恒定，故 $F_q$ 的零空间正是 $\operatorname{span}\{\mathbf1\}$。零损失等价于 $h=c\mathbf1$，归一化后即 Gibbs 解。这个凸性结论针对独立 categorical logits；共享参数神经网络的复合目标仍可非凸。
+\end{proof}
+
+\begin{theorem}[完整词表 BPO 梯度下降与 MDPO 自然梯度的步长条件]
+\label{thm:ch2-inner-logit-step}
+在上述 categorical 条件下且 $|\mathcal V|\ge2$，固定 anchor、信号和常数步长 $\alpha>0$。令 $P=I-\mathbf1\mathbf1^\top/|\mathcal V|$，并以
+\begin{equation*}
+ v_n=P(z_n-\log q-\eta f)
+\end{equation*}
+度量相对于 Gibbs target 的 logit 误差。这里 $v_n$ 是欧氏中心的规范代表；第二章的 $e=C_q\log(p/p^{\mathrm G})$ 使用 anchor 中心。二者相差一个常数向量，表示同一个商空间元素，欧氏范数则分别计算。在这一规范下：
+\begin{enumerate}
+ \item BPO 的普通梯度下降满足 $v_{n+1}=(I-\alpha F_q/\eta)v_n$。对所有初值收敛的充要条件是 $0<\alpha<2\eta/\lambda_{\max}(F_q)$。
+ \item MDPO 使用当前 student 的精确 Fisher $F_{p_n}$ 和无阻尼伪逆时满足 $v_{n+1}=(1-\alpha/\eta)v_n$。对所有初值收敛的充要条件是 $0<\alpha<2\eta$；$\alpha=\eta$ 在一步内到达 Gibbs target。
+ \item BPO 若使用冻结 anchor Fisher $F_q$ 的精确伪逆，也满足第二项的同一递推。
+\end{enumerate}
+第二、三项虽在这一理想参数化下具有相同的有限步概率轨迹，使用的 Fisher 分别为当前 student 和冻结 anchor；不能将两种 preconditioner 互换后仍声称具有该恒等式。
+\end{theorem}
+
+\begin{proof}
+BPO 的梯度已在式~\eqref{eq:ch2-bpo-logit-quadratic} 给出。因为 $PF_q=F_qP=F_q$，投影更新为
+\begin{equation*}
+ v_{n+1}=v_n-\frac\alpha\eta F_qv_n.
+\end{equation*}
+在 $\mathbf1^\perp$ 上将 $F_q$ 正交对角化，所有特征值 $\lambda_i$ 严格为正。每个特征方向的误差乘以 $1-\alpha\lambda_i/\eta$，其绝对值都小于一当且仅当 $0<\alpha<2\eta/\lambda_{\max}(F_q)$。此时以 $\max_i|1-\alpha\lambda_i/\eta|<1$ 的因子收缩；边界上最大特征方向以符号翻转保持幅度，超过边界则该方向发散。
+
+MDPO 的完整词表目标是
+\begin{equation*}
+ \mathcal L_{\mathrm{MDPO}}(z)
+ =\sum_ap_a\left[\frac{\log p_a-\log q_a}{\eta}-f_a\right].
+\end{equation*}
+softmax Jacobian 为 $\nabla_z p=F_p$。对概率与 integrand 同时求导给出
+\begin{equation*}
+ \nabla_z\mathcal L_{\mathrm{MDPO}}
+ =F_p\left[\frac{\log p-\log q+\mathbf1}{\eta}-f\right]
+ =\frac1\eta F_p(z-\log q-\eta f),
+\end{equation*}
+其中利用 $F_p\mathbf1=0$ 消去了 $\mathbf1/\eta$ 和 log-softmax 的归一化常数。正概率条件下 $F_p^\dagger F_p=P$，故自然梯度为 $v_n/\eta$。投影数值更新即 $v_{n+1}=(1-\alpha/\eta)v_n$。所有初值的收缩条件是 $|1-\alpha/\eta|<1$；$\alpha=\eta$ 时投影误差为零，剩余常数不会改变概率。对 BPO 使用 $F_q^\dagger F_q=P$ 可逐步重复这一论证。
+\end{proof}
+
+定理~\ref{thm:ch2-inner-logit-step} 明确区分 $\eta$ 与 optimizer 步长。减小 $\eta$ 将 Gibbs target 拉近 anchor，同时使 BPO、MDPO 原始损失的曲率含有 $1/\eta$；固定数值步长不因此自动稳定。使用阻尼 Fisher、随机 Fisher 估计、Adam、梯度裁剪或有限支持集中心后，上述精确递推不再成立。尤其同一批样本构造的随机 Fisher 伪逆与随机梯度的乘积，不等于总体自然梯度的无偏估计。
+
+在 OPD 中 $f=\log( t/q)$。当 $\eta=1$，精确 Gibbs target 是 teacher；定理中的 MDPO 自然梯度还需 $\alpha=1$、完整期望与独立 categorical logits，才能一步到 teacher。一般 SGD 或 Adam 的一步更新没有这个性质；PMD-Mean 的充分优化解也仍是 Lambert-$W$ 分布。
+
+\begin{proposition}[三种方法在 anchor 初值的尺度与小镜像步的 target]
+\label{prop:ch2-eta-initial-scale}
+在 $p=q$ 处，三个精确参数梯度满足
+\begin{equation*}
+ \nabla_\theta\mathcal L_{\mathrm{Mean}}
+ =-\eta\,\mathbb E_q[f\nabla_\theta\log p],\qquad
+ \nabla_\theta\mathcal L_{\mathrm{BPO}}
+ =\nabla_\theta\mathcal L_{\mathrm{MDPO}}
+ =-\mathbb E_q[f\nabla_\theta\log p].
+\end{equation*}
+固定有限词表、有限冻结信号，令 $h=f-\mathbb E_qf$、$\sigma^2=\mathbb E_qh^2$。当 $\eta\to0$ 时，Mean 与 Gibbs target 的 log-ratio 分别满足
+\begin{equation*}
+ U_a^{\mathrm{Mean}}=\eta h_a-\frac{\eta^2\sigma^2}{2}+O(\eta^3),\qquad
+ U_a^{\mathrm{Gibbs}}=\eta h_a-\frac{\eta^2\sigma^2}{2}+O(\eta^3).
+\end{equation*}
+余项在有限词表上对 action 一致有界。因此两者在小步极限到二阶一致，同时保留有限 $\eta$ 下不同的总体最优解。
+\end{proposition}
+
+\begin{proof}
+初始 log-ratio 和 student KL 均为零，且 $\mathbb E_q[\nabla_\theta\log p]=0$，将这些量代入三个解析梯度即得第一组等式。对 target 展开，Gibbs 的归一化常数满足
+\begin{equation*}
+ \log\mathbb E_qe^{\eta h}=\frac{\eta^2\sigma^2}{2}+O(\eta^3)
+\end{equation*}
+因为 $\mathbb E_qh=0$。Mean 的 KKT 方程为 $U_a=\eta h_a-\lambda e^{U_a}$。在 $(\eta,\lambda)=(0,0)$ 处，归一化方程对 $\lambda$ 的导数为 $-1$，所以隐函数定理给出光滑的 $\lambda(\eta)$ 与 $U(\eta)$。设
+\begin{equation*}
+ U_a=\eta A_a+\eta^2B_a+O(\eta^3),\qquad
+ \lambda=\eta l_1+\eta^2l_2+O(\eta^3).
+\end{equation*}
+一阶 KKT 与归一化分别给出 $A_a=h_a-l_1$、$\mathbb E_qA=0$，因而 $l_1=0$、$A=h$。二阶 KKT 给出 $B_a=-l_2$，二阶归一化给出
+\begin{equation*}
+ 0=\mathbb E_q\left[B+\frac{A^2}{2}\right]=-l_2+\frac{\sigma^2}{2}.
+\end{equation*}
+由此 $l_2=\sigma^2/2$，得到 Mean 展开。有限词表与固定有限信号保证 Taylor 余项对所有 action 一致。
+\end{proof}
+
+比较相同 $\eta$ 下的 SGD 时，Mean 的初始梯度比 BPO、MDPO 小 $\eta$ 倍；初始方向一致的数值步长对应 $\alpha_{\mathrm{Mean}}=\alpha_{\mathrm{BPO}}/\eta$。这仅用于比较初始化的尺度，离开 anchor 后 Mean 额外的 KL 平方项仍改变方向。Adam 中的动量、平方矩估计、$\epsilon$ 和裁剪也使这种 SGD 的尺度换算无法直接套用。
+
+\subsection{总体梯度、经验损失与训练日志的区别}
+\label{subsec:ch2-population-empirical-surrogate}
+
+BPO 的中心导数项消去依赖精确条件恒等式 $\mathbb E_q[R^{\mathrm{BPO}}\mid s]=0$。固定 rollout 中每个 prefix 通常只有一个 sampled action，经验残差均值并不为零。即使中心使用完整词表，经验 PG 更新也不必等于对这批动作的 BPO 平方损失直接 autograd；它在固定参数、重新独立抽样的条件下才具有相同总体梯度。训练参数依赖此前复用的这批数据时，不能再把固定参数的条件无偏结论解释成训练每一步的无条件无偏性。
+
+MDPO 从解析梯度删去 $1/\eta$ 项也依赖 $\mathbb E_{p}[\nabla_\theta\log p]=0$。原始重要性加权目标与删去该项的 PG surrogate，在总体期望下梯度相同，在同一有限样本上相差
+\begin{equation*}
+ \frac1{\eta|\mathcal B_k|}\sum_{(s,a)\in\mathcal B_k}
+ \frac{p(a\mid s)}{q(a\mid s)}\nabla_\theta\log p(a\mid s).
+\end{equation*}
+该项可以作为零均值控制变量选择保留或删除；本书正式 PG 实现删除它，原始 MDPO 自然梯度伪代码保留它。两种 Monte Carlo 梯度的具体数值及方差不同。
+
+停止梯度后的 coefficient 乘 log-prob 是承载解析更新的 surrogate，其标量值可以为负，也没有固定的跨 inner 优化目标含义，因为 coefficient 每步重新计算。inner 收敛应结合真实平方 residual、精确 mirror objective gap、全批量梯度范数和更新幅度判断。Mean 应监控其 Lambert-$W$ target 或受约束平方目标；不能把未到 Gibbs target 当作 Mean 数值优化失败。采用 Tail-aware 中心时还须记录其与 exact KL 的差异，避免把截断中心的残差变小解释成原始 BPO 子问题已经求解。

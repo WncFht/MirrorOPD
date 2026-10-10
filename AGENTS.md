@@ -4,7 +4,7 @@
 
 本仓库维护 MirrorOPD 理论、KL 估计实验和基于 TA-OPD/verl 的训练实现。最重要的理论文档固定为 `docs/book/2026-10-08-固定测度Token级MirrorOPD.tex`，章节由它组织，PDF 从源文件编译生成。继续修改这份主稿及其章节，不因日期、修订轮次另建主稿或 v2/v3 副本。本约定覆盖通用的正文更新后自动改名规则。
 
-理论结论以主稿中写清假设、定义和逐步证明的版本为准；实际算法行为以被测试的源码为准。两者不一致时明确差异并核对推导与实现，不能隐藏矛盾。保留完整推导，不把修订变成摘要。`docs/earlier/` 保存早期工程，当前理论维护入口是 `docs/book/`。
+理论结论以主稿中写清假设、定义和逐步证明的版本为准；实际算法行为以被测试的源码为准。两者不一致时明确差异并核对推导与实现，不能隐藏矛盾。保留完整推导，不把修订变成摘要。`docs/book-old/` 完整保存 2026-10-10 重构前书稿，作为只读历史来源；`docs/earlier/` 保存早期工程，当前理论维护入口是 `docs/book/`。
 
 完整维护规范见 `docs/operations/2026-10-08-仓库维护规范.md`。
 
@@ -18,7 +18,7 @@
 - `experiments/`：实验程序，按 rollout、scoring、analysis、plotting、toy 分组；复用核心包。
 - `data/`：prompt、trajectory、prefix 等输入和原始记录；`data-manifest.json` 保存恢复及校验信息。
 - `results/`：可引用的统计表、图、分析 metadata 和训练验证记录；报告进入 `docs/experiments/`。
-- `docs/book/`：当前主稿、章节及同步 PDF；`docs/operations/`：维护与运行规范；`docs/earlier/`：早期材料。
+- `docs/book/`：当前主稿、章节及同步 PDF；`docs/book-old/`：重构前完整书稿；`docs/operations/`：维护与运行规范；`docs/earlier/`：早期材料。
 - `scripts/`：初始化、工具链和仓库维护；科学实验程序不放这里。
 - `upstream/`：Git 忽略的第三方 checkout；`upstream-manifest.json` 固定版本，`patches/` 保存必要的集成改动。核心算法不得仅留在忽略目录或补丁里。
 - `runs/`：忽略的日志、checkpoint、scratch 和临时输出。模型和大文件不放程序目录。

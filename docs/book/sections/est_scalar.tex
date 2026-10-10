@@ -1,0 +1,244 @@
+\section{KL 数值：从确定性代理到无偏残差校正}
+\label{est:sec:kl-scalar}
+本节固定目标 $K=I_P(\ell)$，所以总定理中的 $f_v=\ell_v$ 是标量。随机估计量默认使用 $\beta=P$；任意 $\beta$ 的权重与支持条件见第~\ref{est:sec:kl-sampling} 节。先给出 Top-$J$ 记号，再分类确定性代理、全词表单样本控制和稀疏头尾控制。每个估计量的误差都相对同一个完整 $K$。
+\subsection{头部与尾部记号}
+
+沿用前节的 $S,P_S,Q_S,\tau_P,\tau_Q,J_A,H$ 和 $\ell_{\mathrm{mass}}$。令
+\begin{equation*}
+ K=\KL(P\Vert Q)=\sum_vP(v)\ell_v,
+ \qquad H=\sum_{v\in S}P(v)\ell_v,
+ \end{equation*}
+并令尾部条件分布为
+\begin{equation*}
+ P^{\tail}(v)=\frac{P(v)}{\tau_P},\qquad
+ Q^{\tail}(v)=\frac{Q(v)}{\tau_Q},\qquad v\notin S.
+\end{equation*}
+定义尾部质量项和尾部形状项
+\begin{equation*}
+ M=\tau_P\log\frac{\tau_P}{\tau_Q},\qquad
+ B=\tau_P\KL(P^{\tail}\Vert Q^{\tail})\geq0.
+\end{equation*}
+
+\begin{corollary}[头尾分区的 KL 链式分解]
+\label{est:thm:chapter3-kl-chain}
+在 $P\ll Q$ 且 $0<\tau_P,\tau_Q<1$ 时，
+\begin{equation}
+ K=H+M+B.
+\label{est:eq:chapter3-kl-chain}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+在定理~\ref{inf:thm:kl-partition-chain} 中取头部 singleton 与单个尾桶。singleton 的条件 KL 为零，粗粒度 KL 是 $H+M$，唯一剩余的条件形状项是 $B$，故得到所述恒等式。
+\end{proof}
+
+该分解说明 sparse teacher payload 能够知道 $H$、$P_S$、$Q_S$，因而知道 $M$，但不知道尾部形状项 $B$。在保留原积分权重的头尾方法中，差异来自质量项 $M$ 与形状项 $B$ 的处理。Normalized 还改变头部条件权重，下面分别推导。
+
+\subsection{确定性估计量}
+
+截断 Top-$J$ 估计量定义为
+\begin{equation*}
+ \widehat K^{\mathrm{trunc}}=H.
+\end{equation*}
+由式~\eqref{est:eq:chapter3-kl-chain}，其条件偏差和方差为
+\begin{equation}
+ \operatorname{Bias}(\widehat K^{\mathrm{trunc}})=-M-B,
+ \qquad
+ \Var(\widehat K^{\mathrm{trunc}})=0.
+ \label{est:eq:chapter3-trunc-bias-var}
+\end{equation}
+它删除了尾部贡献；偏差 $-M-B$ 可正可负，因为 $M$ 的符号可以正也可以负，而 $B$ 总是非负。
+
+Tail-aware scalar 估计量把尾部聚合为一个伪 token：
+\begin{equation*}
+ \widehat K^{\mathrm{TA}}=H+M.
+\end{equation*}
+
+\begin{proposition}[Tail-aware scalar 的偏差]
+\label{est:prop:chapter3-ta-scalar}
+\begin{equation*}
+ \operatorname{Bias}(\widehat K^{\mathrm{TA}})=-B,
+ \qquad
+ \Var(\widehat K^{\mathrm{TA}})=0.
+\end{equation*}
+因此它是完整 KL 的确定性下界，且当且仅当尾部条件分布相等时达到完整 KL。
+\end{proposition}
+
+\begin{proof}
+将 $\widehat K^{\mathrm{TA}}=H+M$ 与 $K=H+M+B$ 相减即可。$B\geq0$ 来自 KL 非负性。
+\end{proof}
+
+Normalized Top-$J$ 不是完整 KL 的估计量，而是头部条件分布的另一个目标：
+\begin{equation*}
+ K^{\mathrm{norm}}_J
+ =\KL\left(\frac{P|_S}{P_S}\middle\|\frac{Q|_S}{Q_S}\right)
+ =\frac{H}{P_S}+\log\frac{Q_S}{P_S}.
+\end{equation*}
+它的条件方差为零，但相对完整 KL 的确定性偏差为
+\begin{equation}
+ \operatorname{Bias}(K^{\mathrm{norm}}_J)
+ =\frac{H}{P_S}+\log\frac{Q_S}{P_S}-(H+M+B).
+ \label{est:eq:chapter3-normalized-bias}
+\end{equation}
+这个偏差没有固定符号，因为 Normalized Top-$J$ 同时改变了头部权重并删除了尾部形状。
+
+\subsection{单 token KL 估计器的基准族}
+
+先记录不依赖 Top-$J$ 的单 token 族。令 $A\sim P$，$\ell=\ell_A$，并假设相应矩存在。$\KL(P\Vert Q)$ 的直接 estimator 为
+\begin{equation*}
+ \widehat K_1=\ell.
+\end{equation*}
+它满足
+\begin{equation*}
+ \E[\widehat K_1]=K,\qquad
+ \operatorname{Bias}(\widehat K_1)=0,\qquad
+ \Var(\widehat K_1)=\Var_P(\ell).
+\end{equation*}
+常用的平方 estimator 为
+\begin{equation*}
+ \widehat K_2=\frac12\ell^2,
+\end{equation*}
+其相对于 $K$ 的偏差和方差为
+\begin{equation}
+ \operatorname{Bias}(\widehat K_2)=\frac12\E_P[\ell^2]-K,
+ \qquad
+ \Var(\widehat K_2)=\frac14\left(\E_P[\ell^4]-\E_P[\ell^2]^2\right).
+ \label{est:eq:chapter3-k2-bias-var}
+\end{equation}
+非负修正 estimator 为
+\begin{equation*}
+ \widehat K_3=e^{-\ell}+\ell-1.
+\end{equation*}
+因为 $e^{-\ell}=Q(A)/P(A)$，有
+\begin{equation*}
+ \E_P[e^{-\ell}]=\sum_vQ(v)=1,
+\end{equation*}
+故 $\E[\widehat K_3]=K$，且
+\begin{equation}
+ \Var(\widehat K_3)=\Var_P(e^{-\ell}+\ell-1).
+ \label{est:eq:chapter3-k3-var}
+\end{equation}
+K3 的方差还可展开为
+\begin{equation*}
+ \Var(\widehat K_3)
+ =\Var_P(\ell)+\Var_P(e^{-\ell})+2\operatorname{Cov}_P(\ell,e^{-\ell}).
+\end{equation*}
+因此 K3 比 K1 方差小的充要条件是
+\begin{equation*}
+ \Var_P(e^{-\ell})+2\operatorname{Cov}_P(\ell,e^{-\ell})<0.
+\end{equation*}
+K3 的逐样本非负性来自 $e^{-\ell}\geq1-\ell$，并不推出全局方差排序。对 $Q(v)=P(v)(1+\varepsilon u_v)$、$\E_P[u]=0$ 的局部扰动，逐项 Taylor 展开给出
+\begin{equation*}
+ \ell_v=-\varepsilon u_v+\frac{\varepsilon^2u_v^2}{2}+O(\varepsilon^3),
+ \quad K=\frac{\varepsilon^2}{2}\E_P[u^2]+O(\varepsilon^3),
+\end{equation*}
+\begin{equation*}
+ \widehat K_2=\frac{\varepsilon^2u_A^2}{2}+O(\varepsilon^3),
+ \quad \widehat K_3=\frac{\varepsilon^2u_A^2}{2}+O(\varepsilon^3).
+\end{equation*}
+这解释了 K2 的局部二阶正确性，以及 K3 在两分布接近时将单点波动从一阶降到二阶的机制。
+K1 是总定理中 $a=0$ 的特例。K3 则取 $a_v=1-e^{-\ell_v}$，因为 $I_P(a)=1-\sum_vQ(v)=0$，总定理给出 $\ell_A-a_A=e^{-\ell_A}+\ell_A-1$。K2 改变了数值目标而未补回残差，所以需要直接报告上面的偏差。
+
+\subsection{采样尾部的无偏 scalar 估计量}
+
+令
+\begin{equation*}
+ \mu_\ell=\E[\ell_A\mid A\notin S]
+ =\log\frac{\tau_P}{\tau_Q}+\KL(P^{\tail}\Vert Q^{\tail}).
+\end{equation*}
+则 $\tau_P\mu_\ell=M+B$。头部精确、尾部采样（Head-Exact Tail-Sampled，HETS）的数值估计量为
+\begin{equation}
+ \widehat K^{\mathrm{HETS}}=H+J_A \ell_A.
+ \label{est:eq:chapter3-ema-scalar}
+\end{equation}
+它是总定理中头部 $a_v=\ell_v$、尾部 $a_v=0$ 的特例。本章后续统一称为 HETS 数值估计量；EMA 只在对应原项目名称时出现。时间上的指数滑动平均不属于此命名。
+
+\begin{theorem}[HETS 数值的无偏性与方差]
+\label{est:thm:chapter3-ema-scalar}
+若 $A\sim P$ 且 $\E_P[\ell_A^2]<\infty$，则
+\begin{equation*}
+ \E[\widehat K^{\mathrm{HETS}}]=K,
+\end{equation*}
+并且
+\begin{align}
+ \Var(\widehat K^{\mathrm{HETS}})
+ &=\tau_P\Var(\ell_A\mid A\notin S)+P_S\tau_P\mu_\ell^2\\
+ &=\sum_{v\notin S}P(v)\ell_v^2
+   -\left(\sum_{v\notin S}P(v)\ell_v\right)^2.
+ \label{est:eq:chapter3-ema-scalar-var}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+尾部修正的期望为
+\begin{equation*}
+ \E[J_A \ell_A]=\sum_{v\notin S}P(v)\ell_v=\tau_P\mu_\ell=M+B.
+\end{equation*}
+加上 $H$ 得到 $K$。对随机变量 $J_A \ell_A$ 按 $J_A$ 使用全方差公式：头部条件下它为零，尾部条件下它为 $\ell_A$，因此
+\begin{equation*}
+ \Var(J_A \ell_A)=\tau_P\Var(\ell_A\mid A\notin S)+P_S\tau_P\mu_\ell^2.
+\end{equation*}
+\end{proof}
+
+还可以用尾部桶 scalar
+\begin{equation*}
+ \ell_{\mathrm{mass}}=\log\frac{\tau_P}{\tau_Q}
+\end{equation*}
+作残差化：
+\begin{equation}
+ \widehat K^{\mathrm{Res\text{-}scalar}}
+ =H+\tau_P\ell_{\mathrm{mass}}+J_A(\ell_A-\ell_{\mathrm{mass}}).
+ \label{est:eq:chapter3-res-scalar}
+\end{equation}
+它满足
+\begin{equation*}
+ \E[\widehat K^{\mathrm{Res\text{-}scalar}}]=K,
+\end{equation*}
+且
+\begin{equation}
+ \Var(\widehat K^{\mathrm{Res\text{-}scalar}})
+ =\tau_P\Var(\ell_A\mid A\notin S)+P_S\tau_P(\mu_\ell-\ell_{\mathrm{mass}})^2.
+ \label{est:eq:chapter3-res-scalar-var}
+\end{equation}
+所以 scalar 残差化相对 HETS 的方差差为
+\begin{equation}
+ \Var(\widehat K^{\mathrm{HETS}})-\Var(\widehat K^{\mathrm{Res\text{-}scalar}})
+ =P_S\tau_P(2\mu_\ell\ell_{\mathrm{mass}}-\ell_{\mathrm{mass}}^2).
+ \label{est:eq:chapter3-res-scalar-gap}
+\end{equation}
+它严格降低方差当且仅当 $|\mu_\ell-\ell_{\mathrm{mass}}|<|\mu_\ell|$。当固定的 $\ell_{\mathrm{mass}}\ne0$ 且尾部内部形状 KL 足够小时，$\mu_\ell$ 足够接近 $\ell_{\mathrm{mass}}$，严格降方差条件成立；若 $\ell_{\mathrm{mass}}=0$，两估计量逐样本相同。
+
+\begin{proposition}[标量尾部控制族]
+对任意在抽样前固定的实数 $c$，令
+\begin{equation*}
+ \widehat K(c)=H+\tau_Pc+J_A(\ell_A-c).
+\end{equation*}
+则它对 $K$ 无偏，且
+\begin{equation*}
+ \Var(\widehat K(c))
+ =\tau_P\Var_{\tail}(\ell_A)+P_S\tau_P(\mu_\ell-c)^2.
+\end{equation*}
+因此最优标量控制为 $c^*=\mu_\ell$；HETS 取 $c=0$，式~\eqref{est:eq:chapter3-res-scalar} 取 $c=\ell_{\mathrm{mass}}$。
+\end{proposition}
+
+\begin{proof}
+先计算均值：
+\begin{equation*}
+ \E[\widehat K(c)]=H+\tau_Pc+\tau_P(\mu_\ell-c)=H+\tau_P\mu_\ell=K.
+\end{equation*}
+再计算中心化随机项的二阶矩：
+\begin{align*}
+ \Var(\widehat K(c))
+ &=\E[J_A(\ell_A-c)^2]-\{\E[J_A(\ell_A-c)]\}^2\\
+ &=\tau_P\{\Var_{\tail}(\ell_A)+(\mu_\ell-c)^2\}
+   -\tau_P^2(\mu_\ell-c)^2\\
+ &=\tau_P\Var_{\tail}(\ell_A)+P_S\tau_P(\mu_\ell-c)^2.
+\end{align*}
+最后一项非负并在 $c=\mu_\ell$ 时为零，给出最优值。将 $c=0$ 与 $c=\ell_{\mathrm{mass}}$ 代入并相减即得式~\eqref{est:eq:chapter3-res-scalar-gap}。
+\end{proof}
+
+这个 scalar 构造是本章从控制族导出的 KL 数值估计量，应与论文中以向量梯度为目标的 ResOPD 算法区别命名。因为 $\mu_\ell=\ell_{\mathrm{mass}}+D_{\tail}$，其中 $D_{\tail}=\KL(P^{\tail}\Vert Q^{\tail})$，方差改变量也等于
+\begin{equation*}
+ P_S\tau_P\{\ell_{\mathrm{mass}}^2+2\ell_{\mathrm{mass}}D_{\tail}\}.
+\end{equation*}
+当 $\ell_{\mathrm{mass}}\geq0$ 时它非负；当 $\ell_{\mathrm{mass}}<0$ 时，它在 $D_{\tail}>-\ell_{\mathrm{mass}}/2$ 下为负。这给出 scalar 残差化反而增大方差的明确条件。

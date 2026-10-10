@@ -1,0 +1,57 @@
+\section{积分目标、采样测度与条件中心}
+\label{est:targets}
+
+固定 prefix $s$ 与当前参数。一般 student 分布为 $P=P_\theta$，冻结参考为 $Q$，实际动作采样分布为 $\beta$，$A\sim\beta$。分析 on-policy OPD 时取 $P=p,Q=t$；分析 student--anchor KL 时取 $P=p,Q=q$。冻结 rollout 取 $\beta=q$。全书 $q,p,t$ 的职责不随这些代入改变。
+
+默认有限词表上 $P(v),Q(v)>0$。参考、分区与已缓存的历史数据在微分时冻结；只对 $P$ 求导。定义
+\begin{equation}
+\ell_v=\log\frac{P(v)}{Q(v)},\qquad
+\psi_v=\nabla_\theta\log P(v),\qquad
+\sg(\cdot)=\operatorname{stopgrad}(\cdot).
+\end{equation}
+对积分权重 $\mu$ 定义 $I_\mu(h)=\sum_v\mu(v)h_v=\E_\mu[h]$。本章残差定理沿用 $I_\nu$ 记号，其中 $\nu$ 仅为积分权重占位符，与实际行为分布 $\beta$ 分开。向量方差约定为协方差迹，故
+\begin{equation}
+\operatorname{Bias}(\widehat I)=\E_\beta\widehat I-I_\nu(h),\qquad
+\operatorname{MSE}(\widehat I)=\|\operatorname{Bias}(\widehat I)\|^2+\operatorname{tr}\operatorname{Cov}_\beta(\widehat I).
+\end{equation}
+所有这些量先条件于 prefix、参数和冻结缓存。访问测度下的总体误差在本章末尾另行计算。
+
+\subsection{双向 KL 的数值与梯度}
+\label{est:four-targets}
+记 $K=\KL(P\Vert Q)$、$K^{\mathrm F}=\KL(Q\Vert P)$。归一化给出
+\begin{equation}
+\sum_vP(v)\psi_v=\nabla_\theta\sum_vP(v)=0.
+\end{equation}
+逐项求导得到
+\begin{align}
+g=\nabla K
+&=\sum_v[(\nabla P(v))\ell_v+P(v)\nabla\ell_v]
+=\sum_vP(v)(\ell_v+1)\psi_v
+=I_P(\ell\psi),\\
+g^{\mathrm F}=\nabla K^{\mathrm F}
+&=-\sum_vQ(v)\nabla\ell_v=-I_Q(\psi).
+\end{align}
+四个积分对象因此为
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+目标 & 积分权重 & 被积函数 & 积分值\\
+\midrule
+$\KL(P\Vert Q)$ 数值 & $P$ & $\ell$ & $K$\\
+$\KL(P\Vert Q)$ 梯度 & $P$ & $\ell\psi$ & $g$\\
+$\KL(Q\Vert P)$ 数值 & $Q$ & $-\ell$ & $K^{\mathrm F}$\\
+$\KL(Q\Vert P)$ 梯度 & $Q$ & $-\psi$ & $g^{\mathrm F}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+KL 的两个有序对象始终显式写成 $\KL(P\Vert Q)$ 与 $\KL(Q\Vert P)$；具体 OPD center 写明 $\KL(q\Vert t)$ 或 $\KL(q\Vert p)$，由两端确定积分和微分。
+
+\subsection{积分微分与固定样本微分}
+\label{est:measure-derivative}
+对参数依赖函数 $F_\theta$，乘积法则给出
+\begin{equation}
+\nabla_\theta I_P(F_\theta)
+=I_P(\nabla_\theta F_\theta+F_\theta\psi).
+\label{est:eq:kl-measure-derivative}
+\end{equation}
+固定样本索引时，普通自动微分只产生 $\nabla F_\theta(A)$；离散抽样没有自动产生 $F_\theta(A)\psi_A$。参考权重冻结的 $I_Q$ 没有对应测度项。数值估计的无偏性、随机向量对 $g$ 的无偏性和其 forward 程序的自动微分分别需要证明。

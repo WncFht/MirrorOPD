@@ -1,0 +1,189 @@
+{
+  "seed": 20261010,
+  "dtype": "float64",
+  "device": "cpu",
+  "trials": 360,
+  "vocab_sizes": [
+    2,
+    3,
+    5,
+    8
+  ],
+  "eta": [
+    0.2,
+    0.7,
+    1,
+    1.8,
+    2.2
+  ],
+  "tolerance": 1e-11,
+  "counterexample_config": {
+    "approx_bpo": {
+      "q": [
+        0.5,
+        0.3,
+        0.2
+      ],
+      "teacher": [
+        0.2,
+        0.3,
+        0.5
+      ],
+      "independent_logits": [
+        -0.3,
+        0.6
+      ],
+      "last_logit": 0,
+      "eta": 0.7,
+      "head": [
+        0
+      ]
+    },
+    "scalar_hets": {
+      "P": [
+        0.18,
+        0.819,
+        0.001
+      ],
+      "Q": [
+        0.08,
+        0.67,
+        0.25
+      ],
+      "head": [
+        1
+      ]
+    },
+    "vector_hets": {
+      "P": [
+        0.075,
+        0.245,
+        0.68
+      ],
+      "Q": [
+        0.12,
+        0.875,
+        0.005
+      ],
+      "head": [
+        1
+      ]
+    },
+    "landscape": {
+      "q": [
+        0.5,
+        0.5
+      ],
+      "f": [
+        2,
+        -2
+      ],
+      "eta": 1,
+      "last_logit": 0
+    }
+  },
+  "max_absolute_errors": {
+    "quotient": 4.996003610813204e-16,
+    "part_bpo": 4.440892098500626e-15,
+    "mean_bpo": 2.1094237467877974e-15,
+    "mdpo_gap": 2.220446049250313e-15,
+    "anchor_gradient": 7.771561172376096e-16,
+    "anchor_hessian": 4.440892098500626e-16
+  },
+  "approx_bpo_jacobian": [
+    [
+      0.3491477001474525,
+      -0.2186486876089669
+    ],
+    [
+      -0.20912359075236597,
+      0.29476414108016474
+    ]
+  ],
+  "approx_bpo_curl": -0.00952509685660094,
+  "sc_curl": 0.07367636957349191,
+  "restricted_projection": {
+    "q": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "teacher": [
+      0.1,
+      0.7,
+      0.2
+    ],
+    "bpo_optimal_first_logit": -1.319528664807629,
+    "part_derivative_at_bpo_optimum": 0.035438843570163366,
+    "bpo_derivative": 2.4483791371317416e-17
+  },
+  "finite_inner": {
+    "q": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "teacher": [
+      0.2,
+      0.3,
+      0.5
+    ],
+    "eta": 0.8,
+    "optimizer": "full-vocabulary ordinary logit GD",
+    "alpha": 0.4,
+    "steps": 1000,
+    "initialization": "anchor",
+    "loss_scale": {
+      "part": 1,
+      "mean": 1,
+      "bpo": 0.8
+    },
+    "endpoints": {
+      "part": {
+        "gibbs_tv": 3.0531133177191805e-16,
+        "probability": [
+          0.25114951642303135,
+          0.3136430031531365,
+          0.43520748042383217
+        ],
+        "gradient_norm": 2.812843727333147e-16
+      },
+      "mean": {
+        "gibbs_tv": 0.037062745525799634,
+        "probability": [
+          0.27800158960918314,
+          0.3238536754927841,
+          0.3981447348980327
+        ],
+        "gradient_norm": 2.0597098099341734e-16
+      },
+      "scaled_bpo": {
+        "gibbs_tv": 2.220446049250313e-16,
+        "probability": [
+          0.25114951642303146,
+          0.3136430031531364,
+          0.43520748042383217
+        ],
+        "gradient_norm": 1.6845416550206495e-16
+      }
+    }
+  },
+  "scalar_variance_counterexample": {
+    "scalar_direct": 0.08891272684186563,
+    "scalar_hets": 0.12913086473388036,
+    "vector_direct_trace": 0.19740456518038965,
+    "vector_hets_trace": 0.1830235586764436
+  },
+  "vector_variance_counterexample": {
+    "scalar_direct": 7.863903720981117,
+    "scalar_hets": 5.502436806509885,
+    "vector_direct_trace": 0.329641633883475,
+    "vector_hets_trace": 0.8501997410309259
+  },
+  "source_sha256": "a4c8459674f951a1bfb21b82407db12d1a6d0ec88c663939863bc136e662e22c",
+  "git_commit": "3a89c771cbe4979f0bbb934b918e2168ab736e52",
+  "command": "uv run --with torch --with numpy python experiments/toy/book_reconstruction_audit.py",
+  "torch_version": "2.14.1",
+  "numpy_version": "2.5.3",
+  "scope": "enumerated finite-vocabulary identities; no neural training or benchmark"
+}

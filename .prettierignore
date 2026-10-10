@@ -10,3 +10,5 @@ results/**/resolved-config.yaml
 data/**/*.json
 runs/
 package-lock.json
+docs/book-old/
+experiments/plotting/vendor/

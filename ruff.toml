@@ -7,6 +7,7 @@ extend-exclude = [
   ".claude",
   "node_modules",
   "runs",
+  "experiments/plotting/vendor", # Unmodified third-party figure-viz style.
 ]
 
 [lint]

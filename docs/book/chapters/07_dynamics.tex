@@ -1,0 +1,13 @@
+\chapter{正确 Inner 目标与同步动力学}
+\label{dyn:chapter}
+
+本章把单轮 inner 的正确总体目标连接到下一轮 anchor。固定 prefix 时，$q_k$ 是本轮冻结 anchor，$p_{k,n}$ 是第 $n$ 个 inner student，$t$ 是固定 teacher；OPD 信号为 $r_k=\log(t/q_k)$。PMD-Part、BPO 和 MDPO 的精确总体 target 相同，均记为 $p_k^{\mathrm G}$；PMD-Mean 的正确总体 target 记为 $p_k^{\mathrm M}$。相同 target 不意味着参数损失、有限步更新或受限模型类投影相同。本章先研究可以逐 prefix 自由表示并精确求解 target 的分布空间更新，再引入实际输出误差。
+
+镜像步长为 $\eta$，inner 优化器学习率为 $\alpha$，概率空间 soft sync 比率为 $\zeta$。每轮 inner 步数为 $N$，同 prefix 独立 action 样本数为 $m$。中心算子统一写作 $C_\mu f=f-\E_\mu f$；teacher 中心坐标为 $y=C_t\log(q/t)$。这些中心作用的测度各不相同，不能互换。
+
+\input{sections/dyn_gibbs}
+\input{sections/dyn_mean}
+\input{sections/dyn_bridges}
+\input{sections/dyn_finite}
+\input{sections/dyn_noise}
+\input{sections/dyn_sync}

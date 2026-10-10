@@ -1,0 +1,154 @@
+\section{双控制族：事件间方差与尾部内部方差}
+\label{est:sec:kl-two-controls}
+
+单控制 ResOPD 只改变头部与尾部两个事件的条件均值差。本节将总定理中的近似扩展为一个尾部常向量与一个条件零均值方向，并使用同一套 $\ell_v,\psi_v,J_A,\tau_P,\mu_g,b_{\mathrm{TA}}$ 记号。定义尾部平均 score
+\begin{equation*}
+ \bar\psi_{\tail}=\E_P[\psi_A\mid J_A=1]
+ =\frac{1}{\tau_P}\sum_{v\notin S}P(v)\psi_v
+ =\nabla_\theta\log\tau_P.
+\end{equation*}
+沿用 $\ell_{\mathrm{mass}}=\log(\tau_P/\tau_Q)$，于是 $b_{\mathrm{TA}}=\ell_{\mathrm{mass}}\bar\psi_{\tail}$。定义向量
+\begin{equation*}
+ \chi_v=\ell_{\mathrm{mass}}(\psi_v-\bar\psi_{\tail}),\qquad
+ R_v^{\mathrm{shape}}=(\ell_v-\ell_{\mathrm{mass}})\psi_v,\qquad v\notin S.
+\end{equation*}
+其中 $\chi_v$ 是尾部条件零均值波动，$R_v^{\mathrm{shape}}$ 是尾部形状残差。逐点恒等式为
+\begin{equation}
+ \ell_v\psi_v=b_{\mathrm{TA}}+\chi_v+R_v^{\mathrm{shape}},\qquad
+ \E_P[\chi_A\mid J_A=1]=0.
+ \label{est:eq:kl-tail-fine-decomposition}
+\end{equation}
+这些定义没有改变目标或采样分布。
+
+\subsection{双控制是总定理的两个正交方向}
+
+在式~\eqref{est:eq:kl-master-estimator} 中取头部 $a_v=\ell_v\psi_v$、尾部 $a_v=b+\vartheta\chi_v$。因为 $\E_{P^{\tail}}\chi_A=0$，精确积分为 $h_g+\tau_Pb$，立即得到下面的双控制估计量。
+
+其正交结构也可以直接从 Gram 矩阵看出。尾部常向量的第 $j$ 个坐标对应零均值控制 $(J_A-\tau_P)e_j$，尾部内部控制为 $J_A\chi_A$，其中 $e_j$ 为参数空间的标准基向量。两列的 Gram 交叉项为
+\begin{equation*}
+ \E_P\langle(J_A-\tau_P)e_j,J_A\chi_A\rangle
+ =P_S\tau_P\E_{P^{\tail}}\langle e_j,\chi_A\rangle=0.
+\end{equation*}
+因此 on-policy 下的 Gram 矩阵分成事件控制和尾部内部控制两个块。后面的两个平方代价来自这一块对角结构，而非两个控制之间的巧合抵消。
+
+\begin{theorem}[双控制估计量及其精确协方差]
+\label{est:thm:kl-two-controls}
+对抽样前固定的向量 $b$ 与标量 $\vartheta$，定义
+\begin{equation*}
+ \widehat g(b,\vartheta)
+ =h_g+\tau_Pb+J_A(\ell_A\psi_A-b-\vartheta \chi_A),\qquad A\sim P.
+\end{equation*}
+则 $\E_P[\widehat g(b,\vartheta)]=g$，并且
+\begin{align}
+ \operatorname{Cov}(\widehat g(b,\vartheta))
+ &=\tau_P\operatorname{Cov}_{\tail}(\ell_A\psi_A-\vartheta \chi_A)
+   +P_S\tau_P(\mu_g-b)(\mu_g-b)^\top, \label{est:eq:kl-two-control-cov}\\
+ \Var(\widehat g(b,\vartheta))
+ &=\tau_P\Var_{\tail}(\ell_A\psi_A-\vartheta \chi_A)
+   +P_S\tau_P\lVert\mu_g-b\rVert^2. \label{est:eq:kl-two-control-var}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+尾部条件下 $\chi_A$ 的均值为零，所以
+\begin{equation*}
+ \E_P[J_A(\ell_A\psi_A-b-\vartheta \chi_A)]
+ =\tau_P(\mu_g-b).
+\end{equation*}
+加上确定性部分 $h_g+\tau_Pb$ 就是 $g$。给定 $J_A=0$ 时，估计量是常向量 $h_g+\tau_Pb$；给定 $J_A=1$ 时，均值为 $h_g+\tau_Pb+\mu_g-b$，协方差为 $\operatorname{Cov}_{\tail}(\ell_A\psi_A-\vartheta \chi_A)$。两分支均值差为 $\mu_g-b$。将这两个条件协方差与条件均值协方差相加，得到式~\eqref{est:eq:kl-two-control-cov}；取迹得到式~\eqref{est:eq:kl-two-control-var}。
+\end{proof}
+
+\begin{theorem}[双控制的最优值与精确代价]
+令
+\begin{equation*}
+ V_\chi=\Var_{\tail}(\chi_A),\qquad
+ D_\chi=\E_{\tail}\langle \ell_A\psi_A-\mu_g,\chi_A\rangle.
+\end{equation*}
+当 $V_\chi>0$ 时，迹方差最优控制为
+\begin{equation*}
+ b^*=\mu_g,\qquad \vartheta^*=\frac{D_\chi}{V_\chi}.
+\end{equation*}
+任意 $b,\vartheta$ 相对最优值的方差差恰好为
+\begin{equation}
+ \Var(\widehat g(b,\vartheta))-\Var(\widehat g(b^*,\vartheta^*))
+ =P_S\tau_P\lVert b-\mu_g\rVert^2
+  +\tau_PV_\chi(\vartheta-\vartheta^*)^2.
+ \label{est:eq:kl-two-control-regret}
+\end{equation}
+当 $V_\chi=0$ 时，$\vartheta$ 不影响估计量的方差。
+\end{theorem}
+
+\begin{proof}
+由 $\E_{\tail}\chi_A=0$，
+\begin{equation*}
+ \Var_{\tail}(\ell_A\psi_A-\vartheta \chi_A)
+ =\Var_{\tail}(\ell_A\psi_A)-2\vartheta D_\chi+\vartheta^2V_\chi.
+\end{equation*}
+对 $\vartheta$ 配方，得到
+\begin{equation*}
+ \Var_{\tail}(\ell_A\psi_A-\vartheta \chi_A)
+ =\Var_{\tail}(\ell_A\psi_A)-\frac{D_\chi^2}{V_\chi}
+  +V_\chi(\vartheta-\vartheta^*)^2.
+\end{equation*}
+再代入式~\eqref{est:eq:kl-two-control-var}，两个非负平方项分别由 $b=\mu_g$ 与 $\vartheta=\vartheta^*$ 消去。若 $V_\chi=0$，则 $\chi_A=0$ 在尾部条件分布下几乎处处成立。
+\end{proof}
+
+\subsection{HETS、ResOPD 与 SC-TA 的统一分类}
+
+样本修正 Tail-aware（Sample-Corrected Tail-Aware，SC-TA）与 ResOPD 的区别在尾部内部控制。双控制族中的坐标为
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+估计量 & $b$ & $\vartheta$\\
+\midrule
+HETS & $0$ & $0$\\
+ResOPD & $b_{\mathrm{TA}}$ & $0$\\
+SC-TA & $b_{\mathrm{TA}}$ & $1$\\
+不可计算的联合最优值 & $\mu_g$ & $\vartheta^*$\\
+\bottomrule
+\end{tabular}
+\end{center}
+三种可计算估计量在 $A\sim P$ 下均无偏。令 $g_{\mathrm{TA}}=h_g+\tau_Pb_{\mathrm{TA}}$，则逐样本有
+\begin{align*}
+ \widehat g^{\mathrm{ResOPD}}&=g_{\mathrm{TA}}+J_A(R_A^{\mathrm{shape}}+\chi_A),\\
+ \widehat g^{\mathrm{SC\text{-}TA}}&=g_{\mathrm{TA}}+J_AR_A^{\mathrm{shape}},\\
+ \widehat g^{\mathrm{SC\text{-}TA}}-\widehat g^{\mathrm{ResOPD}}&=-J_A\chi_A.
+\end{align*}
+这个差的期望为零，逐样本一般不为零。
+
+\begin{proposition}[SC-TA 与 ResOPD 的方差排序]
+当 $V_\chi>0$ 时，
+\begin{equation*}
+ \Var(\widehat g^{\mathrm{ResOPD}})
+ -\Var(\widehat g^{\mathrm{SC\text{-}TA}})
+ =\tau_P(2D_\chi-V_\chi)
+ =\tau_PV_\chi(2\vartheta^*-1).
+\end{equation*}
+因此 SC-TA 方差更小当且仅当 $\vartheta^*>1/2$。一个充分条件为
+\begin{equation*}
+ \Var_{\tail}(R_A^{\mathrm{shape}})<\frac14\Var_{\tail}(\chi_A).
+\end{equation*}
+\end{proposition}
+
+\begin{proof}
+在同一个 $b=b_{\mathrm{TA}}$ 下，事件间方差相同。将 $\vartheta=0,1$ 代入尾部内部二次式并相减，得到第一式。由 $\ell_A\psi_A=b_{\mathrm{TA}}+R_A^{\mathrm{shape}}+\chi_A$，
+\begin{equation*}
+ D_\chi=V_\chi+\E_{\tail}\langle R_A^{\mathrm{shape}}-\E_{\tail}R_A^{\mathrm{shape}},\chi_A\rangle.
+\end{equation*}
+Cauchy--Schwarz 不等式给出交叉项的下界
+\begin{equation*}
+ \E_{\tail}\langle R_A^{\mathrm{shape}}-\E_{\tail}R_A^{\mathrm{shape}},\chi_A\rangle
+ \geq-\sqrt{\Var_{\tail}(R_A^{\mathrm{shape}})V_\chi}.
+\end{equation*}
+给定充分条件时，右侧严格大于 $-V_\chi/2$，故 $2D_\chi-V_\chi>0$。
+\end{proof}
+
+当尾部条件形状完全相同，$\ell_v=\ell_{\mathrm{mass}}$ 对所有尾部 token 成立，此时 $R_A^{\mathrm{shape}}=0$，SC-TA 等于确定性的完整梯度；ResOPD 仍保留 $J_A\chi_A$ 的零均值波动。因此即使尾部桶已经完全描述 KL 数值，ResOPD 的梯度估计也可以有非零方差。若 $V_\chi=0$，两者逐样本相同。这是区分标量 KL 与向量梯度的一个直接例子。
+
+上述所有排序针对协方差迹。较小的迹不推出协方差矩阵在半正定序下更小；事件间协方差之差是两个秩一矩阵之差，某些方向上的方差仍可增大。
+
+当动作改由 $\beta$ 抽样时，令 $w_A=P(A)/\beta(A)$，并假设 $\beta$ 覆盖全部尾部。正确的重要性控制变成 $(J_Aw_A-\tau_P)e_j$ 与 $J_Aw_A\chi_A$。其交叉项为
+\begin{equation*}
+ \sum_{v\notin S}\frac{P(v)^2}{\beta(v)}\langle e_j,\chi_v\rangle,
+\end{equation*}
+一般不为零：$\chi$ 的零均值只针对 $P^{\tail}$，而这个交叉矩使用 $P^2/\beta$。因此非 on-policy 的最优常向量与内部控制应由完整 Gram 矩阵联合求解。仅在块交叉项确实为零时，才可以分别优化两个控制。

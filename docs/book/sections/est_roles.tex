@@ -1,0 +1,186 @@
+\section{OPD 使用方式与误差传递}
+\label{est:sec:kl-opd-roles}
+\subsection{Score baseline 是积分为零的控制}
+
+本小节默认 $\beta=P$。vOPD 在总定理中对应 $f_v=\ell_v\psi_v$、$a_v=c(s)\psi_v$。由于 $I_P(a)=c(s)I_P(\psi)=0$，它直接成为 $(\ell_A-c)\psi_A$。对其他覆盖残差支持的采样分布，正确形式是 $(P(A)/\beta(A))(\ell_A-c)\psi_A$。因此 baseline 是否对 KL 数值无偏，不是这个构造的无偏条件；控制积分为零才是条件。下面求出的最优 $c$ 就是 Gram 定理的单列控制解。
+
+
+Sampled-token estimator 为
+\begin{equation*}
+ \widehat g^{\mathrm{sample}}=\ell_A\psi_A.
+\end{equation*}
+它无偏，且
+\begin{equation}
+ \Var(\widehat g^{\mathrm{sample}})
+ =\E_P[\ell_A^2\lVert \psi_A\rVert_2^2]-\lVert g\rVert_2^2.
+ \label{est:eq:chapter3-sample-grad-var}
+\end{equation}
+
+对任意在抽样前固定的 scalar $c(s)$，vOPD 型 estimator 为
+\begin{equation}
+ \widehat g^{\mathrm{vOPD}}_c=(\ell_A-c)\psi_A.
+ \label{est:eq:chapter3-vopd}
+\end{equation}
+
+\begin{proposition}[固定 scalar baseline 的无偏性与最优值]
+\label{est:prop:chapter3-vopd}
+对任意 action-independent $c(s)$，$\widehat g^{\mathrm{vOPD}}_c$ 无偏。其二阶矩为
+\begin{equation*}
+ \E\lVert\widehat g^{\mathrm{vOPD}}_c\rVert_2^2
+ =\E_P[(\ell_A-c)^2\lVert \psi_A\rVert_2^2],
+\end{equation*}
+当 $\E_P\lVert \psi_A\rVert^2>0$ 时，使该二阶矩最小的 scalar 是
+\begin{equation}
+ c^*=\frac{\E_P[\ell_A\lVert \psi_A\rVert_2^2]}{\E_P[\lVert \psi_A\rVert_2^2]}.
+ \label{est:eq:chapter3-optimal-score-baseline}
+\end{equation}
+一般 $c^*\neq K$，因此用 KL 数值 $K$ 作为 vOPD baseline 是合法的中心化，但不必是 score-gradient 方差最优的 baseline。
+若 $\E_P\lVert \psi_A\rVert^2=0$，score 在 $P$ 下几乎处处为零，所有 baseline 对应的梯度均为零。
+\end{proposition}
+
+\begin{proof}
+\begin{equation*}
+ \E_P[(\ell_A-c)\psi_A]=\E_P[\ell_A\psi_A]-c\E_P[\psi_A]=g.
+\end{equation*}
+对二阶矩关于 $c$ 求导并令其为零，得到式~\eqref{est:eq:chapter3-optimal-score-baseline}。
+\end{proof}
+
+进一步记 $D_\psi=\E_P\lVert \psi_A\rVert^2>0$，展开平方并配方，得到精确的方差表达式
+\begin{align*}
+ \Var(\widehat g_c^{\mathrm{vOPD}})
+ &=\E_P[\ell_A^2\lVert \psi_A\rVert^2]
+   -2c\E_P[\ell_A\lVert \psi_A\rVert^2]+c^2D_\psi-\lVert g\rVert^2\\
+ &=\Var(\widehat g_{c^*}^{\mathrm{vOPD}})+D_\psi(c-c^*)^2.
+\end{align*}
+这给出任意固定 KL proxy 作为 baseline 的代价，而无需假定该 proxy 对 $K$ 无偏。
+
+\begin{proposition}[独立随机 KL baseline 的误差传递]
+令 $C$ 与当前动作 $A$ 条件独立，$\mu_C=\E[C]$、$\sigma_C^2=\Var(C)$，且反传时停止 $C$ 的梯度。则 $(\ell_A-C)\psi_A$ 对 $g$ 无偏，且
+\begin{equation*}
+ \Var((\ell_A-C)\psi_A)
+ =\Var((\ell_A-\mu_C)\psi_A)+D_\psi\sigma_C^2.
+\end{equation*}
+若写 $\mu_C=K+\delta$，则
+\begin{equation*}
+ \Var((\ell_A-C)\psi_A)
+ =\Var(\widehat g_{c^*}^{\mathrm{vOPD}})
+  +D_\psi\{(K+\delta-c^*)^2+\sigma_C^2\}.
+\end{equation*}
+\end{proposition}
+
+\begin{proof}
+条件于 $A$，$\E_C[(\ell_A-C)^2]=(\ell_A-\mu_C)^2+\sigma_C^2$。乘以 $\lVert \psi_A\rVert^2$ 后取 $A$ 的期望，并减去相同的 $\lVert g\rVert^2$，即可得到结论。
+\end{proof}
+
+所以在 vOPD 中只改进后面的 KL 数值估计时，应比较 scalar baseline 的均值与方差；当两个 baseline 均对 $K$ 无偏且独立时，梯度方差之差恰好是 $D_\psi$ 乘以 scalar 方差之差。ResOPD 的向量控制方差结论不能直接用于这个比较。
+
+如果 baseline 是与当前 action 共同随机化的 $C_A$，则上述证明失效：偏差为
+\begin{equation}
+ \operatorname{Bias}(\widehat g_C)=-\E[C_A\psi_A].
+ \label{est:eq:chapter3-random-baseline-bias}
+\end{equation}
+因此随机 baseline 保持无偏的充要条件是 $\E[C_A\psi_A]=0$。独立样本或 leave-one-out/cross-fitting 是保证这个条件的构造方式；仅有 $\E[C_A]=K$ 不够。
+
+同样本 K1 baseline 提供一个极端反例：取 $C_A=\ell_A$，则 $(\ell_A-C_A)\psi_A=0$，偏差恰好为 $-g$，尽管 $\E[C_A]=K$。数值无偏不能消除 baseline 与 score 的相关性。
+
+\subsection{旧 rollout 下的最优 baseline}
+
+若 $A\sim\beta$，且 $\beta$ 覆盖 $P$ 的支持，令 $w_A=P(A)/\beta(A)$。控制 $c \psi_A$ 的正确修正仍然无偏，因为
+\begin{equation*}
+ \E_\beta[w_A(\ell_A-c)\psi_A]=I_P(\ell\psi)-cI_P(\psi)=g.
+\end{equation*}
+但是其二阶矩使用 $P^2/\beta$ 权重。定义
+\begin{equation*}
+ D_{\psi,\beta}=\sum_v\frac{P(v)^2}{\beta(v)}\|\psi_v\|^2.
+\end{equation*}
+若该值为正，对二阶矩关于 $c$ 配方得到
+\begin{equation*}
+ c_\beta^*=
+ \frac{\sum_v P(v)^2\beta(v)^{-1}\ell_v\|\psi_v\|^2}{D_{\psi,\beta}},
+\end{equation*}
+\begin{equation*}
+ \Var_\beta(w_A(\ell_A-c)\psi_A)
+ =\Var_\beta(w_A(\ell_A-c_\beta^*)\psi_A)
+  +D_{\psi,\beta}(c-c_\beta^*)^2.
+\end{equation*}
+这直接来自 Gram 定理取控制列 $w_A\psi_A$。若 $D_{\psi,\beta}=0$，所有 score 均为零，baseline 不影响结果。
+
+对与当前动作独立的随机 baseline $C$，令 $\mu_C=\E C$、$\sigma_C^2=\Var C$。条件于动作展开平方，得到
+\begin{equation*}
+ \Var_\beta(w_A(\ell_A-C)\psi_A)
+ =\Var_\beta(w_A(\ell_A-\mu_C)\psi_A)+D_{\psi,\beta}\sigma_C^2.
+\end{equation*}
+因此两个独立、同均值的 KL baseline 的比较，只需比较其标量方差，梯度方差差为 $D_{\psi,\beta}$ 乘以该差；当前 on-policy 情形是 $\beta=P$ 的特例。若 baseline 与动作相关，无偏性的条件也相应变成 $\E_\beta[w_AC_A\psi_A]=0$。
+
+\subsection{Sampled OPD 与 vOPD}
+
+在通用 KL 记号中代入 $P=p,Q=t$，固定 teacher 作为 $Q$，sampled OPD 取停止系数 $\ell_A$，其最小化梯度为 $\ell_A\psi_A$；若使用 reward 最大化记号，reward 是 $-\ell_A$，两种表述符号相反而更新方向相同。vOPD 取 $(\ell_A-c(s))\psi_A$，其中 $c(s)$ 可取完整 $K$、Tail-aware 下界或独立随机 KL baseline。上述控制定理已经证明：action-independent baseline 的数值偏差不产生梯度偏差；同 action 的无偏 KL 估计反而可以产生梯度偏差。
+
+本仓库生产 OPD baseline 对 $Q=t$ 使用 $H+\tau_P\log(\tau_P/\tau_Q)$，并在梯度系数中停止。它是完整 KL 的有偏数值下界，但作为 action-independent baseline，在正确采样测度或正确重要性校正下保持 OPD 梯度无偏。若 rollout 来自冻结 $q$，则此处 $\beta=q$，需要 $P/\beta$；baseline 本身使用 teacher 作为 $Q$，二者不可混用。
+
+\subsection{Mirror 目标中的 student--anchor KL}
+
+对 MDPO，代入 $P=p$，令本节参考 $Q=q$，固定 reward 为前两章的 $r(s,v)$。负 mirror 目标为
+\begin{equation*}
+ \mathcal L_{\mathrm{MDPO}}
+ =\eta^{-1}K-\E_P[r(s,A)].
+\end{equation*}
+逐项求导并利用 score 均值为零，得到
+\begin{equation*}
+ \nabla\mathcal L_{\mathrm{MDPO}}
+ =\E_P[u_A^{\mathrm{MDPO}}\psi_A],\qquad
+ u_v^{\mathrm{MDPO}}=\eta^{-1}\ell_v-r(s,v).
+\end{equation*}
+在冻结 rollout $\beta=q$ 下，无偏估计为
+\begin{equation*}
+ \widehat g_{\mathrm{MDPO}}=\frac{P(A)}{\beta(A)}u_A^{\mathrm{MDPO}}\psi_A,\qquad
+ \Var_\beta(\widehat g_{\mathrm{MDPO}})
+ =\sum_v\frac{P(v)^2}{\beta(v)}(u_v^{\mathrm{MDPO}})^2\lVert \psi_v\rVert^2
+  -\lVert\nabla\mathcal L_{\mathrm{MDPO}}\rVert^2.
+\end{equation*}
+如果 $\lVert u_v^{\mathrm{MDPO}}\psi_v\rVert\leq C$，则二阶矩满足
+\begin{equation}
+ \E_\beta\lVert\widehat g_{\mathrm{MDPO}}\rVert^2
+ \leq C^2\sum_v\frac{P(v)^2}{\beta(v)}
+ =C^2\{1+\chi^2(P\Vert\beta)\}.
+ \label{est:eq:mdpo-variance}
+\end{equation}
+这说明 stale rollout 与当前 student 分离时的重要性权重代价。
+
+BPO 的 student center 是相反方向的 $\KL(q\Vert P)$，在本节 $Q=\beta=q$ 下就是 $K^{\mathrm F}$；teacher center 是冻结的 $\KL(q\Vert t)$。PMD-Mean 的目标使用冻结 reward 中心而不含同样的 student KL center。它们的原目标就在 anchor 测度下定义，不能因 MDPO 需要 $P/\beta$，便给 Mean 或 BPO 机械乘上该比率。center 放入平方损失后还会出现同样本相关项，须使用本章的有限样本与留一修正；一个 KL scalar estimator 的无偏性不替代整个目标梯度的证明。
+
+\subsection{确定性代理的平方误差}
+
+记 $M=\tau_P\ell_{\mathrm{mass}}$、$B=\tau_P\KL(P^{\tail}\Vert Q^{\tail})$。Tail-aware 与截断的平方误差差为
+\begin{equation*}
+ (K-H)^2-\{K-(H+M)\}^2=(M+B)^2-B^2=M(M+2B).
+\end{equation*}
+因此 $M\geq0$ 时 Tail-aware 的标量平方误差不大于截断；$M<0$ 时删除的质量项与形状项可抵消，零方差确定性 proxy 的排序不能只按是否保留更多项判断。
+
+支持细分的 KL 单调性已经由第~\ref{inf:sec:kl-partition} 节的一般分区定理证明；该性质控制确定性粗化偏差，不能推出 HETS 或 ResOPD 的抽样方差单调下降。
+
+\subsection{Normalized 与 Truncated 的 logit 行为}
+
+令 $P=\operatorname{softmax}(\theta)$，其 score 为 $\psi_{v,j}=\mathbf1\{v=j\}-P(j)$。Normalized Top-$J$ 只依赖头部相对 logits，故对 $j\notin S$ 有
+\begin{equation*}
+ \frac{\partial K^{\mathrm{norm}}_J}{\partial\theta_j}=0.
+\end{equation*}
+截断数值的真实梯度则满足
+\begin{equation*}
+ \frac{\partial H}{\partial\theta_j}=-P(j)(H+P_S),\qquad j\notin S.
+\end{equation*}
+这由 $\nabla H=\sum_{v\in S}P(v)(\ell_v+1)\psi_v$ 逐坐标代入得到。当 $H+P_S>0$ 时，梯度下降增加尾部 logits。停止系数的头部梯度 $h_g$ 省去了 $P_S$ 对应的边界项，但仍缺失完整尾部。因此这两种截断训练路径也必须分别报告。
+
+\subsection{固定 prefix 误差与访问测度下误差}
+
+令 $s\sim d$，条件偏差为 $c(s)=\E[\widehat K\mid s]-K(s)$，条件方差为 $V(s)$。则
+\begin{equation*}
+ \E_{s,A}[\widehat K-K]=\E_d[c(s)],\qquad
+ \E_{s,A}[(\widehat K-K)^2]=\E_d[c(s)^2+V(s)].
+\end{equation*}
+而原始 estimator 的总体方差是
+\begin{equation*}
+ \Var_{s,A}(\widehat K)
+ =\E_d[V(s)]+\Var_d(K(s)+c(s)).
+\end{equation*}
+这三个统计量分别回答总体有符号误差、逐 prefix 均方误差和 estimator 自身的总体波动。确定性 Tail-aware 有 $V(s)=0$，但 $\operatorname{RMSE}=\sqrt{\E_d[B(s)^2]}$，一般不等于 $|\E_d[-B(s)]|$。向量估计量将平方替换为范数平方、方差替换为协方差迹，结论保持相同形式。访问测度 $d$ 在不同 outer 轮次的变化由第四章单独处理。

@@ -1,0 +1,78 @@
+\section{原始 mirror 子问题的 Gibbs 解}
+
+令
+\begin{equation*}
+ Z_k(s)=\sum_{a\in\mathcal V} q_k(a\mid s)\exp(\eta r_k(s,a)).
+\end{equation*}
+由于 $r_k=\log t-\log q_k$，有
+\begin{equation}\label{eq:token-partition}
+ Z_k(s)=\sum_a q_k(a\mid s)^{1-\eta} t(a\mid s)^\eta.
+\end{equation}
+
+\begin{theorem}[Token mirror target]
+\label{thm:token-target}
+若有限词表上 $ q_k(a\mid s)>0$ 且 $ t(a\mid s)>0$ 对每个 action 成立，则式~\eqref{eq:common-objective} 的唯一最大点为
+\begin{equation}\label{eq:token-target}
+  p_k^{\mathrm G}(a\mid s)=
+ \frac{ q_k(a\mid s)\exp(\eta r_k(s,a))}{Z_k(s)}
+ =\frac{ q_k(a\mid s)^{1-\eta} t(a\mid s)^\eta}{Z_k(s)}.
+\end{equation}
+并且对任意 $p$，
+\begin{equation}\label{eq:variational-identity}
+ \mathcal J_{k,s}(p)
+ =\frac{1}{\eta}\log Z_k(s)
+ -\frac{1}{\eta}\KL(p\Vert  p_k^{\mathrm G}).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+由式~\eqref{eq:token-target}，
+\begin{equation*}
+ \log  p_k^{\mathrm G}(a\mid s)=\log q_k(a\mid s)+\eta r_k(s,a)-\log Z_k(s).
+\end{equation*}
+因此
+\begin{align*}
+ \KL(p\Vert  p_k^{\mathrm G})
+ &=\sum_a p(a\mid s)\left[
+ \log\frac{p(a\mid s)}{ q_k(a\mid s)}
+ -\eta r_k(s,a)+\log Z_k(s)\right]\\
+ &=\KL(p\Vert q_k)-\eta\E_p[r_k]+\log Z_k(s).
+\end{align*}
+移项得到式~\eqref{eq:variational-identity}。KL 非负且仅在 $p= p_k^{\mathrm G}$ 时为零，所以最大点唯一。\hfill$\square$
+\end{proof}
+
+\begin{corollary}[几何插值与极限]
+当 $\eta\to0^+$ 时 $ p_k^{\mathrm G}\to q_k$；当 $\eta=1$ 时 $ p_k^{\mathrm G}= t$；当 $0<\eta<1$ 时，logits 满足
+\begin{equation*}
+ \log  p_k^{\mathrm G}=(1-\eta)\log q_k+\eta\log t-\log Z_k.
+\end{equation*}
+因此 $\eta$ 是 token-level teacher interpolation，而不是 inner optimizer 的学习率。
+\end{corollary}
+
+\section{Reward 中心化与回归残差}
+
+定义 $\bar r_k(s)=\mathbb E_{a\sim q_k}[r_k(s,a)]=-\mathcal K_k^T(s)$。将 reward 换成 $r_k-\bar r_k$ 后，配分函数为
+\begin{equation*}
+\mathbb E_{ q_k}[e^{\eta(r_k-\bar r_k)}]=e^{-\eta\bar r_k}Z_k.
+\end{equation*}
+分子和配分函数同乘一个 action 无关的常数，原始 mirror 问题的 Gibbs 解不变。下面的平方回归需要区分完整配分函数与均值近似。
+
+三个 residual 全部采用 student 减 target 的方向：
+\begin{align}
+R^{\mathrm{Part}}_{k,n}(s,a)&\coloneqq U_{k,n}(s,a)-\eta r_k(s,a)+\log Z_k(s),\label{eq:part-residual}\\
+R^{\mathrm{Mean}}_{k,n}(s,a)&\coloneqq U_{k,n}(s,a)-G_k(s,a),\label{eq:mean-residual}\\
+R^{\mathrm{BPO}}_{k,n}(s,a)&\coloneqq U_{k,n}(s,a)-G_k(s,a)+\mathcal K_{k,n}^S(s).
+\end{align}
+PMD-Part 的零残差对应 $ p_{k,n}= p_k^{\mathrm G}$。PMD-Mean 以 $\eta\bar r_k$ 近似 $\log Z_k$，仅中心化 reward。对非恒定 reward，由严格 Jensen 不等式有 $\mathbb E_{ q_k}[e^{G_k}]>1$，所以拟合值 $U=G_k$ 不满足概率归一化，最优残差不能为零。其总体最优分布记为 $ p_k^{\mathrm M}$，由第二章的 Lambert-$W$ 解确定。
+
+BPO 则中心化完整的 student--target residual。其 residual 均值为零，而 Mean 的 residual 均值为 $-\mathcal K_{k,n}^S$。这些定义直接区分两个目标，无需额外改变 residual 符号。
+
+\section{参数化策略的投影}
+
+实际神经网络只能表示参数化策略族。固定 prefix 测度 $d_k$ 后，PMD-Part 的总体 inner loss 定义为
+\begin{equation}\label{eq:part-loss}
+ \mathcal L_{\mathrm{Part}}(\theta_{k,n})
+ =\frac12\E_{s\sim d_k,a\sim q_k}
+ \left[R^{\mathrm{Part}}_{k,n}(s,a)^2\right].
+\end{equation}
+若模型在每个 history 上可以实现式~\eqref{eq:token-target}，则全局最小值为零；否则最小值是 anchor history 测度下的函数类投影误差。inner steps 增加只能逼近该投影，不能消除模型表达误差或 history coverage 误差。

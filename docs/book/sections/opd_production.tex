@@ -1,0 +1,195 @@
+\subsubsection*{Tail-aware 中心的梯度偏差与停止梯度语义}
+
+下面固定一个 prefix $s$ 和一个 inner step，写 $q=q_k(\cdot\mid s)$、 $p=p_{k,n}(\cdot\mid s)$、$t=t(\cdot\mid s)$。 假设有限词表上的三者严格为正，$p$ 关于参数可微，$\eta>0$， 且 $S_J$ 由冻结的 $q$ 选出，因此求导时支持集不变。 用相同的支持集定义两个遗漏的尾部形状项：
+\begin{align}
+ b_J^T(s)&=q(S_J^c)\KL\bigl(q(\cdot\mid S_J^c)\Vert t(\cdot\mid S_J^c)\bigr),\\
+ b_{J,n}^S(s)&=q(S_J^c)\KL\bigl(q(\cdot\mid S_J^c)\Vert p(\cdot\mid S_J^c)\bigr).
+\end{align}
+若尾部为空，两项按连续延拓定义为零。Tail-aware 的链式分解给出
+\begin{equation}
+ \widehat K_{qT,k}=K_{qT,k}-b_J^T,
+ \qquad
+ \widehat K_{qp,k,n}=K_{qp,k,n}-b_{J,n}^S.
+\end{equation}
+这些估计对固定 prefix 是确定性的，因而这里的偏差来自尾部聚合， 并非来自额外 sampled token 的随机性。
+
+\begin{theorem}[Tail-aware Mean/BPO 解析更新的偏差]
+\label{thm:ch2-ta-center-gradient-bias}
+令 $g_{\mathrm{Mean}}(s)$、$g_{\mathrm{BPO}}(s)$ 为精确条件 KL 中心的 score-function 梯度，$\widehat g_{\mathrm{Mean}}(s)$、 $\widehat g_{\mathrm{BPO}}(s)$ 为替换成 Tail-aware 中心并对整个权重 停止梯度后的条件期望。则
+\begin{align}
+ \widehat g_{\mathrm{Mean}}(s)-g_{\mathrm{Mean}}(s)
+ &=\eta b_J^T(s)\mathbb E_{a\sim q}[\nabla_\theta\log p(a)],\\
+ \widehat g_{\mathrm{BPO}}(s)-g_{\mathrm{BPO}}(s)
+ &=\left(b_J^T(s)-\frac{b_{J,n}^S(s)}{\eta}\right)
+   \mathbb E_{a\sim q}[\nabla_\theta\log p(a)].
+\end{align}
+相应的 BPO 近似残差
+\begin{equation}
+ \widehat R_{k,n}^{\mathrm{BPO}}(a)
+ =\log\frac{p(a)}{q(a)}+\widehat K_{qp,k,n}
+ -\eta\left(\log\frac{t(a)}{q(a)}+\widehat K_{qT,k}\right)
+\end{equation}
+满足
+\begin{equation}
+ \mathbb E_q[\widehat R_{k,n}^{\mathrm{BPO}}]=-b_{J,n}^S+\eta b_J^T.
+\end{equation}
+对任意固定 prefix 测度 $d$，总体偏差是上述条件偏差关于 $d$ 的期望。
+\end{theorem}
+
+\begin{proof}
+精确 Mean 残差为 $A_\theta(a)=\log(p(a)/q(a))-\eta(\log(t(a)/q(a))+K_{qT,k})$。 代入 $\widehat K_{qT,k}=K_{qT,k}-b_J^T$，逐动作得到
+\begin{equation}
+ \widehat A_\theta(a)=A_\theta(a)+\eta b_J^T.
+\end{equation}
+两者分别乘以 $\nabla_\theta\log p(a)$，在同一冻结分布 $q$ 下取期望， 即得 Mean 的偏差公式。对于 BPO，两个中心的替换给出
+\begin{equation}
+ \widehat R_{k,n}^{\mathrm{BPO}}(a)=R_{k,n}^{\mathrm{BPO}}(a)-b_{J,n}^S+\eta b_J^T.
+\end{equation}
+精确残差的均值为
+\begin{equation}
+ \mathbb E_q[R_{k,n}^{\mathrm{BPO}}]
+ =-K_{qp,k,n}+K_{qp,k,n}
+ -\eta(-K_{qT,k}+K_{qT,k})=0.
+\end{equation}
+对替换后的残差取期望便得到所述非零均值。再将逐动作残差差除以 $\eta$，乘以 score，并在 $q$ 下取期望，得到 BPO 的偏差公式。 最后在固定 $d$ 下积分，期望线性性给出总体结论。
+\end{proof}
+
+若 $\lVert\nabla_\theta\log p(a)\rVert\le G(s)$，三角不等式还给出
+\begin{align}
+ \lVert\mathbb E_d[\widehat g_{\mathrm{Mean}}-g_{\mathrm{Mean}}]\rVert
+ &\le\eta\mathbb E_d[b_J^T G],\\
+ \lVert\mathbb E_d[\widehat g_{\mathrm{BPO}}-g_{\mathrm{BPO}}]\rVert
+ &\le\mathbb E_d[|b_J^T-b_{J,n}^S/\eta|G].
+\end{align}
+因此 BPO 的两个中心误差可能抵消，也可能被 $1/\eta$ 放大。 单独降低 teacher KL 的 RMSE 不能保证 BPO 梯度误差同步下降。 在 $p=q$ 时，$b_{J,n}^S=0$ 且 $\mathbb E_q[\nabla_\theta\log p]=\nabla_\theta\sum_a p(a)=0$， 所以两种更新的条件偏差都为零；inner 更新后一般不再满足该条件。
+
+\begin{proposition}[Tail-aware BPO 平方损失与 SG 更新的区别]
+\label{prop:ch2-ta-square-versus-sg}
+若 student Tail-aware 中心保留梯度，近似平方目标 $\widehat{\mathcal L}_{\mathrm{BPO}}(s)=\mathbb E_q[(\widehat R_{k,n}^{\mathrm{BPO}})^2]/(2\eta)$ 的完整梯度为
+\begin{equation}
+ \nabla_\theta\widehat{\mathcal L}_{\mathrm{BPO}}(s)
+ =\widehat g_{\mathrm{BPO}}(s)
+ +\left(b_J^T-\frac{b_{J,n}^S}{\eta}\right)
+   \nabla_\theta\widehat K_{qp,k,n}(s).
+\end{equation}
+本节 outer--inner 算法 使用第一项，即对原始 BPO 解析梯度的近似；它一般不等于 替换中心后的平方损失梯度。
+\end{proposition}
+
+\begin{proof}
+$q,T,S_J$ 均冻结，因此
+\begin{equation}
+ \nabla_\theta\widehat R_{k,n}^{\mathrm{BPO}}(a)
+ =\nabla_\theta\log p(a)+\nabla_\theta\widehat K_{qp,k,n}.
+\end{equation}
+对平方目标使用链式法则，得到
+\begin{equation}
+ \nabla_\theta\widehat{\mathcal L}_{\mathrm{BPO}}
+ =\frac1\eta\mathbb E_q[\widehat R_{k,n}^{\mathrm{BPO}}\nabla_\theta\log p]
+ +\frac1\eta\mathbb E_q[\widehat R_{k,n}^{\mathrm{BPO}}]
+   \nabla_\theta\widehat K_{qp,k,n}.
+\end{equation}
+第一项是 SG 权重的 score-function 更新；将上一条定理的残差均值 代入第二项，即得结论。精确中心下残差均值为零，第二项消失； 有限支持集的 Tail-aware 中心不保证这一消去。
+\end{proof}
+
+Mean 的情况不同：teacher 中心完全冻结，故 $\nabla_\theta\widehat A_\theta=\nabla_\theta\log p$。 其平方损失与 $\sg(\widehat A_\theta)\log p$ 在每个 sampled action 上具有相同梯度，而不仅是期望梯度相同。 上述结论都针对固定参数与固定条件分布；反复复用一批 rollout 并用它 更新参数，还会产生有限数据的优化与泛化误差，不能由条件无偏性消除。
+
+缓存上，CPU/NVMe 保存 token IDs、attention mask、response mask、rollout 动作以及 anchor/teacher action log-prob。Tail-aware 路径另外冻结 anchor 的 top-$J$ IDs、头部 log-prob、尾部总质量和 teacher KL 中心；student 的 action log-prob、这些 IDs 上的 log-prob 和尾部质量每个 inner step 重算。 Teacher 中心构造完即可释放其完整 logits，无需保存 teacher 全词表分布。 保存完整 logits 的代价是 $O(BH|\mathcal V|)$，保存 top-$J$ 摘要是 $O(BHJ)$。以 $|\mathcal V|=150{,}000$、FP16 为例，一个 prefix-token 的 完整 logits 约 $300$ kB，8192 token 单序列约 $2.46$ GB；因此全词表 logits 不放进 replay buffer。GPU 只保留当前 microbatch 的 student 激活 及打分 logits，完成摘要与动作权重计算后释放不再需要的打分张量。 此路径没有额外 anchor token 抽样；中心的条件采样方差为零，但保留 定理~\ref{thm:ch2-ta-center-gradient-bias} 给出的尾部形状偏差。 PMD-Part 暂不启用，因为其 $\log Z_k$ 需要另一套估计与误差控制。
+
+\begin{algorithm}[ht]
+\caption{Tail-aware OPD outer--inner optimization\\{\small\textit{Semantics: 冻结 outer rollout，以 Tail-aware KL 中心运行 Mean、BPO 或 MDPO，再同步并重新 rollout}}}
+\begin{algorithmic}[1]
+\Require prompt distribution $\mathcal D$, teacher $t$, initial student $q_0=p_{\theta_{0,0}}$, outer steps $K_{\mathrm{out}}$, rollout batch size $B_{\mathrm{batch}}\ge1$, horizon $H\ge1$, method $M$, $\eta>0$, inner steps $N_{\mathrm{inner}}\ge1$, inner learning rate schedule $\{\alpha_{k,n}\}$, sync mode $\mathrm{Sync}\in\{\mathrm{hard},\mathrm{soft}\}$, soft-sync weight $\zeta\in(0,1]$
+\Ensure final policy $q_{K_{\mathrm{out}}}$ and parameters $\theta_{K_{\mathrm{out}}}$
+\For{$k=0,\ldots,K_{\mathrm{out}}-1$}
+    \State $\mathcal B_k\gets\varnothing$ \Comment{$\mathcal B_k$ stores rollout pairs with multiplicity}
+    \For{$i=1,\ldots,B_{\mathrm{batch}}$}
+        \State sample prompt $x_i\sim\mathcal D$
+        \State generate $y_i=(a_{i,1},\ldots,a_{i,\tau_i})$ with $a_{i,t}\sim q_k(\cdot\mid s_{i,t})$, $s_{i,t}=(x_i,a_{i,<t})$; stop at EOS or $H$ tokens
+        \State $\mathcal B_k\gets\mathcal B_k\mathbin{\uplus}\{(s_{i,t},a_{i,t}):1\le t\le\min(\tau_i,H)\}$
+    \EndFor
+    \State if $\mathcal B_k=\varnothing$, terminate with an empty-rollout error before normalization
+    \State define $\widehat d_k$ as the empirical distribution assigning each prefix occurrence in $\mathcal B_k$ equal mass
+    \State $\theta_{k,0}\gets\theta_k$ \Comment{initialize the inner student from the current outer policy}
+    \State query frozen $\log t(v\mid s)$ and $\log q_k(v\mid s)$ for $(s,a)\in\mathcal B_k$, $v\in\mathcal V$; retain summaries and action log-prob only
+    \State choose and freeze $S_J(s)=\operatorname{TopJ}(q_k(\cdot\mid s))$; freeze $\log q_k(v\mid s)$ for $v\in S_J(s)$ and $\log t(a\mid s),\log q_k(a\mid s)$ for rollout actions
+    \State $\widehat K_{qT,k}(s)\gets\mathcal K_J^{\mathrm{TA}}(q_k(\cdot\mid s)\Vert t(\cdot\mid s))$ using the same $S_J(s)$ and aggregate tail masses
+    \State omit PMD-Part because it requires $\log Z_k$; use all retained rollout pairs, including tail actions
+    \For{$n=0,\ldots,N_{\mathrm{inner}}-1$}
+        \State compute current $\log p_{k,n}(v\mid s)$ and $\widehat K_{qp,k,n}(s)\gets\mathcal K_J^{\mathrm{TA}}(q_k\Vert p_{k,n})$ on the frozen $S_J(s)$; freeze both centers within this gradient evaluation
+        \If{$M=\mathrm{Mean}$}
+            \State $g_{k,n}\gets\frac1{|\mathcal B_k|}\sum_{(s,a)\in\mathcal B_k}\sg\!\left(\log\frac{p_{k,n}(a\mid s)}{q_k(a\mid s)}-\eta\left(\log\frac{t(a\mid s)}{q_k(a\mid s)}+\widehat K_{qT,k}(s)\right)\right)\nabla_{\theta_{k,n}}\log p_{k,n}(a\mid s)$
+        \ElsIf{$M=\mathrm{BPO}$}
+            \State $\begin{aligned}g_{k,n}\gets\frac1{|\mathcal B_k|}\sum_{(s,a)\in\mathcal B_k}&\sg\!\left(\eta^{-1}\left(\log\frac{p_{k,n}(a\mid s)}{q_k(a\mid s)}+\widehat K_{qp,k,n}(s)\right)-\log\frac{t(a\mid s)}{q_k(a\mid s)}-\widehat K_{qT,k}(s)\right)\\&{}\cdot\nabla_{\theta_{k,n}}\log p_{k,n}(a\mid s)\end{aligned}$
+        \ElsIf{$M=\mathrm{MDPO}$}
+            \State $\begin{aligned}g_{k,n}\gets\frac1{|\mathcal B_k|}\sum_{(s,a)\in\mathcal B_k}&\sg\!\left(\frac{p_{k,n}(a\mid s)}{q_k(a\mid s)}\left(\eta^{-1}\log\frac{p_{k,n}(a\mid s)}{q_k(a\mid s)}-\log\frac{t(a\mid s)}{q_k(a\mid s)}\right)\right)\\&{}\cdot\nabla_{\theta_{k,n}}\log p_{k,n}(a\mid s)\end{aligned}$
+        \EndIf
+        \State $\theta_{k,n+1}\gets\operatorname{OptimizerStep}(\theta_{k,n},g_{k,n};\alpha_{k,n})$ \Comment{gradient descent: plain SGD gives $\theta_{k,n}-\alpha_{k,n}g_{k,n}$}
+    \EndFor
+    \If{$\mathrm{Sync}=\mathrm{hard}$}
+        \State $\theta_{k+1}\gets\theta_{k,N_{\mathrm{inner}}}$ and $q_{k+1}\gets p_{\theta_{k+1}}$
+    \Else
+        \State $q_{k+1}(\cdot\mid s)\gets(1-\zeta)q_k(\cdot\mid s)+\zeta p_{k,N_{\mathrm{inner}}}(\cdot\mid s)$ for every prefix $s$
+        \State choose $\theta_{k+1}$ representing this mixture, assuming the policy class is closed under mixtures \Comment{categorical probability mixture; neural-model implementation uses hard sync}
+    \EndIf
+\EndFor
+\State \Return $(q_{K_{\mathrm{out}}},\theta_{K_{\mathrm{out}}})$
+\end{algorithmic}
+\end{algorithm}
+
+本节 outer--inner 算法 直接使用 rollout 保存的 $(s,a)$，每个 token occurrence 具有相同权重。 式中的求和是经验训练目标的梯度：若使用 microbatch，将 $|\mathcal B_k|^{-1}$ 换成该批有效 response token 的归约权重，并在累积与分布式归约时保持一致。 同一轨迹中的 prefix 具有相关性，随机轨迹长度也影响经验归一化；因此这条 有限数据实现不意味着总体 token 测度梯度具有有限样本严格无偏性。 对固定 prefix 与固定参数，动作来自 $q_k$ 时，MDPO 的 $p_{k,n}/q_k$ 比率将条件动作期望变换到当前 student；Mean/BPO 原本就在 anchor 测度下定义，故没有该比率。所有三种权重都在当前 inner 参数处重新计算再停止梯度，而不是在 outer 开始时固定至整个 inner loop。
+
+这里 Tail-aware 只替换 Mean/BPO 的数值中心，解析 score-function 权重整体停止梯度。 它不是把动作期望改成头部求和：动作仍按 anchor 分布积分或采样，尾部动作仍参与 reward 和 score 更新。MDPO 的期望按当前 student 分布，若使用冻结 anchor 动作， 必须乘以停止梯度的 $p_{k,n}/q_k$ 测度比。由于 Tail-aware 对中心存在负偏差， 有限 $J$ 的 Mean/BPO 更新一般属于有偏近似；$J=|\mathcal V|$ 时必然恢复精确解析梯度，有限支持集下也可在上述偏差项为零时恢复。 参数 EMA 与概率混合也必须分别实现；以下 categorical 验证采用概率混合，真实模型 参数 EMA 不能被声称与它等价。算法的 soft 分支要求策略类能表示逐 prefix 的概率 混合；一般神经网络策略类不满足这一封闭性，本文真实模型训练采用 hard sync。 若另行采用参数 EMA，更新式为 $\theta_{k+1}=(1-\zeta)\theta_k+\zeta\theta_{k,N_{\mathrm{inner}}}$，并令 $q_{k+1}=p_{\theta_{k+1}}$；这是另一条动力学，不能套用概率混合的恒等式。
+
+算法中的同步发生在整个 inner loop 结束之后。因而在固定 $k$ 的所有 $N_{\mathrm{inner}}$ 次更新中，rollout 测度、anchor ratio $q_k/t$ 以及所有 mirror target 都保持不变；只有 student 参数 $\theta_{k,n}$ 变化。hard sync 令下一轮 anchor 完全等于 inner 末端 student，soft sync 则令下一轮 anchor 是旧 anchor 与 inner 末端 student 的凸组合。完成同步后丢弃 $\widehat d_k$，使用新的 $q_{k+1}$ 重新 rollout，而不是继续复用旧 rollout。若 inner loop 没有收敛，$p_{k,N_{\mathrm{inner}}}$ 只是当前固定 mirror 子问题的有限步近似解；outer 动力学仍由上述同步映射严格定义。
+
+\subsubsection*{只有 sampled next token：无完整词表时的估计路径}
+
+如果每个 prefix 只有 rollout 中的下一个 token $a\sim q_k(\cdot\mid s)$，仍然可以无偏观测冻结 reward。一般 $\eta$ 下，直接用正的非退化随机 $\widehat Z_k$ 再取对数，会产生 Jensen plug-in bias；这一结论不排除其他信息条件或其他估计器。OPD 在 $\eta=1$ 时精确知道 $Z_k=1$，完整覆盖时也能精确求和。sampled-token 路径应记录 partition 是精确值、外部估计还是 plug-in 近似。可行选择如下。
+
+第一，使用 BPO 或 PMD-Mean，以同一个 prefix 的多条 sampled actions 估计 conditional center；它们不需要显式的 $\log Z_k$。跨 prefix 的平均值一般不等于这个条件中心，不能替代它。第二，MDPO 直接使用 anchor 采样下的重要性加权 score，所需信息仅为同一个 sampled token 的 teacher、anchor 和当前 student log-prob。第三，PMD-Part 在 $\eta=1$ 的 OPD 可直接使用 $\log Z_k=0$；一般 $\eta$ 下可使用完整覆盖、外部 partition 查询、额外样本或明确标注偏差的 plug-in 与展开估计。只有一条 action 的信息不足结论必须附加所允许查询和先验信息的假设。MDPO 的解析梯度为
+\begin{equation}
+\nabla_\theta\mathcal L_{\mathrm{MDPO}}(s)
+=\mathbb E_{a\sim q_k}\!\left[
+\sg\!\left\{
+\frac{p_{k,n}(a\mid s)}{q_k(a\mid s)}
+\left(\frac{1}{\eta}\log\frac{p_{k,n}(a\mid s)}{q_k(a\mid s)}
+-\log\frac{t(a\mid s)}{q_k(a\mid s)}\right)
+\right\}\nabla_\theta\log p_{k,n}(a\mid s)\right].
+\end{equation}
+该等式先在完整分布上微分，再用 $p_{k,n}/q_k$ 换测度；student 下常数 $1/\eta$ 的 score 项期望为零。因而这里无需额外选择 KL 数值估计器。整个乘数停止梯度，实现的是已解析的梯度；这个 surrogate 的数值不是 mirror objective 的数值。有限冻结数据上的重要性加权结果仍有采样误差，不能把总体无偏性解释为任意数据复用后的条件无偏性。
+
+对单个 sampled token，PMD-Part 的可实现 loss 是带 baseline 的近似
+\begin{equation}
+\widehat\ell_{\mathrm{Part}}=\frac12\bigl[\eta(r_k(s,a)-b(s))-U_{k,n}(s,a)\bigr]^2,
+\end{equation}
+它只有在 $b(s)=\log Z_k(s)/\eta$ 时才等于 exact residual；任意其他 baseline 会留下一个 prefix-dependent constant，因而改变 PMD-Part 的有限参数投影。BPO 的中心化 residual 则可用同 prefix 的 $m$ 个 sampled tokens 构造，$m=1$ 时必须使用跨样本或 frozen center。
+
+\begin{algorithm}[ht]
+\caption{OPD sampled-token inner update\\{\small\textit{Semantics: 每个 prefix 只访问 rollout 的下一个 token}}}
+\begin{algorithmic}[1]
+\Require frozen anchor $q_k$, teacher $t$, rollout pairs $(s_i,a_i)$, method $M$, center size $m$, $\eta$
+\Ensure updated student parameters $\theta$
+\For{each prefix $s_i$}
+    \State read $\log t(a_i\mid s_i)$ and $\log q_k(a_i\mid s_i)$
+    \State $r_i\gets\log t(a_i\mid s_i)-\log q_k(a_i\mid s_i)$
+    \If{$M=\mathrm{Mean}$}
+        \State obtain independent auxiliary actions at the same prefix to estimate a frozen reward center $\widehat{\bar r}_i$
+        \State $\ell_i\gets\frac12[U_{k,n}(s_i,a_i)-\eta\sg(r_i-\widehat{\bar r}_i)]^2$
+    \ElsIf{$M=\mathrm{BPO}$}
+        \State estimate the reward center and current student log-ratio center at the same prefix
+        \State form a centered residual loss with the $1/(2\eta)$ factor; retain the student center's derivative
+        \State use the finite-sample correction specified in the BPO inner algorithm
+    \ElsIf{$M=\mathrm{MDPO}$}
+        \State $w_i\gets\sg\!\left(p_{k,n}(a_i\mid s_i)/q_k(a_i\mid s_i)\right)$
+        \State $\ell_i\gets\sg\!\left(w_i[\eta^{-1}\log(p_{k,n}(a_i\mid s_i)/q_k(a_i\mid s_i))-r_i]\right)\log p_{k,n}(a_i\mid s_i)$
+    \ElsIf{$M=\mathrm{Part}$}
+        \State estimate or load a prefix baseline $\widehat{\log Z_i}$; record its bias source
+        \State update $\frac12[\eta r_i-\widehat{\log Z_i}-U_{k,n}(s_i,a_i)]^2$
+    \EndIf
+\EndFor
+\State perform gradient descent on $B^{-1}\sum_i\ell_i$ while keeping $q_k$ and $t$ frozen
+\State \Return $\theta$
+\end{algorithmic}
+\end{algorithm}
+
+完整 vocabulary 与 sampled-token 两条路径的区别是信息论上的：前者能精确知道整个 categorical mirror target，后者只能无偏知道在 anchor 下抽到的一个 action 的 reward。对每个给定方法，两条信息访问路径在无限样本、无函数类误差且 center/partition 估计一致时具有相同总体解；PMD-Mean 的解是 Lambert-$W$ 分布，另外三种方法的解是 Gibbs 分布。有限 batch 下，full-vocabulary 的主要误差是参数优化和 prefix coverage，sampled-token 额外承担 reward、center、KL ratio 和 prefix reuse 的估计方差。

@@ -1,6 +1,11 @@
 \documentclass[lang=cn,scheme=chinese,openany]{elegantbook}
 \usepackage{amsmath,amssymb,mathtools,bm,booktabs,algorithm,algpseudocode,graphicx,hyperref}
 \usepackage{cleveref}
+\usepackage{xurl}
+\makeatletter
+\providecommand{\theHALG@line}{}
+\renewcommand{\theHALG@line}{\thealgorithm.\arabic{ALG@line}}
+\makeatother
 \newcommand{\E}{\mathbb E}
 \newcommand{\KL}{\operatorname{KL}}
 \newcommand{\Var}{\operatorname{Var}}
@@ -10,27 +15,43 @@
 \newcommand{\R}{\mathbb R}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
-\title{固定测度下的 Token 级 MirrorOPD}
+\title{固定测度 Token 级 MirrorOPD：目标、投影、估计与动力学}
 \author{MirrorOPD Research Notes}
-\date{2026 年 10 月 8 日}
+\date{2026 年 10 月 10 日}
 \begin{document}
-\maketitle
+\begin{titlepage}
+\centering
+\vspace*{35mm}
+{\Huge\bfseries 固定测度 Token 级 MirrorOPD\par}
+\vspace{12mm}
+{\Large 目标、投影、估计与动力学\par}
+\vspace{16mm}
+{\color{structurecolor}\rule{0.8\textwidth}{1pt}\par}
+\vspace{12mm}
+{\large 从条件 KL 优化到内层回归与外层同步\par}
+\vfill
+{\large MirrorOPD Research Notes\par}
+\vspace{5mm}
+{\large 2026 年 10 月 10 日\par}
+\vspace{20mm}
+\end{titlepage}
 \frontmatter
+\input{sections/reading_guide}
 \tableofcontents
 \mainmatter
-\input{chapters/01_problem_and_exact_solution}
-\input{chapters/02_four_inner_algorithms}
-\input{chapters/03_kl_estimators_and_variance}
-\input{chapters/04_outer_dynamics_and_finite_inner}
-\input{chapters/05_toy_experiment}
+\input{chapters/01_foundations}
+\input{chapters/02_projections}
+\input{chapters/03_geometry}
+\input{chapters/04_information}
+\input{chapters/05_estimators}
+\input{chapters/06_opd}
+\input{chapters/07_dynamics}
+\input{chapters/08_evidence}
 \backmatter
-\chapter*{参考资料}
+\chapter*{参考资料与来源}
 \begingroup\raggedright
-PMD-Mean 的 reward 中心化目标与 Lambert-$W$ 解依据
-\href{https://arxiv.org/abs/2602.05933}{arXiv:2602.05933} 中的
-$\mathcal L_{\mathrm{mean}}$ 定义与附录约束优化推导。
-本文 KL 估计量的记号与 K3$^{++}$、K4、K5、Top-$J$ 估计量来自
-\href{https://arxiv.org/abs/2602.04417}{arXiv:2602.04417}；One-Shot-OPD 的实现审计见
-\path{upstream/One-Shot-OPD/}。
+PMD-Mean 的 reward 中心化目标与 Lambert-$W$ 解依据 \href{https://arxiv.org/abs/2602.05933}{arXiv:2602.05933} 的目标定义及附录。本书重新给出完整的约束优化证明，并区分最优分布等价与梯度等价。
+\par
+K3$^{++}$、K4、K5、Top-$J$ 估计量的来源为 \href{https://arxiv.org/abs/2602.04417}{arXiv:2602.04417}。One-Shot-OPD 与 ResOPD 的版本及实现证据在实现章和实验章逐项说明。
 \par\endgroup
 \end{document}

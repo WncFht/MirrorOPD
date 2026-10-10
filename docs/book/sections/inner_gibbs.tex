@@ -1,0 +1,96 @@
+\section{共同的 mirror 子问题与精确解}
+\label{sec:ch2-common}
+
+\begin{definition}[Token-level mirror 子问题]
+\label{def:ch2-mirror-subproblem}
+给定固定历史 $s$、token 信号 $f(s,a)$ 和 anchor $ q_k$，定义
+\begin{equation}
+\label{eq:ch2-mirror}
+\mathcal M_s(p;f, q_k)
+=\mathbb E_{a\sim p(\cdot\mid s)}[f(s,a)]
+-\frac1\eta\operatorname{KL}\!\left(p(\cdot\mid s)\middle\Vert q_k(\cdot\mid s)\right).
+\end{equation}
+这里要求 $\eta>0$；$\eta=0$ 仅通过极限定义恒等 mirror 映射，不能直接代入含 $1/\eta$ 的训练损失。镜像子问题是在所有满足 $p\ll q_k$ 的概率分布上最大化 $\mathcal M_s$。同时定义配分函数
+\begin{equation}
+\label{eq:ch2-mirror-normalizer}
+Z_f(s)=\sum_{v\in\mathcal V} q_k(v\mid s)\exp\!\bigl(\eta f(s,v)\bigr).
+\end{equation}
+\end{definition}
+
+\begin{theorem}[KL mirror 子问题的 Gibbs 解]
+\label{thm:ch2-gibbs}
+在有限词表、有限实值冻结信号 $f:\mathcal V\to\mathbb R$ 且 $q_k(v\mid s)>0$ 的条件下，$0<Z_f(s)<\infty$，式 \eqref{eq:ch2-mirror} 的唯一解是
+\begin{equation}
+\label{eq:ch2-optimal-policy}
+ p_k^{\mathrm G}(v\mid s)=\frac{ q_k(v\mid s)e^{\eta f(s,v)}}{Z_f(s)},
+\qquad
+\log\frac{ p_k^{\mathrm G}(v\mid s)}{ q_k(v\mid s)}
+=\eta f(s,v)-\log Z_f(s).
+\end{equation}
+对任意候选 $p$，还有精确分解
+\begin{equation}
+\label{eq:ch2-kl-decomp}
+\mathcal M_s(p;f, q_k)
+=\frac1\eta\log Z_f(s)
+-\frac1\eta\operatorname{KL}\!\left(p\middle\Vert p_k^{\mathrm G}(\cdot\mid s)\right).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+由式 \eqref{eq:ch2-optimal-policy}，有
+\begin{equation*}
+\log\frac{p(v\mid s)}{ p_k^{\mathrm G}(v\mid s)}
+=\log\frac{p(v\mid s)}{ q_k(v\mid s)}-\eta f(s,v)+\log Z_f(s).
+\end{equation*}
+对 $v$ 按 $p$ 求期望，得到
+\begin{equation*}
+\operatorname{KL}(p\Vert p_k^{\mathrm G})
+=\operatorname{KL}(p\Vert q_k)-\eta\mathbb E_p[f]+\log Z_f(s).
+\end{equation*}
+移项即得式 \eqref{eq:ch2-kl-decomp}。KL 非负且仅在 $p= p_k^{\mathrm G}$ 时取零，因此最优解唯一。
+\end{proof}
+
+\begin{definition}[中心化 token 信号]
+\label{def:ch2-centered-signal}
+对任意 $f$ 定义 anchor 条件均值和中心化信号
+\begin{equation*}
+\bar f_k(s)=\mathbb E_{a\sim q_k}[f(s,a)\mid s],
+\qquad
+\widetilde f_k(s,a)=f(s,a)-\bar f_k(s).
+\end{equation*}
+若 $f=A^{ q_k}$ 是 anchor 的优势函数，则 $\bar f_k(s)=0$ 是优势函数定义推出的恒等式；对一般 teacher score 或 OPD log-ratio，$\bar f_k(s)=0$ 不是自动成立的假设。
+\end{definition}
+
+\begin{proposition}[优势函数的 anchor 条件均值]
+\label{prop:ch2-advantage-centering}
+若 $f(s,a)=A^{ q_k}(s,a)$，则对每个满足 $ q_k(\cdot\mid s)$ 定义的历史，
+\begin{equation}
+\label{eq:ch2-advantage-zero-mean}
+\mathbb E_{a\sim q_k(\cdot\mid s)}[f(s,a)\mid s]=0.
+\end{equation}
+对于一般 OPD log-ratio 或 teacher score，条件均值需要计算或估计；PMD-Mean 与 BPO 使用相应的中心化 target。
+\end{proposition}
+
+\begin{proof}
+由 $A^{ q_k}(s,a)=Q^{ q_k}(s,a)-V^{ q_k}(s)$ 以及
+$V^{ q_k}(s)=\mathbb E_{a\sim q_k}[Q^{ q_k}(s,a)\mid s]$，有
+\begin{align*}
+\mathbb E_{ q_k}[A^{ q_k}(s,a)\mid s]
+&=\mathbb E_{ q_k}[Q^{ q_k}(s,a)\mid s]-V^{ q_k}(s)\\
+&=V^{ q_k}(s)-V^{ q_k}(s)=0.
+\end{align*}
+\end{proof}
+
+\begin{proposition}[中心化不改变 mirror 最优策略]
+\label{prop:ch2-centering}
+用 $\widetilde f_k$ 替代 $f$ 不改变式 \eqref{eq:ch2-mirror} 的最优分布。
+\end{proposition}
+
+\begin{proof}
+因为 $\bar f_k(s)$ 与 action 无关，
+\begin{equation*}
+ q_k(v\mid s)e^{\eta\widetilde f_k(s,v)}
+=e^{-\eta\bar f_k(s)} q_k(v\mid s)e^{\eta f(s,v)}.
+\end{equation*}
+分子和归一化常数同时乘以同一个因子 $e^{-\eta\bar f_k(s)}$，归一化后的分布不变。
+\end{proof}

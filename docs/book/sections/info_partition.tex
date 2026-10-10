@@ -1,0 +1,135 @@
+\section{同一分区上的 KL 粗化与梯度残差}
+\label{inf:sec:kl-partition-geometry}
+\label{inf:sec:kl-partition}
+
+头部精确求和、尾部合并和尾部残差抽样，都可以从同一个词表分区推导。分区同时规定可精确计算的粗粒度目标和需要抽样的细粒度残差。下面始终固定 prefix、当前参数和参考分布；只在明确写出梯度时对 student 参数求导。
+
+\begin{definition}[词表分区与桶内分布]
+令 $\mathcal C$ 是有限词表 $\mathcal V$ 的一个分区，各个单元 $C\in\mathcal C$ 非空且两两不交，并满足 $\bigcup_{C\in\mathcal C}C=\mathcal V$。分区在求导时固定。定义
+\begin{equation*}
+ P_C=\sum_{v\in C}P(v),\qquad
+ Q_C=\sum_{v\in C}Q(v),\qquad
+ \ell_C=\log\frac{P_C}{Q_C},
+\end{equation*}
+以及桶内条件分布和平均 score
+\begin{equation*}
+ P^C(v)=\frac{P(v)}{P_C},\qquad
+ Q^C(v)=\frac{Q(v)}{Q_C},\qquad
+ \bar \psi_C=\sum_{v\in C}P^C(v)\psi_v=\nabla\log P_C.
+\end{equation*}
+用 $C(v)$ 表示包含 $v$ 的唯一单元。粗粒度$\KL(P\Vert Q)$ 与桶内形状 KL 分别定义为
+\begin{equation*}
+ K_{\mathcal C}=\sum_{C\in\mathcal C}P_C\ell_C,
+ \qquad D_C=\KL(P^C\Vert Q^C).
+\end{equation*}
+这里 $K_{\mathcal C}$ 是桶标签分布之间的 KL；$D_C$ 描述保留桶标签以后仍未解释的条件分布差异。
+\end{definition}
+
+\begin{theorem}[同一分区上的双向 KL 链式分解]
+\label{inf:thm:kl-partition-chain}
+在本章正支持假设下，$\KL(P\Vert Q)$ 和$\KL(Q\Vert P)$ 分别满足
+\begin{align}
+ K&=K_{\mathcal C}+\sum_{C\in\mathcal C}P_CD_C,
+ \label{inf:eq:kl-partition-chain-reverse}\\
+ K^{\mathrm F}&=K^{\mathrm F}_{\mathcal C}
+       +\sum_{C\in\mathcal C}Q_CD^{\mathrm F}_C,
+ \label{inf:eq:kl-partition-chain-forward}
+\end{align}
+其中
+\begin{equation*}
+ K^{\mathrm F}_{\mathcal C}=-\sum_CQ_C\ell_C,
+ \qquad D_C^{\mathrm F}=\KL(Q^C\Vert P^C).
+\end{equation*}
+因此两种方向的粗粒度 KL 都是对应完整 KL 的下界。等号成立当且仅当每个单元内的条件分布相同。
+\end{theorem}
+
+\begin{proof}
+对任意 $v\in C$，完整 log-ratio 可以逐点写为
+\begin{equation*}
+ \ell_v=\log\frac{P(v)}{Q(v)}
+     =\ell_C+\log\frac{P^C(v)}{Q^C(v)}.
+\end{equation*}
+先乘以 $P(v)=P_CP^C(v)$，在单元内求和，再对单元求和，得到
+\begin{equation*}
+ \sum_vP(v)\ell_v
+ =\sum_CP_C\ell_C
+  +\sum_CP_C\sum_{v\in C}P^C(v)
+                        \log\frac{P^C(v)}{Q^C(v)}.
+\end{equation*}
+这就是反向分解。将上面的逐点恒等式取负并乘以 $Q(v)=Q_CQ^C(v)$，按相同顺序求和，得到正向分解。所有质量严格为正，且每个条件 KL 非负；条件 KL 等于零恰好对应桶内条件分布相同，故得到下界及等号条件。
+\end{proof}
+
+\begin{proposition}[分区细化的标量单调性]
+\label{inf:prop:kl-partition-refinement}
+设 $\mathcal C'$ 细化 $\mathcal C$。记 $\mathcal C'|_C$ 为包含在 $C$ 内的细单元集合，则
+\begin{equation*}
+ K_{\mathcal C'}-K_{\mathcal C}
+ =\sum_{C\in\mathcal C}P_C
+   \KL\left(
+       \left(\frac{P_{C'}}{P_C}\right)_{C'\in\mathcal C'|_C}
+       \middle\Vert
+       \left(\frac{Q_{C'}}{Q_C}\right)_{C'\in\mathcal C'|_C}
+      \right)\geq0.
+\end{equation*}
+正向版本交换两组质量，并将外层权重改为 $Q_C$。因此细化使粗粒度 KL 的标量偏差绝对值和平方偏差单调下降；全部单元都是 singleton 时偏差为零。
+\end{proposition}
+
+\begin{proof}
+对每个 $C$，利用 $\sum_{C'\subseteq C}P_{C'}=P_C$，将新增贡献写成
+\begin{align*}
+ \sum_{C'\subseteq C}P_{C'}\log\frac{P_{C'}}{Q_{C'}}
+    -P_C\log\frac{P_C}{Q_C}
+ &=P_C\sum_{C'\subseteq C}\frac{P_{C'}}{P_C}
+       \log\frac{P_{C'}/P_C}{Q_{C'}/Q_C}.
+\end{align*}
+右边是 $P_C$ 乘以细单元标签之间的条件 KL。对 $C$ 求和即得所述等式。结合粗粒度下界，误差 $K-K_{\mathcal C}$ 非负且随细化下降，其平方也下降。
+\end{proof}
+
+\begin{theorem}[粗粒度 KL 的真实梯度及其残差]
+\label{inf:thm:kl-partition-gradient}
+记 $g_{\mathcal C}=\nabla K_{\mathcal C}$。则
+\begin{align}
+ g_{\mathcal C}
+ &=\sum_CP_C\ell_C\bar \psi_C
+  =\sum_vP(v)\ell_{C(v)}\psi_v,
+ \label{inf:eq:kl-partition-gradient}\\
+ g-g_{\mathcal C}
+ &=\sum_CP_C\E_{P^C}[(\ell_A-\ell_C)\psi_A]
+ \label{inf:eq:kl-partition-gradient-residual}\\
+ &=\sum_CP_C\left\{
+       \operatorname{Cov}_{P^C}(\ell_A-\ell_C,\psi_A)
+       +D_C\bar \psi_C\right\}.
+ \label{inf:eq:kl-partition-gradient-covariance}
+\end{align}
+标量与向量的协方差定义为
+\begin{equation*}
+ \operatorname{Cov}_{P^C}(u_A,\psi_A)
+ =\E_{P^C}[(u_A-\E_{P^C}u_A)(\psi_A-\bar \psi_C)].
+\end{equation*}
+\end{theorem}
+
+\begin{proof}
+由于 $Q$ 固定，$\nabla Q_C=0$，而 $\nabla P_C=P_C\bar \psi_C$。逐项求导得到
+\begin{align*}
+ \nabla K_{\mathcal C}
+ &=\sum_C\{\ell_C\nabla P_C+P_C\nabla\ell_C\}\\
+ &=\sum_C\ell_C\nabla P_C+\sum_C\nabla P_C\\
+ &=\sum_CP_C\ell_C\bar \psi_C.
+\end{align*}
+最后一步用了 $\sum_C\nabla P_C=\nabla1=0$。将 $P_C\bar \psi_C$ 展开为桶内加权 score，得到第二种表示。完整梯度为 $g=\sum_vP(v)\ell_v\psi_v$，与粗粒度梯度逐项相减，得到式~\eqref{inf:eq:kl-partition-gradient-residual}。又因为
+\begin{equation*}
+ \E_{P^C}[\ell_A-\ell_C]=D_C,
+\end{equation*}
+用 $\E[us]=\operatorname{Cov}(u,\psi)+\E[u]\E[\psi]$ 展开每个桶内期望，就得到式~\eqref{inf:eq:kl-partition-gradient-covariance}。
+\end{proof}
+
+式~\eqref{inf:eq:kl-partition-gradient-covariance} 把梯度误差分为桶内相关项和条件形状 KL 乘以平均 score 的项。标量粗化误差只包含 $D_C$ 的加权和，梯度误差还依赖 score 的方向与桶内相关性。因此标量下界的单调改进不能直接推出梯度偏差范数单调下降；梯度结论需要单独分析这些向量项。
+
+对$\KL(Q\Vert P)$，冻结权重 $Q_C$ 使粗粒度梯度变成
+\begin{equation*}
+ g^{\mathrm F}_{\mathcal C}=-\sum_CQ_C\bar \psi_C,
+ \qquad
+ g^{\mathrm F}-g^{\mathrm F}_{\mathcal C}
+ =-\sum_CQ_C\{\E_{Q^C}[\psi_A]-\bar \psi_C\}.
+\end{equation*}
+这里平均 student score $\bar \psi_C$ 的积分分布仍是 $P^C$；它不能替换成 teacher 条件均值。第一式来自 $\nabla\ell_C=\bar \psi_C$，第二式来自完整正向梯度 $-\sum_vQ(v)\psi_v$。
