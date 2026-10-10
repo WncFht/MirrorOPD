@@ -83,7 +83,8 @@ def main():
         ax.set_xlabel("Completed outer updates")
         visible_max = max(max(line.get_ydata()) for line in ax.lines)
         ax.set_ylim(-0.005, max(0.12, visible_max * 1.15))
-        ax.set_xticks(x)
+        stride = max(1, (len(x) + 4) // 5)
+        ax.set_xticks(x[::stride])
         fv.apply_grid(ax, "y-only")
     count = sorted({row["evaluation/generated_examples"] for row in evaluations})
     finish(
