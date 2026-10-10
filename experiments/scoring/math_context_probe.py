@@ -163,6 +163,9 @@ def main():
                         "budget_scores": {},
                     }
                     for budget in (512, 1024, 2048, 4096):
+                        if len(answer.token_ids) <= budget:
+                            record["budget_scores"][str(budget)] = record["scores"]["score"]
+                            continue
                         prefix = tokenizer.decode(
                             answer.token_ids[:budget], skip_special_tokens=True
                         )
