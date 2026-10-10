@@ -1,0 +1,162 @@
+\subsection{稀疏梯度估计量的统一视角}
+\label{sec:unified}
+
+ResOPD 改变了 HETS 方差中的事件间分量，同时保持了其条件下的尾部随机性。这一区别提供了一种有用的方法来比较稀疏无偏估计量：第二个条件均值为零的控制变量可以在尾部内部起作用。本文在此介绍了该族估计量、其最优预言者以及决定 ResOPD--SC-TA 比较的确切条件。相应的审计和下游结果见第~\ref{sec:control-comparison} 节。
+
+\subsubsection{区分事件间与尾部内控制}
+\label{sec:joint-family}
+\label{sec:event-scta}
+
+单控制族仅作用于头对尾事件分量。第二个控制可以在不改变稀疏教师数据负载的情况下，降低尾部中剩余的条件方差。定义条件零均值得分波动
+$\bfluct_A=b(\bscore_A-\bar{\bscore}_{\mathrm{tail}})$ ，使得
+$\E[\bfluct_A\mid J=1]=\bm0$ 。对于任意有限前缀可测的 $\bm B$ 以及标量 $\gamma$ ，两者均在抽取 $A$ 之前停止，定义
+
+\begin{equation}
+ \widehat{\bgrad}(\bm B,\gamma)
+ =\bhead+\tau_p\bm B
+ +J\!\left(\btoken_A-\bm B-\gamma\bfluct_A\right).
+ \label{eq:unified-main}
+\end{equation}
+方程~(\ref{eq:unified-main}) 满足
+\begin{equation}
+ \begin{aligned}
+ \E\!\left[\widehat{\bgrad}(\bm B,\gamma)\right]
+ &=\bhead+\tau_p\bm B
+   +\tau_p(\bmean_{\mathrm{tail}}-\bm B)
+   -\gamma\tau_p\E[\bfluct_A\mid J=1]\\
+ &=\bhead+\tau_p\bmean_{\mathrm{tail}}
+  =\bgrad.
+ \end{aligned}
+ \label{eq:family-unbiased-proof}
+\end{equation}
+在头部事件条件下，其值为 $\bhead+\tau_p\bm B$ ，而在尾部事件条件下，其均值为 $\bhead+\tau_p\bm B+\bmean_{\mathrm{tail}}-\bm B$ 。它们的差值为 $\bmean_{\mathrm{tail}}-\bm B$ ，而只有尾部分支保留了条件随机性。因此，全协方差定律给出
+\begin{equation}
+ \mathcal V\!\left(\widehat{\bgrad}(\bm B,\gamma)\right)
+ =\tau_p\mathcal V_{\mathrm{tail}}(\btoken_A-\gamma\bfluct_A)
+ +P\tau_p\lVert\bmean_{\mathrm{tail}}-\bm B\rVert_2^2.
+ \label{eq:two-level-variance}
+\end{equation}
+该因子分解证明了两个控制在迹协方差下正交：$\bm B$ 仅改变事件间项，而 $\gamma$ 仅改变尾部内项。我们称方程~(\ref{eq:unified-main}) 为 \emph{统一} 家族：第一个坐标泛化了方程~(\ref{eq:residualization}) 中的单个控制，而第二个坐标则减去一个已知均值为零的尾部内波动。如果 $\mathcal V_{\mathrm{tail}}(\bfluct_A)>0$，它们的联合虚设模型是
+\begin{equation}
+ \bm B^\star=\bmean_{\mathrm{tail}},\qquad
+ \gamma^\star=
+ \frac{\operatorname{tr}\!\left(
+       \Cov_{\mathrm{tail}}(\btoken_A,\bfluct_A)\right)}
+      {\mathcal V_{\mathrm{tail}}(\bfluct_A)},
+ \label{eq:joint-oracle}
+\end{equation}
+对两个坐标进行配方运算后得到
+\begin{equation}
+ \begin{aligned}
+ &\mathcal V\!\left(\widehat{\bgrad}(\bm B,\gamma)\right)
+ -\mathcal V\!\left(
+   \widehat{\bgrad}(\bm B^\star,\gamma^\star)\right)\\
+ &\qquad
+ =P\tau_p\lVert\bm B-\bmean_{\mathrm{tail}}\rVert_2^2
+ +\tau_p\mathcal V_{\mathrm{tail}}(\bfluct_A)
+  (\gamma-\gamma^\star)^2.
+ \end{aligned}
+ \label{eq:unified-regret-main}
+\end{equation}
+如果 $\mathcal V_{\mathrm{tail}}(\bfluct_A)=0$、$\gamma$ 无关紧要，第一项保持确切。重要的是，两种预言坐标均无法在线获得：$\bm B^\star$ 需要完整的教师尾部，而每个前缀的 $\gamma^\star$ 需要其条件协方差。ResOPD 则采取了简单但有效的选择 $(\bmean_B,0)$，全局拟合系数是一个分离的离线诊断。
+
+\begin{table}[t]
+\caption{双控制族中的坐标。}
+\label{tab:estimator-map}
+\centering
+\begin{tabular*}{0.7\linewidth}{@{\extracolsep{\fill}} lccc @{}}
+\toprule
+Unbiased estimator & $\bm B$ & $\gamma$ & Role \\
+\midrule
+HETS & $\bm 0$ & $0$ & structural baseline \\
+ResOPD & $\bmean_B$ & $0$ & our estimator \\
+SC-TA & $\bmean_B$ & $1$ & boundary estimator \\
+Joint oracle & $\bmean_{\mathrm{tail}}$ & $\gamma^\star$ & unavailable optimum \\
+\bottomrule
+\end{tabular*}
+\end{table}
+\subsubsection{ResOPD和SC-TA作为主要终点}
+\label{sec:gamma}
+
+我们现在将两层族特化为 $\bm B=\bmean_B$，并将其与 \citet{huang2026tail} 的同期工作中提出的样本修正型 TA-OPD（SC-TA）联系起来。其主要方法 TA-OPD 通过引入尾部伪 token 来增强教师 Top-$k$ 支持，优化由此产生的粗粒度 $(k+1)$ -way 反向 KL 目标。随后，SC-TA 被推导为一种恢复完整词表无偏性的样本修正变体。我们在此基础上，通过我们两控制族内的梯度层面刻画加以补充。具体而言，我们推导出 ResOPD 与 SC-TA 之间的确切逐点关系，将它们的协方差排序表征为尾部内控制系数 $\gamma$ 的函数，识别出迹最优的 $\gamma^\star$ ，并在自然提示分布上评估了这些预测。
+
+\paragraph{确切的精细分解。}
+在尾部拉伸时，
+\begin{equation}
+ r_A
+ =\log\frac{p_A}{q_A}
+ =\underbrace{\log\frac{\tau_p}{\tau_q}}_{b}
+ +\log\frac{p_A/\tau_p}{q_A/\tau_q}.
+\end{equation}
+使用 $\bmean_B=b\bar{\bscore}_{\mathrm{tail}}$  因此得到
+\begin{equation}
+ \btoken_A
+ =\bmean_B
+ +\underbrace{b(\bscore_A-\bar{\bscore}_{\mathrm{tail}})}_{\bfluct_A}
+ +\underbrace{(r_A-b)\bscore_A}_{\bresid_A},
+ \qquad
+ \E[\bfluct_A\mid J=1]=\bm 0.
+ \label{eq:tail-exact-decomposition}
+\end{equation}
+这些术语具有不同的作用。$\bmean_B$ 是粗粒度尾部桶预测；$\bfluct_A$ 是围绕条件学生得分的已知零均值波动；$\bresid_A$ 记录了未解析的学生-教师条件尾部形状不匹配。
+
+使用 $\bgrad_{\mathrm{coarse}}=\bhead+\tau_p\bmean_B$，方程~(\ref{eq:unified-main}) 的特化为
+\begin{equation}
+ \widehat{\bgrad}_\gamma
+ =\bgrad_{\mathrm{coarse}}
+ +J\!\left[\bresid_A+(1-\gamma)\bfluct_A\right].
+ \label{eq:event-scta-family}
+\end{equation}
+公式~(\ref{eq:family-unbiased-proof}) 已经证明了每个固定的 $\gamma$ 都会指向 $\bgrad$。它的两个命名端点是
+\begin{equation}
+ \begin{aligned}
+ \widehat{\bgrad}^{\mathrm{ResOPD}}
+ &=\widehat{\bgrad}_{\gamma=0}
+  =\bgrad_{\mathrm{coarse}}+J(\bresid_A+\bfluct_A),\\
+ \widehat{\bgrad}^{\mathrm{SC}}
+ &=\widehat{\bgrad}_{\gamma=1}
+  =\bgrad_{\mathrm{coarse}}+J\bresid_A.
+ \end{aligned}
+\end{equation}
+因此，它们的带符号点态关系是
+\begin{equation}
+ \boxed{
+ \widehat{\bgrad}^{\mathrm{SC}}
+ =\widehat{\bgrad}^{\mathrm{ResOPD}}-J\bfluct_A
+ }
+ \label{eq:event-scta-difference}
+\end{equation}
+该差异的期望值为零，但在尾部动作上通常不为零。
+
+\paragraph{方差最优与端点证书。}
+令 $\bz_0 = \bresid_A + \bfluct_A = \btoken_A - \bmean_B$。将总方差分解为事件间共同成分和与 $\gamma$ 有关的尾部内成分，可得
+\begin{equation}
+  \begin{aligned}
+    \mathcal{V}(\widehat{\bgrad}_\gamma)
+    &= \tau_p \mathcal{V}_{\mathrm{tail}}(\bz_0 - \gamma \bfluct_A) + P\tau_p \lVert\bmean_{\mathrm{tail}} - \bmean_B\rVert_2^2, \\
+    \mathcal{V}_{\mathrm{tail}}(\bz_0 - \gamma \bfluct_A)
+    &= \mathcal{V}_{\mathrm{tail}}(\bz_0) - 2\gamma \operatorname{tr}\!\left(\Cov_{\mathrm{tail}}(\bz_0, \bfluct_A)\right) + \gamma^2 \mathcal{V}_{\mathrm{tail}}(\bfluct_A).
+  \end{aligned}
+  \label{eq:event-scta-total-var}
+\end{equation}
+当 $\mathcal{V}_{\mathrm{tail}}(\bfluct_A) > 0$ 时，对 $\gamma$ 进行配方可确定迹的最优值：
+\begin{equation}
+  \begin{aligned}
+    \gamma^\star
+    &= \frac{\operatorname{tr}\!\left(\Cov_{\mathrm{tail}}(\bz_0, \bfluct_A)\right)}{\mathcal{V}_{\mathrm{tail}}(\bfluct_A)}, \\
+    \mathcal{V}(\widehat{\bgrad}_\gamma) - \mathcal{V}(\widehat{\bgrad}_{\gamma^\star})
+    &= \tau_p \mathcal{V}_{\mathrm{tail}}(\bfluct_A) (\gamma - \gamma^\star)^2.
+  \end{aligned}
+  \label{eq:event-scta-regret}
+\end{equation}
+在边界点 $\gamma = 1$（SC-TA）和 $\gamma = 0$（ResOPD）处评估二次损失，可发现当且仅当 $\gamma^\star > 1/2$ 时，SC-TA 的迹协方差严格低于 ResOPD。将 $\bz_0 = \bresid_A + \bfluct_A$ 代入后，最优系数展开为
+\begin{equation}
+  \gamma^\star = 1 + \frac{\operatorname{tr}\!\left(\Cov_{\mathrm{tail}}(\bresid_A, \bfluct_A)\right)}{\mathcal{V}_{\mathrm{tail}}(\bfluct_A)}.
+  \label{eq:event-scta-gamma-residual}
+\end{equation}
+因此，当 $\operatorname{tr}\!\left(\Cov_{\mathrm{tail}}(\bresid_A, \bfluct_A)\right) > -\mathcal{V}_{\mathrm{tail}}(\bfluct_A)/2$ 时，SC-TA 的性能优于 ResOPD。根据柯西-施瓦茨不等式，一个充分条件是
+\begin{equation}
+  \mathcal{V}_{\mathrm{tail}}(\bresid_A) < \mathcal{V}_{\mathrm{tail}}(\bfluct_A)/4.
+  \label{eq:event-improvement}
+\end{equation}
+特别是，当条件尾部形状匹配时，残差消失（$\bresid_A = \bm{0}$），从而得到 $\gamma^\star = 1$。这些条件作为依赖于分布的凭证，而非保证普遍的方差排序。
