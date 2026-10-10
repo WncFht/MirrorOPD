@@ -1,0 +1,33 @@
+{
+  "dataset": "DAPO-Math-17k + MATH-500",
+  "dapo_revision": "65877096c24ffa7abc4e4fa5edb95cf3413a5674",
+  "math500_revision": "6e4ed1a2a79af7d8630a6b768ec859cb5af4d3be",
+  "selection": "DAPO unique problems for train; MATH-500 reference test; no AMC/AIME",
+  "train": {
+    "raw_rows": 1791700,
+    "unique_rows": 17917,
+    "dedup_key": "extra_info.index, first occurrence in source order",
+    "wrapper_removed": true,
+    "sha256": "c69c632bae23bc4af6f1dfe21a9b4a360000cabb43e5afd41d9497adc7285a63",
+    "path": "/home/fanghaotian/src/mirroropd/data/dapo-suite/dapo-math-17k/train.parquet"
+  },
+  "test": {
+    "raw_rows": 500,
+    "unique_rows": 500,
+    "sha256": "9a0760d3854c8afc5a7ef365c6e05e58ed64cc852095db4b18837f18053af8ad",
+    "path": "/home/fanghaotian/src/mirroropd/data/dapo-suite/math-500/test.parquet"
+  },
+  "easy_test": {
+    "count": 133,
+    "sha256": "c43f64cc849ee5a8ec5f9e4ff75ba53803974850d674733faef60bf3b9cd4e21"
+  },
+  "exact_train_test_prompt_overlap": [
+    "MATH-500-80",
+    "MATH-500-276"
+  ],
+  "clean_train": {
+    "count": 17915,
+    "sha256": "7c5460556846ac6a140926e94e4e12b23274f98f4a5933b2f1b62f106992ac72",
+    "policy": "exclude exact MATH-500 question matches; retain official source separately"
+  }
+}
