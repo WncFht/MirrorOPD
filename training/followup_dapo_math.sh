@@ -7,6 +7,50 @@ parent_unit=mirroropd-gsm8k-opd-o1000.service
 while systemctl --user is-active --quiet "$parent_unit"; do
   sleep 30
 done
+parent_run="$repo_root/runs/gsm8k-smollm2-opd-onpolicy-o1000-j1"
+if [[ ! -f "$parent_run/exit-code.txt" ]] || [[ $(<"$parent_run/exit-code.txt") != 0 ]]; then
+  echo "Parent training did not finish successfully; refusing concurrent or failed follow-up" >&2
+  exit 1
+fi
+export PYTHONPATH="$repo_root/src:$repo_root/upstream/One-Shot-OPD/verl:$repo_root${PYTHONPATH:+:$PYTHONPATH}"
+for pair in student:360M teacher:1.7B; do
+  label=${pair%%:*}
+  size=${pair#*:}
+  output="$repo_root/runs/dapo-context-baselines/$label"
+  mkdir -p "$output"
+  "$task_python" "$repo_root/experiments/scoring/math_context_probe.py" \
+    --model "HuggingFaceTB/SmolLM2-$size-Instruct" \
+    --data "$repo_root/data/dapo-suite/dapo-math-17k/train.parquet" \
+    --context 8192 --output "$output" >"$output/console.log" 2>&1
+  mkdir -p "$output/sampled"
+  "$task_python" "$repo_root/experiments/scoring/math_context_probe.py" \
+    --model "HuggingFaceTB/SmolLM2-$size-Instruct" \
+    --data "$repo_root/data/dapo-suite/dapo-math-17k/train.parquet" \
+    --context 8192 --temperature 1 --limit 1024 \
+    --output "$output/sampled" >"$output/sampled/console.log" 2>&1
+done
+# Context selection is based on completed full-train probes, not test scores.
+"$task_python" "$repo_root/training/select_dapo_context.py" --repo "$repo_root"
+response_budget=$("$task_python" -c 'import json,sys; v=json.load(open(sys.argv[1]))["max_response_length"]; print(v or 0)' \
+  "$repo_root/runs/dapo-context-baselines/context-selection.json")
+budget_args=()
+if [[ "$response_budget" != 0 ]]; then
+  budget_args=(--response-budget "$response_budget")
+else
+  echo "No fixed budget passes; tests use native context and training remains blocked" >&2
+fi
+for pair in student:360M teacher:1.7B; do
+  label=${pair%%:*}
+  size=${pair#*:}
+  output="$repo_root/runs/dapo-context-baselines/$label/tests"
+  mkdir -p "$output"
+  "$task_python" "$repo_root/experiments/scoring/math_context_probe.py" \
+    --model "HuggingFaceTB/SmolLM2-$size-Instruct" \
+    --data "$repo_root/data/dapo-suite/math-500-easy/test.parquet" \
+    "$repo_root/data/gsm8k-full/test.parquet" \
+    --context 8192 "${budget_args[@]}" \
+    --output "$output" >"$output/console.log" 2>&1
+done
 # Bring only the official verifier into the existing backend after its GPU job
 # has finished. No trainer, optimizer, or live environment is replaced.
 if [[ "$response_budget" == 0 ]]; then
@@ -54,47 +98,3 @@ bash "$repo_root/training/run_configured_training.sh" dapo-smollm2-opd-memory-ca
   trainer.val_before_train=false trainer.test_freq=-1
 bash "$repo_root/training/run_configured_training.sh" dapo-smollm2-opd-onpolicy-o1000-j1 \
   "${common[@]}" trainer.total_training_steps=1000 trainer.total_epochs=4
-parent_run="$repo_root/runs/gsm8k-smollm2-opd-onpolicy-o1000-j1"
-if [[ ! -f "$parent_run/exit-code.txt" ]] || [[ $(<"$parent_run/exit-code.txt") != 0 ]]; then
-  echo "Parent training did not finish successfully; refusing concurrent or failed follow-up" >&2
-  exit 1
-fi
-export PYTHONPATH="$repo_root/src:$repo_root/upstream/One-Shot-OPD/verl:$repo_root${PYTHONPATH:+:$PYTHONPATH}"
-for pair in student:360M teacher:1.7B; do
-  label=${pair%%:*}
-  size=${pair#*:}
-  output="$repo_root/runs/dapo-context-baselines/$label"
-  mkdir -p "$output"
-  "$task_python" "$repo_root/experiments/scoring/math_context_probe.py" \
-    --model "HuggingFaceTB/SmolLM2-$size-Instruct" \
-    --data "$repo_root/data/dapo-suite/dapo-math-17k/train.parquet" \
-    --context 8192 --output "$output" >"$output/console.log" 2>&1
-  mkdir -p "$output/sampled"
-  "$task_python" "$repo_root/experiments/scoring/math_context_probe.py" \
-    --model "HuggingFaceTB/SmolLM2-$size-Instruct" \
-    --data "$repo_root/data/dapo-suite/dapo-math-17k/train.parquet" \
-    --context 8192 --temperature 1 --limit 1024 \
-    --output "$output/sampled" >"$output/sampled/console.log" 2>&1
-done
-# Context selection is based on completed full-train probes, not test scores.
-"$task_python" "$repo_root/training/select_dapo_context.py" --repo "$repo_root"
-response_budget=$("$task_python" -c 'import json,sys; v=json.load(open(sys.argv[1]))["max_response_length"]; print(v or 0)' \
-  "$repo_root/runs/dapo-context-baselines/context-selection.json")
-budget_args=()
-if [[ "$response_budget" != 0 ]]; then
-  budget_args=(--response-budget "$response_budget")
-else
-  echo "No fixed budget passes; tests use native context and training remains blocked" >&2
-fi
-for pair in student:360M teacher:1.7B; do
-  label=${pair%%:*}
-  size=${pair#*:}
-  output="$repo_root/runs/dapo-context-baselines/$label/tests"
-  mkdir -p "$output"
-  "$task_python" "$repo_root/experiments/scoring/math_context_probe.py" \
-    --model "HuggingFaceTB/SmolLM2-$size-Instruct" \
-    --data "$repo_root/data/dapo-suite/math-500-easy/test.parquet" \
-    "$repo_root/data/gsm8k-full/test.parquet" \
-    --context 8192 "${budget_args[@]}" \
-    --output "$output" >"$output/console.log" 2>&1
-done
