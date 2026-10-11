@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 from pathlib import Path
+from statistics import fmean
 
 import matplotlib
 
@@ -28,6 +29,27 @@ def summarize(run, output, verification_root):
     )
     summary["method"] = verification["method"]
     summary["wandb"] = verification["wandb"]
+    inner = read_rows(run / "inner.jsonl")
+    frozen = [row["metrics"] for row in inner if row["inner_step"] == 0]
+    training = [
+        row["data"] for row in read_rows(run / "outer.jsonl") if "timing_s/step" in row["data"]
+    ]
+    window = min(10, len(frozen))
+    if len(training) != len(frozen):
+        raise ValueError("Training outer records must match frozen rollout snapshots")
+    # J>1 repeats frozen teacher/reward values within an outer. Compare outer
+    # windows, so the first ten inner rows cannot stand in for ten rollouts.
+    summary["outer_window_comparison"] = {"window_outer_count": window}
+    for label, rows, key in (
+        ("teacher_center_mean", frozen, "mirror/teacher_center/mean"),
+        ("sampled_reward_mean", frozen, "mirror/sampled_reward/mean"),
+        ("verifier_score_mean", training, "critic/score/mean"),
+        ("training_budget_exhausted_mean", training, "response_length/clip_ratio"),
+    ):
+        summary["outer_window_comparison"][label] = {
+            "first": fmean(row[key] for row in rows[:window]),
+            "last": fmean(row[key] for row in rows[-window:]),
+        }
     summary["benchmarks"] = {}
     for benchmark, examples in BENCHMARKS.items():
         accuracy = f"val-core/{benchmark}/acc/mean@1"
@@ -44,7 +66,7 @@ def summarize(run, output, verification_root):
             "initial_budget_exhausted": initial[exhausted],
             "final_budget_exhausted": final[exhausted],
         }
-    return summary, read_rows(run / "inner.jsonl")
+    return summary, inner
 
 
 def main():
