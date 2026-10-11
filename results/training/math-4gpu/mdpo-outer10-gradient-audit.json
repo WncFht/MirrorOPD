@@ -1,0 +1,59 @@
+{
+  "device": "cpu",
+  "gradient_oracle": [
+    {
+      "k": 0,
+      "max_gradient_error": 5.960464477539063e-08,
+      "coefficients": [
+        -0.43661054968833923,
+        0.07397717982530594,
+        4.142958641052246,
+        0.8307945132255554
+      ]
+    },
+    {
+      "k": 2,
+      "max_gradient_error": 5.960464477539063e-08,
+      "coefficients": [
+        -0.43661054968833923,
+        0.07397717982530594,
+        4.142958641052246,
+        0.8307945132255554
+      ]
+    },
+    {
+      "k": 4,
+      "max_gradient_error": 5.960464477539063e-08,
+      "coefficients": [
+        -0.43661054968833923,
+        0.07397717982530594,
+        4.142958641052246,
+        0.8307945132255554
+      ]
+    }
+  ],
+  "EOS_predecessor_included": true,
+  "budget_last_token_included": true,
+  "total_valid": 5,
+  "inputs": {
+    "anchor_probabilities": [
+      0.4,
+      0.3,
+      0.2,
+      0.1
+    ],
+    "teacher_probabilities": [
+      0.05,
+      0.15,
+      0.3,
+      0.5
+    ],
+    "student_logits": [
+      -0.3,
+      0.2,
+      0.7,
+      -0.1
+    ],
+    "eta": 0.3
+  }
+}
