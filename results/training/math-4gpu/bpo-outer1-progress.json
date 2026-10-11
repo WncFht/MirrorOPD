@@ -1,0 +1,63 @@
+{
+  "run": "dapo-deepseek-bpo-o50-j16",
+  "scope": "First formal outer only; final benchmark effectiveness remains outstanding",
+  "inner_updates": 16,
+  "inner_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "finite": true,
+  "sync_student_center_rms": 9.982127325485594e-08,
+  "importance_ess_fraction_min": 0.9986030963860026,
+  "grad_norm_range": [
+    1.0184013843536377,
+    1.2360353469848633
+  ],
+  "frozen_checks": {
+    "mirror/teacher_center/mean": true,
+    "mirror/anchor_tail_mass/mean": true,
+    "mirror/sampled_reward/mean": true
+  },
+  "gpu_peak_mib": 35451.0,
+  "interpretation": "ESS/importance-ratio diagnostics observe drift; BPO loss uses frozen-rollout weights.",
+  "wandb": {
+    "state": "running",
+    "history_rows": 17,
+    "inner_updates": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "evaluation_steps": [
+      0
+    ],
+    "initial_scores_match_local": true
+  }
+}
