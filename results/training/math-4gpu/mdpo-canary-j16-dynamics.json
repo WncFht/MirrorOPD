@@ -1,0 +1,78 @@
+{
+  "run": "dapo-deepseek-mdpo-canary-j16",
+  "outer_calls": 2,
+  "inner_updates": 32,
+  "exit_code": 0,
+  "finite": true,
+  "outer_audits": [
+    {
+      "outer_call": 0,
+      "inner_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "sync_student_center_rms": 9.981188976047432e-08,
+      "frozen_metric_checks": {
+        "mirror/anchor_head_mass/mean": true,
+        "mirror/anchor_tail_mass/mean": true,
+        "mirror/teacher_center/mean": true,
+        "mirror/sampled_reward/mean": true
+      },
+      "importance_ess_fraction_min": 0.998608466763538,
+      "last_sampled_log_ratio_rms": 0.037571285002853595,
+      "grad_norm_range": [
+        1.0588412284851074,
+        1.2953652143478394
+      ]
+    },
+    {
+      "outer_call": 1,
+      "inner_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "sync_student_center_rms": 9.74005144705951e-08,
+      "frozen_metric_checks": {
+        "mirror/anchor_head_mass/mean": true,
+        "mirror/anchor_tail_mass/mean": true,
+        "mirror/teacher_center/mean": true,
+        "mirror/sampled_reward/mean": true
+      },
+      "importance_ess_fraction_min": 0.9954623237714564,
+      "last_sampled_log_ratio_rms": 0.07076435797939394,
+      "grad_norm_range": [
+        0.5139183402061462,
+        1.0279940366744995
+      ]
+    }
+  ],
+  "interpretation": "Two-outer J16 execution canary with 16-example evaluation; no benchmark effectiveness claim."
+}
