@@ -1,0 +1,55 @@
+{
+  "run": "dapo-deepseek-mdpo-o50-j16",
+  "outer_calls_completed_at_observation": 1,
+  "inner_updates": 16,
+  "inner_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "finite": true,
+  "sync_student_center_rms": 9.931612834085445e-08,
+  "importance_ess_fraction_min": 0.9986219607994029,
+  "last_sampled_log_ratio_rms": 0.03739484529099827,
+  "grad_norm_range": [
+    1.0449542999267578,
+    1.2751336097717285
+  ],
+  "frozen_within_outer": {
+    "mirror/anchor_tail_mass/mean": true,
+    "mirror/teacher_center/mean": true,
+    "mirror/sampled_reward/mean": true
+  },
+  "wandb_inner_updates_observed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "interpretation": "Partial execution evidence; no final benchmark improvement claim."
+}
