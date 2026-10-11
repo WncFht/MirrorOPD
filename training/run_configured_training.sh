@@ -24,7 +24,7 @@ mirror_pmd_mean | mirror_bpo | mirror_mdpo | mirror_opd_onpolicy | mirror_opd_is
   exit 2
   ;;
 esac
-task_python="$task_root/.venv/bin/python"
+task_python=${PYTHON_BIN:-"$task_root/.venv/bin/python"}
 export MIRROR_INNER_METRICS_PATH="$run_dir/inner.jsonl"
 export VERL_FILE_LOGGER_PATH="$run_dir/outer.jsonl"
 export MIRROR_WANDB_RUN_PATH="$run_dir/wandb-run.json"
@@ -73,7 +73,7 @@ if [[ "${MIRROR_AUDIT_NATIVE_PAIR:-0}" == "1" ]]; then
     "$script_dir/audit_gsm8k_setting.py" --config "$run_dir/resolved-config.yaml" \
     --output "$run_dir/model-data-audit.json"
 fi
-nvidia-smi --query-gpu=timestamp,memory.used,utilization.gpu,power.draw,temperature.gpu \
+nvidia-smi ${MIRROR_MONITOR_GPU_IDS:+--id="$MIRROR_MONITOR_GPU_IDS"} --query-gpu=timestamp,index,memory.used,utilization.gpu,power.draw,temperature.gpu \
   --format=csv -lms 1000 >"$run_dir/gpu.csv" &
 monitor_pid=$!
 trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT

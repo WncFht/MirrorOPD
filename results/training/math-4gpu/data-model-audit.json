@@ -1,0 +1,429 @@
+{
+  "created_at": "2026-10-11",
+  "cuda_visible_devices": "",
+  "native_template": true,
+  "add_generation_prompt": true,
+  "datasets": {
+    "DAPO/train": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/DAPO/train.parquet",
+      "sha256": "c69f0fb5cb09b642b77dc3e78615e1ba113388ca3fd5aa8c451c782ff1508719",
+      "rows": 17917,
+      "columns": [
+        "prompt",
+        "data_source",
+        "ability",
+        "reward_model",
+        "extra_info"
+      ],
+      "arrow_schema": "prompt: list<element: struct<content: string, role: string>>\n  child 0, element: struct<content: string, role: string>\n      child 0, content: string\n      child 1, role: string\ndata_source: large_string\nability: large_string\nreward_model: struct<ground_truth: string, style: string>\n  child 0, ground_truth: string\n  child 1, style: string\nextra_info: struct<difficulty: string, index: string, n_tests: int64, source: string, split: string>\n  child 0, difficulty: string\n  child 1, index: string\n  child 2, n_tests: int64\n  child 3, source: string\n  child 4, split: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 686",
+      "data_sources": {
+        "DAPO": 17917
+      },
+      "prompt_lengths": {
+        "min": 17.0,
+        "p50": 86.0,
+        "p90": 157.0,
+        "p95": 194.0,
+        "p99": 325.0,
+        "max": 1493.0
+      },
+      "over_2048": 0,
+      "over_1024": 8,
+      "unique_prompts": 17255,
+      "reward_model_keys": [
+        "ground_truth",
+        "style"
+      ],
+      "reward_styles": [
+        "rule"
+      ],
+      "ground_truth_types": [
+        "str"
+      ],
+      "empty_ground_truth_count": 0,
+      "message_roles": [
+        "user"
+      ],
+      "null_cells": {
+        "prompt": 0,
+        "data_source": 0,
+        "ability": 0,
+        "reward_model": 0,
+        "extra_info": 0
+      },
+      "message_counts": {
+        "1": 17917
+      },
+      "extra_info_splits": {
+        "train": 17917
+      }
+    },
+    "MATH-500/test": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/MATH-500/test.parquet",
+      "sha256": "49e1b2c7bddd84791f38287bcdd4a99639c599e699d5906c238c74d0b31ccf8c",
+      "rows": 500,
+      "columns": [
+        "prompt",
+        "data_source",
+        "ability",
+        "reward_model",
+        "extra_info"
+      ],
+      "arrow_schema": "prompt: list<element: struct<content: string, role: string>>\n  child 0, element: struct<content: string, role: string>\n      child 0, content: string\n      child 1, role: string\ndata_source: large_string\nability: large_string\nreward_model: struct<ground_truth: string, style: string>\n  child 0, ground_truth: string\n  child 1, style: string\nextra_info: struct<difficulty: string, index: string, n_tests: int64, source: string, split: string>\n  child 0, difficulty: string\n  child 1, index: string\n  child 2, n_tests: int64\n  child 3, source: string\n  child 4, split: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 686",
+      "data_sources": {
+        "MATH-500": 500
+      },
+      "prompt_lengths": {
+        "min": 13.0,
+        "p50": 55.0,
+        "p90": 146.10000000000002,
+        "p95": 206.0999999999999,
+        "p99": 347.05999999999995,
+        "max": 796.0
+      },
+      "over_2048": 0,
+      "over_1024": 0,
+      "unique_prompts": 500,
+      "reward_model_keys": [
+        "ground_truth",
+        "style"
+      ],
+      "reward_styles": [
+        "rule"
+      ],
+      "ground_truth_types": [
+        "str"
+      ],
+      "empty_ground_truth_count": 0,
+      "message_roles": [
+        "user"
+      ],
+      "null_cells": {
+        "prompt": 0,
+        "data_source": 0,
+        "ability": 0,
+        "reward_model": 0,
+        "extra_info": 0
+      },
+      "message_counts": {
+        "1": 500
+      },
+      "extra_info_splits": {
+        "test": 500
+      }
+    },
+    "AMC23/test": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AMC23/test.parquet",
+      "sha256": "02389cd00016eb8330134f4fe4fb47bb6fadf0c57b19af48aafd2d115c798072",
+      "rows": 40,
+      "columns": [
+        "prompt",
+        "data_source",
+        "ability",
+        "reward_model",
+        "extra_info"
+      ],
+      "arrow_schema": "prompt: list<element: struct<content: string, role: string>>\n  child 0, element: struct<content: string, role: string>\n      child 0, content: string\n      child 1, role: string\ndata_source: large_string\nability: large_string\nreward_model: struct<ground_truth: string, style: string>\n  child 0, ground_truth: string\n  child 1, style: string\nextra_info: struct<difficulty: string, index: string, n_tests: int64, source: string, split: string>\n  child 0, difficulty: string\n  child 1, index: string\n  child 2, n_tests: int64\n  child 3, source: string\n  child 4, split: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 686",
+      "data_sources": {
+        "AMC23": 40
+      },
+      "prompt_lengths": {
+        "min": 25.0,
+        "p50": 83.0,
+        "p90": 139.10000000000002,
+        "p95": 194.29999999999993,
+        "p99": 219.61,
+        "max": 220.0
+      },
+      "over_2048": 0,
+      "over_1024": 0,
+      "unique_prompts": 40,
+      "reward_model_keys": [
+        "ground_truth",
+        "style"
+      ],
+      "reward_styles": [
+        "rule"
+      ],
+      "ground_truth_types": [
+        "str"
+      ],
+      "empty_ground_truth_count": 0,
+      "message_roles": [
+        "user"
+      ],
+      "null_cells": {
+        "prompt": 0,
+        "data_source": 0,
+        "ability": 0,
+        "reward_model": 0,
+        "extra_info": 0
+      },
+      "message_counts": {
+        "1": 40
+      },
+      "extra_info_splits": {
+        "test": 40
+      }
+    },
+    "AIME25/test": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AIME25/test.parquet",
+      "sha256": "3fcf0118e87348af9a1c996438aa5fb00e91c4df5a5a00fe29a0c909886075b6",
+      "rows": 30,
+      "columns": [
+        "prompt",
+        "data_source",
+        "ability",
+        "reward_model",
+        "extra_info"
+      ],
+      "arrow_schema": "prompt: list<element: struct<content: string, role: string>>\n  child 0, element: struct<content: string, role: string>\n      child 0, content: string\n      child 1, role: string\ndata_source: large_string\nability: large_string\nreward_model: struct<ground_truth: string, style: string>\n  child 0, ground_truth: string\n  child 1, style: string\nextra_info: struct<difficulty: string, index: string, n_tests: int64, source: string, split: string>\n  child 0, difficulty: string\n  child 1, index: string\n  child 2, n_tests: int64\n  child 3, source: string\n  child 4, split: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 686",
+      "data_sources": {
+        "AIME25": 30
+      },
+      "prompt_lengths": {
+        "min": 36.0,
+        "p50": 103.0,
+        "p90": 226.2,
+        "p95": 237.34999999999997,
+        "p99": 254.23000000000002,
+        "max": 258.0
+      },
+      "over_2048": 0,
+      "over_1024": 0,
+      "unique_prompts": 30,
+      "reward_model_keys": [
+        "ground_truth",
+        "style"
+      ],
+      "reward_styles": [
+        "rule"
+      ],
+      "ground_truth_types": [
+        "str"
+      ],
+      "empty_ground_truth_count": 0,
+      "message_roles": [
+        "user"
+      ],
+      "null_cells": {
+        "prompt": 0,
+        "data_source": 0,
+        "ability": 0,
+        "reward_model": 0,
+        "extra_info": 0
+      },
+      "message_counts": {
+        "1": 30
+      },
+      "extra_info_splits": {
+        "test": 30
+      }
+    }
+  },
+  "models": {
+    "DeepSeek-R1-Distill-Qwen-1.5B": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/DeepSeek-R1-Distill-Qwen-1.5B",
+      "config": {
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "model_type": "qwen2",
+        "max_position_embeddings": 131072,
+        "vocab_size": 151936,
+        "hidden_size": 1536,
+        "num_hidden_layers": 28,
+        "num_attention_heads": 12,
+        "num_key_value_heads": 2,
+        "rope_theta": 10000,
+        "rope_scaling": null,
+        "torch_dtype": "bfloat16",
+        "bos_token_id": 151643,
+        "eos_token_id": 151643
+      },
+      "tokenizer": {
+        "bos_token_id": 151646,
+        "eos_token_id": 151643,
+        "pad_token_id": 151643,
+        "model_max_length": 16384,
+        "vocab_size": 151665,
+        "chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+        "sample_generation_prompt": "<｜begin▁of▁sentence｜><｜User｜>Compute 1+1.<｜Assistant｜><think>\n"
+      },
+      "generation_config": {
+        "_from_model_config": true,
+        "bos_token_id": 151646,
+        "eos_token_id": 151643,
+        "do_sample": true,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "transformers_version": "4.39.3"
+      },
+      "files": [
+        {
+          "path": "config.json",
+          "sha256": "37bd455e9679d2959536270fed49d25cc7c290a64f6e52abb97c71345a9cee41"
+        },
+        {
+          "path": "generation_config.json",
+          "sha256": "72cbec1015da9ed03ad025483005cbf6481403abf947adfd54e504d1a66a2126"
+        },
+        {
+          "path": "tokenizer.json",
+          "sha256": "88145e3c3249adc2546ede277e9819d6e405e19072456e4b521cbc724bd60773"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "sha256": "8ac8c85fb242563c2260baec0909debd69d718af6a0b3d90e6cab62b4d341cd5"
+        }
+      ]
+    },
+    "JustRL-DeepSeek-1.5B": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/JustRL-DeepSeek-1.5B",
+      "config": {
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "model_type": "qwen2",
+        "max_position_embeddings": 131072,
+        "vocab_size": 151936,
+        "hidden_size": 1536,
+        "num_hidden_layers": 28,
+        "num_attention_heads": 12,
+        "num_key_value_heads": 2,
+        "rope_theta": 10000,
+        "rope_scaling": null,
+        "torch_dtype": "bfloat16",
+        "bos_token_id": 151643,
+        "eos_token_id": 151643
+      },
+      "tokenizer": {
+        "bos_token_id": 151646,
+        "eos_token_id": 151643,
+        "pad_token_id": 151643,
+        "model_max_length": 16384,
+        "vocab_size": 151665,
+        "chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+        "sample_generation_prompt": "<｜begin▁of▁sentence｜><｜User｜>Compute 1+1.<｜Assistant｜><think>\n"
+      },
+      "generation_config": {
+        "_from_model_config": true,
+        "bos_token_id": 151646,
+        "eos_token_id": 151643,
+        "do_sample": true,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "transformers_version": "4.39.3"
+      },
+      "files": [
+        {
+          "path": "config.json",
+          "sha256": "f62729adb55c028ee1a59a27279b4c35510211aebf5f987e7080c2312ce71755"
+        },
+        {
+          "path": "generation_config.json",
+          "sha256": "72cbec1015da9ed03ad025483005cbf6481403abf947adfd54e504d1a66a2126"
+        },
+        {
+          "path": "tokenizer.json",
+          "sha256": "88145e3c3249adc2546ede277e9819d6e405e19072456e4b521cbc724bd60773"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "sha256": "8ac8c85fb242563c2260baec0909debd69d718af6a0b3d90e6cab62b4d341cd5"
+        }
+      ]
+    }
+  },
+  "compatibility": {
+    "vocabulary_equal": true,
+    "chat_template_equal": true
+  },
+  "reward": {
+    "md_opd_route": "opd_mixed_verify.reward_func -> math fallback -> ttrl_mathverify.reward_func",
+    "semantics": "Boxed answer: ttrl_math.compute_score(fast=False). Unboxed: math_verify.compute_score on final 2000 characters. Score 0/1; format_score reports boxed extraction.",
+    "existing_mirror_wrapper": "MirrorOPD/training/math_reward.py",
+    "backend_default_differs": true,
+    "backend_math_verify_identical": true,
+    "required_exact_modules": {
+      "ttrl_mathverify.py": {
+        "md_sha256": "11b84bbaaa200862604556c3c628127cad9fcca0babd63c22e24e8d960f4e494",
+        "backend_present": true,
+        "backend_sha256": "11b84bbaaa200862604556c3c628127cad9fcca0babd63c22e24e8d960f4e494"
+      },
+      "_timeout.py": {
+        "md_sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5",
+        "backend_present": true,
+        "backend_sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5"
+      },
+      "ttrl_math/__init__.py": {
+        "md_sha256": "2877ba6447cdf64e22a8bb50f47ce3f57ca4e826f2f2bbf2e09c382cd8763fc7",
+        "backend_present": true,
+        "backend_sha256": "2877ba6447cdf64e22a8bb50f47ce3f57ca4e826f2f2bbf2e09c382cd8763fc7"
+      },
+      "ttrl_math/grader.py": {
+        "md_sha256": "0e97d15b7da6a8d7a8cd3b20b6801d7394c2bf15a5e8c8f928b9c838e0b10503",
+        "backend_present": true,
+        "backend_sha256": "0e97d15b7da6a8d7a8cd3b20b6801d7394c2bf15a5e8c8f928b9c838e0b10503"
+      },
+      "ttrl_math/math_normalize.py": {
+        "md_sha256": "048ed5e48921fcf40575bffad8701e6ac780b93ee3fabdd8846c761fd7021d07",
+        "backend_present": true,
+        "backend_sha256": "048ed5e48921fcf40575bffad8701e6ac780b93ee3fabdd8846c761fd7021d07"
+      },
+      "ttrl_math/math_utils.py": {
+        "md_sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822",
+        "backend_present": true,
+        "backend_sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822"
+      }
+    },
+    "dependencies": [
+      "latex2sympy2_extended",
+      "sympy",
+      "math_verify",
+      "pylatexenc",
+      "verl.utils.py_functional.timeout_limit"
+    ],
+    "recommendation": "Install checksum-verified exact MD modules into backend and use existing MirrorOPD/training/math_reward.py as custom reward for training and every validation dataset."
+  },
+  "train_validation_prompt_overlap": {
+    "MATH-500/test": 2,
+    "AMC23/test": 5,
+    "AIME25/test": 0
+  },
+  "train_validation_overlap_indices": {
+    "MATH-500/test": [
+      {
+        "train_index": "DAPO-6216",
+        "validation_index": "MATH-500-80"
+      },
+      {
+        "train_index": "DAPO-17762",
+        "validation_index": "MATH-500-276"
+      }
+    ],
+    "AMC23/test": [
+      {
+        "train_index": "DAPO-15860",
+        "validation_index": "AMC23-3"
+      },
+      {
+        "train_index": "DAPO-15900",
+        "validation_index": "AMC23-13"
+      },
+      {
+        "train_index": "DAPO-14720",
+        "validation_index": "AMC23-17"
+      },
+      {
+        "train_index": "DAPO-15868",
+        "validation_index": "AMC23-27"
+      },
+      {
+        "train_index": "DAPO-15876",
+        "validation_index": "AMC23-28"
+      }
+    ],
+    "AIME25/test": []
+  }
+}

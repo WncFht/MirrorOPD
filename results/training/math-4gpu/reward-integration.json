@@ -1,0 +1,32 @@
+[
+  {
+    "source": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/verl/verl/utils/reward_score/ttrl_mathverify.py",
+    "target": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/backends/mirroropd-taopd/verl/verl/utils/reward_score/ttrl_mathverify.py",
+    "sha256": "11b84bbaaa200862604556c3c628127cad9fcca0babd63c22e24e8d960f4e494"
+  },
+  {
+    "source": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/verl/verl/utils/reward_score/_timeout.py",
+    "target": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/backends/mirroropd-taopd/verl/verl/utils/reward_score/_timeout.py",
+    "sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5"
+  },
+  {
+    "source": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/verl/verl/utils/reward_score/ttrl_math/__init__.py",
+    "target": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/backends/mirroropd-taopd/verl/verl/utils/reward_score/ttrl_math/__init__.py",
+    "sha256": "2877ba6447cdf64e22a8bb50f47ce3f57ca4e826f2f2bbf2e09c382cd8763fc7"
+  },
+  {
+    "source": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/verl/verl/utils/reward_score/ttrl_math/grader.py",
+    "target": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/backends/mirroropd-taopd/verl/verl/utils/reward_score/ttrl_math/grader.py",
+    "sha256": "0e97d15b7da6a8d7a8cd3b20b6801d7394c2bf15a5e8c8f928b9c838e0b10503"
+  },
+  {
+    "source": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/verl/verl/utils/reward_score/ttrl_math/math_normalize.py",
+    "target": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/backends/mirroropd-taopd/verl/verl/utils/reward_score/ttrl_math/math_normalize.py",
+    "sha256": "048ed5e48921fcf40575bffad8701e6ac780b93ee3fabdd8846c761fd7021d07"
+  },
+  {
+    "source": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/verl/verl/utils/reward_score/ttrl_math/math_utils.py",
+    "target": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/backends/mirroropd-taopd/verl/verl/utils/reward_score/ttrl_math/math_utils.py",
+    "sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822"
+  }
+]
