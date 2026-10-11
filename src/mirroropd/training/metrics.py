@@ -74,8 +74,10 @@ def finalize_token_moments(metrics, dp_size=1):
     return result
 
 
-def append_inner_record(path, metrics, *, outer_call, inner_step, metadata=None):
+def append_inner_record(path, metrics, *, outer_call, inner_step, metadata=None, global_rank=0):
     """One source worker writes one already globally reduced update record."""
+    if global_rank != 0:
+        return
     record = dict(metadata or {})
     record.update(outer_call=outer_call, inner_step=inner_step, measurement="pre-update")
     record["metrics"] = {

@@ -20,6 +20,8 @@ test:
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_training_metrics.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_global_inner_writer.py
+	PYTHONPATH=src uv run --with torch --with numpy --with pytest python -m pytest tests/test_rollout_support_alignment.py -q
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mean_bpo.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_kl_estimators.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_outer_inner.py

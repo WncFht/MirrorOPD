@@ -20,10 +20,11 @@ mirror_pmd_mean | mirror_bpo | mirror_mdpo | mirror_opd_onpolicy | mirror_opd_is
   exit 2
   ;;
 esac
-task_python="$task_root/.venv/bin/python"
+task_python=${PYTHON_BIN:-"$task_root/.venv/bin/python"}
 mkdir -p "$task_root/data" "$task_root/logs" "$task_root/scratch"
 export MIRROR_INNER_METRICS_PATH="${MIRROR_INNER_METRICS_PATH:-$task_root/logs/$mode-inner-$(date +%Y%m%d-%H%M%S).jsonl}"
-export TMPDIR="$task_root/scratch"
+export TMPDIR="${MIRROR_TMPDIR:-$task_root/scratch}"
+mkdir -p "$TMPDIR"
 # Ray creates long session/socket names; keep the disk-backed prefix short.
 export RAY_TMPDIR="${MIRROR_RAY_TMPDIR:-$HOME/.cache/mopd-ray}"
 mkdir -p "$RAY_TMPDIR"
@@ -33,6 +34,7 @@ export MKL_NUM_THREADS=1
 export MALLOC_ARENA_MAX=2
 export MALLOC_TRIM_THRESHOLD_=131072
 export TOKENIZERS_PARALLELISM=false
+export MIRROR_ALIGN_ROLLOUT_VOCAB=1
 export WANDB_MODE="${WANDB_MODE:-disabled}"
 export WANDB_DIR="${WANDB_DIR:-$repo_root/runs/wandb}"
 export WANDB_CACHE_DIR="${WANDB_CACHE_DIR:-$HOME/.cache/wandb}"

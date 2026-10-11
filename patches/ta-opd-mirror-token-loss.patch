@@ -900,7 +900,7 @@ index 2bfd200..280ebf8 100644
          teacher_world_size_sum = 0
          for teacher_model in self.teacher_models.values():
 diff --git a/verl/verl/workers/engine/fsdp/transformer_impl.py b/verl/verl/workers/engine/fsdp/transformer_impl.py
-index afbf7ec..ed4f953 100644
+index afbf7ec..02f7f56 100644
 --- a/verl/verl/workers/engine/fsdp/transformer_impl.py
 +++ b/verl/verl/workers/engine/fsdp/transformer_impl.py
 @@ -111,6 +111,28 @@ class FSDPEngine(BaseEngine):
@@ -1007,7 +1007,21 @@ index afbf7ec..ed4f953 100644
  
          if calculate_sum_pi_squared and use_fused_kernels:
              raise NotImplementedError(
-@@ -1119,13 +1159,22 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1086,6 +1126,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
+                 "fused kernels do not materialize the full logits tensor needed for Σπ²."
+             )
+
++        if os.environ.get("MIRROR_ALIGN_ROLLOUT_VOCAB", "0") == "1":
++            if use_fused_kernels:
++                raise NotImplementedError("Rollout support alignment requires non-fused logits")
++            from mirroropd.training.tokenization import align_rollout_logits
++
++            output.logits = align_rollout_logits(output.logits, len(self.model_config.tokenizer))
++
+         model_output = {}
+
+         input_ids = micro_batch["input_ids"]
+@@ -1119,13 +1166,22 @@ class FSDPEngineWithLMHead(FSDPEngine):
  
                  # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)
                  inplace_backward = True
@@ -1031,7 +1045,7 @@ index afbf7ec..ed4f953 100644
  
                  # compute entropy
                  if calculate_entropy:
-@@ -1218,6 +1267,15 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1218,6 +1274,15 @@ class FSDPEngineWithLMHead(FSDPEngine):
                      logits_rmpad = torch.cat([t for t in logits.unbind()])
                      input_ids_rmpad_rolled = output_args["input_ids_rmpad_rolled"]
                      log_probs = logprobs_from_logits(logits=logits_rmpad, labels=input_ids_rmpad_rolled)
@@ -1047,7 +1061,7 @@ index afbf7ec..ed4f953 100644
  
                      # Mirror the use_remove_padding=True branch (see verl#6293).
                      # No Ulysses SP gather here: this branch is the no-SP path
-@@ -1258,6 +1316,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1258,6 +1323,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
  
      def forward_step(self, micro_batch: TensorDict, loss_function, forward_only):
          device_name = get_device_name()
@@ -1058,7 +1072,7 @@ index afbf7ec..ed4f953 100644
          micro_batch = micro_batch.to(get_device_id())
          model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
 diff --git a/verl/verl/workers/engine_workers.py b/verl/verl/workers/engine_workers.py
-index c4c7d8f..071e730 100644
+index c4c7d8f..f3830d0 100644
 --- a/verl/verl/workers/engine_workers.py
 +++ b/verl/verl/workers/engine_workers.py
 @@ -304,7 +304,9 @@ class TrainingWorker(Worker, DistProfilerExtension):
@@ -1072,7 +1086,7 @@ index c4c7d8f..071e730 100644
                      for key, val in output.items():
                          # flattn dp and micro batch
                          if isinstance(val, list):
-@@ -313,7 +315,18 @@ class TrainingWorker(Worker, DistProfilerExtension):
+@@ -313,7 +315,19 @@ class TrainingWorker(Worker, DistProfilerExtension):
                                  if isinstance(val[0], Metric)
                                  else list(chain.from_iterable(val))
                              )
@@ -1081,7 +1095,8 @@ index c4c7d8f..071e730 100644
 +                        output = finalize_token_moments(output, self.engine.get_data_parallel_size())
 +                        record_path = os.environ.get("MIRROR_INNER_METRICS_PATH")
 +                        if record_path:
-+                            append_inner_record(record_path, output, outer_call=mirror_outer_call,
++                            append_inner_record(record_path, output, global_rank=torch.distributed.get_rank(),
++                                                outer_call=mirror_outer_call,
 +                                                inner_step=inner_index,
 +                                                metadata={"epochs": epochs, "mini_batch_size": mini_batch_size,
 +                                                         "clip_grad": self.engine.optimizer_config.clip_grad})
@@ -1091,7 +1106,7 @@ index c4c7d8f..071e730 100644
  
                  output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
              else:
-@@ -514,7 +527,33 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+@@ -514,7 +528,33 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
              ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
  
              # The ref model does not need to enable MTP; force it to false.
@@ -1126,7 +1141,7 @@ index c4c7d8f..071e730 100644
              ref_config.model_config.mtp = MtpConfig(enable=False)
  
              # construct TrainingWorkerConfig
-@@ -707,12 +746,15 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+@@ -707,12 +747,15 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
              return
  
          set_expandable_segments(False)
