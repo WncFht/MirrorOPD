@@ -1,0 +1,58 @@
+{
+  "runs": [
+    "dapo-deepseek-opd-o50-j1",
+    "dapo-deepseek-mdpo-o50-j16"
+  ],
+  "config_sha256": {
+    "dapo-deepseek-opd-o50-j1": "d8c3ef42c742b7f1f84b5fa499c0acd97ae0a789a9d36e54943b0ac05cd1bbf8",
+    "dapo-deepseek-mdpo-o50-j16": "99f90dcd4f52eff3d27e5a893cc9af49165e26200b5bde4e363472183439a1f7"
+  },
+  "resolved_leaf_counts": [
+    788,
+    788
+  ],
+  "differences": [
+    {
+      "key": "actor_rollout_ref.actor.ppo_epochs",
+      "onpolicy": 1,
+      "mdpo": 16
+    },
+    {
+      "key": "actor_rollout_ref.rollout.trace.experiment_name",
+      "onpolicy": "dapo-deepseek-opd-o50-j1",
+      "mdpo": "dapo-deepseek-mdpo-o50-j16"
+    },
+    {
+      "key": "critic.ppo_epochs",
+      "onpolicy": 1,
+      "mdpo": 16
+    },
+    {
+      "key": "distillation.distillation_loss.loss_mode",
+      "onpolicy": "mirror_opd_onpolicy",
+      "mdpo": "mirror_mdpo"
+    },
+    {
+      "key": "ray_kwargs.ray_init.runtime_env.env_vars.MIRROR_INNER_METRICS_PATH",
+      "onpolicy": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-opd-o50-j1/inner.jsonl",
+      "mdpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-mdpo-o50-j16/inner.jsonl"
+    },
+    {
+      "key": "ray_kwargs.ray_init.runtime_env.env_vars.VERL_FILE_LOGGER_PATH",
+      "onpolicy": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-opd-o50-j1/outer.jsonl",
+      "mdpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-mdpo-o50-j16/outer.jsonl"
+    },
+    {
+      "key": "trainer.default_local_dir",
+      "onpolicy": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-opd-o50-j1/checkpoints",
+      "mdpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-mdpo-o50-j16/checkpoints"
+    },
+    {
+      "key": "trainer.experiment_name",
+      "onpolicy": "dapo-deepseek-opd-o50-j1",
+      "mdpo": "dapo-deepseek-mdpo-o50-j16"
+    }
+  ],
+  "allowed_differences_only": true,
+  "interpretation": "Actual resolved configuration comparison: method and epochs plus run-specific names/paths. Critic configuration epochs is dormant; critic is not enabled for distillation. This is configuration evidence, not completed MDPO outcome."
+}
