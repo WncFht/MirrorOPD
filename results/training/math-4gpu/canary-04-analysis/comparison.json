@@ -1,0 +1,120 @@
+[
+  {
+    "run_name": "dapo-deepseek-onpolicy-canary-04",
+    "exit_code": 0,
+    "completed_outer_calls": 2,
+    "inner_updates": 2,
+    "actual_clip_thresholds": [
+      2.0
+    ],
+    "grad_norm_min": 1.2757985591888428,
+    "grad_norm_max": 1.3255176544189453,
+    "clipped_fraction": 0.0,
+    "sync_student_center_max_abs": 1.5268000840178717e-09,
+    "sync_sampled_log_ratio_rms_max": 1.08492281675844e-07,
+    "gpu_peak_mib": 35161.0,
+    "importance_ess_fraction_min": 0.9999999999999872,
+    "outer_seconds_mean": 98.25495733413845,
+    "actor_peak_reserved_gib": 31.771484375,
+    "evaluation": [
+      {
+        "outer_step": 0,
+        "evaluation/generated_examples": 570,
+        "val-aux/MATH-500/reward/mean@1": 0.71,
+        "val-aux/MATH-500/response_tokens/mean@1": 3611.268,
+        "val-aux/MATH-500/eos_terminated/mean@1": 0.724,
+        "val-aux/MATH-500/budget_exhausted/mean@1": 0.276,
+        "val-aux/MATH-500/score/mean@1": 0.71,
+        "val-aux/MATH-500/format_score/mean@1": 0.726,
+        "val-core/MATH-500/acc/mean@1": 0.71,
+        "val-aux/AMC23/reward/mean@1": 0.475,
+        "val-aux/AMC23/response_tokens/mean@1": 5483.025,
+        "val-aux/AMC23/eos_terminated/mean@1": 0.425,
+        "val-aux/AMC23/budget_exhausted/mean@1": 0.575,
+        "val-aux/AMC23/score/mean@1": 0.475,
+        "val-aux/AMC23/format_score/mean@1": 0.45,
+        "val-core/AMC23/acc/mean@1": 0.475,
+        "val-aux/AIME25/reward/mean@1": 0.2,
+        "val-aux/AIME25/response_tokens/mean@1": 6470.833333333333,
+        "val-aux/AIME25/eos_terminated/mean@1": 0.2,
+        "val-aux/AIME25/budget_exhausted/mean@1": 0.8,
+        "val-aux/AIME25/score/mean@1": 0.2,
+        "val-aux/AIME25/format_score/mean@1": 0.2,
+        "val-core/AIME25/acc/mean@1": 0.2,
+        "val-aux/num_turns/min": 2,
+        "val-aux/num_turns/max": 2,
+        "val-aux/num_turns/mean": 2.0
+      },
+      {
+        "outer_step": 2,
+        "evaluation/generated_examples": 570,
+        "val-aux/MATH-500/reward/mean@1": 0.686,
+        "val-aux/MATH-500/response_tokens/mean@1": 3707.068,
+        "val-aux/MATH-500/eos_terminated/mean@1": 0.688,
+        "val-aux/MATH-500/budget_exhausted/mean@1": 0.312,
+        "val-aux/MATH-500/score/mean@1": 0.686,
+        "val-aux/MATH-500/format_score/mean@1": 0.692,
+        "val-core/MATH-500/acc/mean@1": 0.686,
+        "val-aux/AMC23/reward/mean@1": 0.525,
+        "val-aux/AMC23/response_tokens/mean@1": 5120.125,
+        "val-aux/AMC23/eos_terminated/mean@1": 0.5,
+        "val-aux/AMC23/budget_exhausted/mean@1": 0.5,
+        "val-aux/AMC23/score/mean@1": 0.525,
+        "val-aux/AMC23/format_score/mean@1": 0.5,
+        "val-core/AMC23/acc/mean@1": 0.525,
+        "val-aux/AIME25/reward/mean@1": 0.16666666666666666,
+        "val-aux/AIME25/response_tokens/mean@1": 6697.1,
+        "val-aux/AIME25/eos_terminated/mean@1": 0.13333333333333333,
+        "val-aux/AIME25/budget_exhausted/mean@1": 0.8666666666666667,
+        "val-aux/AIME25/score/mean@1": 0.16666666666666666,
+        "val-aux/AIME25/format_score/mean@1": 0.13333333333333333,
+        "val-core/AIME25/acc/mean@1": 0.16666666666666666,
+        "val-aux/num_turns/min": 2,
+        "val-aux/num_turns/max": 2,
+        "val-aux/num_turns/mean": 2.0
+      }
+    ],
+    "interpretation": "Full fixed MATH-500/AMC23/AIME25 test, single training run; no paired per-example outcomes retained.",
+    "method": "mirror_opd_onpolicy",
+    "wandb": {
+      "entity": "wncfht",
+      "project": "mirror-opd-dapo-math-4gpu",
+      "id": "dszo8a4i",
+      "url": "https://wandb.ai/wncfht/mirror-opd-dapo-math-4gpu/runs/dszo8a4i",
+      "state": "finished",
+      "history_rows": 5
+    },
+    "benchmarks": {
+      "MATH-500": {
+        "examples": 500,
+        "initial_outer": 0,
+        "final_outer": 2,
+        "initial_accuracy": 0.71,
+        "final_accuracy": 0.686,
+        "change_percentage_points": -2.399999999999991,
+        "initial_budget_exhausted": 0.276,
+        "final_budget_exhausted": 0.312
+      },
+      "AMC23": {
+        "examples": 40,
+        "initial_outer": 0,
+        "final_outer": 2,
+        "initial_accuracy": 0.475,
+        "final_accuracy": 0.525,
+        "change_percentage_points": 5.000000000000004,
+        "initial_budget_exhausted": 0.575,
+        "final_budget_exhausted": 0.5
+      },
+      "AIME25": {
+        "examples": 30,
+        "initial_outer": 0,
+        "final_outer": 2,
+        "initial_accuracy": 0.2,
+        "final_accuracy": 0.16666666666666666,
+        "change_percentage_points": -3.3333333333333353,
+        "initial_budget_exhausted": 0.8,
+        "final_budget_exhausted": 0.8666666666666667
+      }
+    }
+  }
+]

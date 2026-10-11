@@ -9,6 +9,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 from experiments.analysis.gsm8k_training_report import read_rows, report
 
@@ -60,7 +61,10 @@ def main():
     for run in args.run:
         summary, inner = summarize(run, output, args.verification_root)
         summaries.append(summary)
-        label = summary["method"].removeprefix("mirror_")
+        label = (
+            summary["method"].removeprefix("mirror_")
+            + f" (O={summary['completed_outer_calls']}, J={inner[0]['epochs']})"
+        )
         first = [row for row in inner if row["inner_step"] == 0]
         outer = [row["outer_call"] for row in first]
         axes[0, 0].plot(
@@ -99,7 +103,9 @@ def main():
         axes[1, column].set_ylabel("Accuracy (%)")
         axes[1, column].set_xlabel("Completed outer updates")
         axes[1, column].set_ylim(0, 100)
+    axes[0, 2].set_ylim(0, 1.02)
     for axis in axes.flat:
+        axis.xaxis.set_major_locator(MaxNLocator(integer=True))
         axis.grid(axis="y", alpha=0.25)
         axis.legend(frameon=False)
     fig.tight_layout()
