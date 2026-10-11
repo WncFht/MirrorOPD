@@ -1,0 +1,18 @@
+[
+  {
+    "sdk_step": 2,
+    "payload": {
+      "04_kl_centers/outer_student_center/mean": -1.5268000840178717e-09,
+      "00_axes/outer_rollout_step": 0,
+      "00_axes/outer_step": null
+    }
+  },
+  {
+    "sdk_step": 18,
+    "payload": {
+      "04_kl_centers/outer_student_center/mean": 0.00048477011709062125,
+      "00_axes/outer_rollout_step": null,
+      "00_axes/outer_step": 1
+    }
+  }
+]

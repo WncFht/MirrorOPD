@@ -47,3 +47,6 @@ scratch/
 
 .format-findings.txt
 .markdown-findings.txt
+
+# Immutable math-run audit inputs restore with make data.
+/results/training/math-4gpu/audit-20261012/raw/dapo-*/

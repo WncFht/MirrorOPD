@@ -1,0 +1,16 @@
+{
+  "make_check": "passed",
+  "cpu_probe": "passed",
+  "mdpo_gradient_max_absolute_error": 4.470348358154297e-08,
+  "bpo_center_bias_identity_max_absolute_error": 1.4528632164001465e-07,
+  "ess_cv_identity_absolute_tolerance": 1e-12,
+  "figure_png_count": 16,
+  "figure_pdf_count": 16,
+  "raw_gzip_files": 56,
+  "archive_decompression_byte_equality": "passed for all 56 files",
+  "report_links": "all local targets exist",
+  "training_code_modified": false,
+  "bpo_completed_outer_used": 4,
+  "bpo_pending_outer_inner_excluded": 16,
+  "source_files_verified_per_run": 459
+}

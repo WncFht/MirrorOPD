@@ -1,0 +1,6902 @@
+{
+  "opd-o50-j1": {
+    "commit": "d89e875f97738d1154fc2449720f9f5fd552ae27",
+    "checks": [
+      {
+        "label": "first_party/src/mirroropd/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/verl/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/verl/fsdp.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_categorical.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_lm.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_pg.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/token_inner.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/cache.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/host_memory.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/metrics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/tokenization.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/tracking.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/audit_gsm8k_setting.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/audit_math_run.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/dapo-deepseek-4gpu.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/gsm8k-mdpo.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/gsm8k-opd-onpolicy.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/pythia-mdpo.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configure_wandb_workspace.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_dapo_math.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_gsm8k_ablation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_gsm8k_opd.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/gsm8k_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/math_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/natural_text_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_dapo_math.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_math_backend.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/publish_wandb_diagnostics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/record_training_provenance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_configured_training.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_dapo_math_4gpu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_opd_o1000.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_opd_onpolicy.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_math_suite.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_mdpo_calibration_matrix.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_pythia_eta_scan.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_pythia_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_upstream_mirror_canary.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_upstream_mirror_training.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/score_pythia_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/select_dapo_context.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/base_config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/hccl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/kimi_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/mooncake_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/nccl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/nixl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/single_turn_agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/tool_agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/tool_parser.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/config/fully_async_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/config/fully_async_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/detach_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_main.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_rollouter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/message_queue.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_30b_a3b_base_math_fsdp.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_30b_a3b_math_fsdp_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_async_retool.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_16_16.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_32_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_4_4.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_64_64.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_64_64_mis.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_8_8.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen25vl_7b_megatron_4_4.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_30b_a3b_fsdp2_32_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_30b_megatron_6_2_npu_async.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_8b_fsdp2_16_16_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_8_8_mis_trtllm.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_96_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_96_32_mis.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_8b_base_math_megatron_4_4_trtllm.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_qwen35_35b_megatron_async.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/runtime_env.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/unittest/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/unittest/simple_streaming_demo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/config/one_step_off_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/config/one_step_off_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/main_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_64_64.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_64_64_ris.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_sglang_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_sglang_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_megatron_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_megatron_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_0.6b_gsm8k_fsdp2_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_0.6b_gsm8k_fsdp2_sglang_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_3b_gsm8k_fsdp2_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_qwen3_8b_gsm8k_fsdp2_8_8_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/gdpo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/limited.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/naive.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/remote.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/inner_sglang_router.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/naive_router.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/engine_workers.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/teacher_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/teacher_model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/__main__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/base_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/fsdp_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/megatron_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/bridge.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/config_converter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/loader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/mbridge.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward_1f1b_overlap.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward_fused.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_initializer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/mtp_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/saver.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/util.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/weight_converter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/apertus.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/dense_common.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/glm4v.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/kimi_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/llama.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/monkey_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/npu_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen2.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen2_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen3_5.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen3_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/tiled_mlp.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/weight_loader_registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/protocol.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/decorator.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/worker.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/worker_group.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/ray/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/ray/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/_state_dict_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/checkpoint/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/checkpoint/state_dict.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/vllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/base_tool.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/function_tool.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/schemas.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/tool_registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_torchtitan_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_veomni_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/dp_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/megatron_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/mindspeed_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/torchtitan_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/veomni_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/algorithm/rollout_correction.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/algorithm.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/dp_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/megatron_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/mindspeed_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/torchtitan_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/veomni_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/data/legacy_data.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/distillation/distillation.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/automodel.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/fsdp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/mindspeed.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/evaluation.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/legacy_reward_impl.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model/hf_model.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/dp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/mindspeed.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/npu_profile/npu_profile.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/automodel.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/fsdp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/profiler/profiler.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/dp_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/megatron_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/mindspeed_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/torchtitan_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/veomni_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/reward/reward.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/rollout/rollout.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/sft_trainer_engine.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/constants_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/fsdp/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/fsdp/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/megatron/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_eval.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_generation_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_ppo_sync.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/core_algos.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/metric_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/padding_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/prefix_grouper_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/rollout_corr_helper.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/runtime_env.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/sft_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/sft_trainer_ray.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/activation_offload.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/attention_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/chat_template.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/checkpoint_handler.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/fsdp_checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/megatron_checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/dataset_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/multiturn_sft_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/rl_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/rm_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/vision_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/metrics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/performance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/trajectory_tracker.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/device.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/distributed.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/experimental/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/experimental/torch_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/flops_counter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fs.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fsdp_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/groupwise.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/hdfs_io.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/import_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/fp8_kernel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/kernels.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/linear_cross_entropy.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logger/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logger/aggregate_logger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logging_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/dist_checkpointing.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/memory.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/optimizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/pipeline_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/router_replay_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/router_replay_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/sequence_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/tensor_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron_peft_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/memory_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/metric/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/metric/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/qat_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/qat_weight_exporter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/quantize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/vllm_modelopt_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/net_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/npu_flash_attn_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/empty_annotations.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/mstx_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/nvtx_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/performance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/precision_debugger_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/torch_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/py_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/core.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/linear.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/quantizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/vllm_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/ray_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rendezvous/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rendezvous/ray_backend.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/_timeout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/geo3k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_batch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_verify.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_verify_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/testing_util.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/grader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/math_normalize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/rlla.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/sandbox_fusion/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/sandbox_fusion/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/search_r1_like_qa_em.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/grader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/math_normalize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/math_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_mathverify.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rollout_skip.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rollout_trace.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/seqlen_balancing.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/sglang/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/sglang/sglang_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tensordict_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tokenizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/torch_dtypes.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/torch_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tracking.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/transferqueue_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/transformers_compat.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/trtllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/trtllm/trtllm_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/ulysses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/veomni/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/veomni/router_replay.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/npu_vllm_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/vllm_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/actor.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/checkpoint.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/critic.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/disaggregation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/distillation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/megatron_peft.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/optimizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine_workers.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/abstract.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/batch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/naive.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/prime.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/hf_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/llm_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/naive/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/naive/naive_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/replica.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/schemas.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/async_sglang_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/http_server_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/sglang_pd_replica.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/sglang_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/tokenizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_async_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_worker_extension.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/bucketed_weight_transfer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/vllm_async_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/vllm_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/padding.py",
+        "exists": true,
+        "match": true
+      }
+    ]
+  },
+  "mdpo-o50-j16": {
+    "commit": "87ec5155f4ee4f7904aa275cf580261542350c82",
+    "checks": [
+      {
+        "label": "first_party/src/mirroropd/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/verl/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/verl/fsdp.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_categorical.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_lm.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_pg.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/token_inner.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/cache.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/host_memory.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/metrics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/tokenization.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/tracking.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/audit_gsm8k_setting.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/audit_math_run.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/dapo-deepseek-4gpu.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/gsm8k-mdpo.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/gsm8k-opd-onpolicy.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/pythia-mdpo.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configure_wandb_workspace.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_dapo_math.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_gsm8k_ablation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_gsm8k_opd.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/gsm8k_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/math_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/natural_text_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_dapo_math.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_math_backend.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/publish_wandb_diagnostics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/record_training_provenance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_configured_training.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_dapo_math_4gpu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_opd_o1000.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_opd_onpolicy.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_math_suite.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_mdpo_calibration_matrix.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_pythia_eta_scan.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_pythia_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_upstream_mirror_canary.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_upstream_mirror_training.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/score_pythia_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/select_dapo_context.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/base_config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/hccl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/kimi_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/mooncake_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/nccl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/nixl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/single_turn_agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/tool_agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/tool_parser.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/config/fully_async_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/config/fully_async_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/detach_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_main.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_rollouter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/message_queue.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_30b_a3b_base_math_fsdp.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_30b_a3b_math_fsdp_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_async_retool.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_16_16.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_32_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_4_4.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_64_64.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_64_64_mis.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_8_8.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen25vl_7b_megatron_4_4.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_30b_a3b_fsdp2_32_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_30b_megatron_6_2_npu_async.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_8b_fsdp2_16_16_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_8_8_mis_trtllm.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_96_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_96_32_mis.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_8b_base_math_megatron_4_4_trtllm.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_qwen35_35b_megatron_async.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/runtime_env.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/unittest/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/unittest/simple_streaming_demo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/config/one_step_off_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/config/one_step_off_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/main_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_64_64.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_64_64_ris.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_sglang_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_sglang_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_megatron_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_megatron_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_0.6b_gsm8k_fsdp2_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_0.6b_gsm8k_fsdp2_sglang_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_3b_gsm8k_fsdp2_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_qwen3_8b_gsm8k_fsdp2_8_8_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/gdpo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/limited.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/naive.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/remote.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/inner_sglang_router.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/naive_router.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/engine_workers.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/teacher_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/teacher_model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/__main__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/base_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/fsdp_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/megatron_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/bridge.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/config_converter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/loader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/mbridge.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward_1f1b_overlap.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward_fused.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_initializer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/mtp_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/saver.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/util.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/weight_converter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/apertus.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/dense_common.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/glm4v.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/kimi_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/llama.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/monkey_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/npu_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen2.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen2_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen3_5.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen3_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/tiled_mlp.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/weight_loader_registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/protocol.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/decorator.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/worker.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/worker_group.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/ray/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/ray/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/_state_dict_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/checkpoint/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/checkpoint/state_dict.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/vllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/base_tool.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/function_tool.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/schemas.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/tool_registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_torchtitan_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_veomni_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/dp_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/megatron_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/mindspeed_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/torchtitan_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/veomni_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/algorithm/rollout_correction.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/algorithm.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/dp_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/megatron_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/mindspeed_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/torchtitan_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/veomni_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/data/legacy_data.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/distillation/distillation.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/automodel.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/fsdp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/mindspeed.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/evaluation.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/legacy_reward_impl.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model/hf_model.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/dp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/mindspeed.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/npu_profile/npu_profile.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/automodel.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/fsdp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/profiler/profiler.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/dp_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/megatron_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/mindspeed_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/torchtitan_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/veomni_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/reward/reward.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/rollout/rollout.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/sft_trainer_engine.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/constants_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/fsdp/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/fsdp/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/megatron/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_eval.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_generation_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_ppo_sync.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/core_algos.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/metric_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/padding_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/prefix_grouper_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/rollout_corr_helper.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/runtime_env.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/sft_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/sft_trainer_ray.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/activation_offload.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/attention_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/chat_template.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/checkpoint_handler.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/fsdp_checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/megatron_checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/dataset_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/multiturn_sft_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/rl_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/rm_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/vision_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/metrics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/performance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/trajectory_tracker.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/device.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/distributed.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/experimental/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/experimental/torch_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/flops_counter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fs.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fsdp_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/groupwise.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/hdfs_io.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/import_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/fp8_kernel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/kernels.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/linear_cross_entropy.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logger/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logger/aggregate_logger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logging_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/dist_checkpointing.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/memory.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/optimizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/pipeline_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/router_replay_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/router_replay_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/sequence_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/tensor_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron_peft_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/memory_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/metric/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/metric/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/qat_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/qat_weight_exporter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/quantize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/vllm_modelopt_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/net_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/npu_flash_attn_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/empty_annotations.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/mstx_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/nvtx_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/performance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/precision_debugger_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/torch_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/py_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/core.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/linear.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/quantizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/vllm_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/ray_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rendezvous/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rendezvous/ray_backend.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/_timeout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/geo3k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_batch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_verify.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_verify_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/testing_util.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/grader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/math_normalize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/rlla.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/sandbox_fusion/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/sandbox_fusion/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/search_r1_like_qa_em.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/grader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/math_normalize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/math_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_mathverify.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rollout_skip.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rollout_trace.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/seqlen_balancing.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/sglang/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/sglang/sglang_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tensordict_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tokenizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/torch_dtypes.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/torch_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tracking.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/transferqueue_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/transformers_compat.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/trtllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/trtllm/trtllm_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/ulysses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/veomni/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/veomni/router_replay.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/npu_vllm_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/vllm_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/actor.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/checkpoint.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/critic.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/disaggregation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/distillation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/megatron_peft.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/optimizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine_workers.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/abstract.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/batch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/naive.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/prime.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/hf_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/llm_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/naive/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/naive/naive_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/replica.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/schemas.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/async_sglang_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/http_server_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/sglang_pd_replica.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/sglang_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/tokenizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_async_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_worker_extension.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/bucketed_weight_transfer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/vllm_async_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/vllm_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/padding.py",
+        "exists": true,
+        "match": true
+      }
+    ]
+  },
+  "bpo-o50-j16": {
+    "commit": "ac54a612fb9ef0692b5b65d6c7dae620bdbb39a9",
+    "checks": [
+      {
+        "label": "first_party/src/mirroropd/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/verl/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/integrations/verl/fsdp.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_categorical.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_lm.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/opd_pg.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/token_inner.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/cache.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/host_memory.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/metrics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/tokenization.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/src/mirroropd/training/tracking.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/audit_gsm8k_setting.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/audit_math_run.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/dapo-deepseek-4gpu.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/gsm8k-mdpo.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/gsm8k-opd-onpolicy.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configs/pythia-mdpo.json",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/configure_wandb_workspace.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_dapo_math.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_gsm8k_ablation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/followup_gsm8k_opd.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/gsm8k_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/math_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/natural_text_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_dapo_math.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/prepare_math_backend.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/publish_wandb_diagnostics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/record_training_provenance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_configured_training.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_dapo_math_4gpu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_opd_o1000.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_gsm8k_opd_onpolicy.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_math_suite.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_mdpo_calibration_matrix.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_pythia_eta_scan.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_pythia_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_upstream_mirror_canary.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/run_upstream_mirror_training.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/score_pythia_mdpo.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "first_party/training/select_dapo_context.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/base_config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/hccl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/kimi_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/mooncake_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/nccl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/checkpoint_engine/nixl_checkpoint_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/single_turn_agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/tool_agent_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/tool_parser.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/agent_loop/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/config/fully_async_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/config/fully_async_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/detach_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_main.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_rollouter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/fully_async_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/message_queue.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_30b_a3b_base_math_fsdp.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_30b_a3b_math_fsdp_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_async_retool.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_16_16.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_32_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_4_4.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_64_64.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_64_64_mis.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/dapo_7b_math_fsdp2_8_8.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen25vl_7b_megatron_4_4.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_30b_a3b_fsdp2_32_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_30b_megatron_6_2_npu_async.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/geo3k_qwen3vl_8b_fsdp2_16_16_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_8_8_mis_trtllm.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_96_32.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_30b_a3b_base_math_megatron_96_32_mis.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_8b_base_math_megatron_4_4_trtllm.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/grpo_qwen35_35b_megatron_async.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/shell/runtime_env.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/unittest/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/fully_async_policy/unittest/simple_streaming_demo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/config/one_step_off_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/config/one_step_off_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/main_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_64_64.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_64_64_ris.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_sglang_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_fsdp2_sglang_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_megatron_4_12.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/dapo_7b_math_megatron_colocate.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_0.6b_gsm8k_fsdp2_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_0.6b_gsm8k_fsdp2_sglang_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_3b_gsm8k_fsdp2_2_6.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/one_step_off_policy/shell/grpo_qwen3_8b_gsm8k_fsdp2_8_8_npu.sh",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_loop.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/gdpo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/limited.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/naive.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_manager/remote.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/reward_model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/inner_sglang_router.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/reward_loop/router/naive_router.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/engine_workers.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/separation/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/teacher_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/experimental/teacher_loop/teacher_model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/__main__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/base_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/fsdp_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/model_merger/megatron_model_merger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/bridge.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/config_converter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/loader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/mbridge.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward_1f1b_overlap.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_forward_fused.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/model_initializer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/mtp_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/saver.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/util.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/mcore/weight_converter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/apertus.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/dense_common.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/glm4v.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/kimi_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/llama.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/monkey_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/npu_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen2.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen2_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen3_5.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/qwen3_vl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/transformers/tiled_mlp.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/models/weight_loader_registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/protocol.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/decorator.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/worker.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/base/worker_group.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/ray/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/single_controller/ray/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/_state_dict_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/checkpoint/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/torch/distributed/checkpoint/state_dict.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/third_party/vllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/base_tool.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/function_tool.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/schemas.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/tools/tool_registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_torchtitan_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/_generated_ppo_veomni_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/dp_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/megatron_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/mindspeed_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/torchtitan_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/actor/veomni_actor.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/algorithm/rollout_correction.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/algorithm.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/dp_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/megatron_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/mindspeed_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/torchtitan_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/critic/veomni_critic.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/data/legacy_data.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/distillation/distillation.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/automodel.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/fsdp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/mindspeed.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/engine/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/evaluation.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/legacy_reward_impl.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model/hf_model.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/dp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/mindspeed.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/model_engine/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/npu_profile/npu_profile.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/automodel.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/fsdp.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/megatron.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/torchtitan.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/optim/veomni.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ppo_megatron_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ppo_trainer.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/profiler/profiler.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/dp_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/megatron_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/mindspeed_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/torchtitan_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/ref/veomni_ref.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/reward/reward.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/rollout/rollout.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/config/sft_trainer_engine.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/constants_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/fsdp/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/fsdp/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/distillation/megatron/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_eval.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_generation_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_ppo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/main_ppo_sync.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/core_algos.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/metric_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/padding_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/prefix_grouper_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/ray_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/rollout_corr_helper.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/ppo/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/runtime_env.yaml",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/sft_trainer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/trainer/sft_trainer_ray.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/activation_offload.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/attention_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/chat_template.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/checkpoint_handler.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/fsdp_checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/checkpoint/megatron_checkpoint_manager.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/dataset_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/multiturn_sft_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/rl_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/rm_dataset.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/dataset/vision_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/metrics.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/performance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/debug/trajectory_tracker.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/device.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/distributed.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/experimental/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/experimental/torch_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/flops_counter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fs.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/fsdp_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/groupwise.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/hdfs_io.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/import_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/fp8_kernel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/kernels.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/kernel/linear_cross_entropy.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logger/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logger/aggregate_logger.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/logging_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/dist_checkpointing.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/memory.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/optimizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/pipeline_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/router_replay_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/router_replay_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/sequence_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron/tensor_parallel.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron_peft_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/megatron_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/memory_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/metric/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/metric/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/qat_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/qat_weight_exporter.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/quantize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/modelopt/vllm_modelopt_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/net_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/npu_flash_attn_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/config.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/empty_annotations.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/mstx_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/nvtx_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/performance.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/precision_debugger_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/profiler/torch_profile.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/py_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/core.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/linear.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/quantizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/qat/vllm_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/ray_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rendezvous/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rendezvous/ray_backend.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/_timeout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/geo3k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/gsm8k.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_batch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_verify.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/math_verify_reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/testing_util.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_code/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/grader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/prime_math/math_normalize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/rlla.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/sandbox_fusion/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/sandbox_fusion/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/search_r1_like_qa_em.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/grader.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/math_normalize.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_math/math_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/reward_score/ttrl_mathverify.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rollout_skip.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/rollout_trace.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/seqlen_balancing.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/sglang/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/sglang/sglang_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tensordict_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tokenizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/torch_dtypes.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/torch_functional.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/tracking.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/transferqueue_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/transformers_compat.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/trtllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/trtllm/trtllm_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/ulysses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/veomni/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/veomni/router_replay.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/npu_vllm_patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/patch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/utils/vllm/vllm_fp8_utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/actor.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/checkpoint.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/critic.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/disaggregation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/distillation.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/megatron_peft.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/model.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/optimizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/reward.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/config/rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/automodel/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/fsdp/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/megatron/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/mindspeed/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/torchtitan/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/transformer_impl.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine/veomni/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/engine_workers.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/abstract.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/batch.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/dapo.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/naive.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/prime.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/reward_manager/registry.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/base.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/hf_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/llm_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/naive/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/naive/naive_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/replica.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/schemas.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/async_sglang_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/http_server_engine.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/sglang_pd_replica.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/sglang_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/sglang_rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/tokenizer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_async_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/trtllm_rollout/trtllm_worker_extension.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/bucketed_weight_transfer.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/utils.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/vllm_async_server.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/rollout/vllm_rollout/vllm_rollout.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/__init__.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/losses.py",
+        "exists": true,
+        "match": true
+      },
+      {
+        "label": "framework/verl/workers/utils/padding.py",
+        "exists": true,
+        "match": true
+      }
+    ]
+  }
+}
