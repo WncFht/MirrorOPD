@@ -1,0 +1,58 @@
+[
+  {
+    "pid": 338772,
+    "name": "ray::WorkerDict",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 338773,
+    "name": "ray::WorkerDict",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 338774,
+    "name": "ray::WorkerDict",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 338775,
+    "name": "ray::WorkerDict",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 339897,
+    "name": "ray::vLLMHttpServer",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 339898,
+    "name": "ray::vLLMHttpServer",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 339899,
+    "name": "ray::vLLMHttpServer",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  },
+  {
+    "pid": 339900,
+    "name": "ray::vLLMHttpServer",
+    "cuda_visible_devices_at_process_start": "0,1,2,3",
+    "rollout_support_alignment": "1",
+    "vllm_v1": "1"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "source_commit": "c41dfbf52270e9e159272ec8530d62603373fb81",
+  "checked_at_unix": 1791731442.2441418,
+  "cpu_tests": "All Makefile CPU entries executed with Conda opd Python; passed",
+  "support_regressions": 13,
+  "global_writer_regressions": 3,
+  "make_check": "passed under Conda opd after installing Ruff 0.14.8 and pre-commit",
+  "patch_base": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+  "patch_clean_replay": "passed",
+  "evidence_logs": [
+    "runs/math-4gpu-setup/full-cpu-tests.log",
+    "runs/math-4gpu-setup/check-conda-final.log",
+    "runs/math-4gpu-setup/support-tests.log"
+  ],
+  "gpu_canary_current": {
+    "name": "dapo-deepseek-onpolicy-canary-04",
+    "pid": 335287,
+    "state": "running",
+    "wandb_run": "dszo8a4i",
+    "evaluation_examples": 570
+  },
+  "suite_pid": 335379
+}
