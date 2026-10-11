@@ -1114,5 +1114,13 @@
         "grad_was_clipped": 0.0
       }
     }
-  ]
+  ],
+  "gpu_peak_sample": {
+    "timestamp": "2026/10/11 22:45:36.484",
+    " index": " 1",
+    " memory.used [MiB]": " 35721 MiB",
+    " utilization.gpu [%]": " 1 %",
+    " power.draw [W]": " 165.65 W",
+    " temperature.gpu": " 31"
+  }
 }

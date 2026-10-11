@@ -10,7 +10,7 @@ def read_rows(path):
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
-def report(run, output):
+def report(run, output, *, expected_test_examples=1319, benchmark_label="GSM8K"):
     inner = read_rows(run / "inner.jsonl")
     outer = read_rows(run / "outer.jsonl")
     evaluation = [row for row in outer if "evaluation/generated_examples" in row["data"]]
@@ -56,10 +56,13 @@ def report(run, output):
             for row in evaluation
         ],
         "interpretation": (
-            "Full fixed GSM8K test, single training run; no paired per-example outcomes retained."
+            f"Full fixed {benchmark_label} test, single training run; no paired per-example outcomes retained."
             if evaluation
-            and all(row["data"]["evaluation/generated_examples"] == 1319 for row in evaluation)
-            else "Execution evidence; small test subsets are not GSM8K benchmarks."
+            and all(
+                row["data"]["evaluation/generated_examples"] == expected_test_examples
+                for row in evaluation
+            )
+            else f"Execution evidence; small test subsets are not {benchmark_label} benchmarks."
         ),
     }
     output.mkdir(parents=True, exist_ok=True)
