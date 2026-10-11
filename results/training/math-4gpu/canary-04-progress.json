@@ -1,0 +1,47 @@
+{
+  "run": "dapo-deepseek-onpolicy-canary-04",
+  "measurement": "running snapshot",
+  "exit_code": null,
+  "initial_evaluation": {
+    "step": 0,
+    "data": {
+      "evaluation/generated_examples": 570,
+      "val-aux/MATH-500/reward/mean@1": 0.71,
+      "val-aux/MATH-500/response_tokens/mean@1": 3611.268,
+      "val-aux/MATH-500/eos_terminated/mean@1": 0.724,
+      "val-aux/MATH-500/budget_exhausted/mean@1": 0.276,
+      "val-aux/MATH-500/score/mean@1": 0.71,
+      "val-aux/MATH-500/format_score/mean@1": 0.726,
+      "val-core/MATH-500/acc/mean@1": 0.71,
+      "val-aux/AMC23/reward/mean@1": 0.475,
+      "val-aux/AMC23/response_tokens/mean@1": 5483.025,
+      "val-aux/AMC23/eos_terminated/mean@1": 0.425,
+      "val-aux/AMC23/budget_exhausted/mean@1": 0.575,
+      "val-aux/AMC23/score/mean@1": 0.475,
+      "val-aux/AMC23/format_score/mean@1": 0.45,
+      "val-core/AMC23/acc/mean@1": 0.475,
+      "val-aux/AIME25/reward/mean@1": 0.2,
+      "val-aux/AIME25/response_tokens/mean@1": 6470.833333333333,
+      "val-aux/AIME25/eos_terminated/mean@1": 0.2,
+      "val-aux/AIME25/budget_exhausted/mean@1": 0.8,
+      "val-aux/AIME25/score/mean@1": 0.2,
+      "val-aux/AIME25/format_score/mean@1": 0.2,
+      "val-core/AIME25/acc/mean@1": 0.2,
+      "val-aux/num_turns/min": 2,
+      "val-aux/num_turns/max": 2,
+      "val-aux/num_turns/mean": 2.0
+    }
+  },
+  "observed_inner_indices": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ]
+  ],
+  "next_supervisor_pid": 376974,
+  "next_validation_batch": null
+}

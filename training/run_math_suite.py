@@ -84,6 +84,14 @@ def main():
         while identity is not None and process_identity(args.canary_pid) == identity:
             time.sleep(20)
         verify(args.canary_run)
+        # The full validation loader queues all 570 examples to bounded vLLM
+        # replicas; verify its memory and complete evaluation before long runs.
+        run(
+            "mirror_opd_onpolicy",
+            "dapo-deepseek-onpolicy-canary-05-val-batch",
+            "trainer.total_training_steps=1",
+            "trainer.test_freq=1",
+        )
         run("mirror_opd_onpolicy", "dapo-deepseek-opd-o50-j1")
         for method, short in (("mirror_mdpo", "mdpo"), ("mirror_bpo", "bpo")):
             run(

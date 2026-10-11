@@ -30,7 +30,7 @@
         "distillation.distillation_loss.mirror_eta=0.3",
         "distillation.distillation_loss.topk=16",
         "data.train_batch_size=64",
-        "data.val_batch_size=16",
+        "data.val_batch_size=null",
         "data.max_prompt_length=2048",
         "data.max_response_length=7168",
         "data.truncation=error",
