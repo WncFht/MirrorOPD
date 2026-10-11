@@ -1,13 +1,16 @@
 {
   "runs": [
     "dapo-deepseek-opd-o50-j1",
-    "dapo-deepseek-mdpo-o50-j16"
+    "dapo-deepseek-mdpo-o50-j16",
+    "dapo-deepseek-bpo-o50-j16"
   ],
   "config_sha256": {
     "dapo-deepseek-opd-o50-j1": "d8c3ef42c742b7f1f84b5fa499c0acd97ae0a789a9d36e54943b0ac05cd1bbf8",
-    "dapo-deepseek-mdpo-o50-j16": "99f90dcd4f52eff3d27e5a893cc9af49165e26200b5bde4e363472183439a1f7"
+    "dapo-deepseek-mdpo-o50-j16": "99f90dcd4f52eff3d27e5a893cc9af49165e26200b5bde4e363472183439a1f7",
+    "dapo-deepseek-bpo-o50-j16": "65157a9807bf1655ce9b9b80ec358b8dda949ce81cbf9619ac8e931dd8b1a219"
   },
   "resolved_leaf_counts": [
+    788,
     788,
     788
   ],
@@ -54,5 +57,42 @@
     }
   ],
   "allowed_differences_only": true,
-  "interpretation": "Actual resolved configuration comparison: method and epochs plus run-specific names/paths. Critic configuration epochs is dormant; critic is not enabled for distillation. This is configuration evidence, not completed MDPO outcome."
+  "interpretation": "Actual resolved configurations: top-level differences compare on-policy to MDPO; bpo_comparison compares MDPO to BPO. Only method, epochs and run-specific names/paths differ. Configuration evidence does not imply completed BPO outcome.",
+  "bpo_comparison": {
+    "baseline_run": "dapo-deepseek-mdpo-o50-j16",
+    "run": "dapo-deepseek-bpo-o50-j16",
+    "differences": [
+      {
+        "key": "actor_rollout_ref.rollout.trace.experiment_name",
+        "mdpo": "dapo-deepseek-mdpo-o50-j16",
+        "bpo": "dapo-deepseek-bpo-o50-j16"
+      },
+      {
+        "key": "distillation.distillation_loss.loss_mode",
+        "mdpo": "mirror_mdpo",
+        "bpo": "mirror_bpo"
+      },
+      {
+        "key": "ray_kwargs.ray_init.runtime_env.env_vars.MIRROR_INNER_METRICS_PATH",
+        "mdpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-mdpo-o50-j16/inner.jsonl",
+        "bpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-bpo-o50-j16/inner.jsonl"
+      },
+      {
+        "key": "ray_kwargs.ray_init.runtime_env.env_vars.VERL_FILE_LOGGER_PATH",
+        "mdpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-mdpo-o50-j16/outer.jsonl",
+        "bpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-bpo-o50-j16/outer.jsonl"
+      },
+      {
+        "key": "trainer.default_local_dir",
+        "mdpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-mdpo-o50-j16/checkpoints",
+        "bpo": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/dapo-deepseek-bpo-o50-j16/checkpoints"
+      },
+      {
+        "key": "trainer.experiment_name",
+        "mdpo": "dapo-deepseek-mdpo-o50-j16",
+        "bpo": "dapo-deepseek-bpo-o50-j16"
+      }
+    ],
+    "allowed_differences_only": true
+  }
 }
