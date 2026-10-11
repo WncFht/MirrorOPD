@@ -1,0 +1,78 @@
+{
+  "run": "dapo-deepseek-bpo-canary-j16",
+  "outer_calls": 2,
+  "inner_updates": 32,
+  "exit_code": 0,
+  "finite": true,
+  "outer_audits": [
+    {
+      "outer_call": 0,
+      "inner_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "sync_student_center_rms": 9.931612834085445e-08,
+      "frozen_metric_checks": {
+        "mirror/anchor_head_mass/mean": true,
+        "mirror/anchor_tail_mass/mean": true,
+        "mirror/teacher_center/mean": true,
+        "mirror/sampled_reward/mean": true
+      },
+      "importance_ess_fraction_min": 0.998603765417055,
+      "last_sampled_log_ratio_rms": 0.03744270408461877,
+      "grad_norm_range": [
+        1.049280047416687,
+        1.2757995128631592
+      ]
+    },
+    {
+      "outer_call": 1,
+      "inner_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "sync_student_center_rms": 9.886928203332819e-08,
+      "frozen_metric_checks": {
+        "mirror/anchor_head_mass/mean": true,
+        "mirror/anchor_tail_mass/mean": true,
+        "mirror/teacher_center/mean": true,
+        "mirror/sampled_reward/mean": true
+      },
+      "importance_ess_fraction_min": 0.9950484715864854,
+      "last_sampled_log_ratio_rms": 0.0731763256315738,
+      "grad_norm_range": [
+        0.49219298362731934,
+        1.0550566911697388
+      ]
+    }
+  ],
+  "interpretation": "Two-outer J16 execution canary with 16-example evaluation. Importance ratio/ESS are diagnostics; BPO uses frozen-rollout weights, not MDPO importance weighting. No benchmark effectiveness claim."
+}
