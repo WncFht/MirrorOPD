@@ -1,0 +1,83 @@
+{
+  "run_id": "6bw4rmi3",
+  "snapshot_date": "2026-10-11",
+  "state": "running",
+  "remote_run_dir": "/home/fanghaotian/src/mirroropd/runs/gsm8k-smollm2-opd-onpolicy-o1000-j1",
+  "source_commit": "c0496084ba2415e0ea3d0a7a8ae488e0571ff7f1",
+  "logged_outer_updates": 434,
+  "inner_records": 435,
+  "last_logged_outer": 434,
+  "last_inner_outer_call": 434,
+  "last_evaluation_outer": 430,
+  "evaluations": 87,
+  "examples_per_evaluation": 1319,
+  "snapshot_files": {
+    "inner.jsonl": {
+      "sha256": "b0cef2fd07be69574477c08d516c67a81443b3e7482dc99bc9116d4250b0b2f9",
+      "bytes": 1547411
+    },
+    "model-data-audit.json": {
+      "sha256": "5be5669701cbc209e77b0aeabbeddfd76c2ea2e3eb67d32139f17e2af8e4548a",
+      "bytes": 2137
+    },
+    "outer.jsonl": {
+      "sha256": "d34840f238f04732532766a7eddafbd135deb123a7e22d531545c028407d4ac5",
+      "bytes": 3440362
+    },
+    "resolved-config.yaml": {
+      "sha256": "b83abe7d5a92f02438789353a20e6e6aa1508bdc92f512c261a4b8076a79b447",
+      "bytes": 25644
+    },
+    "source-provenance.json": {
+      "sha256": "93ac7673d4d6460c25a9752d10db364f31e0a6acc597a685d080eb8c933639fc",
+      "bytes": 59480
+    }
+  },
+  "aggregation": "Each outer metric is token-weighted within its batch; windows below are arithmetic means of batch metrics, not pooled token means.",
+  "windows": {
+    "first50": {
+      "first_outer": 1,
+      "last_outer": 50,
+      "outer_count": 50,
+      "mean_over_outer_batches": {
+        "actor/mirror/teacher_center/mean": 0.3244216141663463,
+        "actor/mirror/sampled_reward/mean": -0.38095427602742826,
+        "actor/mirror/token_advantage/mean": 0.05653266184773938,
+        "actor/mirror/token_advantage/rms": 0.9358333444863066,
+        "actor/grad_norm": 1.6807742595672608,
+        "actor/mirror/student_entropy/mean": 1.420962248611749,
+        "actor/mirror/anchor_tail_mass/mean": 0.0688518523567216,
+        "critic/rewards/mean": 0.035625,
+        "response_length/mean": 241.41125
+      }
+    },
+    "last50": {
+      "first_outer": 385,
+      "last_outer": 434,
+      "outer_count": 50,
+      "mean_over_outer_batches": {
+        "actor/mirror/teacher_center/mean": 0.3091465807379848,
+        "actor/mirror/sampled_reward/mean": -0.35182056251050586,
+        "actor/mirror/token_advantage/mean": 0.04267398177713806,
+        "actor/mirror/token_advantage/rms": 0.88315077415239,
+        "actor/grad_norm": 1.1307142305374145,
+        "actor/mirror/student_entropy/mean": 1.1965273327245651,
+        "actor/mirror/anchor_tail_mass/mean": 0.04857656080862226,
+        "critic/rewards/mean": 0.038125,
+        "response_length/mean": 308.97625
+      }
+    }
+  },
+  "grad": {
+    "min": 0.9290832877159119,
+    "max": 2.187490940093994,
+    "clipped_updates": 3,
+    "clip_threshold": 2
+  },
+  "timing_seconds": {
+    "timing_s/step": 22713.541158810636,
+    "timing_s/testing": 75924.5353300981,
+    "timing_s/update_actor": 5463.1941278690065,
+    "timing_s/gen": 12689.778278311453
+  }
+}
