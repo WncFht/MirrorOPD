@@ -130,3 +130,15 @@ def test_collapse_statistic_detects_known_time_rescaling():
     assert result["raw_log_dispersion"] > 0.1
     assert result["effective_log_dispersion"] < 1e-12
     assert result["preregistered_30_percent_reduction_passed"]
+
+
+def test_directory_lease_owner_disappearance_is_retryable(tmp_path):
+    """A lease released during owner lookup must keep the waiter alive."""
+    first = GpuGroupLease(tmp_path / "gpu-group.lease")
+    second = GpuGroupLease(first.directory)
+    assert first.acquire()
+    with patch("pathlib.Path.read_text", side_effect=FileNotFoundError):
+        assert not second.acquire()
+    first.release()
+    assert second.acquire()
+    second.release()

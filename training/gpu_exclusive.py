@@ -36,9 +36,10 @@ class GpuGroupLease:
             self.directory.mkdir()
         except FileExistsError:
             path = self.directory / "owner.json"
-            if not path.exists():
+            try:
+                existing = json.loads(path.read_text())
+            except FileNotFoundError:
                 return False
-            existing = json.loads(path.read_text())
             if (
                 existing["pid_namespace"] == self.owner["pid_namespace"]
                 and process_identity(existing["pid"]) != existing["process_identity"]
