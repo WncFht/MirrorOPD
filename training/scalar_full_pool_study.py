@@ -104,6 +104,48 @@ def execute(phase, configurations):
     plot_phase(ROOT / f"runs/scalar-large/{phase}", output / "figures")
 
 
+def long_check(selection):
+    """Validate short-pool LR choices on a separately frozen 7168-token pool."""
+    cache = "runs/scalar-large/cache-long-s42"
+    launch_phase(
+        "fulllong-prepare",
+        [
+            (
+                "cache-long-s42",
+                [
+                    "experiments/rollout/scalar_large_cache.py",
+                    "--seed",
+                    "42",
+                    "--train-sequences",
+                    "64",
+                    "--validation-sequences",
+                    "16",
+                    "--response-length",
+                    "7168",
+                    "--output",
+                    cache,
+                ],
+            )
+        ],
+        ROOT / "runs/scalar-large/fulllong-prepare-controller",
+    )
+    common = base(42) | {"cache": cache, "updates": 80}
+    execute(
+        "fulllong-canary",
+        [("fulllong-canary", common | {"lr": 5e-7, "updates": 1, "audit_every": 1})],
+    )
+    summary = json.loads(
+        (ROOT / "runs/scalar-large/fulllong-canary/fulllong-canary/summary.json").read_text()
+    )
+    if summary["status"] != "complete" or summary["counts"]["backwards"] != 64:
+        raise RuntimeError("long-pool full-gradient canary failed")
+    rates = sorted({r["lr"] for r in selection["baselines"]} | {1e-6, 2e-6, 4e-6})
+    execute(
+        "fulllong",
+        [(f"fulllong-lr{lr:.3g}", common | {"lr": lr, "maximum": max(1.6e-5, lr)}) for lr in rates],
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--plan-only", action="store_true")
@@ -118,6 +160,14 @@ def main():
         "fork_updates": 40,
         "confirmation_seeds": [42, 142, 242],
         "confirmation_updates": 600,
+        "long_transfer": {
+            "response_length": 7168,
+            "train_sequences": 64,
+            "validation_sequences": 16,
+            "updates": 80,
+            "seed": 42,
+            "rates": "selected two constants plus 1e-6, 2e-6, 4e-6",
+        },
         "pilot_refinement": "add 3.2e-5 and 6.4e-5 if highest LR wins",
         "priority": [
             "active old jobs finish",
@@ -125,6 +175,7 @@ def main():
             "fullstage",
             "fullconfirm",
             "remaining old confirm",
+            "fulllong transfer check",
             "old ablate",
         ],
         "gpu_indices": [0, 1, 2, 3],
@@ -150,6 +201,8 @@ def main():
     execute("fullconfirm", confirmation(selection))
     # The old predeclared experiments retain their original conditions.
     for phase in ("confirm", "ablate"):
+        if phase == "ablate":
+            long_check(selection)
         import subprocess
 
         from training.scalar_large_suite import PYTHON

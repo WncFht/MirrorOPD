@@ -264,6 +264,14 @@
     242
   ],
   "confirmation_updates": 600,
+  "long_transfer": {
+    "response_length": 7168,
+    "train_sequences": 64,
+    "validation_sequences": 16,
+    "updates": 80,
+    "seed": 42,
+    "rates": "selected two constants plus 1e-6, 2e-6, 4e-6"
+  },
   "pilot_refinement": "add 3.2e-5 and 6.4e-5 if highest LR wins",
   "priority": [
     "active old jobs finish",
@@ -271,6 +279,7 @@
     "fullstage",
     "fullconfirm",
     "remaining old confirm",
+    "fulllong transfer check",
     "old ablate"
   ],
   "gpu_indices": [
