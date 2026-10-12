@@ -2,6 +2,7 @@
 
 import argparse
 import copy
+import gzip
 import hashlib
 import json
 import os
@@ -18,6 +19,26 @@ from training.scalar_large_gpu import register_owner
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+
+def restore_frozen_tokens(root, seed, destination):
+    """Restore exact versioned input bytes, rather than resampling a pool."""
+    if destination.exists():
+        return False
+    archive = root / "data/scalar-large" / f"seed-{seed}-tokens.pt.gz"
+    if not archive.exists():
+        return False
+    manifest = json.loads((root / "data-manifest.json").read_text())
+    relative_archive = str(archive.relative_to(root))
+    entry = next(item for item in manifest["files"] if item["archive"] == relative_archive)
+    blob = gzip.decompress(archive.read_bytes())
+    if len(blob) != entry["bytes"] or hashlib.sha256(blob).hexdigest() != entry["sha256"]:
+        raise ValueError("versioned frozen token archive failed checksum verification")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_suffix(".tmp")
+    temporary.write_bytes(blob)
+    temporary.replace(destination)
+    return True
 
 
 def load_student_helper():
@@ -119,10 +140,14 @@ def prepare(args):
     )
     tokenizer.pad_token = tokenizer.eos_token
     records_path = args.output / "tokens.pt"
+    if args.train_sequences == 128 and args.validation_sequences == 32:
+        restore_frozen_tokens(ROOT, args.seed, records_path)
     student = load_model(student_path)
     register_owner(args.device)
     if records_path.exists():
         records = torch.load(records_path, weights_only=False)
+        if len(records) != args.train_sequences + args.validation_sequences:
+            raise ValueError("frozen input count differs from the requested pool; preserved")
     else:
         prompts = select_prompts(
             tokenizer, args.seed, args.train_sequences + args.validation_sequences

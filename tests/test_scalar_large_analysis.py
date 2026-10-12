@@ -190,3 +190,42 @@ def test_optional_proxy_logging_does_not_change_constant_adam_updates(tmp_path, 
             assert torch.equal(
                 workers[0].optimizer.state[left][key], workers[1].optimizer.state[right][key]
             )
+
+
+def test_frozen_input_restore_verifies_bytes_and_preserves_existing_data(tmp_path):
+    import gzip
+    import hashlib
+
+    import pytest
+
+    from experiments.rollout.scalar_large_cache import restore_frozen_tokens
+
+    folder = tmp_path / "data/scalar-large"
+    folder.mkdir(parents=True)
+    original = b"fixed rollout IDs; test fixture, not a torch archive"
+    archive = folder / "seed-42-tokens.pt.gz"
+    archive.write_bytes(gzip.compress(original))
+    (tmp_path / "data-manifest.json").write_text(
+        json.dumps(
+            {
+                "files": [
+                    {
+                        "archive": "data/scalar-large/seed-42-tokens.pt.gz",
+                        "bytes": len(original),
+                        "sha256": hashlib.sha256(original).hexdigest(),
+                    }
+                ]
+            }
+        )
+    )
+    destination = tmp_path / "runs/cache/tokens.pt"
+    assert restore_frozen_tokens(tmp_path, 42, destination)
+    assert destination.read_bytes() == original
+    destination.write_bytes(b"existing data is preserved")
+    assert not restore_frozen_tokens(tmp_path, 42, destination)
+    assert destination.read_bytes() == b"existing data is preserved"
+    destination.unlink()
+    archive.write_bytes(gzip.compress(b"corrupt"))
+    with pytest.raises(ValueError, match="checksum"):
+        restore_frozen_tokens(tmp_path, 42, destination)
+    assert not destination.exists()
