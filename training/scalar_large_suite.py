@@ -2,13 +2,13 @@
 
 import argparse
 import contextlib
-import fcntl
 import json
 import os
 import subprocess
 import time
 from pathlib import Path
 
+from training.scalar_gpu_lease import GpuGroupLease
 from training.scalar_large_gpu import gpu_driver_pids
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,56 +29,35 @@ def inventory():
 
 @contextlib.contextmanager
 def gpu_phase(name):
-    directory = ROOT.parent / "runs/gpu-locks"
-    directory.mkdir(parents=True, exist_ok=True)
-    handles = [(directory / f"physical-gpu-{device}.lock").open("a+") for device in range(4)]
+    lease = GpuGroupLease(ROOT.parent / "runs/gpu-locks/physical-gpu-0-3.lease")
     while True:
-        acquired = []
-        try:
-            for handle in handles:
-                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                acquired.append(handle)
-
-        except BlockingIOError:
-            for handle in acquired:
-                fcntl.flock(handle, fcntl.LOCK_UN)
-            print(
-                json.dumps({"phase": name, "status": "waiting_for_gpu_0_3", "unix": time.time()}),
-                flush=True,
-            )
-            time.sleep(15)
-        else:
+        if lease.acquire():
             if all(value <= 512 for value in inventory().values()):
                 break
-            for handle in acquired:
-                fcntl.flock(handle, fcntl.LOCK_UN)
-            print(
-                json.dumps(
-                    {"phase": name, "status": "waiting_for_gpu_memory", "unix": time.time()}
-                ),
-                flush=True,
-            )
-            time.sleep(15)
-    for handle in handles:
-        handle.seek(0)
-        handle.truncate()
-        handle.write(f"scalar-large {name} pid={os.getpid()}\n")
-        handle.flush()
+            lease.release()
+        print(
+            json.dumps({"phase": name, "status": "waiting_for_gpu_0_3", "unix": time.time()}),
+            flush=True,
+        )
+        time.sleep(15)
     try:
-        yield
+        yield lease
     finally:
-        for handle in handles:
-            fcntl.flock(handle, fcntl.LOCK_UN)
-            handle.close()
+        lease.release()
 
 
-def launch_phase(name, commands, output):
+class GPUResourceConflictError(RuntimeError):
+    """A competing GPU process requires waiting, not changing the experiment."""
+
+
+def launch_phase_once(name, commands, output):
     output.mkdir(parents=True, exist_ok=True)
     pending = list(commands)
     active = {}
     completed = []
-    with gpu_phase(name):
+    with gpu_phase(name) as lease:
         while pending or active:
+            lease.heartbeat()
             for device in range(4):
                 if device not in active and pending:
                     job, arguments = pending.pop(0)
@@ -121,7 +100,7 @@ def launch_phase(name, commands, output):
                             child.terminate()
                             child.wait()
                             handle.close()
-                        raise RuntimeError(
+                        raise GPUResourceConflictError(
                             "foreign GPU process detected; own jobs stopped, others preserved"
                         )
             for device, (job, process, log) in list(active.items()):
@@ -152,6 +131,28 @@ def launch_phase(name, commands, output):
             )
             time.sleep(1)
     return completed
+
+
+def launch_phase(name, commands, output):
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            return launch_phase_once(name, commands, output)
+        except GPUResourceConflictError as error:
+            print(
+                json.dumps(
+                    {
+                        "phase": name,
+                        "status": "resource_conflict_wait",
+                        "attempt": attempt,
+                        "reason": str(error),
+                        "unix": time.time(),
+                    }
+                ),
+                flush=True,
+            )
+            time.sleep(15)
 
 
 def canary_commands():
@@ -309,12 +310,11 @@ def ablation_configs(selection):
         for name, changes in conditions
         for label, config in arms
     ]
-    if scalar["method"] == "search":
-        result += [
-            ("ablate-monitor2048-scalar", scalar | {"monitor_positions": 2048}),
-            ("ablate-monitor-sampled-scalar", scalar | {"monitor": "sampled"}),
-            ("ablate-monitor-two-clusters-scalar", scalar | {"monitor_clusters": 2}),
-        ]
+    result += [
+        ("ablate-monitor2048-scalar", scalar | {"monitor_positions": 2048}),
+        ("ablate-monitor-sampled-scalar", scalar | {"monitor": "sampled"}),
+        ("ablate-monitor-two-clusters-scalar", scalar | {"monitor_clusters": 2}),
+    ]
     return result
 
 
@@ -367,7 +367,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--phase",
-        choices=("canary-prepare", "prepare", "canary", "tune", "confirm", "ablate", "all"),
+        choices=(
+            "canary-prepare",
+            "prepare",
+            "canary",
+            "tune",
+            "confirm",
+            "ablate",
+            "all",
+            "resume",
+        ),
         required=True,
     )
     args = parser.parse_args()
@@ -417,15 +426,15 @@ def main():
         (root / "tune-plan.json").write_text(json.dumps(configurations, indent=2) + "\n")
         launch_phase("tune", training_commands("tune", configurations), root / "tune-controller")
         choose(root)
-    if args.phase in ("confirm", "ablate", "all"):
+    if args.phase in ("confirm", "ablate", "all", "resume"):
         selection = json.loads((root / "selection.json").read_text())
-        if args.phase in ("confirm", "all"):
+        if args.phase in ("confirm", "all", "resume"):
             configurations = confirmation_configs(selection)
             (root / "confirm-plan.json").write_text(json.dumps(configurations, indent=2) + "\n")
             launch_phase(
                 "confirm", training_commands("confirm", configurations), root / "confirm-controller"
             )
-        if args.phase in ("ablate", "all"):
+        if args.phase in ("ablate", "all", "resume"):
             configurations = ablation_configs(selection)
             (root / "ablate-plan.json").write_text(json.dumps(configurations, indent=2) + "\n")
             launch_phase(

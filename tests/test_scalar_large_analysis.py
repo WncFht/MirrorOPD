@@ -229,3 +229,70 @@ def test_frozen_input_restore_verifies_bytes_and_preserves_existing_data(tmp_pat
     with pytest.raises(ValueError, match="checksum"):
         restore_frozen_tokens(tmp_path, 42, destination)
     assert not destination.exists()
+
+
+def test_directory_gpu_lease_excludes_competing_owner(tmp_path):
+    from training.scalar_gpu_lease import GpuGroupLease
+
+    first = GpuGroupLease(tmp_path / "physical-gpu-0-3.lease")
+    second = GpuGroupLease(first.directory)
+    assert first.acquire()
+    assert not second.acquire()
+    second.release()
+    assert first.directory.exists()
+    first.release()
+    assert second.acquire()
+    second.release()
+
+
+def test_directory_lease_reclaims_only_provably_dead_local_identity(tmp_path):
+    from training.scalar_gpu_lease import GpuGroupLease
+
+    lease = GpuGroupLease(tmp_path / "lease")
+    lease.directory.mkdir()
+    foreign = dict(lease.owner, pid_namespace="another namespace", process_identity="dead")
+    path = lease.directory / "owner.json"
+    path.write_text(json.dumps(foreign))
+    assert not lease.acquire()
+    assert path.exists()
+    foreign["pid_namespace"] = lease.owner["pid_namespace"]
+    path.write_text(json.dumps(foreign))
+    assert not lease.acquire()
+    assert not lease.directory.exists()
+    assert lease.acquire()
+    lease.release()
+
+
+def test_resource_conflict_retries_without_changing_experiment_plan(tmp_path, monkeypatch):
+    import training.scalar_large_suite as module
+
+    calls = []
+    commands = [("run", ["training/scalar_large_worker.py", "--config", "locked.json"])]
+
+    def attempt(name, arguments, output):
+        calls.append((name, arguments, output))
+        if len(calls) == 1:
+            raise module.GPUResourceConflictError("competing process")
+        return [{"job": "run", "exit_code": 0}]
+
+    monkeypatch.setattr(module, "launch_phase_once", attempt)
+    monkeypatch.setattr(module.time, "sleep", lambda _seconds: None)
+    result = module.launch_phase("confirm", commands, tmp_path)
+    assert len(calls) == 2
+    assert calls[0] == calls[1]
+    assert result[0]["exit_code"] == 0
+
+
+def test_feedback_winner_keeps_all_named_monitor_ablations():
+    from training.scalar_large_suite import ablation_configs
+
+    base = base_config()
+    selection = {"baseline_configs": [base], "primary_scalar_config": base | {"method": "feedback"}}
+    configurations = ablation_configs(selection)
+    names = {name for name, _ in configurations}
+    assert len(configurations) == 17
+    assert {
+        "ablate-monitor2048-scalar",
+        "ablate-monitor-sampled-scalar",
+        "ablate-monitor-two-clusters-scalar",
+    } <= names
