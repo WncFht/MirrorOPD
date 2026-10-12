@@ -1,0 +1,87 @@
+{
+  "source": "docs/operations/2026-10-12-OPD统一伪代码与算法决策分类.md",
+  "pseudocode_version": "2.4.1",
+  "katex_version": "0.16.11",
+  "numbered": false,
+  "noend": false,
+  "algorithms": [
+    {
+      "caption": "共同 outer--phase--inner 训练循环",
+      "math_expressions": 54,
+      "sha256": "ff0fa90f5c34ded95e3bb4f4c3aa010e1983865dc9b8211755b2e32de71bb526",
+      "status": "passed"
+    },
+    {
+      "caption": "固定 head 与稳定 tail 准备",
+      "math_expressions": 21,
+      "sha256": "7c8f5333d1a9a1bae0367e5ec8412b7a238d2f2fd7582f6d429ae3f962f561fa",
+      "status": "passed"
+    },
+    {
+      "caption": "TA coarse：head 加聚合 tail",
+      "math_expressions": 10,
+      "sha256": "855ebeb69c1aa9f2e3a33c03156313a0ca537648eb12f877b5c608d0dc43e1a1",
+      "status": "passed"
+    },
+    {
+      "caption": "TA normalized：条件 head KL",
+      "math_expressions": 15,
+      "sha256": "237c50487b7fcb128049f10288d7b05eeb6199cc335f43f1d542fc5196d2b92b",
+      "status": "passed"
+    },
+    {
+      "caption": "SC-TA：停止 residual，保留 ratio 梯度",
+      "math_expressions": 21,
+      "sha256": "05400580bc25badf4e5b9b0d5dfb0712ea22375f424d0ca1d425bebc03a48a47",
+      "status": "passed"
+    },
+    {
+      "caption": "ResOPD：条件 head 与中心化事件",
+      "math_expressions": 40,
+      "sha256": "0c1e01ac1b1ce7fbd1410846c35b40437ef0603eaa2a5000665b6b9f78580c6e",
+      "status": "passed"
+    },
+    {
+      "caption": "共同 sampled/candidate PPO kernel",
+      "math_expressions": 25,
+      "sha256": "66a22709f3a9d9b82038b1a90e417d46db8f9f426e02d6c6f8d8df5d14911240",
+      "status": "passed"
+    },
+    {
+      "caption": "Sampled teacher-gap 的冻结信号",
+      "math_expressions": 14,
+      "sha256": "5263a0d5beed99378ad89c191ef847fc5a45e9f9ef1ba942d915f2e3410b9c44",
+      "status": "passed"
+    },
+    {
+      "caption": "Candidate teacher-gap 的支持与权重",
+      "math_expressions": 16,
+      "sha256": "5a364023bac91aae602f00d431c461a34a789c8e35e1b60d2dc67f9eb52281d8",
+      "status": "passed"
+    },
+    {
+      "caption": "A2：phase-pre utility 与下一轮 controller",
+      "math_expressions": 36,
+      "sha256": "d6ab87ec016149d44b1ab78a6364fa8c59f951c2ac3a521517c8f7cfce18fc9f",
+      "status": "passed"
+    },
+    {
+      "caption": "LSPD sampled regression 与 entropy",
+      "math_expressions": 23,
+      "sha256": "f250aaa43ce0aa1fcfaecb089b79ef6032bd24c1329189ef83dd85064b07565c",
+      "status": "passed"
+    },
+    {
+      "caption": "LSPD-RB：有界 FIFO 与重复更新",
+      "math_expressions": 34,
+      "sha256": "6228cb45b07000bc08a6c10d4ed3df0a3e8dc066392493763eb6a75d22fd4e0c",
+      "status": "passed"
+    },
+    {
+      "caption": "Mirror Part/Mean/BPO/MDPO 的 score kernel",
+      "math_expressions": 24,
+      "sha256": "612590b2656fafe25346f4222f4491356aca4d0be475598be82d1680f148fd10",
+      "status": "passed"
+    }
+  ]
+}
