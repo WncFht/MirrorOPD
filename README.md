@@ -6,7 +6,7 @@ MirrorOPD 的独立研究与实现仓库。理论文档、KL 估计量实验、�
 
 | 路径                | 内容                                                        |
 | ------------------- | ----------------------------------------------------------- |
-| `src/mirroropd/`    | 可复用的数学参考实现与 CPU 模型验证内核                     |
+| `src/mirroropd/`    | 生产训练内核、verl 适配与数学参考实现                       |
 | `tests/`            | 数学恒等式、模型与上游集成测试                              |
 | `training/`         | TA-OPD/verl 正式训练与 GPU canary 启动入口                  |
 | `experiments/`      | 按 rollout、scoring、analysis、plotting、toy 分组的实验程序 |
@@ -41,9 +41,13 @@ make check
 
 ## 训练入口与当前证据
 
+当前数学实验使用 DeepSeek-R1-Distill-Qwen-1.5B 学生和 JustRL-DeepSeek-1.5B 教师，在四张 H800 上比较 OPD、MDPO、BPO。设置、日志审计和图表见[数学三算法主报告](docs/experiments/2026-10-12-数学三算法日志审计与学习效率比较.md)，字段、事件轴和公式见[统一指标规范](docs/operations/2026-10-12-蒸馏统一日志与评测指标规范.md)。
+
+代码分层、实际 GPU 环境清单、模型与数据要求、可移植 canary 和正式启动命令见[代码架构与跨机器复现](docs/operations/2026-10-12-代码架构与跨机器复现.md)。新默认数学评测已改为每题 16 次采样和独立长预算；旧正式比较采用单次 greedy。新默认配置尚未完成 GPU canary。`make bootstrap` 不安装 GPU 训练栈，数学模型和 parquet 需要单独准备。
+
 正式训练使用 **TA-OPD/verl** 调度，MirrorOPD 算法源码由本仓库直接维护。核心 loss 位于 [training/losses.py](src/mirroropd/training/losses.py)，冻结缓存位于 [training/cache.py](src/mirroropd/training/cache.py)，prediction-position 与 nested-tensor 适配位于 [integrations/verl/fsdp.py](src/mirroropd/integrations/verl/fsdp.py)。上游只保留导入、薄包装和框架接入；outer rollout 与权重版本检查仍在 `upstream/TA-OPD/verl/verl/trainer/ppo/ray_trainer.py`。本仓库的 [训练入口](training/run_upstream_mirror_training.sh) 调用该框架，没有另外实现分布式训练器。
 
-三机源码目录统一为 `~/src/mirroropd` 和 `~/src/MD-OPD`，后续开发与训练在 archbox 进行；运行产物留在 archbox。MirrorOPD 已验证的 TA-OPD 后端仍位于 `~/src/mirroropd-taopd`，保留其虚拟环境和运行依赖，第一方核心从 `~/src/mirroropd/src` 加载。路径、版本及本地修改见 [三机仓库路径与同步](docs/operations/2026-10-10-三机仓库路径与同步.md)。支持 `mirror_pmd_mean`、`mirror_bpo`、`mirror_mdpo`：
+三机源码目录统一为 `~/src/mirroropd` 和 `~/src/MD-OPD`，后续开发与训练在 archbox 进行；运行产物留在 archbox。MirrorOPD 已验证的 TA-OPD 后端仍位于 `~/src/mirroropd-taopd`，保留其虚拟环境和运行依赖，第一方核心从 `~/src/mirroropd/src` 加载。路径、版本及本地修改见 [三机仓库路径与同步](docs/operations/2026-10-10-三机仓库路径与同步.md)。生产入口支持 `mirror_pmd_mean`、`mirror_bpo`、`mirror_mdpo`、`mirror_opd_onpolicy`、`mirror_opd_is` 和 `mirror_opd_is_no_baseline`；PMD-Part 尚未接入生产入口：
 
 ```bash
 MIRROR_UPSTREAM_ROOT="$HOME/src/mirroropd-taopd" \

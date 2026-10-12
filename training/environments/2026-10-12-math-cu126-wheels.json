@@ -1,0 +1,29 @@
+{
+    "captured_at": "2026-10-12",
+    "python": "3.12.15 (main, Oct  6 2026, 23:50:18) [GCC 15.3.0]",
+    "platform": "Linux x86_64",
+    "packages": {
+        "torch": "2.7.1+cu126",
+        "torchaudio": "2.7.1+cu126",
+        "torchvision": "0.22.1+cu126",
+        "xformers": "0.0.31",
+        "vllm": "0.10.0+cu126",
+        "flash-attn": "2.8.3.post1",
+        "transformers": "4.57.6",
+        "ray": "2.59.0",
+        "verl": "0.9.0.dev0"
+    },
+    "local_wheels": [
+        {
+            "filename": "flash_attn-2.8.3.post1+cu12torch2.7cxx11abiTRUE-cp312-cp312-linux_x86_64.whl",
+            "sha256": "f87164bb919f5597cb94f7485196be6ac7842b71d7bf8e9f8e9133b9045ab5ea",
+            "bytes": 256029263
+        },
+        {
+            "filename": "vllm-0.10.0+cu126-cp38-abi3-manylinux1_x86_64.whl",
+            "sha256": "d3a8d58eee37f2475aedaf5b54403d9747da9ec273e802ad81b32b59ba81a87b",
+            "bytes": 360943083
+        }
+    ],
+    "note": "Inventory of the existing working environment; fresh-machine installation and new R16 GPU canary have not been run."
+}
