@@ -1,0 +1,12 @@
+\section{固定监督下的标量调度验证}
+\label{evidence:scalar}
+
+2026 年 10 月 12 日的验证包括 690 条可控二次轨迹、540 条共享分类模型轨迹，以及 GPU 0--3 上的 20 条 DeepSeek 1.5B 固定 prefix 轨迹。二次与分类模型各条件采用五个种子。语言模型固定 13 条 DAPO prompt、416 个 q-sampled prefix，缓存、teacher、anchor 和 $\eta=0.3$ 在 inner 中冻结；短 response 和 prompt 截断用于优化验证，未进行数学正确率评测。
+
+完整 BPO 的 FP32 分支中，沿标准 AdamW 方向作三点 forward 搜索，在初始目标的 $0.1\%$ 阈值上用 117 次 backward，常数 lr 网格中最快分支为 131 次。对应累计 forward 分别为 469 与 133，耗时分别约为 82.3 与 43.6 秒。搜索减少 10.7\% backward，增加总运行时间。搜索在第 117 步之后至第 500 步保持低于该阈值；常数网格中最早保持到终点的分支为 251 步。该保持口径是有限预算内的反弹审计，不能推广为无限步稳定性。
+
+搜索未固定后期相对吸收率。三个 50 步窗口的平均 log 收缩率从 0.0612 降到 0.0108，再降到 0.00184。该结果符合第~\ref{dyn:scalar} 节的方向能力限制。方向搜索更好地匹配当前位置的稳定步幅，没有把共享参数的慢谱消除。
+
+生产 Top-16 加尾部桶、固定 sampled action 的分支表现出经验 residual 与完整 BPO 的失配。默认常数 lr 下，120 步后经验平方 residual 为初始的 0.0115\%，完整 BPO 仍为初始的 62.7\%。提高 lr 可进一步恶化完整误差。经验 residual 搜索的完整误差终值为初始的 43.0\%，而更小的常数 lr 已达到 44.1\%；搜索额外 forward 成本未得到对应的总时间收益。用完整误差接受步长但保持生产 surrogate 方向的分支有 36 次拒绝，说明标量无法替代缺失的下降方向。
+
+原始轨迹、逐条件 CSV、forward/backward 计数及图像位于仓库的 \texttt{results/scalar-schedule/}。固定 token IDs 和 attention mask 已版本化，可以重建 full-vocabulary cache；具体复现命令和生产更新场的分解维护在对应的 BPO 标量调度实验报告中。当前证据支持完整目标上的条件性步长改进，尚未支持现有 sampled/Top-k 生产更新的普遍加速。

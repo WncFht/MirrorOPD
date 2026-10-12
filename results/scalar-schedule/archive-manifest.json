@@ -1,0 +1,16 @@
+[
+  {
+    "path": "results/scalar-schedule/categorical-expanded.json.gz",
+    "raw_sha256": "ae7f35cb8a3ed7aeae472ab667e158c14c5b07ed25c3416456207b8d9f87b642",
+    "gzip_sha256": "fb4840782c75ef292a694208230a19309b25fc91a402d5101e5a82389fa41c9e",
+    "bytes": 30489172,
+    "packed_bytes": 7665003
+  },
+  {
+    "path": "results/scalar-schedule/quadratic-expanded.json.gz",
+    "raw_sha256": "86fea97ca41148cdea6f57fe63a5dd6151c793005d96b663039dc448dd40cd93",
+    "gzip_sha256": "86e52232dd34d7c63fb5b3a1fe53331bbb10119b39073b01faea09489f733517",
+    "bytes": 59577635,
+    "packed_bytes": 12028678
+  }
+]

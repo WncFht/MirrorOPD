@@ -803,6 +803,12 @@
             "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/wandb-run.json.gz",
             "sha256": "f5e3d5ba9a727f06bc628e3accd44279ba3d7dbbdb3e54cfeb0217b0aa112b4e",
             "bytes": 163
+        },
+        {
+            "path": "data/scalar-schedule/deepseek-fixed-prefixes.json",
+            "archive": "data/scalar-schedule/deepseek-fixed-prefixes.json.gz",
+            "sha256": "ef9d380605843b787d543aab20b7d55fdb9557a481623b9e4e7539c3f311389e",
+            "bytes": 31679
         }
     ]
 }

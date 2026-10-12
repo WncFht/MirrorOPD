@@ -57,3 +57,6 @@ scratch/
 
 # Immutable review input logs restore with make data.
 /results/training/math-4gpu/review-20261012/raw/dapo-*/
+
+# Fixed scalar-schedule prefixes restore from the versioned gzip archive.
+/data/scalar-schedule/deepseek-fixed-prefixes.json

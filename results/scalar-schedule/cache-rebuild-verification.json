@@ -1,0 +1,10 @@
+{
+  "q_logits": 0.0013394355773925781,
+  "t_logits": 0.0007238388061523438,
+  "ids_equal": true,
+  "attention_mask_equal": true,
+  "q_logits_mean_kl": 3.582379421622831e-11,
+  "q_logits_max_kl": 1.3143622281951533e-09,
+  "t_logits_mean_kl": 1.0931760717659989e-10,
+  "t_logits_max_kl": 9.657396605891269e-09
+}
