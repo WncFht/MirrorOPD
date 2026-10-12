@@ -5,6 +5,7 @@ import hashlib
 import json
 import multiprocessing
 import os
+import tempfile
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
@@ -157,24 +158,33 @@ def generate_outputs(args, assigned):
     torch.empty(1, device="cuda")
     register_gpu_owner(args.owners, args.rank)
 
-    engine = LLM(
-        model=str(args.model),
-        tokenizer=str(args.model),
-        dtype="bfloat16",
-        tensor_parallel_size=1,
-        max_model_len=9216,
-        max_num_batched_tokens=9216,
-        max_num_seqs=32,
-        gpu_memory_utilization=0.4,
-        enforce_eager=True,
-        seed=0,
-        disable_log_stats=True,
-    )
-    outputs = engine.generate(
-        [row["prompt"] for row in assigned],
-        SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, max_tokens=7168),
-        use_tqdm=False,
-    )
+    # A private FileStore avoids the bind-close-rebind race of TCP rendezvous.
+    # Each replica is an independent world-size-one group on one owned GPU.
+    with tempfile.TemporaryDirectory(prefix="oneshot-eval-rendezvous-", dir="/tmp") as directory:
+        torch.distributed.init_process_group(
+            backend="nccl",
+            init_method=(Path(directory) / "store").as_uri(),
+            rank=0,
+            world_size=1,
+        )
+        engine = LLM(
+            model=str(args.model),
+            tokenizer=str(args.model),
+            dtype="bfloat16",
+            tensor_parallel_size=1,
+            max_model_len=9216,
+            max_num_batched_tokens=9216,
+            max_num_seqs=32,
+            gpu_memory_utilization=0.4,
+            enforce_eager=True,
+            seed=0,
+            disable_log_stats=True,
+        )
+        outputs = engine.generate(
+            [row["prompt"] for row in assigned],
+            SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, max_tokens=7168),
+            use_tqdm=False,
+        )
     generated = []
     for row, output in zip(assigned, outputs, strict=True):
         response = output.outputs[0]
