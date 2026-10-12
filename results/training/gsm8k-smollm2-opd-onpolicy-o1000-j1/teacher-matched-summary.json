@@ -1,0 +1,19 @@
+{
+  "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+  "examples": 1319,
+  "test": "/home/fanghaotian/src/mirroropd/data/gsm8k-full/test.parquet",
+  "max_new_tokens": 2048,
+  "temperature": 0,
+  "native_template": true,
+  "means": {
+    "score": 0.4700530705079606,
+    "acc": 0.4700530705079606,
+    "acc_strict": 0.3305534495830174,
+    "acc_explicit": 0.37680060652009095,
+    "format_hash": 0.6982562547384382,
+    "format_boxed": 0.10614101592115238,
+    "parse_failure": 0.0,
+    "response_tokens": 226.7414708112206,
+    "budget_exhausted": 0.011372251705837756
+  }
+}
