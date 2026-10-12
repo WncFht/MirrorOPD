@@ -12,6 +12,7 @@ data:
 	python3 scripts/restore-data.py
 
 test:
+	CUDA_VISIBLE_DEVICES= PYTHONPATH=src:. uv run --with torch --with numpy --with transformers --with matplotlib --with pytest python -m pytest tests/test_oneshot_experiments.py -q
 	PYTHONPATH=src uv run --with torch --with pytest python -m pytest tests/test_scalar_schedule.py -q
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_math_evaluation.py
 	python3 tests/test_kl_theory_identities.py

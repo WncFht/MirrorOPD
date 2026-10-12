@@ -1,0 +1,32 @@
+{
+  "config": {
+    "batch_size": 64,
+    "response_length": 7168,
+    "diagnostic_positions": 4096,
+    "diagnostic_every": 1,
+    "topk": 16,
+    "eta": 0.3,
+    "clip_grad": 1.0,
+    "weight_decay": 0.01,
+    "anchor_interval": 0,
+    "rollout": "frozen",
+    "method": "opd",
+    "wandb": true,
+    "id": "prepare-s42",
+    "seed": 42,
+    "precision": "bf16",
+    "lr": 0.0,
+    "updates": 4,
+    "checkpoint_steps": []
+  },
+  "data_sha256": "af78c1b70ab81e6b242ba0faeaf8efa6c744320567205f1c285fa922e95b0653",
+  "total_tokens": 395862,
+  "diagnostic_tokens": 4096,
+  "budget_exhausted_count": 29,
+  "rank_sha256": {
+    "0": "b6978ce7bb54f190c8f8f5aaea00cb618852a61075136a760a6b7ef6a6580f80",
+    "1": "c8641267b04e2d7dcace83be046942b5caa83e6be2168240579a6254213a2782",
+    "2": "01197127f68bd1bfb493996f30079697e874aa19f6880e531369e36c7693ad20",
+    "3": "70edd49d83d10361c71da08086e64ff499c12e48e57e742919ec969d36b5e336"
+  }
+}

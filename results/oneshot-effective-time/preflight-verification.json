@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-12",
+  "new_cpu_tests": 6,
+  "new_cpu_tests_passed": true,
+  "makefile_test_entries_in_pinned_runtime": 21,
+  "makefile_test_entries_passed": true,
+  "pinned_runtime": "torch 2.7.1+cu126, transformers 4.57.6",
+  "gpu_canaries": {
+    "bf16": {
+      "batch_size": 64,
+      "response_limit": 7168,
+      "updates": 4,
+      "passed": true
+    },
+    "fp32": {
+      "batch_size": 64,
+      "response_limit": 7168,
+      "updates": 4,
+      "passed": true
+    }
+  },
+  "full_math_canary_questions": 570,
+  "full_math_canary_passed": true,
+  "tokenizer_parity_questions": 570,
+  "formal_matrix": {
+    "arms": 45,
+    "optimizer_updates": 16074,
+    "completed_arms": 0
+  },
+  "formal_results_complete": false
+}

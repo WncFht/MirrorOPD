@@ -60,3 +60,6 @@ scratch/
 
 # Fixed scalar-schedule prefixes restore from the versioned gzip archive.
 /data/scalar-schedule/deepseek-fixed-prefixes.json
+
+# Rebuild large One-Shot probability caches from versioned token IDs.
+data/oneshot-effective-time-20261012/*/rank-*.pt
