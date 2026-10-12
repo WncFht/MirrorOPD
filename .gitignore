@@ -50,3 +50,7 @@ scratch/
 
 # Immutable math-run audit inputs restore with make data.
 /results/training/math-4gpu/audit-20261012/raw/dapo-*/
+
+# Follow-up immutable BPO and historical baseline inputs restore with make data.
+/results/training/math-4gpu/followup-20261012/raw/dapo-*/
+/results/training/math-4gpu/followup-20261012/raw/baseline-*/

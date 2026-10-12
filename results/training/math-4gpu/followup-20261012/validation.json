@@ -1,0 +1,23 @@
+{
+  "fixed_bpo_completed_outer": 14,
+  "fixed_bpo_updates": 224,
+  "new_png_count": 24,
+  "new_pdf_count": 24,
+  "bpo_coefficient_linear_identity_tolerance": 1e-06,
+  "source_files_archived": 24,
+  "gzip_byte_equality": "all 24 archives verified",
+  "all_report_links": "exist",
+  "watcher_once_canary": "passed",
+  "live_outer_observed": 17,
+  "live_evaluation_nodes_observed": [
+    0,
+    5,
+    10,
+    15
+  ],
+  "watcher_poll_seconds": 30,
+  "new_teacher_short_greedy_evaluation": "not executed",
+  "new_sample16_training_evaluation": "not executed",
+  "production_training_code_modified": false,
+  "make_check": "passed"
+}

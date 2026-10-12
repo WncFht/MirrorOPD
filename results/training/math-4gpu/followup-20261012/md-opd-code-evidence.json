@@ -1,0 +1,119 @@
+{
+  "overlap": {
+    "definition": "student_teacher_topk_intersection_over_k",
+    "paths": [
+      {
+        "path": "MD-OPD/verl/verl/workers/fsdp_teacher_worker.py",
+        "lines": [
+          153,
+          155,
+          161,
+          522,
+          527
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/trainer/ppo/opd_trainer_mixin.py",
+        "lines": [
+          54,
+          61,
+          306,
+          313
+        ]
+      }
+    ],
+    "dp_aggregation": "mean_of_rank_token_ratios"
+  },
+  "mirror_overlap": {
+    "definition": "current_student_frozen_anchor_topk_intersection_over_k",
+    "path": "MirrorOPD/src/mirroropd/training/losses.py",
+    "lines": [
+      110,
+      115
+    ]
+  },
+  "validation": {
+    "paths": [
+      {
+        "path": "MD-OPD/recipe/_common.sh",
+        "lines": [
+          233,
+          234,
+          352,
+          356
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/experimental/agent_loop/agent_loop.py",
+        "lines": [
+          620,
+          638,
+          646
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/trainer/ppo/ray_trainer.py",
+        "lines": [
+          810,
+          813
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/trainer/ppo/metric_utils.py",
+        "lines": [
+          1012,
+          1016,
+          1073
+        ]
+      }
+    ]
+  },
+  "precision": {
+    "paths": [
+      {
+        "path": "MD-OPD/verl/verl/workers/engine/fsdp/transformer_impl.py",
+        "lines": [
+          239,
+          245,
+          372,
+          384
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/workers/fsdp_teacher_worker.py",
+        "lines": [
+          284,
+          301,
+          318,
+          359
+        ]
+      }
+    ]
+  },
+  "support_mismatch": {
+    "paths": [
+      {
+        "path": "MD-OPD/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py",
+        "lines": [
+          461
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/workers/engine/fsdp/transformer_impl.py",
+        "lines": [
+          1319,
+          1322,
+          1382,
+          1483
+        ]
+      },
+      {
+        "path": "MD-OPD/verl/verl/workers/fsdp_teacher_worker.py",
+        "lines": [
+          373,
+          395
+        ]
+      }
+    ]
+  }
+}

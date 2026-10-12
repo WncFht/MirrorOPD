@@ -353,6 +353,150 @@
             "archive": "data/training/math-policy-audit-20261012/dapo-deepseek-opd-o50-j1/wandb-system.jsonl.gz",
             "sha256": "320ac598e60909b12f21636db0e7c5200465538e4a1d2503fb2eb82637a1515c",
             "bytes": 7892206
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/baseline-6uorrk2k/wandb-history.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/baseline-6uorrk2k/wandb-history.jsonl.gz",
+            "sha256": "900dfef2aa093550d919b017b07fe67e8c2b23eae1de4c3d3891d525d1b80983",
+            "bytes": 53332
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/baseline-6uorrk2k/wandb-metadata.json",
+            "archive": "data/training/math-policy-followup-20261012/baseline-6uorrk2k/wandb-metadata.json.gz",
+            "sha256": "00b8f7f1eadf9a94f22079ef1af9195c9fef0a32d6194943e9fcf9b872b9dd4a",
+            "bytes": 94588
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/baseline-u87buult/wandb-history.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/baseline-u87buult/wandb-history.jsonl.gz",
+            "sha256": "7ef864c54483bb29baaad4690d2cd2f37cc3e93a7503cba717319f918ad0daa3",
+            "bytes": 53372
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/baseline-u87buult/wandb-metadata.json",
+            "archive": "data/training/math-policy-followup-20261012/baseline-u87buult/wandb-metadata.json.gz",
+            "sha256": "9c71a695a053ee839047b964a3480bc86f5740d6c45d2e728462ca47419bf2c7",
+            "bytes": 94489
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/config.stderr",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/config.stderr.gz",
+            "sha256": "9a0d37acaafdcd410f4ab01fd01d1f5c8fa378c78686b647c603ec28d22adea9",
+            "bytes": 589
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/console.log",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/console.log.gz",
+            "sha256": "15c250f36b383f9e398260501799908072ebdec5c141c7041078ff6c596766b9",
+            "bytes": 241123
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/data-manifest.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/data-manifest.json.gz",
+            "sha256": "6ff6b17377db53556c11e7207c0b1385cbdab33cf258ab16bd465d919caea2cc",
+            "bytes": 52
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/gpu.csv",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/gpu.csv.gz",
+            "sha256": "68a3fe8d9eb2fdf69ff29185a4afa59958bd1419f1c015fc50671945354acd51",
+            "bytes": 946435
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/host-memory.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/host-memory.jsonl.gz",
+            "sha256": "2ff70307ec2f5ce79c573b83bae2e2ad200b2d02e6d377c367963c87ddf183c1",
+            "bytes": 1531533
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/inner.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/inner.jsonl.gz",
+            "sha256": "e69f0bd5fecff3971a99a4a2e3de5d72fe4d31e41476d9d824d07e0126c1b2dd",
+            "bytes": 871245
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/method.txt",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/method.txt.gz",
+            "sha256": "53a651177a015f8f489639b67661871d79a9072f2a4622239f2d43b858bd665d",
+            "bytes": 11
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/model-data-audit.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/model-data-audit.json.gz",
+            "sha256": "106d2aefdb853cabd6e170392b8d78d4074db04848985b09bf7d441b7bdd1186",
+            "bytes": 2367
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/outer.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/outer.jsonl.gz",
+            "sha256": "2404005547a418a78ad13240360043fd825c37573ab05487ce549e87d1f0ca56",
+            "bytes": 117418
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/overrides.txt",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/overrides.txt.gz",
+            "sha256": "483a125f06d508e51bb80547dcb70ed11c9a05e84e7841edf560bd94b2c7915d",
+            "bytes": 3581
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/resolved-config.yaml",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/resolved-config.yaml.gz",
+            "sha256": "65157a9807bf1655ce9b9b80ec358b8dda949ce81cbf9619ac8e931dd8b1a219",
+            "bytes": 26468
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/resource-statistics.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/resource-statistics.json.gz",
+            "sha256": "6f0323f8514634528695b9ce226df343add29923485a0fa1e1976a6c54672a25",
+            "bytes": 2484
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/setting.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/setting.json.gz",
+            "sha256": "84419564a916c291fffc883d4e4c354fcf30373bcf2ee2ca4e47673a5e64a73f",
+            "bytes": 3669
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/source-commit.txt",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/source-commit.txt.gz",
+            "sha256": "b038389f42d43f92719b573056a54e7c2d096016396639b05dda748f6f09643f",
+            "bytes": 41
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/source-provenance.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/source-provenance.json.gz",
+            "sha256": "12174a0a771923e0d8a2e95664032b2159e3dd5d76d65bc673d1646e8facec59",
+            "bytes": 58249
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/wandb-history.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/wandb-history.jsonl.gz",
+            "sha256": "080b6078351c0f9471c94f94f9154219f3bf7c462c36138cac749da81e8e4385",
+            "bytes": 1284210
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/wandb-local-parity.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/wandb-local-parity.json.gz",
+            "sha256": "7bcc5d3b37550461daf4b771a8e4d769e2e1634453695524826af9ec7188fa33",
+            "bytes": 158
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/wandb-metadata.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/wandb-metadata.json.gz",
+            "sha256": "c0da97eb2d28e494952fafe872de09eb833aa2e7a96a17ca09f51989b9b3886c",
+            "bytes": 51837
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/wandb-run.json",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/wandb-run.json.gz",
+            "sha256": "f5e3d5ba9a727f06bc628e3accd44279ba3d7dbbdb3e54cfeb0217b0aa112b4e",
+            "bytes": 163
+        },
+        {
+            "path": "results/training/math-4gpu/followup-20261012/raw/dapo-deepseek-bpo-o50-j16/wandb-system.jsonl",
+            "archive": "data/training/math-policy-followup-20261012/dapo-deepseek-bpo-o50-j16/wandb-system.jsonl.gz",
+            "sha256": "bb52f4ce996e7704a991b213b6c216286327a271edd0b9b999eae68e391aaefb",
+            "bytes": 2348260
         }
     ]
 }

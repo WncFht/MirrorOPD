@@ -1,0 +1,113 @@
+{
+  "snapshot_unix": 1791763738.912618,
+  "reused_runs": {
+    "opd": "../../audit-20261012/raw/dapo-deepseek-opd-o50-j1",
+    "mdpo": "../../audit-20261012/raw/dapo-deepseek-mdpo-o50-j16"
+  },
+  "runs": {
+    "dapo-deepseek-bpo-o50-j16": {
+      "config.stderr": {
+        "bytes": 589,
+        "sha256": "9a0d37acaafdcd410f4ab01fd01d1f5c8fa378c78686b647c603ec28d22adea9"
+      },
+      "console.log": {
+        "bytes": 241123,
+        "sha256": "15c250f36b383f9e398260501799908072ebdec5c141c7041078ff6c596766b9"
+      },
+      "data-manifest.json": {
+        "bytes": 52,
+        "sha256": "6ff6b17377db53556c11e7207c0b1385cbdab33cf258ab16bd465d919caea2cc"
+      },
+      "gpu.csv": {
+        "bytes": 946435,
+        "sha256": "68a3fe8d9eb2fdf69ff29185a4afa59958bd1419f1c015fc50671945354acd51"
+      },
+      "host-memory.jsonl": {
+        "bytes": 1531533,
+        "sha256": "2ff70307ec2f5ce79c573b83bae2e2ad200b2d02e6d377c367963c87ddf183c1"
+      },
+      "inner.jsonl": {
+        "bytes": 871245,
+        "sha256": "e69f0bd5fecff3971a99a4a2e3de5d72fe4d31e41476d9d824d07e0126c1b2dd"
+      },
+      "method.txt": {
+        "bytes": 11,
+        "sha256": "53a651177a015f8f489639b67661871d79a9072f2a4622239f2d43b858bd665d"
+      },
+      "model-data-audit.json": {
+        "bytes": 2367,
+        "sha256": "106d2aefdb853cabd6e170392b8d78d4074db04848985b09bf7d441b7bdd1186"
+      },
+      "outer.jsonl": {
+        "bytes": 117418,
+        "sha256": "2404005547a418a78ad13240360043fd825c37573ab05487ce549e87d1f0ca56"
+      },
+      "overrides.txt": {
+        "bytes": 3581,
+        "sha256": "483a125f06d508e51bb80547dcb70ed11c9a05e84e7841edf560bd94b2c7915d"
+      },
+      "resolved-config.yaml": {
+        "bytes": 26468,
+        "sha256": "65157a9807bf1655ce9b9b80ec358b8dda949ce81cbf9619ac8e931dd8b1a219"
+      },
+      "setting.json": {
+        "bytes": 3669,
+        "sha256": "84419564a916c291fffc883d4e4c354fcf30373bcf2ee2ca4e47673a5e64a73f"
+      },
+      "source-commit.txt": {
+        "bytes": 41,
+        "sha256": "b038389f42d43f92719b573056a54e7c2d096016396639b05dda748f6f09643f"
+      },
+      "source-provenance.json": {
+        "bytes": 58249,
+        "sha256": "12174a0a771923e0d8a2e95664032b2159e3dd5d76d65bc673d1646e8facec59"
+      },
+      "wandb-run.json": {
+        "bytes": 163,
+        "sha256": "f5e3d5ba9a727f06bc628e3accd44279ba3d7dbbdb3e54cfeb0217b0aa112b4e"
+      }
+    }
+  },
+  "fetched_evidence": {
+    "baseline-6uorrk2k/wandb-history.jsonl": {
+      "bytes": 53332,
+      "sha256": "900dfef2aa093550d919b017b07fe67e8c2b23eae1de4c3d3891d525d1b80983"
+    },
+    "baseline-6uorrk2k/wandb-metadata.json": {
+      "bytes": 94588,
+      "sha256": "00b8f7f1eadf9a94f22079ef1af9195c9fef0a32d6194943e9fcf9b872b9dd4a"
+    },
+    "baseline-u87buult/wandb-history.jsonl": {
+      "bytes": 53372,
+      "sha256": "7ef864c54483bb29baaad4690d2cd2f37cc3e93a7503cba717319f918ad0daa3"
+    },
+    "baseline-u87buult/wandb-metadata.json": {
+      "bytes": 94489,
+      "sha256": "9c71a695a053ee839047b964a3480bc86f5740d6c45d2e728462ca47419bf2c7"
+    },
+    "dapo-deepseek-bpo-o50-j16/resource-statistics.json": {
+      "bytes": 2484,
+      "sha256": "6f0323f8514634528695b9ce226df343add29923485a0fa1e1976a6c54672a25"
+    },
+    "dapo-deepseek-bpo-o50-j16/wandb-history.jsonl": {
+      "bytes": 1284210,
+      "sha256": "080b6078351c0f9471c94f94f9154219f3bf7c462c36138cac749da81e8e4385"
+    },
+    "dapo-deepseek-bpo-o50-j16/wandb-local-parity.json": {
+      "bytes": 158,
+      "sha256": "7bcc5d3b37550461daf4b771a8e4d769e2e1634453695524826af9ec7188fa33"
+    },
+    "dapo-deepseek-bpo-o50-j16/wandb-metadata.json": {
+      "bytes": 51837,
+      "sha256": "c0da97eb2d28e494952fafe872de09eb833aa2e7a96a17ca09f51989b9b3886c"
+    },
+    "dapo-deepseek-bpo-o50-j16/wandb-run.json": {
+      "bytes": 163,
+      "sha256": "f5e3d5ba9a727f06bc628e3accd44279ba3d7dbbdb3e54cfeb0217b0aa112b4e"
+    },
+    "dapo-deepseek-bpo-o50-j16/wandb-system.jsonl": {
+      "bytes": 2348260,
+      "sha256": "bb52f4ce996e7704a991b213b6c216286327a271edd0b9b999eae68e391aaefb"
+    }
+  }
+}

@@ -105,6 +105,7 @@ def load_run(root, name):
         "completed": completed,
         "times": times,
         "name": name,
+        "directory": directory,
     }
 
 
@@ -112,10 +113,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--raw", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--bpo-raw", type=Path, help="Newer BPO snapshot root; reuse completed runs"
+    )
     args = parser.parse_args()
     output = args.output
     output.mkdir(parents=True, exist_ok=True)
-    runs = {m: load_run(args.raw, n) for m, n in RUNS.items()}
+    roots = {m: args.bpo_raw if m == "BPO" and args.bpo_raw else args.raw for m in RUNS}
+    runs = {m: load_run(roots[m], n) for m, n in RUNS.items()}
     summary = {}
     inner_csv, eval_csv, outer_csv = [], [], []
     for method, run in runs.items():
@@ -410,7 +415,7 @@ def main():
 
     fig, axes = plt.subplots(2, 3, figsize=(16, 8))
     for col, (method, run) in enumerate(runs.items()):
-        with (args.raw / run["name"] / "gpu.csv").open() as stream:
+        with (run["directory"] / "gpu.csv").open() as stream:
             rows = list(csv.DictReader(stream, skipinitialspace=True))
         # A common fixed offset only defines elapsed time, not a UTC claim.
         start = datetime.strptime(rows[0]["timestamp"], "%Y/%m/%d %H:%M:%S.%f").replace(
@@ -459,7 +464,7 @@ def main():
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 4))
     for method, run in runs.items():
-        history = read_rows(args.raw / run["name"] / "wandb-history.jsonl")
+        history = read_rows(run["directory"] / "wandb-history.jsonl")
         quality_key = "01_quality/val-core/MATH-500/acc/mean@1"
         qrows = [r for r in history if r.get(quality_key) is not None]
         line(
@@ -520,9 +525,9 @@ def main():
     write_csv(output / "outer.csv", outer_csv)
     (output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     sources = {}
-    for name in RUNS.values():
+    for method, name in RUNS.items():
         for filename in ["inner.jsonl", "outer.jsonl", "gpu.csv"]:
-            path = args.raw / name / filename
+            path = roots[method] / name / filename
             sources[str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
     (output / "source-sha256.json").write_text(json.dumps(sources, indent=2) + "\n")
     print(
