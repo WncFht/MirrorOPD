@@ -1,0 +1,83 @@
+{
+  "design": {
+    "question": "Which regression/score programs are gradient aliases, and when do KL scalar estimators change training gradients?",
+    "falsification": "Mean per-action mismatch, exact BPO population mismatch, or direct-k2/direct-k3 target mismatch invalidates the proposed contract.",
+    "scope": "Finite three-action conditional enumeration; no LLM/GPU evidence."
+  },
+  "q": [
+    0.5,
+    0.3,
+    0.2
+  ],
+  "p": [
+    0.2,
+    0.5,
+    0.3
+  ],
+  "teacher": [
+    0.4,
+    0.1,
+    0.5
+  ],
+  "eta": 0.3,
+  "bpo": {
+    "full": {
+      "residual_mean": -2.0816681711721685e-17,
+      "population_gradient_regression": [
+        -1.1715203400984275,
+        0.9868447727872588,
+        0.18467556731116888
+      ],
+      "population_gradient_score": [
+        -1.1715203400984278,
+        0.9868447727872588,
+        0.18467556731116883
+      ],
+      "population_max_abs_difference": 4.163336342344337e-17,
+      "sample_max_abs_difference": 0.9868447727872587
+    },
+    "anchor-top1-tail": {
+      "residual_mean": 0.07058478971533594,
+      "population_gradient_regression": [
+        -1.1715203400984278,
+        0.9839037398824533,
+        0.18761660021597443
+      ],
+      "population_gradient_score": [
+        -1.1009355503830918,
+        0.9397882463103682,
+        0.16114730407272343
+      ],
+      "population_max_abs_difference": 0.07058478971533592,
+      "sample_max_abs_difference": 1.0574295625025947
+    }
+  },
+  "mean_sample_max_abs_difference": 0.0,
+  "direct_estimator_population_gradients": {
+    "k1": [
+      -4.85722573273506e-17,
+      -1.1102230246251565e-16,
+      -2.7755575615628914e-17
+    ],
+    "k2": [
+      -0.24119780270704183,
+      0.5482980397294182,
+      -0.3071002370223764
+    ],
+    "k3": [
+      -0.19999999999999993,
+      0.3999999999999999,
+      -0.19999999999999998
+    ]
+  },
+  "exact_reverse_kl_gradient": [
+    -0.24119780270704197,
+    0.548298039729418,
+    -0.30710023702237654
+  ],
+  "exact_forward_kl_gradient": [
+    -0.19999999999999996,
+    0.40000000000000013,
+    -0.19999999999999996
+  ]
+}
