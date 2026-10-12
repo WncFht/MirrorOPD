@@ -809,6 +809,42 @@
             "archive": "data/scalar-schedule/deepseek-fixed-prefixes.json.gz",
             "sha256": "ef9d380605843b787d543aab20b7d55fdb9557a481623b9e4e7539c3f311389e",
             "bytes": 31679
+        },
+        {
+            "path": "data/scalar-large/seed-1042-tokens.pt",
+            "archive": "data/scalar-large/seed-1042-tokens.pt.gz",
+            "sha256": "6c7bf8c7bb5b3f84f86773f19031a5cd2b48687570746f89582beced24354168",
+            "bytes": 536217
+        },
+        {
+            "path": "data/scalar-large/seed-42-tokens.pt",
+            "archive": "data/scalar-large/seed-42-tokens.pt.gz",
+            "sha256": "d0a8603d5cc5ec550f7460289084e85905aa9db8c51343342203718157e61686",
+            "bytes": 544921
+        },
+        {
+            "path": "data/scalar-large/seed-142-tokens.pt",
+            "archive": "data/scalar-large/seed-142-tokens.pt.gz",
+            "sha256": "794f5d0aa3b4cfd14b48a1cd77c572913a195402cdb9cc365e292997fa2efb78",
+            "bytes": 548569
+        },
+        {
+            "path": "data/scalar-large/seed-242-tokens.pt",
+            "archive": "data/scalar-large/seed-242-tokens.pt.gz",
+            "sha256": "15407910f9f6abb1961b9e89bd2b097830d876853340b4e8d8deab3a5907775e",
+            "bytes": 550169
+        },
+        {
+            "path": "data/scalar-large/seed-342-tokens.pt",
+            "archive": "data/scalar-large/seed-342-tokens.pt.gz",
+            "sha256": "c8697ac5e031cb42843da8d99a0fef432dff0b4e08d7c5ed3badfe68d739a72f",
+            "bytes": 556889
+        },
+        {
+            "path": "data/scalar-large/seed-442-tokens.pt",
+            "archive": "data/scalar-large/seed-442-tokens.pt.gz",
+            "sha256": "4164afb35974e440ad301c754e5379ffdc835fc09f2940eb033670cdf27664bf",
+            "bytes": 551897
         }
     ]
 }

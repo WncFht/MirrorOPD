@@ -21,6 +21,7 @@ def compute_mirror_opd_token_loss(
     teacher_head_log_probs: torch.Tensor | None = None,
     teacher_tail_log_prob: torch.Tensor | None = None,
     teacher_topk_ids: torch.Tensor | None = None,
+    full_anchor_log_probs: torch.Tensor | None = None,
 ) -> dict[str, torch.Tensor]:
     """Token score surrogate on frozen anchor actions (no PPO clipping).
 
@@ -29,6 +30,9 @@ def compute_mirror_opd_token_loss(
     fixed throughout inner updates. Unlike TA-OPD's direct KL loss, centers
     and residuals here stop gradient after deriving the score formula.
     This primitive operates on a local complete vocabulary, not TP shards.
+    Supplying full_anchor_log_probs replaces only the student center with the
+    exact full-vocabulary KL; the caller must supply the corresponding frozen
+    full teacher center. Score coefficients still stop gradient.
     """
     if (
         math.isnan(eta)
@@ -80,6 +84,13 @@ def compute_mirror_opd_token_loss(
         nonempty = torch.isfinite(q_tail_lp)
         tail[nonempty] = q_tail_lp[nonempty].exp() * (q_tail_lp[nonempty] - p_tail_lp[nonempty])
         center = head + tail
+        if full_anchor_log_probs is not None:
+            if full_anchor_log_probs.shape != log_p.shape:
+                raise ValueError(
+                    "full anchor probabilities must align with the complete vocabulary"
+                )
+            full_q = full_anchor_log_probs.detach().float()
+            center = (full_q.exp() * (full_q - log_p.detach())).sum(-1)
         u = action_lp.detach() - anchor_action_log_prob.detach()
         reward = teacher_action_log_prob.detach() - anchor_action_log_prob.detach()
         kt = teacher_center.detach()

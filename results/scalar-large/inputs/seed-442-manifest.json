@@ -1,0 +1,976 @@
+{
+  "seed": 442,
+  "train_sequences": 128,
+  "validation_sequences": 32,
+  "response_length": 256,
+  "temperature": 1,
+  "top_p": 1,
+  "top_k": 0,
+  "prompt_truncation": false,
+  "source_sha256": "7cf25710488b2e5fd03f1fc2b39024748b57792d6328737adc9d3f64a025a44e",
+  "trajectory_sha256": "4164afb35974e440ad301c754e5379ffdc835fc09f2940eb033670cdf27664bf",
+  "student": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/DeepSeek-R1-Distill-Qwen-1.5B",
+  "teacher": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/JustRL-DeepSeek-1.5B",
+  "entries": [
+    {
+      "file": "sequence-0000.pt",
+      "response_tokens": 256,
+      "source_row": 11759,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0001.pt",
+      "response_tokens": 256,
+      "source_row": 15510,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0002.pt",
+      "response_tokens": 256,
+      "source_row": 5585,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0003.pt",
+      "response_tokens": 256,
+      "source_row": 17603,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0004.pt",
+      "response_tokens": 256,
+      "source_row": 15247,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0005.pt",
+      "response_tokens": 256,
+      "source_row": 14949,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0006.pt",
+      "response_tokens": 256,
+      "source_row": 14703,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0007.pt",
+      "response_tokens": 256,
+      "source_row": 6586,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0008.pt",
+      "response_tokens": 256,
+      "source_row": 15183,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0009.pt",
+      "response_tokens": 256,
+      "source_row": 14303,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0010.pt",
+      "response_tokens": 256,
+      "source_row": 2900,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0011.pt",
+      "response_tokens": 256,
+      "source_row": 6644,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0012.pt",
+      "response_tokens": 256,
+      "source_row": 2425,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0013.pt",
+      "response_tokens": 256,
+      "source_row": 3526,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0014.pt",
+      "response_tokens": 256,
+      "source_row": 1463,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0015.pt",
+      "response_tokens": 256,
+      "source_row": 9089,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0016.pt",
+      "response_tokens": 256,
+      "source_row": 17205,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0017.pt",
+      "response_tokens": 256,
+      "source_row": 16239,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0018.pt",
+      "response_tokens": 256,
+      "source_row": 4139,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0019.pt",
+      "response_tokens": 256,
+      "source_row": 13645,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0020.pt",
+      "response_tokens": 256,
+      "source_row": 13827,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0021.pt",
+      "response_tokens": 256,
+      "source_row": 16963,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0022.pt",
+      "response_tokens": 256,
+      "source_row": 7402,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0023.pt",
+      "response_tokens": 256,
+      "source_row": 1989,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0024.pt",
+      "response_tokens": 256,
+      "source_row": 6683,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0025.pt",
+      "response_tokens": 256,
+      "source_row": 15896,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0026.pt",
+      "response_tokens": 256,
+      "source_row": 7751,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0027.pt",
+      "response_tokens": 256,
+      "source_row": 11245,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0028.pt",
+      "response_tokens": 256,
+      "source_row": 15584,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0029.pt",
+      "response_tokens": 256,
+      "source_row": 16587,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0030.pt",
+      "response_tokens": 256,
+      "source_row": 1727,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0031.pt",
+      "response_tokens": 256,
+      "source_row": 15962,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0032.pt",
+      "response_tokens": 256,
+      "source_row": 5488,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0033.pt",
+      "response_tokens": 256,
+      "source_row": 1787,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0034.pt",
+      "response_tokens": 256,
+      "source_row": 1565,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0035.pt",
+      "response_tokens": 256,
+      "source_row": 14521,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0036.pt",
+      "response_tokens": 256,
+      "source_row": 7842,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0037.pt",
+      "response_tokens": 256,
+      "source_row": 10447,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0038.pt",
+      "response_tokens": 256,
+      "source_row": 2108,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0039.pt",
+      "response_tokens": 256,
+      "source_row": 10913,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0040.pt",
+      "response_tokens": 256,
+      "source_row": 4502,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0041.pt",
+      "response_tokens": 256,
+      "source_row": 2096,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0042.pt",
+      "response_tokens": 256,
+      "source_row": 10201,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0043.pt",
+      "response_tokens": 256,
+      "source_row": 14231,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0044.pt",
+      "response_tokens": 256,
+      "source_row": 15778,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0045.pt",
+      "response_tokens": 256,
+      "source_row": 2861,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0046.pt",
+      "response_tokens": 256,
+      "source_row": 10059,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0047.pt",
+      "response_tokens": 256,
+      "source_row": 1376,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0048.pt",
+      "response_tokens": 256,
+      "source_row": 3627,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0049.pt",
+      "response_tokens": 256,
+      "source_row": 14542,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0050.pt",
+      "response_tokens": 256,
+      "source_row": 15995,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0051.pt",
+      "response_tokens": 256,
+      "source_row": 2977,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0052.pt",
+      "response_tokens": 256,
+      "source_row": 7311,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0053.pt",
+      "response_tokens": 256,
+      "source_row": 4837,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0054.pt",
+      "response_tokens": 256,
+      "source_row": 9977,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0055.pt",
+      "response_tokens": 256,
+      "source_row": 5747,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0056.pt",
+      "response_tokens": 256,
+      "source_row": 16712,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0057.pt",
+      "response_tokens": 256,
+      "source_row": 13960,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0058.pt",
+      "response_tokens": 256,
+      "source_row": 1738,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0059.pt",
+      "response_tokens": 256,
+      "source_row": 17125,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0060.pt",
+      "response_tokens": 256,
+      "source_row": 1027,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0061.pt",
+      "response_tokens": 256,
+      "source_row": 16597,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0062.pt",
+      "response_tokens": 256,
+      "source_row": 10195,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0063.pt",
+      "response_tokens": 256,
+      "source_row": 7725,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0064.pt",
+      "response_tokens": 256,
+      "source_row": 1986,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0065.pt",
+      "response_tokens": 256,
+      "source_row": 17072,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0066.pt",
+      "response_tokens": 256,
+      "source_row": 2255,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0067.pt",
+      "response_tokens": 256,
+      "source_row": 12370,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0068.pt",
+      "response_tokens": 256,
+      "source_row": 6675,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0069.pt",
+      "response_tokens": 256,
+      "source_row": 16256,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0070.pt",
+      "response_tokens": 256,
+      "source_row": 1207,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0071.pt",
+      "response_tokens": 256,
+      "source_row": 8741,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0072.pt",
+      "response_tokens": 256,
+      "source_row": 13916,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0073.pt",
+      "response_tokens": 256,
+      "source_row": 6654,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0074.pt",
+      "response_tokens": 256,
+      "source_row": 16452,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0075.pt",
+      "response_tokens": 256,
+      "source_row": 2873,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0076.pt",
+      "response_tokens": 256,
+      "source_row": 11398,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0077.pt",
+      "response_tokens": 256,
+      "source_row": 3105,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0078.pt",
+      "response_tokens": 256,
+      "source_row": 4318,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0079.pt",
+      "response_tokens": 256,
+      "source_row": 16216,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0080.pt",
+      "response_tokens": 256,
+      "source_row": 7697,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0081.pt",
+      "response_tokens": 256,
+      "source_row": 3115,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0082.pt",
+      "response_tokens": 256,
+      "source_row": 1628,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0083.pt",
+      "response_tokens": 256,
+      "source_row": 11912,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0084.pt",
+      "response_tokens": 256,
+      "source_row": 10420,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0085.pt",
+      "response_tokens": 256,
+      "source_row": 10935,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0086.pt",
+      "response_tokens": 256,
+      "source_row": 923,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0087.pt",
+      "response_tokens": 256,
+      "source_row": 2967,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0088.pt",
+      "response_tokens": 256,
+      "source_row": 12513,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0089.pt",
+      "response_tokens": 256,
+      "source_row": 1991,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0090.pt",
+      "response_tokens": 256,
+      "source_row": 13356,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0091.pt",
+      "response_tokens": 256,
+      "source_row": 2217,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0092.pt",
+      "response_tokens": 256,
+      "source_row": 8734,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0093.pt",
+      "response_tokens": 256,
+      "source_row": 17263,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0094.pt",
+      "response_tokens": 256,
+      "source_row": 5361,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0095.pt",
+      "response_tokens": 256,
+      "source_row": 10946,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0096.pt",
+      "response_tokens": 256,
+      "source_row": 2877,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0097.pt",
+      "response_tokens": 256,
+      "source_row": 13217,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0098.pt",
+      "response_tokens": 256,
+      "source_row": 17448,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0099.pt",
+      "response_tokens": 256,
+      "source_row": 5161,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0100.pt",
+      "response_tokens": 256,
+      "source_row": 10267,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0101.pt",
+      "response_tokens": 256,
+      "source_row": 3775,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0102.pt",
+      "response_tokens": 256,
+      "source_row": 17068,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0103.pt",
+      "response_tokens": 256,
+      "source_row": 13781,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0104.pt",
+      "response_tokens": 256,
+      "source_row": 13176,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0105.pt",
+      "response_tokens": 256,
+      "source_row": 7923,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0106.pt",
+      "response_tokens": 256,
+      "source_row": 14178,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0107.pt",
+      "response_tokens": 256,
+      "source_row": 6385,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0108.pt",
+      "response_tokens": 256,
+      "source_row": 920,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0109.pt",
+      "response_tokens": 256,
+      "source_row": 2439,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0110.pt",
+      "response_tokens": 256,
+      "source_row": 7984,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0111.pt",
+      "response_tokens": 256,
+      "source_row": 13952,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0112.pt",
+      "response_tokens": 256,
+      "source_row": 16231,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0113.pt",
+      "response_tokens": 256,
+      "source_row": 15860,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0114.pt",
+      "response_tokens": 256,
+      "source_row": 3966,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0115.pt",
+      "response_tokens": 256,
+      "source_row": 5428,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0116.pt",
+      "response_tokens": 256,
+      "source_row": 5825,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0117.pt",
+      "response_tokens": 256,
+      "source_row": 9663,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0118.pt",
+      "response_tokens": 256,
+      "source_row": 4778,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0119.pt",
+      "response_tokens": 256,
+      "source_row": 6303,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0120.pt",
+      "response_tokens": 256,
+      "source_row": 15219,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0121.pt",
+      "response_tokens": 256,
+      "source_row": 745,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0122.pt",
+      "response_tokens": 256,
+      "source_row": 16352,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0123.pt",
+      "response_tokens": 256,
+      "source_row": 15845,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0124.pt",
+      "response_tokens": 256,
+      "source_row": 5259,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0125.pt",
+      "response_tokens": 256,
+      "source_row": 13560,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0126.pt",
+      "response_tokens": 256,
+      "source_row": 12929,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0127.pt",
+      "response_tokens": 256,
+      "source_row": 5942,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0128.pt",
+      "response_tokens": 256,
+      "source_row": 9311,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0129.pt",
+      "response_tokens": 256,
+      "source_row": 9648,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0130.pt",
+      "response_tokens": 256,
+      "source_row": 1647,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0131.pt",
+      "response_tokens": 256,
+      "source_row": 12584,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0132.pt",
+      "response_tokens": 256,
+      "source_row": 5848,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0133.pt",
+      "response_tokens": 256,
+      "source_row": 15686,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0134.pt",
+      "response_tokens": 256,
+      "source_row": 3040,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0135.pt",
+      "response_tokens": 256,
+      "source_row": 2343,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0136.pt",
+      "response_tokens": 256,
+      "source_row": 10487,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0137.pt",
+      "response_tokens": 256,
+      "source_row": 3265,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0138.pt",
+      "response_tokens": 256,
+      "source_row": 4535,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0139.pt",
+      "response_tokens": 256,
+      "source_row": 4883,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0140.pt",
+      "response_tokens": 256,
+      "source_row": 13379,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0141.pt",
+      "response_tokens": 256,
+      "source_row": 1888,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0142.pt",
+      "response_tokens": 256,
+      "source_row": 15360,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0143.pt",
+      "response_tokens": 256,
+      "source_row": 11312,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0144.pt",
+      "response_tokens": 256,
+      "source_row": 8839,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0145.pt",
+      "response_tokens": 256,
+      "source_row": 6670,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0146.pt",
+      "response_tokens": 256,
+      "source_row": 12259,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0147.pt",
+      "response_tokens": 256,
+      "source_row": 10540,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0148.pt",
+      "response_tokens": 256,
+      "source_row": 5582,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0149.pt",
+      "response_tokens": 256,
+      "source_row": 12176,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0150.pt",
+      "response_tokens": 256,
+      "source_row": 7118,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0151.pt",
+      "response_tokens": 256,
+      "source_row": 13613,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0152.pt",
+      "response_tokens": 256,
+      "source_row": 11649,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0153.pt",
+      "response_tokens": 256,
+      "source_row": 10668,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0154.pt",
+      "response_tokens": 256,
+      "source_row": 7356,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0155.pt",
+      "response_tokens": 256,
+      "source_row": 6455,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0156.pt",
+      "response_tokens": 256,
+      "source_row": 3070,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0157.pt",
+      "response_tokens": 256,
+      "source_row": 9185,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0158.pt",
+      "response_tokens": 256,
+      "source_row": 16957,
+      "truncated": true
+    },
+    {
+      "file": "sequence-0159.pt",
+      "response_tokens": 256,
+      "source_row": 1892,
+      "truncated": true
+    }
+  ]
+}

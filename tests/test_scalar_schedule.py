@@ -134,3 +134,73 @@ def test_topk_expected_field_matches_predicted_bias():
     assert torch.allclose(
         sampled_field - exact_gradient, bias * (q - logp.detach().exp()) / 0.3, atol=2e-7
     )
+
+
+def test_full_center_override_recovers_expected_quadratic_field():
+    import torch
+
+    from mirroropd.training.cache import build_mirror_opd_cache_from_full_logits
+    from mirroropd.training.losses import compute_mirror_opd_token_loss
+
+    z = torch.tensor([0.8, -0.3, 0.2, -0.5], requires_grad=True)
+    anchor = torch.tensor([0.4, -0.1, 0.6, 0.2])
+    teacher = torch.tensor([-0.2, 0.4, 0.9, -0.7])
+    actions = torch.arange(4)
+    cache = build_mirror_opd_cache_from_full_logits(
+        anchor.repeat(4, 1), teacher.repeat(4, 1), actions, torch.ones(4, dtype=torch.bool), 1
+    )
+    qlog, tlog = anchor.log_softmax(-1), teacher.log_softmax(-1)
+    q = qlog.exp()
+    full_teacher_center = (q * (qlog - tlog)).sum().expand(4)
+    result = compute_mirror_opd_token_loss(
+        z.repeat(4, 1),
+        actions,
+        cache["mirror_anchor_ids"],
+        cache["mirror_anchor_head_log_probs"],
+        cache["mirror_anchor_tail_log_prob"],
+        cache["mirror_anchor_action_log_prob"],
+        cache["mirror_teacher_action_log_prob"],
+        full_teacher_center,
+        "bpo",
+        0.3,
+        full_anchor_log_probs=qlog.repeat(4, 1),
+    )
+    score_gradient = torch.autograd.grad(
+        (q * result["distillation_losses"]).sum(), z, retain_graph=True
+    )[0]
+    residual = z - 0.7 * anchor - 0.3 * teacher
+    residual = residual - (q * residual).sum()
+    exact_gradient = torch.autograd.grad((q * residual.square()).sum() / 0.6, z)[0]
+    assert torch.allclose(score_gradient, exact_gradient, atol=2e-7)
+    assert abs(float((q * result["mirror_score_coefficient"]).sum())) < 2e-7
+
+
+def test_length_weighted_minibatches_target_uniform_prefix_measure():
+    import torch
+
+    from training.scalar_large_worker import FrozenPool
+
+    pool = object.__new__(FrozenPool)
+    pool.lengths = torch.tensor([1.0, 9.0], dtype=torch.float64)
+    pool.training = [{"gradient": 2.0}, {"gradient": 0.0}]
+    pool.sampler = torch.Generator().manual_seed(42)
+    values = [
+        sum(record["gradient"] * weight for record, weight in pool.batch(8)) for _ in range(4000)
+    ]
+    # Full token-mean gradient is (1*2 + 9*0)/10 = 0.2;
+    # uniform trajectory sampling would converge to 1.0.
+    assert abs(sum(values) / len(values) - 0.2) < 0.02
+
+
+def test_uniform_audit_positions_have_no_duplicates_or_out_of_range():
+    import torch
+
+    from training.scalar_large_worker import FrozenPool
+
+    records = [{"response_tokens": count} for count in (3, 11, 7)]
+    selected = FrozenPool.uniform_positions(records, 15, 42)
+    assert sum(len(positions) for _, positions in selected) == 15
+    for record, positions in selected:
+        assert positions.min() >= 0
+        assert positions.max() < record["response_tokens"]
+        assert len(torch.unique(positions)) == len(positions)

@@ -1,0 +1,54 @@
+[
+  {
+    "name": "canary-constant-sampled",
+    "seconds": 53.70963749848306,
+    "counts": {
+      "forwards": 40,
+      "backwards": 8,
+      "forward_tokens": 13494,
+      "backward_tokens": 2048,
+      "search_forwards": 0,
+      "rejected": 0
+    },
+    "peak_gpu_gib": 28.430965423583984
+  },
+  {
+    "name": "canary-search-sampled",
+    "seconds": 57.8195754410699,
+    "counts": {
+      "forwards": 64,
+      "backwards": 8,
+      "forward_tokens": 21618,
+      "backward_tokens": 2048,
+      "search_forwards": 24,
+      "rejected": 0
+    },
+    "peak_gpu_gib": 41.67210006713867
+  },
+  {
+    "name": "canary-search-sampled_full",
+    "seconds": 59.323234690353274,
+    "counts": {
+      "forwards": 64,
+      "backwards": 8,
+      "forward_tokens": 21618,
+      "backward_tokens": 2048,
+      "search_forwards": 24,
+      "rejected": 0
+    },
+    "peak_gpu_gib": 41.67210006713867
+  },
+  {
+    "name": "canary-search-exact",
+    "seconds": 57.24780315812677,
+    "counts": {
+      "forwards": 64,
+      "backwards": 8,
+      "forward_tokens": 21618,
+      "backward_tokens": 2048,
+      "search_forwards": 24,
+      "rejected": 0
+    },
+    "peak_gpu_gib": 41.67208385467529
+  }
+]

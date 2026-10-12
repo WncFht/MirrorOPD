@@ -1,0 +1,50 @@
+[
+  {
+    "seed": 1042,
+    "prefixes": 40960,
+    "cache": "runs/scalar-large/cache-s1042",
+    "tokens_archive": "data/scalar-large/seed-1042-tokens.pt.gz",
+    "trajectory_sha256": "6c7bf8c7bb5b3f84f86773f19031a5cd2b48687570746f89582beced24354168",
+    "manifest_sha256": "240785e72ae6515cd1c1062594bc90ea38378eafc2c9252a98950cc847bc2d96"
+  },
+  {
+    "seed": 42,
+    "prefixes": 40960,
+    "cache": "runs/scalar-large/cache-s42",
+    "tokens_archive": "data/scalar-large/seed-42-tokens.pt.gz",
+    "trajectory_sha256": "d0a8603d5cc5ec550f7460289084e85905aa9db8c51343342203718157e61686",
+    "manifest_sha256": "f74f0aac23fadabac2ee9aaf61553e61184da7479f14e22508f5e9c5c00c98e8"
+  },
+  {
+    "seed": 142,
+    "prefixes": 40960,
+    "cache": "runs/scalar-large/cache-s142",
+    "tokens_archive": "data/scalar-large/seed-142-tokens.pt.gz",
+    "trajectory_sha256": "794f5d0aa3b4cfd14b48a1cd77c572913a195402cdb9cc365e292997fa2efb78",
+    "manifest_sha256": "64d2cfb0181a42f6052ac8c0212dbac43a8cfc4e4b36e7364e5c2f65ceb36851"
+  },
+  {
+    "seed": 242,
+    "prefixes": 40960,
+    "cache": "runs/scalar-large/cache-s242",
+    "tokens_archive": "data/scalar-large/seed-242-tokens.pt.gz",
+    "trajectory_sha256": "15407910f9f6abb1961b9e89bd2b097830d876853340b4e8d8deab3a5907775e",
+    "manifest_sha256": "193d6fbe669731f36d0168e94466fdf7a317cc9b62c554f448aebb7743edec21"
+  },
+  {
+    "seed": 342,
+    "prefixes": 40960,
+    "cache": "runs/scalar-large/cache-s342",
+    "tokens_archive": "data/scalar-large/seed-342-tokens.pt.gz",
+    "trajectory_sha256": "c8697ac5e031cb42843da8d99a0fef432dff0b4e08d7c5ed3badfe68d739a72f",
+    "manifest_sha256": "5c53271416b8521892e17b468e5067a35fcf63629a3bbcd5b1a1c53a59856a1a"
+  },
+  {
+    "seed": 442,
+    "prefixes": 40960,
+    "cache": "runs/scalar-large/cache-s442",
+    "tokens_archive": "data/scalar-large/seed-442-tokens.pt.gz",
+    "trajectory_sha256": "4164afb35974e440ad301c754e5379ffdc835fc09f2940eb033670cdf27664bf",
+    "manifest_sha256": "89a119e3ed350365909c8662887203c33cce537a7df5d56deb29da2272bcaf36"
+  }
+]

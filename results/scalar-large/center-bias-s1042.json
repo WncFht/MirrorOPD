@@ -1,0 +1,17 @@
+{
+  "seed": 1042,
+  "prefixes": 40960.0,
+  "eta": 0.3,
+  "reference": "exact Gibbs target; logit field bias, not neural parameter gradient",
+  "means": {
+    "initial_bpo": 0.0311339186044928,
+    "k16_head_mass": 0.9971932223139766,
+    "k16_teacher_kl_missing": 0.0016681838901929868,
+    "k16_target_residual_bias_sq": 2.4776100476643164e-06,
+    "k16_target_logit_field_norm": 9.765456251353518e-05,
+    "k64_head_mass": 0.999581706624196,
+    "k64_teacher_kl_missing": 0.0001870016559964714,
+    "k64_target_residual_bias_sq": 6.182572240727198e-08,
+    "k64_target_logit_field_norm": 1.1128595210336399e-05
+  }
+}

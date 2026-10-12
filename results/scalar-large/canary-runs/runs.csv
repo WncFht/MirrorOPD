@@ -1,0 +1,5 @@
+id,seed,method,lr,objective,topk,precision,search_every,monitor_positions,status,updates,backwards,forwards,seconds,final_train_ratio,validation_bpo,validation_teacher_kl,log_auc,two_audits_0.5,persistent_0.5,two_audits_0.2,persistent_0.2,two_audits_0.1,persistent_0.1,two_audits_0.01,persistent_0.01,two_audits_0.001,persistent_0.001
+canary-constant-sampled,1042,constant,1e-06,sampled,16,fp32,1,256,complete,4,8,40,53.70963749848306,0.5773853975002093,0.02576948178997401,0.08816052938038016,-0.2946064004106354,,,,,,,,,,
+canary-search-exact,1042,search,1e-06,exact,16,fp32,1,256,complete,4,8,64,57.24780315812677,1.108927711655415,0.022436389899319713,0.08394623044000263,0.07684260293044576,,,,,,,,,,
+canary-search-sampled,1042,search,1e-06,sampled,16,fp32,1,256,complete,4,8,64,57.8195754410699,1.3956604185120014,0.02389441616310351,0.08537958562529373,0.18745069122252908,,,,,,,,,,
+canary-search-sampled_full,1042,search,1e-06,sampled_full,16,fp32,1,256,complete,4,8,64,59.323234690353274,1.3888109181750496,0.023892170469323855,0.08537835663223432,0.18454364067117252,,,,,,,,,,
