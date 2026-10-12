@@ -1,0 +1,14 @@
+{
+  "model.layers.0.self_attn.q_proj.weight": {
+    "elements": 2359296,
+    "source_dtype": "torch.bfloat16",
+    "fraction_bf16_can_change_for_abs_delta_at_most_1e-6": 0.01308525912463665,
+    "max_abs_weight": 0.9609375
+  },
+  "model.layers.12.mlp.down_proj.weight": {
+    "elements": 13762560,
+    "source_dtype": "torch.bfloat16",
+    "fraction_bf16_can_change_for_abs_delta_at_most_1e-6": 0.010965402238070965,
+    "max_abs_weight": 1.15625
+  }
+}

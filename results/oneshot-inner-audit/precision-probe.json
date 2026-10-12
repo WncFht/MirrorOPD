@@ -1,0 +1,86 @@
+{
+  "torch": "2.6.0+cu124",
+  "device": "NVIDIA H800",
+  "seed": 42,
+  "response_tokens": 128,
+  "world_size": 1,
+  "attention": "sdpa",
+  "eta": 0.3,
+  "topk": 16,
+  "conditions": {
+    "bf16": [
+      {
+        "updates_before_measurement": 0,
+        "student_center_mean": -5.021760784984508e-12,
+        "teacher_center_mean": 0.05527283996343613,
+        "current_gap_mean": 0.043386224657297134,
+        "grad_norm": 5.917535305023193
+      },
+      {
+        "updates_before_measurement": 1,
+        "student_center_mean": -5.021760784984508e-12,
+        "teacher_center_mean": 0.05527283996343613,
+        "current_gap_mean": 0.043386224657297134,
+        "grad_norm": 5.9177165031433105
+      },
+      {
+        "updates_before_measurement": 2,
+        "student_center_mean": 0.00040795106906443834,
+        "teacher_center_mean": 0.05527283996343613,
+        "current_gap_mean": 0.042175814509391785,
+        "grad_norm": 5.8741655349731445
+      },
+      {
+        "updates_before_measurement": 3,
+        "student_center_mean": 0.0004983386024832726,
+        "teacher_center_mean": 0.05527283996343613,
+        "current_gap_mean": 0.043926335871219635,
+        "grad_norm": 5.117300033569336
+      },
+      {
+        "updates_before_measurement": 4,
+        "student_center_mean": 0.0004319674917496741,
+        "teacher_center_mean": 0.05527283996343613,
+        "current_gap_mean": 0.043606653809547424,
+        "grad_norm": 5.035927772521973
+      }
+    ],
+    "fp32": [
+      {
+        "updates_before_measurement": 0,
+        "student_center_mean": 4.2962161606041605e-11,
+        "teacher_center_mean": 0.0555577278137207,
+        "current_gap_mean": 0.04353562742471695,
+        "grad_norm": 5.789085388183594
+      },
+      {
+        "updates_before_measurement": 1,
+        "student_center_mean": 4.2962161606041605e-11,
+        "teacher_center_mean": 0.0555577278137207,
+        "current_gap_mean": 0.04353562742471695,
+        "grad_norm": 5.789085388183594
+      },
+      {
+        "updates_before_measurement": 2,
+        "student_center_mean": 0.005081884562969208,
+        "teacher_center_mean": 0.0555577278137207,
+        "current_gap_mean": 0.01125321350991726,
+        "grad_norm": 7.6790995597839355
+      },
+      {
+        "updates_before_measurement": 3,
+        "student_center_mean": 0.009820517152547836,
+        "teacher_center_mean": 0.0555577278137207,
+        "current_gap_mean": -0.013513553887605667,
+        "grad_norm": 6.760002136230469
+      },
+      {
+        "updates_before_measurement": 4,
+        "student_center_mean": 0.010323012247681618,
+        "teacher_center_mean": 0.0555577278137207,
+        "current_gap_mean": -0.012255574576556683,
+        "grad_norm": 6.071259021759033
+      }
+    ]
+  }
+}

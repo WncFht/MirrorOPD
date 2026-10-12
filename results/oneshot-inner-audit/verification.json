@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-12",
+  "checks": {
+    "full_mdpo_and_bpo_1600_unique_records": true,
+    "input_archives_sha256": true,
+    "runtime_source_sha256_against_startup_commits": true,
+    "mdpo_800_and_bpo_416_archived_online_parity": true,
+    "report_local_links": true,
+    "zero_lr_precision_controls": true,
+    "test_mean_bpo": true,
+    "test_upstream_opd_semantics": true,
+    "rounding_only_probe": true,
+    "make_check": true
+  },
+  "gpu_probe": {
+    "physical_gpu": 1,
+    "torch": "2.6.0+cu124",
+    "model": "DeepSeek-R1-Distill-Qwen-1.5B",
+    "teacher": "JustRL-DeepSeek-1.5B",
+    "response_tokens": 128,
+    "attention": "sdpa",
+    "world_size": 1,
+    "parameter_dtype": "fp32",
+    "forward_conditions": [
+      "bf16",
+      "fp32"
+    ],
+    "clip_grad": 2.0,
+    "lr": 1e-06,
+    "eta": 0.3,
+    "topk": 16,
+    "scope": "Single-prefix-set numerical control, not four-GPU benchmark"
+  },
+  "history_sources": {
+    "MD-OPD": "Saved W&B CSV histories and config metadata",
+    "MirrorOPD": "Final local archives plus saved online W&B history snapshots"
+  },
+  "production_training_changed": false
+}
