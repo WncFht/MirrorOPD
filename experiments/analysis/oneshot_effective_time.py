@@ -18,7 +18,13 @@ def history(path, index):
     """Keep the latest record for each update while retaining raw retry ledgers."""
     if not path.exists():
         return []
-    records = [json.loads(line) for line in path.read_text().splitlines()]
+    # The observer reads a growing JSONL file. A newline commits a record;
+    # the writer may still be completing the final line during this read.
+    records = [
+        json.loads(line)
+        for line in path.read_text().splitlines(keepends=True)
+        if line.endswith("\n")
+    ]
     by_update = {record[index]: record for record in records}
     return [by_update[update] for update in sorted(by_update)]
 
@@ -143,12 +149,29 @@ def audit_completed_arm(suite, config):
     ]
     return {
         "config": config,
+        "is_complete": True,
+        "logged_updates": len(records),
         "steps": steps,
         "effective_time": [config["lr"] / 1e-6 * step for step in steps],
         "distance": distance,
         "records": records,
         "fixed_native": history(directory / "fixed-native.jsonl", "update"),
         "fixed_fp32": history(directory / "diagnostics.jsonl", "update"),
+    }
+
+
+def observed_curve(suite, config):
+    """Plot committed measurements from a running arm without scoring its outcome."""
+    records = history(suite / config["id"] / "updates.jsonl", "update_before")
+    if not records:
+        return None
+    return {
+        "config": config,
+        "is_complete": False,
+        "logged_updates": len(records),
+        "steps": [record["update_before"] for record in records],
+        "effective_time": [record["effective_time_before"] for record in records],
+        "distance": [record["metrics"]["current_advantage_abs/mean"] for record in records],
     }
 
 
@@ -176,7 +199,7 @@ def plot_curves(arms, output):
                     color=colors[config["lr"]],
                     alpha=0.7,
                     linewidth=1.1,
-                    label=f"lr={config['lr']:g}, seed={config['seed']}",
+                    label=f"lr={config['lr']:g}, seed={config['seed']} ({arm['logged_updates']}/{config['updates']} updates logged)",
                 )
                 axis.set_yscale("log")
                 axis.set_xlim(left=0)
@@ -186,7 +209,10 @@ def plot_curves(arms, output):
         axes[1].set_xlabel("Effective time: updates * lr / 1e-6")
         axes[1].set_xlim(0, 300)
         axes[0].legend(fontsize=7)
-        figure.suptitle(f"{rollout} OPD / {precision}")
+        partial = any(not arm["is_complete"] for arm in selected)
+        figure.suptitle(
+            f"{rollout} OPD / {precision}" + (" / partial observations" if partial else "")
+        )
         figure.savefig(output / f"{rollout}-{precision}.png", dpi=180)
         figure.savefig(output / f"{rollout}-{precision}.pdf")
         plt.close(figure)
@@ -287,6 +313,10 @@ def main():
     report["pending_evaluations"] = sorted(expected_evaluations - report["evaluations"].keys())
     report["all_evaluations_complete"] = not report["pending_evaluations"]
     report["all_training_complete"] = len(arms) == len(plan)
+    observed = [
+        curve for config in plan if (curve := observed_curve(args.suite, config)) is not None
+    ]
+    report["observed_optimizer_updates"] = sum(len(curve["steps"]) for curve in observed)
     with (args.output / "native-distance.csv").open("w") as handle:
         writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(["arm", "update", "effective_time", "native_action_abs_gap"])
@@ -298,7 +328,7 @@ def main():
                 )
             )
     (args.output / "summary.json").write_text(json.dumps(report, indent=2) + "\n")
-    plot_curves(arms, args.output)
+    plot_curves([lookup.get(curve["config"]["id"], curve) for curve in observed], args.output)
     print(
         json.dumps(
             {"completed": len(arms), "requested": len(plan), "pending": len(report["pending"])}
