@@ -19,6 +19,7 @@ test:
 	PYTHONPATH=src python3 tests/test_tracking_layout.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_topk_overlap.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_training_metrics.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_global_inner_writer.py
 	PYTHONPATH=src uv run --with torch --with numpy --with pytest python -m pytest tests/test_rollout_support_alignment.py -q

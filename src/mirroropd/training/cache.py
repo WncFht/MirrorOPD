@@ -95,6 +95,8 @@ def complete_mirror_teacher_cache(
     result.pop("mirror_vocab_size")
     result["mirror_teacher_action_log_prob"] = torch.where(valid, action_lp, 0).detach()
     result["mirror_teacher_center"] = torch.where(valid, center, 0).detach()
+    teacher_ids = teacher_logp.topk(ids.shape[-1], dim=-1).indices
+    result["mirror_teacher_topk_ids"] = torch.where(valid.unsqueeze(-1), teacher_ids, 0).detach()
     result["mirror_teacher_head_log_probs"] = torch.where(
         valid.unsqueeze(-1), teacher_head, 0
     ).detach()

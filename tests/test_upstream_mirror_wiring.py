@@ -162,6 +162,9 @@ def main():
     completed = teacher(trainer, batch)
     assert requests == ["anchor", "teacher"]
     assert completed.batch["mirror_teacher_center"].shape == ids.shape
+    assert completed.batch["mirror_teacher_topk_ids"].shape == (*ids.shape, 3)
+    assert completed.batch["mirror_teacher_topk_ids"].dtype == torch.long
+    assert not completed.batch["mirror_teacher_topk_ids"][~batch.batch["mirror_valid"]].any()
     assert batch.batch["mirror_anchor_ids"].shape == (*ids.shape, 3)
     assert batch.batch["mirror_valid"].sum().item() == mask.sum().item()
     assert "teacher_ids" not in batch.batch
