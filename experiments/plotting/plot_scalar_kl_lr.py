@@ -74,7 +74,13 @@ def plot(root, output, seed):
                     for row in audits
                 ],
                 "lr_updates": [
-                    {"update": row["update_after"], "lr": row["applied_lr"]} for row in updates
+                    {
+                        "update": row["update_after"],
+                        "lr": row["applied_lr"],
+                        "grad_norm_before_clip": row["gradient_norm_before_clip"],
+                        "clipped": row["clipped"],
+                    }
+                    for row in updates
                 ],
             }
         )
@@ -88,8 +94,13 @@ def plot(root, output, seed):
     axes[0].legend(fontsize=9, ncol=2)
     for axis in axes:
         axis.grid(alpha=0.25)
+    config = records[0]["config"]
+    batch_label = (
+        "full pool" if config.get("full_batch") else f"minibatch {config['batch_sequences']}"
+    )
     fig.suptitle(
-        f"Frozen sampled-token BPO, seed {seed}; FP32, 64 x 256-token pool, batch 8\n"
+        f"Frozen sampled-token BPO, seed {seed}; {config['precision'].upper()}, "
+        f"{config['train_sequences']} x 256-token pool, {batch_label}\n"
         "KL: full vocabulary at 4096 fixed positions per split; LR: every update"
     )
     for suffix in ("png", "pdf"):
