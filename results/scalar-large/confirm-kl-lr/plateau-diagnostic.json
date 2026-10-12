@@ -1,0 +1,185 @@
+{
+  "definition": "Retrospective proximity to median of last six train-KL audits; at least three audit points and no later departure within observed budget. Not an asymptotic limit or a noise-floor estimate.",
+  "runs": [
+    {
+      "id": "confirm-constant1-s142",
+      "seed": 142,
+      "lr": 5e-07,
+      "updates": 600,
+      "tail_reference": 0.05562042181233783,
+      "initial_kl": 0.09406599620177027,
+      "estimates": {
+        "within_5pct_observed_initial_to_tail_gap": {
+          "tolerance": 0.0019222787194716217,
+          "step": 160,
+          "u": 80.0,
+          "persistent_audit_points": 23
+        },
+        "within_1pct_tail_kl": {
+          "tolerance": 0.0005562042181233783,
+          "step": 340,
+          "u": 170.0,
+          "persistent_audit_points": 14
+        }
+      },
+      "grad_norm_median_per_100_updates": [
+        0.7241028547286987,
+        0.35598963499069214,
+        0.21790634840726852,
+        0.20094358175992966,
+        0.24703053385019302,
+        0.25225137174129486
+      ]
+    },
+    {
+      "id": "confirm-constant1-s242",
+      "seed": 242,
+      "lr": 5e-07,
+      "updates": 600,
+      "tail_reference": 0.054903653589263454,
+      "initial_kl": 0.0933292842562387,
+      "estimates": {
+        "within_5pct_observed_initial_to_tail_gap": {
+          "tolerance": 0.0019212815333487622,
+          "step": 180,
+          "u": 90.0,
+          "persistent_audit_points": 22
+        },
+        "within_1pct_tail_kl": {
+          "tolerance": 0.0005490365358926346,
+          "step": 420,
+          "u": 210.0,
+          "persistent_audit_points": 10
+        }
+      },
+      "grad_norm_median_per_100_updates": [
+        0.807504802942276,
+        0.23660888522863388,
+        0.32622238993644714,
+        0.38882307708263397,
+        0.1752711609005928,
+        0.2655402570962906
+      ]
+    },
+    {
+      "id": "confirm-constant1-s42",
+      "seed": 42,
+      "lr": 5e-07,
+      "updates": 600,
+      "tail_reference": 0.05693781099697297,
+      "initial_kl": 0.09498860447324788,
+      "estimates": {
+        "within_5pct_observed_initial_to_tail_gap": {
+          "tolerance": 0.0019025396738137454,
+          "step": 180,
+          "u": 90.0,
+          "persistent_audit_points": 22
+        },
+        "within_1pct_tail_kl": {
+          "tolerance": 0.0005693781099697297,
+          "step": 500,
+          "u": 250.0,
+          "persistent_audit_points": 6
+        }
+      },
+      "grad_norm_median_per_100_updates": [
+        0.7900724112987518,
+        0.304017037153244,
+        0.40800370275974274,
+        0.2690969556570053,
+        0.18825934082269669,
+        0.17167098075151443
+      ]
+    },
+    {
+      "id": "confirm-constant2-s142",
+      "seed": 142,
+      "lr": 2.5e-07,
+      "updates": 600,
+      "tail_reference": 0.05611714051162792,
+      "initial_kl": 0.09406599620177027,
+      "estimates": {
+        "within_5pct_observed_initial_to_tail_gap": {
+          "tolerance": 0.0018974427845071173,
+          "step": 200,
+          "u": 50.0,
+          "persistent_audit_points": 21
+        },
+        "within_1pct_tail_kl": {
+          "tolerance": 0.0005611714051162792,
+          "step": 480,
+          "u": 120.0,
+          "persistent_audit_points": 7
+        }
+      },
+      "grad_norm_median_per_100_updates": [
+        0.613004744052887,
+        0.12232343852519989,
+        0.06657063588500023,
+        0.06114010699093342,
+        0.133449986577034,
+        0.13317976146936417
+      ]
+    },
+    {
+      "id": "confirm-constant2-s242",
+      "seed": 242,
+      "lr": 2.5e-07,
+      "updates": 600,
+      "tail_reference": 0.0545691679343463,
+      "initial_kl": 0.0933292842562387,
+      "estimates": {
+        "within_5pct_observed_initial_to_tail_gap": {
+          "tolerance": 0.00193800581609462,
+          "step": 300,
+          "u": 75.0,
+          "persistent_audit_points": 16
+        },
+        "within_1pct_tail_kl": {
+          "tolerance": 0.0005456916793434629,
+          "step": 460,
+          "u": 115.0,
+          "persistent_audit_points": 8
+        }
+      },
+      "grad_norm_median_per_100_updates": [
+        0.7487817406654358,
+        0.16918565332889557,
+        0.07688362151384354,
+        0.05838092416524887,
+        0.04117782041430473,
+        0.06263471581041813
+      ]
+    },
+    {
+      "id": "confirm-constant2-s42",
+      "seed": 42,
+      "lr": 2.5e-07,
+      "updates": 600,
+      "tail_reference": 0.056868018003549514,
+      "initial_kl": 0.09498860447324788,
+      "estimates": {
+        "within_5pct_observed_initial_to_tail_gap": {
+          "tolerance": 0.0019060293234849182,
+          "step": 280,
+          "u": 70.0,
+          "persistent_audit_points": 17
+        },
+        "within_1pct_tail_kl": {
+          "tolerance": 0.0005686801800354952,
+          "step": 460,
+          "u": 115.0,
+          "persistent_audit_points": 8
+        }
+      },
+      "grad_norm_median_per_100_updates": [
+        0.6990305483341217,
+        0.15222151577472687,
+        0.09265413135290146,
+        0.0717657282948494,
+        0.06373199820518494,
+        0.048965273424983025
+      ]
+    }
+  ]
+}
