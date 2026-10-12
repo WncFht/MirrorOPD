@@ -54,6 +54,7 @@ def compute_mirror_cache_from_logits(
                 "mirror_teacher_center",
                 "mirror_teacher_head_log_probs",
                 "mirror_teacher_tail_log_prob",
+                "mirror_teacher_topk_ids",
             )
         }
     raise ValueError(f"unknown mirror_cache_stage: {stage}")
@@ -90,10 +91,17 @@ def compute_mirror_opd_from_cache(
             raise ValueError(f"{key} must align with full prediction positions")
         cache[key] = value
     valid = cache["mirror_valid"].bool()
-    for key in ("mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob"):
+    for key in (
+        "mirror_teacher_head_log_probs",
+        "mirror_teacher_tail_log_prob",
+        "mirror_teacher_topk_ids",
+    ):
         if key in data:
             value = data[key]
             cache[key] = value.values().unsqueeze(0) if value.is_nested else value
+    overlap_pairs = ("student_anchor",)
+    if "mirror_teacher_topk_ids" in cache:
+        overlap_pairs += ("student_teacher", "anchor_teacher")
     result = {
         key: student_logits.new_zeros(valid.shape, dtype=torch.float32)
         for key in (
@@ -112,6 +120,16 @@ def compute_mirror_opd_from_cache(
             "mirror_student_head_mass",
             "mirror_anchor_tail_mass",
             "mirror_student_tail_mass",
+            *(
+                f"mirror_overlap_{pair}_{stat}"
+                for pair in overlap_pairs
+                for stat in (
+                    "intersection_count",
+                    "union_count",
+                    "intersection_fraction",
+                    "jaccard",
+                )
+            ),
         )
     }
     if valid.any():
@@ -128,6 +146,9 @@ def compute_mirror_opd_from_cache(
             eta=config.distillation_loss.mirror_eta,
             teacher_head_log_probs=cache["mirror_teacher_head_log_probs"][valid]
             if "mirror_teacher_head_log_probs" in cache
+            else None,
+            teacher_topk_ids=cache["mirror_teacher_topk_ids"][valid]
+            if "mirror_teacher_topk_ids" in cache
             else None,
             teacher_tail_log_prob=cache["mirror_teacher_tail_log_prob"][valid]
             if "mirror_teacher_tail_log_prob" in cache

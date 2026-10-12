@@ -36,6 +36,8 @@ def metric_name(key: str, scope: str) -> str:  # noqa: PLR0911
         "valid_tokens": "08_rollout",
     }
     field = name.split("/", 1)[0]
+    if field.startswith("overlap_"):
+        category[field] = "06_support_mass"
     if name.endswith(("/min", "/max")) and field != "importance_ratio":
         return f"90_detail_extrema/{scope}_{name}"
     if field in category:

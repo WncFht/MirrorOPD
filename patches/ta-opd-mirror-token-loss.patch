@@ -530,7 +530,7 @@ index 8f6cd41..c5b36aa 100644
              # without registering a teacher model worker in role-worker mapping
              self.mapping[Role.TeacherModel] = "teacher_pool"
 diff --git a/verl/verl/trainer/ppo/ray_trainer.py b/verl/verl/trainer/ppo/ray_trainer.py
-index d1eaa7b..5490aab 100644
+index d1eaa7b..e43463d 100644
 --- a/verl/verl/trainer/ppo/ray_trainer.py
 +++ b/verl/verl/trainer/ppo/ray_trainer.py
 @@ -38,7 +38,9 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
@@ -681,7 +681,7 @@ index d1eaa7b..5490aab 100644
 +        )
 +        output = self.ref_policy_wg.compute_ref_log_prob(batch_td)
 +        result = {key: no_padding_2_full_padding(tu.get(output, key), batch_td)
-+                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center", "mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob")}
++                  for key in ("mirror_teacher_action_log_prob", "mirror_teacher_center", "mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob", "mirror_teacher_topk_ids")}
 +        return DataProto.from_tensordict(tu.get_tensordict(result))
 +
      def _update_actor(self, batch: DataProto) -> DataProto:
@@ -1158,10 +1158,10 @@ index c4c7d8f..f3830d0 100644
          # 2. determine if we need a base weight sync (adapter path only)
          per_tensor_param, peft_config = self.actor.engine.get_per_tensor_param(
 diff --git a/verl/verl/workers/utils/padding.py b/verl/verl/workers/utils/padding.py
-index 6d537ea..ff76b4d 100644
+index 6d537ea..3b5bd99 100644
 --- a/verl/verl/workers/utils/padding.py
 +++ b/verl/verl/workers/utils/padding.py
-@@ -107,9 +107,73 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
+@@ -107,9 +107,74 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
          data["teacher_sampled_logprob"] = teacher_sampled_logprob_nested
          # print(f"padding: {teacher_sampled_logprob.shape}")
  
@@ -1172,6 +1172,7 @@ index 6d537ea..ff76b4d 100644
 +        "mirror_anchor_head_log_probs", "mirror_anchor_tail_log_prob",
 +        "mirror_anchor_action_log_prob", "mirror_teacher_action_log_prob",
 +        "mirror_teacher_center", "mirror_teacher_head_log_probs", "mirror_teacher_tail_log_prob",
++        "mirror_teacher_topk_ids",
 +        "mirror_vocab_size",
 +    ):
 +        value = data.get(key, None)

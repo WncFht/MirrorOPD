@@ -4,6 +4,8 @@ import math
 
 import torch
 
+from mirroropd.training.support import topk_pair_overlap
+
 
 def compute_mirror_opd_token_loss(
     student_logits: torch.Tensor,
@@ -18,6 +20,7 @@ def compute_mirror_opd_token_loss(
     eta: float,
     teacher_head_log_probs: torch.Tensor | None = None,
     teacher_tail_log_prob: torch.Tensor | None = None,
+    teacher_topk_ids: torch.Tensor | None = None,
 ) -> dict[str, torch.Tensor]:
     """Token score surrogate on frozen anchor actions (no PPO clipping).
 
@@ -103,19 +106,20 @@ def compute_mirror_opd_token_loss(
             kt = baseline
         if not torch.isfinite(coefficient).all():
             raise FloatingPointError("nonfinite MirrorOPD weight; no silent ratio clipping")
-        # One-Shot-OPD reports support overlap to distinguish signal drift from
-        # optimization drift.  Here the frozen rollout support is the anchor
-        # Top-K; compare it with the current policy Top-K after every inner
-        # forward.  This is a pure diagnostic and carries no gradient.
+        # Each pair compares native Top-J sets, independently of the loss support.
         support_k = anchor_ids.shape[-1]
-        if support_k:
-            current_ids = log_p.topk(support_k, dim=-1).indices
-            support_overlap = (
-                current_ids.unsqueeze(-1).eq(anchor_ids.unsqueeze(-2)).any(-1).float().mean(-1)
+        current_ids = log_p.topk(support_k, dim=-1).indices
+        overlap_fields = topk_pair_overlap(current_ids, anchor_ids, "student_anchor")
+        if teacher_topk_ids is not None:
+            if teacher_topk_ids.shape != anchor_ids.shape:
+                raise ValueError("teacher Top-J ids must align with anchor Top-J ids")
+            overlap_fields.update(
+                topk_pair_overlap(current_ids, teacher_topk_ids, "student_teacher")
             )
-        else:
-            support_overlap = torch.zeros_like(coefficient)
+            overlap_fields.update(topk_pair_overlap(anchor_ids, teacher_topk_ids, "anchor_teacher"))
+        support_overlap = overlap_fields["mirror_overlap_student_anchor_intersection_fraction"]
     return {
+        **overlap_fields,
         "distillation_losses": coefficient * action_lp,
         "mirror_student_center": center,
         "mirror_teacher_center": kt,
