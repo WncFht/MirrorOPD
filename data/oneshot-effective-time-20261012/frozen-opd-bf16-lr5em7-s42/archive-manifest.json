@@ -1,0 +1,15 @@
+{
+  "arm": "frozen-opd-bf16-lr5em7-s42",
+  "updates": 600,
+  "lr": 5e-07,
+  "effective_time": 300,
+  "exit_code": 0,
+  "source_cache": "seed-42",
+  "raw_sha256": {
+    "updates.jsonl": "6822b9ba9d97de4728238a7604d75ed025cd8b09425692520b89f929a1ff94f3",
+    "fixed-native.jsonl": "f395034de4c4548d65b1f44f58c2641231095ab7d575d0e6ffc6fe07dbd792a0",
+    "diagnostics.jsonl": "df7fc96c1c0c53b9714cfc7f0f04adf99a9073153da06a637e6704800718f9fe",
+    "native-final.jsonl": "e206f605b16b2984edecfa49e5b29b6f82b782cad627b271d49fa713d2ab3737"
+  },
+  "full_math_evaluation_pending": true
+}
