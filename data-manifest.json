@@ -881,6 +881,12 @@
             "archive": "data/oneshot-lr-stability/yj2w13fq.csv.gz",
             "sha256": "db845c2d1c6cb2fc2b61e47cb8b2a0957366f2fed53a0a5bff9e5a7e22128992",
             "bytes": 23809
+        },
+        {
+            "path": "data/oneshot-effective-time-20261012/seed-42/trajectories.jsonl",
+            "archive": "data/oneshot-effective-time-20261012/seed-42/trajectories.jsonl.gz",
+            "sha256": "f20fcd07ec81a397127782c64af0fd695f004033188eeb5cee48b03ad9be312a",
+            "bytes": 2058954
         }
     ]
 }

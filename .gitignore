@@ -65,3 +65,7 @@ scratch/
 /data/scalar-large/*.pt
 
 data/oneshot-lr-stability/*.csv
+
+/data/oneshot-effective-time-20261012/seed-*/rank-*.pt
+
+/data/oneshot-effective-time-20261012/seed-*/trajectories.jsonl
