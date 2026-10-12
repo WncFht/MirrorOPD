@@ -308,11 +308,18 @@ class Worker:
 
     def update(self, index):
         config = self.config
-        value = self.proxy_value()
-        if self.initial_proxy is None:
-            self.initial_proxy = value
-        if not math.isfinite(value) or value > self.initial_proxy * 1e6:
-            raise FloatingPointError("residual exceeded the preregistered stability limit")
+        search = config["method"] == "search" and index % config["search_every"] == 0
+        needs_proxy = (
+            not config.get("minimal_monitoring", True)
+            or config["method"] in ("feedback", "logloss")
+            or search
+        )
+        value = self.proxy_value() if needs_proxy else None
+        if value is not None:
+            if self.initial_proxy is None:
+                self.initial_proxy = value
+            if not math.isfinite(value) or value > self.initial_proxy * 1e6:
+                raise FloatingPointError("residual exceeded the preregistered stability limit")
         if config["method"] == "feedback" and self.previous is not None:
             self.lr = absorption_feedback(
                 self.lr, self.previous, value, config["target_rate"], config["maximum"]
@@ -345,7 +352,6 @@ class Worker:
             raise FloatingPointError("nonfinite gradient norm")
         self.optimizer.param_groups[0]["lr"] = self.lr
         selected = self.lr
-        search = config["method"] == "search" and index % config["search_every"] == 0
         fitted = None
         if search:
             old = [p.detach().clone() for p in self.parameters]
@@ -374,7 +380,8 @@ class Worker:
             del old, direction
         else:
             self.optimizer.step()
-        self.previous = value
+        if value is not None:
+            self.previous = value
         record = {
             "update_before": index,
             "update_after": index + 1,
@@ -431,6 +438,9 @@ class Worker:
                 (self.pool.directory / "manifest.json").read_bytes()
             ).hexdigest(),
             "status": status,
+            "monitoring_policy": "algorithm-required"
+            if self.config.get("minimal_monitoring", True)
+            else "every-step",
             "reason": reason,
         }
         (self.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")

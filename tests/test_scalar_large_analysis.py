@@ -119,3 +119,74 @@ def test_checkpoint_restores_moments_rng_and_discards_uncommitted_logs(tmp_path)
         for line in (tmp_path / "updates.jsonl").read_text().splitlines()
     ] == [1]
     assert restored.start_update == 1
+
+
+def test_single_final_crossing_does_not_count_as_persistent(tmp_path):
+    run = read_run(fake_run(tmp_path, "late-crossing", "constant", 2))
+    assert run["row"]["two_audits_0.1"] is None
+    assert run["row"]["persistent_0.1"] is None
+    assert run["row"]["persistent_0.5"] == 10
+
+
+def test_duplicate_audit_replay_is_rejected(tmp_path):
+    import pytest
+
+    directory = fake_run(tmp_path, "duplicate", "constant", 1)
+    with (directory / "audits.jsonl").open("a") as stream:
+        stream.write((directory / "audits.jsonl").read_text().splitlines()[-1] + "\n")
+    with pytest.raises(ValueError, match="duplicate replay"):
+        read_run(directory)
+
+
+def test_optional_proxy_logging_does_not_change_constant_adam_updates(tmp_path, monkeypatch):
+    import collections
+    import copy
+    import time
+    from types import SimpleNamespace
+
+    import torch
+
+    import training.scalar_large_worker as module
+
+    initial = torch.nn.Linear(2, 1)
+    x = torch.tensor([[1.0, 2.0]])
+    monkeypatch.setattr(module, "field", lambda logits, _record, _config: logits.square().mean())
+    monkeypatch.setattr(torch.cuda, "max_memory_allocated", lambda: 0)
+    workers = []
+    for minimal in (False, True):
+        worker = object.__new__(module.Worker)
+        worker.model = copy.deepcopy(initial)
+        worker.parameters = list(worker.model.parameters())
+        worker.optimizer = torch.optim.AdamW(worker.parameters, lr=1e-3, weight_decay=0)
+        worker.pool = SimpleNamespace(batch=lambda _count: [({"response_tokens": 1}, 1.0)])
+        worker.config = {
+            "method": "constant",
+            "minimal_monitoring": minimal,
+            "search_every": 1,
+            "batch_sequences": 1,
+        }
+        worker.output = tmp_path / str(minimal)
+        worker.output.mkdir()
+        worker.lr = 1e-3
+        worker.previous = worker.initial_proxy = None
+        worker.elapsed = 0
+        worker.begin = time.perf_counter()
+        worker.counts = collections.Counter()
+        worker.forward = lambda _record, worker=worker: worker.model(x)
+
+        def proxy(worker=worker):
+            worker.counts["proxy_calls"] += 1
+            return float(worker.model(x).square().mean().detach())
+
+        worker.proxy_value = proxy
+        for index in range(3):
+            worker.update(index)
+        workers.append(worker)
+    assert workers[0].counts["proxy_calls"] == 3
+    assert workers[1].counts["proxy_calls"] == 0
+    for left, right in zip(workers[0].parameters, workers[1].parameters, strict=True):
+        assert torch.equal(left, right)
+        for key in ("exp_avg", "exp_avg_sq", "step"):
+            assert torch.equal(
+                workers[0].optimizer.state[left][key], workers[1].optimizer.state[right][key]
+            )
