@@ -57,7 +57,7 @@
     }
   ],
   "allowed_differences_only": true,
-  "interpretation": "Actual resolved configurations: top-level differences compare on-policy to MDPO; bpo_comparison compares MDPO to BPO. Only method, epochs and run-specific names/paths differ. Configuration evidence does not imply completed BPO outcome.",
+  "interpretation": "All three formal runs are completed and verified. Actual resolved configurations differ only in method, epoch counts and run-specific names/paths; equal outer counts do not imply equal optimizer compute.",
   "bpo_comparison": {
     "baseline_run": "dapo-deepseek-mdpo-o50-j16",
     "run": "dapo-deepseek-bpo-o50-j16",

@@ -1,0 +1,394 @@
+{
+  "date": "2026-10-12",
+  "passed": true,
+  "requested_runs_completed": 3,
+  "checks": {
+    "original_requested_models_and_data": true,
+    "physical_gpu_0_to_3_only": true,
+    "shared_config_allowed_differences_only": true,
+    "outer_50_all_methods": true,
+    "inner_1_16_16_exact": true,
+    "eleven_full_570_evaluations_each": true,
+    "actual_exit_zero_all": true,
+    "online_wandb_finished_full_history": true,
+    "final_comparison_generated": true,
+    "raw_archives_roundtrip_sha256_verified": true,
+    "independent_bpo_final_audit": true,
+    "maintained_operations_history": true,
+    "all_three_final_reports_present": true,
+    "report_links_and_line_limits_verified": true,
+    "make_check_passed": true,
+    "formal_gpu_resources_released": true
+  },
+  "analysis": "results/training/math-4gpu/comparison/comparison.json",
+  "runs": [
+    {
+      "run": "dapo-deepseek-opd-o50-j1",
+      "source_commit": "d89e875f97738d1154fc2449720f9f5fd552ae27",
+      "verification": "results/training/math-4gpu/dapo-deepseek-opd-o50-j1-verification.json",
+      "outer_steps": 50,
+      "inner_updates": 50,
+      "evaluation_steps": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "examples_per_evaluation": 570,
+      "exit_code": 0,
+      "gpu_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "gpu_peak_mib": 36745.0,
+      "wandb": {
+        "entity": "wncfht",
+        "project": "mirror-opd-dapo-math-4gpu",
+        "id": "wass1wqb",
+        "url": "https://wandb.ai/wncfht/mirror-opd-dapo-math-4gpu/runs/wass1wqb",
+        "state": "finished",
+        "history_rows": 101
+      },
+      "archives": [
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/inner.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/inner.jsonl.gz",
+          "sha256": "a571b76542862bc1ded1224b965b68505832d3a4afb267735435b22a64e3af2e",
+          "bytes": 192684
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/outer.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/outer.jsonl.gz",
+          "sha256": "456b05d4d1900be8ea1c95ff0935938b0755b0dea1679cff8ef584041abc5a13",
+          "bytes": 417202
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/gpu.csv",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/gpu.csv.gz",
+          "sha256": "8669eee1ae4e19a76c4254b81b8326f6f95382b499909e249f5fa67173b9a184",
+          "bytes": 1669211
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/host-memory.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/host-memory.jsonl.gz",
+          "sha256": "08a2767656f6643335bc7ff1f734471d806bcb7151505dfa3911ba3c6690b10c",
+          "bytes": 2181304
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/resolved-config.yaml",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/resolved-config.yaml.gz",
+          "sha256": "d8c3ef42c742b7f1f84b5fa499c0acd97ae0a789a9d36e54943b0ac05cd1bbf8",
+          "bytes": 26470
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/setting.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/setting.json.gz",
+          "sha256": "84419564a916c291fffc883d4e4c354fcf30373bcf2ee2ca4e47673a5e64a73f",
+          "bytes": 3669
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/overrides.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/overrides.txt.gz",
+          "sha256": "a6fe2a79ea6f4c2d4cc4e3167032f813b948f272dfc637c7c267cce2aa90b667",
+          "bytes": 3577
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/source-commit.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/source-commit.txt.gz",
+          "sha256": "cf748fb4e5e21e2dacf70a41ba8081899895dcffbb2ca8a1c84b5f625968447c",
+          "bytes": 41
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/source-provenance.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/source-provenance.json.gz",
+          "sha256": "d64af1922bcbe70012aff70b16757faa64baf546a4bf66ec4e7cb2d3e809ee61",
+          "bytes": 58249
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/model-data-audit.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/model-data-audit.json.gz",
+          "sha256": "106d2aefdb853cabd6e170392b8d78d4074db04848985b09bf7d441b7bdd1186",
+          "bytes": 2367
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/data-manifest.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/data-manifest.json.gz",
+          "sha256": "6ff6b17377db53556c11e7207c0b1385cbdab33cf258ab16bd465d919caea2cc",
+          "bytes": 52
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/exit-code.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/exit-code.txt.gz",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/dapo-deepseek-opd-o50-j1/wandb-run.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-opd-o50-j1/wandb-run.json.gz",
+          "sha256": "4168a5e7c4f34f7d8b267f5211417d74f8ffc88663c854ddba6c140524aba87a",
+          "bytes": 163
+        }
+      ]
+    },
+    {
+      "run": "dapo-deepseek-mdpo-o50-j16",
+      "source_commit": "87ec5155f4ee4f7904aa275cf580261542350c82",
+      "verification": "results/training/math-4gpu/dapo-deepseek-mdpo-o50-j16-verification.json",
+      "outer_steps": 50,
+      "inner_updates": 800,
+      "evaluation_steps": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "examples_per_evaluation": 570,
+      "exit_code": 0,
+      "gpu_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "gpu_peak_mib": 36745.0,
+      "wandb": {
+        "entity": "wncfht",
+        "project": "mirror-opd-dapo-math-4gpu",
+        "id": "3o5o72du",
+        "url": "https://wandb.ai/wncfht/mirror-opd-dapo-math-4gpu/runs/3o5o72du",
+        "state": "finished",
+        "history_rows": 851
+      },
+      "archives": [
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/inner.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/inner.jsonl.gz",
+          "sha256": "6d020d1c8ace62a097f1ba58e1fa76e05ff5fc0a852337a5a05acae5576bd1c1",
+          "bytes": 3114786
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/outer.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/outer.jsonl.gz",
+          "sha256": "ec75d0ba52a5ed562d39a7185a1cf3b96b21deddf0d82f16999d956291c6ef17",
+          "bytes": 419705
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/gpu.csv",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/gpu.csv.gz",
+          "sha256": "8c36274fd33909dbad5c2b18b3ed7fa8778ed0453102b5746ac79fa396e5ed74",
+          "bytes": 3112364
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/host-memory.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/host-memory.jsonl.gz",
+          "sha256": "344bb82388e36ee73fab9f4d0b254e7d004865c24eb30c887e6cca3d83dd906c",
+          "bytes": 5460319
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/resolved-config.yaml",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/resolved-config.yaml.gz",
+          "sha256": "99f90dcd4f52eff3d27e5a893cc9af49165e26200b5bde4e363472183439a1f7",
+          "bytes": 26474
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/setting.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/setting.json.gz",
+          "sha256": "84419564a916c291fffc883d4e4c354fcf30373bcf2ee2ca4e47673a5e64a73f",
+          "bytes": 3669
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/overrides.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/overrides.txt.gz",
+          "sha256": "0ce52f3496064d88ebd3bfbed254470a74bf0794c1ba4c86e066bca5a40900d2",
+          "bytes": 3584
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/source-commit.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/source-commit.txt.gz",
+          "sha256": "38771bede78cae83712ee8c56bb22ab83baa704711ffbbc8dcbd76bc40f60358",
+          "bytes": 41
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/source-provenance.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/source-provenance.json.gz",
+          "sha256": "b7eba5f0399529101931ac35ae47cafdbd54c81f5bb18ca6c100be89ab307ad3",
+          "bytes": 58249
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/model-data-audit.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/model-data-audit.json.gz",
+          "sha256": "106d2aefdb853cabd6e170392b8d78d4074db04848985b09bf7d441b7bdd1186",
+          "bytes": 2367
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/data-manifest.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/data-manifest.json.gz",
+          "sha256": "6ff6b17377db53556c11e7207c0b1385cbdab33cf258ab16bd465d919caea2cc",
+          "bytes": 52
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/exit-code.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/exit-code.txt.gz",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/dapo-deepseek-mdpo-o50-j16/wandb-run.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-mdpo-o50-j16/wandb-run.json.gz",
+          "sha256": "a6f1e96342b20a880d90168491afc99a5039361784d7a063317c8ae1bb650f52",
+          "bytes": 163
+        }
+      ]
+    },
+    {
+      "run": "dapo-deepseek-bpo-o50-j16",
+      "source_commit": "ac54a612fb9ef0692b5b65d6c7dae620bdbb39a9",
+      "verification": "results/training/math-4gpu/dapo-deepseek-bpo-o50-j16-verification.json",
+      "outer_steps": 50,
+      "inner_updates": 800,
+      "evaluation_steps": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "examples_per_evaluation": 570,
+      "exit_code": 0,
+      "gpu_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "gpu_peak_mib": 36765.0,
+      "wandb": {
+        "entity": "wncfht",
+        "project": "mirror-opd-dapo-math-4gpu",
+        "id": "gp7pyuj6",
+        "url": "https://wandb.ai/wncfht/mirror-opd-dapo-math-4gpu/runs/gp7pyuj6",
+        "state": "finished",
+        "history_rows": 851
+      },
+      "archives": [
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/inner.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/inner.jsonl.gz",
+          "sha256": "82f068d6cc1934c29c630f6654fe299d13b27f522f7a95874ee01291704eb414",
+          "bytes": 3115037
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/outer.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/outer.jsonl.gz",
+          "sha256": "8c5ba86365c723bd5b17e93d648504d643c59fe2acae7f389adcb43112a4e43e",
+          "bytes": 419931
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/gpu.csv",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/gpu.csv.gz",
+          "sha256": "3e3574c91789b21f00b128f99be880f0658e2ab690ef50cdf8639f02b20d4b23",
+          "bytes": 3159321
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/host-memory.jsonl",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/host-memory.jsonl.gz",
+          "sha256": "54a9c605b8fbc8ed16fd7e123e24bba2ccf2d6a0d26b9aee9d27c5e9a9a4ba1c",
+          "bytes": 5460286
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/resolved-config.yaml",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/resolved-config.yaml.gz",
+          "sha256": "65157a9807bf1655ce9b9b80ec358b8dda949ce81cbf9619ac8e931dd8b1a219",
+          "bytes": 26468
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/setting.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/setting.json.gz",
+          "sha256": "84419564a916c291fffc883d4e4c354fcf30373bcf2ee2ca4e47673a5e64a73f",
+          "bytes": 3669
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/overrides.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/overrides.txt.gz",
+          "sha256": "483a125f06d508e51bb80547dcb70ed11c9a05e84e7841edf560bd94b2c7915d",
+          "bytes": 3581
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/source-commit.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/source-commit.txt.gz",
+          "sha256": "b038389f42d43f92719b573056a54e7c2d096016396639b05dda748f6f09643f",
+          "bytes": 41
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/source-provenance.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/source-provenance.json.gz",
+          "sha256": "12174a0a771923e0d8a2e95664032b2159e3dd5d76d65bc673d1646e8facec59",
+          "bytes": 58249
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/model-data-audit.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/model-data-audit.json.gz",
+          "sha256": "106d2aefdb853cabd6e170392b8d78d4074db04848985b09bf7d441b7bdd1186",
+          "bytes": 2367
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/data-manifest.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/data-manifest.json.gz",
+          "sha256": "6ff6b17377db53556c11e7207c0b1385cbdab33cf258ab16bd465d919caea2cc",
+          "bytes": 52
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/exit-code.txt",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/exit-code.txt.gz",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/dapo-deepseek-bpo-o50-j16/wandb-run.json",
+          "archive": "data/training/math-4gpu-final-20261012/dapo-deepseek-bpo-o50-j16/wandb-run.json.gz",
+          "sha256": "f5e3d5ba9a727f06bc628e3accd44279ba3d7dbbdb3e54cfeb0217b0aa112b4e",
+          "bytes": 163
+        }
+      ]
+    }
+  ],
+  "independent_audit": "results/training/math-4gpu/2026-10-12-bpo-final-independent-audit.md",
+  "final_resource_observation": {
+    "physical_gpu_indices": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "memory_used_mib": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "wrapper_pid_134176_exited": true,
+    "supervisor_status": "all_runs_verified"
+  }
+}
