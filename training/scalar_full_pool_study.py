@@ -4,7 +4,6 @@ import argparse
 import json
 
 from experiments.analysis.scalar_large_report import rows_at, summarize
-from experiments.plotting.plot_scalar_large import plot_phase
 from training.scalar_large_suite import ROOT, base_config, launch_phase, training_commands
 
 LRS = (1.25e-7, 2.5e-7, 5e-7, 1e-6, 2e-6, 4e-6, 8e-6, 1.6e-5)
@@ -101,11 +100,15 @@ def execute(phase, configurations):
     )
     output = ROOT / f"results/scalar-large/fullpool-lr-study/{phase}"
     summarize(ROOT / f"runs/scalar-large/{phase}", output, None)
+    from experiments.plotting.plot_scalar_large import plot_phase
+
     plot_phase(ROOT / f"runs/scalar-large/{phase}", output / "figures")
 
 
 def long_check(selection):
     """Validate short-pool LR choices on a separately frozen 7168-token pool."""
+    if (ROOT / "results/scalar-large/fullpool-lr-study/long-transfer-complete.json").exists():
+        return
     cache = "runs/scalar-large/cache-long-s42"
     launch_phase(
         "fulllong-prepare",
@@ -143,6 +146,11 @@ def long_check(selection):
     execute(
         "fulllong",
         [(f"fulllong-lr{lr:.3g}", common | {"lr": lr, "maximum": max(1.6e-5, lr)}) for lr in rates],
+    )
+
+    (ROOT / "results/scalar-large/fullpool-lr-study/long-transfer-complete.json").write_text(
+        json.dumps({"status": "finished", "rates": rates, "cache": cache, "updates": 80}, indent=2)
+        + "\n"
     )
 
 

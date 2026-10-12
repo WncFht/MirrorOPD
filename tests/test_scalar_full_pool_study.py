@@ -78,3 +78,38 @@ def test_fork_preserves_adam_moments_and_update_count(tmp_path):
         not torch.equal(a, b)
         for a, b in zip(workers[0].model.parameters(), workers[1].model.parameters(), strict=True)
     )
+
+
+def test_fresh_ablation_entrypoint_honors_long_check_priority(tmp_path, monkeypatch):
+    import json
+    import sys
+
+    import training.scalar_full_pool_study as study_module
+    import training.scalar_large_suite as suite_module
+
+    study = tmp_path / "results/scalar-large/fullpool-lr-study"
+    study.mkdir(parents=True)
+    (study / "plan.json").write_text("{}")
+    (study / "selection.json").write_text(json.dumps({"baselines": [{"lr": 1e-6}]}))
+    old_root = tmp_path / "runs/scalar-large"
+    old_root.mkdir(parents=True)
+    (old_root / "selection.json").write_text(
+        json.dumps(
+            {
+                "baseline_configs": [{"lr": 5e-7}],
+                "primary_scalar_config": {
+                    "method": "feedback",
+                    "search_every": 1,
+                    "target_rate": 0.01,
+                },
+            }
+        )
+    )
+    calls = []
+    monkeypatch.setattr(suite_module, "ROOT", tmp_path)
+    monkeypatch.setattr(study_module, "long_check", lambda _selection: calls.append("long"))
+    monkeypatch.setattr(suite_module, "launch_phase", lambda *_args: calls.append("ablate"))
+    monkeypatch.setattr(suite_module, "report", lambda *_args: None)
+    monkeypatch.setattr(sys, "argv", ["suite", "--phase", "ablate"])
+    suite_module.main()
+    assert calls == ["long", "ablate"]

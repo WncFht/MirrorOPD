@@ -380,6 +380,17 @@ def main():
         required=True,
     )
     args = parser.parse_args()
+    study = ROOT / "results/scalar-large/fullpool-lr-study"
+    if (
+        args.phase == "ablate"
+        and (study / "plan.json").exists()
+        and (study / "selection.json").exists()
+        and not (study / "long-transfer-complete.json").exists()
+    ):
+        # Fresh phase entrypoints honor priorities added after an outer controller started.
+        from training.scalar_full_pool_study import long_check
+
+        long_check(json.loads((study / "selection.json").read_text()))
     root = ROOT / "runs/scalar-large"
     if args.phase == "canary-prepare":
         commands = [
