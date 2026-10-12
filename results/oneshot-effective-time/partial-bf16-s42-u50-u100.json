@@ -1,0 +1,140 @@
+{
+  "state": "partial-two-learning-rates",
+  "seed": 42,
+  "precision": "bf16",
+  "formal_time_scaling_verdict": "pending-third-rate-and-complete-trajectories",
+  "points": [
+    {
+      "arm": "frozen-opd-bf16-lr5em7-s42",
+      "update": 100,
+      "effective_time": 50,
+      "metrics": {
+        "anchor_student_full_kl": 0.05383539304241816,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.028615196504689216,
+        "fixed_action_abs_gap": 0.11321129483069073,
+        "fixed_action_signed_gap": -0.05507408208268933,
+        "mirror_target_full_kl": 0.02678147079486211,
+        "student_teacher_full_kl": 0.026781471071175678,
+        "teacher_logprob_regression": 0.03744647225253509,
+        "teacher_student_full_kl": 0.02782063025218236,
+        "top16_teacher_overlap": 0.8865203857421875,
+        "diagnostic_positions": 4096.0
+      }
+    },
+    {
+      "arm": "frozen-opd-bf16-lr1em6-s42",
+      "update": 50,
+      "effective_time": 50,
+      "metrics": {
+        "anchor_student_full_kl": 0.05245565446544842,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.03409917393094471,
+        "fixed_action_abs_gap": 0.1226296722192532,
+        "fixed_action_signed_gap": -0.05713940320908309,
+        "mirror_target_full_kl": 0.031174279023431003,
+        "student_teacher_full_kl": 0.031174279272496764,
+        "teacher_logprob_regression": 0.043984800068413835,
+        "teacher_student_full_kl": 0.031717544264808877,
+        "top16_teacher_overlap": 0.877716064453125,
+        "diagnostic_positions": 4096.0
+      }
+    },
+    {
+      "arm": "frozen-opd-bf16-lr5em7-s42",
+      "update": 200,
+      "effective_time": 100,
+      "metrics": {
+        "anchor_student_full_kl": 0.09213829908323697,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.008492589545972179,
+        "fixed_action_abs_gap": 0.048175098455990446,
+        "fixed_action_signed_gap": -0.01053010227894455,
+        "mirror_target_full_kl": 0.007721700029754992,
+        "student_teacher_full_kl": 0.00772170028369632,
+        "teacher_logprob_regression": 0.00989054161228179,
+        "teacher_student_full_kl": 0.0077011862222459045,
+        "top16_teacher_overlap": 0.925262451171875,
+        "diagnostic_positions": 4096.0
+      }
+    },
+    {
+      "arm": "frozen-opd-bf16-lr1em6-s42",
+      "update": 100,
+      "effective_time": 100,
+      "metrics": {
+        "anchor_student_full_kl": 0.09205810170100405,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.009338393884316305,
+        "fixed_action_abs_gap": 0.053197967881821545,
+        "fixed_action_signed_gap": -0.009290149738039086,
+        "mirror_target_full_kl": 0.00851299763869055,
+        "student_teacher_full_kl": 0.008512997923507544,
+        "teacher_logprob_regression": 0.01088179681297308,
+        "teacher_student_full_kl": 0.008475745678542923,
+        "top16_teacher_overlap": 0.9222259521484375,
+        "diagnostic_positions": 4096.0
+      }
+    }
+  ],
+  "configs": [
+    {
+      "path": "runs/oneshot-effective-time-20261012/attempts/frozen-opd-bf16-lr5em7-s42-001/config.json",
+      "sha256": "803046ca432bed6da47223cdc489fa261e6688b48994bab4876be95171069432",
+      "config": {
+        "batch_size": 64,
+        "response_length": 7168,
+        "diagnostic_positions": 4096,
+        "diagnostic_every": 5,
+        "topk": 16,
+        "eta": 0.3,
+        "clip_grad": 1.0,
+        "weight_decay": 0.01,
+        "anchor_interval": 0,
+        "rollout": "frozen",
+        "method": "opd",
+        "wandb": true,
+        "id": "frozen-opd-bf16-lr5em7-s42",
+        "seed": 42,
+        "precision": "bf16",
+        "lr": 5e-07,
+        "updates": 600,
+        "checkpoint_steps": [
+          100,
+          200,
+          400,
+          600
+        ]
+      }
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/attempts/frozen-opd-bf16-lr1em6-s42-001/config.json",
+      "sha256": "133cc3bd7ca016eb0f413bd534b58413aca8bf61117ec99e2a0f484de66d5fe7",
+      "config": {
+        "batch_size": 64,
+        "response_length": 7168,
+        "diagnostic_positions": 4096,
+        "diagnostic_every": 5,
+        "topk": 16,
+        "eta": 0.3,
+        "clip_grad": 1.0,
+        "weight_decay": 0.01,
+        "anchor_interval": 0,
+        "rollout": "frozen",
+        "method": "opd",
+        "wandb": true,
+        "id": "frozen-opd-bf16-lr1em6-s42",
+        "seed": 42,
+        "precision": "bf16",
+        "lr": 1e-06,
+        "updates": 300,
+        "checkpoint_steps": [
+          50,
+          100,
+          200,
+          300
+        ]
+      }
+    }
+  ]
+}
