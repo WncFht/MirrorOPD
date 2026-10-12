@@ -265,11 +265,21 @@ class Worker:
         temporary = self.output / "resume.tmp"
         torch.save(snapshot, temporary)
         temporary.replace(self.output / "resume.pt")
+        if update in self.config.get("keep_checkpoints", []):
+            retained = self.output / f"checkpoint-{update}.pt"
+            if not retained.exists():
+                os.link(self.output / "resume.pt", retained)
         self.append("checkpoints.jsonl", {"update": update, "checkpoint": "resume.pt"})
 
     def restore(self):
         checkpoint = self.output / "resume.pt"
         if not checkpoint.exists():
+            if self.config.get("fork_checkpoint"):
+                self.load_fork(
+                    torch.load(
+                        self.config["fork_checkpoint"], weights_only=False, map_location="cpu"
+                    )
+                )
             return
         record = torch.load(checkpoint, weights_only=False, map_location="cpu")
         if record["config"] != self.config:
@@ -295,6 +305,35 @@ class Worker:
         self.counts = record["counts"]
         self.elapsed = record["elapsed"]
         self.begin = time.perf_counter()
+
+    def load_fork(self, record):
+        """Keep parameters, Adam moments and step; reset only experiment counters and LR."""
+        for key in (
+            "cache",
+            "seed",
+            "train_sequences",
+            "batch_sequences",
+            "full_batch",
+            "eta",
+            "objective",
+            "precision",
+            "topk",
+        ):
+            if record["config"][key] != self.config[key]:
+                raise ValueError(f"fork changes fixed-supervision setting: {key}")
+        self.model.load_state_dict(record["parameters"])
+        self.optimizer.load_state_dict(record["optimizer"])
+        self.pool.sampler.set_state(record["sampler"])
+        for group in self.optimizer.param_groups:
+            group["lr"] = self.config["lr"]
+        self.append(
+            "fork.jsonl",
+            {
+                "source": self.config["fork_checkpoint"],
+                "source_update": record["update"],
+                "lr": self.config["lr"],
+            },
+        )
 
     def direction(self):
         result = []
@@ -410,7 +449,10 @@ class Worker:
             return
         if self.start_update == 0:
             initial = self.audit(0)
-            if initial["train"]["anchor_forward_kl"] > 1e-5:
+            if (
+                not self.config.get("fork_checkpoint")
+                and initial["train"]["anchor_forward_kl"] > 1e-5
+            ):
                 raise ValueError("zero-step FP32 anchor alignment failed")
         for update in range(self.start_update, self.config["updates"]):
             try:
@@ -420,11 +462,17 @@ class Worker:
                 return
             if update % 10 == 0:
                 print(json.dumps(record), flush=True)
-            if (update + 1) % self.config["audit_every"] == 0 or update + 1 == self.config[
-                "updates"
-            ]:
+            if (
+                (update + 1) % self.config["audit_every"] == 0
+                or update + 1 == self.config["updates"]
+                or update + 1 in self.config.get("audit_steps", [])
+            ):
                 self.audit(update + 1)
-            if (update + 1) % 100 == 0 or update + 1 == self.config["updates"]:
+            if (
+                (update + 1) % 100 == 0
+                or update + 1 == self.config["updates"]
+                or update + 1 in self.config.get("keep_checkpoints", [])
+            ):
                 self.save(update + 1)
         self.finish("complete")
 
