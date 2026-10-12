@@ -68,6 +68,16 @@ git -C "$repo_root" rev-parse HEAD >"$run_dir/source-commit.txt" 2>/dev/null || 
 bash "$script_dir/run_upstream_mirror_training.sh" "$method" \
   "$data_dir/train.parquet" "$test_file" \
   "${setting_args[@]}" "$@" --cfg job --resolve >"$run_dir/resolved-config.yaml" 2>"$run_dir/config.stderr"
+PYTHONPATH="$repo_root/src${PYTHONPATH:+:$PYTHONPATH}" "$task_python" - "$run_dir/resolved-config.yaml" "$run_dir/evaluation-protocol.json" <<'PYCODE'
+import json
+import sys
+from pathlib import Path
+from omegaconf import OmegaConf
+from mirroropd.training.evaluation import evaluation_protocol
+
+config = OmegaConf.load(sys.argv[1])
+Path(sys.argv[2]).write_text(json.dumps(evaluation_protocol(config), indent=2) + "\n")
+PYCODE
 if [[ "${MIRROR_AUDIT_NATIVE_PAIR:-0}" == "1" ]]; then
   PYTHONPATH="$repo_root/src${PYTHONPATH:+:$PYTHONPATH}" "$task_python" \
     "$script_dir/audit_gsm8k_setting.py" --config "$run_dir/resolved-config.yaml" \

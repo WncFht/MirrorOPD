@@ -10,6 +10,7 @@ import pandas as pd
 from omegaconf import OmegaConf
 from transformers import AutoConfig, AutoTokenizer
 
+from mirroropd.training.evaluation import effective_prompt_length, evaluation_protocol
 from mirroropd.training.tokenization import assert_shared_tokenization
 
 
@@ -25,6 +26,7 @@ def audit(config):
     context = config.actor_rollout_ref.rollout.max_model_len
     if context < data.max_prompt_length + data.max_response_length:
         raise ValueError("max_model_len must cover prompt budget + full response budget")
+    report["evaluation_protocol"] = evaluation_protocol(config)
     report["model_configs"] = {}
     for name in (model.path, teacher_path):
         hf = AutoConfig.from_pretrained(name)
@@ -81,8 +83,9 @@ def audit(config):
                     raise ValueError("Chat tokenization introduces extra special tokens")
                 lengths.append(len(ids))
             count += len(frame)
-        if max(lengths) > data.max_prompt_length:
-            raise ValueError(f"{split}: overlong prompt {max(lengths)} > {data.max_prompt_length}")
+        prompt_budget = effective_prompt_length(data, split == "test")
+        if max(lengths) > prompt_budget:
+            raise ValueError(f"{split}: overlong prompt {max(lengths)} > {prompt_budget}")
         report["splits"][split] = {
             "available_examples": count,
             "configured_max_samples": data.get(

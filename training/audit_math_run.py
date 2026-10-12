@@ -9,6 +9,8 @@ from pathlib import Path
 import wandb
 from omegaconf import OmegaConf
 
+from mirroropd.training.evaluation import audit_evaluation_records
+
 
 def read_rows(path):
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
@@ -52,11 +54,9 @@ def audit(run_dir):
     if [row["step"] for row in evaluations] != expected_evaluations:
         raise ValueError("Missing periodic evaluations")
     max_samples = config.data.val_max_samples
-    expected_examples = min(570, max_samples) if max_samples > 0 else 570
-    if any(
-        row["data"]["evaluation/generated_examples"] != expected_examples for row in evaluations
-    ):
-        raise ValueError("Incomplete evaluation dataset")
+    expected_questions = min(570, max_samples) if max_samples > 0 else 570
+    evaluation_audit = audit_evaluation_records(run_dir, config, evaluations, expected_questions)
+    expected_examples = evaluation_audit["evaluation_examples"]
     reference = json.loads((run_dir / "wandb-run.json").read_text())
     remote = wandb.Api().run(f"{reference['entity']}/{reference['project']}/{reference['id']}")
     history = list(remote.scan_history(page_size=1000))
@@ -70,6 +70,10 @@ def audit(run_dir):
     ]
     if [row["00_axes/evaluation_outer"] for row in remote_evaluations] != expected_evaluations:
         raise ValueError("W&B evaluation history is incomplete")
+    if any(
+        row.get("01_quality/generated_examples") != expected_examples for row in remote_evaluations
+    ):
+        raise ValueError("W&B evaluation counts disagree with resolved validation protocol")
     if remote.state != "finished":
         raise ValueError(f"W&B run state is {remote.state}")
     with (run_dir / "gpu.csv").open() as handle:
@@ -84,7 +88,7 @@ def audit(run_dir):
         "outer_steps": len(updates),
         "inner_updates": len(inner),
         "evaluation_steps": expected_evaluations,
-        "evaluation_examples": expected_examples,
+        **evaluation_audit,
         "gpu_indices": sorted(gpu_indices),
         "gpu_peak_mib": peak_mib,
         "wandb": {**reference, "state": remote.state, "history_rows": len(history)},
