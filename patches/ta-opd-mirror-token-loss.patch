@@ -1,16 +1,28 @@
 diff --git a/verl/verl/experimental/agent_loop/agent_loop.py b/verl/verl/experimental/agent_loop/agent_loop.py
-index 24d305f..ca629a4 100644
+index 24d305f..797fe92 100644
 --- a/verl/verl/experimental/agent_loop/agent_loop.py
 +++ b/verl/verl/experimental/agent_loop/agent_loop.py
-@@ -49,6 +49,7 @@ from verl.experimental.agent_loop.utils import resolve_config_path
+@@ -47,8 +47,10 @@ from transformers import AutoProcessor, AutoTokenizer
+ 
+ from verl.experimental.agent_loop.utils import resolve_config_path
  from verl.protocol import DataProto
++from mirroropd.training.evaluation import effective_response_length, effective_prompt_length, phase_data_config
  from verl.tools.tool_registry import load_all_tools
  from verl.trainer.distillation import is_distillation_enabled
 +from verl.trainer.distillation.losses import is_mirror_opd_enabled
  from verl.utils.chat_template import apply_chat_template, initialize_system_prompt
  from verl.utils.config import omega_conf_to_dataclass
  from verl.utils.dataset.rl_dataset import RLHFDataset, get_dataset_class
-@@ -427,7 +428,9 @@ class AgentLoopWorker:
+@@ -342,7 +344,7 @@ class AgentLoopBase(ABC):
+         # ``_pad_token_ids`` (and downstream ``torch.cat``) can rely on uniform shapes.
+         # Multimodal prompts cannot be sliced here because placeholder tokens must remain
+         # aligned 1:1 with ``multi_modal_inputs`` features, so we fail loudly instead.
+-        prompt_length = self.rollout_config.prompt_length
++        prompt_length = self.data_config.get("max_prompt_length", self.rollout_config.prompt_length)
+         if len(prompt_ids) > prompt_length:
+             if images or videos or audios:
+                 raise ValueError(
+@@ -427,7 +429,9 @@ class AgentLoopWorker:
          self.mm_processor_kwargs = config.data.get("mm_processor_kwargs", {})
  
          # Online policy distillation
@@ -21,6 +33,104 @@ index 24d305f..ca629a4 100644
          if self.distillation_enabled:
              from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
  
+@@ -516,6 +520,7 @@ class AgentLoopWorker:
+             sampling_params["top_p"] = config.val_kwargs.top_p
+             sampling_params["top_k"] = config.val_kwargs.top_k
+             sampling_params["temperature"] = config.val_kwargs.temperature
++            sampling_params["max_tokens"] = effective_response_length(config, True)
+ 
+         # by default, we assume it's a single turn agent
+         if "agent_name" not in batch.non_tensor_batch:
+@@ -598,7 +603,7 @@ class AgentLoopWorker:
+                 tokenizer=self.tokenizer,
+                 processor=self.processor,
+                 dataset_cls=self.dataset_cls,
+-                data_config=DictConfigWrap(self.config.data),
++                data_config=DictConfigWrap(phase_data_config(self.config.data, trajectory["validate"])),
+                 tools=ToolListWrap(self.tools),
+             )
+             output: AgentLoopOutput = await agent_loop.run(sampling_params, **kwargs)
+@@ -630,6 +635,7 @@ class AgentLoopWorker:
+     async def _agent_loop_postprocess(self, output, validate, **kwargs) -> _InternalAgentLoopOutput:
+         """Perform post-processing operations on the output of each individual agent loop."""
+         output.extra_fields["raw_prompt"] = kwargs["raw_prompt"]
++        response_length = effective_response_length(self.rollout_config, validate)
+ 
+         # Some AgentLoop may have already computed the reward score, e.g SWE-agent.
+ 
+@@ -654,28 +660,28 @@ class AgentLoopWorker:
+         # TODO(wuxibin): remove padding and use tensordict.
+         prompt_output = self._pad_token_ids(
+             output.prompt_ids,
+-            max_length=self.rollout_config.prompt_length,
++            max_length=effective_prompt_length(self.config.data, validate),
+             padding_side="left",
+             return_attention_mask=True,
+         )
+ 
+         response_output = self._pad_token_ids(
+             output.response_ids,
+-            max_length=self.rollout_config.response_length,
++            max_length=response_length,
+             padding_side="right",
+             return_attention_mask=True,
+         )
+ 
+         response_mask_output = self._pad_token_ids(
+             output.response_mask,
+-            max_length=self.rollout_config.response_length,
++            max_length=response_length,
+             padding_side="right",
+             return_attention_mask=False,
+         )
+ 
+         response_logprobs = None
+         if output.response_logprobs is not None:
+-            pad_size = self.rollout_config.response_length - len(output.response_logprobs)
++            pad_size = response_length - len(output.response_logprobs)
+             response_logprobs = torch.tensor(output.response_logprobs + [0.0] * pad_size).unsqueeze(0)
+ 
+         response_mask = response_mask_output["input_ids"] * response_output["attention_mask"]
+@@ -991,6 +997,10 @@ class AgentLoopWorker:
+         if self.reward_loop_worker_handles is None and input_non_tensor_batch:
+             non_tensor_batch.update(input_non_tensor_batch)
+ 
++        non_tensor_batch["generation_finish_reason"] = np.array(
++            [item.extra_fields.get("generation_finish_reason") for item in inputs], dtype=object
++        )
++
+         # add reward_extra_info to non_tensor_batch
+         reward_extra_infos = [input.extra_fields.get("reward_extra_info", {}) for input in inputs]
+         reward_extra_keys = list(reward_extra_infos[0].keys())
+diff --git a/verl/verl/experimental/agent_loop/single_turn_agent_loop.py b/verl/verl/experimental/agent_loop/single_turn_agent_loop.py
+index 5324c69..31bdac0 100644
+--- a/verl/verl/experimental/agent_loop/single_turn_agent_loop.py
++++ b/verl/verl/experimental/agent_loop/single_turn_agent_loop.py
+@@ -37,6 +37,8 @@ class SingleTurnAgentLoop(AgentLoopBase):
+     @rollout_trace_op
+     async def run(self, sampling_params: dict[str, Any], **kwargs) -> AgentLoopOutput:
+         messages = list(kwargs["raw_prompt"])
++        # Match MD-OPD: read before the server consumes max_tokens.
++        response_length = int(sampling_params.get("max_tokens") or self.response_length)
+ 
+         # 1. extract multimodal inputs from messages
+         multi_modal_data = await self.process_multi_modal_info(messages)
+@@ -72,11 +74,11 @@ class SingleTurnAgentLoop(AgentLoopBase):
+ 
+         output: AgentLoopOutput = AgentLoopOutput(
+             prompt_ids=prompt_ids,
+-            response_ids=output.token_ids[: self.response_length],
+-            response_mask=response_mask[: self.response_length],
+-            response_logprobs=output.log_probs[: self.response_length] if output.log_probs else None,
++            response_ids=output.token_ids[: response_length],
++            response_mask=response_mask[: response_length],
++            response_logprobs=output.log_probs[: response_length] if output.log_probs else None,
+             routed_experts=(
+-                output.routed_experts[: len(prompt_ids) + self.response_length]
++                output.routed_experts[: len(prompt_ids) + response_length]
+                 if output.routed_experts is not None
+                 else None
+             ),
 diff --git a/verl/verl/models/transformers/monkey_patch.py b/verl/verl/models/transformers/monkey_patch.py
 index 7a5d6f0..26527fd 100644
 --- a/verl/verl/models/transformers/monkey_patch.py
@@ -75,6 +185,20 @@ index a2f1871..07888a9 100644
 -teacher_key: data_source
 \ No newline at end of file
 +teacher_key: data_source
+diff --git a/verl/verl/trainer/config/rollout/rollout.yaml b/verl/verl/trainer/config/rollout/rollout.yaml
+index 1bb0f71..c5db2de 100644
+--- a/verl/verl/trainer/config/rollout/rollout.yaml
++++ b/verl/verl/trainer/config/rollout/rollout.yaml
+@@ -142,6 +142,9 @@ engine_kwargs:
+ # Sampling parameters used during validation.
+ val_kwargs:
+ 
++  # Validation-only response budget; null retains the training budget.
++  max_tokens: null
++
+   # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+   _target_: verl.workers.config.SamplingConfig
+ 
 diff --git a/verl/verl/trainer/distillation/fsdp/losses.py b/verl/verl/trainer/distillation/fsdp/losses.py
 index d37c85d..366d385 100644
 --- a/verl/verl/trainer/distillation/fsdp/losses.py
@@ -530,7 +654,7 @@ index 8f6cd41..c5b36aa 100644
              # without registering a teacher model worker in role-worker mapping
              self.mapping[Role.TeacherModel] = "teacher_pool"
 diff --git a/verl/verl/trainer/ppo/ray_trainer.py b/verl/verl/trainer/ppo/ray_trainer.py
-index d1eaa7b..5490aab 100644
+index d1eaa7b..160c65f 100644
 --- a/verl/verl/trainer/ppo/ray_trainer.py
 +++ b/verl/verl/trainer/ppo/ray_trainer.py
 @@ -38,7 +38,9 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
@@ -544,7 +668,15 @@ index d1eaa7b..5490aab 100644
  from verl.trainer.ppo import core_algos
  from verl.trainer.ppo.core_algos import AdvantageEstimator, agg_loss
  from verl.trainer.ppo.metric_utils import (
-@@ -70,7 +72,10 @@ from verl.utils.torch_functional import masked_mean
+@@ -63,6 +65,7 @@ from verl.utils.config import omega_conf_to_dataclass
+ from verl.utils.debug import marked_timer
+ from verl.utils.import_utils import deprecated, load_class_from_fqn
+ from verl.utils.metric import reduce_metrics
++from mirroropd.training.evaluation import phase_data_config
+ from verl.utils.py_functional import rename_dict
+ from verl.utils.rollout_skip import RolloutSkip
+ from verl.utils.seqlen_balancing import calculate_workload, get_seqlen_balanced_partitions, log_seqlen_unbalance
+@@ -70,7 +73,10 @@ from verl.utils.torch_functional import masked_mean
  from verl.utils.tracking import ValidationGenerationsLogger
  from verl.workers.config import DistillationConfig, EngineConfig
  from verl.workers.rollout.llm_server import LLMServerManager
@@ -556,7 +688,7 @@ index d1eaa7b..5490aab 100644
  
  
  def apply_kl_penalty(data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, kl_penalty="kl"):
-@@ -329,6 +334,29 @@ class RayPPOTrainer:
+@@ -329,6 +335,29 @@ class RayPPOTrainer:
          self.tokenizer = tokenizer
          self.processor = processor
          self.config = config
@@ -586,7 +718,7 @@ index d1eaa7b..5490aab 100644
  
          self.hybrid_engine = config.actor_rollout_ref.hybrid_engine
          assert self.hybrid_engine, "Currently, only support hybrid engine"
-@@ -358,6 +386,8 @@ class RayPPOTrainer:
+@@ -358,6 +387,8 @@ class RayPPOTrainer:
          if lora_rank <= 0:
              lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
          self.ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
@@ -595,7 +727,50 @@ index d1eaa7b..5490aab 100644
  
          # define in-reward KL control
          # kl loss control currently not suppoorted
-@@ -679,6 +709,16 @@ class RayPPOTrainer:
+@@ -389,7 +420,7 @@ class RayPPOTrainer:
+         if val_dataset is None:
+             val_dataset = create_rl_dataset(
+                 self.config.data.val_files,
+-                self.config.data,
++                phase_data_config(self.config.data, True),
+                 self.tokenizer,
+                 self.processor,
+                 max_samples=self.config.data.get("val_max_samples", -1),
+@@ -607,14 +638,21 @@ class RayPPOTrainer:
+         sample_scores = []
+         sample_turns = []
+         sample_uids = []
++        sample_finish_reasons = []
++        from mirroropd.training.evaluation import (
++            effective_response_length, stable_question_uids, generation_metadata, evaluation_protocol
++        )
+ 
+         for test_data in self.val_dataloader:
+             test_batch = DataProto.from_single_dict(test_data)
+ 
+-            if "uid" not in test_batch.non_tensor_batch:
+-                test_batch.non_tensor_batch["uid"] = np.array(
+-                    [str(uuid.uuid4()) for _ in range(len(test_batch.batch))], dtype=object
+-                )
++            test_batch.non_tensor_batch["uid"] = np.array(
++                stable_question_uids(
++                    test_batch.non_tensor_batch["data_source"],
++                    test_batch.non_tensor_batch["raw_prompt"],
++                    test_batch.non_tensor_batch.get("uid"),
++                ), dtype=object,
++            )
+ 
+             # repeat test batch
+             test_batch = test_batch.repeat(
+@@ -671,6 +709,7 @@ class RayPPOTrainer:
+             input_texts = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in input_ids]
+             sample_inputs.extend(input_texts)
+             sample_uids.extend(test_batch.non_tensor_batch["uid"])
++            sample_finish_reasons.extend(test_output_gen_batch.non_tensor_batch["generation_finish_reason"])
+ 
+             # evaluate using reward_function
+             reward_tensor, reward_extra_info = extract_reward(test_batch)
+@@ -679,6 +718,17 @@ class RayPPOTrainer:
              sample_scores.extend(scores)
  
              reward_extra_infos_dict["reward"].extend(scores)
@@ -605,23 +780,68 @@ index d1eaa7b..5490aab 100644
 +                response_attention = test_output_gen_batch.batch["attention_mask"][:, -output_ids.shape[1]:]
 +                for ids, mask in zip(output_ids.cpu().tolist(), response_attention.cpu().tolist(), strict=True):
 +                    diagnostics = response_diagnostics(
-+                        ids, mask, self.tokenizer.eos_token_id, self.config.data.max_response_length
++                        ids, mask, self.tokenizer.eos_token_id,
++                        effective_response_length(self.config.actor_rollout_ref.rollout, True)
 +                    )
 +                    for key, value in diagnostics.items():
 +                        reward_extra_infos_dict[key].append(value)
              for key, values in reward_extra_info.items():
                  if key not in reward_extra_infos_dict:
                      reward_extra_infos_dict[key] = []
-@@ -723,7 +763,7 @@ class RayPPOTrainer:
+@@ -695,6 +745,13 @@ class RayPPOTrainer:
+ 
+         self._maybe_log_val_generations(inputs=sample_inputs, outputs=sample_outputs, scores=sample_scores)
+ 
++        # Persist aligned UID/sample identity and real vLLM termination reasons.
++        data_sources = np.concatenate(data_source_lst, axis=0)
++        reward_extra_infos_dict.update(generation_metadata(sample_uids, data_sources, sample_finish_reasons))
++        protocol = evaluation_protocol(self.config)
++        reward_extra_infos_dict["protocol_id"] = [protocol["protocol_id"]] * len(sample_uids)
++        reward_extra_infos_dict["generations_per_question"] = [protocol["samples_per_question"]] * len(sample_uids)
++
+         # dump generations
+         val_data_dir = self.config.trainer.get("validation_data_dir", None)
+         if val_data_dir:
+@@ -722,8 +779,26 @@ class RayPPOTrainer:
+         return self._val_metrics_update(data_sources, sample_uids, reward_extra_infos_dict, sample_turns)
  
      def _val_metrics_update(self, data_sources, sample_uids, reward_extra_infos_dict, sample_turns):
-         data_src2var2metric2val = process_validation_metrics(data_sources, sample_uids, reward_extra_infos_dict)
+-        data_src2var2metric2val = process_validation_metrics(data_sources, sample_uids, reward_extra_infos_dict)
 -        metric_dict = {}
++        # Generation identity belongs to artifacts, not numerical reward reductions.
++        identity_keys = {"uid", "sample_index", "data_source", "finish_reason", "protocol_id", "generations_per_question"}
++        scoring_infos = {key: values for key, values in reward_extra_infos_dict.items() if key not in identity_keys}
++        data_src2var2metric2val = process_validation_metrics(data_sources, sample_uids, scoring_infos)
 +        metric_dict = {"evaluation/generated_examples": len(sample_uids)}
++        if self.config.trainer.get("mirror_math_evaluation", False):
++            from mirroropd.training.evaluation import complete_sample_metrics, evaluation_protocol
++            protocol = evaluation_protocol(self.config)
++            metric_dict = complete_sample_metrics(
++                data_sources, sample_uids, reward_extra_infos_dict["reward"],
++                protocol["samples_per_question"], len(self.val_dataset),
++                reward_extra_infos_dict["sample_index"],
++            )
++            metric_dict.update({
++                "evaluation/max_response_tokens": protocol["max_response_tokens"],
++                "evaluation/temperature": protocol["temperature"],
++                "evaluation/top_p": protocol["top_p"],
++                "evaluation/top_k": protocol["top_k"],
++                "evaluation/protocol_id": protocol["protocol_id"],
++            })
          for data_source, var2metric2val in data_src2var2metric2val.items():
              core_var = "acc" if "acc" in var2metric2val else "reward"
              for var_name, metric2val in var2metric2val.items():
-@@ -926,6 +966,8 @@ class RayPPOTrainer:
+@@ -738,7 +813,8 @@ class RayPPOTrainer:
+                     else:
+                         metric_sec = "val-aux"
+                     pfx = f"{metric_sec}/{data_source}/{var_name}/{metric_name}"
+-                    metric_dict[pfx] = metric_val
++                    if pfx not in metric_dict:
++                        metric_dict[pfx] = metric_val
+ 
+         if len(sample_turns) > 0:
+             sample_turns = np.concatenate(sample_turns)
+@@ -926,6 +1002,8 @@ class RayPPOTrainer:
          else:
              self.teacher_model_manager = None
              self.distillation_config = None
@@ -630,7 +850,7 @@ index d1eaa7b..5490aab 100644
  
          # Support custom AgentLoopManager via config
          manager_class_fqn = self.config.actor_rollout_ref.rollout.get("agent", {}).get("agent_loop_manager_class")
-@@ -1257,6 +1299,9 @@ class RayPPOTrainer:
+@@ -1257,6 +1335,9 @@ class RayPPOTrainer:
          # TODO: remove step 1, 2, 4 after we make the whole training tensordict and padding free
          # step 1: convert dataproto to tensordict.
          batch_td = batch.to_tensordict()
@@ -640,7 +860,7 @@ index d1eaa7b..5490aab 100644
          # step 2: convert from padding to nopadding
          batch_td = left_right_2_no_padding(batch_td)
          # step 3: add meta info
-@@ -1267,6 +1312,12 @@ class RayPPOTrainer:
+@@ -1267,6 +1348,12 @@ class RayPPOTrainer:
              calculate_sum_pi_squared=calculate_sum_pi_squared,
              compute_loss=False,
          )
@@ -653,7 +873,7 @@ index d1eaa7b..5490aab 100644
          output = self.actor_rollout_wg.compute_log_prob(batch_td)
          # gather output
          entropy = tu.get(output, "entropy")
-@@ -1282,6 +1333,13 @@ class RayPPOTrainer:
+@@ -1282,6 +1369,13 @@ class RayPPOTrainer:
              sum_pi_squared = no_padding_2_padding(sum_pi_squared, batch_td)
          # step 5: rebuild a tensordict and convert to dataproto
          result = {"old_log_probs": log_probs.float(), "entropys": entropy.float()}
@@ -667,7 +887,7 @@ index d1eaa7b..5490aab 100644
          if routed_experts is not None:
              result["routed_experts"] = routed_experts
          if sum_pi_squared is not None:
-@@ -1290,6 +1348,19 @@ class RayPPOTrainer:
+@@ -1290,6 +1384,19 @@ class RayPPOTrainer:
          old_log_prob = DataProto.from_tensordict(old_log_prob)
          return old_log_prob, old_log_prob_mfu
  
@@ -687,7 +907,7 @@ index d1eaa7b..5490aab 100644
      def _update_actor(self, batch: DataProto) -> DataProto:
          rollout_config = self.config.actor_rollout_ref.rollout
          batch.meta_info["multi_turn"] = rollout_config.multi_turn.enable
-@@ -1397,6 +1468,7 @@ class RayPPOTrainer:
+@@ -1397,6 +1504,7 @@ class RayPPOTrainer:
              logger.log(data=val_metrics, step=self.global_steps)
              if self.config.trainer.get("val_only", False):
                  self._shutdown_dump_executor()
@@ -695,7 +915,7 @@ index d1eaa7b..5490aab 100644
                  return
  
          if self.config.actor_rollout_ref.rollout.skip.get("enable", False):
-@@ -1476,6 +1548,12 @@ class RayPPOTrainer:
+@@ -1476,6 +1584,12 @@ class RayPPOTrainer:
                          combined_gen_output.meta_info.pop("timing", None)
  
                      gen_batch_output = combined_gen_output.slice(0, num_sampled_prompts)
@@ -708,7 +928,7 @@ index d1eaa7b..5490aab 100644
                      if "__do_sample__" in gen_batch_output.non_tensor_batch:
                          gen_batch_output.pop(non_tensor_batch_keys=["__do_sample__"])
  
-@@ -1573,7 +1651,10 @@ class RayPPOTrainer:
+@@ -1573,7 +1687,10 @@ class RayPPOTrainer:
  
                      assert "old_log_probs" in batch.batch, f'"old_log_prob" not in {batch.batch.keys()=}'
  
@@ -720,7 +940,7 @@ index d1eaa7b..5490aab 100644
                          # compute reference log_prob
                          with marked_timer(str(Role.RefPolicy), timing_raw, color="olive"):
                              ref_log_prob = self._compute_ref_log_prob(batch)
-@@ -1647,6 +1728,11 @@ class RayPPOTrainer:
+@@ -1647,6 +1764,11 @@ class RayPPOTrainer:
                          # update actor
                          with marked_timer("update_actor", timing_raw, color="red"):
                              actor_output = self._update_actor(batch)
@@ -732,7 +952,7 @@ index d1eaa7b..5490aab 100644
  
                          # Check if the ESI (Elastic Server Instance)/training plan is close to expiration.
                          esi_close_to_expiration = should_save_ckpt_esi(
-@@ -1758,6 +1844,7 @@ class RayPPOTrainer:
+@@ -1758,6 +1880,7 @@ class RayPPOTrainer:
                      self._shutdown_dump_executor()
                      pprint(f"Final validation metrics: {last_val_metrics}")
                      progress_bar.close()
@@ -899,6 +1119,18 @@ index 2bfd200..280ebf8 100644
          self.teacher_models = self._resolve_teacher_models()
          teacher_world_size_sum = 0
          for teacher_model in self.teacher_models.values():
+diff --git a/verl/verl/workers/config/rollout.py b/verl/verl/workers/config/rollout.py
+index 8162f8b..73abb7e 100644
+--- a/verl/verl/workers/config/rollout.py
++++ b/verl/verl/workers/config/rollout.py
+@@ -60,6 +60,7 @@ class SamplingConfig(BaseConfig):
+     top_p: float = 1.0
+     do_sample: bool = True
+     n: int = 1
++    max_tokens: Optional[int] = None
+ 
+ 
+ @dataclass
 diff --git a/verl/verl/workers/engine/fsdp/transformer_impl.py b/verl/verl/workers/engine/fsdp/transformer_impl.py
 index afbf7ec..02f7f56 100644
 --- a/verl/verl/workers/engine/fsdp/transformer_impl.py
@@ -1010,7 +1242,7 @@ index afbf7ec..02f7f56 100644
 @@ -1086,6 +1126,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
                  "fused kernels do not materialize the full logits tensor needed for Σπ²."
              )
-
+ 
 +        if os.environ.get("MIRROR_ALIGN_ROLLOUT_VOCAB", "0") == "1":
 +            if use_fused_kernels:
 +                raise NotImplementedError("Rollout support alignment requires non-fused logits")
@@ -1019,7 +1251,7 @@ index afbf7ec..02f7f56 100644
 +            output.logits = align_rollout_logits(output.logits, len(self.model_config.tokenizer))
 +
          model_output = {}
-
+ 
          input_ids = micro_batch["input_ids"]
 @@ -1119,13 +1166,22 @@ class FSDPEngineWithLMHead(FSDPEngine):
  
@@ -1157,6 +1389,26 @@ index c4c7d8f..f3830d0 100644
  
          # 2. determine if we need a base weight sync (adapter path only)
          per_tensor_param, peft_config = self.actor.engine.get_per_tensor_param(
+diff --git a/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py b/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
+index 3b24590..4a8a032 100644
+--- a/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
++++ b/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
+@@ -553,6 +553,7 @@ class vLLMHttpServer:
+                 log_probs=None,
+                 routed_experts=None,
+                 stop_reason="aborted",
++                extra_fields={"generation_finish_reason": "abort"},
+             )
+ 
+         extra_fields = {"global_steps": self.global_steps}
+@@ -572,6 +573,7 @@ class vLLMHttpServer:
+ 
+         # Determine stop reason from finish_reason
+         finish_reason = final_res.outputs[0].finish_reason
++        extra_fields["generation_finish_reason"] = finish_reason
+         if finish_reason == "abort":
+             stop_reason = "aborted"
+         elif finish_reason in ("stop", "length"):
 diff --git a/verl/verl/workers/utils/padding.py b/verl/verl/workers/utils/padding.py
 index 6d537ea..ff76b4d 100644
 --- a/verl/verl/workers/utils/padding.py

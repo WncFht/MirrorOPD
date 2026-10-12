@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -9,7 +10,8 @@ from pathlib import Path
 def main():
     repo = Path(__file__).resolve().parents[1]
     source = repo.parent / "MD-OPD/verl/verl/utils/reward_score"
-    target = repo.parent / "backends/mirroropd-taopd/verl/verl/utils/reward_score"
+    backend = Path(os.environ.get("MIRROR_UPSTREAM_ROOT", repo.parent / "backends/mirroropd-taopd"))
+    target = backend / "verl/verl/utils/reward_score"
     files = [source / "ttrl_mathverify.py", source / "_timeout.py"]
     files.extend(sorted((source / "ttrl_math").glob("*.py")))
     # Validate the entire set before modifying the backend.

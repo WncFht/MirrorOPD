@@ -3,8 +3,13 @@
 set -euo pipefail
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 workspace_root=$(cd -- "$repo_root/.." && pwd)
+requested_backend=${MIRROR_UPSTREAM_ROOT:-}
 source "$workspace_root/.bashrc"
+# The workspace shell sets a default backend. Honor the caller's isolated checkout.
+if [[ -n "$requested_backend" ]]; then export MIRROR_UPSTREAM_ROOT="$requested_backend"; fi
 fht-mirror
+"$PYTHON_BIN" "$repo_root/training/check_math_evaluation_backend.py" \
+  "${MIRROR_UPSTREAM_ROOT:-$HOME/src/mirroropd-taopd}"
 "$PYTHON_BIN" "$repo_root/training/prepare_math_backend.py"
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=0,1,2,3
