@@ -1,0 +1,145 @@
+{
+  "definition": "u_n=sum(applied_lr[:n])/1e-6",
+  "runs": [
+    {
+      "id": "tune-constant-1.5e-06",
+      "updates": 240,
+      "u_final": 360.0,
+      "final_bpo_ratio": 0.5844887807228918,
+      "common_u_log_interpolation": {
+        "20": 0.5816698123291086,
+        "40": 0.43010829923512217,
+        "60": 0.4043001404601685
+      }
+    },
+    {
+      "id": "tune-constant-1.6e-05",
+      "updates": 240,
+      "u_final": 3840.0,
+      "final_bpo_ratio": 8.039044473465006,
+      "common_u_log_interpolation": {
+        "20": 1.1447910317253467,
+        "40": 1.3105465063187836,
+        "60": 1.500301887092729
+      }
+    },
+    {
+      "id": "tune-constant-1e-06",
+      "updates": 240,
+      "u_final": 240.0,
+      "final_bpo_ratio": 0.3590678537641944,
+      "common_u_log_interpolation": {
+        "20": 0.34357815875122283,
+        "40": 0.2979299502771213,
+        "60": 0.2721069257117239
+      }
+    },
+    {
+      "id": "tune-constant-2.5e-07",
+      "updates": 240,
+      "u_final": 60.0,
+      "final_bpo_ratio": 0.1782811016220094,
+      "common_u_log_interpolation": {
+        "20": 0.2704087481496999,
+        "40": 0.20194542623470835,
+        "60": 0.17828110162200944
+      }
+    },
+    {
+      "id": "tune-constant-2e-06",
+      "updates": 240,
+      "u_final": 480.0,
+      "final_bpo_ratio": 0.9495105807792013,
+      "common_u_log_interpolation": {
+        "20": 0.7720577185864909,
+        "40": 0.5960731208289771,
+        "60": 0.5765245239074597
+      }
+    },
+    {
+      "id": "tune-constant-4e-06",
+      "updates": 240,
+      "u_final": 960.0,
+      "final_bpo_ratio": 2.6134362452635247,
+      "common_u_log_interpolation": {
+        "20": 1.1375684318160193,
+        "40": 1.294061937064357,
+        "60": 1.472084008419101
+      }
+    },
+    {
+      "id": "tune-constant-5e-07",
+      "updates": 240,
+      "u_final": 120.0,
+      "final_bpo_ratio": 0.18192540609139946,
+      "common_u_log_interpolation": {
+        "20": 0.2828260707224757,
+        "40": 0.23004934808870117,
+        "60": 0.21079677580703843
+      }
+    },
+    {
+      "id": "tune-constant-8e-06",
+      "updates": 240,
+      "u_final": 1920.0,
+      "final_bpo_ratio": 5.38822600124799,
+      "common_u_log_interpolation": {
+        "20": 1.2006136376509116,
+        "40": 1.4414731069133546,
+        "60": 1.7306522704672038
+      }
+    },
+    {
+      "id": "tune-feedback-rate0.01",
+      "updates": 240,
+      "u_final": 37.1282331845542,
+      "final_bpo_ratio": 0.21302228484267136,
+      "common_u_log_interpolation": {
+        "20": 0.2693419037969159
+      }
+    },
+    {
+      "id": "tune-feedback-rate0.03",
+      "updates": 240,
+      "u_final": 45.049331096953594,
+      "final_bpo_ratio": 0.2884316204608589,
+      "common_u_log_interpolation": {
+        "20": 0.285737555084113,
+        "40": 0.3061679625927148
+      }
+    },
+    {
+      "id": "tune-logloss-control",
+      "updates": 240,
+      "u_final": 240.0,
+      "final_bpo_ratio": 0.3942699302895041,
+      "common_u_log_interpolation": {
+        "20": 0.34659801334859636,
+        "40": 0.2996353655939854,
+        "60": 0.2922875139885371
+      }
+    },
+    {
+      "id": "tune-search-every1",
+      "updates": 240,
+      "u_final": 103.40277769158297,
+      "final_bpo_ratio": 0.29052509301725493,
+      "common_u_log_interpolation": {
+        "20": 0.7802459151297884,
+        "40": 0.5228029997559328,
+        "60": 0.378955406823585
+      }
+    },
+    {
+      "id": "tune-search-every4",
+      "updates": 240,
+      "u_final": 165.566693057265,
+      "final_bpo_ratio": 0.6488674472841548,
+      "common_u_log_interpolation": {
+        "20": 0.7035694246630072,
+        "40": 0.5869565233178496,
+        "60": 0.6755695527857387
+      }
+    }
+  ]
+}
