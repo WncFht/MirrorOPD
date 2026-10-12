@@ -11,5 +11,11 @@
     "diagnostics.jsonl": "df7fc96c1c0c53b9714cfc7f0f04adf99a9073153da06a637e6704800718f9fe",
     "native-final.jsonl": "e206f605b16b2984edecfa49e5b29b6f82b782cad627b271d49fa713d2ab3737"
   },
-  "full_math_evaluation_pending": true
+  "full_math_evaluation_pending": false,
+  "completed_evaluation_updates": [
+    100,
+    200,
+    400,
+    600
+  ]
 }

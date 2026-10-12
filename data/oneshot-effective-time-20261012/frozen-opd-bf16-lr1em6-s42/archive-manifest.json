@@ -1,0 +1,41 @@
+{
+  "arm": "frozen-opd-bf16-lr1em6-s42",
+  "updates": 300,
+  "lr": 1e-06,
+  "effective_time": 300,
+  "exit_code": 0,
+  "source_cache": "seed-42",
+  "raw_files": [
+    {
+      "path": "updates.jsonl",
+      "sha256": "febc1540400d644b32064b1230a3d62c1ccc69d5434c3283d6be1907c6682f09",
+      "bytes": 793443
+    },
+    {
+      "path": "fixed-native.jsonl",
+      "sha256": "6473ce9e7e9fa94350a3249e8faf8939fb0a021af5b9d490ede815cccaf6ea30",
+      "bytes": 37122
+    },
+    {
+      "path": "diagnostics.jsonl",
+      "sha256": "1429beaba87beeddaf57d2afe6ee303f9fe6a73c432ab0adb9665b7ffafc98df",
+      "bytes": 36339
+    },
+    {
+      "path": "native-final.jsonl",
+      "sha256": "1812af7d3e5d441b9145c0154a36b37d79aaf4e28102b132f871bb86f7ec46c4",
+      "bytes": 306
+    },
+    {
+      "path": "completion.json",
+      "sha256": "3bd8938a1d48a1ebadcae9fa7cb8292de5cf72f8e6d2414767b32d470322ba37",
+      "bytes": 86
+    },
+    {
+      "path": "wandb-run.json",
+      "sha256": "50a506cee60a63967cb09984a6b1b65813e034675ad58c3b6a2d2e9affa7da15",
+      "bytes": 97
+    }
+  ],
+  "full_math_evaluation_pending": true
+}
