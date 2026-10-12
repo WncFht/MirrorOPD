@@ -1,0 +1,582 @@
+{
+  "scope": "24 completed original minibatch confirmation conditions; feedback seed442 absent",
+  "selection_sha256": "3efe1de50f91488812cf44f052bdfec83be16c06f2c8e564e1cf9bf6b06b0f47",
+  "files": [
+    {
+      "run": "confirm-constant1-s142",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s142/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s142-summary.json.gz",
+      "original_sha256": "6a25412a3ba9d2ade99e8aa2296f46decbc47bb221a0febc41bdb4a663904d27",
+      "archive_sha256": "e272a6865770dff1f7848832616b7b3eb13c604687c3f221b2e9ebefe7505521"
+    },
+    {
+      "run": "confirm-constant1-s142",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s142/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s142-audits.jsonl.gz",
+      "original_sha256": "4fa854aa806d81699d1dc3fbf5f950568a26f2878d9db93d6f2be40b33eb291b",
+      "archive_sha256": "4c5788b6b1d1ae9df4dcf3ce1607960a1d45209504768e9514c1f5cb144a4de7"
+    },
+    {
+      "run": "confirm-constant1-s142",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s142/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s142-updates.jsonl.gz",
+      "original_sha256": "aa5e741678387432850eb85b9cf8f839dca21836cd1344aa6514d3328f8d410c",
+      "archive_sha256": "e7eef5847e8f77b4ddd45c3e2554ce9723b52e8597d50f49e11487b325479be4"
+    },
+    {
+      "run": "confirm-constant1-s242",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s242/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s242-summary.json.gz",
+      "original_sha256": "50748bf1a183b46405a413565f9ec16e23e4c2724f86936a3de86da9fea1a70a",
+      "archive_sha256": "a03c8a7c2a71db06a94bc95b6387b48c11fcc58edb300e05be86b299e3f7a0fc"
+    },
+    {
+      "run": "confirm-constant1-s242",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s242/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s242-audits.jsonl.gz",
+      "original_sha256": "2faa913857878864ec8e8f18e91a93f0f9807962a13af039c5bcc664f711350f",
+      "archive_sha256": "c449e59f3042956d4a8582b8af3c079404da7000d93620f590715eb0ff4a0c10"
+    },
+    {
+      "run": "confirm-constant1-s242",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s242/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s242-updates.jsonl.gz",
+      "original_sha256": "be226f28bef032a776bf3ff40989dec20ca746070eacf7d37284cdd3b48f3221",
+      "archive_sha256": "ee44e4f9819d70a908b6b26b939f294224732726d3be1455a5ae07e5292b08c6"
+    },
+    {
+      "run": "confirm-constant1-s342",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s342/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s342-summary.json.gz",
+      "original_sha256": "206b6b4f8cb417fe87d613ab84b9ab0011bdfb9d5ecb4a32fdf6177a58390bb4",
+      "archive_sha256": "c6f376333941cc607025ef79d4db5c136eb674d23b8e28af36c2accb695a6e9e"
+    },
+    {
+      "run": "confirm-constant1-s342",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s342/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s342-audits.jsonl.gz",
+      "original_sha256": "2ce2f2e03c94973b834ac809ee950c7137f781e83853ed0c19bc5d6e9f23ee21",
+      "archive_sha256": "5a0adcf9ae672cf02b4b5b0440447dfc1a52994129256b34f721313b034391a6"
+    },
+    {
+      "run": "confirm-constant1-s342",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s342/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s342-updates.jsonl.gz",
+      "original_sha256": "769a21d18cafcfb578ca1158fbc3bc77c89a323e7e863a45a54d269f98725d21",
+      "archive_sha256": "0fbe027d98d7e00499718f258374196cf89f76b11f64a8106455b5bd015284d0"
+    },
+    {
+      "run": "confirm-constant1-s42",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s42/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s42-summary.json.gz",
+      "original_sha256": "f03f988b394395d52b042b9c9aac634a2a81bf39bfb932fe17e09e5f66e1714c",
+      "archive_sha256": "eea89d8667c5f3f5a7fca0122cffcf8533ac73ffbeb74f8ace69e7e1f839f1a9"
+    },
+    {
+      "run": "confirm-constant1-s42",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s42/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s42-audits.jsonl.gz",
+      "original_sha256": "4f37d95cefb7b868381deb97dce4d3b9b5dfb3d9a3fdd23cf4414d2dea4900d2",
+      "archive_sha256": "88af3bc6663ee32eb10f72daecbd04f51ec12867a9f62cb751a84250dccde8d9"
+    },
+    {
+      "run": "confirm-constant1-s42",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s42/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s42-updates.jsonl.gz",
+      "original_sha256": "f910f23cfc8daba3f3c43b58ac8c89c2dd9171d68b640f2bac53a488ffb5a851",
+      "archive_sha256": "1554d77dc11cef11a09b4b4955a3b0c7d4a9cc9e5d674aecd661c11e6d8f5e5e"
+    },
+    {
+      "run": "confirm-constant1-s442",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s442/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s442-summary.json.gz",
+      "original_sha256": "08a2318131c95a78eefbe6ba74bffc567aa4e3d5786ebe2b64b76ea922fd4c4e",
+      "archive_sha256": "108e28f8c430a236ff718516b22f147143fe9a3e7c628b141882b3840e153007"
+    },
+    {
+      "run": "confirm-constant1-s442",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s442/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s442-audits.jsonl.gz",
+      "original_sha256": "2279b06ed843572d80fe094940ba7379743dcbee6617a8b5b2b7fa68e44f4b96",
+      "archive_sha256": "c39a8ee13af1f69d00d508ba5809d4554d599d25fa5d413dc4f349d610b1278b"
+    },
+    {
+      "run": "confirm-constant1-s442",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant1-s442/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant1-s442-updates.jsonl.gz",
+      "original_sha256": "a3e77a24bef337d3b5523e38290a9d2c9cfdfeefee79076c199687692de050d1",
+      "archive_sha256": "6eaf75b007ffe997047058c82f15b80ad2a7ae4918c70a52c9495abb9842c6d5"
+    },
+    {
+      "run": "confirm-constant2-s142",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s142/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s142-summary.json.gz",
+      "original_sha256": "708c6b7ea08ff78f83a41032c0db4b11ef35d194bddd54049e6858710bf1b8a3",
+      "archive_sha256": "ff46e4dc4a5654b62489ba6f18fd51725f69e0e2e2556033303565e9b7394386"
+    },
+    {
+      "run": "confirm-constant2-s142",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s142/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s142-audits.jsonl.gz",
+      "original_sha256": "5a00cdf043cfd8a42ed742126ed43662fbcab1f8fe052b7121981645e1e2e457",
+      "archive_sha256": "1154891941b51d7ce51dc04b5cb00e0ed4f1246aa5d29af771702777a86be072"
+    },
+    {
+      "run": "confirm-constant2-s142",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s142/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s142-updates.jsonl.gz",
+      "original_sha256": "dc582e15f576e1e823c562765649cba1c4464e4be2e3696bfd5ea0995bffe514",
+      "archive_sha256": "6ad017b2ac956b07275d2a138af680e7b0db8a2c9ef999c5329a241cb0d34e9b"
+    },
+    {
+      "run": "confirm-constant2-s242",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s242/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s242-summary.json.gz",
+      "original_sha256": "4b03e021468d98512b648083b1caef3a3d2baaa0b199521dceac0190a95f67b9",
+      "archive_sha256": "9a3f85c0ac13da16ef12b5c115855b9981d612cb448614d4f37c01688dd99cfe"
+    },
+    {
+      "run": "confirm-constant2-s242",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s242/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s242-audits.jsonl.gz",
+      "original_sha256": "a61b56331d7c254cf237e028e28a2ece072f7dec5bd05dd7ffd58df11a1fe991",
+      "archive_sha256": "9529cf5b1105feb4d9311eede4decf146ade12f86432f6fd5705252e2178dfa9"
+    },
+    {
+      "run": "confirm-constant2-s242",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s242/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s242-updates.jsonl.gz",
+      "original_sha256": "0c83c6c6939135b62cf87f80f21431d2b320386c58007ab5e57c2ea6bac65c9f",
+      "archive_sha256": "98d378c755c41cfa16616c271b6ec59dc4331954331c5fb33ab0d77ade50a80e"
+    },
+    {
+      "run": "confirm-constant2-s342",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s342/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s342-summary.json.gz",
+      "original_sha256": "6fcf759a3ab04cd0ed0ecee8475c5d33aa4551b92a719fed38639275caa6a9a7",
+      "archive_sha256": "618af24cac85306ecd925612a3febc6ba63bbfe4f081e8e6c1f4f0c43a57f3c7"
+    },
+    {
+      "run": "confirm-constant2-s342",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s342/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s342-audits.jsonl.gz",
+      "original_sha256": "24b6f94c9e0b9037c1857761e2c0119a157a7840640e2542388fcfb5f8ef2a86",
+      "archive_sha256": "102d1a6ed12a303192d1fc913af655425a3626e429a062ce075ade12a6f6bfa7"
+    },
+    {
+      "run": "confirm-constant2-s342",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s342/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s342-updates.jsonl.gz",
+      "original_sha256": "9814bab726688871b0a6dc45c8611513bfc677b6d284cc2411297b6cb2899444",
+      "archive_sha256": "b1cd36c67ea25591176369e43f93bcc86857fe1ce3d2b7eb6326805313ea6dd0"
+    },
+    {
+      "run": "confirm-constant2-s42",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s42/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s42-summary.json.gz",
+      "original_sha256": "ec09e04c5a420f1b381b2749e28ea3a347911e32545a87b142968a019da4ad97",
+      "archive_sha256": "926a895da62e76d106f93c546054d71bb18b9115c2cfc67bb8a48fcd58cdd637"
+    },
+    {
+      "run": "confirm-constant2-s42",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s42/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s42-audits.jsonl.gz",
+      "original_sha256": "25bc0e8cb641fc73eaa31d613ba9e693467a37a09d50d9b18c04d49d4dc06ce5",
+      "archive_sha256": "62759ae28c17ca01f7b681b609df576106e935b9f8cbcc6bf2855066772eed2e"
+    },
+    {
+      "run": "confirm-constant2-s42",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s42/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s42-updates.jsonl.gz",
+      "original_sha256": "aa5af84507033c747ea887561f914fe294f5811118b3cec289dafb92746fdcd1",
+      "archive_sha256": "9462992d1b2acb6477ffa8a0ad8ce88929205ea17dd949e0673391492914d726"
+    },
+    {
+      "run": "confirm-constant2-s442",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s442/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s442-summary.json.gz",
+      "original_sha256": "838658d3d7e0438aadaab1911bcfa2c6bd526111cc1be4487e5a0af8af09e624",
+      "archive_sha256": "bf5d414c3cec2c5480737825f290336a47ce1bc3f2df791b93c6d4d44ee4323b"
+    },
+    {
+      "run": "confirm-constant2-s442",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s442/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s442-audits.jsonl.gz",
+      "original_sha256": "18d619347a3420c60395cab377e6e3009dcced20824aaf623cdf9aa37652eb0c",
+      "archive_sha256": "caaa6c0ad8853b7930c95d9642616bb29dea990eff488000ada514390149cb63"
+    },
+    {
+      "run": "confirm-constant2-s442",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-constant2-s442/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-constant2-s442-updates.jsonl.gz",
+      "original_sha256": "4871b9de05e9cb02e54604836d4fdf3cd6ba3229ec8af8d591dd5ffe9a68ef64",
+      "archive_sha256": "71855583bf98e35cd4cb18328eae8353059cfb9b6860e00a67405f7fe8d20b85"
+    },
+    {
+      "run": "confirm-feedback-s142",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s142/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s142-summary.json.gz",
+      "original_sha256": "e432842d89d615b3f647254489b33685328a5ea5f958531e48b555758e53989e",
+      "archive_sha256": "78b24716dac6eb0cb35f2409f7f4bca0b053fd7cebadf561a51a7db50e7b7832"
+    },
+    {
+      "run": "confirm-feedback-s142",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s142/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s142-audits.jsonl.gz",
+      "original_sha256": "907ee11c962a209e0b1861e36b13da7ae62e97daaf8d44db962c12b247b8fe09",
+      "archive_sha256": "42f3864e0e0536c8d78181f3b5e82a8a6f93d1957355e6bf6a2e3c81d88a9db5"
+    },
+    {
+      "run": "confirm-feedback-s142",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s142/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s142-updates.jsonl.gz",
+      "original_sha256": "fd5de72d105a876e7183d2f9eda3cdfa4d87aa12b003746d309be2837e8c1273",
+      "archive_sha256": "9fbf9b7baeb84a448af952f74d84195878295e88a9821db7fbdf21c4bc6964c5"
+    },
+    {
+      "run": "confirm-feedback-s242",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s242/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s242-summary.json.gz",
+      "original_sha256": "e8edaa5f5723502113a408fa9a7d97458471dfd4f2a0cd8ef3f84a08b21eba5e",
+      "archive_sha256": "2435d4fddd246209d050c8d22bb7f365c0f4ad3e064322cf05f84a54191284a7"
+    },
+    {
+      "run": "confirm-feedback-s242",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s242/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s242-audits.jsonl.gz",
+      "original_sha256": "13dc0e8ee4ddaa096ebd70369bbdad6e9f1f49f0fa18ff107e6ab55b87dfff0e",
+      "archive_sha256": "7e9805dddd66ef7fe4b332258a47d7b36f7e7f4598507bdeb52369f306372f72"
+    },
+    {
+      "run": "confirm-feedback-s242",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s242/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s242-updates.jsonl.gz",
+      "original_sha256": "00ded3ff39b928805b878441816e0b2698d6dba5e8a707e920d7b195f3069548",
+      "archive_sha256": "21fc4d5f18a661eae103d146b31198f0cf845a2e774ff838e70dd4e2175c786e"
+    },
+    {
+      "run": "confirm-feedback-s342",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s342/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s342-summary.json.gz",
+      "original_sha256": "ae98aa90b608767cdd5e8f8c3fda535d4899575c33b5b77513a1155b0f990160",
+      "archive_sha256": "37f992b22ef2f11ef28a64e7c26a88d0abff4d2e92911a2673e05dd5c8a0786f"
+    },
+    {
+      "run": "confirm-feedback-s342",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s342/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s342-audits.jsonl.gz",
+      "original_sha256": "dc6c9d697c93b2ae6e0edf5e7d0cfbf4dfdcb247de7b9ca32e38ffa4c7d5d92b",
+      "archive_sha256": "643071109a4df89c7bba14f2b93abc9206e4e55e3ea07e302c9d347194aa345f"
+    },
+    {
+      "run": "confirm-feedback-s342",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s342/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s342-updates.jsonl.gz",
+      "original_sha256": "eb6de46f213efb196d242f361d9913039e0c000a03a9de2d3af08a239855c7db",
+      "archive_sha256": "e377d8e35475280a6b181fab5286ffa96bb5fb168c47358dbc92968de1259f2d"
+    },
+    {
+      "run": "confirm-feedback-s42",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s42/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s42-summary.json.gz",
+      "original_sha256": "57f160aed336fa453260809d48e0c21f42f435b7677925b2bb5079e89ad66e44",
+      "archive_sha256": "acc6d43daa8ee63aa8a934a0e4daf9db1fdb1a6e7b97a5d0affaa86f357b3cf9"
+    },
+    {
+      "run": "confirm-feedback-s42",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s42/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s42-audits.jsonl.gz",
+      "original_sha256": "4fc7a6cc72bde5f7477b4a805eb07564d4786f7824b063ace4e36b67598ed205",
+      "archive_sha256": "7c0fee5687a120f2438b2b3453947d3a10a457d9ca7bc7de731fdcbd49b9402b"
+    },
+    {
+      "run": "confirm-feedback-s42",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-feedback-s42/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-feedback-s42-updates.jsonl.gz",
+      "original_sha256": "30cd9a54c9ec75683662c842a1d569ab046b7d6824ea6fba552bc32092fd877c",
+      "archive_sha256": "50a36bb4ce2aef0293653024d6c35415425219039912361ee223b461594a6732"
+    },
+    {
+      "run": "confirm-search-every1-s142",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s142/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s142-summary.json.gz",
+      "original_sha256": "e0d13c97d2cddf6304180bcb69fe3d499799a961389f1806ad4a985f81577a93",
+      "archive_sha256": "f48ae9f314cc627180800c395db0842c0655693e9595988b808a648f99c97b95"
+    },
+    {
+      "run": "confirm-search-every1-s142",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s142/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s142-audits.jsonl.gz",
+      "original_sha256": "ccf4df2d43039e6dc8e38b3303ef90841d4be3c90e017b484e6135a76a6ccc3e",
+      "archive_sha256": "5248b2b25a8cb8ee6d90a16fc27f585b74580d02e31b1bb00fbd1ed6aabcdefe"
+    },
+    {
+      "run": "confirm-search-every1-s142",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s142/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s142-updates.jsonl.gz",
+      "original_sha256": "b94d9d5a7c9a1c1d5acf007181613e62e574328fb7edae28d1f2b568ebd9c92e",
+      "archive_sha256": "2913332d12fc89c8d02bd01c4d94333ad17f18243b76ecd27c73787ca6a66a9d"
+    },
+    {
+      "run": "confirm-search-every1-s242",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s242/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s242-summary.json.gz",
+      "original_sha256": "6e505b0e0ce2b8fd66693944163d09cd88396c54899a097acdfe5c9adb163468",
+      "archive_sha256": "ac052643c86c8c9b04eb75bfcdf0c0af1cfe979ddaf982d0d9659bab92250e82"
+    },
+    {
+      "run": "confirm-search-every1-s242",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s242/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s242-audits.jsonl.gz",
+      "original_sha256": "b8aeb84777633a460f7b8a05833ced5d78555a96ffe012cb8886c5c90f720619",
+      "archive_sha256": "41f04c8f47de7145ba0ea94a8f056fe25fb14c64b0177b4fffa35c5d5aeccb78"
+    },
+    {
+      "run": "confirm-search-every1-s242",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s242/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s242-updates.jsonl.gz",
+      "original_sha256": "654c81a674c878522991417cf3ad13a3cc97c0d359839f3f04ccd69e01b54acc",
+      "archive_sha256": "2326fc90504a9c99cbcbf34df8ecf216848ebe1a60c81e63450f48caba5f0b1c"
+    },
+    {
+      "run": "confirm-search-every1-s342",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s342/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s342-summary.json.gz",
+      "original_sha256": "3e252602a25da0e72e71fb58c6e8c6a694dc644350538895d582bb9b4925f10d",
+      "archive_sha256": "947494b11d91bd3bcb60598ea468ca4aa05b21a3cbe22268cac497644a3e29e3"
+    },
+    {
+      "run": "confirm-search-every1-s342",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s342/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s342-audits.jsonl.gz",
+      "original_sha256": "18286ede1a93e53bd132fdd5e273f20c09bd4bfb6585dbbbd6b551fd7be20312",
+      "archive_sha256": "35e7faa761faa2db91bcf21b2262ae59f684a7af200c69b34cc3b0f963b8a1b2"
+    },
+    {
+      "run": "confirm-search-every1-s342",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s342/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s342-updates.jsonl.gz",
+      "original_sha256": "a429cee1bd47f84334f9fed32de09cf911337f2c93f330b879064498418746c1",
+      "archive_sha256": "91da4590975c6581d53faf8bbf0f31e5940cf18be960d02381edcd165333ceca"
+    },
+    {
+      "run": "confirm-search-every1-s42",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s42/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s42-summary.json.gz",
+      "original_sha256": "313980e9df529883b86078ff2fc017fbedd290ad21105407ff1dbcb4874f6fd6",
+      "archive_sha256": "a476418f9b557f5c54c0dc7ee05b0de4a284323f16a2f53adf3bb4d70f27f457"
+    },
+    {
+      "run": "confirm-search-every1-s42",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s42/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s42-audits.jsonl.gz",
+      "original_sha256": "79828140b38831d88d28884a8982a6ed430687f06579ad525a41d17302946432",
+      "archive_sha256": "d379357dcf8abf002301f658df4fe09113834f6da21f8208315e66bfb92aca6b"
+    },
+    {
+      "run": "confirm-search-every1-s42",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s42/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s42-updates.jsonl.gz",
+      "original_sha256": "d33c24d404072e4c2469dd92b576736f5c4b582ea120c0dc9f385c0000c74259",
+      "archive_sha256": "306774cedba704d84f7bff710776d95ddfa7c60f3b77c0ffa2cf9153731c7fa2"
+    },
+    {
+      "run": "confirm-search-every1-s442",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s442/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s442-summary.json.gz",
+      "original_sha256": "9fbc95a17e978a6d25c686f587033a017ea33a060878a61aa0a2dfe076e67061",
+      "archive_sha256": "3f5cd41ee86ad6e2ee176aa64a297d47037d6c09b16e020b86f168450a6713b2"
+    },
+    {
+      "run": "confirm-search-every1-s442",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s442/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s442-audits.jsonl.gz",
+      "original_sha256": "8da029bc5bb70fb54b9a96a2c2655d22915e9bf5db2635ccc49eec4551119207",
+      "archive_sha256": "115cfdc1bc19c2f729f841c2d304d5de4811f4767c85820c7204b012a33db599"
+    },
+    {
+      "run": "confirm-search-every1-s442",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every1-s442/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every1-s442-updates.jsonl.gz",
+      "original_sha256": "a161d3f5640620c1f130734a4c815539e267eba2402e92574a9764910f8b1f88",
+      "archive_sha256": "b3a8fe0bb23e44c6a24230076d4c3bf06e000761654136c96557060aa5b841ca"
+    },
+    {
+      "run": "confirm-search-every4-s142",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s142/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s142-summary.json.gz",
+      "original_sha256": "690673cefb8c20a3d1106a69bd917119521a3e7374b335653605f7cca593ccc4",
+      "archive_sha256": "d10edfb602425296150ed68ec8c85e3ab99cf42e368409b25a60f034a5cc51fb"
+    },
+    {
+      "run": "confirm-search-every4-s142",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s142/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s142-audits.jsonl.gz",
+      "original_sha256": "0e90039bede21727ae1b1d7b15987f6615499da0a63c74bccb8891e485178797",
+      "archive_sha256": "cc83535258d2653da1045d9ad100a11919e96f3e300505f4efb912465a4198c6"
+    },
+    {
+      "run": "confirm-search-every4-s142",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s142/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s142-updates.jsonl.gz",
+      "original_sha256": "3252452c77b911fadca32996481e19f3911250c8a16135224fbfe37c0df18ab3",
+      "archive_sha256": "47fc6c6f881d6509a384a585845257adf5e31cf9b775332057f527f8731eede6"
+    },
+    {
+      "run": "confirm-search-every4-s242",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s242/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s242-summary.json.gz",
+      "original_sha256": "ae893f59c27b21e5ec3b88d5a0fa6e7e6fe9ab47920cbf1a776985197837c8d4",
+      "archive_sha256": "4080c86a7a02ab24ad1155558ec08ebb2f696989eb135c8bc4fb10b6d283d3e2"
+    },
+    {
+      "run": "confirm-search-every4-s242",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s242/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s242-audits.jsonl.gz",
+      "original_sha256": "7293189982f56e5f10c6e22bb3c624a2ed3d364cf14fb91f8158a583c4d36896",
+      "archive_sha256": "f2452bf6f98a200c3e59b28fcb8041f2f387991c667e9aa3ac5da1545bca451d"
+    },
+    {
+      "run": "confirm-search-every4-s242",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s242/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s242-updates.jsonl.gz",
+      "original_sha256": "0af36099e6ddb3f311c43d44e80399172d9a544b5a7dcb8125ffe019c279b817",
+      "archive_sha256": "2c67d9cb7949927b9bcf4f55771c08b56f74655cce98e63ffdaabf3fddf0028f"
+    },
+    {
+      "run": "confirm-search-every4-s342",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s342/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s342-summary.json.gz",
+      "original_sha256": "94bc05f0624eb3047356a0a613ab3f90495962cc5416885f4618c9f2135957ed",
+      "archive_sha256": "95da5624dc5ee0bcbae70d7f3300734ec7596590d98f8bbd79121268fd695404"
+    },
+    {
+      "run": "confirm-search-every4-s342",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s342/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s342-audits.jsonl.gz",
+      "original_sha256": "05efcdb419b5fc3158d84965aedface818205e631eb25b466a02b5e2fac059db",
+      "archive_sha256": "fc71da902f040f1d54d884930c84ff4f09c60b94e00a65c6479c2496ab77a8c0"
+    },
+    {
+      "run": "confirm-search-every4-s342",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s342/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s342-updates.jsonl.gz",
+      "original_sha256": "32aafc7b68c9369070707243b577d1cdc1f92e962ec7dee94e5dd728b73125ab",
+      "archive_sha256": "a9693aacec6f17c9087c080657f7ae186552f2914878abc43fb6b55549b83465"
+    },
+    {
+      "run": "confirm-search-every4-s42",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s42/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s42-summary.json.gz",
+      "original_sha256": "3def8221a7537f3744dc8f3e912e1a1e6660cff8c94dc4c5390f7e16c630c9c2",
+      "archive_sha256": "ecc74ab34e4e9191dc0f68989411716e37bc9401b2f3f248987c24794f8dbec9"
+    },
+    {
+      "run": "confirm-search-every4-s42",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s42/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s42-audits.jsonl.gz",
+      "original_sha256": "55646f2346ce1a9df0bc141c619d7b74c4a01211a65ea462f1722691087ef3a0",
+      "archive_sha256": "95d00bdd325dc268c18cda365e2a3c7b26abcae20619433f80d2d6566a99dab0"
+    },
+    {
+      "run": "confirm-search-every4-s42",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s42/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s42-updates.jsonl.gz",
+      "original_sha256": "eea98f306a10997193fb68f510da10eeaf8f59e9046f8f7b5855245d30f8f658",
+      "archive_sha256": "89f795a2277ef57dfda9478551aab74311f23a0f1f61ae2ecd3ef682542952c8"
+    },
+    {
+      "run": "confirm-search-every4-s442",
+      "file": "summary.json",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s442/summary.json",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s442-summary.json.gz",
+      "original_sha256": "633d69a0acd4b94db8898195ed64b975f5c34489786015b9f9083dc3ffd0cd74",
+      "archive_sha256": "f533b639a74834a56cc5f9991b61122e19368586e166a3469806fd03a6b5768a"
+    },
+    {
+      "run": "confirm-search-every4-s442",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s442/audits.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s442-audits.jsonl.gz",
+      "original_sha256": "657a183c76cd5e57c2224230e7fb97c48fe5895b92b7fd71847a6e14eaa272be",
+      "archive_sha256": "9d2f9b9b195758bf8ea62fde4c7713324678b23d371f574859c88dbbb192cc00"
+    },
+    {
+      "run": "confirm-search-every4-s442",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/confirm/confirm-search-every4-s442/updates.jsonl",
+      "archive": "results/scalar-large/confirm-snapshot-24/raw/confirm-search-every4-s442-updates.jsonl.gz",
+      "original_sha256": "90f76a8227143b31eb66e466aa39226ed72106f6f6f0d7de69c190225de42464",
+      "archive_sha256": "122432cd87d6871b0ff1613ff7883644cdf3a6b73ac4bfebb4facf4f1ccd4cb8"
+    }
+  ]
+}

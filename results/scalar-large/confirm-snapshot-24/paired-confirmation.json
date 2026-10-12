@@ -1,0 +1,465 @@
+{
+  "expected_seeds": [
+    42,
+    142,
+    242,
+    342,
+    442
+  ],
+  "missing_seeds": [
+    442
+  ],
+  "paired_seeds": 4,
+  "observed_pairs": 4,
+  "failed_pairs": 0,
+  "comparisons": [
+    {
+      "seed": 42,
+      "status": "complete",
+      "baseline": "confirm-constant1-s42",
+      "scalar": "confirm-feedback-s42",
+      "final_ratio_gain": -0.10526747376241574,
+      "matched_time_gain": -0.10526694987344998,
+      "log_auc_gain": -0.19271323821500141,
+      "primary_geomean_gain": -0.2125350349485733,
+      "validation_bpo_ratio": 1.0369000896439702,
+      "validation_teacher_kl_ratio": 1.0150857525223982,
+      "baseline_costs": {
+        "forwards": 7537,
+        "backwards": 4561,
+        "forward_tokens": 2622303,
+        "backward_tokens": 1167616,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1286.0806730296463
+      },
+      "scalar_costs": {
+        "forwards": 12337,
+        "backwards": 4561,
+        "forward_tokens": 4284303,
+        "backward_tokens": 1167616,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1519.6856657834724
+      },
+      "threshold_costs": {
+        "0.5": {
+          "baseline": {
+            "backwards": 156,
+            "forwards": 348,
+            "seconds": 110.23158083576709,
+            "previous_audit_update": 0,
+            "update": 20
+          },
+          "scalar": {
+            "backwards": 463,
+            "forwards": 1327,
+            "seconds": 137.703023805283,
+            "previous_audit_update": 40,
+            "update": 60
+          }
+        },
+        "0.2": {
+          "baseline": {
+            "backwards": 1070,
+            "forwards": 1838,
+            "seconds": 345.2789672249928,
+            "previous_audit_update": 120,
+            "update": 140
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.1": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.01": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.001": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        }
+      }
+    },
+    {
+      "seed": 142,
+      "status": "complete",
+      "baseline": "confirm-constant1-s142",
+      "scalar": "confirm-feedback-s142",
+      "final_ratio_gain": -0.03708295712809373,
+      "matched_time_gain": -0.03708181318051107,
+      "log_auc_gain": -0.16167950411042242,
+      "primary_geomean_gain": -0.1754834433312673,
+      "validation_bpo_ratio": 1.024257240216523,
+      "validation_teacher_kl_ratio": 1.0166020903466462,
+      "baseline_costs": {
+        "forwards": 7532,
+        "backwards": 4556,
+        "forward_tokens": 2646350,
+        "backward_tokens": 1166336,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1295.1067007770762
+      },
+      "scalar_costs": {
+        "forwards": 12332,
+        "backwards": 4556,
+        "forward_tokens": 4289750,
+        "backward_tokens": 1166336,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1497.2915975507349
+      },
+      "threshold_costs": {
+        "0.5": {
+          "baseline": {
+            "backwards": 149,
+            "forwards": 341,
+            "seconds": 123.12290334701538,
+            "previous_audit_update": 0,
+            "update": 20
+          },
+          "scalar": {
+            "backwards": 453,
+            "forwards": 1317,
+            "seconds": 131.90838464163244,
+            "previous_audit_update": 40,
+            "update": 60
+          }
+        },
+        "0.2": {
+          "baseline": {
+            "backwards": 1067,
+            "forwards": 1835,
+            "seconds": 358.5019348273054,
+            "previous_audit_update": 120,
+            "update": 140
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.1": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.01": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.001": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        }
+      }
+    },
+    {
+      "seed": 242,
+      "status": "complete",
+      "baseline": "confirm-constant1-s242",
+      "scalar": "confirm-feedback-s242",
+      "final_ratio_gain": -0.9891943123285183,
+      "matched_time_gain": -0.9891938965534663,
+      "log_auc_gain": -0.6474826505810325,
+      "primary_geomean_gain": -0.9107248077683909,
+      "validation_bpo_ratio": 1.0259784127539935,
+      "validation_teacher_kl_ratio": 1.014217055004703,
+      "baseline_costs": {
+        "forwards": 7539,
+        "backwards": 4563,
+        "forward_tokens": 2648244,
+        "backward_tokens": 1168128,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1329.2780574904755
+      },
+      "scalar_costs": {
+        "forwards": 12339,
+        "backwards": 4563,
+        "forward_tokens": 4322244,
+        "backward_tokens": 1168128,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1529.2559764189646
+      },
+      "threshold_costs": {
+        "0.5": {
+          "baseline": {
+            "backwards": 156,
+            "forwards": 348,
+            "seconds": 152.40984814614058,
+            "previous_audit_update": 0,
+            "update": 20
+          },
+          "scalar": {
+            "backwards": 463,
+            "forwards": 1327,
+            "seconds": 138.93958528805524,
+            "previous_audit_update": 40,
+            "update": 60
+          }
+        },
+        "0.2": {
+          "baseline": {
+            "backwards": 1381,
+            "forwards": 2341,
+            "seconds": 450.4637986468151,
+            "previous_audit_update": 160,
+            "update": 180
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.1": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.01": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.001": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        }
+      }
+    },
+    {
+      "seed": 342,
+      "status": "complete",
+      "baseline": "confirm-constant1-s342",
+      "scalar": "confirm-feedback-s342",
+      "final_ratio_gain": -1.6255222322098035,
+      "matched_time_gain": -1.6255205640603299,
+      "log_auc_gain": -0.8212599921659792,
+      "primary_geomean_gain": -1.2733624525981129,
+      "validation_bpo_ratio": 1.0271967865406217,
+      "validation_teacher_kl_ratio": 1.0131673153320722,
+      "baseline_costs": {
+        "forwards": 7513,
+        "backwards": 4537,
+        "forward_tokens": 2681694,
+        "backward_tokens": 1161472,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1304.3563091130927
+      },
+      "scalar_costs": {
+        "forwards": 12313,
+        "backwards": 4537,
+        "forward_tokens": 4448094,
+        "backward_tokens": 1161472,
+        "search_forwards": 0,
+        "rejected": 0,
+        "seconds": 1556.6866150479764
+      },
+      "threshold_costs": {
+        "0.5": {
+          "baseline": {
+            "backwards": 149,
+            "forwards": 341,
+            "seconds": 126.52218234632164,
+            "previous_audit_update": 0,
+            "update": 20
+          },
+          "scalar": {
+            "backwards": 455,
+            "forwards": 1319,
+            "seconds": 139.66671620029956,
+            "previous_audit_update": 40,
+            "update": 60
+          }
+        },
+        "0.2": {
+          "baseline": {
+            "backwards": 908,
+            "forwards": 1580,
+            "seconds": 331.2817436400801,
+            "previous_audit_update": 100,
+            "update": 120
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.1": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.01": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        },
+        "0.001": {
+          "baseline": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          },
+          "scalar": {
+            "backwards": null,
+            "forwards": null,
+            "seconds": null,
+            "previous_audit_update": null,
+            "update": null
+          }
+        }
+      }
+    }
+  ]
+}
