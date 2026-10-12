@@ -353,7 +353,7 @@ def main():
                 "d300": float(final),
                 "d200_over_d100": float(middle / first),
                 "d300_over_d100": float(final / first),
-                "passed": middle / first <= 0.8 and final / first <= 0.7,
+                "passed": bool(middle / first <= 0.8 and final / first <= 0.7),
             }
         for rollout, precision in (("frozen", "bf16"), ("frozen", "fp32"), ("online", "bf16")):
             group = [
