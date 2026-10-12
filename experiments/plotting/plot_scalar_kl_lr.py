@@ -27,7 +27,7 @@ def plot(root, output, seed):
         updates = [json.loads(line) for line in updates_path.read_text().splitlines()]
         method = config["method"]
         name = (
-            f"constant {config['lr']:.2g}"
+            f"constant {config['lr']:.3g}"
             if method == "constant"
             else f"search every {config['search_every']}"
             if method == "search"

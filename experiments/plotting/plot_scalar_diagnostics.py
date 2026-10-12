@@ -14,7 +14,7 @@ import numpy as np
 def name(run):
     config = run["config"]
     if config["method"] == "constant":
-        return f"constant {config['lr']:.2g}"
+        return f"constant {config['lr']:.3g}"
     if config["method"] == "search":
         return f"search every {config['search_every']}"
     return f"feedback {config['target_rate']:.2g}"
@@ -32,9 +32,27 @@ def save(fig, output, stem):
 
 def plot(source, output, anchor_step=60, anchor_u=30):
     records = json.loads(source.read_text())["runs"]
+    if not records:
+        raise ValueError("at least one run is required")
+    seeds = {run["config"]["seed"] for run in records}
+    if len(seeds) != 1:
+        raise ValueError("local diagnostics require a single seed")
+    seed = seeds.pop()
+    last_update = min(max(p["update"] for p in run["lr_updates"]) for run in records)
+    if last_update < anchor_step:
+        raise ValueError("runs must reach the requested step anchor")
+    for run in records:
+        if run["config"]["method"] == "constant":
+            effective_time = sum(p["lr"] / 1e-6 for p in run["lr_updates"])
+            if effective_time + 1e-9 < anchor_u:
+                raise ValueError("constant runs must reach the requested effective-time anchor")
     output.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(4, 3, figsize=(16, 12), constrained_layout=True)
-    windows = [(0, 600), (0, 100), (500, 600)]
+    windows = [
+        (0, last_update),
+        (0, min(100, last_update)),
+        (max(0, last_update - 100), last_update),
+    ]
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
     statistics = []
     for index, run in enumerate(records):
@@ -78,7 +96,7 @@ def plot(source, output, anchor_step=60, anchor_u=30):
                             p["clipped"] for p in updates if low < p["update"] <= high
                         ),
                     }
-                    for low, high in ((0, 30), (30, 60), (60, 100), (500, 600))
+                    for low, high in ((0, 30), (30, 60), (60, 100), windows[-1])
                 ],
             }
         )
@@ -104,10 +122,14 @@ def plot(source, output, anchor_step=60, anchor_u=30):
     ):
         axes[row, 0].set_ylabel(label)
     axes[0, 0].legend(fontsize=8, ncol=2)
+    config = records[0]["config"]
+    batch = "full pool" if config.get("full_batch") else f"minibatch {config['batch_sequences']}"
     fig.suptitle(
-        "Seed 42, FP32 sampled BPO, frozen 64 x 256-token pool, minibatch 8\nIndependent 4096-position KL audits; dashed vertical line: descriptive step-60 anchor"
+        f"Seed {seed}, {config['precision'].upper()} {config['objective']} BPO, "
+        f"frozen {config['train_sequences']}-trajectory pool, {batch}\n"
+        f"Independent fixed-prefix KL audits; descriptive step-{anchor_step} anchor"
     )
-    save(fig, output, "kl-grad-lr-local-seed-42")
+    save(fig, output, f"kl-grad-lr-local-seed-{seed}")
 
     fig, axes = plt.subplots(2, 3, figsize=(15, 7), constrained_layout=True)
     for run in records:
@@ -136,11 +158,15 @@ def plot(source, output, anchor_step=60, anchor_u=30):
         ):
             axes[1, column].plot(x[mask], norms[mask], label=name(run))
     titles = (
-        "Absolute KL after step 60",
-        "KL / KL(step 60)",
-        "KL / KL(u=30): common effective-time anchor",
+        f"Absolute KL after step {anchor_step}",
+        f"KL / KL(step {anchor_step})",
+        f"KL / KL(u={anchor_u}): common effective-time anchor",
     )
-    labels = ("Optimizer updates", "Updates since step 60", "Effective time since u=30")
+    labels = (
+        "Optimizer updates",
+        f"Updates since step {anchor_step}",
+        f"Effective time since u={anchor_u}",
+    )
     for column in range(3):
         axes[0, column].set_title(titles[column])
         axes[1, column].set_xlabel(labels[column])
@@ -154,7 +180,7 @@ def plot(source, output, anchor_step=60, anchor_u=30):
     fig.suptitle(
         "Constant LR comparison; descriptive anchors follow prior d30/d60 diagnostics\nNormalization does not remove Adam moment history or establish causal control"
     )
-    save(fig, output, "constant-kl-grad-aligned-seed-42")
+    save(fig, output, f"constant-kl-grad-aligned-seed-{seed}")
     (output / "alignment-statistics.json").write_text(
         json.dumps({"anchor_step": anchor_step, "anchor_u": anchor_u, "runs": statistics}, indent=2)
         + "\n"
