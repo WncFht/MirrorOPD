@@ -12,6 +12,7 @@ data:
 	python3 scripts/restore-data.py
 
 test:
+	PYTHONPATH=src uv run --with numpy --with pandas --with scipy --with pytest python -m pytest tests/test_oneshot_lr_stability.py -q
 	PYTHONPATH=src uv run --with torch --with pytest python -m pytest tests/test_scalar_schedule.py tests/test_scalar_large_analysis.py -q
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_math_evaluation.py
 	python3 tests/test_kl_theory_identities.py

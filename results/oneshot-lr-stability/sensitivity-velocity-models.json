@@ -1,0 +1,472 @@
+[
+  {
+    "phase": "held_out_1e-5_and_1e-4",
+    "effective_window": 60,
+    "distance_band": [
+      0.05,
+      0.02
+    ],
+    "fit_run_ids": [
+      "ybi7q89v",
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.0008219367543828429,
+    "b": 6.420455065861073e-05,
+    "candidate_zero_rate_lr": 1.2801845756280665e-05,
+    "candidate_best_rate_lr": 6.400922878140332e-06,
+    "fit_relative_rmse": 0.057278178435629,
+    "measurements": [
+      {
+        "id": "ybi7q89v",
+        "lr": 5e-07,
+        "elapsed_updates": 83,
+        "rate": 0.00036144578313253013,
+        "log_rate": 0.011039647371977771,
+        "grad_norm_median_in_band": 0.16933380067348475
+      },
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 42,
+        "rate": 0.0007142857142857144,
+        "log_rate": 0.02181644599700369,
+        "grad_norm_median_in_band": 0.1670140922069549
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 21,
+        "rate": 0.0014285714285714288,
+        "log_rate": 0.04363289199400738,
+        "grad_norm_median_in_band": 0.1980801522731781
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 12,
+        "rate": 0.0025,
+        "log_rate": 0.07635756098951292,
+        "grad_norm_median_in_band": 0.3319432437419891
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 12,
+        "rate": 0.0025,
+        "log_rate": 0.07635756098951292,
+        "grad_norm_median_in_band": 0.3945373892784118
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0017989124779673547,
+    "held_out_1e-4_predicted_rate": -0.5598518311478231,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "refit_all_usable_rates",
+    "effective_window": 60,
+    "distance_band": [
+      0.05,
+      0.02
+    ],
+    "fit_run_ids": [
+      "ybi7q89v",
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f",
+      "l0a6rsc1"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.0007728631808770989,
+    "b": 5.238688667144035e-05,
+    "candidate_zero_rate_lr": 1.4752989344916332e-05,
+    "candidate_best_rate_lr": 7.376494672458166e-06,
+    "fit_relative_rmse": 0.03415798063021171,
+    "measurements": [
+      {
+        "id": "ybi7q89v",
+        "lr": 5e-07,
+        "elapsed_updates": 83,
+        "rate": 0.00036144578313253013,
+        "log_rate": 0.011039647371977771,
+        "grad_norm_median_in_band": 0.16933380067348475
+      },
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 42,
+        "rate": 0.0007142857142857144,
+        "log_rate": 0.02181644599700369,
+        "grad_norm_median_in_band": 0.1670140922069549
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 21,
+        "rate": 0.0014285714285714288,
+        "log_rate": 0.04363289199400738,
+        "grad_norm_median_in_band": 0.1980801522731781
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 12,
+        "rate": 0.0025,
+        "log_rate": 0.07635756098951292,
+        "grad_norm_median_in_band": 0.3319432437419891
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 12,
+        "rate": 0.0025,
+        "log_rate": 0.07635756098951292,
+        "grad_norm_median_in_band": 0.3945373892784118
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0024899431416269546,
+    "held_out_1e-4_predicted_rate": -0.44658254862669355,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "held_out_1e-5_and_1e-4",
+    "effective_window": 60,
+    "distance_band": [
+      0.02,
+      0.01
+    ],
+    "fit_run_ids": [
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.0001411299735738764,
+    "b": 1.5524180369965785e-06,
+    "candidate_zero_rate_lr": 9.090977443608989e-05,
+    "candidate_best_rate_lr": 4.5454887218044944e-05,
+    "fit_relative_rmse": 0.011497306455808484,
+    "measurements": [
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 73,
+        "rate": 0.000136986301369863,
+        "log_rate": 0.009495166856985551,
+        "grad_norm_median_in_band": 0.1147962212562561
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 36,
+        "rate": 0.0002777777777777778,
+        "log_rate": 0.01925408834888737,
+        "grad_norm_median_in_band": 0.1148478165268898
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 15,
+        "rate": 0.0006666666666666666,
+        "log_rate": 0.046209812037329684,
+        "grad_norm_median_in_band": 0.1700157821178436
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 10,
+        "rate": 0.001,
+        "log_rate": 0.06931471805599453,
+        "grad_norm_median_in_band": 0.2236107289791107
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0012560579320391061,
+    "held_out_1e-4_predicted_rate": -0.001411183012578145,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "refit_all_usable_rates",
+    "effective_window": 60,
+    "distance_band": [
+      0.02,
+      0.01
+    ],
+    "fit_run_ids": [
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f",
+      "l0a6rsc1"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.00015946034325750946,
+    "b": 5.911789623648574e-06,
+    "candidate_zero_rate_lr": 2.697327770589635e-05,
+    "candidate_best_rate_lr": 1.3486638852948174e-05,
+    "fit_relative_rmse": 0.0693887729720974,
+    "measurements": [
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 73,
+        "rate": 0.000136986301369863,
+        "log_rate": 0.009495166856985551,
+        "grad_norm_median_in_band": 0.1147962212562561
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 36,
+        "rate": 0.0002777777777777778,
+        "log_rate": 0.01925408834888737,
+        "grad_norm_median_in_band": 0.1148478165268898
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 15,
+        "rate": 0.0006666666666666666,
+        "log_rate": 0.046209812037329684,
+        "grad_norm_median_in_band": 0.1700157821178436
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 10,
+        "rate": 0.001,
+        "log_rate": 0.06931471805599453,
+        "grad_norm_median_in_band": 0.2236107289791107
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0010034244702102372,
+    "held_out_1e-4_predicted_rate": -0.04317186191073479,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "held_out_1e-5_and_1e-4",
+    "effective_window": 90,
+    "distance_band": [
+      0.05,
+      0.02
+    ],
+    "fit_run_ids": [
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.0008293163891323407,
+    "b": 6.573181419807198e-05,
+    "candidate_zero_rate_lr": 1.2616666666666652e-05,
+    "candidate_best_rate_lr": 6.308333333333326e-06,
+    "fit_relative_rmse": 0.04201012072833253,
+    "measurements": [
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 42,
+        "rate": 0.0007142857142857144,
+        "log_rate": 0.02181644599700369,
+        "grad_norm_median_in_band": 0.1484820246696472
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 21,
+        "rate": 0.0014285714285714288,
+        "log_rate": 0.04363289199400738,
+        "grad_norm_median_in_band": 0.15985782444477076
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 12,
+        "rate": 0.0025,
+        "log_rate": 0.07635756098951292,
+        "grad_norm_median_in_band": 0.2596984207630157
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 11,
+        "rate": 0.0027272727272727275,
+        "log_rate": 0.083299157443105,
+        "grad_norm_median_in_band": 0.37610775232315063
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0017199824715162081,
+    "held_out_1e-4_predicted_rate": -0.5743865030674857,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "refit_all_usable_rates",
+    "effective_window": 90,
+    "distance_band": [
+      0.05,
+      0.02
+    ],
+    "fit_run_ids": [
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f",
+      "l0a6rsc1"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.0007572076963076303,
+    "b": 4.85827554460636e-05,
+    "candidate_zero_rate_lr": 1.55859355723098e-05,
+    "candidate_best_rate_lr": 7.7929677861549e-06,
+    "fit_relative_rmse": 0.04083961410470714,
+    "measurements": [
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 42,
+        "rate": 0.0007142857142857144,
+        "log_rate": 0.02181644599700369,
+        "grad_norm_median_in_band": 0.1484820246696472
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 21,
+        "rate": 0.0014285714285714288,
+        "log_rate": 0.04363289199400738,
+        "grad_norm_median_in_band": 0.15985782444477076
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 12,
+        "rate": 0.0025,
+        "log_rate": 0.07635756098951292,
+        "grad_norm_median_in_band": 0.2596984207630157
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 11,
+        "rate": 0.0027272727272727275,
+        "log_rate": 0.083299157443105,
+        "grad_norm_median_in_band": 0.37610775232315063
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0027138014184699437,
+    "held_out_1e-4_predicted_rate": -0.41010678482987295,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "held_out_1e-5_and_1e-4",
+    "effective_window": 90,
+    "distance_band": [
+      0.02,
+      0.01
+    ],
+    "fit_run_ids": [
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.00014057003589737428,
+    "b": -4.682266216848943e-07,
+    "candidate_zero_rate_lr": null,
+    "candidate_best_rate_lr": null,
+    "fit_relative_rmse": 0.017930123517701013,
+    "measurements": [
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 73,
+        "rate": 0.000136986301369863,
+        "log_rate": 0.009495166856985551,
+        "grad_norm_median_in_band": 0.10568934679031365
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 35,
+        "rate": 0.00028571428571428574,
+        "log_rate": 0.01980420515885558,
+        "grad_norm_median_in_band": 0.10418091714382165
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 14,
+        "rate": 0.0007142857142857143,
+        "log_rate": 0.049510512897138946,
+        "grad_norm_median_in_band": 0.1588868796825409
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 10,
+        "rate": 0.001,
+        "log_rate": 0.06931471805599453,
+        "grad_norm_median_in_band": 0.2011438161134719
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0014525230211422323,
+    "held_out_1e-4_predicted_rate": 0.01873926980658637,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  },
+  {
+    "phase": "refit_all_usable_rates",
+    "effective_window": 90,
+    "distance_band": [
+      0.02,
+      0.01
+    ],
+    "fit_run_ids": [
+      "mdxt04lm",
+      "yj2w13fq",
+      "ml6mz58f",
+      "l0a6rsc1"
+    ],
+    "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+    "a": 0.00017296471393697045,
+    "b": 7.235951823262043e-06,
+    "candidate_zero_rate_lr": 2.390351928282963e-05,
+    "candidate_best_rate_lr": 1.1951759641414814e-05,
+    "fit_relative_rmse": 0.120256991331046,
+    "measurements": [
+      {
+        "id": "mdxt04lm",
+        "lr": 1e-06,
+        "elapsed_updates": 73,
+        "rate": 0.000136986301369863,
+        "log_rate": 0.009495166856985551,
+        "grad_norm_median_in_band": 0.10568934679031365
+      },
+      {
+        "id": "yj2w13fq",
+        "lr": 2e-06,
+        "elapsed_updates": 35,
+        "rate": 0.00028571428571428574,
+        "log_rate": 0.01980420515885558,
+        "grad_norm_median_in_band": 0.10418091714382165
+      },
+      {
+        "id": "ml6mz58f",
+        "lr": 5e-06,
+        "elapsed_updates": 14,
+        "rate": 0.0007142857142857143,
+        "log_rate": 0.049510512897138946,
+        "grad_norm_median_in_band": 0.1588868796825409
+      },
+      {
+        "id": "l0a6rsc1",
+        "lr": 1e-05,
+        "elapsed_updates": 10,
+        "rate": 0.001,
+        "log_rate": 0.06931471805599453,
+        "grad_norm_median_in_band": 0.2011438161134719
+      }
+    ],
+    "held_out_1e-5_predicted_rate": 0.0010060519570435002,
+    "held_out_1e-4_predicted_rate": -0.05506304683892339,
+    "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+  }
+]

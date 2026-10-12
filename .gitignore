@@ -63,3 +63,5 @@ scratch/
 
 # Large scalar-confirmation input tokens restore from gzip.
 /data/scalar-large/*.pt
+
+data/oneshot-lr-stability/*.csv
