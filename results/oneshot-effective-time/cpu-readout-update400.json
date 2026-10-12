@@ -1,0 +1,133 @@
+{
+  "device": "CPU only",
+  "torch": "2.7.1+cu126",
+  "checkpoint": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr5em7-s42/checkpoints/update-000400",
+  "examples": 8,
+  "selection": "Eight earliest positions from the original fixed diagnostic reservoir",
+  "conditions": {
+    "bf16": [
+      {
+        "sample_index": 6,
+        "position": 7,
+        "prefix_tokens": 109,
+        "student_teacher_kl": 0.03209842169899841,
+        "teacher_student_kl": 0.054511633677045195
+      },
+      {
+        "sample_index": 12,
+        "position": 12,
+        "prefix_tokens": 114,
+        "student_teacher_kl": 0.009583267188895333,
+        "teacher_student_kl": 0.01238069350955101
+      },
+      {
+        "sample_index": 20,
+        "position": 5,
+        "prefix_tokens": 107,
+        "student_teacher_kl": 8.028235721880455e-07,
+        "teacher_student_kl": 5.63503164372853e-07
+      },
+      {
+        "sample_index": 60,
+        "position": 3,
+        "prefix_tokens": 105,
+        "student_teacher_kl": 0.00032489383010037866,
+        "teacher_student_kl": 0.00030646617227945354
+      },
+      {
+        "sample_index": 50,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.005702626929551505,
+        "teacher_student_kl": 0.01016182194040623
+      },
+      {
+        "sample_index": 56,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.005702626929551505,
+        "teacher_student_kl": 0.01016182194040623
+      },
+      {
+        "sample_index": 62,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.025802360622536682,
+        "teacher_student_kl": 0.03195343559090688
+      },
+      {
+        "sample_index": 56,
+        "position": 10,
+        "prefix_tokens": 112,
+        "student_teacher_kl": 3.102554077228271e-08,
+        "teacher_student_kl": -7.550263565356225e-09
+      }
+    ],
+    "fp32": [
+      {
+        "sample_index": 6,
+        "position": 7,
+        "prefix_tokens": 109,
+        "student_teacher_kl": 0.044516975332011946,
+        "teacher_student_kl": 0.08434337778317949,
+        "bf16_fp32_kl": 0.0026597611894810585
+      },
+      {
+        "sample_index": 12,
+        "position": 12,
+        "prefix_tokens": 114,
+        "student_teacher_kl": 0.2730036415816489,
+        "teacher_student_kl": 0.328136978335906,
+        "bf16_fp32_kl": 0.3174773058251245
+      },
+      {
+        "sample_index": 20,
+        "position": 5,
+        "prefix_tokens": 107,
+        "student_teacher_kl": 4.542491664309789e-07,
+        "teacher_student_kl": 3.419437181243027e-07,
+        "bf16_fp32_kl": 1.4154977296228707e-06
+      },
+      {
+        "sample_index": 60,
+        "position": 3,
+        "prefix_tokens": 105,
+        "student_teacher_kl": 0.017121269288397432,
+        "teacher_student_kl": 0.012665611741359658,
+        "bf16_fp32_kl": 0.014554636674586466
+      },
+      {
+        "sample_index": 50,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.014219922705810288,
+        "teacher_student_kl": 0.021079772891672763,
+        "bf16_fp32_kl": 0.00368689025346239
+      },
+      {
+        "sample_index": 56,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.014219922705810288,
+        "teacher_student_kl": 0.021079772891672763,
+        "bf16_fp32_kl": 0.00368689025346239
+      },
+      {
+        "sample_index": 62,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.007803825487078241,
+        "teacher_student_kl": 0.007285525510996434,
+        "bf16_fp32_kl": 0.05164344802914276
+      },
+      {
+        "sample_index": 56,
+        "position": 10,
+        "prefix_tokens": 112,
+        "student_teacher_kl": 3.6747827513646214e-09,
+        "teacher_student_kl": -2.0021996885986444e-09,
+        "bf16_fp32_kl": 2.332502474287857e-08
+      }
+    ]
+  }
+}

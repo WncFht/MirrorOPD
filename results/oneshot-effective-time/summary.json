@@ -1,0 +1,767 @@
+{
+  "requested_arms": 45,
+  "completed_arms": 4,
+  "requested_optimizer_updates": 16074,
+  "completed_optimizer_updates": 908,
+  "long_absorption": {
+    "42": {
+      "d100": 0.05259558828701576,
+      "d200": 0.029230586682977542,
+      "d300": 0.02209617108113609,
+      "d200_over_d100": 0.5557611890081983,
+      "d300_over_d100": 0.4201145343323588,
+      "passed": true
+    }
+  },
+  "zero_lr_controls": {
+    "zero-bf16-s42": {
+      "anchor_kl_mean_abs_max": 1.0878580243370841e-10,
+      "anchor_kl_rms_max": 5.931370574144479e-09,
+      "inspected_parameter_change_fraction_max": 0.0,
+      "native_distance_change": 0.0,
+      "passed": true
+    },
+    "zero-fp32-s42": {
+      "anchor_kl_mean_abs_max": 1.1897140496844984e-10,
+      "anchor_kl_rms_max": 5.896092602931441e-09,
+      "inspected_parameter_change_fraction_max": 0.0,
+      "native_distance_change": 0.0,
+      "passed": true
+    }
+  },
+  "time_collapse": {},
+  "evaluations": {
+    "canary-bf16-s42-update4": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 345,
+        "accuracy": 0.69,
+        "budget_exhausted_fraction": 0.322
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 18,
+        "accuracy": 0.45,
+        "budget_exhausted_fraction": 0.55
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.8333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 350,
+        "accuracy": 0.7,
+        "budget_exhausted_fraction": 0.36
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 21,
+        "accuracy": 0.525,
+        "budget_exhausted_fraction": 0.575
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 1,
+        "accuracy": 0.03333333333333333,
+        "budget_exhausted_fraction": 0.9666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update200": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 360,
+        "accuracy": 0.72,
+        "budget_exhausted_fraction": 0.362
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 22,
+        "accuracy": 0.55,
+        "budget_exhausted_fraction": 0.625
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "budget_exhausted_fraction": 0.9
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update400": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 361,
+        "accuracy": 0.722,
+        "budget_exhausted_fraction": 0.35
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.675
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 2,
+        "accuracy": 0.06666666666666667,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update600": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 360,
+        "accuracy": 0.72,
+        "budget_exhausted_fraction": 0.344
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 18,
+        "accuracy": 0.45,
+        "budget_exhausted_fraction": 0.65
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "budget_exhausted_fraction": 0.9666666666666667
+      }
+    },
+    "initial-s42": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 364,
+        "accuracy": 0.728,
+        "budget_exhausted_fraction": 0.28
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 21,
+        "accuracy": 0.525,
+        "budget_exhausted_fraction": 0.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 7,
+        "accuracy": 0.23333333333333334,
+        "budget_exhausted_fraction": 0.8
+      }
+    },
+    "teacher": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 395,
+        "accuracy": 0.79,
+        "budget_exhausted_fraction": 0.23
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 27,
+        "accuracy": 0.675,
+        "budget_exhausted_fraction": 0.475
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.7666666666666667
+      }
+    }
+  },
+  "paired_benchmark_changes": {
+    "frozen-opd-bf16-lr5em7-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 42,
+        "lost_correct": 56,
+        "net_correct_change": -14,
+        "change_percentage_points": -2.8
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 7,
+        "lost_correct": 7,
+        "net_correct_change": 0,
+        "change_percentage_points": 0.0
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 0,
+        "lost_correct": 6,
+        "net_correct_change": -6,
+        "change_percentage_points": -20.0
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update200": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 46,
+        "lost_correct": 50,
+        "net_correct_change": -4,
+        "change_percentage_points": -0.8
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 8,
+        "lost_correct": 7,
+        "net_correct_change": 1,
+        "change_percentage_points": 2.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 0,
+        "lost_correct": 4,
+        "net_correct_change": -4,
+        "change_percentage_points": -13.333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update400": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 45,
+        "lost_correct": 48,
+        "net_correct_change": -3,
+        "change_percentage_points": -0.6
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 4,
+        "lost_correct": 6,
+        "net_correct_change": -2,
+        "change_percentage_points": -5.0
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 0,
+        "lost_correct": 5,
+        "net_correct_change": -5,
+        "change_percentage_points": -16.666666666666668
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update600": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 53,
+        "lost_correct": 57,
+        "net_correct_change": -4,
+        "change_percentage_points": -0.8
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 5,
+        "lost_correct": 8,
+        "net_correct_change": -3,
+        "change_percentage_points": -7.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 0,
+        "lost_correct": 4,
+        "net_correct_change": -4,
+        "change_percentage_points": -13.333333333333334
+      }
+    }
+  },
+  "arm_diagnostics": {
+    "zero-bf16-s42": {
+      "initial_native_fixed": {
+        "anchor_student_full_kl": -1.8840376854109553e-09,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11619850918608636,
+        "fixed_action_abs_gap": 0.2448360329435294,
+        "fixed_action_signed_gap": -0.11443149627284391,
+        "mirror_target_full_kl": 0.10620575541892581,
+        "student_teacher_full_kl": 0.10620575567670404,
+        "teacher_logprob_regression": 0.14121488802692836,
+        "teacher_student_full_kl": 0.10525219303936845,
+        "top16_teacher_overlap": 0.8176116943359375,
+        "diagnostic_positions": 4096.0
+      },
+      "final_native_fixed": {
+        "anchor_student_full_kl": -1.8840376854109553e-09,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11619850918608636,
+        "fixed_action_abs_gap": 0.2448360329435294,
+        "fixed_action_signed_gap": -0.11443149627284391,
+        "mirror_target_full_kl": 0.10620575541892581,
+        "student_teacher_full_kl": 0.10620575567670404,
+        "teacher_logprob_regression": 0.14121488802692836,
+        "teacher_student_full_kl": 0.10525219303936845,
+        "top16_teacher_overlap": 0.8176116943359375,
+        "diagnostic_positions": 4096.0
+      },
+      "initial_fp32_readout": {
+        "anchor_student_full_kl": 0.0003708809824180437,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11519591928795124,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.14012510821833168,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "final_fp32_readout": {
+        "anchor_student_full_kl": 0.0003708809824180437,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11519591928795124,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.14012510821833168,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "first_step_anchor_kl": -1.0878580243370841e-10,
+      "final_preupdate_anchor_kl": -1.0878580243370841e-10,
+      "clip_count": 4,
+      "importance_ess_fraction_min": 1.0,
+      "importance_ratio_used_in_gradient": false,
+      "first_update_inspected_fp32_change_fraction": 0.0,
+      "first_update_inspected_bf16_change_fraction": 0.0
+    },
+    "zero-fp32-s42": {
+      "initial_native_fixed": {
+        "anchor_student_full_kl": -1.46861369332979e-09,
+        "anchor_teacher_full_kl": 0.105226495802265,
+        "bpo_target_variance": 0.11506213584498395,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.13975527079150538,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "final_native_fixed": {
+        "anchor_student_full_kl": -1.46861369332979e-09,
+        "anchor_teacher_full_kl": 0.105226495802265,
+        "bpo_target_variance": 0.11506213584498395,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.13975527079150538,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "initial_fp32_readout": {
+        "anchor_student_full_kl": -1.46861369332979e-09,
+        "anchor_teacher_full_kl": 0.105226495802265,
+        "bpo_target_variance": 0.11506213584498395,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.13975527079150538,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "final_fp32_readout": {
+        "anchor_student_full_kl": -1.46861369332979e-09,
+        "anchor_teacher_full_kl": 0.105226495802265,
+        "bpo_target_variance": 0.11506213584498395,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.13975527079150538,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "first_step_anchor_kl": -1.1897140496844984e-10,
+      "final_preupdate_anchor_kl": -1.1897140496844984e-10,
+      "clip_count": 4,
+      "importance_ess_fraction_min": 1.0,
+      "importance_ratio_used_in_gradient": false,
+      "first_update_inspected_fp32_change_fraction": 0.0,
+      "first_update_inspected_bf16_change_fraction": 0.0
+    },
+    "frozen-opd-bf16-lr5em7-s42": {
+      "initial_native_fixed": {
+        "anchor_student_full_kl": -1.8840376854109553e-09,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11619850918608636,
+        "fixed_action_abs_gap": 0.2448360329435294,
+        "fixed_action_signed_gap": -0.11443149627284391,
+        "mirror_target_full_kl": 0.10620575541892581,
+        "student_teacher_full_kl": 0.10620575567670404,
+        "teacher_logprob_regression": 0.14121488802692836,
+        "teacher_student_full_kl": 0.10525219303936845,
+        "top16_teacher_overlap": 0.8176116943359375,
+        "diagnostic_positions": 4096.0
+      },
+      "final_native_fixed": {
+        "anchor_student_full_kl": 0.09854791884686256,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.00387275557410784,
+        "fixed_action_abs_gap": 0.020603967757886907,
+        "fixed_action_signed_gap": -0.0017841901860612876,
+        "mirror_target_full_kl": 0.003103721304226458,
+        "student_teacher_full_kl": 0.0031037216123868503,
+        "teacher_logprob_regression": 0.004354945184994637,
+        "teacher_student_full_kl": 0.003052780529563267,
+        "top16_teacher_overlap": 0.940673828125,
+        "diagnostic_positions": 4096.0
+      },
+      "initial_fp32_readout": {
+        "anchor_student_full_kl": 0.0003708809824180437,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11519591928795124,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.14012510821833168,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "final_fp32_readout": {
+        "anchor_student_full_kl": 0.42391566563362476,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.19196111807855137,
+        "fixed_action_abs_gap": 0.3983230630265462,
+        "fixed_action_signed_gap": 0.3231786561816253,
+        "mirror_target_full_kl": 0.1584518465398541,
+        "student_teacher_full_kl": 0.15845184709656168,
+        "teacher_logprob_regression": 0.4379306316084226,
+        "teacher_student_full_kl": 0.1550119349103781,
+        "top16_teacher_overlap": 0.8228912353515625,
+        "diagnostic_positions": 4096.0
+      },
+      "first_step_anchor_kl": 0.0004060988567961927,
+      "final_preupdate_anchor_kl": 0.09132712525761374,
+      "clip_count": 61,
+      "importance_ess_fraction_min": 0.7199439382531448,
+      "importance_ratio_used_in_gradient": false,
+      "first_update_inspected_fp32_change_fraction": 0.9998268189469004,
+      "first_update_inspected_bf16_change_fraction": 0.005114051384654471
+    },
+    "frozen-opd-bf16-lr1em6-s42": {
+      "initial_native_fixed": {
+        "anchor_student_full_kl": -1.8840376854109553e-09,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11619850918608636,
+        "fixed_action_abs_gap": 0.2448360329435294,
+        "fixed_action_signed_gap": -0.11443149627284391,
+        "mirror_target_full_kl": 0.10620575541892581,
+        "student_teacher_full_kl": 0.10620575567670404,
+        "teacher_logprob_regression": 0.14121488802692836,
+        "teacher_student_full_kl": 0.10525219303936845,
+        "top16_teacher_overlap": 0.8176116943359375,
+        "diagnostic_positions": 4096.0
+      },
+      "final_native_fixed": {
+        "anchor_student_full_kl": 0.09804496040824744,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.00410843573033306,
+        "fixed_action_abs_gap": 0.021917795850285263,
+        "fixed_action_signed_gap": -0.0024785625711436724,
+        "mirror_target_full_kl": 0.003290256749628448,
+        "student_teacher_full_kl": 0.0032902570745798002,
+        "teacher_logprob_regression": 0.004625264357437563,
+        "teacher_student_full_kl": 0.003228069497104604,
+        "top16_teacher_overlap": 0.9393768310546875,
+        "diagnostic_positions": 4096.0
+      },
+      "initial_fp32_readout": {
+        "anchor_student_full_kl": 0.0003708809824180437,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11519591928795124,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.14012510821833168,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "final_fp32_readout": {
+        "anchor_student_full_kl": 0.39305220822995834,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.16409070218698907,
+        "fixed_action_abs_gap": 0.3652889685324108,
+        "fixed_action_signed_gap": 0.2924750378611795,
+        "mirror_target_full_kl": 0.13856741838763567,
+        "student_teacher_full_kl": 0.13856741863507446,
+        "teacher_logprob_regression": 0.3665242813548091,
+        "teacher_student_full_kl": 0.1350715404294253,
+        "top16_teacher_overlap": 0.832366943359375,
+        "diagnostic_positions": 4096.0
+      },
+      "first_step_anchor_kl": 0.00040858392241995505,
+      "final_preupdate_anchor_kl": 0.09086783976556695,
+      "clip_count": 31,
+      "importance_ess_fraction_min": 0.6975511900226938,
+      "importance_ratio_used_in_gradient": false,
+      "first_update_inspected_fp32_change_fraction": 0.9998611822360899,
+      "first_update_inspected_bf16_change_fraction": 0.010235111887862042
+    }
+  },
+  "running_update_counts": {
+    "frozen-opd-bf16-lr2em6-s42": 0,
+    "frozen-opd-fp32-lr5em7-s42": 0,
+    "frozen-opd-fp32-lr1em6-s42": 0,
+    "frozen-opd-fp32-lr2em6-s42": 0,
+    "online-opd-bf16-lr5em7-s42": 0,
+    "online-opd-bf16-lr1em6-s42": 0,
+    "online-opd-bf16-lr2em6-s42": 0,
+    "frozen-mdpo-bf16-reset0-s42": 0,
+    "frozen-mdpo-bf16-reset16-s42": 0,
+    "frozen-bpo-bf16-reset0-s42": 0,
+    "frozen-bpo-bf16-reset16-s42": 0,
+    "zero-bf16-s142": 0,
+    "zero-fp32-s142": 0,
+    "frozen-opd-bf16-lr5em7-s142": 0,
+    "frozen-opd-bf16-lr1em6-s142": 0,
+    "frozen-opd-bf16-lr2em6-s142": 0,
+    "frozen-opd-fp32-lr5em7-s142": 0,
+    "frozen-opd-fp32-lr1em6-s142": 0,
+    "frozen-opd-fp32-lr2em6-s142": 0,
+    "online-opd-bf16-lr5em7-s142": 0,
+    "online-opd-bf16-lr1em6-s142": 0,
+    "online-opd-bf16-lr2em6-s142": 0,
+    "frozen-mdpo-bf16-reset0-s142": 0,
+    "frozen-mdpo-bf16-reset16-s142": 0,
+    "frozen-bpo-bf16-reset0-s142": 0,
+    "frozen-bpo-bf16-reset16-s142": 0,
+    "zero-bf16-s242": 0,
+    "zero-fp32-s242": 0,
+    "frozen-opd-bf16-lr5em7-s242": 0,
+    "frozen-opd-bf16-lr1em6-s242": 0,
+    "frozen-opd-bf16-lr2em6-s242": 0,
+    "frozen-opd-fp32-lr5em7-s242": 0,
+    "frozen-opd-fp32-lr1em6-s242": 0,
+    "frozen-opd-fp32-lr2em6-s242": 0,
+    "online-opd-bf16-lr5em7-s242": 0,
+    "online-opd-bf16-lr1em6-s242": 0,
+    "online-opd-bf16-lr2em6-s242": 0,
+    "frozen-mdpo-bf16-reset0-s242": 0,
+    "frozen-mdpo-bf16-reset16-s242": 0,
+    "frozen-bpo-bf16-reset0-s242": 0,
+    "frozen-bpo-bf16-reset16-s242": 0
+  },
+  "pending": [
+    "frozen-opd-bf16-lr2em6-s42",
+    "frozen-opd-fp32-lr5em7-s42",
+    "frozen-opd-fp32-lr1em6-s42",
+    "frozen-opd-fp32-lr2em6-s42",
+    "online-opd-bf16-lr5em7-s42",
+    "online-opd-bf16-lr1em6-s42",
+    "online-opd-bf16-lr2em6-s42",
+    "frozen-mdpo-bf16-reset0-s42",
+    "frozen-mdpo-bf16-reset16-s42",
+    "frozen-bpo-bf16-reset0-s42",
+    "frozen-bpo-bf16-reset16-s42",
+    "zero-bf16-s142",
+    "zero-fp32-s142",
+    "frozen-opd-bf16-lr5em7-s142",
+    "frozen-opd-bf16-lr1em6-s142",
+    "frozen-opd-bf16-lr2em6-s142",
+    "frozen-opd-fp32-lr5em7-s142",
+    "frozen-opd-fp32-lr1em6-s142",
+    "frozen-opd-fp32-lr2em6-s142",
+    "online-opd-bf16-lr5em7-s142",
+    "online-opd-bf16-lr1em6-s142",
+    "online-opd-bf16-lr2em6-s142",
+    "frozen-mdpo-bf16-reset0-s142",
+    "frozen-mdpo-bf16-reset16-s142",
+    "frozen-bpo-bf16-reset0-s142",
+    "frozen-bpo-bf16-reset16-s142",
+    "zero-bf16-s242",
+    "zero-fp32-s242",
+    "frozen-opd-bf16-lr5em7-s242",
+    "frozen-opd-bf16-lr1em6-s242",
+    "frozen-opd-bf16-lr2em6-s242",
+    "frozen-opd-fp32-lr5em7-s242",
+    "frozen-opd-fp32-lr1em6-s242",
+    "frozen-opd-fp32-lr2em6-s242",
+    "online-opd-bf16-lr5em7-s242",
+    "online-opd-bf16-lr1em6-s242",
+    "online-opd-bf16-lr2em6-s242",
+    "frozen-mdpo-bf16-reset0-s242",
+    "frozen-mdpo-bf16-reset16-s242",
+    "frozen-bpo-bf16-reset0-s242",
+    "frozen-bpo-bf16-reset16-s242"
+  ],
+  "long_absorption_at_least_two_seeds_passed": null,
+  "pending_evaluations": [
+    "frozen-bpo-bf16-reset0-s142-update100",
+    "frozen-bpo-bf16-reset0-s142-update200",
+    "frozen-bpo-bf16-reset0-s142-update300",
+    "frozen-bpo-bf16-reset0-s142-update50",
+    "frozen-bpo-bf16-reset0-s242-update100",
+    "frozen-bpo-bf16-reset0-s242-update200",
+    "frozen-bpo-bf16-reset0-s242-update300",
+    "frozen-bpo-bf16-reset0-s242-update50",
+    "frozen-bpo-bf16-reset0-s42-update100",
+    "frozen-bpo-bf16-reset0-s42-update200",
+    "frozen-bpo-bf16-reset0-s42-update300",
+    "frozen-bpo-bf16-reset0-s42-update50",
+    "frozen-bpo-bf16-reset16-s142-update100",
+    "frozen-bpo-bf16-reset16-s142-update200",
+    "frozen-bpo-bf16-reset16-s142-update300",
+    "frozen-bpo-bf16-reset16-s142-update50",
+    "frozen-bpo-bf16-reset16-s142-update800",
+    "frozen-bpo-bf16-reset16-s242-update100",
+    "frozen-bpo-bf16-reset16-s242-update200",
+    "frozen-bpo-bf16-reset16-s242-update300",
+    "frozen-bpo-bf16-reset16-s242-update50",
+    "frozen-bpo-bf16-reset16-s242-update800",
+    "frozen-bpo-bf16-reset16-s42-update100",
+    "frozen-bpo-bf16-reset16-s42-update200",
+    "frozen-bpo-bf16-reset16-s42-update300",
+    "frozen-bpo-bf16-reset16-s42-update50",
+    "frozen-bpo-bf16-reset16-s42-update800",
+    "frozen-mdpo-bf16-reset0-s142-update100",
+    "frozen-mdpo-bf16-reset0-s142-update200",
+    "frozen-mdpo-bf16-reset0-s142-update300",
+    "frozen-mdpo-bf16-reset0-s142-update50",
+    "frozen-mdpo-bf16-reset0-s242-update100",
+    "frozen-mdpo-bf16-reset0-s242-update200",
+    "frozen-mdpo-bf16-reset0-s242-update300",
+    "frozen-mdpo-bf16-reset0-s242-update50",
+    "frozen-mdpo-bf16-reset0-s42-update100",
+    "frozen-mdpo-bf16-reset0-s42-update200",
+    "frozen-mdpo-bf16-reset0-s42-update300",
+    "frozen-mdpo-bf16-reset0-s42-update50",
+    "frozen-mdpo-bf16-reset16-s142-update100",
+    "frozen-mdpo-bf16-reset16-s142-update200",
+    "frozen-mdpo-bf16-reset16-s142-update300",
+    "frozen-mdpo-bf16-reset16-s142-update50",
+    "frozen-mdpo-bf16-reset16-s142-update800",
+    "frozen-mdpo-bf16-reset16-s242-update100",
+    "frozen-mdpo-bf16-reset16-s242-update200",
+    "frozen-mdpo-bf16-reset16-s242-update300",
+    "frozen-mdpo-bf16-reset16-s242-update50",
+    "frozen-mdpo-bf16-reset16-s242-update800",
+    "frozen-mdpo-bf16-reset16-s42-update100",
+    "frozen-mdpo-bf16-reset16-s42-update200",
+    "frozen-mdpo-bf16-reset16-s42-update300",
+    "frozen-mdpo-bf16-reset16-s42-update50",
+    "frozen-mdpo-bf16-reset16-s42-update800",
+    "frozen-opd-bf16-lr1em6-s142-update100",
+    "frozen-opd-bf16-lr1em6-s142-update200",
+    "frozen-opd-bf16-lr1em6-s142-update300",
+    "frozen-opd-bf16-lr1em6-s142-update50",
+    "frozen-opd-bf16-lr1em6-s242-update100",
+    "frozen-opd-bf16-lr1em6-s242-update200",
+    "frozen-opd-bf16-lr1em6-s242-update300",
+    "frozen-opd-bf16-lr1em6-s242-update50",
+    "frozen-opd-bf16-lr1em6-s42-update100",
+    "frozen-opd-bf16-lr1em6-s42-update200",
+    "frozen-opd-bf16-lr1em6-s42-update300",
+    "frozen-opd-bf16-lr1em6-s42-update50",
+    "frozen-opd-bf16-lr2em6-s142-update100",
+    "frozen-opd-bf16-lr2em6-s142-update150",
+    "frozen-opd-bf16-lr2em6-s142-update25",
+    "frozen-opd-bf16-lr2em6-s142-update50",
+    "frozen-opd-bf16-lr2em6-s242-update100",
+    "frozen-opd-bf16-lr2em6-s242-update150",
+    "frozen-opd-bf16-lr2em6-s242-update25",
+    "frozen-opd-bf16-lr2em6-s242-update50",
+    "frozen-opd-bf16-lr2em6-s42-update100",
+    "frozen-opd-bf16-lr2em6-s42-update150",
+    "frozen-opd-bf16-lr2em6-s42-update25",
+    "frozen-opd-bf16-lr2em6-s42-update50",
+    "frozen-opd-bf16-lr5em7-s142-update100",
+    "frozen-opd-bf16-lr5em7-s142-update200",
+    "frozen-opd-bf16-lr5em7-s142-update400",
+    "frozen-opd-bf16-lr5em7-s142-update600",
+    "frozen-opd-bf16-lr5em7-s242-update100",
+    "frozen-opd-bf16-lr5em7-s242-update200",
+    "frozen-opd-bf16-lr5em7-s242-update400",
+    "frozen-opd-bf16-lr5em7-s242-update600",
+    "frozen-opd-fp32-lr1em6-s142-update100",
+    "frozen-opd-fp32-lr1em6-s142-update200",
+    "frozen-opd-fp32-lr1em6-s142-update300",
+    "frozen-opd-fp32-lr1em6-s142-update50",
+    "frozen-opd-fp32-lr1em6-s242-update100",
+    "frozen-opd-fp32-lr1em6-s242-update200",
+    "frozen-opd-fp32-lr1em6-s242-update300",
+    "frozen-opd-fp32-lr1em6-s242-update50",
+    "frozen-opd-fp32-lr1em6-s42-update100",
+    "frozen-opd-fp32-lr1em6-s42-update200",
+    "frozen-opd-fp32-lr1em6-s42-update300",
+    "frozen-opd-fp32-lr1em6-s42-update50",
+    "frozen-opd-fp32-lr2em6-s142-update100",
+    "frozen-opd-fp32-lr2em6-s142-update150",
+    "frozen-opd-fp32-lr2em6-s142-update25",
+    "frozen-opd-fp32-lr2em6-s142-update50",
+    "frozen-opd-fp32-lr2em6-s242-update100",
+    "frozen-opd-fp32-lr2em6-s242-update150",
+    "frozen-opd-fp32-lr2em6-s242-update25",
+    "frozen-opd-fp32-lr2em6-s242-update50",
+    "frozen-opd-fp32-lr2em6-s42-update100",
+    "frozen-opd-fp32-lr2em6-s42-update150",
+    "frozen-opd-fp32-lr2em6-s42-update25",
+    "frozen-opd-fp32-lr2em6-s42-update50",
+    "frozen-opd-fp32-lr5em7-s142-update100",
+    "frozen-opd-fp32-lr5em7-s142-update200",
+    "frozen-opd-fp32-lr5em7-s142-update400",
+    "frozen-opd-fp32-lr5em7-s142-update600",
+    "frozen-opd-fp32-lr5em7-s242-update100",
+    "frozen-opd-fp32-lr5em7-s242-update200",
+    "frozen-opd-fp32-lr5em7-s242-update400",
+    "frozen-opd-fp32-lr5em7-s242-update600",
+    "frozen-opd-fp32-lr5em7-s42-update100",
+    "frozen-opd-fp32-lr5em7-s42-update200",
+    "frozen-opd-fp32-lr5em7-s42-update400",
+    "frozen-opd-fp32-lr5em7-s42-update600",
+    "initial-s142",
+    "initial-s242",
+    "online-opd-bf16-lr1em6-s142-update100",
+    "online-opd-bf16-lr1em6-s142-update200",
+    "online-opd-bf16-lr1em6-s142-update300",
+    "online-opd-bf16-lr1em6-s142-update50",
+    "online-opd-bf16-lr1em6-s242-update100",
+    "online-opd-bf16-lr1em6-s242-update200",
+    "online-opd-bf16-lr1em6-s242-update300",
+    "online-opd-bf16-lr1em6-s242-update50",
+    "online-opd-bf16-lr1em6-s42-update100",
+    "online-opd-bf16-lr1em6-s42-update200",
+    "online-opd-bf16-lr1em6-s42-update300",
+    "online-opd-bf16-lr1em6-s42-update50",
+    "online-opd-bf16-lr2em6-s142-update100",
+    "online-opd-bf16-lr2em6-s142-update150",
+    "online-opd-bf16-lr2em6-s142-update25",
+    "online-opd-bf16-lr2em6-s142-update50",
+    "online-opd-bf16-lr2em6-s242-update100",
+    "online-opd-bf16-lr2em6-s242-update150",
+    "online-opd-bf16-lr2em6-s242-update25",
+    "online-opd-bf16-lr2em6-s242-update50",
+    "online-opd-bf16-lr2em6-s42-update100",
+    "online-opd-bf16-lr2em6-s42-update150",
+    "online-opd-bf16-lr2em6-s42-update25",
+    "online-opd-bf16-lr2em6-s42-update50",
+    "online-opd-bf16-lr5em7-s142-update100",
+    "online-opd-bf16-lr5em7-s142-update200",
+    "online-opd-bf16-lr5em7-s142-update400",
+    "online-opd-bf16-lr5em7-s142-update600",
+    "online-opd-bf16-lr5em7-s242-update100",
+    "online-opd-bf16-lr5em7-s242-update200",
+    "online-opd-bf16-lr5em7-s242-update400",
+    "online-opd-bf16-lr5em7-s242-update600",
+    "online-opd-bf16-lr5em7-s42-update100",
+    "online-opd-bf16-lr5em7-s42-update200",
+    "online-opd-bf16-lr5em7-s42-update400",
+    "online-opd-bf16-lr5em7-s42-update600"
+  ],
+  "all_evaluations_complete": false,
+  "all_training_complete": false,
+  "observed_optimizer_updates": 908
+}

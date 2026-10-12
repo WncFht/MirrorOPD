@@ -1,0 +1,40 @@
+{
+  "state": "two-completed-learning-rate-arms-one-seed",
+  "third_learning_rate": "pending",
+  "other_seeds": "pending",
+  "readout_positions": 4096,
+  "source_files": [
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr5em7-s42/fixed-native.jsonl",
+      "sha256": "f395034de4c4548d65b1f44f58c2641231095ab7d575d0e6ffc6fe07dbd792a0"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr5em7-s42/diagnostics.jsonl",
+      "sha256": "df7fc96c1c0c53b9714cfc7f0f04adf99a9073153da06a637e6704800718f9fe"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr5em7-s42/updates.jsonl",
+      "sha256": "6822b9ba9d97de4728238a7604d75ed025cd8b09425692520b89f929a1ff94f3"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr5em7-s42/native-final.jsonl",
+      "sha256": "e206f605b16b2984edecfa49e5b29b6f82b782cad627b271d49fa713d2ab3737"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr1em6-s42/fixed-native.jsonl",
+      "sha256": "6473ce9e7e9fa94350a3249e8faf8939fb0a021af5b9d490ede815cccaf6ea30"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr1em6-s42/diagnostics.jsonl",
+      "sha256": "1429beaba87beeddaf57d2afe6ee303f9fe6a73c432ab0adb9665b7ffafc98df"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr1em6-s42/updates.jsonl",
+      "sha256": "febc1540400d644b32064b1230a3d62c1ccc69d5434c3283d6be1907c6682f09"
+    },
+    {
+      "path": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr1em6-s42/native-final.jsonl",
+      "sha256": "1812af7d3e5d441b9145c0154a36b37d79aaf4e28102b132f871bb86f7ec46c4"
+    }
+  ]
+}

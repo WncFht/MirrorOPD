@@ -1,0 +1,18 @@
+{
+  "torch": "2.7.1+cu126",
+  "cuda_matmul_allow_tf32": false,
+  "comparisons": {
+    "model.layers.0.self_attn.q_proj.weight": {
+      "cosine": 0.6392479181345829,
+      "rms_bf16_master_delta": 3.126791939900464e-06,
+      "rms_fp32_master_delta": 2.961388438909653e-06,
+      "relative_delta_difference": 0.8745983050273589
+    },
+    "model.layers.12.mlp.down_proj.weight": {
+      "cosine": 0.9854530234115182,
+      "rms_bf16_master_delta": 3.950199911352406e-06,
+      "rms_fp32_master_delta": 3.911787344904209e-06,
+      "relative_delta_difference": 0.17168597331070398
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "device": "CPU only",
+  "torch": "2.7.1+cu126",
+  "checkpoint": "runs/oneshot-effective-time-20261012/frozen-opd-bf16-lr5em7-s42/checkpoints/update-000400",
+  "examples": 8,
+  "selection": "Eight earliest positions with initial anchor-teacher KL >=0.02 and position <=512",
+  "conditions": {
+    "bf16": [
+      {
+        "sample_index": 62,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.025802360622536682,
+        "teacher_student_kl": 0.03195343559090688
+      },
+      {
+        "sample_index": 6,
+        "position": 7,
+        "prefix_tokens": 109,
+        "student_teacher_kl": 0.03209842169899841,
+        "teacher_student_kl": 0.054511633677045195
+      },
+      {
+        "sample_index": 12,
+        "position": 12,
+        "prefix_tokens": 114,
+        "student_teacher_kl": 0.009583267188895333,
+        "teacher_student_kl": 0.01238069350955101
+      },
+      {
+        "sample_index": 27,
+        "position": 19,
+        "prefix_tokens": 121,
+        "student_teacher_kl": 0.005915521881942308,
+        "teacher_student_kl": 0.0061807832896482225
+      },
+      {
+        "sample_index": 61,
+        "position": 23,
+        "prefix_tokens": 125,
+        "student_teacher_kl": 0.00020562829912731885,
+        "teacher_student_kl": 0.00021385265040122701
+      },
+      {
+        "sample_index": 37,
+        "position": 27,
+        "prefix_tokens": 129,
+        "student_teacher_kl": 0.0012487554552741175,
+        "teacher_student_kl": 0.0012157428561107902
+      },
+      {
+        "sample_index": 58,
+        "position": 29,
+        "prefix_tokens": 131,
+        "student_teacher_kl": 0.005221419606892101,
+        "teacher_student_kl": 0.005759500008971049
+      },
+      {
+        "sample_index": 37,
+        "position": 30,
+        "prefix_tokens": 132,
+        "student_teacher_kl": 1.1093860564021995e-07,
+        "teacher_student_kl": -3.739882244226294e-08
+      }
+    ],
+    "fp32": [
+      {
+        "sample_index": 62,
+        "position": 6,
+        "prefix_tokens": 108,
+        "student_teacher_kl": 0.007803825487078241,
+        "teacher_student_kl": 0.007285525510996434,
+        "bf16_fp32_kl": 0.05164344802914276
+      },
+      {
+        "sample_index": 6,
+        "position": 7,
+        "prefix_tokens": 109,
+        "student_teacher_kl": 0.044516975332011946,
+        "teacher_student_kl": 0.08434337778317949,
+        "bf16_fp32_kl": 0.0026597611894810585
+      },
+      {
+        "sample_index": 12,
+        "position": 12,
+        "prefix_tokens": 114,
+        "student_teacher_kl": 0.2730036415816489,
+        "teacher_student_kl": 0.328136978335906,
+        "bf16_fp32_kl": 0.3174773058251245
+      },
+      {
+        "sample_index": 27,
+        "position": 19,
+        "prefix_tokens": 121,
+        "student_teacher_kl": 0.025915737617548836,
+        "teacher_student_kl": 0.02222331213442758,
+        "bf16_fp32_kl": 0.01504543119904627
+      },
+      {
+        "sample_index": 61,
+        "position": 23,
+        "prefix_tokens": 125,
+        "student_teacher_kl": 0.1330179208067607,
+        "teacher_student_kl": 0.08154426899448874,
+        "bf16_fp32_kl": 0.08768703931606997
+      },
+      {
+        "sample_index": 37,
+        "position": 27,
+        "prefix_tokens": 129,
+        "student_teacher_kl": 0.9791042141249598,
+        "teacher_student_kl": 1.0008466242218947,
+        "bf16_fp32_kl": 0.9418218258355129
+      },
+      {
+        "sample_index": 58,
+        "position": 29,
+        "prefix_tokens": 131,
+        "student_teacher_kl": 0.006221766379060448,
+        "teacher_student_kl": 0.008266845812447106,
+        "bf16_fp32_kl": 0.010513029194456519
+      },
+      {
+        "sample_index": 37,
+        "position": 30,
+        "prefix_tokens": 132,
+        "student_teacher_kl": 0.00020272686702462413,
+        "teacher_student_kl": 0.001400476367089589,
+        "bf16_fp32_kl": 0.0014007414316793295
+      }
+    ]
+  }
+}

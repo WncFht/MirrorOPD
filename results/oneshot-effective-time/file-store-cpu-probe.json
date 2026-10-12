@@ -1,0 +1,30 @@
+{
+  "backend": "gloo",
+  "gpu_validation": "pending",
+  "replicas": [
+    {
+      "replica": 0,
+      "world_size": 1,
+      "reduction": 1,
+      "temporary_directory_removed": true
+    },
+    {
+      "replica": 1,
+      "world_size": 1,
+      "reduction": 2,
+      "temporary_directory_removed": true
+    },
+    {
+      "replica": 2,
+      "world_size": 1,
+      "reduction": 3,
+      "temporary_directory_removed": true
+    },
+    {
+      "replica": 3,
+      "world_size": 1,
+      "reduction": 4,
+      "temporary_directory_removed": true
+    }
+  ]
+}
