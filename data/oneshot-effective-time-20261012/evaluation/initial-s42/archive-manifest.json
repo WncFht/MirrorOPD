@@ -1,0 +1,75 @@
+{
+  "source": "runs/oneshot-effective-time-20261012/evaluation/initial-s42",
+  "files": [
+    {
+      "path": "completion.json",
+      "bytes": 155,
+      "sha256": "d61016b1bb29faae7f3767850cdf5c3305f4f5fa2dde42b0e7f612c56407b7ac"
+    },
+    {
+      "path": "rank-0-generations.jsonl",
+      "bytes": 4800426,
+      "sha256": "daaff691fb0a2a82ab85246968db939d9b42daf730f59586c7df145f701c7347"
+    },
+    {
+      "path": "rank-0-metadata.json",
+      "bytes": 392,
+      "sha256": "69bacd8ed346d3afdd1bc31ab6b3ccad2e41d1bb8326a97718eb1fe291e90221"
+    },
+    {
+      "path": "rank-0.jsonl",
+      "bytes": 4811491,
+      "sha256": "7a554256f0a1822ab6e5ed1661ba4f9c36398e862000dcf043b894d7b95ab6dc"
+    },
+    {
+      "path": "rank-1-generations.jsonl",
+      "bytes": 4328432,
+      "sha256": "f16229674bfb351df0451fe9b90074252c119de9af6b12bc0b4dd4ae05406ffe"
+    },
+    {
+      "path": "rank-1-metadata.json",
+      "bytes": 392,
+      "sha256": "a93c5b38b7772df95c54f0dd8a62a2a2f428a4c63b6c5aa23003d87ecae09749"
+    },
+    {
+      "path": "rank-1.jsonl",
+      "bytes": 4339487,
+      "sha256": "71e84f622214f2a42328029ea742b1f569abe1d52a285757fb7c6adf962c6b49"
+    },
+    {
+      "path": "rank-2-generations.jsonl",
+      "bytes": 4339174,
+      "sha256": "73697f772662871baefce43d5462bdfc147428b7d6df2a99c501bf3c0184ab90"
+    },
+    {
+      "path": "rank-2-metadata.json",
+      "bytes": 392,
+      "sha256": "a27ff9ddf5618d3333b4a418845f758bcd6fd75f9c2365d120284446af1fe748"
+    },
+    {
+      "path": "rank-2.jsonl",
+      "bytes": 4350150,
+      "sha256": "92e538a920f813310fde2edeeeb0f8ae7f6d9d818d13e82e10ed6eb21d87dfdd"
+    },
+    {
+      "path": "rank-3-generations.jsonl",
+      "bytes": 4286426,
+      "sha256": "2f17241f0773ba52dbb38c530922dcaa783d708e9947e78b5b93fdc72f5381e3"
+    },
+    {
+      "path": "rank-3-metadata.json",
+      "bytes": 392,
+      "sha256": "409b1368dbe02a7bc01ebf597a056a058a88ab5e94f8338dbf9765993f5ada3e"
+    },
+    {
+      "path": "rank-3.jsonl",
+      "bytes": 4297398,
+      "sha256": "5d6d464fd217dfb9bc42ff0118c8a4115cfc2e9a0d1a2d0a39b71b0c492904d8"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 377,
+      "sha256": "378cdbf6d30a0c9c98b71484b221ceb2a89d5f4d71143d3bee0032c6a278a203"
+    }
+  ]
+}

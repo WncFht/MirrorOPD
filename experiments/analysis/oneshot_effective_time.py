@@ -129,6 +129,41 @@ def audit_evaluation(directory):
     return summary
 
 
+def paired_benchmark_changes(initial, current):
+    """Count gains and losses on the same questions without a significance claim."""
+    baseline = {
+        row["uid"]: row
+        for rank in range(4)
+        for row in [
+            json.loads(line) for line in (initial / f"rank-{rank}.jsonl").read_text().splitlines()
+        ]
+    }
+    rows = [
+        json.loads(line)
+        for rank in range(4)
+        for line in (current / f"rank-{rank}.jsonl").read_text().splitlines()
+    ]
+    assert {row["uid"] for row in rows} == baseline.keys()
+    assert all(
+        row["ground_truth"] == baseline[row["uid"]]["ground_truth"]
+        and row["prompt"] == baseline[row["uid"]]["prompt"]
+        for row in rows
+    )
+    result = {}
+    for task in ("MATH-500", "AMC23", "AIME25"):
+        selected = [row for row in rows if row["task"] == task]
+        gained = sum(row["correct"] and not baseline[row["uid"]]["correct"] for row in selected)
+        lost = sum(not row["correct"] and baseline[row["uid"]]["correct"] for row in selected)
+        result[task] = {
+            "questions": len(selected),
+            "gained_correct": gained,
+            "lost_correct": lost,
+            "net_correct_change": gained - lost,
+            "change_percentage_points": 100 * (gained - lost) / len(selected),
+        }
+    return result
+
+
 def audit_completed_arm(suite, config):
     """Require a complete optimizer ledger and final distance before scoring an arm."""
     directory = suite / config["id"]
@@ -295,6 +330,7 @@ def main():
         },
         "time_collapse": {},
         "evaluations": {},
+        "paired_benchmark_changes": {},
         "arm_diagnostics": {
             identifier: arm_diagnostics(arm, args.suite) for identifier, arm in lookup.items()
         },
@@ -338,6 +374,14 @@ def main():
         completion = json.loads((path.parent / "completion.json").read_text())
         assert completion["unique_questions"] == 570
         report["evaluations"][path.parent.name] = audit_evaluation(path.parent)
+    for config in plan:
+        initial = args.suite / "evaluation" / f"initial-s{config['seed']}"
+        for step in config["checkpoint_steps"]:
+            identifier = config["id"] + f"-update{step}"
+            if identifier in report["evaluations"]:
+                report["paired_benchmark_changes"][identifier] = paired_benchmark_changes(
+                    initial, args.suite / "evaluation" / identifier
+                )
     expected_evaluations = (
         {f"initial-s{seed}" for seed in (42, 142, 242)}
         | {"teacher"}
