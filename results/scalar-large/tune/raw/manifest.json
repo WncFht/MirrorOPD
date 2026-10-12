@@ -1,0 +1,275 @@
+[
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1.5e-06-summary.json.gz",
+    "original_sha256": "2b40f157f0358e5590710aaa1b8012ffc23c94d511ba3a7ab6719e1f4e3f2f95",
+    "archive_sha256": "87ff43350a94895762e020112c88323186b6b922d791257b9b360d394925d6f7",
+    "bytes": 883,
+    "archive_bytes": 470
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1.5e-06-audits.jsonl.gz",
+    "original_sha256": "f4d356ff23aaf76bafccb674cfe844f8a01d84a83b04c422624511b2470522a0",
+    "archive_sha256": "9618b4e1b32b7375ea5419999ed853469614bbff98f44c937f1520dbf9d9361d",
+    "bytes": 7436,
+    "archive_bytes": 1793
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1.5e-06-updates.jsonl.gz",
+    "original_sha256": "227a9b5e3e9ea19f5c988d8a7c6b44df61d19c2ba62b7521489ed899b5ec23ca",
+    "archive_sha256": "df5ef90f0623dfad13c965c6fedf3915849ff44452236baf9f577e7b73e58cd0",
+    "bytes": 105463,
+    "archive_bytes": 16885
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1.6e-05-summary.json.gz",
+    "original_sha256": "2907ffe1cbf7952281eada31817b4e8fab793084740278c19d71bff0224ad225",
+    "archive_sha256": "be644af0319be3061dc96c9c7c417520c902136f9dad8973a45b9931bf91e23c",
+    "bytes": 883,
+    "archive_bytes": 467
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1.6e-05-audits.jsonl.gz",
+    "original_sha256": "9b98e06928b133b9ecb570c8b0bc4dbfc54e3c58de9f398fbf5712b7aea9bc0c",
+    "archive_sha256": "d141a0f9eee0127ea4466c1e582fa194a6a0789e1df4c5062124892223416598",
+    "bytes": 7334,
+    "archive_bytes": 1806
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1.6e-05-updates.jsonl.gz",
+    "original_sha256": "98f7e9c46fbade46f1871c4674d403df78859830e1e50993120b039108d7467c",
+    "archive_sha256": "38e9b398d894c557e6272c419e2c85f184ec20b62eb7444d4f34ed1ad5afb739",
+    "bytes": 104895,
+    "archive_bytes": 16818
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1e-06-summary.json.gz",
+    "original_sha256": "c19fe5f4228badcd654650b9c95c775b4efff9aaebae2180b31f19332e8d5f74",
+    "archive_sha256": "948d3773800fb4b1c42e9304af826acdf62b2a586c8473a0d978e83781111941",
+    "bytes": 881,
+    "archive_bytes": 470
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1e-06-audits.jsonl.gz",
+    "original_sha256": "36414bcc1ee8a6208503deade7fd7912c092f308cade4590061c8ea4a6a5ca17",
+    "archive_sha256": "22c96bd10c28a7d099bd4eb6b5575183a82eff7cd6002947315c129bccdf33f6",
+    "bytes": 7446,
+    "archive_bytes": 1788
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-1e-06-updates.jsonl.gz",
+    "original_sha256": "8794197ee6a6e1f995391c8cf0ca318bf1c9e97851772fb02284d968e5b79e6e",
+    "archive_sha256": "4e88cf5646fbbae81f7ff37bb20f015067c81e83be81ca97557e7b739c848eae",
+    "bytes": 104565,
+    "archive_bytes": 16883
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-2.5e-07-summary.json.gz",
+    "original_sha256": "e34eda88d872a0b3d6bc9cf768a4d9c5fda06fa5e0d9f6e3607965c9be5935ca",
+    "archive_sha256": "83e92f45b7de771c938e4e4bd49beaac3c5e71a33c8709a4e3482c6a43e0fcc7",
+    "bytes": 883,
+    "archive_bytes": 472
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-2.5e-07-audits.jsonl.gz",
+    "original_sha256": "a9a86e434c6aadc02d62b55fbb2309310d7e79200c90aeac09c31118b241b433",
+    "archive_sha256": "96980758e713d6b55eb027ed3b7915a420df663aafc34fdd62d9155609c64c02",
+    "bytes": 7447,
+    "archive_bytes": 1807
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-2.5e-07-updates.jsonl.gz",
+    "original_sha256": "b508b841985f017a99190db2260b29d7392a588f3e0cfe778609c9ba59881168",
+    "archive_sha256": "c1264b20cf9eeeae858ab4b8b366cb7d92fef4b8dff918de1abdc24a1fc8fb09",
+    "bytes": 105811,
+    "archive_bytes": 16886
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-2e-06-summary.json.gz",
+    "original_sha256": "23f03af29d8748f3cbba7801eba4ead36dbc4dcd666af1faad04104c3e87bbec",
+    "archive_sha256": "8fee2972416f2505deeb4df1af427e5357b2629b6488f1d10fe874a8e36d8757",
+    "bytes": 881,
+    "archive_bytes": 471
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-2e-06-audits.jsonl.gz",
+    "original_sha256": "022eaaa9bf88d3e7cf63784802ff1ad2a868bed5af2a26b448899a7c694fa0c2",
+    "archive_sha256": "8b7526d752fcb8e363518597fe5722c36823e421cea77ec244561f60a20e1eee",
+    "bytes": 7427,
+    "archive_bytes": 1798
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-2e-06-updates.jsonl.gz",
+    "original_sha256": "62f3c4ff7842f1c7a4838fa1a5a25f2e1bc183c83bc4f3416e7fdea649af0257",
+    "archive_sha256": "8f5b7f2a19248f0f63d23f55295ab83d8c488c6da5b8cfaf362d2d8078f68554",
+    "bytes": 104348,
+    "archive_bytes": 16935
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-4e-06-summary.json.gz",
+    "original_sha256": "a5c735598a687b2d4472fc524c55ab118e4c1c7ba1a8d92e4fe072a2ca059c16",
+    "archive_sha256": "ffbe4abbe34963fdcf1e5220bf2954c167060b323ab6b1a194316ef37162e7cd",
+    "bytes": 881,
+    "archive_bytes": 470
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-4e-06-audits.jsonl.gz",
+    "original_sha256": "d0287262e913bf98fac4262f9f4d4a608a0a2a9d0314bd5e0de06f4a0a4cc8d8",
+    "archive_sha256": "5a1ba59a529499790e5fe9388a247f7fe7fab544979d87afd44b715d40976703",
+    "bytes": 7398,
+    "archive_bytes": 1793
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-4e-06-updates.jsonl.gz",
+    "original_sha256": "6616262dcb23e35d15b3d882d2cb222624856a9a92fb3d13f81df59b802a7f40",
+    "archive_sha256": "dc7d9a85d1b78d3ff9b1e222075ef7549dbdde518790f5efd189f72fec5d2077",
+    "bytes": 104106,
+    "archive_bytes": 16870
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-5e-07-summary.json.gz",
+    "original_sha256": "c07c8a2426e9731cb8468a76076ce327c0722960305163184c4aba6178e59a6b",
+    "archive_sha256": "e2dc4c75a842e7c0febe4bb3b3d91019dce3658d9885d46115c8fd764c2575cc",
+    "bytes": 881,
+    "archive_bytes": 471
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-5e-07-audits.jsonl.gz",
+    "original_sha256": "d76f7545e992094ccc7384d70a3e75b592e0317d1ee6bc7152223a75d98f5473",
+    "archive_sha256": "aae6ae64ba2833a7e6e879e2f80ecf0a06ac7f8ead444f8d0fb27492fbdc3fe1",
+    "bytes": 7443,
+    "archive_bytes": 1790
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-5e-07-updates.jsonl.gz",
+    "original_sha256": "539f6267b70cade7416f89079996a78406c2059e0b9c75bc714a313967ba66d8",
+    "archive_sha256": "f95c8ab1e1f65d044f40a8af05f13c9963d2e0d6dd5766aeb4bf1d4a39dd0961",
+    "bytes": 104769,
+    "archive_bytes": 16862
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-8e-06-summary.json.gz",
+    "original_sha256": "6e49f11779245a161264b1786d841296435e3cb901d5138fe669edce071bf01e",
+    "archive_sha256": "c65f59aaa76d46f9e8a735f4bd370fe9e4cf6f135a023b646c5c8b0065b0c938",
+    "bytes": 881,
+    "archive_bytes": 471
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-8e-06-audits.jsonl.gz",
+    "original_sha256": "85a3b3c6979dafa8f232f6b6140da2e65b6266ea8d9039f6a654021bca6f4260",
+    "archive_sha256": "11c0abdbced0af996957aa0387440f5e1c2be0cefb383050a85e9b1ba31d7794",
+    "bytes": 7377,
+    "archive_bytes": 1811
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-constant-8e-06-updates.jsonl.gz",
+    "original_sha256": "b44a4d1be3969f5f956e9ff31aee73dc8fc96998fc5a2431c5c2b470dbddc1ef",
+    "archive_sha256": "ffd4f803406b72d34dc041ac4b7d0595019c51f9a4c0e3ea96612caf55eb466e",
+    "bytes": 103986,
+    "archive_bytes": 16888
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-feedback-rate0.01-summary.json.gz",
+    "original_sha256": "ad078881c136271b0db4d82206d11f27ab0d4a6e965b3e101173668d62f6620c",
+    "archive_sha256": "f5ecbd8bd7d501a2be46742f0cbaa15e530f3da74b61393baea28b589d4ded15",
+    "bytes": 881,
+    "archive_bytes": 471
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-feedback-rate0.01-audits.jsonl.gz",
+    "original_sha256": "cfa9d9dbbccdaaa0606f1ffc9c9eec77bfa0a7fcbf07c14de514c04738566385",
+    "archive_sha256": "370aa52ccb33642bb7e5840c5f912b17dcb1bf17d15d4c15f63b229a049b10d3",
+    "bytes": 7436,
+    "archive_bytes": 1721
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-feedback-rate0.01-updates.jsonl.gz",
+    "original_sha256": "bac6513a5551309896ceb2cbba93d682aeafb837e3d87f353bae194be5c63c8c",
+    "archive_sha256": "b7c66a30b2a2c21ead77382db6abe9e6bfee9ef5d1af6fda3704f155c3f57858",
+    "bytes": 110820,
+    "archive_bytes": 19358
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-feedback-rate0.03-summary.json.gz",
+    "original_sha256": "6aa6023c838868aefd42fe3f689f47fa6f39c5929195c039a3b778225f142b5f",
+    "archive_sha256": "cc4c48a6e49f4e1a69657b827c24ec3ea62bf8934a829c341012d4117b91c14d",
+    "bytes": 881,
+    "archive_bytes": 471
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-feedback-rate0.03-audits.jsonl.gz",
+    "original_sha256": "34ff0ba29abf6f6b372c9abbca1f9eab7f101883d0bf4aab74a73e327a8798aa",
+    "archive_sha256": "0a5b97975d8ea100c2ba72392fdbf45beb0141efb06e724fc941a0a03e39ff3b",
+    "bytes": 7443,
+    "archive_bytes": 1661
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-feedback-rate0.03-updates.jsonl.gz",
+    "original_sha256": "92119e0448cd816aa92e491be99ef9de9b023b75267e371427fd52da7cc2b07f",
+    "archive_sha256": "e209a02db8ea823a910243075d3c19b8f3e5144881e77a02b0f79f3c284099b3",
+    "bytes": 109104,
+    "archive_bytes": 18292
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-logloss-control-summary.json.gz",
+    "original_sha256": "cf32a6ce32292b18ac6637801a68b1dee7da3cead172a6b9a27ee1d08e3869fa",
+    "archive_sha256": "38da539944961366c9a6a8ec739b014da6b4ab305bd0202c8bac0ff890e5d713",
+    "bytes": 925,
+    "archive_bytes": 497
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-logloss-control-audits.jsonl.gz",
+    "original_sha256": "24fe6072d6e847eabd35e46d8bd029bec654346998be71efa2b73b2d27299692",
+    "archive_sha256": "e3dab558c1fc244756ce55cbe7debbdeb0c7d172e70e0c7222ba7c42febea35b",
+    "bytes": 7445,
+    "archive_bytes": 1796
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-logloss-control-updates.jsonl.gz",
+    "original_sha256": "4a56e1add3bffac27a9fa618a979dc699abea1da34b774f1b590723a9efc4834",
+    "archive_sha256": "8bed32bcce9fa3a03c2b0d38a5b0e6187991b7578f88ae80dad3a70da9b691b4",
+    "bytes": 104252,
+    "archive_bytes": 16911
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-search-every1-summary.json.gz",
+    "original_sha256": "84530a387cd0b795339c7d7bc39f1cc7920822887ef5d31a55f88df5c07e76e5",
+    "archive_sha256": "2bc852c11989f6d2d7bf038400efed4c6536d1ab9faae6bd00bd22e70a6f3ace",
+    "bytes": 886,
+    "archive_bytes": 471
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-search-every1-audits.jsonl.gz",
+    "original_sha256": "809201ced78fe01322f44be4cfd2eb069d99252b8aebbaac704597f8f9a5292c",
+    "archive_sha256": "d8a89db0cf7d5b8d24edbc294ac7a3de6653c3299e87d57827295fd3912022d2",
+    "bytes": 7497,
+    "archive_bytes": 1590
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-search-every1-updates.jsonl.gz",
+    "original_sha256": "20beef620baa653fd370ecc1292f97f99a2569a76b3e409a61d41cf645582460",
+    "archive_sha256": "7bce6185fd7489cf73a052e72098e64a16983892afd44d3c823c4b3355eaf4dd",
+    "bytes": 139203,
+    "archive_bytes": 25461
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-search-every4-summary.json.gz",
+    "original_sha256": "969413fb24af97d6966c1f1f652e4b0b9c8e27ab735780325b38d26f2d7c21c5",
+    "archive_sha256": "2ad88f4125cd53f18761b0d30272cccfc90faad27e14c1e12241b3dd87cb350a",
+    "bytes": 882,
+    "archive_bytes": 469
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-search-every4-audits.jsonl.gz",
+    "original_sha256": "43979ee6d0c2283c805b6a43056ca0bd4e7c38f67c3cace6d59dbbe8c5fa3575",
+    "archive_sha256": "f340c700b936adc1e888214aae571a85e2f55581e9a078b835e0312cb683e354",
+    "bytes": 7473,
+    "archive_bytes": 1848
+  },
+  {
+    "path": "results/scalar-large/tune/raw/tune-search-every4-updates.jsonl.gz",
+    "original_sha256": "aec1a6058d20418a082d03cfe3fdc564de62db7611c3577d3ca715eeb956639c",
+    "archive_sha256": "180a006cda3e4bb85caa69541b6c7eb54e256ea94e88622e7d9c658bb6155ff7",
+    "bytes": 120060,
+    "archive_bytes": 20143
+  }
+]
