@@ -71,6 +71,13 @@ def finalize_token_moments(metrics, dp_size=1):
         ss = raw["mirror/raw/importance_ratio/sum_sq"]
         result["mirror/importance_ess"] = dp_size * s * s / ss if ss else 0.0
         result["mirror/importance_ess_fraction"] = s * s / (count * ss) if ss else 0.0
+    # A pooled ratio of set-member counts is not the mean per-prefix Jaccard.
+    for name in names:
+        if name.startswith("overlap_") and name.endswith("_intersection_count"):
+            pair = name.removesuffix("_intersection_count")
+            intersection = raw[f"mirror/raw/{name}/sum"]
+            union = raw[f"mirror/raw/{pair}_union_count/sum"]
+            result[f"mirror/{pair}_pooled_jaccard"] = intersection / union if union else 0.0
     return result
 
 

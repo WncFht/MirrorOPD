@@ -7,7 +7,7 @@ import os
 import time
 from pathlib import Path
 
-from experiments.analysis.math_policy_coefficients import run_plots
+from experiments.analysis.math_training_review import render_review
 
 
 def snapshot_bpo(source, root):
@@ -50,18 +50,22 @@ def main():
         if completed != previous_outer:
             manifest = snapshot_bpo(args.source, args.output / "raw")
             staging = args.output / "rendering"
-            summary = run_plots(args.baseline_raw, args.output / "raw", staging)
-            figures = args.output / "figures"
-            figures.mkdir(exist_ok=True)
-            for artifact in staging.iterdir():
-                artifact.replace(figures / artifact.name)
+            summary = render_review(
+                args.baseline_raw, args.output / "raw", staging, include_wandb=False
+            )
+            for area in ["figures", "tables"]:
+                target = args.output / area
+                target.mkdir(exist_ok=True)
+                for artifact in (staging / area).iterdir():
+                    artifact.replace(target / artifact.name)
+            (staging / "figure-manifest.json").replace(args.output / "figure-manifest.json")
             snapshot_rows = [
                 json.loads(s)
                 for s in (args.output / "raw" / args.source.name / "outer.jsonl")
                 .read_text()
                 .splitlines()
             ]
-            completed = summary["methods"]["BPO"]["available_outer_count"]
+            completed = summary["methods"]["BPO"]["completed_outer"]
             state = {
                 "watcher_pid": os.getpid(),
                 "updated_unix": time.time(),
@@ -72,7 +76,7 @@ def main():
                 "training_exited": training_exited,
                 "training_exit_code": int(exit_path.read_text()) if training_exited else None,
                 "snapshot": manifest,
-                "coefficient_summary": summary,
+                "review_summary": summary,
             }
             temporary = args.output / "status.json.tmp"
             temporary.write_text(json.dumps(state, indent=2) + "\n")

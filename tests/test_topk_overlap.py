@@ -23,6 +23,14 @@ def main():
     )
     for key, value in topk_pair_overlap(left.flip(-1), right.flip(-1), "student_teacher").items():
         torch.testing.assert_close(value, expected[key])
+    # One identical and one disjoint prefix: mean Jaccard=.5, pooled=1/3.
+    pair = topk_pair_overlap(
+        left.repeat(2, 1), torch.tensor([[1, 2, 3, 4], [5, 6, 7, 8]]), "student_teacher"
+    )
+    raw = token_moments(pair, torch.ones(2, dtype=torch.bool))
+    pooled = finalize_token_moments({key: value for key, (_, value) in raw.items()})
+    assert pooled["mirror/overlap_student_teacher_jaccard/mean"] == 0.5
+    assert abs(pooled["mirror/overlap_student_teacher_pooled_jaccard"] - 1 / 3) < 1e-12
 
     torch.manual_seed(73)
     anchor, teacher, student = (torch.randn(2, 5, 6) for _ in range(3))

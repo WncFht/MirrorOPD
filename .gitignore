@@ -54,3 +54,6 @@ scratch/
 # Follow-up immutable BPO and historical baseline inputs restore with make data.
 /results/training/math-4gpu/followup-20261012/raw/dapo-*/
 /results/training/math-4gpu/followup-20261012/raw/baseline-*/
+
+# Immutable review input logs restore with make data.
+/results/training/math-4gpu/review-20261012/raw/dapo-*/

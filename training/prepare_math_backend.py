@@ -34,7 +34,8 @@ def main():
                 "sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
             }
         )
-    output = repo / "results/training/math-4gpu/reward-integration.json"
+    # Backend-specific evidence must not replace the frozen experiment audit.
+    output = backend / "mirroropd-verifier-integration.json"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(records, indent=2) + "\n")
     print(f"Verified {len(records)} math verifier modules")

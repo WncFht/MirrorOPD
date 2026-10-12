@@ -1,0 +1,72 @@
+[
+  {
+    "id": "01-quality-budgets",
+    "scope": "outer",
+    "quantities": "mean correctness",
+    "axes": "rollouts, updates, training minutes",
+    "generated": true
+  },
+  {
+    "id": "02-outer-learning",
+    "scope": "outer",
+    "quantities": "teacher TA KL, sampled KL, verifier, entropy, length, clipping",
+    "axes": "frozen k",
+    "generated": true
+  },
+  {
+    "id": "03-outer-optimization",
+    "scope": "outer",
+    "quantities": "coefficient RMS, gradient, anchor KL, ESS, overlap",
+    "axes": "frozen k",
+    "generated": true
+  },
+  {
+    "id": "04-inner-progress",
+    "scope": "inner",
+    "quantities": "coefficient RMS, gradient, anchor KL, objective estimate",
+    "axes": "pre-update n",
+    "generated": true
+  },
+  {
+    "id": "05-inner-heatmaps",
+    "scope": "inner",
+    "quantities": "RMS and gradient relative to own n=0; anchor KL",
+    "axes": "(k,n)",
+    "generated": true
+  },
+  {
+    "id": "06-is-ess",
+    "scope": "outer and inner",
+    "quantities": "ESS deficit, ratio extrema, weight std and U RMS",
+    "axes": "k and n",
+    "generated": true
+  },
+  {
+    "id": "07-generation-budget",
+    "scope": "outer",
+    "quantities": "test response tokens and budget exhaustion",
+    "axes": "completed outer",
+    "generated": true
+  },
+  {
+    "id": "08-resources",
+    "scope": "resources",
+    "quantities": "exclusive top-level seconds, training time, device memory/utilization",
+    "axes": "k and wall time",
+    "generated": true
+  },
+  {
+    "id": "09-log-semantics",
+    "scope": "logging",
+    "quantities": "SDK steps and duplicate-x center sources",
+    "axes": "actual W&B axes",
+    "generated": true
+  },
+  {
+    "id": "10-reference-protocol",
+    "scope": "evaluation",
+    "quantities": "historical student/teacher mean@16",
+    "axes": "separate T=.7,p=.9,L=31744 protocol",
+    "generated": true
+  }
+]

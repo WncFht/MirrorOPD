@@ -1,0 +1,22 @@
+{
+  "make_test": "passed",
+  "key_cpu_tests_on_training_torch_2_7_1": "passed",
+  "combined_patch_reverse_check": "passed",
+  "combined_patch_files": 18,
+  "active_backend_modified": false,
+  "idle_backend_ready": "runs/backend-integration-next",
+  "new_gpu_evaluation_executed": false,
+  "fixed_bpo_completed_outer": 26,
+  "fixed_bpo_updates": 416,
+  "fixed_bpo_evaluation_latest": 25,
+  "curated_figure_groups": 10,
+  "archived_figure_groups": 40,
+  "report_and_spec_links": "verified",
+  "json_examples": "parsed",
+  "topj_macro_vs_pooled_jaccard": "verified",
+  "logging_snapshot_aggregate_and_changed_epochs": "verified",
+  "new_math_validation_570_by_16": "verified on CPU",
+  "new_raw_archives": 12,
+  "make_check": "passed",
+  "pooled_jaccard_and_changed_epochs_cpu_regressions": "passed"
+}

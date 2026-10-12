@@ -15,8 +15,9 @@ export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export MIRROR_MONITOR_GPU_IDS=0,1,2,3
 export RAY_ADDRESS=local
-export MIRROR_RAY_TMPDIR=/tmp/mopd-math-ray
-export MIRROR_TMPDIR=/tmp/mopd-math-tmp
+export MIRROR_RAY_TMPDIR="$repo_root/runs/math-4gpu-runtime/ray"
+export MIRROR_TMPDIR="$repo_root/runs/math-4gpu-runtime/tmp"
+mkdir -p "$MIRROR_RAY_TMPDIR" "$MIRROR_TMPDIR"
 # Ray invokes the engine from a background thread. vLLM 0.10 otherwise
 # auto-falls back to V0, whereas the deployed server uses V1 AsyncLLM.
 export VLLM_USE_V1=1

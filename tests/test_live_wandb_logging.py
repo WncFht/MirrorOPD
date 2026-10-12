@@ -54,9 +54,9 @@ def test_inner_records_are_uploaded_incrementally(tmp_path: Path):
     assert logger.log_inner_records(path) == 0
     logger.log({"actor/lr": 1e-6}, step=1)
     assert [step for step, _ in wandb.run.logged] == [1, 2]
-    assert wandb.run.logged[0][1]["00_axes/inner_update"] == 16
+    assert wandb.run.logged[0][1]["00_axes/inner_update"] == 0
     assert wandb.run.logged[0][1]["00_axes/outer_rollout_step"] == 1
-    assert wandb.run.logged[0][1]["04_kl_centers/outer_teacher_center/mean"] == 0.4
+    assert wandb.run.logged[0][1]["04_kl_centers/rollout_teacher_center/mean"] == 0.4
     assert wandb.run.logged[1][1]["00_axes/outer_step"] == 1
 
 
@@ -74,8 +74,62 @@ def test_test_metrics_keep_outer_axis_after_inner_uploads(tmp_path: Path):
     assert first["01_quality/generated_examples"] == 1319
     assert "00_axes/evaluation_outer" not in training
     assert last["00_axes/evaluation_outer"] == 5
-    assert ("01_quality/*", {"step_metric": "00_axes/evaluation_outer"}) in wandb.run.axes
+    assert (
+        "01_quality/*",
+        {"step_metric": "00_axes/evaluation_outer", "step_sync": False},
+    ) in wandb.run.axes
     assert [step for step, _ in wandb.run.logged] == [1, 2, 3]
+
+
+def test_rollout_snapshot_does_not_share_aggregate_names(tmp_path):
+    wandb = FakeWandb()
+    logger = WandbLogger(wandb, {})
+    path = tmp_path / "inner.jsonl"
+    path.write_text(
+        json.dumps(
+            {
+                "outer_call": 0,
+                "inner_step": 0,
+                "epochs": 16,
+                "metrics": {"mirror/student_center/mean": 0.0},
+            }
+        )
+        + "\n"
+    )
+    logger.log_inner_records(path)
+    logger.log({"actor/mirror/student_center/mean": 0.00048}, step=1)
+    snapshot, aggregate = [payload for _, payload in wandb.run.logged]
+    assert snapshot["04_kl_centers/rollout_student_center/mean"] == 0
+    assert aggregate["04_kl_centers/aggregate_student_center/mean"] == 0.00048
+    assert "04_kl_centers/rollout_student_center/mean" not in aggregate
+    assert "00_axes/outer_rollout_step" not in aggregate
+    assert all(
+        kwargs.get("step_sync") is False for _, kwargs in wandb.run.axes if "step_metric" in kwargs
+    )
+
+
+def test_real_update_axis_survives_changed_epochs_and_multiple_minibatches(tmp_path):
+    wandb = FakeWandb()
+    logger = WandbLogger(wandb, {})
+    path = tmp_path / "inner.jsonl"
+    records = [
+        {
+            "outer_call": k,
+            "inner_step": n,
+            "epochs": epochs,
+            "metrics": {"mirror/student_center/mean": 0},
+        }
+        for k, epochs, updates in [(0, 1, 2), (1, 3, 6)]
+        for n in range(updates)
+    ]
+    path.write_text("\n".join(json.dumps(r) for r in records) + "\n")
+    logger.log_inner_records(path)
+    assert [data["00_axes/inner_update"] for _, data in wandb.run.logged] == list(range(8))
+    logger.log({"timing_s/step": 11.0}, step=2)
+    logger.log({"val-core/MATH-500/acc/mean@16": 0.6}, step=2)
+    last = wandb.run.logged[-1][1]
+    assert last["00_axes/updates_completed"] == 8
+    assert last["00_axes/training_seconds"] == 11.0
 
 
 def test_failure_recovery_skips_uploaded_rows_and_preserves_failure(tmp_path, monkeypatch):

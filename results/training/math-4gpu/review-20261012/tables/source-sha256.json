@@ -1,0 +1,11 @@
+{
+  "results/training/math-4gpu/audit-20261012/raw/dapo-deepseek-opd-o50-j1/inner.jsonl": "a571b76542862bc1ded1224b965b68505832d3a4afb267735435b22a64e3af2e",
+  "results/training/math-4gpu/audit-20261012/raw/dapo-deepseek-opd-o50-j1/outer.jsonl": "456b05d4d1900be8ea1c95ff0935938b0755b0dea1679cff8ef584041abc5a13",
+  "results/training/math-4gpu/audit-20261012/raw/dapo-deepseek-opd-o50-j1/gpu.csv": "8669eee1ae4e19a76c4254b81b8326f6f95382b499909e249f5fa67173b9a184",
+  "results/training/math-4gpu/audit-20261012/raw/dapo-deepseek-mdpo-o50-j16/inner.jsonl": "6d020d1c8ace62a097f1ba58e1fa76e05ff5fc0a852337a5a05acae5576bd1c1",
+  "results/training/math-4gpu/audit-20261012/raw/dapo-deepseek-mdpo-o50-j16/outer.jsonl": "ec75d0ba52a5ed562d39a7185a1cf3b96b21deddf0d82f16999d956291c6ef17",
+  "results/training/math-4gpu/audit-20261012/raw/dapo-deepseek-mdpo-o50-j16/gpu.csv": "8c36274fd33909dbad5c2b18b3ed7fa8778ed0453102b5746ac79fa396e5ed74",
+  "results/training/math-4gpu/review-20261012/raw/dapo-deepseek-bpo-o50-j16/inner.jsonl": "b9b6fb29c644f57a403fe98dd2cad9f27b04d2994009de4ee17e595407747801",
+  "results/training/math-4gpu/review-20261012/raw/dapo-deepseek-bpo-o50-j16/outer.jsonl": "1d0392844b4d6ffb555493dc1ba798bad10e86bb902b12209e615e2695d4fe7c",
+  "results/training/math-4gpu/review-20261012/raw/dapo-deepseek-bpo-o50-j16/gpu.csv": "b31ba98f577e47a1fef794c382373b7e535f815e74c64737075503ad3f0f980a"
+}

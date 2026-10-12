@@ -11,7 +11,13 @@ def main():
     parser.add_argument("--entity", default="wncfht")
     parser.add_argument("--project", default="mirror-opd-pythia")
     parser.add_argument("--url", help="Update this saved workspace instead of creating a view")
-    parser.add_argument("--quality", choices=("independent", "gsm8k"), default="independent")
+    parser.add_argument(
+        "--quality", choices=("independent", "gsm8k", "math"), default="independent"
+    )
+    parser.add_argument(
+        "--quality-axis", choices=("outer", "updates", "training-time"), default="outer"
+    )
+    parser.add_argument("--samples", type=int, default=16, help="Math responses per question")
     args = parser.parse_args()
     groups = [
         (
@@ -105,6 +111,33 @@ def main():
                 "01_quality/val-aux/openai/gsm8k/response_tokens/mean@1",
                 "01_quality/generated_examples",
             ],
+        )
+    if args.quality == "math":
+        axis = {
+            "outer": "00_axes/evaluation_outer",
+            "updates": "00_axes/updates_completed",
+            "training-time": "00_axes/training_seconds",
+        }[args.quality_axis]
+        groups[0] = (
+            f"01 Quality - math mean@{args.samples}; {args.quality_axis} budget",
+            axis,
+            [
+                f"01_quality/val-core/{name}/acc/mean@{args.samples}"
+                for name in ["MATH-500", "AMC23", "AIME25"]
+            ]
+            + [
+                f"01_quality/val-aux/{name}/budget_exhausted/mean@{args.samples}"
+                for name in ["MATH-500", "AMC23", "AIME25"]
+            ]
+            + ["01_quality/generated_examples", "01_quality/unique_questions"],
+        )
+        groups[5][2].extend(
+            [
+                "06_support_mass/inner_overlap_student_teacher_intersection_fraction/mean",
+                "06_support_mass/inner_overlap_student_teacher_jaccard/mean",
+                "06_support_mass/inner_overlap_student_anchor_intersection_fraction/mean",
+                "06_support_mass/inner_overlap_anchor_teacher_intersection_fraction/mean",
+            ]
         )
     workspace = (
         Workspace.from_url(args.url)

@@ -128,27 +128,15 @@ with tempfile.TemporaryDirectory() as scratch:
     logger.log_inner_records(first_batch)
 first_outer = json.loads(outer_lines[1])
 logger.log(first_outer["data"], first_outer["step"])
-key = "04_kl_centers/outer_student_center/mean"
-evidence = [item for item in logger_backend.payloads if key in item["payload"]]
-assert len(evidence) == 2
-assert evidence[0]["payload"]["00_axes/outer_rollout_step"] == 0
-assert "00_axes/outer_rollout_step" not in evidence[1]["payload"]
-assert abs(evidence[0]["payload"][key]) < 1e-6
-assert evidence[1]["payload"][key] > 1e-4
-evidence = [
-    {
-        "sdk_step": item["sdk_step"],
-        "payload": {
-            key: item["payload"][key],
-            "00_axes/outer_rollout_step": item["payload"].get("00_axes/outer_rollout_step"),
-            "00_axes/outer_step": item["payload"].get("00_axes/outer_step"),
-        },
-    }
-    for item in evidence
-]
-(target / "logger-payload-collision.json").write_text(json.dumps(evidence, indent=2) + "\n")
-print(
-    json.dumps(
-        {"BPO": rows, "first_snapshot": evidence[0], "outer_aggregate": evidence[-1]}, indent=2
-    )
-)
+snapshot_key = "04_kl_centers/rollout_student_center/mean"
+aggregate_key = "04_kl_centers/aggregate_student_center/mean"
+snapshots = [item for item in logger_backend.payloads if snapshot_key in item["payload"]]
+aggregates = [item for item in logger_backend.payloads if aggregate_key in item["payload"]]
+assert len(snapshots) == len(aggregates) == 1
+assert snapshots[0]["payload"]["00_axes/outer_rollout_step"] == 0
+assert "00_axes/outer_rollout_step" not in aggregates[0]["payload"]
+assert abs(snapshots[0]["payload"][snapshot_key]) < 1e-6
+assert aggregates[0]["payload"][aggregate_key] > 1e-4
+evidence = {"snapshot": snapshots[0], "aggregate": aggregates[0], "same_metric_name": False}
+(target / "logger-current-axis-audit.json").write_text(json.dumps(evidence, indent=2) + "\n")
+print(json.dumps({"BPO": rows, "current_logger_scopes": evidence}, indent=2))

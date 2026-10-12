@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from mirroropd.training.tracking import configure_wandb, grouped_metrics
+from mirroropd.training.tracking import configure_wandb, grouped_metrics, metric_name
 
 
 def main():
@@ -57,7 +57,15 @@ def main():
             internal_step += 1
             payload = {
                 "00_axes/outer_step": record["step"],
-                **grouped_metrics(record["data"], "outer"),
+                **{
+                    metric_name(
+                        key,
+                        "aggregate"
+                        if key.startswith("actor/mirror/") or key == "actor/grad_norm"
+                        else "outer",
+                    ): value
+                    for key, value in record["data"].items()
+                },
             }
             if any(
                 key.startswith(("val-core/", "val-aux/", "evaluation/")) for key in record["data"]
@@ -76,7 +84,7 @@ def main():
             {
                 "00_axes/inner_update": index,
                 "00_axes/inner_outer": record["outer_call"],
-                "00_axes/inner_epoch_index": record["inner_step"],
+                "00_axes/inner_step_index": record["inner_step"],
                 **grouped_metrics(record["metrics"], "inner"),
             },
             step=internal_step,

@@ -27,7 +27,10 @@ def main():
     run = FakeRun()
     configure_wandb(run, {})
     assert run.summary["setting/topk"] == 16, "Publishing must preserve settings"
-    assert ("01_quality/*", {"step_metric": "00_axes/evaluation_outer"}) in run.axes
+    assert (
+        "01_quality/*",
+        {"step_metric": "00_axes/evaluation_outer", "step_sync": False},
+    ) in run.axes
     print("W&B grouping preserves all metrics and separates inner/evaluation axes")
 
 

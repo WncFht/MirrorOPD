@@ -64,9 +64,11 @@ def configure_wandb(run, config: dict) -> None:
     """Define axes and record a resumable reference without exposing credentials."""
     run.define_metric("00_axes/outer_step")
     run.define_metric("00_axes/inner_update")
+    run.define_metric("00_axes/updates_completed")
+    run.define_metric("00_axes/training_seconds")
     run.define_metric("00_axes/evaluation_outer")
     run.define_metric("00_axes/inner_outer")
-    run.define_metric("00_axes/inner_epoch_index")
+    run.define_metric("00_axes/inner_step_index")
     run.define_metric("00_axes/outer_rollout_step")
     for category in (
         "02_offpolicy",
@@ -78,17 +80,21 @@ def configure_wandb(run, config: dict) -> None:
         "08_rollout",
         "90_detail_extrema",
     ):
-        run.define_metric(f"{category}/outer_*", step_metric="00_axes/outer_step")
-        run.define_metric(f"{category}/inner_*", step_metric="00_axes/inner_update")
-    run.define_metric("09_resources/*", step_metric="00_axes/outer_step")
-    run.define_metric("99_framework/*", step_metric="00_axes/outer_step")
-    run.define_metric("01_quality/*", step_metric="00_axes/evaluation_outer")
-    run.define_metric("03_optimization/learning_rate", step_metric="00_axes/outer_step")
+        run.define_metric(f"{category}/outer_*", step_metric="00_axes/outer_step", step_sync=False)
+        run.define_metric(
+            f"{category}/aggregate_*", step_metric="00_axes/outer_step", step_sync=False
+        )
+        run.define_metric(
+            f"{category}/inner_*", step_metric="00_axes/inner_update", step_sync=False
+        )
+        run.define_metric(
+            f"{category}/rollout_*", step_metric="00_axes/outer_rollout_step", step_sync=False
+        )
+    run.define_metric("09_resources/*", step_metric="00_axes/outer_step", step_sync=False)
+    run.define_metric("99_framework/*", step_metric="00_axes/outer_step", step_sync=False)
+    run.define_metric("01_quality/*", step_metric="00_axes/evaluation_outer", step_sync=False)
     run.define_metric(
-        "04_kl_centers/outer_teacher_center/*", step_metric="00_axes/outer_rollout_step"
-    )
-    run.define_metric(
-        "04_kl_centers/outer_student_center/*", step_metric="00_axes/outer_rollout_step"
+        "03_optimization/learning_rate", step_metric="00_axes/outer_step", step_sync=False
     )
     loss = config.get("distillation", {}).get("distillation_loss", {})
     if loss:
@@ -122,13 +128,29 @@ class WandbLogger:
         # inner write from making a later outer write non-monotone.
         self._internal_step = max(int(getattr(wandb_module.run, "step", 0) or 0), 0)
         self._inner_records_seen = 0
+        self._training_seconds = 0.0
 
     def log(self, data, step):
         self._internal_step += 1
+        if "timing_s/step" in data:
+            self._training_seconds += float(data["timing_s/step"])
         evaluation_keys = tuple(
             key for key in data if key.startswith(("val-core/", "val-aux/", "evaluation/"))
         )
-        payload = {"00_axes/outer_step": step, **grouped_metrics(data, "outer")}
+        payload = {
+            "00_axes/outer_step": step,
+            "00_axes/updates_completed": self._inner_records_seen,
+            "00_axes/training_seconds": self._training_seconds,
+            **{
+                metric_name(
+                    key,
+                    "aggregate"
+                    if key.startswith("actor/mirror/") or key == "actor/grad_norm"
+                    else "outer",
+                ): value
+                for key, value in data.items()
+            },
+        }
         if evaluation_keys:
             payload["00_axes/evaluation_outer"] = step
         self.wandb.log(
@@ -158,23 +180,26 @@ class WandbLogger:
             self._internal_step += 1
             outer_call = int(record.get("outer_call", 0))
             inner_step = int(record.get("inner_step", 0))
-            epochs = int(record.get("epochs", 1))
-            inner_update = outer_call * epochs + inner_step
+            # One rank-zero record follows each completed optimizer update.
+            # Its forward measured the policy after `index` previous updates;
+            # epochs is not an update count when mini-batches or N change.
+            inner_update = index
             payload = {
                 "00_axes/inner_update": inner_update,
+                "00_axes/updates_completed": inner_update,
                 "00_axes/inner_outer": outer_call,
-                "00_axes/inner_epoch_index": inner_step,
+                "00_axes/inner_step_index": inner_step,
                 **grouped_metrics(record.get("metrics", {}), "inner"),
             }
             # The first inner record is evaluated against the frozen rollout
             # cache before the update. Keep this outer snapshot on its own
-            # axis, including outer=0, instead of making it an inner-only point.
+            # axis, including outer=0, with its own metric names. Aggregates
+            # never write these names, and axes never silently carry forward.
             if inner_step == 0:
                 metrics = record.get("metrics", {})
                 payload["00_axes/outer_rollout_step"] = outer_call
                 for key, value in metrics.items():
-                    if key.startswith(("mirror/teacher_center/", "mirror/student_center/")):
-                        payload[metric_name(key, "outer")] = value
+                    payload[metric_name(key, "rollout")] = value
             self.wandb.log(
                 payload,
                 step=self._internal_step,

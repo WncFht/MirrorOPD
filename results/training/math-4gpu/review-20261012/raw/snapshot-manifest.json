@@ -1,0 +1,54 @@
+{
+  "snapshot_unix": 1791767033.4917731,
+  "source": "runs/dapo-deepseek-bpo-o50-j16",
+  "files": {
+    "gpu.csv": {
+      "bytes": 1702305,
+      "sha256": "b31ba98f577e47a1fef794c382373b7e535f815e74c64737075503ad3f0f980a"
+    },
+    "host-memory.jsonl": {
+      "bytes": 2841097,
+      "sha256": "cacaa265b27450571aa8bbf336f410a8e6c375bf3c26bb10d6027d57530a58b7"
+    },
+    "inner.jsonl": {
+      "bytes": 1618947,
+      "sha256": "b9b6fb29c644f57a403fe98dd2cad9f27b04d2994009de4ee17e595407747801"
+    },
+    "model-data-audit.json": {
+      "bytes": 2367,
+      "sha256": "106d2aefdb853cabd6e170392b8d78d4074db04848985b09bf7d441b7bdd1186"
+    },
+    "outer.jsonl": {
+      "bytes": 218574,
+      "sha256": "1d0392844b4d6ffb555493dc1ba798bad10e86bb902b12209e615e2695d4fe7c"
+    },
+    "resolved-config.yaml": {
+      "bytes": 26468,
+      "sha256": "65157a9807bf1655ce9b9b80ec358b8dda949ce81cbf9619ac8e931dd8b1a219"
+    },
+    "setting.json": {
+      "bytes": 3669,
+      "sha256": "84419564a916c291fffc883d4e4c354fcf30373bcf2ee2ca4e47673a5e64a73f"
+    },
+    "source-commit.txt": {
+      "bytes": 41,
+      "sha256": "b038389f42d43f92719b573056a54e7c2d096016396639b05dda748f6f09643f"
+    },
+    "source-provenance.json": {
+      "bytes": 58249,
+      "sha256": "12174a0a771923e0d8a2e95664032b2159e3dd5d76d65bc673d1646e8facec59"
+    },
+    "wandb-history.jsonl": {
+      "bytes": 2395992,
+      "sha256": "c980a74e38a51a589783fc443d6b6d0fcc1f79017213d7dda564fa71b796f7c3"
+    },
+    "wandb-metadata.json": {
+      "bytes": 51821,
+      "sha256": "4ede5ae3ca8844004c7491214b1f8c87583ba28cb693339b405b80b40f2cda9e"
+    },
+    "wandb-run.json": {
+      "bytes": 163,
+      "sha256": "f5e3d5ba9a727f06bc628e3accd44279ba3d7dbbdb3e54cfeb0217b0aa112b4e"
+    }
+  }
+}
