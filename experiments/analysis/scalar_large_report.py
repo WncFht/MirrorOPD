@@ -70,6 +70,18 @@ def read_run(path):
         stable = last_bad + 1
         row[f"two_audits_{threshold}"] = int(updates[first]) if first is not None else None
         row[f"persistent_{threshold}"] = int(updates[stable]) if stable + 1 < len(updates) else None
+        for kind, index in (
+            ("two_audits", first),
+            ("persistent", stable if stable + 1 < len(updates) else None),
+        ):
+            point = points[index] if index is not None else None
+            prefix = f"{kind}_{threshold}"
+            for cost in ("backwards", "forwards", "backward_tokens", "forward_tokens"):
+                row[f"{prefix}_{cost}"] = point.get("counts", {}).get(cost) if point else None
+            row[f"{prefix}_seconds"] = point["seconds"] if point else None
+            row[f"{prefix}_previous_audit_update"] = (
+                int(updates[index - 1]) if index is not None and index > 0 else None
+            )
     return {"summary": summary, "points": points, "row": row, "ratios": values, "seconds": seconds}
 
 
@@ -127,7 +139,7 @@ def exact_sign_test(improvements):
     return sum(math.comb(n, k) for k in range(wins, n + 1)) / 2**n if n else 1.0
 
 
-def summarize(root, output, selection_path):
+def summarize(root, output, selection_path, *, expected_seeds=(42, 142, 242, 342, 442)):
     runs = rows_at(root)
     output.mkdir(parents=True, exist_ok=True)
     if not runs:
@@ -136,13 +148,21 @@ def summarize(root, output, selection_path):
         writer = csv.DictWriter(stream, fieldnames=list(runs[0]["row"]))
         writer.writeheader()
         writer.writerows(r["row"] for r in runs)
-    if selection_path is None or not selection_path.exists():
+    if selection_path is None:
         return
-    selection = json.loads(selection_path.read_text())
+    if isinstance(selection_path, dict):
+        selection = selection_path
+    else:
+        if not selection_path.exists():
+            return
+        selection = json.loads(selection_path.read_text())
+    expected_seeds = tuple(expected_seeds)
+    if not expected_seeds or len(set(expected_seeds)) != len(expected_seeds):
+        raise ValueError("expected seeds must be nonempty and unique")
     baseline_lr = selection["baseline_configs"][0]["lr"]
     candidate = selection["primary_scalar_config"]
     comparisons = []
-    for seed in (42, 142, 242, 342, 442):
+    for seed in expected_seeds:
         same_seed = [r for r in runs if r["row"]["seed"] == seed]
         baseline = next(
             (
@@ -198,16 +218,40 @@ def summarize(root, output, selection_path):
                 / baseline["row"]["validation_bpo"],
                 "validation_teacher_kl_ratio": scalar["row"]["validation_teacher_kl"]
                 / baseline["row"]["validation_teacher_kl"],
+                "baseline_costs": baseline["summary"]["counts"]
+                | {"seconds": baseline["summary"]["seconds"]},
+                "scalar_costs": scalar["summary"]["counts"]
+                | {"seconds": scalar["summary"]["seconds"]},
+                "threshold_costs": {
+                    str(threshold): {
+                        arm: {
+                            cost: run["row"][f"two_audits_{threshold}_{cost}"]
+                            for cost in (
+                                "backwards",
+                                "forwards",
+                                "seconds",
+                                "previous_audit_update",
+                            )
+                        }
+                        | {"update": run["row"][f"two_audits_{threshold}"]}
+                        for arm, run in (("baseline", baseline), ("scalar", scalar))
+                    }
+                    for threshold in (0.5, 0.2, 0.1, 0.01, 0.001)
+                },
             }
         )
     complete_pairs = [row for row in comparisons if row["status"] == "complete"]
     result = {
+        "expected_seeds": list(expected_seeds),
+        "missing_seeds": [
+            seed for seed in expected_seeds if seed not in {r["seed"] for r in comparisons}
+        ],
         "paired_seeds": len(complete_pairs),
         "observed_pairs": len(comparisons),
         "failed_pairs": len(comparisons) - len(complete_pairs),
         "comparisons": comparisons,
     }
-    if len(complete_pairs) == 5:
+    if len(complete_pairs) == len(expected_seeds):
         gains = [r["primary_geomean_gain"] for r in comparisons]
         times = [r["matched_time_gain"] for r in comparisons]
         result.update(
@@ -236,11 +280,12 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--select", action="store_true")
     parser.add_argument("--selection", type=Path)
+    parser.add_argument("--seeds", type=int, nargs="+", default=[42, 142, 242, 342, 442])
     args = parser.parse_args()
     if args.select:
         select_calibration(args.root, args.output)
     else:
-        summarize(args.root, args.output, args.selection)
+        summarize(args.root, args.output, args.selection, expected_seeds=args.seeds)
 
 
 if __name__ == "__main__":

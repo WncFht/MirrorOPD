@@ -103,6 +103,13 @@ def execute(phase, configurations):
     from experiments.plotting.plot_scalar_large import plot_phase
 
     plot_phase(ROOT / f"runs/scalar-large/{phase}", output / "figures")
+    if phase == "fullconfirm":
+        from experiments.analysis.scalar_full_pool_report import report
+
+        selection = json.loads(
+            (ROOT / "results/scalar-large/fullpool-lr-study/selection.json").read_text()
+        )
+        report(ROOT / "runs/scalar-large/fullconfirm", output / "comparisons", selection)
 
 
 def long_check(selection):

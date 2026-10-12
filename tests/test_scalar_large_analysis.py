@@ -3,7 +3,12 @@
 import json
 import math
 
-from experiments.analysis.scalar_large_report import exact_sign_test, read_run, select_calibration
+from experiments.analysis.scalar_large_report import (
+    exact_sign_test,
+    read_run,
+    select_calibration,
+    summarize,
+)
 from training.scalar_large_suite import base_config, confirmation_configs, tuning_configs
 
 
@@ -296,3 +301,83 @@ def test_feedback_winner_keeps_all_named_monitor_ablations():
         "ablate-monitor-sampled-scalar",
         "ablate-monitor-two-clusters-scalar",
     } <= names
+
+
+def test_threshold_costs_use_actual_audit_counters(tmp_path):
+    directory = fake_run(tmp_path, "counter-costs", "constant", 1)
+    path = directory / "audits.jsonl"
+    points = [json.loads(line) for line in path.read_text().splitlines()]
+    for point in points:
+        point["counts"] = {"backwards": point["update"] * 64, "forwards": point["update"] * 72}
+    path.write_text("".join(json.dumps(point) + "\n" for point in points))
+    row = read_run(directory)["row"]
+    assert row["persistent_0.5_backwards"] == 640
+    assert row["persistent_0.5_forwards"] == 720
+    assert row["persistent_0.5_seconds"] == 1
+    assert row["persistent_0.5_previous_audit_update"] == 0
+    assert row["persistent_0.1_backwards"] is None
+
+
+def full_confirmation_fixture(root, *, missing=None, failed=None):
+    for seed in (42, 142, 242):
+        methods = [("constant", 1), ("constant", 0.5), ("search", 2), ("feedback", 2)]
+        for index, (method, scale) in enumerate(methods):
+            if (seed, method) == missing:
+                continue
+            directory = fake_run(
+                root,
+                f"s{seed}-arm{index}",
+                method,
+                scale,
+                status="nonfinite" if (seed, method) == failed else "complete",
+            )
+            path = directory / "summary.json"
+            summary = json.loads(path.read_text())
+            summary["config"].update(
+                seed=seed, search_every=4 if method == "search" else 1, target_rate=0.01
+            )
+            path.write_text(json.dumps(summary))
+
+
+def test_full_confirmation_scores_both_candidates_and_locked_constants(tmp_path):
+    from experiments.analysis.scalar_full_pool_report import report
+
+    full_confirmation_fixture(tmp_path)
+    output = tmp_path / "report"
+    selection = {"baselines": [{"lr": 1e-6}, {"lr": 0.5e-6}]}
+    report(tmp_path, output, selection)
+    for method in ("search", "feedback"):
+        for baseline in (1, 2):
+            result = json.loads(
+                (output / f"{method}-vs-constant{baseline}/paired-confirmation.json").read_text()
+            )
+            assert result["paired_seeds"] == 3
+            assert result["missing_seeds"] == []
+            assert result["overall_success"]
+            assert result["one_sided_sign_p"] == 1 / 8
+    legacy = tmp_path / "legacy"
+    summarize(
+        tmp_path,
+        legacy,
+        {
+            "baseline_configs": [{"lr": 1e-6}],
+            "primary_scalar_config": {"method": "feedback", "search_every": 1, "target_rate": 0.01},
+        },
+    )
+    result = json.loads((legacy / "paired-confirmation.json").read_text())
+    assert result["missing_seeds"] == [342, 442]
+    assert "overall_success" not in result
+
+
+def test_missing_and_failed_full_confirmation_do_not_pass(tmp_path):
+    from experiments.analysis.scalar_full_pool_report import report
+
+    full_confirmation_fixture(tmp_path, missing=(142, "search"), failed=(242, "feedback"))
+    output = tmp_path / "report"
+    report(tmp_path, output, {"baselines": [{"lr": 1e-6}, {"lr": 0.5e-6}]})
+    search = json.loads((output / "search-vs-constant1/paired-confirmation.json").read_text())
+    feedback = json.loads((output / "feedback-vs-constant1/paired-confirmation.json").read_text())
+    assert search["missing_seeds"] == [142]
+    assert "overall_success" not in search
+    assert feedback["failed_pairs"] == 1
+    assert "overall_success" not in feedback
