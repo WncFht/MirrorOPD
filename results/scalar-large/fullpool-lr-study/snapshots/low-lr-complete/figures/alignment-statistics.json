@@ -1,0 +1,122 @@
+{
+  "anchor_step": 60,
+  "anchor_u": 30,
+  "runs": [
+    {
+      "id": "fullpilot-lr1.25e-07",
+      "windows": [
+        {
+          "start": 0,
+          "end": 30,
+          "grad_norm_median": 1.0108922719955444,
+          "clipped_updates": 0
+        },
+        {
+          "start": 30,
+          "end": 60,
+          "grad_norm_median": 0.2759192883968353,
+          "clipped_updates": 0
+        },
+        {
+          "start": 60,
+          "end": 100,
+          "grad_norm_median": 0.08613443747162819,
+          "clipped_updates": 0
+        },
+        {
+          "start": 140,
+          "end": 240,
+          "grad_norm_median": 0.01300550950691104,
+          "clipped_updates": 0
+        }
+      ]
+    },
+    {
+      "id": "fullpilot-lr1e-06",
+      "windows": [
+        {
+          "start": 0,
+          "end": 30,
+          "grad_norm_median": 0.26428842544555664,
+          "clipped_updates": 0
+        },
+        {
+          "start": 30,
+          "end": 60,
+          "grad_norm_median": 0.038545118644833565,
+          "clipped_updates": 0
+        },
+        {
+          "start": 60,
+          "end": 100,
+          "grad_norm_median": 0.0067502937745302916,
+          "clipped_updates": 0
+        },
+        {
+          "start": 140,
+          "end": 240,
+          "grad_norm_median": 0.0004955549084115773,
+          "clipped_updates": 0
+        }
+      ]
+    },
+    {
+      "id": "fullpilot-lr2.5e-07",
+      "windows": [
+        {
+          "start": 0,
+          "end": 30,
+          "grad_norm_median": 0.5086834877729416,
+          "clipped_updates": 0
+        },
+        {
+          "start": 30,
+          "end": 60,
+          "grad_norm_median": 0.06275776773691177,
+          "clipped_updates": 0
+        },
+        {
+          "start": 60,
+          "end": 100,
+          "grad_norm_median": 0.019821034744381905,
+          "clipped_updates": 0
+        },
+        {
+          "start": 140,
+          "end": 240,
+          "grad_norm_median": 0.0032813074067234993,
+          "clipped_updates": 0
+        }
+      ]
+    },
+    {
+      "id": "fullpilot-lr5e-07",
+      "windows": [
+        {
+          "start": 0,
+          "end": 30,
+          "grad_norm_median": 0.3255906254053116,
+          "clipped_updates": 0
+        },
+        {
+          "start": 30,
+          "end": 60,
+          "grad_norm_median": 0.04515940137207508,
+          "clipped_updates": 0
+        },
+        {
+          "start": 60,
+          "end": 100,
+          "grad_norm_median": 0.008723343722522259,
+          "clipped_updates": 0
+        },
+        {
+          "start": 140,
+          "end": 240,
+          "grad_norm_median": 0.0011286814115010202,
+          "clipped_updates": 0
+        }
+      ]
+    }
+  ]
+}
