@@ -182,15 +182,13 @@ def write_record(path, record, wandb_run=None):
         with path.open("a") as handle:
             handle.write(json.dumps(record, allow_nan=False) + "\n")
         if wandb_run is not None:
-            scope = (
-                "train"
-                if path.name == "updates.jsonl"
-                else "native_final"
-                if path.name == "native-final.jsonl"
-                else "fixed_native"
-                if path.name == "fixed-native.jsonl"
-                else "fixed_fp32"
-            )
+            scope = {
+                "updates.jsonl": "train",
+                "native-final.jsonl": "native_final",
+                "fixed-native.jsonl": "fixed_native",
+                "diagnostics.jsonl": "fixed_fp32",
+                "inner-window-final.jsonl": "window_final",
+            }[path.name]
             update = record["update_before"] if scope == "train" else record["update"]
             payload = {scope + "/optimizer_updates": update}
             for key, value in record["metrics"].items():
@@ -339,6 +337,9 @@ def step_update(model, optimizer, sequences, config, *, measure_distribution):
                 values["anchor_teacher_tail_kl"] = float(
                     cache["mirror_teacher_center"][positions].double().sum()
                 )
+                values["anchor_tail_mass"] = float(
+                    cache["mirror_anchor_tail_log_prob"][positions].double().exp().sum()
+                )
                 for key, value in values.items():
                     measured[key] = measured.get(key, 0.0) + value
             (loss.sum() * (dist.get_world_size() / total_tokens)).backward()
@@ -364,7 +365,20 @@ def step_update(model, optimizer, sequences, config, *, measure_distribution):
         n * merged["mirror/raw/importance_ratio/sum_sq"]
     )
     if measure_distribution:
-        metrics["native_reservoir"] = reduce_sums(measured)
+        diagnostic = reduce_sums(measured)
+        diagnostic["student_tail_kl_contribution"] = (
+            diagnostic["anchor_student_full_kl"] - diagnostic["anchor_student_tail_kl"]
+        )
+        diagnostic["teacher_tail_kl_contribution"] = (
+            diagnostic["anchor_teacher_full_kl"] - diagnostic["anchor_teacher_tail_kl"]
+        )
+        diagnostic["student_tail_conditional_kl_mass_weighted"] = (
+            diagnostic["student_tail_kl_contribution"] / diagnostic["anchor_tail_mass"]
+        )
+        diagnostic["teacher_tail_conditional_kl_mass_weighted"] = (
+            diagnostic["teacher_tail_kl_contribution"] / diagnostic["anchor_tail_mass"]
+        )
+        metrics["native_reservoir"] = diagnostic
     inspected = {
         name: (parameter, parameter.detach().clone())
         for name, parameter in model.named_parameters()
@@ -476,7 +490,7 @@ def train(root, output, cache_dir, config):
             dir=str(output),
             resume="allow",
         )
-        for scope in ("train", "fixed_fp32", "fixed_native", "native_final"):
+        for scope in ("train", "fixed_fp32", "fixed_native", "native_final", "window_final"):
             wandb_run.define_metric(scope + "/optimizer_updates")
             wandb_run.define_metric(
                 scope + "/*", step_metric=scope + "/optimizer_updates", step_sync=False
@@ -540,6 +554,21 @@ def train(root, output, cache_dir, config):
             },
             wandb_run,
         )
+        if config["anchor_interval"] and (update + 1) % config["anchor_interval"] == 0:
+            write_record(
+                output / "inner-window-final.jsonl",
+                {
+                    "update": update + 1,
+                    "outer_window": update // config["anchor_interval"],
+                    "inner_updates_completed": config["anchor_interval"],
+                    "effective_time": config["lr"] / 1e-6 * (update + 1),
+                    "measurement": "native-current-window-target-post-update-before-anchor-reset",
+                    "metrics": evaluate_fixed(
+                        model, sequences, precision, config["eta"], native=True
+                    ),
+                },
+                wandb_run,
+            )
         if (update + 1) % config["diagnostic_every"] == 0 or update + 1 == config["updates"]:
             record_fixed_readouts(
                 model, diagnostic_sequences, config, output, update + 1, wandb_run

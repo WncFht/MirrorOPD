@@ -11,6 +11,15 @@ from pathlib import Path
 from training.gpu_exclusive import register_gpu_owner
 
 
+def file_digest(path):
+    """Hash a full model checkpoint without loading it into process memory."""
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def initialize_cpu_scorer():
     """Prevent scoring workers from opening CUDA contexts."""
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -114,6 +123,23 @@ def main():
                 "max_response_tokens": 7168,
                 "max_context_tokens": 9216,
                 "physical_gpu": args.rank,
+                "model_sha256": file_digest(args.model / "model.safetensors")
+                if args.rank == 0
+                else None,
+                "scoring_source_sha256": {
+                    name: file_digest(
+                        args.repo.parent
+                        / "backends/mirroropd-taopd/verl/verl/utils/reward_score"
+                        / name
+                    )
+                    for name in (
+                        "math_verify.py",
+                        "_timeout.py",
+                        "ttrl_mathverify.py",
+                        "ttrl_math/__init__.py",
+                        "ttrl_math/math_utils.py",
+                    )
+                },
             },
             indent=2,
         )

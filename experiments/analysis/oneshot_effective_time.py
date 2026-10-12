@@ -40,6 +40,11 @@ def collapse_statistics(arms):
     raw_dispersion = float(np.sqrt(np.mean(np.var(raw, axis=0))))
     effective_dispersion = float(np.sqrt(np.mean(np.var(effective, axis=0))))
     reduction = 1 - effective_dispersion / raw_dispersion if raw_dispersion else 0.0
+    full_grid = np.arange(30.0, 300.1, 1.0)
+    full_effective = np.stack(
+        [log_curve(arm["effective_time"], arm["distance"], full_grid) for arm in arms]
+    )
+    pair_spread = np.exp(np.max(full_effective, axis=0) - np.min(full_effective, axis=0)) - 1
     return {
         "grid_start": 30,
         "grid_end": 150,
@@ -50,7 +55,72 @@ def collapse_statistics(arms):
         "effective_geometric_max_min_ratio": float(
             np.exp(np.mean(np.max(effective, axis=0) - np.min(effective, axis=0)))
         ),
+        "full_effective_grid_start": 30,
+        "full_effective_grid_end": 300,
+        "effective_pair_relative_spread_max": float(pair_spread.max()),
+        "effective_pair_relative_spread_median": float(np.median(pair_spread)),
+        "preregistered_20_percent_pair_spread_passed": bool(np.all(pair_spread <= 0.2)),
     }
+
+
+def arm_diagnostics(arm, suite):
+    """Distinguish anchor displacement, current teacher distance, and window target error."""
+    config = arm["config"]
+    records = arm["records"]
+    native = arm["fixed_native"]
+    result = {
+        "initial_native_fixed": native[0]["metrics"],
+        "final_native_fixed": native[-1]["metrics"],
+        "initial_fp32_readout": arm["fixed_fp32"][0]["metrics"],
+        "final_fp32_readout": arm["fixed_fp32"][-1]["metrics"],
+        "first_step_anchor_kl": records[1]["metrics"]["student_center/mean"],
+        "final_preupdate_anchor_kl": records[-1]["metrics"]["student_center/mean"],
+        "clip_count": sum(record["metrics"]["grad_clip_scale"] < 1 for record in records),
+        "importance_ess_fraction_min": min(
+            record["metrics"]["importance_ess_fraction"] for record in records
+        ),
+        "importance_ratio_used_in_gradient": config["method"] == "mdpo",
+        "first_update_inspected_fp32_change_fraction": records[0]["metrics"][
+            "inspected_fp32_changed_fraction"
+        ],
+        "first_update_inspected_bf16_change_fraction": records[0]["metrics"][
+            "inspected_bf16_changed_fraction"
+        ],
+    }
+    if config["anchor_interval"]:
+        windows = history(suite / config["id"] / "inner-window-final.jsonl", "update")
+        assert [record["update"] for record in windows] == list(
+            range(config["anchor_interval"], config["updates"] + 1, config["anchor_interval"])
+        )
+        result["window_targets_after_full_inner_updates"] = [
+            {
+                "update": record["update"],
+                "current_teacher_kl": record["metrics"]["student_teacher_full_kl"],
+                "current_window_target_kl": record["metrics"]["mirror_target_full_kl"],
+                "current_window_anchor_kl": record["metrics"]["anchor_student_full_kl"],
+                "bpo_target_variance": record["metrics"]["bpo_target_variance"],
+            }
+            for record in windows
+        ]
+    return result
+
+
+def audit_evaluation(directory):
+    """Recompute accuracy from all paired question outputs, beyond completion markers."""
+    rows = [
+        json.loads(line)
+        for rank in range(4)
+        for line in (directory / f"rank-{rank}.jsonl").read_text().splitlines()
+    ]
+    assert len(rows) == 570
+    assert len({row["uid"] for row in rows}) == 570
+    summary = json.loads((directory / "summary.json").read_text())
+    for task, expected in (("MATH-500", 500), ("AMC23", 40), ("AIME25", 30)):
+        selected = [row for row in rows if row["task"] == task]
+        assert len(selected) == expected
+        assert summary[task]["correct"] == sum(row["correct"] for row in selected)
+        assert summary[task]["accuracy"] == sum(row["correct"] for row in selected) / expected
+    return summary
 
 
 def audit_completed_arm(suite, config):
@@ -58,6 +128,11 @@ def audit_completed_arm(suite, config):
     directory = suite / config["id"]
     records = history(directory / "updates.jsonl", "update_before")
     if not (directory / "completion.json").exists():
+        return None
+    attempts = sorted((suite / "attempts").glob(config["id"] + "-*"))
+    if not attempts or not (attempts[-1] / "exit.json").exists():
+        return None
+    if json.loads((attempts[-1] / "exit.json").read_text())["exit_code"] != 0:
         return None
     assert [record["update_before"] for record in records] == list(range(config["updates"]))
     final = history(directory / "native-final.jsonl", "update")[-1]
@@ -133,8 +208,38 @@ def main():
         "requested_optimizer_updates": sum(config["updates"] for config in plan),
         "completed_optimizer_updates": sum(arm["config"]["updates"] for arm in arms),
         "long_absorption": {},
+        "zero_lr_controls": {
+            identifier: {
+                "anchor_kl_mean_abs_max": max(
+                    abs(record["metrics"]["student_center/mean"]) for record in arm["records"]
+                ),
+                "anchor_kl_rms_max": max(
+                    record["metrics"]["student_center/rms"] for record in arm["records"]
+                ),
+                "inspected_parameter_change_fraction_max": max(
+                    record["metrics"]["inspected_fp32_changed_fraction"]
+                    for record in arm["records"]
+                ),
+                "native_distance_change": arm["distance"][-1] - arm["distance"][0],
+                "passed": all(
+                    abs(record["metrics"]["student_center/mean"]) < 1e-6
+                    and record["metrics"]["student_center/rms"] < 1e-5
+                    for record in arm["records"]
+                ),
+            }
+            for identifier, arm in lookup.items()
+            if arm["config"]["lr"] == 0
+        },
         "time_collapse": {},
         "evaluations": {},
+        "arm_diagnostics": {
+            identifier: arm_diagnostics(arm, args.suite) for identifier, arm in lookup.items()
+        },
+        "running_update_counts": {
+            config["id"]: len(history(args.suite / config["id"] / "updates.jsonl", "update_before"))
+            for config in plan
+            if config["id"] not in lookup
+        },
         "pending": [config["id"] for config in plan if config["id"] not in lookup],
     }
     for seed in (42, 142, 242):
@@ -169,7 +274,18 @@ def main():
     for path in sorted((args.suite / "evaluation").glob("*/summary.json")):
         completion = json.loads((path.parent / "completion.json").read_text())
         assert completion["unique_questions"] == 570
-        report["evaluations"][path.parent.name] = json.loads(path.read_text())
+        report["evaluations"][path.parent.name] = audit_evaluation(path.parent)
+    expected_evaluations = (
+        {f"initial-s{seed}" for seed in (42, 142, 242)}
+        | {"teacher"}
+        | {
+            config["id"] + f"-update{step}"
+            for config in plan
+            for step in config["checkpoint_steps"]
+        }
+    )
+    report["pending_evaluations"] = sorted(expected_evaluations - report["evaluations"].keys())
+    report["all_evaluations_complete"] = not report["pending_evaluations"]
     report["all_training_complete"] = len(arms) == len(plan)
     with (args.output / "native-distance.csv").open("w") as handle:
         writer = csv.writer(handle, lineterminator="\n")
