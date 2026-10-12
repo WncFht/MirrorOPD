@@ -1,0 +1,65 @@
+{
+  "a2_commit": "d6cf55ce2be5d9a525a602ed39afcd209498e1f0",
+  "torch": "2.6.0+cu124",
+  "q": [
+    0.550000011920929,
+    0.30000001192092896,
+    0.10000000149011612,
+    0.05000000074505806
+  ],
+  "proxy_expert": [
+    0.30000001192092896,
+    0.5,
+    0.15000000596046448,
+    0.05000000074505806
+  ],
+  "proxy_base": [
+    0.4000000059604645,
+    0.30000001192092896,
+    0.20000000298023224,
+    0.10000000149011612
+  ],
+  "candidate_ids": [
+    0,
+    1,
+    2
+  ],
+  "utility": [
+    -0.28768211603164673,
+    0.5108256340026855,
+    -0.28768205642700195
+  ],
+  "advantage": [
+    -0.1459875851869583,
+    0.17253077030181885,
+    -0.026543188840150833
+  ],
+  "advantage_sum": -3.725290298461914e-09,
+  "gradient_at_anchor": [
+    0.1459875851869583,
+    -0.17253077030181885,
+    0.026543188840150833,
+    -1.8626450382086546e-10
+  ],
+  "gradient_formula_max_error": 1.8626450382086546e-10,
+  "gradient_after_drift_no_clip": [
+    0.09754625707864761,
+    -0.10517741739749908,
+    0.013935171067714691,
+    -0.006304008886218071
+  ],
+  "token_importance": 0.13776716589927673,
+  "checks": [
+    "candidate weights sum to one with mass 0.95",
+    "state-centered contribution sums to zero",
+    "initial surrogate gradient equals minus contribution on selected ids",
+    "zero target-anchor displacement leaves nonzero proxy reward",
+    "off-anchor unclipped ratio creates nonzero unselected-token gradient"
+  ],
+  "validation": {
+    "make_check": "passed",
+    "test_mean_bpo": "passed: 48 random cases and Fisher dynamics",
+    "test_upstream_opd_semantics": "failed during AST extraction: unpatched local TA-OPD checkout lacks MirrorOPD integration functions; no BPO assertions executed",
+    "gpu_training": "not run"
+  }
+}
