@@ -218,6 +218,43 @@ def plot_curves(arms, output):
         plt.close(figure)
 
 
+def plot_precision_readouts(suite, config, output):
+    """Compare two readouts of identical weights on identical diagnostic positions."""
+    directory = suite / config["id"]
+    native = {row["update"]: row for row in history(directory / "fixed-native.jsonl", "update")}
+    fp32 = {row["update"]: row for row in history(directory / "diagnostics.jsonl", "update")}
+    shared = sorted(native.keys() & fp32.keys())
+    if len(shared) < 2 or config["precision"] != "bf16" or config["lr"] == 0:
+        return
+    figure, axes = plt.subplots(1, 2, figsize=(11, 4), constrained_layout=True)
+    for records, label, color in (
+        (native, "Training-precision policy", "#2166ac"),
+        (fp32, "FP32 readout of the same weights", "#b2182b"),
+    ):
+        for axis, metric in zip(
+            axes, ("student_teacher_full_kl", "fixed_action_abs_gap"), strict=True
+        ):
+            axis.plot(
+                shared,
+                [records[step]["metrics"][metric] for step in shared],
+                color=color,
+                label=label,
+            )
+            axis.set_yscale("log")
+            axis.set_xlim(left=0)
+            axis.set_xlabel("Optimizer updates")
+            axis.grid(True, alpha=0.2)
+    axes[0].set_ylabel("Full-vocabulary student-to-teacher KL")
+    axes[1].set_ylabel("Mean absolute gap on fixed sampled actions")
+    axes[0].legend(fontsize=8)
+    figure.suptitle(
+        config["id"] + (" / partial observations" if shared[-1] < config["updates"] else "")
+    )
+    figure.savefig(output / (config["id"] + "-readouts.png"), dpi=180)
+    figure.savefig(output / (config["id"] + "-readouts.pdf"))
+    plt.close(figure)
+
+
 def main():
     """Summarize completed arms; incomplete conditions remain explicitly pending."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -329,6 +366,8 @@ def main():
             )
     (args.output / "summary.json").write_text(json.dumps(report, indent=2) + "\n")
     plot_curves([lookup.get(curve["config"]["id"], curve) for curve in observed], args.output)
+    for config in plan:
+        plot_precision_readouts(args.suite, config, args.output)
     print(
         json.dumps(
             {"completed": len(arms), "requested": len(plan), "pending": len(report["pending"])}
