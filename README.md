@@ -41,7 +41,7 @@ make check
 
 ## 训练入口与当前证据
 
-固定监督下的全局标量学习率分析、精确 BPO 推导和 GPU 0–3 验证见 [BPO 标量调度分析与验证](docs/experiments/2026-10-12-BPO标量调度分析与验证.md)。报告区分完整目标与 sampled/Top-k 更新场，并同时记录 backward、forward、耗时和后期反弹。
+固定监督下的全局标量学习率分析、精确 BPO 推导和 GPU 0–3 验证见 [BPO 标量调度实验总报告](docs/experiments/2026-10-13-BPO标量调度实验总报告.md)。报告区分完整目标与 sampled/Top-k 更新场，并同时记录 backward、forward、耗时和后期反弹。
 
 当前数学实验使用 DeepSeek-R1-Distill-Qwen-1.5B 学生和 JustRL-DeepSeek-1.5B 教师，在四张 H800 上比较 OPD、MDPO、BPO。设置、日志审计和图表见[数学三算法主报告](docs/experiments/2026-10-12-数学三算法日志审计与学习效率比较.md)，字段、事件轴和公式见[统一指标规范](docs/operations/2026-10-12-蒸馏统一日志与评测指标规范.md)。
 
