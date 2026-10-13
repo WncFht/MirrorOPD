@@ -113,3 +113,28 @@ def test_fresh_ablation_entrypoint_honors_long_check_priority(tmp_path, monkeypa
     monkeypatch.setattr(sys, "argv", ["suite", "--phase", "ablate"])
     suite_module.main()
     assert calls == ["long", "ablate"]
+
+
+def test_remaining_single_seed_plan_preserves_completed_work(tmp_path, monkeypatch):
+    import json
+    import subprocess
+    import sys
+
+    import training.scalar_full_pool_study as module
+
+    output = tmp_path / "results/scalar-large/fullpool-lr-study"
+    output.mkdir(parents=True)
+    (output / "selection.json").write_text(json.dumps({"baselines": [{"lr": 1e-6}, {"lr": 5e-7}]}))
+    (output / "plan.json").write_text('{"original": true}')
+    calls = []
+    monkeypatch.setattr(module, "ROOT", tmp_path)
+    monkeypatch.setattr(module, "execute", lambda phase, _configs: calls.append(phase))
+    monkeypatch.setattr(module, "long_check", lambda _selection: calls.append("long"))
+    monkeypatch.setattr(subprocess, "run", lambda args, **_kwargs: calls.append(args[-1]))
+    monkeypatch.setattr(sys, "argv", ["study", "--remaining-only", "--skip-confirmation"])
+    module.main()
+    assert calls == ["long", "ablate"]
+    assert json.loads((output / "plan.json").read_text()) == {"original": True}
+    amended = json.loads((output / "remaining-plan.json").read_text())
+    assert amended["confirmation_seeds"] == []
+    assert amended["priority"] == ["fulllong transfer check", "old ablate"]

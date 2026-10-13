@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-13",
+  "reason": "User requested dropping further multi-seed confirmation",
+  "skip_fullconfirm": true,
+  "skip_remaining_old_confirm": true,
+  "cancelled_unstarted_fullconfirm_runs": 12,
+  "cancelled_unstarted_old_confirm_runs": [
+    "confirm-feedback-s442"
+  ],
+  "retained_completed_original_confirm_runs": 24,
+  "remaining_scope": "single seed42 long-rollout LR transfer and 17 mechanism ablations",
+  "gpu_indices": [
+    0,
+    1,
+    2,
+    3
+  ]
+}

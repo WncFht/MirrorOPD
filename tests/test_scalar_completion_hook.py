@@ -44,3 +44,35 @@ def test_queue_exit_with_missing_artifacts_requires_review(tmp_path):
     assert result["issues"]
     assert (output / "completion.json").exists()
     assert (output / "ready.md").exists()
+
+
+def test_user_cancelled_confirmations_are_not_expected(tmp_path):
+    from training.scalar_completion_hook import expected_jobs
+    from training.scalar_large_suite import base_config
+
+    study = tmp_path / "results/scalar-large/fullpool-lr-study"
+    study.mkdir(parents=True)
+    (study / "selection.json").write_text(
+        json.dumps({"baselines": [{"id": "chosen", "lr": 1e-6}, {"id": "second", "lr": 5e-7}]})
+    )
+    old = tmp_path / "runs/scalar-large"
+    old.mkdir(parents=True)
+    config = base_config()
+    (old / "selection.json").write_text(
+        json.dumps(
+            {
+                "baseline_configs": [config, config | {"lr": 5e-7}],
+                "feedback_target": 0.01,
+                "primary_scalar_config": config | {"method": "feedback"},
+            }
+        )
+    )
+    assert {"fullconfirm", "confirm"} <= expected_jobs(tmp_path).keys()
+    (study / "user-amendment.json").write_text(
+        json.dumps({"skip_fullconfirm": True, "skip_remaining_old_confirm": True})
+    )
+    jobs = expected_jobs(tmp_path)
+    assert "fullconfirm" not in jobs
+    assert "confirm" not in jobs
+    assert {"fullpilot", "fullstage", "fulllong", "ablate"} <= jobs.keys()
+    assert len(jobs["ablate"]) == 17

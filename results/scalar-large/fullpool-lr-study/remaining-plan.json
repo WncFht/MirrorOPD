@@ -1,0 +1,284 @@
+{
+  "scope": "frozen 64-rollout full gradient; existing 256-token data",
+  "pilot": [
+    [
+      "fullpilot-lr1.25e-07",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 1.25e-07,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr2.5e-07",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 2.5e-07,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr5e-07",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 5e-07,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr1e-06",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 1e-06,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr2e-06",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 2e-06,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr4e-06",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 4e-06,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr8e-06",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 8e-06,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ],
+    [
+      "fullpilot-lr1.6e-05",
+      {
+        "cache": "runs/scalar-large/cache-s1042",
+        "seed": 1042,
+        "train_sequences": 64,
+        "batch_sequences": 64,
+        "updates": 240,
+        "eta": 0.3,
+        "lr": 1.6e-05,
+        "maximum": 1.6e-05,
+        "precision": "fp32",
+        "objective": "sampled",
+        "topk": 16,
+        "monitor": "full",
+        "monitor_positions": 512,
+        "monitor_clusters": 8,
+        "method": "constant",
+        "search_every": 1,
+        "target_rate": 0.01,
+        "audit_every": 10,
+        "full_batch": true,
+        "minimal_monitoring": true,
+        "keep_checkpoints": [
+          40,
+          120,
+          240
+        ]
+      }
+    ]
+  ],
+  "fork_stages": [
+    40,
+    120,
+    240
+  ],
+  "fork_rates": [
+    1.25e-07,
+    2.5e-07,
+    5e-07,
+    1e-06,
+    2e-06,
+    4e-06,
+    8e-06,
+    1.6e-05
+  ],
+  "fork_updates": 40,
+  "confirmation_seeds": [],
+  "confirmation_updates": 600,
+  "long_transfer": {
+    "response_length": 7168,
+    "train_sequences": 64,
+    "validation_sequences": 16,
+    "updates": 80,
+    "seed": 42,
+    "rates": "selected two constants plus 1e-6, 2e-6, 4e-6"
+  },
+  "pilot_refinement": "add 3.2e-5 and 6.4e-5 if highest LR wins",
+  "priority": [
+    "fulllong transfer check",
+    "old ablate"
+  ],
+  "gpu_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "skip_confirmation": true,
+  "remaining_only": true
+}

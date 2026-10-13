@@ -36,7 +36,7 @@ def expected_jobs(root):
         pilots += pilot_configs((3.2e-5, 6.4e-5))
     rates = sorted({item["lr"] for item in selection["baselines"]} | {1e-6, 2e-6, 4e-6})
     long = base(42) | {"cache": "runs/scalar-large/cache-long-s42", "updates": 80}
-    return {
+    jobs = {
         "fullpilot-canary": [("fullpilot-canary", base() | {"updates": 4, "lr": 5e-7})],
         "fullpilot": pilots,
         "fullstage": forks(selection),
@@ -46,6 +46,14 @@ def expected_jobs(root):
         "fulllong": [(f"fulllong-lr{lr:.3g}", long | {"lr": lr}) for lr in rates],
         "ablate": ablation_configs(old),
     }
+    amendment = root / "results/scalar-large/fullpool-lr-study/user-amendment.json"
+    if amendment.exists():
+        requested = json.loads(amendment.read_text())
+        if requested.get("skip_fullconfirm"):
+            jobs.pop("fullconfirm")
+        if requested.get("skip_remaining_old_confirm"):
+            jobs.pop("confirm")
+    return jobs
 
 
 def audit_summary(summary, expected):
@@ -139,6 +147,11 @@ def finish(root, output):
         "issues": failures,
         "reports": str(reports),
         "scope": "experiment queue artifacts; research goal still requires final analysis",
+        "user_amendment": json.loads(
+            (root / "results/scalar-large/fullpool-lr-study/user-amendment.json").read_text()
+        )
+        if (root / "results/scalar-large/fullpool-lr-study/user-amendment.json").exists()
+        else None,
     }
     write_json(output / "completion.json", record)
     (output / "ready.md").write_text(
@@ -180,7 +193,10 @@ def main():
     args = parser.parse_args()
     identity = process_identity(args.pid)
     command = Path(f"/proc/{args.pid}/cmdline").read_bytes()
-    if identity is None or b"training.scalar_queue_handoff" not in command:
+    if identity is None or not any(
+        name in command
+        for name in (b"training.scalar_queue_handoff", b"training.scalar_full_pool_study")
+    ):
         raise RuntimeError("hook requires the scalar queue supervisor")
     descriptor = open_pidfd(args.pid)
     try:

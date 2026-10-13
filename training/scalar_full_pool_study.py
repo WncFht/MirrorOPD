@@ -164,6 +164,8 @@ def long_check(selection):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--plan-only", action="store_true")
+    parser.add_argument("--remaining-only", action="store_true")
+    parser.add_argument("--skip-confirmation", action="store_true")
     args = parser.parse_args()
     output = ROOT / "results/scalar-large/fullpool-lr-study"
     output.mkdir(parents=True, exist_ok=True)
@@ -194,28 +196,46 @@ def main():
             "old ablate",
         ],
         "gpu_indices": [0, 1, 2, 3],
+        "skip_confirmation": args.skip_confirmation,
+        "remaining_only": args.remaining_only,
     }
-    (output / "plan.json").write_text(json.dumps(plan, indent=2) + "\n")
+    plan_path = output / ("remaining-plan.json" if args.remaining_only else "plan.json")
+    if args.skip_confirmation:
+        plan["confirmation_seeds"] = []
+        plan["priority"] = [
+            p for p in plan["priority"] if p not in ("fullconfirm", "remaining old confirm")
+        ]
+    if args.remaining_only:
+        plan["priority"] = [
+            p
+            for p in plan["priority"]
+            if p not in ("active old jobs finish", "fullpilot", "fullstage")
+        ]
+    plan_path.write_text(json.dumps(plan, indent=2) + "\n")
     if args.plan_only:
         return
-    execute(
-        "fullpilot-canary",
-        [("fullpilot-canary", base() | {"lr": 5e-7, "updates": 4, "audit_every": 2})],
-    )
-    summary = json.loads(
-        (ROOT / "runs/scalar-large/fullpilot-canary/fullpilot-canary/summary.json").read_text()
-    )
-    if summary["status"] != "complete" or summary["counts"]["backwards"] != 256:
-        raise RuntimeError("full-pool canary failed")
-    execute("fullpilot", pilot_configs())
-    selection = select()
-    if selection["baselines"][0]["lr"] == max(LRS):
-        execute("fullpilot", pilot_configs((3.2e-5, 6.4e-5)))
+    if args.remaining_only:
+        selection = json.loads((output / "selection.json").read_text())
+    else:
+        execute(
+            "fullpilot-canary",
+            [("fullpilot-canary", base() | {"lr": 5e-7, "updates": 4, "audit_every": 2})],
+        )
+        summary = json.loads(
+            (ROOT / "runs/scalar-large/fullpilot-canary/fullpilot-canary/summary.json").read_text()
+        )
+        if summary["status"] != "complete" or summary["counts"]["backwards"] != 256:
+            raise RuntimeError("full-pool canary failed")
+        execute("fullpilot", pilot_configs())
         selection = select()
-    execute("fullstage", forks(selection))
-    execute("fullconfirm", confirmation(selection))
+        if selection["baselines"][0]["lr"] == max(LRS):
+            execute("fullpilot", pilot_configs((3.2e-5, 6.4e-5)))
+            selection = select()
+        execute("fullstage", forks(selection))
+    if not args.skip_confirmation:
+        execute("fullconfirm", confirmation(selection))
     # The old predeclared experiments retain their original conditions.
-    for phase in ("confirm", "ablate"):
+    for phase in ("ablate",) if args.skip_confirmation else ("confirm", "ablate"):
         if phase == "ablate":
             long_check(selection)
         import subprocess
