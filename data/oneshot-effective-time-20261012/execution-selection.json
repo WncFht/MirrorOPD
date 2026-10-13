@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "changed_date": "2026-10-13",
+  "reason": "User cancelled multiple seeds; current FP32 evidence is sufficient to deprioritize further precision runs. Retain seed42 online OPD and mirror-anchor ablations.",
+  "active_ids": [
+    "zero-bf16-s42",
+    "zero-fp32-s42",
+    "frozen-opd-bf16-lr5em7-s42",
+    "frozen-opd-bf16-lr1em6-s42",
+    "frozen-opd-bf16-lr2em6-s42",
+    "online-opd-bf16-lr5em7-s42",
+    "online-opd-bf16-lr1em6-s42",
+    "online-opd-bf16-lr2em6-s42",
+    "frozen-mdpo-bf16-reset0-s42",
+    "frozen-mdpo-bf16-reset16-s42",
+    "frozen-bpo-bf16-reset0-s42",
+    "frozen-bpo-bf16-reset16-s42"
+  ],
+  "retained_partial_ids": [
+    "frozen-opd-fp32-lr5em7-s42"
+  ],
+  "original_conditions": 45
+}

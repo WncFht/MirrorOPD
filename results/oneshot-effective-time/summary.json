@@ -1,8 +1,73 @@
 {
-  "requested_arms": 45,
-  "completed_arms": 4,
-  "requested_optimizer_updates": 16074,
-  "completed_optimizer_updates": 908,
+  "requested_arms": 12,
+  "original_requested_arms": 45,
+  "execution_selection": {
+    "schema_version": 1,
+    "changed_date": "2026-10-13",
+    "reason": "User cancelled multiple seeds; current FP32 evidence is sufficient to deprioritize further precision runs. Retain seed42 online OPD and mirror-anchor ablations.",
+    "active_ids": [
+      "zero-bf16-s42",
+      "zero-fp32-s42",
+      "frozen-opd-bf16-lr5em7-s42",
+      "frozen-opd-bf16-lr1em6-s42",
+      "frozen-opd-bf16-lr2em6-s42",
+      "online-opd-bf16-lr5em7-s42",
+      "online-opd-bf16-lr1em6-s42",
+      "online-opd-bf16-lr2em6-s42",
+      "frozen-mdpo-bf16-reset0-s42",
+      "frozen-mdpo-bf16-reset16-s42",
+      "frozen-bpo-bf16-reset0-s42",
+      "frozen-bpo-bf16-reset16-s42"
+    ],
+    "retained_partial_ids": [
+      "frozen-opd-fp32-lr5em7-s42"
+    ],
+    "original_conditions": 45
+  },
+  "excluded_arms": [
+    "frozen-opd-fp32-lr5em7-s42",
+    "frozen-opd-fp32-lr1em6-s42",
+    "frozen-opd-fp32-lr2em6-s42",
+    "zero-bf16-s142",
+    "zero-fp32-s142",
+    "frozen-opd-bf16-lr5em7-s142",
+    "frozen-opd-bf16-lr1em6-s142",
+    "frozen-opd-bf16-lr2em6-s142",
+    "frozen-opd-fp32-lr5em7-s142",
+    "frozen-opd-fp32-lr1em6-s142",
+    "frozen-opd-fp32-lr2em6-s142",
+    "online-opd-bf16-lr5em7-s142",
+    "online-opd-bf16-lr1em6-s142",
+    "online-opd-bf16-lr2em6-s142",
+    "frozen-mdpo-bf16-reset0-s142",
+    "frozen-mdpo-bf16-reset16-s142",
+    "frozen-bpo-bf16-reset0-s142",
+    "frozen-bpo-bf16-reset16-s142",
+    "zero-bf16-s242",
+    "zero-fp32-s242",
+    "frozen-opd-bf16-lr5em7-s242",
+    "frozen-opd-bf16-lr1em6-s242",
+    "frozen-opd-bf16-lr2em6-s242",
+    "frozen-opd-fp32-lr5em7-s242",
+    "frozen-opd-fp32-lr1em6-s242",
+    "frozen-opd-fp32-lr2em6-s242",
+    "online-opd-bf16-lr5em7-s242",
+    "online-opd-bf16-lr1em6-s242",
+    "online-opd-bf16-lr2em6-s242",
+    "frozen-mdpo-bf16-reset0-s242",
+    "frozen-mdpo-bf16-reset16-s242",
+    "frozen-bpo-bf16-reset0-s242",
+    "frozen-bpo-bf16-reset16-s242"
+  ],
+  "retained_partial_runs": {
+    "frozen-opd-fp32-lr5em7-s42": {
+      "logged_updates": 330,
+      "state": "stopped-by-user"
+    }
+  },
+  "completed_arms": 5,
+  "requested_optimizer_updates": 4308,
+  "completed_optimizer_updates": 1058,
   "long_absorption": {
     "42": {
       "d100": 0.05259558828701576,
@@ -29,7 +94,22 @@
       "passed": true
     }
   },
-  "time_collapse": {},
+  "time_collapse": {
+    "frozen-bf16-s42": {
+      "grid_start": 30,
+      "grid_end": 150,
+      "raw_log_dispersion": 0.452079680831631,
+      "effective_log_dispersion": 0.10223834862099386,
+      "dispersion_reduction": 0.7738488302926609,
+      "preregistered_30_percent_reduction_passed": true,
+      "effective_geometric_max_min_ratio": 1.2561867195467786,
+      "full_effective_grid_start": 30,
+      "full_effective_grid_end": 300,
+      "effective_pair_relative_spread_max": 0.5000331603484862,
+      "effective_pair_relative_spread_median": 0.2193756146179291,
+      "preregistered_20_percent_pair_spread_passed": false
+    }
+  },
   "evaluations": {
     "canary-bf16-s42-update4": {
       "MATH-500": {
@@ -49,6 +129,166 @@
         "correct": 5,
         "accuracy": 0.16666666666666666,
         "budget_exhausted_fraction": 0.8333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 344,
+        "accuracy": 0.688,
+        "budget_exhausted_fraction": 0.414
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update200": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 337,
+        "accuracy": 0.674,
+        "budget_exhausted_fraction": 0.382
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 22,
+        "accuracy": 0.55,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "budget_exhausted_fraction": 0.9
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update300": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 351,
+        "accuracy": 0.702,
+        "budget_exhausted_fraction": 0.358
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 20,
+        "accuracy": 0.5,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.8666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update50": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 328,
+        "accuracy": 0.656,
+        "budget_exhausted_fraction": 0.414
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.65
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 355,
+        "accuracy": 0.71,
+        "budget_exhausted_fraction": 0.37
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.9
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update150": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 343,
+        "accuracy": 0.686,
+        "budget_exhausted_fraction": 0.404
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 21,
+        "accuracy": 0.525,
+        "budget_exhausted_fraction": 0.575
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update25": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 320,
+        "accuracy": 0.64,
+        "budget_exhausted_fraction": 0.418
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 20,
+        "accuracy": 0.5,
+        "budget_exhausted_fraction": 0.6
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.8333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update50": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 338,
+        "accuracy": 0.676,
+        "budget_exhausted_fraction": 0.422
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 20,
+        "accuracy": 0.5,
+        "budget_exhausted_fraction": 0.65
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 6,
+        "accuracy": 0.2,
+        "budget_exhausted_fraction": 0.9333333333333333
       }
     },
     "frozen-opd-bf16-lr5em7-s42-update100": {
@@ -263,6 +503,190 @@
         "lost_correct": 4,
         "net_correct_change": -4,
         "change_percentage_points": -13.333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update50": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 33,
+        "lost_correct": 69,
+        "net_correct_change": -36,
+        "change_percentage_points": -7.2
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 3,
+        "lost_correct": 5,
+        "net_correct_change": -2,
+        "change_percentage_points": -5.0
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 1,
+        "lost_correct": 4,
+        "net_correct_change": -3,
+        "change_percentage_points": -10.0
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 44,
+        "lost_correct": 64,
+        "net_correct_change": -20,
+        "change_percentage_points": -4.0
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 5,
+        "lost_correct": 7,
+        "net_correct_change": -2,
+        "change_percentage_points": -5.0
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 1,
+        "lost_correct": 3,
+        "net_correct_change": -2,
+        "change_percentage_points": -6.666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update200": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 38,
+        "lost_correct": 65,
+        "net_correct_change": -27,
+        "change_percentage_points": -5.4
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 5,
+        "lost_correct": 4,
+        "net_correct_change": 1,
+        "change_percentage_points": 2.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 0,
+        "lost_correct": 4,
+        "net_correct_change": -4,
+        "change_percentage_points": -13.333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update300": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 44,
+        "lost_correct": 57,
+        "net_correct_change": -13,
+        "change_percentage_points": -2.6
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 7,
+        "lost_correct": 8,
+        "net_correct_change": -1,
+        "change_percentage_points": -2.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 1,
+        "lost_correct": 3,
+        "net_correct_change": -2,
+        "change_percentage_points": -6.666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update25": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 30,
+        "lost_correct": 74,
+        "net_correct_change": -44,
+        "change_percentage_points": -8.8
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 4,
+        "lost_correct": 5,
+        "net_correct_change": -1,
+        "change_percentage_points": -2.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 2,
+        "lost_correct": 4,
+        "net_correct_change": -2,
+        "change_percentage_points": -6.666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update50": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 37,
+        "lost_correct": 63,
+        "net_correct_change": -26,
+        "change_percentage_points": -5.2
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 8,
+        "lost_correct": 9,
+        "net_correct_change": -1,
+        "change_percentage_points": -2.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 1,
+        "lost_correct": 2,
+        "net_correct_change": -1,
+        "change_percentage_points": -3.3333333333333335
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 40,
+        "lost_correct": 49,
+        "net_correct_change": -9,
+        "change_percentage_points": -1.8
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 5,
+        "lost_correct": 7,
+        "net_correct_change": -2,
+        "change_percentage_points": -5.0
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 1,
+        "lost_correct": 4,
+        "net_correct_change": -3,
+        "change_percentage_points": -10.0
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update150": {
+      "MATH-500": {
+        "questions": 500,
+        "gained_correct": 46,
+        "lost_correct": 67,
+        "net_correct_change": -21,
+        "change_percentage_points": -4.2
+      },
+      "AMC23": {
+        "questions": 40,
+        "gained_correct": 3,
+        "lost_correct": 3,
+        "net_correct_change": 0,
+        "change_percentage_points": 0.0
+      },
+      "AIME25": {
+        "questions": 30,
+        "gained_correct": 1,
+        "lost_correct": 4,
+        "net_correct_change": -3,
+        "change_percentage_points": -10.0
       }
     }
   },
@@ -510,252 +934,117 @@
       "importance_ratio_used_in_gradient": false,
       "first_update_inspected_fp32_change_fraction": 0.9998611822360899,
       "first_update_inspected_bf16_change_fraction": 0.010235111887862042
+    },
+    "frozen-opd-bf16-lr2em6-s42": {
+      "initial_native_fixed": {
+        "anchor_student_full_kl": -1.8840376854109553e-09,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11619850918608636,
+        "fixed_action_abs_gap": 0.2448360329435294,
+        "fixed_action_signed_gap": -0.11443149627284391,
+        "mirror_target_full_kl": 0.10620575541892581,
+        "student_teacher_full_kl": 0.10620575567670404,
+        "teacher_logprob_regression": 0.14121488802692836,
+        "teacher_student_full_kl": 0.10525219303936845,
+        "top16_teacher_overlap": 0.8176116943359375,
+        "diagnostic_positions": 4096.0
+      },
+      "final_native_fixed": {
+        "anchor_student_full_kl": 0.09714120858092574,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.0046268582738524695,
+        "fixed_action_abs_gap": 0.024073018000262097,
+        "fixed_action_signed_gap": -0.0022002401109972782,
+        "mirror_target_full_kl": 0.0036607889834272393,
+        "student_teacher_full_kl": 0.0036607893120469115,
+        "teacher_logprob_regression": 0.0052141176219195964,
+        "teacher_student_full_kl": 0.0035681134064514818,
+        "top16_teacher_overlap": 0.9357452392578125,
+        "diagnostic_positions": 4096.0
+      },
+      "initial_fp32_readout": {
+        "anchor_student_full_kl": 0.0003708809824180437,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.11519591928795124,
+        "fixed_action_abs_gap": 0.24380020294049443,
+        "fixed_action_signed_gap": -0.11390844925467848,
+        "mirror_target_full_kl": 0.10522649701504871,
+        "student_teacher_full_kl": 0.10522649730433337,
+        "teacher_logprob_regression": 0.14012510821833168,
+        "teacher_student_full_kl": 0.10440755417236904,
+        "top16_teacher_overlap": 0.819000244140625,
+        "diagnostic_positions": 4096.0
+      },
+      "final_fp32_readout": {
+        "anchor_student_full_kl": 0.35555705962597217,
+        "anchor_teacher_full_kl": 0.10620575338985976,
+        "bpo_target_variance": 0.1314794586535009,
+        "fixed_action_abs_gap": 0.3257085089759675,
+        "fixed_action_signed_gap": 0.25566008806955376,
+        "mirror_target_full_kl": 0.11669919043190721,
+        "student_teacher_full_kl": 0.11669919083994015,
+        "teacher_logprob_regression": 0.28486062919276045,
+        "teacher_student_full_kl": 0.11279381868170464,
+        "top16_teacher_overlap": 0.842620849609375,
+        "diagnostic_positions": 4096.0
+      },
+      "first_step_anchor_kl": 0.00040480081283003096,
+      "final_preupdate_anchor_kl": 0.09007357793430287,
+      "clip_count": 16,
+      "importance_ess_fraction_min": 0.620252975786095,
+      "importance_ratio_used_in_gradient": false,
+      "first_update_inspected_fp32_change_fraction": 0.9998776195495109,
+      "first_update_inspected_bf16_change_fraction": 0.02042488160172129
     }
   },
   "running_update_counts": {
-    "frozen-opd-bf16-lr2em6-s42": 0,
-    "frozen-opd-fp32-lr5em7-s42": 0,
-    "frozen-opd-fp32-lr1em6-s42": 0,
-    "frozen-opd-fp32-lr2em6-s42": 0,
-    "online-opd-bf16-lr5em7-s42": 0,
+    "online-opd-bf16-lr5em7-s42": 167,
     "online-opd-bf16-lr1em6-s42": 0,
     "online-opd-bf16-lr2em6-s42": 0,
     "frozen-mdpo-bf16-reset0-s42": 0,
     "frozen-mdpo-bf16-reset16-s42": 0,
     "frozen-bpo-bf16-reset0-s42": 0,
-    "frozen-bpo-bf16-reset16-s42": 0,
-    "zero-bf16-s142": 0,
-    "zero-fp32-s142": 0,
-    "frozen-opd-bf16-lr5em7-s142": 0,
-    "frozen-opd-bf16-lr1em6-s142": 0,
-    "frozen-opd-bf16-lr2em6-s142": 0,
-    "frozen-opd-fp32-lr5em7-s142": 0,
-    "frozen-opd-fp32-lr1em6-s142": 0,
-    "frozen-opd-fp32-lr2em6-s142": 0,
-    "online-opd-bf16-lr5em7-s142": 0,
-    "online-opd-bf16-lr1em6-s142": 0,
-    "online-opd-bf16-lr2em6-s142": 0,
-    "frozen-mdpo-bf16-reset0-s142": 0,
-    "frozen-mdpo-bf16-reset16-s142": 0,
-    "frozen-bpo-bf16-reset0-s142": 0,
-    "frozen-bpo-bf16-reset16-s142": 0,
-    "zero-bf16-s242": 0,
-    "zero-fp32-s242": 0,
-    "frozen-opd-bf16-lr5em7-s242": 0,
-    "frozen-opd-bf16-lr1em6-s242": 0,
-    "frozen-opd-bf16-lr2em6-s242": 0,
-    "frozen-opd-fp32-lr5em7-s242": 0,
-    "frozen-opd-fp32-lr1em6-s242": 0,
-    "frozen-opd-fp32-lr2em6-s242": 0,
-    "online-opd-bf16-lr5em7-s242": 0,
-    "online-opd-bf16-lr1em6-s242": 0,
-    "online-opd-bf16-lr2em6-s242": 0,
-    "frozen-mdpo-bf16-reset0-s242": 0,
-    "frozen-mdpo-bf16-reset16-s242": 0,
-    "frozen-bpo-bf16-reset0-s242": 0,
-    "frozen-bpo-bf16-reset16-s242": 0
+    "frozen-bpo-bf16-reset16-s42": 0
   },
   "pending": [
-    "frozen-opd-bf16-lr2em6-s42",
-    "frozen-opd-fp32-lr5em7-s42",
-    "frozen-opd-fp32-lr1em6-s42",
-    "frozen-opd-fp32-lr2em6-s42",
     "online-opd-bf16-lr5em7-s42",
     "online-opd-bf16-lr1em6-s42",
     "online-opd-bf16-lr2em6-s42",
     "frozen-mdpo-bf16-reset0-s42",
     "frozen-mdpo-bf16-reset16-s42",
     "frozen-bpo-bf16-reset0-s42",
-    "frozen-bpo-bf16-reset16-s42",
-    "zero-bf16-s142",
-    "zero-fp32-s142",
-    "frozen-opd-bf16-lr5em7-s142",
-    "frozen-opd-bf16-lr1em6-s142",
-    "frozen-opd-bf16-lr2em6-s142",
-    "frozen-opd-fp32-lr5em7-s142",
-    "frozen-opd-fp32-lr1em6-s142",
-    "frozen-opd-fp32-lr2em6-s142",
-    "online-opd-bf16-lr5em7-s142",
-    "online-opd-bf16-lr1em6-s142",
-    "online-opd-bf16-lr2em6-s142",
-    "frozen-mdpo-bf16-reset0-s142",
-    "frozen-mdpo-bf16-reset16-s142",
-    "frozen-bpo-bf16-reset0-s142",
-    "frozen-bpo-bf16-reset16-s142",
-    "zero-bf16-s242",
-    "zero-fp32-s242",
-    "frozen-opd-bf16-lr5em7-s242",
-    "frozen-opd-bf16-lr1em6-s242",
-    "frozen-opd-bf16-lr2em6-s242",
-    "frozen-opd-fp32-lr5em7-s242",
-    "frozen-opd-fp32-lr1em6-s242",
-    "frozen-opd-fp32-lr2em6-s242",
-    "online-opd-bf16-lr5em7-s242",
-    "online-opd-bf16-lr1em6-s242",
-    "online-opd-bf16-lr2em6-s242",
-    "frozen-mdpo-bf16-reset0-s242",
-    "frozen-mdpo-bf16-reset16-s242",
-    "frozen-bpo-bf16-reset0-s242",
-    "frozen-bpo-bf16-reset16-s242"
+    "frozen-bpo-bf16-reset16-s42"
   ],
+  "multi_seed_validation_requested": false,
+  "long_absorption_active_seeds_passed": true,
   "long_absorption_at_least_two_seeds_passed": null,
   "pending_evaluations": [
-    "frozen-bpo-bf16-reset0-s142-update100",
-    "frozen-bpo-bf16-reset0-s142-update200",
-    "frozen-bpo-bf16-reset0-s142-update300",
-    "frozen-bpo-bf16-reset0-s142-update50",
-    "frozen-bpo-bf16-reset0-s242-update100",
-    "frozen-bpo-bf16-reset0-s242-update200",
-    "frozen-bpo-bf16-reset0-s242-update300",
-    "frozen-bpo-bf16-reset0-s242-update50",
     "frozen-bpo-bf16-reset0-s42-update100",
     "frozen-bpo-bf16-reset0-s42-update200",
     "frozen-bpo-bf16-reset0-s42-update300",
     "frozen-bpo-bf16-reset0-s42-update50",
-    "frozen-bpo-bf16-reset16-s142-update100",
-    "frozen-bpo-bf16-reset16-s142-update200",
-    "frozen-bpo-bf16-reset16-s142-update300",
-    "frozen-bpo-bf16-reset16-s142-update50",
-    "frozen-bpo-bf16-reset16-s142-update800",
-    "frozen-bpo-bf16-reset16-s242-update100",
-    "frozen-bpo-bf16-reset16-s242-update200",
-    "frozen-bpo-bf16-reset16-s242-update300",
-    "frozen-bpo-bf16-reset16-s242-update50",
-    "frozen-bpo-bf16-reset16-s242-update800",
     "frozen-bpo-bf16-reset16-s42-update100",
     "frozen-bpo-bf16-reset16-s42-update200",
     "frozen-bpo-bf16-reset16-s42-update300",
     "frozen-bpo-bf16-reset16-s42-update50",
     "frozen-bpo-bf16-reset16-s42-update800",
-    "frozen-mdpo-bf16-reset0-s142-update100",
-    "frozen-mdpo-bf16-reset0-s142-update200",
-    "frozen-mdpo-bf16-reset0-s142-update300",
-    "frozen-mdpo-bf16-reset0-s142-update50",
-    "frozen-mdpo-bf16-reset0-s242-update100",
-    "frozen-mdpo-bf16-reset0-s242-update200",
-    "frozen-mdpo-bf16-reset0-s242-update300",
-    "frozen-mdpo-bf16-reset0-s242-update50",
     "frozen-mdpo-bf16-reset0-s42-update100",
     "frozen-mdpo-bf16-reset0-s42-update200",
     "frozen-mdpo-bf16-reset0-s42-update300",
     "frozen-mdpo-bf16-reset0-s42-update50",
-    "frozen-mdpo-bf16-reset16-s142-update100",
-    "frozen-mdpo-bf16-reset16-s142-update200",
-    "frozen-mdpo-bf16-reset16-s142-update300",
-    "frozen-mdpo-bf16-reset16-s142-update50",
-    "frozen-mdpo-bf16-reset16-s142-update800",
-    "frozen-mdpo-bf16-reset16-s242-update100",
-    "frozen-mdpo-bf16-reset16-s242-update200",
-    "frozen-mdpo-bf16-reset16-s242-update300",
-    "frozen-mdpo-bf16-reset16-s242-update50",
-    "frozen-mdpo-bf16-reset16-s242-update800",
     "frozen-mdpo-bf16-reset16-s42-update100",
     "frozen-mdpo-bf16-reset16-s42-update200",
     "frozen-mdpo-bf16-reset16-s42-update300",
     "frozen-mdpo-bf16-reset16-s42-update50",
     "frozen-mdpo-bf16-reset16-s42-update800",
-    "frozen-opd-bf16-lr1em6-s142-update100",
-    "frozen-opd-bf16-lr1em6-s142-update200",
-    "frozen-opd-bf16-lr1em6-s142-update300",
-    "frozen-opd-bf16-lr1em6-s142-update50",
-    "frozen-opd-bf16-lr1em6-s242-update100",
-    "frozen-opd-bf16-lr1em6-s242-update200",
-    "frozen-opd-bf16-lr1em6-s242-update300",
-    "frozen-opd-bf16-lr1em6-s242-update50",
-    "frozen-opd-bf16-lr1em6-s42-update100",
-    "frozen-opd-bf16-lr1em6-s42-update200",
-    "frozen-opd-bf16-lr1em6-s42-update300",
-    "frozen-opd-bf16-lr1em6-s42-update50",
-    "frozen-opd-bf16-lr2em6-s142-update100",
-    "frozen-opd-bf16-lr2em6-s142-update150",
-    "frozen-opd-bf16-lr2em6-s142-update25",
-    "frozen-opd-bf16-lr2em6-s142-update50",
-    "frozen-opd-bf16-lr2em6-s242-update100",
-    "frozen-opd-bf16-lr2em6-s242-update150",
-    "frozen-opd-bf16-lr2em6-s242-update25",
-    "frozen-opd-bf16-lr2em6-s242-update50",
-    "frozen-opd-bf16-lr2em6-s42-update100",
-    "frozen-opd-bf16-lr2em6-s42-update150",
-    "frozen-opd-bf16-lr2em6-s42-update25",
-    "frozen-opd-bf16-lr2em6-s42-update50",
-    "frozen-opd-bf16-lr5em7-s142-update100",
-    "frozen-opd-bf16-lr5em7-s142-update200",
-    "frozen-opd-bf16-lr5em7-s142-update400",
-    "frozen-opd-bf16-lr5em7-s142-update600",
-    "frozen-opd-bf16-lr5em7-s242-update100",
-    "frozen-opd-bf16-lr5em7-s242-update200",
-    "frozen-opd-bf16-lr5em7-s242-update400",
-    "frozen-opd-bf16-lr5em7-s242-update600",
-    "frozen-opd-fp32-lr1em6-s142-update100",
-    "frozen-opd-fp32-lr1em6-s142-update200",
-    "frozen-opd-fp32-lr1em6-s142-update300",
-    "frozen-opd-fp32-lr1em6-s142-update50",
-    "frozen-opd-fp32-lr1em6-s242-update100",
-    "frozen-opd-fp32-lr1em6-s242-update200",
-    "frozen-opd-fp32-lr1em6-s242-update300",
-    "frozen-opd-fp32-lr1em6-s242-update50",
-    "frozen-opd-fp32-lr1em6-s42-update100",
-    "frozen-opd-fp32-lr1em6-s42-update200",
-    "frozen-opd-fp32-lr1em6-s42-update300",
-    "frozen-opd-fp32-lr1em6-s42-update50",
-    "frozen-opd-fp32-lr2em6-s142-update100",
-    "frozen-opd-fp32-lr2em6-s142-update150",
-    "frozen-opd-fp32-lr2em6-s142-update25",
-    "frozen-opd-fp32-lr2em6-s142-update50",
-    "frozen-opd-fp32-lr2em6-s242-update100",
-    "frozen-opd-fp32-lr2em6-s242-update150",
-    "frozen-opd-fp32-lr2em6-s242-update25",
-    "frozen-opd-fp32-lr2em6-s242-update50",
-    "frozen-opd-fp32-lr2em6-s42-update100",
-    "frozen-opd-fp32-lr2em6-s42-update150",
-    "frozen-opd-fp32-lr2em6-s42-update25",
-    "frozen-opd-fp32-lr2em6-s42-update50",
-    "frozen-opd-fp32-lr5em7-s142-update100",
-    "frozen-opd-fp32-lr5em7-s142-update200",
-    "frozen-opd-fp32-lr5em7-s142-update400",
-    "frozen-opd-fp32-lr5em7-s142-update600",
-    "frozen-opd-fp32-lr5em7-s242-update100",
-    "frozen-opd-fp32-lr5em7-s242-update200",
-    "frozen-opd-fp32-lr5em7-s242-update400",
-    "frozen-opd-fp32-lr5em7-s242-update600",
-    "frozen-opd-fp32-lr5em7-s42-update100",
-    "frozen-opd-fp32-lr5em7-s42-update200",
-    "frozen-opd-fp32-lr5em7-s42-update400",
-    "frozen-opd-fp32-lr5em7-s42-update600",
-    "initial-s142",
-    "initial-s242",
-    "online-opd-bf16-lr1em6-s142-update100",
-    "online-opd-bf16-lr1em6-s142-update200",
-    "online-opd-bf16-lr1em6-s142-update300",
-    "online-opd-bf16-lr1em6-s142-update50",
-    "online-opd-bf16-lr1em6-s242-update100",
-    "online-opd-bf16-lr1em6-s242-update200",
-    "online-opd-bf16-lr1em6-s242-update300",
-    "online-opd-bf16-lr1em6-s242-update50",
     "online-opd-bf16-lr1em6-s42-update100",
     "online-opd-bf16-lr1em6-s42-update200",
     "online-opd-bf16-lr1em6-s42-update300",
     "online-opd-bf16-lr1em6-s42-update50",
-    "online-opd-bf16-lr2em6-s142-update100",
-    "online-opd-bf16-lr2em6-s142-update150",
-    "online-opd-bf16-lr2em6-s142-update25",
-    "online-opd-bf16-lr2em6-s142-update50",
-    "online-opd-bf16-lr2em6-s242-update100",
-    "online-opd-bf16-lr2em6-s242-update150",
-    "online-opd-bf16-lr2em6-s242-update25",
-    "online-opd-bf16-lr2em6-s242-update50",
     "online-opd-bf16-lr2em6-s42-update100",
     "online-opd-bf16-lr2em6-s42-update150",
     "online-opd-bf16-lr2em6-s42-update25",
     "online-opd-bf16-lr2em6-s42-update50",
-    "online-opd-bf16-lr5em7-s142-update100",
-    "online-opd-bf16-lr5em7-s142-update200",
-    "online-opd-bf16-lr5em7-s142-update400",
-    "online-opd-bf16-lr5em7-s142-update600",
-    "online-opd-bf16-lr5em7-s242-update100",
-    "online-opd-bf16-lr5em7-s242-update200",
-    "online-opd-bf16-lr5em7-s242-update400",
-    "online-opd-bf16-lr5em7-s242-update600",
     "online-opd-bf16-lr5em7-s42-update100",
     "online-opd-bf16-lr5em7-s42-update200",
     "online-opd-bf16-lr5em7-s42-update400",
@@ -763,5 +1052,5 @@
   ],
   "all_evaluations_complete": false,
   "all_training_complete": false,
-  "observed_optimizer_updates": 908
+  "observed_optimizer_updates": 1225
 }

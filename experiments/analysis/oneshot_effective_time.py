@@ -8,7 +8,7 @@ from pathlib import Path
 import matplotlib
 import numpy as np
 
-from training.oneshot_suite import experiment_plan
+from training.oneshot_suite import experiment_plan, selected_experiment_plan
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -249,7 +249,9 @@ def plot_curves(arms, output):
             f"{rollout} OPD / {precision}" + (" / partial observations" if partial else "")
         )
         figure.savefig(output / f"{rollout}-{precision}.png", dpi=180)
-        figure.savefig(output / f"{rollout}-{precision}.pdf")
+        figure.savefig(
+            output / f"{rollout}-{precision}.pdf", metadata={"CreationDate": None, "ModDate": None}
+        )
         plt.close(figure)
 
 
@@ -286,7 +288,10 @@ def plot_precision_readouts(suite, config, output):
         config["id"] + (" / partial observations" if shared[-1] < config["updates"] else "")
     )
     figure.savefig(output / (config["id"] + "-readouts.png"), dpi=180)
-    figure.savefig(output / (config["id"] + "-readouts.pdf"))
+    figure.savefig(
+        output / (config["id"] + "-readouts.pdf"),
+        metadata={"CreationDate": None, "ModDate": None},
+    )
     plt.close(figure)
 
 
@@ -297,11 +302,26 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    plan = experiment_plan()
+    original_plan = experiment_plan()
+    plan = selected_experiment_plan(args.suite)
+    selection_path = args.suite / "execution-selection.json"
+    selection = json.loads(selection_path.read_text()) if selection_path.exists() else {}
     arms = [arm for config in plan if (arm := audit_completed_arm(args.suite, config)) is not None]
     lookup = {arm["config"]["id"]: arm for arm in arms}
     report = {
         "requested_arms": len(plan),
+        "original_requested_arms": len(original_plan),
+        "execution_selection": selection,
+        "excluded_arms": [c["id"] for c in original_plan if c["id"] not in {a["id"] for a in plan}],
+        "retained_partial_runs": {
+            identifier: {
+                "logged_updates": len(
+                    history(args.suite / identifier / "updates.jsonl", "update_before")
+                ),
+                "state": "stopped-by-user",
+            }
+            for identifier in selection.get("retained_partial_ids", [])
+        },
         "completed_arms": len(arms),
         "requested_optimizer_updates": sum(config["updates"] for config in plan),
         "completed_optimizer_updates": sum(arm["config"]["updates"] for arm in arms),
@@ -365,6 +385,13 @@ def main():
                 report["time_collapse"][f"{rollout}-{precision}-s{seed}"] = collapse_statistics(
                     group
                 )
+    selected_seeds = {str(config["seed"]) for config in plan}
+    report["multi_seed_validation_requested"] = len(selected_seeds) > 1
+    report["long_absorption_active_seeds_passed"] = (
+        all(report["long_absorption"][seed]["passed"] for seed in selected_seeds)
+        if selected_seeds <= report["long_absorption"].keys()
+        else None
+    )
     report["long_absorption_at_least_two_seeds_passed"] = (
         sum(value["passed"] for value in report["long_absorption"].values()) >= 2
         if len(report["long_absorption"]) == 3
@@ -383,7 +410,7 @@ def main():
                     initial, args.suite / "evaluation" / identifier
                 )
     expected_evaluations = (
-        {f"initial-s{seed}" for seed in (42, 142, 242)}
+        {f"initial-s{config['seed']}" for config in plan}
         | {"teacher"}
         | {
             config["id"] + f"-update{step}"
@@ -410,8 +437,9 @@ def main():
             )
     (args.output / "summary.json").write_text(json.dumps(report, indent=2) + "\n")
     plot_curves([lookup.get(curve["config"]["id"], curve) for curve in observed], args.output)
-    for config in plan:
-        plot_precision_readouts(args.suite, config, args.output)
+    for config in original_plan:
+        if config in plan or config["id"] in selection.get("retained_partial_ids", []):
+            plot_precision_readouts(args.suite, config, args.output)
     print(
         json.dumps(
             {"completed": len(arms), "requested": len(plan), "pending": len(report["pending"])}

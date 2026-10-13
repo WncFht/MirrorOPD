@@ -4,6 +4,7 @@ import json
 from unittest.mock import patch
 
 import numpy as np
+import pytest
 import torch
 
 from experiments.analysis.oneshot_effective_time import collapse_statistics
@@ -13,7 +14,7 @@ from training.gpu_exclusive import (
     gpu_processes,
     register_gpu_owner,
 )
-from training.oneshot_suite import experiment_plan
+from training.oneshot_suite import experiment_plan, selected_experiment_plan
 from training.oneshot_worker import distribution_sums
 
 
@@ -130,3 +131,37 @@ def test_collapse_statistic_detects_known_time_rescaling():
     assert result["raw_log_dispersion"] > 0.1
     assert result["effective_log_dispersion"] < 1e-12
     assert result["preregistered_30_percent_reduction_passed"]
+
+
+def test_directory_lease_owner_disappearance_is_retryable(tmp_path):
+    """A lease released during owner lookup must keep the waiter alive."""
+    first = GpuGroupLease(tmp_path / "gpu-group.lease")
+    second = GpuGroupLease(first.directory)
+    assert first.acquire()
+    with patch("pathlib.Path.read_text", side_effect=FileNotFoundError):
+        assert not second.acquire()
+    first.release()
+    assert second.acquire()
+    second.release()
+
+
+def test_user_selection_cancels_other_seeds_and_positive_lr_fp32(tmp_path):
+    """An explicit scope revision changes execution while preserving registration."""
+    original = experiment_plan()
+    assert len(selected_experiment_plan(tmp_path)) == 45
+    active = [
+        c["id"]
+        for c in original
+        if c["seed"] == 42 and not (c["precision"] == "fp32" and c["lr"] > 0)
+    ]
+    path = tmp_path / "execution-selection.json"
+    path.write_text(json.dumps({"schema_version": 1, "active_ids": active}))
+    selected = selected_experiment_plan(tmp_path)
+    assert len(selected) == 12
+    assert sum(c["updates"] for c in selected) == 4308
+    assert all(c["seed"] == 42 for c in selected)
+    assert all(c["precision"] != "fp32" or c["lr"] == 0 for c in selected)
+    assert len(experiment_plan()) == 45
+    path.write_text(json.dumps({"schema_version": 1, "active_ids": [active[0], active[0]]}))
+    with pytest.raises(ValueError, match="duplicate or unknown"):
+        selected_experiment_plan(tmp_path)
