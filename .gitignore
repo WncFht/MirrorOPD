@@ -69,3 +69,6 @@ data/oneshot-lr-stability/*.csv
 /data/oneshot-effective-time-20261012/seed-*/rank-*.pt
 
 /data/oneshot-effective-time-20261012/seed-*/trajectories.jsonl
+
+# Machine-local watcher heartbeat; scientific result snapshots stay versioned.
+/results/oneshot-effective-time/watcher-status.json
