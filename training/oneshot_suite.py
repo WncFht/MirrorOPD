@@ -141,7 +141,9 @@ def snapshot_sources(repo, destination):
     (destination / "source-sha256.json").write_text(json.dumps(hashes, indent=2) + "\n")
 
 
-def run_worker(repo, suite, phase, config, output, cache=None):
+def run_worker(
+    repo, suite, phase, config, output, cache=None, *, worker_entry="training/oneshot_worker.py"
+):
     """Run one owned process group and stop only that group on a conflict."""
     status = suite / "status.json"
     attempt = max(
@@ -160,6 +162,15 @@ def run_worker(repo, suite, phase, config, output, cache=None):
         owners.mkdir()
         snapshot = attempt_dir / "source"
         snapshot_sources(repo, snapshot)
+        if worker_entry != "training/oneshot_worker.py":
+            relative = Path(worker_entry)
+            if relative.is_absolute() or ".." in relative.parts or relative.parts[0] != "training":
+                raise ValueError("Experiment worker must be a repository training entrypoint")
+            shutil.copy2(repo / relative, snapshot / relative)
+            hashes_path = snapshot / "source-sha256.json"
+            hashes = json.loads(hashes_path.read_text())
+            hashes[str(relative)] = hashlib.sha256((snapshot / relative).read_bytes()).hexdigest()
+            hashes_path.write_text(json.dumps(hashes, indent=2) + "\n")
         config_path = attempt_dir / "config.json"
         config_path.write_text(json.dumps(config, indent=2) + "\n")
         environment = os.environ.copy()
@@ -175,7 +186,7 @@ def run_worker(repo, suite, phase, config, output, cache=None):
             NETRC=str(repo.parent / ".secrets/netrc"),
             WANDB_DIR=str(output),
             WANDB_CACHE_DIR=str(repo.parent / "cache/wandb"),
-            WANDB_PROJECT="mirror-opd-oneshot-absorption",
+            WANDB_PROJECT=config.get("wandb_project", "mirror-opd-oneshot-absorption"),
             WANDB_MODE="online",
             WANDB_BASE_URL="https://api.wandb.ai",
             WANDB_CONFIG_DIR=str(repo.parent / "config/wandb"),
@@ -188,7 +199,7 @@ def run_worker(repo, suite, phase, config, output, cache=None):
             "torch.distributed.run",
             "--standalone",
             "--nproc_per_node=4",
-            str(snapshot / "training/oneshot_worker.py"),
+            str(snapshot / worker_entry),
             "--phase",
             phase,
             "--config",
@@ -274,6 +285,8 @@ def run_worker(repo, suite, phase, config, output, cache=None):
                 conflict=conflict,
                 output=str(output),
             )
+            if not config.get("retry_on_gpu_conflict", True):
+                raise RuntimeError(f"{config['id']} stopped on GPU ownership conflict")
             continue
         if exit_code:
             write_status(

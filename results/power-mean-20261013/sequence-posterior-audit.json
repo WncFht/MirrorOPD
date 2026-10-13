@@ -1,0 +1,1041 @@
+{
+  "responses": 64,
+  "prompts": 1,
+  "scope": "Recorded 1.5B model trajectories; prefix posterior of a sequence-level arithmetic mixture, not constant token interpolation",
+  "records": [
+    {
+      "response": 0,
+      "strength": 0.1,
+      "tokens": 5513,
+      "sequence_log_teacher_anchor_ratio": -534.1148932927771,
+      "mean_posterior_teacher_weight": 0.003127934883582142,
+      "fraction_posterior_below_1em6": 0.9688010157808815
+    },
+    {
+      "response": 0,
+      "strength": 0.3,
+      "tokens": 5513,
+      "sequence_log_teacher_anchor_ratio": -534.1148932927771,
+      "mean_posterior_teacher_weight": 0.007402438347007707,
+      "fraction_posterior_below_1em6": 0.9684382368946127
+    },
+    {
+      "response": 1,
+      "strength": 0.1,
+      "tokens": 5980,
+      "sequence_log_teacher_anchor_ratio": -562.6021434729948,
+      "mean_posterior_teacher_weight": 0.00193438441324355,
+      "fraction_posterior_below_1em6": 0.9657190635451505
+    },
+    {
+      "response": 1,
+      "strength": 0.3,
+      "tokens": 5980,
+      "sequence_log_teacher_anchor_ratio": -562.6021434729948,
+      "mean_posterior_teacher_weight": 0.005226384780202424,
+      "fraction_posterior_below_1em6": 0.9593645484949833
+    },
+    {
+      "response": 2,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -830.4036831103895,
+      "mean_posterior_teacher_weight": 0.00037592972147497395,
+      "fraction_posterior_below_1em6": 0.9779575892857143
+    },
+    {
+      "response": 2,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -830.4036831103895,
+      "mean_posterior_teacher_weight": 0.001246915455871291,
+      "fraction_posterior_below_1em6": 0.9772600446428571
+    },
+    {
+      "response": 3,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -687.0835033021907,
+      "mean_posterior_teacher_weight": 0.0008761384068314031,
+      "fraction_posterior_below_1em6": 0.9634486607142857
+    },
+    {
+      "response": 3,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -687.0835033021907,
+      "mean_posterior_teacher_weight": 0.0028410994882675103,
+      "fraction_posterior_below_1em6": 0.9634486607142857
+    },
+    {
+      "response": 4,
+      "strength": 0.1,
+      "tokens": 5993,
+      "sequence_log_teacher_anchor_ratio": -604.0085566671394,
+      "mean_posterior_teacher_weight": 0.0005268877228572997,
+      "fraction_posterior_below_1em6": 0.9758051059569498
+    },
+    {
+      "response": 4,
+      "strength": 0.3,
+      "tokens": 5993,
+      "sequence_log_teacher_anchor_ratio": -604.0085566671394,
+      "mean_posterior_teacher_weight": 0.0017106279618135203,
+      "fraction_posterior_below_1em6": 0.9758051059569498
+    },
+    {
+      "response": 5,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -723.3227619370061,
+      "mean_posterior_teacher_weight": 0.0008869619091719634,
+      "fraction_posterior_below_1em6": 0.9747488839285714
+    },
+    {
+      "response": 5,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -723.3227619370061,
+      "mean_posterior_teacher_weight": 0.0027469656001000496,
+      "fraction_posterior_below_1em6": 0.97265625
+    },
+    {
+      "response": 6,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -856.0452586671549,
+      "mean_posterior_teacher_weight": 0.00024512257170505663,
+      "fraction_posterior_below_1em6": 0.9833984375
+    },
+    {
+      "response": 6,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -856.0452586671549,
+      "mean_posterior_teacher_weight": 0.000797627605021929,
+      "fraction_posterior_below_1em6": 0.9801897321428571
+    },
+    {
+      "response": 7,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -842.2353430699878,
+      "mean_posterior_teacher_weight": 0.0004307266058067232,
+      "fraction_posterior_below_1em6": 0.9733537946428571
+    },
+    {
+      "response": 7,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -842.2353430699878,
+      "mean_posterior_teacher_weight": 0.0011809902990056955,
+      "fraction_posterior_below_1em6": 0.9711216517857143
+    },
+    {
+      "response": 8,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -709.3413907460642,
+      "mean_posterior_teacher_weight": 0.0005427619702073886,
+      "fraction_posterior_below_1em6": 0.9792131696428571
+    },
+    {
+      "response": 8,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -709.3413907460642,
+      "mean_posterior_teacher_weight": 0.0018424945295611272,
+      "fraction_posterior_below_1em6": 0.9773995535714286
+    },
+    {
+      "response": 9,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -743.052420889999,
+      "mean_posterior_teacher_weight": 0.00017853217263127483,
+      "fraction_posterior_below_1em6": 0.9701450892857143
+    },
+    {
+      "response": 9,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -743.052420889999,
+      "mean_posterior_teacher_weight": 0.0005707083808371335,
+      "fraction_posterior_below_1em6": 0.9662388392857143
+    },
+    {
+      "response": 10,
+      "strength": 0.1,
+      "tokens": 6367,
+      "sequence_log_teacher_anchor_ratio": -666.4919360214678,
+      "mean_posterior_teacher_weight": 0.0011654349423985064,
+      "fraction_posterior_below_1em6": 0.9789539814669389
+    },
+    {
+      "response": 10,
+      "strength": 0.3,
+      "tokens": 6367,
+      "sequence_log_teacher_anchor_ratio": -666.4919360214678,
+      "mean_posterior_teacher_weight": 0.0032938217270282446,
+      "fraction_posterior_below_1em6": 0.9732998272341762
+    },
+    {
+      "response": 11,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -746.4921780875001,
+      "mean_posterior_teacher_weight": 0.000436633993197892,
+      "fraction_posterior_below_1em6": 0.9681919642857143
+    },
+    {
+      "response": 11,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -746.4921780875001,
+      "mean_posterior_teacher_weight": 0.0014910802378091377,
+      "fraction_posterior_below_1em6": 0.9672154017857143
+    },
+    {
+      "response": 12,
+      "strength": 0.1,
+      "tokens": 5602,
+      "sequence_log_teacher_anchor_ratio": -568.5444786214755,
+      "mean_posterior_teacher_weight": 0.0026107803285180414,
+      "fraction_posterior_below_1em6": 0.9625133880756872
+    },
+    {
+      "response": 12,
+      "strength": 0.3,
+      "tokens": 5602,
+      "sequence_log_teacher_anchor_ratio": -568.5444786214755,
+      "mean_posterior_teacher_weight": 0.005856487110788553,
+      "fraction_posterior_below_1em6": 0.9584077115315959
+    },
+    {
+      "response": 13,
+      "strength": 0.1,
+      "tokens": 4205,
+      "sequence_log_teacher_anchor_ratio": -424.28908269588425,
+      "mean_posterior_teacher_weight": 0.000882554929492089,
+      "fraction_posterior_below_1em6": 0.949346016646849
+    },
+    {
+      "response": 13,
+      "strength": 0.3,
+      "tokens": 4205,
+      "sequence_log_teacher_anchor_ratio": -424.28908269588425,
+      "mean_posterior_teacher_weight": 0.0029523122387940877,
+      "fraction_posterior_below_1em6": 0.9483947681331748
+    },
+    {
+      "response": 14,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -781.4046061206052,
+      "mean_posterior_teacher_weight": 0.00023640428186705347,
+      "fraction_posterior_below_1em6": 0.9850725446428571
+    },
+    {
+      "response": 14,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -781.4046061206052,
+      "mean_posterior_teacher_weight": 0.000764874156375131,
+      "fraction_posterior_below_1em6": 0.9839564732142857
+    },
+    {
+      "response": 15,
+      "strength": 0.1,
+      "tokens": 5061,
+      "sequence_log_teacher_anchor_ratio": -400.2646091994285,
+      "mean_posterior_teacher_weight": 0.0005822658415699004,
+      "fraction_posterior_below_1em6": 0.9600869393400514
+    },
+    {
+      "response": 15,
+      "strength": 0.3,
+      "tokens": 5061,
+      "sequence_log_teacher_anchor_ratio": -400.2646091994285,
+      "mean_posterior_teacher_weight": 0.001965508363547444,
+      "fraction_posterior_below_1em6": 0.9585062240663901
+    },
+    {
+      "response": 16,
+      "strength": 0.1,
+      "tokens": 4413,
+      "sequence_log_teacher_anchor_ratio": -415.4502569419617,
+      "mean_posterior_teacher_weight": 0.0016813002223958688,
+      "fraction_posterior_below_1em6": 0.9721278042148198
+    },
+    {
+      "response": 16,
+      "strength": 0.3,
+      "tokens": 4413,
+      "sequence_log_teacher_anchor_ratio": -415.4502569419617,
+      "mean_posterior_teacher_weight": 0.005075890250855594,
+      "fraction_posterior_below_1em6": 0.9671425334239746
+    },
+    {
+      "response": 17,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -784.6248139357533,
+      "mean_posterior_teacher_weight": 0.00047344937867216424,
+      "fraction_posterior_below_1em6": 0.9801897321428571
+    },
+    {
+      "response": 17,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -784.6248139357533,
+      "mean_posterior_teacher_weight": 0.00153289473343308,
+      "fraction_posterior_below_1em6": 0.9793526785714286
+    },
+    {
+      "response": 18,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -793.6882587054894,
+      "mean_posterior_teacher_weight": 0.0009331382017001607,
+      "fraction_posterior_below_1em6": 0.9806082589285714
+    },
+    {
+      "response": 18,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -793.6882587054894,
+      "mean_posterior_teacher_weight": 0.0028629536836772924,
+      "fraction_posterior_below_1em6": 0.9806082589285714
+    },
+    {
+      "response": 19,
+      "strength": 0.1,
+      "tokens": 4681,
+      "sequence_log_teacher_anchor_ratio": -490.69152181925165,
+      "mean_posterior_teacher_weight": 0.0008808788409737437,
+      "fraction_posterior_below_1em6": 0.9760734885708182
+    },
+    {
+      "response": 19,
+      "strength": 0.3,
+      "tokens": 4681,
+      "sequence_log_teacher_anchor_ratio": -490.69152181925165,
+      "mean_posterior_teacher_weight": 0.0026698909675775154,
+      "fraction_posterior_below_1em6": 0.9758598590044862
+    },
+    {
+      "response": 20,
+      "strength": 0.1,
+      "tokens": 3391,
+      "sequence_log_teacher_anchor_ratio": -342.7774829449691,
+      "mean_posterior_teacher_weight": 0.006377764763206931,
+      "fraction_posterior_below_1em6": 0.9430846358006488
+    },
+    {
+      "response": 20,
+      "strength": 0.3,
+      "tokens": 3391,
+      "sequence_log_teacher_anchor_ratio": -342.7774829449691,
+      "mean_posterior_teacher_weight": 0.015130408294328497,
+      "fraction_posterior_below_1em6": 0.937776467118844
+    },
+    {
+      "response": 21,
+      "strength": 0.1,
+      "tokens": 4984,
+      "sequence_log_teacher_anchor_ratio": -424.416848052361,
+      "mean_posterior_teacher_weight": 0.0023367659508443345,
+      "fraction_posterior_below_1em6": 0.9648876404494382
+    },
+    {
+      "response": 21,
+      "strength": 0.3,
+      "tokens": 4984,
+      "sequence_log_teacher_anchor_ratio": -424.416848052361,
+      "mean_posterior_teacher_weight": 0.006710221251196384,
+      "fraction_posterior_below_1em6": 0.9642857142857143
+    },
+    {
+      "response": 22,
+      "strength": 0.1,
+      "tokens": 6051,
+      "sequence_log_teacher_anchor_ratio": -550.6826769233878,
+      "mean_posterior_teacher_weight": 0.0006506929093372662,
+      "fraction_posterior_below_1em6": 0.9719054701702198
+    },
+    {
+      "response": 22,
+      "strength": 0.3,
+      "tokens": 6051,
+      "sequence_log_teacher_anchor_ratio": -550.6826769233878,
+      "mean_posterior_teacher_weight": 0.002115092434669123,
+      "fraction_posterior_below_1em6": 0.9709138985291688
+    },
+    {
+      "response": 23,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -797.5054375070655,
+      "mean_posterior_teacher_weight": 0.0004004540138795852,
+      "fraction_posterior_below_1em6": 0.9864676339285714
+    },
+    {
+      "response": 23,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -797.5054375070655,
+      "mean_posterior_teacher_weight": 0.0012969900848549922,
+      "fraction_posterior_below_1em6": 0.9836774553571429
+    },
+    {
+      "response": 24,
+      "strength": 0.1,
+      "tokens": 5179,
+      "sequence_log_teacher_anchor_ratio": -543.9548446541921,
+      "mean_posterior_teacher_weight": 0.0008670406962501047,
+      "fraction_posterior_below_1em6": 0.9638926433674454
+    },
+    {
+      "response": 24,
+      "strength": 0.3,
+      "tokens": 5179,
+      "sequence_log_teacher_anchor_ratio": -543.9548446541921,
+      "mean_posterior_teacher_weight": 0.002806215621703848,
+      "fraction_posterior_below_1em6": 0.9617686812125893
+    },
+    {
+      "response": 25,
+      "strength": 0.1,
+      "tokens": 4798,
+      "sequence_log_teacher_anchor_ratio": -394.910468813286,
+      "mean_posterior_teacher_weight": 0.0007559740727012773,
+      "fraction_posterior_below_1em6": 0.9735306377657357
+    },
+    {
+      "response": 25,
+      "strength": 0.3,
+      "tokens": 4798,
+      "sequence_log_teacher_anchor_ratio": -394.910468813286,
+      "mean_posterior_teacher_weight": 0.0024226822472781396,
+      "fraction_posterior_below_1em6": 0.9699874947894956
+    },
+    {
+      "response": 26,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -886.8046402542763,
+      "mean_posterior_teacher_weight": 0.0021958614102853655,
+      "fraction_posterior_below_1em6": 0.9790736607142857
+    },
+    {
+      "response": 26,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -886.8046402542763,
+      "mean_posterior_teacher_weight": 0.00496065915890115,
+      "fraction_posterior_below_1em6": 0.9767020089285714
+    },
+    {
+      "response": 27,
+      "strength": 0.1,
+      "tokens": 6049,
+      "sequence_log_teacher_anchor_ratio": -548.1464728872699,
+      "mean_posterior_teacher_weight": 0.00022848720768810685,
+      "fraction_posterior_below_1em6": 0.9712349148619607
+    },
+    {
+      "response": 27,
+      "strength": 0.3,
+      "tokens": 6049,
+      "sequence_log_teacher_anchor_ratio": -548.1464728872699,
+      "mean_posterior_teacher_weight": 0.0007743797092507717,
+      "fraction_posterior_below_1em6": 0.9707389651182013
+    },
+    {
+      "response": 28,
+      "strength": 0.1,
+      "tokens": 5887,
+      "sequence_log_teacher_anchor_ratio": -547.1871243981586,
+      "mean_posterior_teacher_weight": 0.0028132720789695222,
+      "fraction_posterior_below_1em6": 0.9765585187701715
+    },
+    {
+      "response": 28,
+      "strength": 0.3,
+      "tokens": 5887,
+      "sequence_log_teacher_anchor_ratio": -547.1871243981586,
+      "mean_posterior_teacher_weight": 0.006286903299816288,
+      "fraction_posterior_below_1em6": 0.9760489213521318
+    },
+    {
+      "response": 29,
+      "strength": 0.1,
+      "tokens": 4621,
+      "sequence_log_teacher_anchor_ratio": -532.2676824353508,
+      "mean_posterior_teacher_weight": 0.0005754400512922434,
+      "fraction_posterior_below_1em6": 0.9688379138714563
+    },
+    {
+      "response": 29,
+      "strength": 0.3,
+      "tokens": 4621,
+      "sequence_log_teacher_anchor_ratio": -532.2676824353508,
+      "mean_posterior_teacher_weight": 0.0019323891323450898,
+      "fraction_posterior_below_1em6": 0.9671066868643151
+    },
+    {
+      "response": 30,
+      "strength": 0.1,
+      "tokens": 4237,
+      "sequence_log_teacher_anchor_ratio": -462.96835525718404,
+      "mean_posterior_teacher_weight": 0.0010830019319539854,
+      "fraction_posterior_below_1em6": 0.9645975926362993
+    },
+    {
+      "response": 30,
+      "strength": 0.3,
+      "tokens": 4237,
+      "sequence_log_teacher_anchor_ratio": -462.96835525718404,
+      "mean_posterior_teacher_weight": 0.0030568811990749475,
+      "fraction_posterior_below_1em6": 0.9634175123908426
+    },
+    {
+      "response": 31,
+      "strength": 0.1,
+      "tokens": 3951,
+      "sequence_log_teacher_anchor_ratio": -341.9477261526107,
+      "mean_posterior_teacher_weight": 0.0003664281915244238,
+      "fraction_posterior_below_1em6": 0.9703872437357631
+    },
+    {
+      "response": 31,
+      "strength": 0.3,
+      "tokens": 3951,
+      "sequence_log_teacher_anchor_ratio": -341.9477261526107,
+      "mean_posterior_teacher_weight": 0.0012139041547925286,
+      "fraction_posterior_below_1em6": 0.9643128321943811
+    },
+    {
+      "response": 32,
+      "strength": 0.1,
+      "tokens": 5443,
+      "sequence_log_teacher_anchor_ratio": -486.1077313011906,
+      "mean_posterior_teacher_weight": 0.0011643908108919484,
+      "fraction_posterior_below_1em6": 0.9746463347418703
+    },
+    {
+      "response": 32,
+      "strength": 0.3,
+      "tokens": 5443,
+      "sequence_log_teacher_anchor_ratio": -486.1077313011906,
+      "mean_posterior_teacher_weight": 0.0032246672942884093,
+      "fraction_posterior_below_1em6": 0.9720742237736543
+    },
+    {
+      "response": 33,
+      "strength": 0.1,
+      "tokens": 6813,
+      "sequence_log_teacher_anchor_ratio": -737.4047774299381,
+      "mean_posterior_teacher_weight": 0.0026617633997648013,
+      "fraction_posterior_below_1em6": 0.9788639365918098
+    },
+    {
+      "response": 33,
+      "strength": 0.3,
+      "tokens": 6813,
+      "sequence_log_teacher_anchor_ratio": -737.4047774299381,
+      "mean_posterior_teacher_weight": 0.005636271885889965,
+      "fraction_posterior_below_1em6": 0.9740202553940995
+    },
+    {
+      "response": 34,
+      "strength": 0.1,
+      "tokens": 6589,
+      "sequence_log_teacher_anchor_ratio": -726.9260471192956,
+      "mean_posterior_teacher_weight": 0.00023020553002815308,
+      "fraction_posterior_below_1em6": 0.9770830171497951
+    },
+    {
+      "response": 34,
+      "strength": 0.3,
+      "tokens": 6589,
+      "sequence_log_teacher_anchor_ratio": -726.9260471192956,
+      "mean_posterior_teacher_weight": 0.0007169109353901806,
+      "fraction_posterior_below_1em6": 0.9770830171497951
+    },
+    {
+      "response": 35,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -891.7354605514865,
+      "mean_posterior_teacher_weight": 0.0011090183162673938,
+      "fraction_posterior_below_1em6": 0.9790736607142857
+    },
+    {
+      "response": 35,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -891.7354605514865,
+      "mean_posterior_teacher_weight": 0.0031469097582557523,
+      "fraction_posterior_below_1em6": 0.9782366071428571
+    },
+    {
+      "response": 36,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -883.3869076193766,
+      "mean_posterior_teacher_weight": 0.0006368339866919341,
+      "fraction_posterior_below_1em6": 0.9744698660714286
+    },
+    {
+      "response": 36,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -883.3869076193766,
+      "mean_posterior_teacher_weight": 0.0020420604820825246,
+      "fraction_posterior_below_1em6": 0.9736328125
+    },
+    {
+      "response": 37,
+      "strength": 0.1,
+      "tokens": 6159,
+      "sequence_log_teacher_anchor_ratio": -580.0851547246996,
+      "mean_posterior_teacher_weight": 0.0006589445974117125,
+      "fraction_posterior_below_1em6": 0.9655788277317746
+    },
+    {
+      "response": 37,
+      "strength": 0.3,
+      "tokens": 6159,
+      "sequence_log_teacher_anchor_ratio": -580.0851547246996,
+      "mean_posterior_teacher_weight": 0.0021230535597867996,
+      "fraction_posterior_below_1em6": 0.964929371651242
+    },
+    {
+      "response": 38,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -717.5306715843453,
+      "mean_posterior_teacher_weight": 0.003643082736699965,
+      "fraction_posterior_below_1em6": 0.974609375
+    },
+    {
+      "response": 38,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -717.5306715843453,
+      "mean_posterior_teacher_weight": 0.008507155946649091,
+      "fraction_posterior_below_1em6": 0.9737723214285714
+    },
+    {
+      "response": 39,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -908.7037933630568,
+      "mean_posterior_teacher_weight": 0.0003940728394127311,
+      "fraction_posterior_below_1em6": 0.9896763392857143
+    },
+    {
+      "response": 39,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -908.7037933630568,
+      "mean_posterior_teacher_weight": 0.001215562180799155,
+      "fraction_posterior_below_1em6": 0.9892578125
+    },
+    {
+      "response": 40,
+      "strength": 0.1,
+      "tokens": 7153,
+      "sequence_log_teacher_anchor_ratio": -744.4787317299584,
+      "mean_posterior_teacher_weight": 0.0003846931556686715,
+      "fraction_posterior_below_1em6": 0.9843422340276807
+    },
+    {
+      "response": 40,
+      "strength": 0.3,
+      "tokens": 7153,
+      "sequence_log_teacher_anchor_ratio": -744.4787317299584,
+      "mean_posterior_teacher_weight": 0.0012748857787329253,
+      "fraction_posterior_below_1em6": 0.9843422340276807
+    },
+    {
+      "response": 41,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -921.8449327976272,
+      "mean_posterior_teacher_weight": 0.00039620395678153266,
+      "fraction_posterior_below_1em6": 0.9813058035714286
+    },
+    {
+      "response": 41,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -921.8449327976272,
+      "mean_posterior_teacher_weight": 0.001293263822495408,
+      "fraction_posterior_below_1em6": 0.9813058035714286
+    },
+    {
+      "response": 42,
+      "strength": 0.1,
+      "tokens": 5013,
+      "sequence_log_teacher_anchor_ratio": -522.9683916488749,
+      "mean_posterior_teacher_weight": 0.0002808144130558723,
+      "fraction_posterior_below_1em6": 0.9818471972870536
+    },
+    {
+      "response": 42,
+      "strength": 0.3,
+      "tokens": 5013,
+      "sequence_log_teacher_anchor_ratio": -522.9683916488749,
+      "mean_posterior_teacher_weight": 0.0008983769386718002,
+      "fraction_posterior_below_1em6": 0.981049271893078
+    },
+    {
+      "response": 43,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -777.1466615696943,
+      "mean_posterior_teacher_weight": 0.0004384588362433658,
+      "fraction_posterior_below_1em6": 0.9818638392857143
+    },
+    {
+      "response": 43,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -777.1466615696943,
+      "mean_posterior_teacher_weight": 0.0014149073800706808,
+      "fraction_posterior_below_1em6": 0.9817243303571429
+    },
+    {
+      "response": 44,
+      "strength": 0.1,
+      "tokens": 7075,
+      "sequence_log_teacher_anchor_ratio": -768.5845732058928,
+      "mean_posterior_teacher_weight": 0.0008252672815466199,
+      "fraction_posterior_below_1em6": 0.974416961130742
+    },
+    {
+      "response": 44,
+      "strength": 0.3,
+      "tokens": 7075,
+      "sequence_log_teacher_anchor_ratio": -768.5845732058928,
+      "mean_posterior_teacher_weight": 0.002348778330381234,
+      "fraction_posterior_below_1em6": 0.9730035335689046
+    },
+    {
+      "response": 45,
+      "strength": 0.1,
+      "tokens": 6337,
+      "sequence_log_teacher_anchor_ratio": -699.1152401820921,
+      "mean_posterior_teacher_weight": 0.0003530188720691626,
+      "fraction_posterior_below_1em6": 0.970490768502446
+    },
+    {
+      "response": 45,
+      "strength": 0.3,
+      "tokens": 6337,
+      "sequence_log_teacher_anchor_ratio": -699.1152401820921,
+      "mean_posterior_teacher_weight": 0.0011717944441890047,
+      "fraction_posterior_below_1em6": 0.9703329651254536
+    },
+    {
+      "response": 46,
+      "strength": 0.1,
+      "tokens": 3780,
+      "sequence_log_teacher_anchor_ratio": -375.8230662467457,
+      "mean_posterior_teacher_weight": 0.001534516496422999,
+      "fraction_posterior_below_1em6": 0.953968253968254
+    },
+    {
+      "response": 46,
+      "strength": 0.3,
+      "tokens": 3780,
+      "sequence_log_teacher_anchor_ratio": -375.8230662467457,
+      "mean_posterior_teacher_weight": 0.004871692249423426,
+      "fraction_posterior_below_1em6": 0.9523809523809523
+    },
+    {
+      "response": 47,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -874.7130621650914,
+      "mean_posterior_teacher_weight": 0.000499741292195297,
+      "fraction_posterior_below_1em6": 0.9832589285714286
+    },
+    {
+      "response": 47,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -874.7130621650914,
+      "mean_posterior_teacher_weight": 0.0016480039939275593,
+      "fraction_posterior_below_1em6": 0.9829799107142857
+    },
+    {
+      "response": 48,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -688.4398684571979,
+      "mean_posterior_teacher_weight": 0.0012455047016328813,
+      "fraction_posterior_below_1em6": 0.9736328125
+    },
+    {
+      "response": 48,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -688.4398684571979,
+      "mean_posterior_teacher_weight": 0.0036776876609169603,
+      "fraction_posterior_below_1em6": 0.9725167410714286
+    },
+    {
+      "response": 49,
+      "strength": 0.1,
+      "tokens": 5715,
+      "sequence_log_teacher_anchor_ratio": -537.9855932428397,
+      "mean_posterior_teacher_weight": 0.005434663698568455,
+      "fraction_posterior_below_1em6": 0.9641294838145232
+    },
+    {
+      "response": 49,
+      "strength": 0.3,
+      "tokens": 5715,
+      "sequence_log_teacher_anchor_ratio": -537.9855932428397,
+      "mean_posterior_teacher_weight": 0.012031584308618051,
+      "fraction_posterior_below_1em6": 0.9636045494313211
+    },
+    {
+      "response": 50,
+      "strength": 0.1,
+      "tokens": 6915,
+      "sequence_log_teacher_anchor_ratio": -656.5945240431842,
+      "mean_posterior_teacher_weight": 0.0007303811672704671,
+      "fraction_posterior_below_1em6": 0.9674620390455532
+    },
+    {
+      "response": 50,
+      "strength": 0.3,
+      "tokens": 6915,
+      "sequence_log_teacher_anchor_ratio": -656.5945240431842,
+      "mean_posterior_teacher_weight": 0.0023352183940936588,
+      "fraction_posterior_below_1em6": 0.967172812725958
+    },
+    {
+      "response": 51,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -829.7404293884118,
+      "mean_posterior_teacher_weight": 0.00055771125897188,
+      "fraction_posterior_below_1em6": 0.9767020089285714
+    },
+    {
+      "response": 51,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -829.7404293884118,
+      "mean_posterior_teacher_weight": 0.0015547819831611598,
+      "fraction_posterior_below_1em6": 0.9748883928571429
+    },
+    {
+      "response": 52,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -765.4546695577133,
+      "mean_posterior_teacher_weight": 0.000468950846348245,
+      "fraction_posterior_below_1em6": 0.9835379464285714
+    },
+    {
+      "response": 52,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -765.4546695577133,
+      "mean_posterior_teacher_weight": 0.0014884033749951145,
+      "fraction_posterior_below_1em6": 0.9825613839285714
+    },
+    {
+      "response": 53,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -781.0069215319203,
+      "mean_posterior_teacher_weight": 0.0002751032424774154,
+      "fraction_posterior_below_1em6": 0.9773995535714286
+    },
+    {
+      "response": 53,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -781.0069215319203,
+      "mean_posterior_teacher_weight": 0.0009275588866734249,
+      "fraction_posterior_below_1em6": 0.9753069196428571
+    },
+    {
+      "response": 54,
+      "strength": 0.1,
+      "tokens": 7128,
+      "sequence_log_teacher_anchor_ratio": -734.8331090960055,
+      "mean_posterior_teacher_weight": 0.0003833233185073563,
+      "fraction_posterior_below_1em6": 0.9855499438832772
+    },
+    {
+      "response": 54,
+      "strength": 0.3,
+      "tokens": 7128,
+      "sequence_log_teacher_anchor_ratio": -734.8331090960055,
+      "mean_posterior_teacher_weight": 0.0012688760149094076,
+      "fraction_posterior_below_1em6": 0.9852693602693603
+    },
+    {
+      "response": 55,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -705.2721345221094,
+      "mean_posterior_teacher_weight": 0.0003479764851929737,
+      "fraction_posterior_below_1em6": 0.974609375
+    },
+    {
+      "response": 55,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -705.2721345221094,
+      "mean_posterior_teacher_weight": 0.0010993078654230894,
+      "fraction_posterior_below_1em6": 0.9737723214285714
+    },
+    {
+      "response": 56,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -827.5965276221709,
+      "mean_posterior_teacher_weight": 0.0004700157197304986,
+      "fraction_posterior_below_1em6": 0.9751674107142857
+    },
+    {
+      "response": 56,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -827.5965276221709,
+      "mean_posterior_teacher_weight": 0.0015304559213929708,
+      "fraction_posterior_below_1em6": 0.9739118303571429
+    },
+    {
+      "response": 57,
+      "strength": 0.1,
+      "tokens": 4947,
+      "sequence_log_teacher_anchor_ratio": -457.93269588025225,
+      "mean_posterior_teacher_weight": 0.0018694213808297148,
+      "fraction_posterior_below_1em6": 0.9630078835657975
+    },
+    {
+      "response": 57,
+      "strength": 0.3,
+      "tokens": 4947,
+      "sequence_log_teacher_anchor_ratio": -457.93269588025225,
+      "mean_posterior_teacher_weight": 0.005216363549351491,
+      "fraction_posterior_below_1em6": 0.9597736001617142
+    },
+    {
+      "response": 58,
+      "strength": 0.1,
+      "tokens": 3750,
+      "sequence_log_teacher_anchor_ratio": -312.588574075392,
+      "mean_posterior_teacher_weight": 0.0003455919758011556,
+      "fraction_posterior_below_1em6": 0.9621333333333333
+    },
+    {
+      "response": 58,
+      "strength": 0.3,
+      "tokens": 3750,
+      "sequence_log_teacher_anchor_ratio": -312.588574075392,
+      "mean_posterior_teacher_weight": 0.0011293317189179394,
+      "fraction_posterior_below_1em6": 0.9562666666666667
+    },
+    {
+      "response": 59,
+      "strength": 0.1,
+      "tokens": 4475,
+      "sequence_log_teacher_anchor_ratio": -353.4495615801677,
+      "mean_posterior_teacher_weight": 0.005145610233242051,
+      "fraction_posterior_below_1em6": 0.950391061452514
+    },
+    {
+      "response": 59,
+      "strength": 0.3,
+      "tokens": 4475,
+      "sequence_log_teacher_anchor_ratio": -353.4495615801677,
+      "mean_posterior_teacher_weight": 0.011187189426493594,
+      "fraction_posterior_below_1em6": 0.9481564245810056
+    },
+    {
+      "response": 60,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -812.0284718875682,
+      "mean_posterior_teacher_weight": 0.0003832469681064654,
+      "fraction_posterior_below_1em6": 0.9787946428571429
+    },
+    {
+      "response": 60,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -812.0284718875682,
+      "mean_posterior_teacher_weight": 0.00129050541220187,
+      "fraction_posterior_below_1em6": 0.9786551339285714
+    },
+    {
+      "response": 61,
+      "strength": 0.1,
+      "tokens": 3735,
+      "sequence_log_teacher_anchor_ratio": -387.01412648917614,
+      "mean_posterior_teacher_weight": 0.00041932930553256504,
+      "fraction_posterior_below_1em6": 0.9649263721552879
+    },
+    {
+      "response": 61,
+      "strength": 0.3,
+      "tokens": 3735,
+      "sequence_log_teacher_anchor_ratio": -387.01412648917614,
+      "mean_posterior_teacher_weight": 0.0013637620837821632,
+      "fraction_posterior_below_1em6": 0.9585006693440429
+    },
+    {
+      "response": 62,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -939.2747487480317,
+      "mean_posterior_teacher_weight": 0.0014072987975561047,
+      "fraction_posterior_below_1em6": 0.9807477678571429
+    },
+    {
+      "response": 62,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -939.2747487480317,
+      "mean_posterior_teacher_weight": 0.003835541086976648,
+      "fraction_posterior_below_1em6": 0.9803292410714286
+    },
+    {
+      "response": 63,
+      "strength": 0.1,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -804.2542043520434,
+      "mean_posterior_teacher_weight": 0.0005308959625456889,
+      "fraction_posterior_below_1em6": 0.9856305803571429
+    },
+    {
+      "response": 63,
+      "strength": 0.3,
+      "tokens": 7168,
+      "sequence_log_teacher_anchor_ratio": -804.2542043520434,
+      "mean_posterior_teacher_weight": 0.001722609527302039,
+      "fraction_posterior_below_1em6": 0.9856305803571429
+    }
+  ],
+  "0.1": {
+    "mean_sequence_log_ratio": -652.3084815827841,
+    "mean_response_posterior": 0.0011388352531202565,
+    "token_weighted_fraction_below_1em6": 0.9742561801840035
+  },
+  "0.3": {
+    "mean_sequence_log_ratio": -652.3084815827841,
+    "mean_response_posterior": 0.0030614400734692146,
+    "token_weighted_fraction_below_1em6": 0.9726722948906437
+  }
+}

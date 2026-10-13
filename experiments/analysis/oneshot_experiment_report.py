@@ -668,6 +668,13 @@ $$
         text = text.replace(heading + "\n", f'<a id="{identifier}"></a>\n\n' + heading + "\n", 1)
     for old, anchor in ALIASES.items():
         text = text.replace(old, REPORT.name + "#" + anchor)
+    # Retain the separately maintained power-family study when rebuilding history.
+    if REPORT.exists():
+        existing = REPORT.read_text()
+        first, last = "<!-- power-mean-study:start -->", "<!-- power-mean-study:end -->"
+        if first in existing and last in existing:
+            retained = existing[existing.index(first) : existing.index(last) + len(last)]
+            text = text.replace("### 参考文献\n", retained + "\n\n### 参考文献\n", 1)
     assert len(text.splitlines()) < 1000
     REPORT.write_text(text)
     snapshot = {

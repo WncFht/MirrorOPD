@@ -1,0 +1,76 @@
+\subsection{target 形状与拟合形状是两个参数}
+
+前文 $\kappa$ 用于构造 $m_{\kappa,\lambda}$，本小节明确写为 $\kappa_{\mathrm{target}}$。拟合一个已经冻结的 $m$ 时，可以另外选择 $\kappa_{\mathrm{fit}}$，最小化 $D_{\kappa_{\mathrm{fit}}}(m\Vert p)$。前文的重心进展恒等式直接对应两者相等的情形；两者不相等时仍共享最优点 $p=m$，但有限 inner 应使用 reverse KL/Rényi 证书或另行证明共同评价目标的进展。
+
+因此，几何 target 可以搭配 Hellinger 拟合，算术 target 也可以搭配 Hellinger 拟合。下面的最优常数结论作用于拟合形状，不能直接宣称平方根 target 对任何任务都最优。
+
+\subsection{当前学生采样的误差相关梯度矩界}
+
+固定 prefix 和 target $m$，本小节记 $k=\kappa_{\mathrm{fit}}$。从当前学生 $a\sim p$ 采样动作，令 $\rho=m/p$、$A_k=\E_p\rho^k$、$\psi_p=\nabla_\theta\log p$。解析微分 $D_k(m\Vert p)$，并利用 $\E_p\psi_p=0$，得到无偏估计量
+\begin{equation}
+ g_k(a)=\frac{A_k-\rho_a^k}{k}\psi_p(a),\qquad
+ \E_pg_k=\nabla_\theta D_k(m\Vert p).
+\end{equation}
+它在 $p=m$ 时逐 action 为零。前缀保持固定、动作从当前学生重采样，与每步重新生成完整 response 是两种不同的测度操作。
+
+\begin{theorem}[误差相关二阶矩的锐常数]
+\label{thm:proximal-sharp-self-bound}
+若 $\|\psi_p(a)\|\le M$、$0<k\le1/2$，则
+\begin{equation}
+ \Var_p(g_k)\le\E_p\|g_k\|^2
+ \le\frac{M^2}{k}D_k(m\Vert p).
+\end{equation}
+系数 $1/k$ 是对所有完整支持概率分布统一成立的锐常数。$k=0$ 或 $k>1/2$ 没有有限的统一误差相关常数。按此标准，$k=1/2$ 是该规范化散度族中的唯一最佳形状。
+\end{theorem}
+
+\begin{proof}
+令 $A(t)=\E_p\rho^t$，则 $A(1)=1$，$A$ 对 $t$ 凸，且 $A(k)\le1$。由于 $2k\in[k,1]$，凸性给出
+\begin{equation}
+ A(2k)\le\frac{1-2k}{1-k}A(k)+\frac{k}{1-k}.
+\end{equation}
+所以
+\begin{align}
+ \Var_p(\rho^k)&=A(2k)-A(k)^2\\
+ &\le\frac{(1-A(k))[k+(1-k)A(k)]}{1-k}\\
+ &\le\frac{1-A(k)}{1-k}.
+\end{align}
+再由 $D_k(m\Vert p)=(1-A(k))/[k(1-k)]$，得到 $\E_p[(A_k-\rho^k)^2/k^2]\le D_k/k$，乘以 score 范数界即可。
+
+为证明锐性，取 $p=(v,1-v)$、$m=(v^2,1-v^2)$，$v\to0$。比率为 $\rho=(v,1+v)$，因此 $A(k)=1-(1-k)v+o(v)$、$A(2k)=1-(1-2k)v+o(v)$，有 $\Var_p\rho^k=v+o(v)$、$D_k=v/k+o(v)$。系数二阶矩与损失之比趋于 $1/k$。categorical logits 的 rare-action score 范数平方趋于 2，其概率为 $v$，common-action score 范数平方为 $O(v^2)$，故实际梯度二阶矩也达到这个相对常数；均值平方为 $O(v^2)$，方差具有同一极限。
+
+$1/2<k<1$ 时，取 $p=(v,1-v)$、$m=(1/2,1/2)$，系数方差按 $v^{1-2k}$ 发散，但 $D_k\le1/[k(1-k)]$。$k=1$ 时系数方差按 $1/v$ 发散，损失只按 $\log(1/v)$ 增长。$k=0$ 的 centred log-ratio 系数二阶矩可按 $\log^2(1/m_a)$ 增长，而 reverse KL 只按 $\log(1/m_a)$ 增长。取非对称、固定正质量的学生即可使梯度方差与损失的比也发散。\hfill$\square$
+\end{proof}
+
+在平方根点，这个关系更精确：$A=\sum\sqrt{pm}$，$D_{1/2}=4(1-A)$，系数二阶矩为 $4(1-A^2)=D_{1/2}(1+A)$。它既有统一绝对上界 4，也随拟合误差消失。若使用损失 $L=D_{1/2}/\lambda$，对应的缩放梯度满足 $\E\|g/\lambda\|^2\le(2M^2/\lambda)L$。模型投影误差不为零时，这个结论不强制噪声消失。
+
+\subsection{精确 BPO 已有残差驱动的噪声控制}
+
+对任意 target $m$ 与冻结 anchor $q$，定义 $R=C_q\log(p/m)$ 和 $L_{\mathrm{BPO}}=\E_qR^2/(2\lambda)$。解析梯度中 centre 的导数乘以 $\E_qR=0$ 后消失，因此 $g=R\psi_p/\lambda$ 是 anchor 动作采样的无偏估计量，并满足
+\begin{equation}
+ \E_q\|g\|^2\le\frac{M^2}{\lambda^2}\E_qR^2
+ =\frac{2M^2}{\lambda}L_{\mathrm{BPO}}.
+\end{equation}
+所以误差相关的噪声控制不只存在于 Hellinger 拟合；BPO 本来就具有这项性质。区别是 BPO 残差损失可任意大，而 Hellinger 损失不超过 4。几何 target 的初始 BPO 误差仍可能由极端 teacher log-ratio 主导；改变 target 的形状可以控制这个初始误差。生产 Top-$J$ centre 与完整词表条件均值之间的偏差，必须与这个精确结论区分。
+
+\subsection{平方根 target 和平方根拟合的初始矩界}
+
+若 $m=m_{1/2,\lambda}(q,t)$，令 $A=\sum\sqrt{qt}$、$Z=(1-\lambda)^2+\lambda^2+2\lambda(1-\lambda)A$。在 inner 起点 $p=q$，有
+\begin{equation}
+ \sum_a\sqrt{q_am_a}=\frac{1-\lambda+\lambda A}{\sqrt Z},\qquad
+ 1-\left(\sum_a\sqrt{q_am_a}\right)^2=\frac{\lambda^2(1-A^2)}Z.
+\end{equation}
+因此平方根拟合的梯度系数在除以 $\lambda$ 后，二阶矩为 $4(1-A^2)/Z\le4/[(1-\lambda)^2+\lambda^2]\le8$。这给出同时对所有 teacher、anchor 和 $0<\lambda<1$ 成立的初始上界；其 Fisher--Rao 目标位移也由相同的角度恒等式控制。这个干净的联合性质支持研究平方根组合，但不等于所有数据上的最高信噪比或最佳任务成绩。
+
+\subsection{局部 SGD 收敛与投影误差的条件结论}
+
+固定 prefix 测度，若非负损失 $L(\theta)$ 在迭代所在区域具有光滑常数 $L_{\mathrm{sm}}$，且满足 PL 条件 $\|\nabla L\|^2\ge2\mu L$，无偏估计量满足 $\E\|g\|^2\le CL$，则 SGD 更新 $\theta^+=\theta-\alpha_{\mathrm{opt}}g$ 给出
+\begin{align}
+ \E[L(\theta^+)\mid\theta]
+ &\le L-\alpha_{\mathrm{opt}}\|\nabla L\|^2+
+ \frac{L_{\mathrm{sm}}\alpha_{\mathrm{opt}}^2}2\E\|g\|^2\\
+ &\le\left(1-2\mu\alpha_{\mathrm{opt}}+
+ \frac{L_{\mathrm{sm}}C\alpha_{\mathrm{opt}}^2}2\right)L.
+\end{align}
+取 $0<\alpha_{\mathrm{opt}}\le\min\{1/\mu,2\mu/(L_{\mathrm{sm}}C)\}$，得到 $\E L_n\le(1-\mu\alpha_{\mathrm{opt}})^nL_0$。与固定非零噪声上界相比，目标可实现时不存在由此项造成的固定步长误差底。若最小投影损失为 $L_\star>0$，只假设 PL 控制 $L-L_\star$，同一推导多出 $L_{\mathrm{sm}}C\alpha_{\mathrm{opt}}^2L_\star/2$，相应渐近超额误差不超过 $L_{\mathrm{sm}}C\alpha_{\mathrm{opt}}L_\star/(2\mu)$。
+
+这些是带明确光滑性、PL、可实现性和 score 条件的 SGD 结论。大模型共享参数、BF16 算术与本轮 AdamW 试验没有自动获得这些假设。实验直接检查残差、真损失和实际参数梯度，而不把条件收敛定理作为已完成的神经网络训练结论。

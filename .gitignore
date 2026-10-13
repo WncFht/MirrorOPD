@@ -72,3 +72,6 @@ data/oneshot-lr-stability/*.csv
 
 # Machine-local watcher heartbeat; scientific result snapshots stay versioned.
 /results/oneshot-effective-time/watcher-status.json
+
+# Exact model audit restores from its versioned gzip archive.
+/data/power-mean-20261013/prefix-audit.csv

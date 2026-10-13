@@ -1,0 +1,75 @@
+{
+  "cached_relative_noise": {
+    "bf16-lambda0.1-kappa0.5": {
+      "relative_logit_noise_ratio": 1.2234358769467082,
+      "paired_response_cluster_ci95": [
+        1.1637635631119971,
+        1.2913979098081698
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "bf16-lambda0.1-kappa1.0": {
+      "relative_logit_noise_ratio": 1.7865456363915606,
+      "paired_response_cluster_ci95": [
+        1.6643303761229176,
+        1.9232164198716952
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "bf16-lambda0.3-kappa0.5": {
+      "relative_logit_noise_ratio": 1.1218692630881206,
+      "paired_response_cluster_ci95": [
+        1.0729972248073865,
+        1.1785911313076647
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "bf16-lambda0.3-kappa1.0": {
+      "relative_logit_noise_ratio": 1.337037395387253,
+      "paired_response_cluster_ci95": [
+        1.258827282801508,
+        1.426451839310319
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "fp32-lambda0.1-kappa0.5": {
+      "relative_logit_noise_ratio": 1.2322177581284592,
+      "paired_response_cluster_ci95": [
+        1.1714681175917954,
+        1.2992767900735385
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "fp32-lambda0.1-kappa1.0": {
+      "relative_logit_noise_ratio": 1.8009829287132653,
+      "paired_response_cluster_ci95": [
+        1.6763979767540742,
+        1.9413121476869895
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "fp32-lambda0.3-kappa0.5": {
+      "relative_logit_noise_ratio": 1.1294915108990344,
+      "paired_response_cluster_ci95": [
+        1.0794197259571356,
+        1.1862314594118133
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    },
+    "fp32-lambda0.3-kappa1.0": {
+      "relative_logit_noise_ratio": 1.3479943275955681,
+      "paired_response_cluster_ci95": [
+        1.2664453410080134,
+        1.437984590337619
+      ],
+      "scope": "Ratio of averaged per-prefix covariance and squared mean logit gradient; not full-parameter batch SNR"
+    }
+  },
+  "training_cells": [],
+  "parameter_gradient_probes": {},
+  "minimax_velocity_shape": 0.44192837352858505,
+  "sharp_worst_fisher_speed_squared": 3.527274844172147,
+  "completed_training_cells": 0,
+  "planned_training_cells": 20,
+  "scope": "Cached model audit and training pilot are separate evidence levels; no completed GPU training is inferred from cached distributions"
+}

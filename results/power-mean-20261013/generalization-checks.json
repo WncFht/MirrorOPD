@@ -1,0 +1,25 @@
+{
+  "kernel_max_error": 2.7755575615628914e-16,
+  "renyi_certificate_max_violation": 0.0,
+  "sequence_counterexamples_lambda01": {
+    "0.0": {
+      "old_sequence_kl": 5.193992142099483,
+      "new_sequence_kl": 6.074450860864709,
+      "frozen_prefix_sum_kl": 5.063673023907631,
+      "new_hard_branch_probability": 0.02469629023839625
+    },
+    "0.5": {
+      "old_sequence_kl": 5.193992142099483,
+      "new_sequence_kl": 7.097917629587446,
+      "frozen_prefix_sum_kl": 4.919771662192081,
+      "new_hard_branch_probability": 0.041959515838265564
+    },
+    "1.0": {
+      "old_sequence_kl": 5.193992142099483,
+      "new_sequence_kl": 10.44580616811869,
+      "frozen_prefix_sum_kl": 4.385030429883729,
+      "new_hard_branch_probability": 0.108
+    }
+  },
+  "source_sha256": "b3664cddbc0765db6bc8f77877138f028e9103a7a99ebb66467229d4bfc564b7"
+}
