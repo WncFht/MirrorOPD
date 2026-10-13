@@ -85,74 +85,14 @@ TOP-D\footnote{Zhengpeng Xie, Li Lyna Zhang, Zeke Xie, Mao Yang. Trust Region Po
 高维下它们一般不共线；小系数不能纠正方向差异。只有 teacher 与 anchor 的概率比都接近一时，两条方向才一阶接近。
 
 \section{归一化幂均值及散度重心}
+\label{sec:proximal-barycenters}
 
-\subsection{用形状参数统一 target}
-
-定义 $0<\kappa\le1$、$0<\lambda<1$ 的归一化幂均值
-\begin{equation}
- h_{\kappa,\lambda,a}=[(1-\lambda)q_a^\kappa+\lambda t_a^\kappa]^{1/\kappa},\qquad
- m_{\kappa,\lambda,a}=\frac{h_{\kappa,\lambda,a}}{\sum_bh_{\kappa,\lambda,b}}.
- \label{eq:proximal-power-target}
-\end{equation}
-端点 $\kappa=0$ 用极限定义。对 $q_a,t_a>0$，展开 $q_a^\kappa=1+\kappa\log q_a+O(\kappa^2)$，得到
-\begin{equation}
- \lim_{\kappa\to0}\log h_{\kappa,\lambda,a}
- =(1-\lambda)\log q_a+\lambda\log t_a.
-\end{equation}
-因此 $\kappa=0$ 是原始 Mirror 几何 target、$\kappa=1$ 是 TOP-D 算术 target。$\kappa=1/2$ 为归一化平方根插值 $m_a\propto[(1-\lambda)\sqrt{q_a}+\lambda\sqrt{t_a}]^2$。这是 Hellinger 散度重心；平方根坐标中的归一化弦线还沿着 Fisher--Rao 短弧，但 $\lambda$ 通常不是弧长参数\footnote{Mitsuhiro Itoh, Yuichi Shishido. Information geometry of the space of probability measures and barycenter maps. arXiv:2208.11861. \url{https://arxiv.org/html/2208.11861}.}。
-
-\subsection{由散度最小化推导幂均值}
-
-对 $0<\kappa<1$ 定义
-\begin{equation}
- D_\kappa(u\Vert p)
- =\frac{1-\sum_au_a^\kappa p_a^{1-\kappa}}{\kappa(1-\kappa)}.
- \label{eq:proximal-power-divergence}
-\end{equation}
-它是 $\alpha$-divergence 的一种参数化；本章用 $\kappa$ 固定方向与指数。Hölder 不等式保证分子非负。令 $\kappa\to0$，分子展开为 $\kappa\KL(p\Vert u)+O(\kappa^2)$；令 $\kappa=1-\delta\to1$，分子展开为 $\delta\KL(u\Vert p)+O(\delta^2)$。所以端点分别为 $D_0(u\Vert p)=\KL(p\Vert u)$、$D_1(u\Vert p)=\KL(u\Vert p)$。
-
-考虑统一的重心问题
-\begin{equation}
- \min_{p\in\Delta^{d-1}}
- (1-\lambda)D_\kappa(q\Vert p)+\lambda D_\kappa(t\Vert p).
- \label{eq:proximal-divergence-barycenter}
-\end{equation}
-记 $S_a=(1-\lambda)q_a^\kappa+\lambda t_a^\kappa$。其目标为 $(1-\sum_aS_ap_a^{1-\kappa})/[\kappa(1-\kappa)]$。带归一化乘子 $\nu$ 的一阶条件为
-\begin{equation}
- -\frac{S_a}{\kappa}p_a^{-\kappa}+\nu=0
- \quad\Longrightarrow\quad
- p_a=(S_a/(\kappa\nu))^{1/\kappa}.
-\end{equation}
-归一化就得到式~\eqref{eq:proximal-power-target}。其 Hessian 在概率坐标中为正对角阵 $\operatorname{diag}(S_ap_a^{-\kappa-1})$，故目标严格凸，内点解唯一。两个端点分别恢复加权 reverse KL 的几何解与加权 forward KL 的算术解。
-
-所有这些散度在相同分布附近具有同一个 Fisher 二阶项。取 $p=u+\delta$、$\sum_a\delta_a=0$，并令 $\max_a|\delta_a/u_a|\to0$。由
-\begin{equation}
- u_a^\kappa(u_a+\delta_a)^{1-\kappa}
- =u_a+(1-\kappa)\delta_a-\frac{\kappa(1-\kappa)}2\frac{\delta_a^2}{u_a}
- +O(|\delta_a|^3/u_a^2),
-\end{equation}
-求和得到
-\begin{equation}
- D_\kappa(u\Vert u+\delta)
- =\frac12\sum_a\frac{\delta_a^2}{u_a}
- +O\left(\sum_a|\delta_a|^3/u_a^2\right).
-\end{equation}
-共同的局部度量并不意味着到远处 teacher 的方向或有限步路径相同，尤其不能在接近概率边界时忽略高阶项。
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=\textwidth]{../../results/proximal-family-geometry/geometry.pdf}
- \caption{归一化幂均值族。左图用三维概率向量的单纯形展示路径，圆点均为 $\lambda=0.2$；右图用 64 维固定概率向量展示各 token 的归一化目标 log-ratio。$\kappa=0$ 为直线，$\kappa>0$ 为带有限负尾部的曲线。}
-\end{figure}
+\input{sections/proximal_barycenters}
+\input{sections/proximal_barycenter_moments}
 
 \section{通用冻结信号与维数无关的二阶矩界}
 
-由 $r=\log(t/q)$ 定义
-\begin{equation}
- f_{\kappa,\lambda}(r)=\frac1\kappa\log(1-\lambda+\lambda e^{\kappa r}),
- \qquad f_{0,\lambda}(r)=\lambda r.
- \label{eq:proximal-power-signal}
-\end{equation}
+上一节已给出形状相关的精确渐近阶数。本节对式~\eqref{eq:proximal-power-signal} 保留一个所有 $0<\kappa\le1$ 都适用的简便上界。
 通用 mirror 子问题取 $\eta=1$、冻结信号 $f_{\kappa,\lambda}$，则 Gibbs 解 $p\propto qe^f$ 恰好为 $m_{\kappa,\lambda}$。若再取一般 $\eta$，目标变为 $p\propto q^{1-\eta}m_{\kappa,\lambda}^\eta$；此时 $\eta$ 是额外的拟合步幅，不再与族内 $\lambda$ 混用。$\kappa=0$ 时，只需 $\eta f=\eta\lambda r$，等效于原始 mirror 系数 $\eta\lambda$。
 
 形状参数改变尾部而保持相同局部斜率：
@@ -197,7 +137,7 @@ TOP-D\footnote{Zhengpeng Xie, Li Lyna Zhang, Zeke Xie, Mao Yang. Trust Region Po
 
 幂均值族统一的是目标构造。对任一 target $m$，MDPO 可取 $\KL(p\Vert m)$，PMD-Part 可取 $\tfrac12\E_q[\log(p/m)^2]$，BPO 可取 $\tfrac12\Var_q[\log(p/m)]$。完整支持和可实现函数类下，三个损失均在 $p=m$ 取得零值，但它们的投影测度、曲率和有限步轨迹不同。PMD-Mean 的均值归一化近似不能据此获得同一 target 保证。
 
-TOP-D 的固定 advantage PPO 更新也不自动等价于这些目标。不同的 target 族、拟合损失、采样测度、中心化方式和 optimizer 可组合，但每个组合都应单独写清梯度与停止梯度。对幂均值新变体，本章只证明目标重心与即时信号二阶矩界；没有证明神经网络训练效果、外层收缩率或 PPO 单调改善。
+TOP-D 的固定 advantage PPO 更新也不自动等价于这些目标。不同的 target 族、拟合损失、采样测度、中心化方式和 optimizer 可组合，但每个组合都应单独写清梯度与停止梯度。第~\ref{sec:proximal-barycenters}~节证明了精确分布更新的散度进展、escort 收缩与有限 inner 的数学条件；这些结果不自动覆盖神经网络拟合、prefix 测度变化或不同优化目标。
 
 可优先比较 $\kappa\in\{0,1/4,1/2,1\}$，固定同一 $\lambda$，使所有信号在 $r=0$ 的斜率相同。报告原始、中心化与标准化后的梯度方差，同时记录平均梯度、有效更新幅度和目标偏移；避免只比较一个会随整体尺度变化的方差数值。完整训练还需固定模型、prefix batch、inner 次数和优化器配置。
 

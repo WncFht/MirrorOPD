@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-13",
+  "seed": 20261013,
+  "question": "Deepen section 9.3: exact objective gaps, natural flow, escort contraction and moment threshold",
+  "success_conditions": "Algebraic identities and finite differences below 1e-7; tail exponents within 0.01 of predictions",
+  "rejection_conditions": "Any identity, monotonicity or asymptotic order violation rejects the corresponding claim",
+  "variable_choices": "Full-support target family and exact distributions; no production training changes",
+  "scope": "Analytic finite-simplex checks, not an LLM benchmark or proof of novelty",
+  "checks": {
+    "tested_dimensions": [
+      3,
+      64,
+      1024
+    ],
+    "random_checks": 45,
+    "shared_parameter_checks": {
+      "prefixes": 3,
+      "actions": 5,
+      "parameters": 4,
+      "shapes": [
+        0.25,
+        0.5,
+        0.75
+      ]
+    },
+    "max_errors": {
+      "decomposition": 2.220446049250313e-16,
+      "escort_step": 1.6653345369377348e-16,
+      "monotonic_identity": 2.0816681711721685e-16,
+      "flow_derivative": 1.9984014443252818e-15,
+      "hessian": 3.407360504859014e-11,
+      "escort_flow": 6.8718919443711e-11,
+      "hellinger_affinity_flow": 2.3314683517128287e-15,
+      "parameter_gradient": 2.5508803402907176e-11,
+      "projection_orthogonality": 3.0184188481996443e-16
+    }
+  },
+  "tail_witness_slopes": {
+    "0.25": 2.0000000070111508,
+    "0.5": 1.9999999565508622,
+    "0.75": 1.333338745722583,
+    "1.0": 0.9999999822848955
+  },
+  "source_commit": "6807aca25c63ecd015f014579c74a65ad64cf1ee",
+  "script_sha256": "cda3f52f88d5b2f7701f78b78d397a5896d69948c1d3275b9d9f32f5244b6fe6",
+  "versions": {
+    "numpy": "1.26.4",
+    "matplotlib": "3.10.9"
+  },
+  "reproduce": "uv run --no-project --with numpy --with matplotlib python experiments/analysis/proximal_family_dynamics.py"
+}
