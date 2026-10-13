@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "question": "Compare geometric, square-root and arithmetic proximal targets before attributing variance or training gains to interpolation geometry",
   "theory": [
     "Generalize TOP-D's variance bound to sharp shape-dependent moment orders and distinguish normalized signal scale",
@@ -113,13 +113,13 @@
         0.7,
         1
       ],
-      "primary_fit": "reverse_kl",
+      "primary_fit": "bpo",
       "additional_matched_divergence_controls": [
         "kappa0.5-lambda0.1",
         "kappa1-lambda0.1"
       ],
       "updates": 300,
-      "sample_count": 4,
+      "sample_count": 0,
       "training_responses": 64,
       "positions_per_training_response": 16,
       "heldout_responses": 64,
@@ -130,7 +130,7 @@
       "weight_decay": 0.0,
       "gradient_clip": null,
       "seed": 42,
-      "action_sampling": "Fresh iid anchor actions each inner update; shared action seeds across shapes",
+      "action_sampling": "Primary and radius controls: exact conditional sum. Remaining estimator/loss controls retain their declared auxiliary categorical draws; probes instrument fresh draws at fixed parameters without extra responses.",
       "diagnostic_every": 10,
       "primary_metrics": [
         "native student-to-teacher full KL",
@@ -180,10 +180,11 @@
       ],
       "optimizer_update_budget": 18900,
       "canary_update_budget": 10,
-      "exact_backward_plus_mc_probe_budget": 720
+      "exact_backward_plus_mc_probe_budget": 720,
+      "primary_action_expectation": "Exact frozen-anchor full-vocabulary conditional expectation at the prefixes of one rollout per prompt slot; no extra actions in primary updates"
     },
     "math_evaluation": {
-      "conditions": "All 50 unique primary-grid final models plus reused initial model; each evaluated on the same 570 questions before proceeding to the next condition",
+      "conditions": "All 50 unique primary BPO-grid final models plus reused initial model; same 570 questions",
       "questions": 570,
       "datasets": [
         "MATH-500",
@@ -234,6 +235,16 @@
       "grid": "7 kappa x 8 eta; eta1 targets identical; 50 unique primary + 13 loss/proposal/radius controls",
       "original_reference": "lr1e-6, 300 updates, batch64, original eta.3; original decay.01 and clip1 are intentionally not reused",
       "selection": "No choosing best eta/kappa from the 570-question evaluation and calling its score an unbiased generalization estimate; comparisons single-seed exploratory."
+    },
+    {
+      "date": "2026-10-14",
+      "before_gpu_training": true,
+      "reason": "User selects one rollout per prompt and BPO rather than PPO/group-advantage continuation. Primary grid now fits the frozen power target with exact conditional BPO; one response still supplies states. No group advantage, suffix return or random standardization. Original reverse-KL preregistration archived; 13 estimator/loss controls retained as separate diagnostics.",
+      "primary_conditions": 50,
+      "additional_conditions": 13,
+      "primary_action_sample_count": 0,
+      "scope": "Cached t22 panel remains one prompt repeated across 64 slots and a single outer cycle. It validates inner fitting, not a completed multi-prompt fresh-outer algorithm.",
+      "theory": "docs/book/sections/proximal_bpo_algorithm.tex; ideal anchor-Fisher-preconditioned BPO has exact finite-inner all-f-divergence teacher descent, but actual AdamW sweep does not assume this property."
     }
   ]
 }

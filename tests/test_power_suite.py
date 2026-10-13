@@ -89,5 +89,6 @@ def test_batch64_uses_every_response_with_disjoint_positions():
     plan = study_plan({"bf16": {"matched_strengths": {"0.5": 0.1, "1.0": 0.1}}})
     primary = [c for c in plan if c["comparison"] == "fixed_strength"]
     assert len(primary) == 50
+    assert all(c["fit"] == "bpo" and c["sample_count"] == 0 for c in primary)
     assert len({(c["kappa"], c["strength"]) for c in primary if c["strength"] < 1}) == 49
     assert len(primary[-1]["equivalent_kappas"]) == 7

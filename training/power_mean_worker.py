@@ -294,7 +294,7 @@ def gradient_probe(model, sequences, config, count, output, stage="initial"):
             "samples": samples,
             "stage": stage,
             "relative_parameter_noise": max(variance, 0) / max(float(totals[0]), 1e-30),
-            "scope": "BF16-forward full-parameter gradients at fixed prefixes and parameters; finite draws compare actual arithmetic including rounding to an oracle backward",
+            "scope": "Instrument: fresh auxiliary actions at fixed parameters compared to full-vocabulary backward, including BF16 rounding. Does not imply that main training uses sampled actions; exact-expectation BPO has no conditional action sampling noise.",
         }
         (
             output / ("gradient-probe.json" if stage == "initial" else "gradient-probe-final.json")
@@ -404,8 +404,7 @@ def train(args, config, rank):
             {
                 "count": float(count) / 4,
                 "objective": objective,
-                "importance_second": ratio_second,
-                **noise,
+                **({"importance_second": ratio_second, **noise} if config["sample_count"] else {}),
             }
         )
         record(
@@ -418,6 +417,9 @@ def train(args, config, rank):
                 "peak_reserved_memory_gib": torch.cuda.max_memory_reserved() / 2**30,
                 "response_batch_size": config.get("batch_size", 16),
                 "prefix_batch_size": int(count),
+                "action_expectation": "fresh_auxiliary_mc"
+                if config["sample_count"]
+                else "exact_full_vocabulary",
                 "objective_kind": "score_surrogate"
                 if config["sample_count"]
                 else "exact_normalized_loss",

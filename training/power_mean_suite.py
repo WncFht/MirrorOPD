@@ -36,7 +36,7 @@ def study_plan(calibration):
     result = []
     for kappa in (0.0, 0.1, 0.25, minimax_velocity_shape(), 0.5, 0.75, 1.0):
         for strength in (0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7):
-            identifier = f"power-sweep-b64-k{kappa:.6g}-e{strength:g}"
+            identifier = f"power-bpo-sweep-b64-k{kappa:.6g}-e{strength:g}"
             result.append(
                 base
                 | {
@@ -44,15 +44,19 @@ def study_plan(calibration):
                     "kappa": kappa,
                     "strength": strength,
                     "comparison": "fixed_strength",
+                    "fit": "bpo",
+                    "sample_count": 0,
                 }
             )
     result.append(
         base
         | {
-            "id": "power-sweep-b64-teacher-e1",
+            "id": "power-bpo-sweep-b64-teacher-e1",
             "kappa": 0.0,
             "strength": 1.0,
             "comparison": "fixed_strength",
+            "fit": "bpo",
+            "sample_count": 0,
             "equivalent_kappas": [0.0, 0.1, 0.25, minimax_velocity_shape(), 0.5, 0.75, 1.0],
         }
     )
@@ -86,6 +90,8 @@ def study_plan(calibration):
                 "kappa": kappa,
                 "strength": strength,
                 "comparison": "matched_initial_radius",
+                "fit": "bpo",
+                "sample_count": 0,
             }
         )
     result.append(

@@ -116,3 +116,41 @@ def test_error_relative_coefficient_constant_has_a_sharp_boundary_witness(kappa)
     loss = target_divergence(p.log(), m.log(), kappa, "power")
     assert float(moment / loss) <= 1 / kappa + 1e-5
     assert float(moment / loss) >= 0.7 / kappa
+
+
+@pytest.mark.parametrize("kappa", [0.0, 0.25, 0.5, 1.0])
+@pytest.mark.parametrize("eta", [0.03, 0.3, 1.0])
+def test_anchor_fisher_bpo_steps_are_mirror_steps_with_finite_teacher_progress(kappa, eta):
+    q = torch.tensor([0.35, 0.25, 0.18, 0.12, 0.07, 0.03], dtype=torch.float64)
+    teacher = torch.tensor([0.04, 0.1, 0.13, 0.2, 0.25, 0.28], dtype=torch.float64)
+    mlog = power_log_target(q.log(), teacher.log(), kappa, eta)
+    fisher = torch.diag(q) - q[:, None] * q[None, :]
+    inverse = torch.linalg.pinv(fisher)
+    tau = 0.4
+    z = q.log().requires_grad_()
+
+    def metrics(logp):
+        p = logp.exp()
+        return torch.stack(
+            (
+                target_divergence(logp, teacher.log(), 0),
+                target_divergence(teacher.log(), logp, 0),
+                (p - teacher).abs().sum() / 2,
+                (p.sqrt() - teacher.sqrt()).square().sum(),
+            )
+        )
+
+    previous = metrics(z.log_softmax(-1))
+    for _ in range(3):
+        logp = z.log_softmax(-1)
+        loss = target_divergence(logp, mlog, kappa, "bpo", anchor_logp=q.log()) / eta
+        gradient = torch.autograd.grad(loss, z)[0]
+        next_z = (z - tau * eta * (inverse @ gradient)).detach().requires_grad_()
+        next_logp = next_z.log_softmax(-1)
+        expected = ((1 - tau) * logp + tau * mlog).log_softmax(-1)
+        torch.testing.assert_close(next_logp, expected, atol=1e-12, rtol=1e-12)
+        current = metrics(next_logp)
+        assert torch.all(current <= previous + 1e-12)
+        next_loss = target_divergence(next_logp, mlog, kappa, "bpo", anchor_logp=q.log()) / eta
+        torch.testing.assert_close(next_loss, (1 - tau) ** 2 * loss, atol=1e-12, rtol=1e-12)
+        previous, z = current.detach(), next_z

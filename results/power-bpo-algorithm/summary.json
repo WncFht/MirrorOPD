@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-14",
+  "finite_inner_teacher_progress": {
+    "distribution_shape_strength_cases": 48,
+    "points_per_path": 101,
+    "divergences": [
+      "reverse KL",
+      "forward KL",
+      "total variation",
+      "squared Hellinger"
+    ],
+    "largest_numerical_increase": 0.0,
+    "bpo_contraction": "(1-beta)^2 checked by exact summation"
+  },
+  "gradient_max_abs_error": 1.1202509406227357e-10,
+  "verified_cases": 12,
+  "bpo_decrease_does_not_imply_teacher_kl_decrease": {
+    "q": [
+      0.4999995,
+      0.4999995,
+      1e-06
+    ],
+    "teacher": [
+      0.8,
+      0.199999,
+      1e-06
+    ],
+    "target": [
+      0.5954650795758138,
+      0.4045338983962901,
+      1.0220278961037716e-06
+    ],
+    "candidate": [
+      0.5105420662073101,
+      0.3468407794547164,
+      0.14261715433797362
+    ],
+    "bpo_initial": 0.06227708006752995,
+    "bpo_candidate": 0.00023999976,
+    "teacher_reverse_kl_initial": 0.22314482817490833,
+    "teacher_reverse_kl_candidate": 1.6542190420038172
+  },
+  "power_vs_fixed_loss_md": {
+    "power_target": [
+      0.5651540510056932,
+      0.2849990522865653,
+      0.14984689670774154
+    ],
+    "fixed_loss_entropy_md": [
+      0.44230866441648714,
+      0.21128610253149693,
+      0.346405233052016
+    ],
+    "l1_difference": 0.39311667268854883
+  },
+  "scope": "Exact finite-simplex checks, no new GPU training results"
+}
