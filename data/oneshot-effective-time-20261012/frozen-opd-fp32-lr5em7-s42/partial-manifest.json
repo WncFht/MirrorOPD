@@ -1,0 +1,108 @@
+{
+  "state": "stopped-by-user-scope-revision",
+  "original_planned_updates": 600,
+  "committed_updates": 330,
+  "completed_training_arm": false,
+  "available_checkpoint_updates": [
+    100,
+    200
+  ],
+  "last_300_step_measurement": {
+    "global_tokens": 395862.0,
+    "grad_norm": 0.010719546116888523,
+    "grad_clip_scale": 1.0,
+    "student_entropy/mean": 0.7841947069996211,
+    "student_entropy/rms": 1.2375697831848307,
+    "overlap_student_anchor_intersection_fraction/mean": 0.8432239328351799,
+    "overlap_student_anchor_intersection_fraction/rms": 0.8475640006147789,
+    "student_tail_mass/mean": 0.023119141210262994,
+    "student_tail_mass/rms": 0.06129233679614873,
+    "token_advantage/mean": 0.002291033547415821,
+    "token_advantage/rms": 0.04022145873881364,
+    "importance_ratio/mean": 0.9996094222480523,
+    "importance_ratio/rms": 1.1695709189084988,
+    "sampled_log_ratio/mean": -0.10300191935914514,
+    "sampled_log_ratio/rms": 0.5247761390661204,
+    "anchor_head_mass/mean": 0.980179709584725,
+    "anchor_head_mass/rms": 0.9814250345780504,
+    "overlap_student_anchor_jaccard/mean": 0.7381584937215474,
+    "overlap_student_anchor_jaccard/rms": 0.7486806413076904,
+    "score_coefficient/mean": 0.0022910335474158215,
+    "score_coefficient/rms": 0.04022145873881364,
+    "action_nll/mean": 0.8811317428384539,
+    "action_nll/rms": 1.8578813017358025,
+    "support_overlap/mean": 0.8432239328351799,
+    "support_overlap/rms": 0.8475640006147789,
+    "student_center/mean": 0.08929861091666703,
+    "student_center/rms": 0.20066367473125335,
+    "overlap_student_anchor_union_count/mean": 18.50841707463712,
+    "overlap_student_anchor_union_count/rms": 18.559096555924718,
+    "current_advantage/mean": -0.0022910335474158215,
+    "current_advantage/rms": 0.04022145873881364,
+    "student_head_mass/mean": 0.976881031546932,
+    "student_head_mass/rms": 0.9785288900475737,
+    "anchor_tail_mass/mean": 0.01982047435446374,
+    "anchor_tail_mass/rms": 0.053251305845199326,
+    "overlap_student_anchor_intersection_count/mean": 13.491582925362879,
+    "overlap_student_anchor_intersection_count/rms": 13.561024009836462,
+    "current_advantage_abs/mean": 0.021004901946827897,
+    "current_advantage_abs/rms": 0.04022145873881364,
+    "sampled_reward/mean": -0.10529295290319281,
+    "sampled_reward/rms": 0.5283245044402898,
+    "teacher_center/mean": 0.09717271976173109,
+    "teacher_center/rms": 0.21339368484275095,
+    "importance_ess_fraction": 0.7304787051812013,
+    "native_reservoir": {
+      "anchor_student_full_kl": 0.09656041568111041,
+      "anchor_student_tail_kl": 0.08980036286368571,
+      "anchor_tail_mass": 0.018640052591067522,
+      "anchor_teacher_full_kl": 0.105226495802265,
+      "anchor_teacher_tail_kl": 0.09744726510062846,
+      "bpo_target_variance": 0.004183895082679679,
+      "fixed_action_abs_gap": 0.02100891077813805,
+      "fixed_action_signed_gap": -0.0033935816319204427,
+      "mirror_target_full_kl": 0.0034525457778801748,
+      "student_teacher_full_kl": 0.003452546090080418,
+      "teacher_logprob_regression": 0.004739483935234329,
+      "teacher_student_full_kl": 0.00342251821969065,
+      "top16_teacher_overlap": 0.9387359619140625,
+      "diagnostic_positions": 4096.0,
+      "student_tail_kl_contribution": 0.0067600528174247,
+      "teacher_tail_kl_contribution": 0.007779230701636539,
+      "student_tail_conditional_kl_mass_weighted": 0.36266275453880303,
+      "teacher_tail_conditional_kl_mass_weighted": 0.4173395253919195
+    },
+    "inspected_fp32_changed_fraction": 0.9613249243759527,
+    "inspected_bf16_changed_fraction": 0.0011893791881034046,
+    "inspected_parameter_delta_rms": 4.798409471244629e-08,
+    "adam_first_moment_rms": 2.724093182335629e-07,
+    "adam_second_moment_mean": 1.5613493222509024e-11
+  },
+  "files": [
+    {
+      "path": "updates.jsonl",
+      "sha256": "94c7e0a89260f970f578d18478e0e01e4d784c6a3b4329f95a5a4c405103465b",
+      "bytes": 871893
+    },
+    {
+      "path": "fixed-native.jsonl",
+      "sha256": "e6e09b659907c9b046fa29e89a4150e1d54db59944043bc3816c10075c71c79e",
+      "bytes": 39978
+    },
+    {
+      "path": "diagnostics.jsonl",
+      "sha256": "10254f8f6cd36a2ec843c8cb850764dcc8fe1d922b712663724b4d0b9d1239be",
+      "bytes": 39846
+    },
+    {
+      "path": "wandb-run.json",
+      "sha256": "01ff03ff68e9176fe3c5a5d202c5da240761c926f1af393120bd2e02b8a5c8fc",
+      "bytes": 97
+    },
+    {
+      "path": "stopped-by-user.json",
+      "sha256": "3d93374828b4640708bda31d69c3310e174f68a26b9147deeca712124d549671",
+      "bytes": 186
+    }
+  ]
+}

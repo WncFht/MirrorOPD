@@ -78,6 +78,22 @@ def experiment_plan():
     return arms
 
 
+def selected_experiment_plan(suite):
+    """Apply an explicit user scope revision without changing preregistered arms."""
+    original = experiment_plan()
+    path = Path(suite) / "execution-selection.json"
+    if not path.exists():
+        return original
+    selection = json.loads(path.read_text())
+    identifiers = selection["active_ids"]
+    available = {config["id"] for config in original}
+    if selection["schema_version"] != 1 or not identifiers:
+        raise ValueError("Invalid experiment selection")
+    if len(set(identifiers)) != len(identifiers) or not set(identifiers) <= available:
+        raise ValueError("Selection contains duplicate or unknown experiment IDs")
+    return [config for config in original if config["id"] in identifiers]
+
+
 def write_status(path, **values):
     """Publish a complete status file atomically for independent observers."""
     values["updated_unix"] = time.time()
@@ -332,7 +348,9 @@ def main():
     assert len(plan) == 45
     assert sum(arm["updates"] for arm in plan) == 16074
     (suite / "plan.json").write_text(json.dumps(plan, indent=2) + "\n")
-    for seed in (42, 142, 242):
+    plan = selected_experiment_plan(suite)
+    (suite / "active-plan.json").write_text(json.dumps(plan, indent=2) + "\n")
+    for seed in sorted({config["seed"] for config in plan}):
         cache = repo / "data/oneshot-effective-time-20261012" / f"seed-{seed}"
         prepare = plan[0] | {"id": f"prepare-s{seed}", "seed": seed}
         if not (cache / "manifest.json").exists() or not all(
