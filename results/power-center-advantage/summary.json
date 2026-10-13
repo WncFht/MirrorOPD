@@ -1,0 +1,474 @@
+{
+  "date": "2026-10-14",
+  "mathematical_checks": {
+    "cases": 480,
+    "positive_representation_mean_max_error": 8.881784197001252e-16,
+    "baseline_counterexample": {
+      "kappa": 0.5,
+      "eta": 0.3,
+      "teacher_center": 0.5301302283959937,
+      "teacher_reverse_kl": 0.637145646205098,
+      "advantage_variance": 0.5598534886241449,
+      "positive_center_estimator_variance": 17.44274893482359,
+      "uncentered_logit_gradient_variance": 0.9262193386347409,
+      "mean_centered_logit_gradient_variance": 1.0753665809492574,
+      "optimal_baseline_logit_gradient_variance": 0,
+      "mean_logit_gradient_squared": 0.011085099074758072,
+      "q_top16_tail_mass": 0.0,
+      "teacher_top16_tail_mass": 0.0,
+      "bucket_center_lower": 0.5301302283959937,
+      "center_upper": 0.5301302283959937
+    }
+  },
+  "cached_models": {
+    "prefixes": 128,
+    "responses": 64,
+    "precisions": [
+      "native_bf16_anchor",
+      "cached_teacher",
+      "float64_exact_readout"
+    ],
+    "rows": 2560,
+    "conditions": {
+      "k0.0-eta0.03": {
+        "teacher_center": 0.09802354207380676,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.20559833650017503,
+        "positive_center_estimator_variance": 0.24899446572485878,
+        "uncentered_logit_gradient_variance": 0.21256708023793613,
+        "mean_centered_logit_gradient_variance": 0.1907936815077979,
+        "optimal_baseline_logit_gradient_variance": 0.14621527317463817,
+        "scalar_variance_ratio_to_geometric": 1.0,
+        "response_cluster_ratio_ci95": [
+          1.0,
+          1.0
+        ],
+        "between_prefix_center_variance": 0.056467847813415524,
+        "pooled_raw_signal_variance": 0.2620661843135906,
+        "pooled_centered_signal_variance": 0.20559833650017503
+      },
+      "k0.0-eta0.1": {
+        "teacher_center": 0.09802354207380674,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.20559833650017503,
+        "positive_center_estimator_variance": 0.24899446572485878,
+        "uncentered_logit_gradient_variance": 0.21256708023793613,
+        "mean_centered_logit_gradient_variance": 0.1907936815077979,
+        "optimal_baseline_logit_gradient_variance": 0.14621527317463817,
+        "scalar_variance_ratio_to_geometric": 1.0,
+        "response_cluster_ratio_ci95": [
+          1.0,
+          1.0
+        ],
+        "between_prefix_center_variance": 0.05646784781341553,
+        "pooled_raw_signal_variance": 0.2620661843135906,
+        "pooled_centered_signal_variance": 0.20559833650017503
+      },
+      "k0.0-eta0.3": {
+        "teacher_center": 0.09802354207380674,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.20559833650017503,
+        "positive_center_estimator_variance": 0.24899446572485878,
+        "uncentered_logit_gradient_variance": 0.21256708023793616,
+        "mean_centered_logit_gradient_variance": 0.1907936815077979,
+        "optimal_baseline_logit_gradient_variance": 0.14621527317463814,
+        "scalar_variance_ratio_to_geometric": 1.0,
+        "response_cluster_ratio_ci95": [
+          1.0,
+          1.0
+        ],
+        "between_prefix_center_variance": 0.056467847813415545,
+        "pooled_raw_signal_variance": 0.2620661843135906,
+        "pooled_centered_signal_variance": 0.20559833650017503
+      },
+      "k0.0-eta0.7": {
+        "teacher_center": 0.09802354207380676,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.20559833650017503,
+        "positive_center_estimator_variance": 0.24899446572485878,
+        "uncentered_logit_gradient_variance": 0.21256708023793613,
+        "mean_centered_logit_gradient_variance": 0.1907936815077979,
+        "optimal_baseline_logit_gradient_variance": 0.14621527317463817,
+        "scalar_variance_ratio_to_geometric": 1.0,
+        "response_cluster_ratio_ci95": [
+          1.0,
+          1.0
+        ],
+        "between_prefix_center_variance": 0.056467847813415524,
+        "pooled_raw_signal_variance": 0.2620661843135906,
+        "pooled_centered_signal_variance": 0.20559833650017503
+      },
+      "k0.25-eta0.03": {
+        "teacher_center": 0.06917177932892263,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.1652503868047055,
+        "positive_center_estimator_variance": 0.19834188359849633,
+        "uncentered_logit_gradient_variance": 0.16227850645814185,
+        "mean_centered_logit_gradient_variance": 0.15756335436805485,
+        "optimal_baseline_logit_gradient_variance": 0.12393424441480194,
+        "top16_interval_width_quantiles": [
+          0.00044160583565451366,
+          0.24749885209816105,
+          0.7494086359285836
+        ],
+        "top16_lower_bound_bias_mean": 0.005447816732600948,
+        "scalar_variance_ratio_to_geometric": 0.8037535206641364,
+        "response_cluster_ratio_ci95": [
+          0.7318072674207147,
+          0.9087273883078405
+        ],
+        "between_prefix_center_variance": 0.023091324988489374,
+        "pooled_raw_signal_variance": 0.18834171179319487,
+        "pooled_centered_signal_variance": 0.1652503868047055
+      },
+      "k0.25-eta0.1": {
+        "teacher_center": 0.07087643672421672,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.16581198889410728,
+        "positive_center_estimator_variance": 0.20218088817368532,
+        "uncentered_logit_gradient_variance": 0.16302786963132523,
+        "mean_centered_logit_gradient_variance": 0.15757784715703554,
+        "optimal_baseline_logit_gradient_variance": 0.12368208724869827,
+        "top16_interval_width_quantiles": [
+          0.00046085474265558104,
+          0.2554685178957342,
+          0.7756854735292364
+        ],
+        "top16_lower_bound_bias_mean": 0.0055666763098223574,
+        "scalar_variance_ratio_to_geometric": 0.8064850704371634,
+        "response_cluster_ratio_ci95": [
+          0.7369198197127156,
+          0.906314405955714
+        ],
+        "between_prefix_center_variance": 0.024412998189210496,
+        "pooled_raw_signal_variance": 0.19022498708331778,
+        "pooled_centered_signal_variance": 0.16581198889410728
+      },
+      "k0.25-eta0.3": {
+        "teacher_center": 0.07592240519870337,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.16897094613563576,
+        "positive_center_estimator_variance": 0.21204902827954697,
+        "uncentered_logit_gradient_variance": 0.16713748074607113,
+        "mean_centered_logit_gradient_variance": 0.1593474678535286,
+        "optimal_baseline_logit_gradient_variance": 0.12435549095217246,
+        "top16_interval_width_quantiles": [
+          0.0005291517332466788,
+          0.2837537082679505,
+          0.8686993250063343
+        ],
+        "top16_lower_bound_bias_mean": 0.005914955783099748,
+        "scalar_variance_ratio_to_geometric": 0.821849772775238,
+        "response_cluster_ratio_ci95": [
+          0.7596862744122528,
+          0.9084694782700516
+        ],
+        "between_prefix_center_variance": 0.028701753778920897,
+        "pooled_raw_signal_variance": 0.19767269991455666,
+        "pooled_centered_signal_variance": 0.16897094613563576
+      },
+      "k0.25-eta0.7": {
+        "teacher_center": 0.0873144698348398,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.18323577745702052,
+        "positive_center_estimator_variance": 0.23081048209913504,
+        "uncentered_logit_gradient_variance": 0.18512220998136653,
+        "mean_centered_logit_gradient_variance": 0.17101410719961269,
+        "optimal_baseline_logit_gradient_variance": 0.1320258560408147,
+        "top16_interval_width_quantiles": [
+          0.0007997941909876215,
+          0.39572162406951683,
+          1.2538687861843538
+        ],
+        "top16_lower_bound_bias_mean": 0.0066929569118161685,
+        "scalar_variance_ratio_to_geometric": 0.8912318094405617,
+        "response_cluster_ratio_ci95": [
+          0.8516851716831056,
+          0.9423754841704107
+        ],
+        "between_prefix_center_variance": 0.04087258013433611,
+        "pooled_raw_signal_variance": 0.22410835759135664,
+        "pooled_centered_signal_variance": 0.18323577745702052
+      },
+      "k0.5-eta0.03": {
+        "teacher_center": 0.045726435323924564,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.164245439414071,
+        "positive_center_estimator_variance": 0.15130206542867455,
+        "uncentered_logit_gradient_variance": 0.1632763429697463,
+        "mean_centered_logit_gradient_variance": 0.16565325859192875,
+        "optimal_baseline_logit_gradient_variance": 0.13399121292621477,
+        "top16_interval_width_quantiles": [
+          0.00022977643340786895,
+          0.13385255526721052,
+          0.401484784166304
+        ],
+        "top16_lower_bound_bias_mean": 0.0038140371376134173,
+        "scalar_variance_ratio_to_geometric": 0.7988656047026488,
+        "response_cluster_ratio_ci95": [
+          0.6854868929579578,
+          0.9812726785251534
+        ],
+        "between_prefix_center_variance": 0.008802230457985727,
+        "pooled_raw_signal_variance": 0.17304766987205672,
+        "pooled_centered_signal_variance": 0.164245439414071
+      },
+      "k0.5-eta0.1": {
+        "teacher_center": 0.04873695961793439,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.15911255510140265,
+        "positive_center_estimator_variance": 0.16407237440722075,
+        "uncentered_logit_gradient_variance": 0.15629160044877619,
+        "mean_centered_logit_gradient_variance": 0.1580107438818029,
+        "optimal_baseline_logit_gradient_variance": 0.12703786795220917,
+        "top16_interval_width_quantiles": [
+          0.00023288377741176867,
+          0.1379372585058857,
+          0.41401635448900914
+        ],
+        "top16_lower_bound_bias_mean": 0.004042085147021846,
+        "scalar_variance_ratio_to_geometric": 0.7739000120814072,
+        "response_cluster_ratio_ci95": [
+          0.6693645257811165,
+          0.9343351515207986
+        ],
+        "between_prefix_center_variance": 0.010019336764952742,
+        "pooled_raw_signal_variance": 0.16913189186635538,
+        "pooled_centered_signal_variance": 0.15911255510140265
+      },
+      "k0.5-eta0.3": {
+        "teacher_center": 0.057218206303886535,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.1528369046526783,
+        "positive_center_estimator_variance": 0.18725598446915057,
+        "uncentered_logit_gradient_variance": 0.14810706636206925,
+        "mean_centered_logit_gradient_variance": 0.14756553631858854,
+        "optimal_baseline_logit_gradient_variance": 0.1172114977090195,
+        "top16_interval_width_quantiles": [
+          0.0002512314408309646,
+          0.15467145241795915,
+          0.4593803996961481
+        ],
+        "top16_lower_bound_bias_mean": 0.004638811582384499,
+        "scalar_variance_ratio_to_geometric": 0.7433761734378048,
+        "response_cluster_ratio_ci95": [
+          0.6546957322894643,
+          0.8775734599312914
+        ],
+        "between_prefix_center_variance": 0.014043606055225887,
+        "pooled_raw_signal_variance": 0.1668805107079042,
+        "pooled_centered_signal_variance": 0.1528369046526783
+      },
+      "k0.5-eta0.7": {
+        "teacher_center": 0.07626695798694104,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.1626392089732227,
+        "positive_center_estimator_variance": 0.21725812074217302,
+        "uncentered_logit_gradient_variance": 0.1605243759740192,
+        "mean_centered_logit_gradient_variance": 0.15264806229487593,
+        "optimal_baseline_logit_gradient_variance": 0.11883618471463514,
+        "top16_interval_width_quantiles": [
+          0.0003687860988913083,
+          0.21355973258750552,
+          0.6405523701809147
+        ],
+        "top16_lower_bound_bias_mean": 0.00594361869032444,
+        "scalar_variance_ratio_to_geometric": 0.7910531366244018,
+        "response_cluster_ratio_ci95": [
+          0.7224425197376105,
+          0.8843545338618136
+        ],
+        "between_prefix_center_variance": 0.027527662174106047,
+        "pooled_raw_signal_variance": 0.19016687114732875,
+        "pooled_centered_signal_variance": 0.1626392089732227
+      },
+      "k0.75-eta0.03": {
+        "teacher_center": 0.024796555848821518,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.197455275360544,
+        "positive_center_estimator_variance": 0.0982759064806003,
+        "uncentered_logit_gradient_variance": 0.2122829110882797,
+        "mean_centered_logit_gradient_variance": 0.21653266226813772,
+        "optimal_baseline_logit_gradient_variance": 0.18027803246939625,
+        "top16_interval_width_quantiles": [
+          0.0001470112156373468,
+          0.09036232769562362,
+          0.2896900300687562
+        ],
+        "top16_lower_bound_bias_mean": 0.002308428637410946,
+        "scalar_variance_ratio_to_geometric": 0.9603933510443355,
+        "response_cluster_ratio_ci95": [
+          0.7690842866467614,
+          1.2801410814424987
+        ],
+        "between_prefix_center_variance": 0.002391958016394723,
+        "pooled_raw_signal_variance": 0.19984723337693872,
+        "pooled_centered_signal_variance": 0.197455275360544
+      },
+      "k0.75-eta0.1": {
+        "teacher_center": 0.02955693771269583,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.1741243335433376,
+        "positive_center_estimator_variance": 0.12904029814629742,
+        "uncentered_logit_gradient_variance": 0.1789153595247115,
+        "mean_centered_logit_gradient_variance": 0.18306555975219457,
+        "optimal_baseline_logit_gradient_variance": 0.1501067244115943,
+        "top16_interval_width_quantiles": [
+          0.0001547935022404135,
+          0.0934666799530911,
+          0.29754740805849395
+        ],
+        "top16_lower_bound_bias_mean": 0.002725950644868065,
+        "scalar_variance_ratio_to_geometric": 0.8469150894282133,
+        "response_cluster_ratio_ci95": [
+          0.7010542025690483,
+          1.0894512584605476
+        ],
+        "between_prefix_center_variance": 0.0033728835853876534,
+        "pooled_raw_signal_variance": 0.17749721712872524,
+        "pooled_centered_signal_variance": 0.1741243335433376
+      },
+      "k0.75-eta0.3": {
+        "teacher_center": 0.04140784218953564,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.14845067458290356,
+        "positive_center_estimator_variance": 0.1698462267250529,
+        "uncentered_logit_gradient_variance": 0.14442179174897396,
+        "mean_centered_logit_gradient_variance": 0.1472716802682656,
+        "optimal_baseline_logit_gradient_variance": 0.11850212116038811,
+        "top16_interval_width_quantiles": [
+          0.00018028334602923483,
+          0.10473095013526408,
+          0.32602019439844887
+        ],
+        "top16_lower_bound_bias_mean": 0.003573878174914687,
+        "scalar_variance_ratio_to_geometric": 0.722042196984299,
+        "response_cluster_ratio_ci95": [
+          0.6166205275526532,
+          0.8876236212080252
+        ],
+        "between_prefix_center_variance": 0.0065614002037194695,
+        "pooled_raw_signal_variance": 0.15501207478662304,
+        "pooled_centered_signal_variance": 0.14845067458290356
+      },
+      "k0.75-eta0.7": {
+        "teacher_center": 0.06584989145845069,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.1464312582853336,
+        "positive_center_estimator_variance": 0.2088216826758446,
+        "uncentered_logit_gradient_variance": 0.14166215722360623,
+        "mean_centered_logit_gradient_variance": 0.1381380525864243,
+        "optimal_baseline_logit_gradient_variance": 0.10843685853039578,
+        "top16_interval_width_quantiles": [
+          0.0002408194833943356,
+          0.1487401760612817,
+          0.4429484761857188
+        ],
+        "top16_lower_bound_bias_mean": 0.005215234451036735,
+        "scalar_variance_ratio_to_geometric": 0.7122200538096716,
+        "response_cluster_ratio_ci95": [
+          0.62771294134683,
+          0.8312412989382195
+        ],
+        "between_prefix_center_variance": 0.017977646262219683,
+        "pooled_raw_signal_variance": 0.16440890454755328,
+        "pooled_centered_signal_variance": 0.1464312582853336
+      },
+      "k1.0-eta0.03": {
+        "teacher_center": 0.004607160527347059,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.2767823229540325,
+        "positive_center_estimator_variance": 0.051992529313466075,
+        "uncentered_logit_gradient_variance": 0.32879780502979217,
+        "mean_centered_logit_gradient_variance": 0.3306280752427829,
+        "optimal_baseline_logit_gradient_variance": 0.28264366702273036,
+        "top16_interval_width_quantiles": [
+          9.319682705297634e-05,
+          0.0850386766127725,
+          0.22720622621377445
+        ],
+        "top16_lower_bound_bias_mean": 0.0008117936016904552,
+        "scalar_variance_ratio_to_geometric": 1.3462284163656006,
+        "response_cluster_ratio_ci95": [
+          0.997839817292622,
+          1.9364010302364172
+        ],
+        "between_prefix_center_variance": 0.00011000944926425542,
+        "pooled_raw_signal_variance": 0.27689233240329675,
+        "pooled_centered_signal_variance": 0.2767823229540325
+      },
+      "k1.0-eta0.1": {
+        "teacher_center": 0.012128208862173022,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.20671229335725,
+        "positive_center_estimator_variance": 0.10065419399002844,
+        "uncentered_logit_gradient_variance": 0.2258178682907544,
+        "mean_centered_logit_gradient_variance": 0.22922550124119012,
+        "optimal_baseline_logit_gradient_variance": 0.19048190456904787,
+        "top16_interval_width_quantiles": [
+          9.847034941701801e-05,
+          0.08480542216682423,
+          0.23192801427404852
+        ],
+        "top16_lower_bound_bias_mean": 0.0015565450352920081,
+        "scalar_variance_ratio_to_geometric": 1.0054181219363807,
+        "response_cluster_ratio_ci95": [
+          0.8001469693194596,
+          1.3526631657241832
+        ],
+        "between_prefix_center_variance": 0.0006145400136105957,
+        "pooled_raw_signal_variance": 0.2073268333708606,
+        "pooled_centered_signal_variance": 0.20671229335725
+      },
+      "k1.0-eta0.3": {
+        "teacher_center": 0.02784697184803692,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.15052958573493275,
+        "positive_center_estimator_variance": 0.15746786014801303,
+        "uncentered_logit_gradient_variance": 0.14919876897561896,
+        "mean_centered_logit_gradient_variance": 0.15320986349282595,
+        "optimal_baseline_logit_gradient_variance": 0.12425623370790356,
+        "top16_interval_width_quantiles": [
+          0.00011248488783809855,
+          0.07891004506719713,
+          0.2586779428342442
+        ],
+        "top16_lower_bound_bias_mean": 0.002691857570733982,
+        "scalar_variance_ratio_to_geometric": 0.7321537143604496,
+        "response_cluster_ratio_ci95": [
+          0.6130776989439796,
+          0.927837667633815
+        ],
+        "between_prefix_center_variance": 0.002809084054955894,
+        "pooled_raw_signal_variance": 0.15333866978988864,
+        "pooled_centered_signal_variance": 0.15052958573493275
+      },
+      "k1.0-eta0.7": {
+        "teacher_center": 0.05650114071536211,
+        "teacher_reverse_kl": 0.09802354207380673,
+        "advantage_variance": 0.13430454311679232,
+        "positive_center_estimator_variance": 0.20399553666144674,
+        "uncentered_logit_gradient_variance": 0.12798716738559301,
+        "mean_centered_logit_gradient_variance": 0.12732882241195215,
+        "optimal_baseline_logit_gradient_variance": 0.10063700391293583,
+        "top16_interval_width_quantiles": [
+          0.00019216641623421747,
+          0.11255733512434583,
+          0.34584470826787234
+        ],
+        "top16_lower_bound_bias_mean": 0.004545018113266817,
+        "scalar_variance_ratio_to_geometric": 0.6532374989166218,
+        "response_cluster_ratio_ci95": [
+          0.561717575169056,
+          0.7874876479931691
+        ],
+        "between_prefix_center_variance": 0.011767314357828854,
+        "pooled_raw_signal_variance": 0.14607185747462118,
+        "pooled_centered_signal_variance": 0.13430454311679232
+      }
+    },
+    "raw_sha256": "b48e3fe436d69f0181ab00bd48730547f68134490ff59daf2304470af9e51abd",
+    "scope": "Two deterministic random reservoir positions per original response; single t22 prompt; exact conditional action moments; not new GPU training or full-parameter covariance.",
+    "bootstrap": "2000 paired response-cluster resamples across 64 responses; single prompt, not prompt-generalization uncertainty"
+  }
+}

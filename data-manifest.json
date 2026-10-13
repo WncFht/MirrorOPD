@@ -893,6 +893,12 @@
             "archive": "data/power-mean-20261013/prefix-audit.csv.gz",
             "sha256": "7a0644bd3518e9476a957911ea5779cbeb38ee696f735c1b552b391e064b5faf",
             "bytes": 31642875
+        },
+        {
+            "path": "data/power-center-20261014/prefix-audit.csv",
+            "archive": "data/power-center-20261014/prefix-audit.csv.gz",
+            "sha256": "b48e3fe436d69f0181ab00bd48730547f68134490ff59daf2304470af9e51abd",
+            "bytes": 682553
         }
     ]
 }

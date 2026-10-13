@@ -75,3 +75,6 @@ data/oneshot-lr-stability/*.csv
 
 # Exact model audit restores from its versioned gzip archive.
 /data/power-mean-20261013/prefix-audit.csv
+
+# Conditional teacher-center audit restores from its versioned gzip archive.
+/data/power-center-20261014/prefix-audit.csv

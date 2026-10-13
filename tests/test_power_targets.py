@@ -154,3 +154,79 @@ def test_anchor_fisher_bpo_steps_are_mirror_steps_with_finite_teacher_progress(k
         next_loss = target_divergence(next_logp, mlog, kappa, "bpo", anchor_logp=q.log()) / eta
         torch.testing.assert_close(next_loss, (1 - tau) ** 2 * loss, atol=1e-12, rtol=1e-12)
         previous, z = current.detach(), next_z
+
+
+@pytest.mark.parametrize("eta", [0.03, 0.3, 0.7])
+def test_teacher_center_is_bounded_monotone_and_has_certified_tail_bounds(eta):
+    from mirroropd.proximal import power_signal
+
+    q = torch.tensor([0.35, 0.25, 0.18, 0.12, 0.07, 0.03], dtype=torch.float64)
+    teacher = torch.tensor([0.04, 0.1, 0.13, 0.2, 0.25, 0.28], dtype=torch.float64)
+    rho = teacher / q
+    previous = (q * -rho.log()).sum()
+    delta, tail_teacher = q[2:].sum(), teacher[2:].sum()
+    for kappa in (0.25, 0.5, 0.75, 1):
+        a = power_signal(rho.log(), kappa, eta) / eta
+        center = -(q * a).sum()
+        cap = -math.log1p(-eta) / (kappa * eta)
+        assert 0 <= center <= previous + 1e-12
+        assert center <= cap + 1e-12
+        phi = rho - 1 - a
+        assert torch.all(phi >= -1e-12)
+        torch.testing.assert_close((q * phi).sum(), center, atol=1e-12, rtol=1e-12)
+        tail_a = power_signal((tail_teacher / delta).log(), kappa, eta) / eta
+        lower = -(q[:2] * a[:2]).sum() - delta * tail_a
+        upper = -(q[:2] * a[:2]).sum() + delta * cap
+        assert lower <= center + 1e-12
+        assert center <= upper + 1e-12
+        if kappa <= 0.5:
+            affinity = (q * rho.pow(kappa)).sum()
+            variance = (q * (a + center).square()).sum()
+            assert variance <= (1 - affinity.square()) / (kappa**2 * (1 - eta) ** 2) + 1e-12
+            assert variance <= 2 * center / (kappa * (1 - eta) ** 2) + 1e-12
+        previous = center
+
+
+def test_square_root_teacher_center_and_variance_have_hellinger_limits():
+    from mirroropd.proximal import power_signal
+
+    q = torch.tensor([0.6, 0.3, 0.1], dtype=torch.float64)
+    teacher = torch.tensor([0.1, 0.2, 0.7], dtype=torch.float64)
+    h2 = (q.sqrt() - teacher.sqrt()).square().sum()
+    eta = 1e-6
+    a = power_signal((teacher / q).log(), 0.5, eta) / eta
+    center = -(q * a).sum()
+    variance = (q * (a + center).square()).sum()
+    torch.testing.assert_close(center, h2, atol=2e-6, rtol=2e-6)
+    torch.testing.assert_close(variance, h2 * (4 - h2), atol=2e-5, rtol=2e-5)
+
+
+def test_nonnegative_center_estimator_can_have_diverging_variance():
+    from mirroropd.proximal import power_signal
+
+    moments = []
+    teacher = torch.tensor([0.5, 0.5], dtype=torch.float64)
+    for epsilon in (1e-3, 1e-8):
+        q = torch.tensor([epsilon, 1 - epsilon], dtype=torch.float64)
+        rho = teacher / q
+        a = power_signal(rho.log(), 0.5, 0.3) / 0.3
+        center = -(q * a).sum()
+        phi = rho - 1 - a
+        signed_variance = (q * (a + center).square()).sum()
+        positive_variance = (q * (phi - center).square()).sum()
+        torch.testing.assert_close((q * phi).sum(), center, atol=1e-10, rtol=1e-10)
+        moments.append((signed_variance, positive_variance))
+    assert moments[1][0] < moments[0][0]
+    assert moments[1][1] > 10000 * moments[0][1]
+
+
+@pytest.mark.parametrize("kappa", [0.0, 0.5, 1.0])
+def test_same_action_positive_center_estimate_cancels_teacher_shape(kappa):
+    from mirroropd.proximal import power_signal
+
+    q = torch.tensor([0.6, 0.3, 0.1], dtype=torch.float64)
+    teacher = torch.tensor([0.1, 0.2, 0.7], dtype=torch.float64)
+    rho = teacher / q
+    a = power_signal(rho.log(), kappa, 0.3) / 0.3
+    positive_estimate = rho - 1 - a
+    torch.testing.assert_close(a + positive_estimate, rho - 1, atol=1e-12, rtol=1e-12)
