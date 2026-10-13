@@ -19,7 +19,9 @@ def main():
             map_location="cpu",
             weights_only=False,
         )
-        selected = panels(artifact, {"kappa": 0, "strength": 0.1}, device="cpu")["train"]
+        selected = panels(artifact, {"kappa": 0, "strength": 0.1, "batch_size": 64}, device="cpu")[
+            "train"
+        ]
         inputs.extend((s["qlog"], s["tlog"]) for s in selected)
     qlog, tlog = (torch.cat([pair[i] for pair in inputs]) for i in (0, 1))
 
@@ -45,11 +47,11 @@ def main():
         "bf16": {
             "matched_strengths": strengths,
             "training_prefixes": len(qlog),
-            "training_responses": 16,
+            "training_responses": 64,
             "mean_squared_fisher_rao_radius": reference,
             "measured_radius_by_shape": measured,
         },
-        "amendment": "The 128-prefix diagnostic calibration did not transfer to the 4096-prefix panel. GPU radius controls now use the exact training panel, excluding heldout responses and all trained-model outcomes.",
+        "amendment": "The 128-prefix diagnostic calibration did not transfer to the 4096-prefix panel. GPU radius controls now use the exact training panel, excluding heldout positions and all trained-model outcomes.",
     }
     (repo / "results/power-mean-20261013/training-radius-calibration.json").write_text(
         json.dumps(result, indent=2) + "\n"

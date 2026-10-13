@@ -25,14 +25,18 @@ def study_plan(calibration):
         "wandb_project": "mirror-opd-power-family",
         "sample_count": 4,
         "sampler": "anchor",
-        "updates": 60,
+        "updates": 300,
+        "batch_size": 64,
+        "train_positions_per_response": 16,
+        "heldout_positions_per_response": 16,
+        "gradient_probe_draws": 4,
         "fit": "reverse_kl",
         "retry_on_gpu_conflict": False,
     }
     result = []
-    for kappa in (0.0, 0.5, 1.0):
-        for strength in (0.1, 0.3):
-            identifier = f"power-common-k{kappa:g}-l{strength:g}"
+    for kappa in (0.0, 0.1, 0.25, minimax_velocity_shape(), 0.5, 0.75, 1.0):
+        for strength in (0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7):
+            identifier = f"power-sweep-b64-k{kappa:.6g}-e{strength:g}"
             result.append(
                 base
                 | {
@@ -42,6 +46,16 @@ def study_plan(calibration):
                     "comparison": "fixed_strength",
                 }
             )
+    result.append(
+        base
+        | {
+            "id": "power-sweep-b64-teacher-e1",
+            "kappa": 0.0,
+            "strength": 1.0,
+            "comparison": "fixed_strength",
+            "equivalent_kappas": [0.0, 0.1, 0.25, minimax_velocity_shape(), 0.5, 0.75, 1.0],
+        }
+    )
     for kappa in (0.5, 1.0):
         result.append(
             base
@@ -120,9 +134,37 @@ def study_plan(calibration):
             "sampler": "student" if fit == "power" else "anchor",
             "comparison": "minimax_velocity_target",
         }
-        for fit in ("reverse_kl", "power")
+        for fit in ("power",)
     )
     return result
+
+
+def canary_plan(plan):
+    canaries = [
+        plan[i]
+        | {
+            "id": f"power-canary-k{plan[i]['kappa']:g}",
+            "updates": 2,
+            "sample_count": 0,
+            "gradient_probe_draws": 8,
+        }
+        for i in (2, 30, 44)
+    ]
+    canaries.extend(
+        plan[0]
+        | {
+            "id": f"power-canary-half-{fit}",
+            "kappa": 0.5,
+            "fit_kappa": 0.5,
+            "fit": fit,
+            "sampler": sampler,
+            "updates": 2,
+            "sample_count": 4,
+            "gradient_probe_draws": 8,
+        }
+        for fit, sampler in (("power", "student"), ("bpo", "anchor"))
+    )
+    return canaries
 
 
 def audit(output, config):
@@ -172,30 +214,14 @@ def main():
         write_status(status, state="waiting_for_gpu_reservation", pid=os.getpid())
         time.sleep(5)
     atexit.register(lease.release)
-    canaries = [
-        plan[i]
-        | {
-            "id": f"power-canary-k{plan[i]['kappa']:g}",
-            "updates": 2,
-            "sample_count": 0,
-            "gradient_probe_draws": 8,
-        }
-        for i in (0, 2, 4)
-    ]
-    canaries.extend(
-        plan[0]
-        | {
-            "id": f"power-canary-half-{fit}",
-            "kappa": 0.5,
-            "fit_kappa": 0.5,
-            "fit": fit,
-            "sampler": sampler,
-            "updates": 2,
-            "sample_count": 4,
-            "gradient_probe_draws": 8,
-        }
-        for fit, sampler in (("power", "student"), ("bpo", "anchor"))
-    )
+    canaries = canary_plan(plan)
+    (suite / "canary-plan.json").write_text(json.dumps(canaries, indent=2) + "\n")
+    evaluations = {
+        "initial": str(repo / "runs/oneshot-effective-time-20261012/evaluation/initial-s42")
+    }
+    evaluation_file = suite / "evaluations.json"
+    if evaluation_file.exists():
+        evaluations.update(json.loads(evaluation_file.read_text()))
     for config in canaries + plan:
         output = suite / config["id"]
         if not (output / "completion.json").exists():
@@ -210,6 +236,12 @@ def main():
             )
         audit(output, config)
         write_status(status, state="condition_verified", stage=config["id"], output=str(output))
+        if config["comparison"] == "fixed_strength" and not config["id"].startswith("power-canary"):
+            model = output / f"checkpoints/update-{config['updates']:06d}"
+            evaluations[config["id"]] = str(
+                evaluate_model(repo, suite, config["id"] + "-final", model)
+            )
+            evaluation_file.write_text(json.dumps(evaluations, indent=2) + "\n")
         subprocess.run(  # noqa: S603 -- fixed checked CPU progress analysis
             [
                 str(repo.parent / "envs/opd/bin/python"),
@@ -222,16 +254,6 @@ def main():
             cwd=repo,
             check=True,
         )
-    evaluations = {
-        "initial": str(repo / "runs/oneshot-effective-time-20261012/evaluation/initial-s42")
-    }
-    for config in plan:
-        if config["comparison"] == "fixed_strength" and config["strength"] == 0.1:
-            model = suite / config["id"] / f"checkpoints/update-{config['updates']:06d}"
-            evaluations[config["id"]] = str(
-                evaluate_model(repo, suite, config["id"] + "-final", model)
-            )
-    (suite / "evaluations.json").write_text(json.dumps(evaluations, indent=2) + "\n")
     subprocess.run(  # noqa: S603 -- fixed checked CPU analysis argv
         [
             str(repo.parent / "envs/opd/bin/python"),

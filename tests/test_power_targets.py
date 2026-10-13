@@ -17,16 +17,20 @@ from mirroropd.proximal import (
 
 @pytest.mark.parametrize("kappa", [0.0, 0.25, 0.5, 0.75, 1.0])
 @pytest.mark.parametrize("fit", ["reverse_kl", "power", "bpo"])
-def test_anchor_enumerated_score_matches_true_fitting_gradient(kappa, fit):
+@pytest.mark.parametrize("strength", [0.2, 1.0])
+def test_anchor_enumerated_score_matches_true_fitting_gradient(kappa, fit, strength):
     qlog = torch.tensor([[0.2, 0.3, 0.5]]).log()
     tlog = torch.tensor([[0.6, 0.35, 0.05]]).log()
-    target = power_log_target(qlog, tlog, kappa, 0.2)
+    target = power_log_target(qlog, tlog, kappa, strength)
     logits = torch.tensor([[-0.7, 0.2, 0.8]], requires_grad=True)
     true = (
-        target_divergence(logits.log_softmax(-1), target, kappa, fit, anchor_logp=qlog).sum() / 0.2
+        target_divergence(logits.log_softmax(-1), target, kappa, fit, anchor_logp=qlog).sum()
+        / strength
     )
     expected = torch.autograd.grad(true, logits)[0]
-    fields = sampled_target_loss(logits, qlog, target, torch.tensor([[0, 1, 2]]), kappa, 0.2, fit)
+    fields = sampled_target_loss(
+        logits, qlog, target, torch.tensor([[0, 1, 2]]), kappa, strength, fit
+    )
     # Enumerating categorical outcomes requires q weights, not an unweighted average.
     surrogate = (qlog.exp() * fields["coefficient"] * logits.log_softmax(-1)).sum()
     actual = torch.autograd.grad(surrogate, logits)[0]

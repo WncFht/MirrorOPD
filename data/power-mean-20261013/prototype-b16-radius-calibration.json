@@ -1,0 +1,18 @@
+{
+  "bf16": {
+    "matched_strengths": {
+      "0.0": 0.1,
+      "0.5": 0.10445091128349304,
+      "1.0": 0.08613148331642151
+    },
+    "training_prefixes": 256,
+    "training_responses": 16,
+    "mean_squared_fisher_rao_radius": 0.002046485689383725,
+    "measured_radius_by_shape": {
+      "0.0": 0.002046485689383725,
+      "0.5": 0.002046485201679051,
+      "1.0": 0.002046485278127615
+    }
+  },
+  "amendment": "The 128-prefix diagnostic calibration did not transfer to the 4096-prefix panel. GPU radius controls now use the exact training panel, excluding heldout responses and all trained-model outcomes."
+}

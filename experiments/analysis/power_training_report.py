@@ -117,6 +117,118 @@ def save(fig, output, name):
     plt.close(fig)
 
 
+def planned_grid(output):
+    kappas = [0, 0.1, 0.25, minimax_velocity_shape(), 0.5, 0.75, 1]
+    strengths = [0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7, 1]
+    fig, ax = plt.subplots(figsize=(9, 5), layout="constrained")
+    for row, _kappa in enumerate(kappas):
+        for column, eta in enumerate(strengths):
+            ax.scatter(column, row, s=420, marker="s", color="#a3c9df" if eta < 1 else "#d1d1d1")
+            ax.text(
+                column,
+                row,
+                "run" if eta < 1 else "shared T",
+                ha="center",
+                va="center",
+                fontsize=8,
+            )
+    ax.set(
+        xticks=range(8),
+        xticklabels=strengths,
+        yticks=range(7),
+        yticklabels=[f"{k:.6g}" for k in kappas],
+        xlabel="eta: target strength",
+        ylabel="kappa: target shape",
+        title="Preregistered design: 56 positions, 50 unique runs",
+        xlim=(-0.7, 7.7),
+        ylim=(-0.7, 6.7),
+    )
+    save(fig, output, "planned-eta-kappa-grid")
+
+
+def sweep_heatmaps(output, cells):
+    primary = [c for c in cells if c["config"]["comparison"] == "fixed_strength" and c["completed"]]
+    if not primary:
+        return
+    kappas = sorted(
+        {c["config"]["kappa"] for c in primary}
+        | {0, 0.1, 0.25, minimax_velocity_shape(), 0.5, 0.75, 1}
+    )
+    strengths = [0.01, 0.03, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0]
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5), layout="constrained")
+    for ax, metric, title in zip(
+        axes,
+        ("teacher_reverse_kl", "teacher_forward_kl", "fit_divergence"),
+        ("Heldout reverse KL change", "Heldout forward KL change", "Heldout fit final / initial"),
+        strict=True,
+    ):
+        values = np.full((len(kappas), len(strengths)), np.nan)
+        for c in primary:
+            first, last = c["heldout"][0], c["heldout"][-1]
+            v = (
+                last[metric] / max(first[metric], 1e-30)
+                if metric == "fit_divergence"
+                else last[metric] - first[metric]
+            )
+            rows = (
+                range(len(kappas))
+                if c["config"]["strength"] == 1
+                else [kappas.index(c["config"]["kappa"])]
+            )
+            for row in rows:
+                values[row, strengths.index(c["config"]["strength"])] = v
+        picture = ax.imshow(np.ma.masked_invalid(values), aspect="auto", cmap="coolwarm")
+        ax.set(
+            xticks=range(len(strengths)),
+            xticklabels=strengths,
+            yticks=range(len(kappas)),
+            yticklabels=[f"{k:.4g}" for k in kappas],
+            xlabel="eta",
+            ylabel="target kappa",
+            title=title,
+        )
+        fig.colorbar(picture, ax=ax)
+    save(fig, output, "eta-kappa-sweep")
+
+
+def update_document(repo, plan, cells, evaluations):
+    path = repo / "docs/experiments/2026-10-13-OneShot与镜像蒸馏实验报告.md"
+    source = path.read_text()
+    start, end = "<!-- power-sweep-cells:start -->", "<!-- power-sweep-cells:end -->"
+    if start not in source:
+        return
+    by_id = {c["id"]: c for c in cells}
+    rows = [
+        start,
+        "",
+        "| 实验 setting：ID；κ；η；fit / sampler | 结果 | 分析 |",
+        "| --- | --- | --- |",
+    ]
+    for config in plan:
+        c = by_id.get(config["id"])
+        shape = config.get("fit_kappa", config["kappa"]) if config["fit"] == "power" else 0
+        fit_label = f"{config['fit']}(κf={shape:.6g})" if config["fit"] != "bpo" else "bpo"
+        setting = f"{config['id']}；{config['kappa']:.6g}；{config['strength']:.6g}；{fit_label} / {config['sampler']}；N={config['updates']}, M={config['sample_count']}"
+        result, analysis = "待执行", "待结果；不作效果判断"
+        if c and c["heldout"]:
+            first, last = c["heldout"][0], c["heldout"][-1]
+            delta = last["teacher_reverse_kl"] - first["teacher_reverse_kl"]
+            result = f"{'完成' if c['completed'] else '运行中'} {last['update']}/{config['updates']}；保留 RKL={last['teacher_reverse_kl']:.6g}；Δ={delta:+.3g}"
+            analysis = "保留条件 RKL 下降" if delta < 0 else "保留条件 RKL 未下降"
+            analysis += "；单 prompt、单 seed"
+        if config["id"] in evaluations:
+            summary = evaluations[config["id"]]
+            result += "；" + "/".join(
+                f"{name}:{value['correct']}/{value['questions']}"
+                for name, value in summary.items()
+                if isinstance(value, dict) and "correct" in value and "questions" in value
+            )
+        rows.append(f"| {setting} | {result} | {analysis} |")
+    rows += ["", end]
+    a, b = source.index(start), source.index(end) + len(end)
+    path.write_text(source[:a] + "\n".join(rows) + source[b:])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--suite", type=Path, required=True)
@@ -144,12 +256,20 @@ def main():
             }
         )
     probes = {}
-    for path in args.suite.glob("power-canary-*/gradient-probe.json"):
-        probes[path.parent.name] = json.loads(path.read_text())
+    for path in args.suite.glob("power-*/gradient-probe*.json"):
+        probes[path.parent.name + "/" + path.stem] = json.loads(path.read_text())
+    evaluations = {}
+    manifest = args.suite / "evaluations.json"
+    if manifest.exists():
+        for identifier, directory in json.loads(manifest.read_text()).items():
+            summary_path = Path(directory) / "summary.json"
+            if summary_path.exists():
+                evaluations[identifier] = json.loads(summary_path.read_text())
     k = minimax_velocity_shape()
     summary = {
         "cached_relative_noise": relative_noise(repo),
         "training_cells": cells,
+        "math_evaluations": evaluations,
         "parameter_gradient_probes": probes,
         "minimax_velocity_shape": k,
         "sharp_worst_fisher_speed_squared": worst_fisher_speed_squared(k),
@@ -158,7 +278,22 @@ def main():
         "scope": "Cached model audit and training pilot are separate evidence levels; no completed GPU training is inferred from cached distributions",
     }
     (args.output / "training-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    planned_grid(args.output)
     figures(args.output, cells)
+    sweep_heatmaps(args.output, cells)
+    canary_file = args.suite / "canary-plan.json"
+    canary_configs = json.loads(canary_file.read_text()) if canary_file.exists() else []
+    canary_cells = [
+        {
+            "id": c["id"],
+            "config": c,
+            "train": history(args.suite / c["id"] / "train-native.jsonl"),
+            "heldout": history(args.suite / c["id"] / "heldout-native.jsonl"),
+            "completed": (args.suite / c["id"] / "completion.json").exists(),
+        }
+        for c in canary_configs
+    ]
+    update_document(repo, canary_configs + plan, canary_cells + cells, evaluations)
     print(
         json.dumps(
             {

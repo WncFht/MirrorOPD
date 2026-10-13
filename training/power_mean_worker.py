@@ -28,17 +28,29 @@ from training.oneshot_worker import ResponseModel, reduce_sums, save_checkpoint
 
 
 def panels(artifact, config, device="cuda"):
-    """Use disjoint response sets and deterministic positions inside the existing reservoir."""
+    """Batch 64 uses all responses and disjoint positions; legacy panels split responses."""
     result = {"train": [], "heldout": []}
-    for group, indices, count in (
-        ("train", range(4), 16),
-        ("heldout", range(4, 8), 32),
-    ):
+    batch64 = config.get("batch_size") == 64
+    train_count = config.get("train_positions_per_response", 16)
+    groups = (
+        ("train", range(16) if batch64 else range(4), train_count),
+        (
+            "heldout",
+            range(16) if batch64 else range(4, 8),
+            config.get("heldout_positions_per_response", 16 if batch64 else 32),
+        ),
+    )
+    if batch64 and len(artifact["sequences"]) != 16:
+        raise ValueError("Batch 64 requires exactly 16 cached responses per rank")
+    for group, indices, count in groups:
         for index in indices:
             sequence = artifact["sequences"][index]
             size = len(sequence["selected"])
             order = torch.randperm(size, generator=torch.Generator().manual_seed(4242 + index))
-            chosen = order[: min(size, count)].sort().values
+            offset = train_count if batch64 and group == "heldout" else 0
+            chosen = order[offset : min(size, offset + count)].sort().values
+            if not len(chosen):
+                raise ValueError("Insufficient disjoint heldout positions in response cache")
             qlog = sequence["q_logp_bf16"][chosen].clone().double()
             tlog = sequence["teacher_logp"][chosen].clone().double()
             qlog -= qlog.logsumexp(-1, keepdim=True)
@@ -46,6 +58,7 @@ def panels(artifact, config, device="cuda"):
             mlog = power_log_target(qlog, tlog, config["kappa"], config["strength"])
             result[group].append(
                 {
+                    "response_index": index,
                     "ids": sequence["ids"].clone(),
                     "start": sequence["start"],
                     "selected": sequence["selected"][chosen].clone(),
@@ -58,7 +71,7 @@ def panels(artifact, config, device="cuda"):
     return result
 
 
-def measure(model, sequences, config, *, native):
+def measure(model, sequences, config, *, native, group="train"):
     """Read exact conditional losses at fixed states without changing parameters."""
     model.train(native)
     sums = {}
@@ -90,6 +103,47 @@ def measure(model, sequences, config, *, native):
                 ),
                 "teacher_reverse_kl_upper_certificate": renyi_inner_bound(logp, mlog, tlog),
             }
+            fields["normalized_fit_divergence"] = fields["fit_divergence"] / config["strength"]
+            probability, target, teacher = logp.exp(), mlog.exp(), tlog.exp()
+            midpoint = torch.logaddexp(logp, tlog) - math.log(2)
+            fields.update(
+                {
+                    "target_teacher_reverse_kl": (target * (mlog - tlog)).sum(-1),
+                    "target_teacher_forward_kl": (teacher * (tlog - mlog)).sum(-1),
+                    "target_anchor_fisher_rao_squared": 4
+                    * torch.exp((mlog + qlog) / 2).sum(-1).clamp(0, 1).acos().square(),
+                    "teacher_entropy": -(teacher * tlog).sum(-1),
+                    "student_entropy": -(probability * logp).sum(-1),
+                    "teacher_total_variation": (probability - teacher).abs().sum(-1) / 2,
+                    "teacher_jensen_shannon": (
+                        (probability * (logp - midpoint)).sum(-1)
+                        + (teacher * (tlog - midpoint)).sum(-1)
+                    )
+                    / 2,
+                    "teacher_hellinger_squared": (probability.sqrt() - teacher.sqrt())
+                    .square()
+                    .sum(-1),
+                    "target_forward_kl": (target * (mlog - logp)).sum(-1),
+                    "anchor_fisher_rao_squared": 4
+                    * torch.exp((logp + qlog) / 2).sum(-1).clamp(0, 1).acos().square(),
+                }
+            )
+            if config.get("diagnostic_output"):
+                from pathlib import Path
+
+                row = {
+                    "update": config.get("diagnostic_update", 0),
+                    "response_index": dist.get_rank() * 16 + sequence["response_index"],
+                    "prefix_count": len(logp),
+                    **{key: float(value.mean()) for key, value in fields.items()},
+                }
+                suffix = "native" if native else "fp32-converted"
+                path = (
+                    Path(config["diagnostic_output"])
+                    / f"{group}-{suffix}-responses-rank{dist.get_rank()}.jsonl"
+                )
+                with path.open("a") as stream:
+                    stream.write(json.dumps(row, allow_nan=False) + "\n")
             for key, values in fields.items():
                 sums[key] = sums.get(key, 0.0) + float(values.sum())
             sums["count"] = sums.get("count", 0.0) + len(logp)
@@ -121,6 +175,12 @@ def backward_once(model, sequences, config, count, update):
     model.zero_grad(set_to_none=True)
     objective = 0.0
     ratio_second = 0.0
+    noise = {
+        "coefficient_second": 0.0,
+        "coefficient_fourth": 0.0,
+        "importance_fourth": 0.0,
+        "importance_gt10_fraction": 0.0,
+    }
     for index, sequence in enumerate(sequences):
         with contextlib.nullcontext() if index == len(sequences) - 1 else model.no_sync():
             logits = model(
@@ -153,6 +213,14 @@ def backward_once(model, sequences, config, count, update):
                     config["fit"],
                 )
                 loss = fields["loss"]
+                coefficient, ratio = (
+                    fields["coefficient"].detach().double(),
+                    fields["importance_ratio"].detach().double(),
+                )
+                noise["coefficient_second"] += float(coefficient.square().mean(-1).sum())
+                noise["coefficient_fourth"] += float(coefficient.pow(4).mean(-1).sum())
+                noise["importance_fourth"] += float(ratio.pow(4).mean(-1).sum())
+                noise["importance_gt10_fraction"] += float((ratio > 10).double().mean(-1).sum())
                 ratio_second += float(fields["importance_ratio"].square().mean(-1).sum())
             else:
                 loss = (
@@ -169,10 +237,10 @@ def backward_once(model, sequences, config, count, update):
                 raise FloatingPointError("A power-target fitting loss is nonfinite")
             objective += float(loss.detach().sum())
             (loss.sum() * dist.get_world_size() / float(count)).backward()
-    return objective, ratio_second
+    return objective, ratio_second, noise
 
 
-def gradient_probe(model, sequences, config, count, output):
+def gradient_probe(model, sequences, config, count, output, stage="initial"):
     """Measure full-parameter gradient covariance before any optimizer update."""
     draws = config["gradient_probe_draws"]
     backward_once(model, sequences, config | {"sample_count": 0}, count, 0)
@@ -224,9 +292,13 @@ def gradient_probe(model, sequences, config, count, output):
             "mean_squared_error_to_full_vocab_backward": float(scalar[1]) / draws,
             "squared_sample_mean_error": float(totals[2]),
             "samples": samples,
+            "stage": stage,
+            "relative_parameter_noise": max(variance, 0) / max(float(totals[0]), 1e-30),
             "scope": "BF16-forward full-parameter gradients at fixed prefixes and parameters; finite draws compare actual arithmetic including rounding to an oracle backward",
         }
-        (output / "gradient-probe.json").write_text(json.dumps(result, indent=2) + "\n")
+        (
+            output / ("gradient-probe.json" if stage == "initial" else "gradient-probe-final.json")
+        ).write_text(json.dumps(result, indent=2) + "\n")
     del exact, mean
     model.zero_grad(set_to_none=True)
     gc.collect()
@@ -301,6 +373,7 @@ def train(args, config, rank):
         (args.output / "wandb-run.json").write_text(
             json.dumps({"id": run.id, "url": run.url}) + "\n"
         )
+    config = config | {"diagnostic_output": str(args.output), "diagnostic_update": 0}
     initial = measure(model, data["train"], config, native=True)
     if initial["anchor_to_student_kl"] > 1e-5:
         raise RuntimeError("Native full-model forward does not reproduce the frozen anchor")
@@ -308,20 +381,32 @@ def train(args, config, rank):
     record(
         args.output,
         "heldout-native.jsonl",
-        {"update": 0, **measure(model, data["heldout"], config, native=True)},
+        {"update": 0, **measure(model, data["heldout"], config, native=True, group="heldout")},
         run,
     )
+    for group in ("train", "heldout"):
+        record(
+            args.output,
+            group + "-fp32-converted.jsonl",
+            {"update": 0, **measure(model, data[group], config, native=False, group=group)},
+            run,
+        )
     if config.get("gradient_probe_draws", 0):
         gradient_probe(model, data["train"], config, count, args.output)
     begin = time.monotonic()
     for update in range(config["updates"]):
-        objective, ratio_second = backward_once(model, data["train"], config, count, update)
+        objective, ratio_second, noise = backward_once(model, data["train"], config, count, update)
         norm = float(model.clip_grad_norm_(float("inf")))
         if not math.isfinite(norm):
             raise FloatingPointError("Power-target parameter gradient is nonfinite")
         optimizer.step()
         metrics = reduce_sums(
-            {"count": float(count) / 4, "objective": objective, "importance_second": ratio_second}
+            {
+                "count": float(count) / 4,
+                "objective": objective,
+                "importance_second": ratio_second,
+                **noise,
+            }
         )
         record(
             args.output,
@@ -329,6 +414,10 @@ def train(args, config, rank):
             {
                 "update": update + 1,
                 "grad_norm": norm,
+                "peak_allocated_memory_gib": torch.cuda.max_memory_allocated() / 2**30,
+                "peak_reserved_memory_gib": torch.cuda.max_memory_reserved() / 2**30,
+                "response_batch_size": config.get("batch_size", 16),
+                "prefix_batch_size": int(count),
                 "objective_kind": "score_surrogate"
                 if config["sample_count"]
                 else "exact_normalized_loss",
@@ -338,17 +427,24 @@ def train(args, config, rank):
             run,
         )
         if (update + 1) % 10 == 0 or update + 1 == config["updates"]:
+            config["diagnostic_update"] = update + 1
             for group in ("train", "heldout"):
                 record(
                     args.output,
                     group + "-native.jsonl",
-                    {"update": update + 1, **measure(model, data[group], config, native=True)},
+                    {
+                        "update": update + 1,
+                        **measure(model, data[group], config, native=True, group=group),
+                    },
                     run,
                 )
                 record(
                     args.output,
                     group + "-fp32-converted.jsonl",
-                    {"update": update + 1, **measure(model, data[group], config, native=False)},
+                    {
+                        "update": update + 1,
+                        **measure(model, data[group], config, native=False, group=group),
+                    },
                     run,
                 )
         if rank == 0:
@@ -362,6 +458,8 @@ def train(args, config, rank):
                 )
                 + "\n"
             )
+    if config.get("gradient_probe_draws", 0):
+        gradient_probe(model, data["train"], config, count, args.output, stage="final")
     save_checkpoint(
         args.repo,
         args.output,

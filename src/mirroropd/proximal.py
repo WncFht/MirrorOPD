@@ -95,8 +95,8 @@ def sampled_target_loss(
     gradient after analytic differentiation. The objective is divided by the
     interpolation strength so shape-zero matches the original MDPO scale.
     """
-    if not 0 < strength < 1 or not 0 <= kappa <= 1:
-        raise ValueError("Interior strength and valid shape required")
+    if not 0 < strength <= 1 or not 0 <= kappa <= 1:
+        raise ValueError("Positive strength at most one and valid shape required")
     logp = student_logits.float().log_softmax(-1)
     qlog, mlog = anchor_logp.detach(), target_logp.detach()
     lp = logp.gather(-1, actions)

@@ -2,17 +2,17 @@
   "bf16": {
     "matched_strengths": {
       "0.0": 0.1,
-      "0.5": 0.10445091128349304,
-      "1.0": 0.08613148331642151
+      "0.5": 0.11014565825462341,
+      "1.0": 0.08857408165931702
     },
-    "training_prefixes": 256,
-    "training_responses": 16,
-    "mean_squared_fisher_rao_radius": 0.002046485689383725,
+    "training_prefixes": 1024,
+    "training_responses": 64,
+    "mean_squared_fisher_rao_radius": 0.0023207379956921913,
     "measured_radius_by_shape": {
-      "0.0": 0.002046485689383725,
-      "0.5": 0.002046485201679051,
-      "1.0": 0.002046485278127615
+      "0.0": 0.0023207379956921913,
+      "0.5": 0.002320739018156926,
+      "1.0": 0.002320738703536473
     }
   },
-  "amendment": "The 128-prefix diagnostic calibration did not transfer to the 4096-prefix panel. GPU radius controls now use the exact training panel, excluding heldout responses and all trained-model outcomes."
+  "amendment": "The 128-prefix diagnostic calibration did not transfer to the 4096-prefix panel. GPU radius controls now use the exact training panel, excluding heldout positions and all trained-model outcomes."
 }

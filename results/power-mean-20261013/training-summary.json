@@ -66,10 +66,11 @@
     }
   },
   "training_cells": [],
+  "math_evaluations": {},
   "parameter_gradient_probes": {},
   "minimax_velocity_shape": 0.44192837352858505,
   "sharp_worst_fisher_speed_squared": 3.527274844172147,
   "completed_training_cells": 0,
-  "planned_training_cells": 20,
+  "planned_training_cells": 63,
   "scope": "Cached model audit and training pilot are separate evidence levels; no completed GPU training is inferred from cached distributions"
 }
