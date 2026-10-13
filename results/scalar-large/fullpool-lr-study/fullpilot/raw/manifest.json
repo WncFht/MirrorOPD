@@ -1,0 +1,261 @@
+{
+  "phase": "fullpilot",
+  "files": [
+    {
+      "run": "fullpilot-lr1.25e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.25e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.25e-07-summary.json.gz",
+      "original_sha256": "e5828b8d2de81d6998849babb49cbc981cdedd92113f031a9fb53196934448e5",
+      "archive_sha256": "0b6b6ab3e64ed7ef74aa4a25c65437d5862905146b530be95d9601ebfc00a2b4"
+    },
+    {
+      "run": "fullpilot-lr1.25e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.25e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.25e-07-audits.jsonl.gz",
+      "original_sha256": "ae798770ccf7b1193a04a39e8b1a7d0f50599fe99840aa7b3dcffc72bef0ea2e",
+      "archive_sha256": "cc76d16c865a291395b5979b78d96976ba1c1a2b7e9348212447b7433cc53af9"
+    },
+    {
+      "run": "fullpilot-lr1.25e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.25e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.25e-07-updates.jsonl.gz",
+      "original_sha256": "681c8c9e6a8ebc83259e67a0168c23ec860068ccf6bdba0dad6bbaf36ba2c1b7",
+      "archive_sha256": "9a4e8d6d6932b7077e96a06f90f5d1bd7c14da1bd42057a2b4ce6a9f243a23b2"
+    },
+    {
+      "run": "fullpilot-lr1.25e-07",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.25e-07/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.25e-07-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr1.6e-05",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.6e-05/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.6e-05-summary.json.gz",
+      "original_sha256": "f72821c361e84521319b72dd6d20987d844707ebdb331035631f2d0e50766f3f",
+      "archive_sha256": "4bae1cd457a36a4f01d288a4ffb3d70f139be6c5d0ff453d3875fed01afcc4aa"
+    },
+    {
+      "run": "fullpilot-lr1.6e-05",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.6e-05/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.6e-05-audits.jsonl.gz",
+      "original_sha256": "f3fee3947171c797248b9e8e99db2943cf2d96ede10dce9b91c5f92d0488bc55",
+      "archive_sha256": "89a0cae5e5ce741116ba0ad66599225957c55db224a36fc30239f012e75f70c9"
+    },
+    {
+      "run": "fullpilot-lr1.6e-05",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.6e-05/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.6e-05-updates.jsonl.gz",
+      "original_sha256": "6357933d67767f19f53670eba9fb5c73dd753ffdcb9bfc8285f6768f9cde4729",
+      "archive_sha256": "dbd5ea7f361c9e3957183d1659af7075acdc5c848cfda9b4699da676837626e9"
+    },
+    {
+      "run": "fullpilot-lr1.6e-05",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1.6e-05/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1.6e-05-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr1e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1e-06-summary.json.gz",
+      "original_sha256": "275004824c574a94faaeb1999ff19b637189e0bbed4ab1064b869e9bc6b9a4fe",
+      "archive_sha256": "6d3c68f4f74270ed1f45f21728a150d810652359a9b2ca6c7bc8977f3d5ccc8b"
+    },
+    {
+      "run": "fullpilot-lr1e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1e-06-audits.jsonl.gz",
+      "original_sha256": "6f11b730717b73f9ae5f3def1ce354abe2caac58c56e80c551075fcc669a5e92",
+      "archive_sha256": "967eb7afb461310d238367f37b5c1038aa0d8864f8f5f59380ba3848530a5b65"
+    },
+    {
+      "run": "fullpilot-lr1e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1e-06-updates.jsonl.gz",
+      "original_sha256": "bdc61e9a9b47704a69f1ad242d5d2c62f87e62a422e52a2e8d2911ac2eb3654c",
+      "archive_sha256": "0fe864d368cd52c737d6e27bd8b08b76e9b308487dc4c255322be7ed20eae8fd"
+    },
+    {
+      "run": "fullpilot-lr1e-06",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr1e-06/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr1e-06-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr2.5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2.5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2.5e-07-summary.json.gz",
+      "original_sha256": "f7d80b1a31084ad44660a4308cb65deaa2dc2f2172853b09073e4cef590df18f",
+      "archive_sha256": "b3aaefb84d0be53ca9e528e4f91f6db08e9bbf100d301469f26110cec89c10b3"
+    },
+    {
+      "run": "fullpilot-lr2.5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2.5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2.5e-07-audits.jsonl.gz",
+      "original_sha256": "b25acf58129e998b9892dbedb693aaa98b56c99fce99caa6af27fa0ed0028cbb",
+      "archive_sha256": "346e4142439a00d768b4938237a0d081ebfa57d3eac249fdc4cc5ae00d97407b"
+    },
+    {
+      "run": "fullpilot-lr2.5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2.5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2.5e-07-updates.jsonl.gz",
+      "original_sha256": "76a16ececb3ad0cf2c534ab3c575f264f223478e1b0caebcc0a084bd87200bd4",
+      "archive_sha256": "e7c2ce0ab507550b3a5ad7f7b5c3ef90561cf6bea5e51e89aac481f91709e3ed"
+    },
+    {
+      "run": "fullpilot-lr2.5e-07",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2.5e-07/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2.5e-07-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr2e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2e-06-summary.json.gz",
+      "original_sha256": "294b50945150b3a83fe95cd2ae961e53417b2d981387818c5527d02240d92c68",
+      "archive_sha256": "d7c0445f527cf384238af422bb53706c0236a9e49643fb78dad9cd475e98345f"
+    },
+    {
+      "run": "fullpilot-lr2e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2e-06-audits.jsonl.gz",
+      "original_sha256": "af014e985ad61b77064ba4fe18ba3458877c935779a78216f14849f07dbc55ad",
+      "archive_sha256": "3f74ef63f744ecc2235f37669487128bd23f3cd149c503b68da2b046026b6a52"
+    },
+    {
+      "run": "fullpilot-lr2e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2e-06-updates.jsonl.gz",
+      "original_sha256": "e938130b3aa56fa17084057e7c37d8c0021a56f08d92a2972b9859f5b01f086d",
+      "archive_sha256": "dcb8e366ee01e064bfc2e854233ea2843a3efeac20300e03c6eee0faae5ecb0a"
+    },
+    {
+      "run": "fullpilot-lr2e-06",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr2e-06/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr2e-06-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr4e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr4e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr4e-06-summary.json.gz",
+      "original_sha256": "54eb95d75101fa34ad40d97cb5ee8f4c5adf6e0989fe4cbcc72aa0b57d9dc6af",
+      "archive_sha256": "55b39bbccbd6cb95b3453364900473377494a8f70d614289028c6e7ddff9403f"
+    },
+    {
+      "run": "fullpilot-lr4e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr4e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr4e-06-audits.jsonl.gz",
+      "original_sha256": "fe820be0968957fa00ec491e05166c376ed791c11d34b6db991ce10f46c0120d",
+      "archive_sha256": "4131a3cc2375b55c76a55491ccb0f9a4a3e21128ad08e36fca65ace0acb4c233"
+    },
+    {
+      "run": "fullpilot-lr4e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr4e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr4e-06-updates.jsonl.gz",
+      "original_sha256": "ee0d5a9474b35e22e75a5fed74c8ffbf27e99c2312375651a7c818a418364da6",
+      "archive_sha256": "c5506a43d5d417cd1f51dcaebd44ed66c25ae8de2e4893dcff3623bbe94528af"
+    },
+    {
+      "run": "fullpilot-lr4e-06",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr4e-06/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr4e-06-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr5e-07-summary.json.gz",
+      "original_sha256": "4aa507a2ad3b64d35e8ce005b7d53fee9fd36a2cf183fbebab25cd7b16f64f24",
+      "archive_sha256": "903c2be8d604e83b730859f80ae453f47cd2fae4cb2c577cd4d08ecb43c5054d"
+    },
+    {
+      "run": "fullpilot-lr5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr5e-07-audits.jsonl.gz",
+      "original_sha256": "11b60f3fc3e8ed58b8cc88d9a0fee0f7ad52d620acc35aa43b85a17e27b5e023",
+      "archive_sha256": "fc69c901d0f8d14f95b9eeb783995c06bafb6805e7bf64ad295160e064730c61"
+    },
+    {
+      "run": "fullpilot-lr5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr5e-07-updates.jsonl.gz",
+      "original_sha256": "adff297f584a18fee6c88fdfc3028f12dfdc33b5a66672de30d518ccba592a34",
+      "archive_sha256": "872570c05d248ed87066847dfb05cbf9c3f65d9b1ff987c658f9f168e0b308d7"
+    },
+    {
+      "run": "fullpilot-lr5e-07",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr5e-07/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr5e-07-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    },
+    {
+      "run": "fullpilot-lr8e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr8e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr8e-06-summary.json.gz",
+      "original_sha256": "4f298075db57460a58b7b6ae1353d994596e2cd1ed6e774ca47034d35293b616",
+      "archive_sha256": "3deea84b77e47f42d6f6ff8b583eb01c7b2a5a3ff3cd7e7d1007047b4f1233a2"
+    },
+    {
+      "run": "fullpilot-lr8e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr8e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr8e-06-audits.jsonl.gz",
+      "original_sha256": "8a854b1955a5165287d11b3969ce581c4f49c27172fb084806f134295f5a040f",
+      "archive_sha256": "7b52aa72ef356c02f622af8548cc727f6418688607311353eb6f01c14cc1e377"
+    },
+    {
+      "run": "fullpilot-lr8e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr8e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr8e-06-updates.jsonl.gz",
+      "original_sha256": "93c73203b0fc9f44f629ba97556a8a4ecd71abf9369e34d74dfd98a436d48044",
+      "archive_sha256": "06fa400ae60c479cb9bb6e2e6a17ab5ee3b4a870c4f95981a565590e1a4bca7c"
+    },
+    {
+      "run": "fullpilot-lr8e-06",
+      "file": "checkpoints.jsonl",
+      "source": "runs/scalar-large/fullpilot/fullpilot-lr8e-06/checkpoints.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullpilot/raw/fullpilot-lr8e-06-checkpoints.jsonl.gz",
+      "original_sha256": "4246242045eb975e8674a1ac3dda1943f87ae15f1db662465a212ca3b7b51c94",
+      "archive_sha256": "855c6dd2ab46c446b94063a69a803760900f340bdcf0f2d19a737a8296eefd84"
+    }
+  ]
+}

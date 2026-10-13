@@ -1,0 +1,14 @@
+{
+  "criterion": "train full-BPO normalized log-loss AUC",
+  "baselines": [
+    {
+      "id": "fullpilot-lr1e-06",
+      "lr": 1e-06
+    },
+    {
+      "id": "fullpilot-lr5e-07",
+      "lr": 5e-07
+    }
+  ],
+  "failed_or_incomplete": []
+}

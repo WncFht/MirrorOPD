@@ -1,0 +1,773 @@
+{
+  "phase": "fullstage",
+  "files": [
+    {
+      "run": "fullstage-parent120-lr1.25e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.25e-07-summary.json.gz",
+      "original_sha256": "f3e74b4a35535efc4da5271204ed0f6494dc987da79c9f8cbff1ab1efe40a947",
+      "archive_sha256": "5ec8788837379d68845c969a552b7f3b04ffe38b278304cde6617a73a4182cd3"
+    },
+    {
+      "run": "fullstage-parent120-lr1.25e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.25e-07-audits.jsonl.gz",
+      "original_sha256": "dd8a8fc674e6a06fea1b760c6576d189637099ac7ad1ea6864455850d722ce14",
+      "archive_sha256": "23d22c41caae447112bbb5764a37a12ed9f6dabdeaca071ded88d74b2b45de93"
+    },
+    {
+      "run": "fullstage-parent120-lr1.25e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.25e-07-updates.jsonl.gz",
+      "original_sha256": "4f3e29a061a234974a45c4c593616c181bcfec3a0d6d1c9e8e41981ecff85b3f",
+      "archive_sha256": "99774514bd48746d488a06b9ffef474d7542e0e9efd227db2b71549c7a06cea3"
+    },
+    {
+      "run": "fullstage-parent120-lr1.25e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.25e-07-fork.jsonl.gz",
+      "original_sha256": "6ef1dadc0b4c01a5abb32ee1fc2b6572f4f4af053540ece6ab477f0b784e6d0f",
+      "archive_sha256": "4906405a31d9cfb8da40c3db2323f8c73fa034a943cd16e293efcb32d115851c"
+    },
+    {
+      "run": "fullstage-parent120-lr1.6e-05",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.6e-05-summary.json.gz",
+      "original_sha256": "163a416410fe47724c5c9dfcd0144d86da544d935aa9a0a0dc8350a6e27976f2",
+      "archive_sha256": "a4a1674c2c439112d7c3357cddb9afc26a32e63a09f9e7e6a7fb9d7adf9e9fd7"
+    },
+    {
+      "run": "fullstage-parent120-lr1.6e-05",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.6e-05-audits.jsonl.gz",
+      "original_sha256": "fa786089abf9bf980a0aa48060eca532f42d3acdc0da3a319a15da080e3afeea",
+      "archive_sha256": "fe8ca88bc189002d193debfe75ac70fe521a1177274c33664c442df7d6c34fcd"
+    },
+    {
+      "run": "fullstage-parent120-lr1.6e-05",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.6e-05-updates.jsonl.gz",
+      "original_sha256": "9f2c978215ed570878190659a1027bcafb47f3927edb7abf4114141cf069ea8e",
+      "archive_sha256": "06fa806e3cc2ec0d75929c6cbe41852d09e07ae1dd6cf0552ea737c182469698"
+    },
+    {
+      "run": "fullstage-parent120-lr1.6e-05",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1.6e-05-fork.jsonl.gz",
+      "original_sha256": "63c3a6caabe6e4cc5c4d0a93e7b947c115ede4cdfbd6e05129da1d034196bd4e",
+      "archive_sha256": "86c1905a845284cb39ac21b11ec5f2f7930440e9e7bb7bd4b909a36a6945b50c"
+    },
+    {
+      "run": "fullstage-parent120-lr1e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1e-06-summary.json.gz",
+      "original_sha256": "52046fec23f18e5ad1198e5cc22cc936f8a66cb334935eb20d7d61ae75ac70de",
+      "archive_sha256": "7dd0d69074a434f6780866c5a0de6891315988d57ad6fa6ab7fab8ef64ecf6f9"
+    },
+    {
+      "run": "fullstage-parent120-lr1e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1e-06-audits.jsonl.gz",
+      "original_sha256": "80e69df22b807b655ad6d17d68075447e146622aace3c2c79949c23eea3d174e",
+      "archive_sha256": "fe153f3ea675f6f2f6995f70a8ef48d0e681f03a1389fd78c9b07642bd2c82b2"
+    },
+    {
+      "run": "fullstage-parent120-lr1e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1e-06-updates.jsonl.gz",
+      "original_sha256": "fad7a12c4c55fffc0edebe953c0c8ad089fa9caab71f1d137eed01a311b8e8c4",
+      "archive_sha256": "1c258ee0595be0eb96b2d2ac614bc7ef150992ed7a6af61e1cfd13ebbb4dc013"
+    },
+    {
+      "run": "fullstage-parent120-lr1e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr1e-06-fork.jsonl.gz",
+      "original_sha256": "629832840254b87c0d8e54344f5870240cf4b3e11a89288aaaa39f6ee9bcf883",
+      "archive_sha256": "c0b33428c028b8e21df7b34d6f6b3679cf1506b2db1b61c54f2f45eb636459de"
+    },
+    {
+      "run": "fullstage-parent120-lr2.5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2.5e-07-summary.json.gz",
+      "original_sha256": "0b0b8965000192f1dc06d1ca809c47aee7aaef38d417018f65fce93d01a61669",
+      "archive_sha256": "610b8df0293478d902197d2c62fb1dfb20e54b514649f6b3919b27f46604a372"
+    },
+    {
+      "run": "fullstage-parent120-lr2.5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2.5e-07-audits.jsonl.gz",
+      "original_sha256": "f6fd3aacd9a21a8c481a72ea8c9fdb232f4ec32abe1297ab1f2e5fe718bd82fe",
+      "archive_sha256": "097191f772cf97fead78e7c08e6782cfc3f19f8cdcd1ef44aa07f3bd742c1215"
+    },
+    {
+      "run": "fullstage-parent120-lr2.5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2.5e-07-updates.jsonl.gz",
+      "original_sha256": "3e9fa8dcb58c7a52649fc32939589bd7df2106056f6a129471b99ce8bc1640e3",
+      "archive_sha256": "145afa8c73568c6322c0a52cdcfad7f3c95498e2de212c047bbb50a01f2585ef"
+    },
+    {
+      "run": "fullstage-parent120-lr2.5e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2.5e-07-fork.jsonl.gz",
+      "original_sha256": "1a7ba5214a5614ac5e186bd95fd8701d60a3f39fceaa3f846a5463abc22884d3",
+      "archive_sha256": "4648f842b1adb7c90f202ddcb0a1f23687bcbf92e49d39fb161a50de9f86ef03"
+    },
+    {
+      "run": "fullstage-parent120-lr2e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2e-06-summary.json.gz",
+      "original_sha256": "411d520b9b5b9805a60b987e191c30de814ad6a4e52ba4e213d25342d4e906cf",
+      "archive_sha256": "c3310da88a1de91ce882bcc5ba682a03a9b9d24fef4bbc347f8b3ae6c859b0d5"
+    },
+    {
+      "run": "fullstage-parent120-lr2e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2e-06-audits.jsonl.gz",
+      "original_sha256": "fabcec51042d68c5331874b3fd23adb63fb548896dc22c0f91240b72510bae30",
+      "archive_sha256": "5a90aa2a17c288845d4f579272f984febc942a94d0358d388e4f652f446a1cc6"
+    },
+    {
+      "run": "fullstage-parent120-lr2e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2e-06-updates.jsonl.gz",
+      "original_sha256": "9334aba9a54d6e54ba6bedb8f0336499ba4d46f17eb862380caf04905ba8091a",
+      "archive_sha256": "37e790088d074fed9dce1870727714c084aaeda1d1b54d6cede9ffacdb27bf25"
+    },
+    {
+      "run": "fullstage-parent120-lr2e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr2e-06-fork.jsonl.gz",
+      "original_sha256": "f29574e59766bb74d6c0f303ef307335943f980122cf206a79034ad5ce77c541",
+      "archive_sha256": "c65727d9570c409644b2c8db6184c31ce5fc5c966e07c80aaa4ff773f14a033b"
+    },
+    {
+      "run": "fullstage-parent120-lr4e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr4e-06-summary.json.gz",
+      "original_sha256": "d990cbd4369e949be13c11368a1b21dfe3bbebde54ade1190ce15fcd27d4b55d",
+      "archive_sha256": "9fdb0b60aafe96d253c11b3b17c687d8f72bd3845aea3773eca0481c39e720e7"
+    },
+    {
+      "run": "fullstage-parent120-lr4e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr4e-06-audits.jsonl.gz",
+      "original_sha256": "2205c5d3d5d5b6976d7d5ec4c62e23ce3267726ef37655c2de001c3d44d44c64",
+      "archive_sha256": "e3b2264aabc1b4e29d835746570fd3d9cef1be697a49c5bc4a99c30fdd5e4395"
+    },
+    {
+      "run": "fullstage-parent120-lr4e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr4e-06-updates.jsonl.gz",
+      "original_sha256": "66f5c6516ad95dc547ccdba37604455cdb9dd8ef5112afa0d357c06d49a7818a",
+      "archive_sha256": "9fd0a63bccd454a1d65d565b7e6329dbda439826505ce6c0e5711e5a3de7f624"
+    },
+    {
+      "run": "fullstage-parent120-lr4e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr4e-06-fork.jsonl.gz",
+      "original_sha256": "a8d6638afd2e9c1c6175c73085a09f93835fa2c7e9a113e1917af23c09c52a4f",
+      "archive_sha256": "477e3c4e164474c333cda5cba7f3d8d8c2097644acf1dfac47c3d4e63630ec31"
+    },
+    {
+      "run": "fullstage-parent120-lr5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr5e-07-summary.json.gz",
+      "original_sha256": "da3092e117f7a43fd893a300ca1d7ab85e382e3c74a01ddc004431c4e7071a03",
+      "archive_sha256": "0596fbe3dcbc4fa6db693ae81a589a42ab6c1fe04897b9651d13bd417e73a177"
+    },
+    {
+      "run": "fullstage-parent120-lr5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr5e-07-audits.jsonl.gz",
+      "original_sha256": "2926f2eaa195f685cacfb32cdf735f664ec97fbec71badc8bda09ff238659be2",
+      "archive_sha256": "986655557c1e9ea8789e3a2bd4ddc6f7609fdca9022f883e442265a5b19cfabe"
+    },
+    {
+      "run": "fullstage-parent120-lr5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr5e-07-updates.jsonl.gz",
+      "original_sha256": "df557a3b9df34b9e9f3bffea0f82f81d1857b2bf6b8210817de925222b1cc565",
+      "archive_sha256": "c52582a26b5c25fcffd0295b479d221fc3fa158b328c2b421f42949494a53464"
+    },
+    {
+      "run": "fullstage-parent120-lr5e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr5e-07-fork.jsonl.gz",
+      "original_sha256": "7116106c4df529f45ea7c9112f111898064e651810b4fc3113c5db495f2e1980",
+      "archive_sha256": "28ed8a5eb8ae82b55dbdfe003aad7348ca33e0c133428b88d91bec7486dca61b"
+    },
+    {
+      "run": "fullstage-parent120-lr8e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr8e-06-summary.json.gz",
+      "original_sha256": "ae807b16139006e23899f7f13aa6d55349d4063ee4dbaef6d74e5e339a474633",
+      "archive_sha256": "633ac104677cbb8179fade64ad95a768245da4e138835d5c4210848cedb81f2a"
+    },
+    {
+      "run": "fullstage-parent120-lr8e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr8e-06-audits.jsonl.gz",
+      "original_sha256": "3a13047d7e09dc7ca85983aace52a5cbeed0ff229cb6d11d208b545ed6548a5c",
+      "archive_sha256": "71cff605fd81d2142895913feb81360ffdd58768f2753104748f0faf6301c5e7"
+    },
+    {
+      "run": "fullstage-parent120-lr8e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr8e-06-updates.jsonl.gz",
+      "original_sha256": "ed1264d057dd050885ff1d07a282adc2fb2c9a804d89ef844b1a07f441159948",
+      "archive_sha256": "86a72f56b395a8e210dfa849f253b517e2cfc40042f5e9631b01119266bcd8cf"
+    },
+    {
+      "run": "fullstage-parent120-lr8e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent120-lr8e-06-fork.jsonl.gz",
+      "original_sha256": "5f62c71a11a2adc0da1e7318d978bdd746b5eb72f83164adfb1ae613fa4b1e41",
+      "archive_sha256": "08fbbd0c2b4780fe68e2f435816f0c47c9a4663c1172c1141387b7a33adf9012"
+    },
+    {
+      "run": "fullstage-parent240-lr1.25e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.25e-07-summary.json.gz",
+      "original_sha256": "cc3158cde2afb908569dd655ff4128de681d024b1862bb0e22690c73b46181e9",
+      "archive_sha256": "8f11a402da7a59847da0fd970f2f0f08d160ff56044703da6e5061403173cbd5"
+    },
+    {
+      "run": "fullstage-parent240-lr1.25e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.25e-07-audits.jsonl.gz",
+      "original_sha256": "087d252180a0f954a8243066b0c692440b9982768743789ee33ddeb0b9d7a8fa",
+      "archive_sha256": "27d110bc1b83c0b872b630c5e6085c79007d7f762aea70cc4087228cc07e4dfb"
+    },
+    {
+      "run": "fullstage-parent240-lr1.25e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.25e-07-updates.jsonl.gz",
+      "original_sha256": "0d87f42eeea2ab8be3a34935fd319b6a17baae56db41ae2921f0d96e5b7a6244",
+      "archive_sha256": "13e90f971974200cc6ca09660aa9944da77b51d13f9c9448e2de841853262482"
+    },
+    {
+      "run": "fullstage-parent240-lr1.25e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.25e-07-fork.jsonl.gz",
+      "original_sha256": "cc9d222236c3c2f7164a4e77dac1570da32e9e264622a87703483c2f1bfa7199",
+      "archive_sha256": "c52bc15d91ee35adfde1d222d015a9d7a3d1cb31cfed9f13a97d78d7834310cc"
+    },
+    {
+      "run": "fullstage-parent240-lr1.6e-05",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.6e-05-summary.json.gz",
+      "original_sha256": "7c47ab7bca3b498ec2901b381da1451f7044e523e4a670cc6fd34df7933caacd",
+      "archive_sha256": "17e3961dd3313f22b19865b71be6d103fcf4f5017ec5b7ef5d37452cfd50cd15"
+    },
+    {
+      "run": "fullstage-parent240-lr1.6e-05",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.6e-05-audits.jsonl.gz",
+      "original_sha256": "4ac699bf2a59bde821f0a6d5600fd6a3760fc7be796a7664a491cd8b4f304a8d",
+      "archive_sha256": "b3ef7d8093056400c09581678ab0c0ae64d0e2edd1b9f2b553e64180c4c7aa28"
+    },
+    {
+      "run": "fullstage-parent240-lr1.6e-05",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.6e-05-updates.jsonl.gz",
+      "original_sha256": "ae8d3b7cf596955302e1e735c26381cf3c96912134c04e3beb83a055e9131fbf",
+      "archive_sha256": "b8e60e4d1acf007fdf714771d034e6ccb18d064de7d5d55cc866d262927b6988"
+    },
+    {
+      "run": "fullstage-parent240-lr1.6e-05",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1.6e-05-fork.jsonl.gz",
+      "original_sha256": "328868b157a0ea25b2ff6351816c34678e0f5597a759374c255f15ea933d1035",
+      "archive_sha256": "7aaff95e82f7fa50a1abdef88181f4826024f5b070b0f517e3327aa5f1e11a52"
+    },
+    {
+      "run": "fullstage-parent240-lr1e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1e-06-summary.json.gz",
+      "original_sha256": "417bc4a3313308c040ddb46952e3e82fd6aed75029a2838c2fb279d0b32c627a",
+      "archive_sha256": "545167f9cf36036c72c7588f4e2ad09687ed0c173cbd15554ee75536ed287d09"
+    },
+    {
+      "run": "fullstage-parent240-lr1e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1e-06-audits.jsonl.gz",
+      "original_sha256": "cceefaa3a2593347264004a57720a9d3dbd55c917ef480426330d99c9eef2c7d",
+      "archive_sha256": "edba9d74a03050c69cda023ee803d1b2777b6571f167d0edcd50617eba79e5b0"
+    },
+    {
+      "run": "fullstage-parent240-lr1e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1e-06-updates.jsonl.gz",
+      "original_sha256": "2ab6eab0d32579c177832b54539689fc89846ee96f873d7e2da0171b3af4bc20",
+      "archive_sha256": "06fa1efab98bcfd5637cdbf9f0b694919244c9ce336f36aa666d07cd5bf71aae"
+    },
+    {
+      "run": "fullstage-parent240-lr1e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr1e-06-fork.jsonl.gz",
+      "original_sha256": "570547de801edbd464c6e5f81c7d12f8213894056ab7b2b65ed66d5440bf6656",
+      "archive_sha256": "dbb62a859fea84cc2cee176e53cece4188654968a703de8c7a3d0ce1255fd716"
+    },
+    {
+      "run": "fullstage-parent240-lr2.5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2.5e-07-summary.json.gz",
+      "original_sha256": "3a7933e914d5ace2bf01045c1ae538c242b633656f99ef7a409570b18db2584c",
+      "archive_sha256": "4bea5d2574ceb6b0ef1534b3d42b781dc6890858e0068a626febc6eab081cb35"
+    },
+    {
+      "run": "fullstage-parent240-lr2.5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2.5e-07-audits.jsonl.gz",
+      "original_sha256": "1b692404520d34851be69eefeebcf3fc2c55bd37da049c673482a6d486434929",
+      "archive_sha256": "ca4dadd6a74e98bafb50a6b5b8481407aa3823fdb12bf1820bf7a52008129c51"
+    },
+    {
+      "run": "fullstage-parent240-lr2.5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2.5e-07-updates.jsonl.gz",
+      "original_sha256": "0c4c2e585f2586a3513ef50ad4c3f565c38e6e66bad48780738bdcf542bbafce",
+      "archive_sha256": "8ab71f6e767110df0b0d828078165383c4d7bbb073bb19d02ea167c0e68240fe"
+    },
+    {
+      "run": "fullstage-parent240-lr2.5e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2.5e-07-fork.jsonl.gz",
+      "original_sha256": "2e49be9c700d58db3afd0ec0c086c3391941b4ba64e981303cf0fabaab799fb4",
+      "archive_sha256": "8afc7b4dc2b5a687e066a0fc429d0ba98fa6ae250422d77d1fb0ad714cd24cfa"
+    },
+    {
+      "run": "fullstage-parent240-lr2e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2e-06-summary.json.gz",
+      "original_sha256": "3ee662b598b98a855855522587cfaffcac3ce34bd6424b347eb883453a4ee4fd",
+      "archive_sha256": "8bbcab17d9cdbb7bc3150a53ec64e3993843315c56395e18b4320c082b1db7c1"
+    },
+    {
+      "run": "fullstage-parent240-lr2e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2e-06-audits.jsonl.gz",
+      "original_sha256": "62f504a51de275d9bc54d98b9afa84e73e300824f6af51f98dc7f4e09e8c0139",
+      "archive_sha256": "65e6fbeecb6cea7161309bda2042a19269b3f01f0f2bd206e66c94050b8c3c90"
+    },
+    {
+      "run": "fullstage-parent240-lr2e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2e-06-updates.jsonl.gz",
+      "original_sha256": "afb0478966b7b8e4cca5127d35065f392b4cbf61e09400f3eedf274f72fc3b1b",
+      "archive_sha256": "26e1e3568c5e35c371684260e8ff56cbdde983fbf17c6fc57953a20cb69d22d0"
+    },
+    {
+      "run": "fullstage-parent240-lr2e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr2e-06-fork.jsonl.gz",
+      "original_sha256": "48cc6805203cbfed41ce1a3f14cd18d5e3a6ddaadd4bc3539c102a0f90e802dd",
+      "archive_sha256": "a3c606df981ca1263c455d5d52ad2e3dcd7ce0c0a46cf4cbf42faf3f5af854af"
+    },
+    {
+      "run": "fullstage-parent240-lr4e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr4e-06-summary.json.gz",
+      "original_sha256": "ab7edf114e908dcb46d7f0ee39a19219ebf3a7c07061827470e7bd8c16fa5fd9",
+      "archive_sha256": "619989feec11826ba1db0cd751d0b94ddb66099abf47a1adecf4288b7f09a657"
+    },
+    {
+      "run": "fullstage-parent240-lr4e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr4e-06-audits.jsonl.gz",
+      "original_sha256": "d7cbb6261a7de082b4bd0bacf3babd64a8abd52ad239dd1d0be4423305e1e047",
+      "archive_sha256": "11050acde6dbd607284c0556ad39b2954ebc94aa88201666e0abbc079e82a573"
+    },
+    {
+      "run": "fullstage-parent240-lr4e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr4e-06-updates.jsonl.gz",
+      "original_sha256": "94fcbecc0b45ffbe02661404a4e81888c1f34caefaec3e660aed0e40a761ca3f",
+      "archive_sha256": "b3be704f459265a9547971155590d943c17d9baaa7ec8026a7f3189108d3ec1b"
+    },
+    {
+      "run": "fullstage-parent240-lr4e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr4e-06-fork.jsonl.gz",
+      "original_sha256": "1d4723734e7126a48f650ea2986e70ec56a3496421c6c4859c2fffd8b035228a",
+      "archive_sha256": "f9442f1755600b0d96d7fec7a111643f2b7871b80c57e9fb10403f40263b1ac6"
+    },
+    {
+      "run": "fullstage-parent240-lr5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr5e-07-summary.json.gz",
+      "original_sha256": "a6edd047ea222edd1859f81eac5897a513bcc7606c6a0647a594eb14771f1224",
+      "archive_sha256": "2fa15166ccb701f5fe3b5ac1bc700e3d23179ccf9c9b9e4c45a48133615d7fc2"
+    },
+    {
+      "run": "fullstage-parent240-lr5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr5e-07-audits.jsonl.gz",
+      "original_sha256": "246457901dabce1807e4afba5c567a501d3f282bf7d95f02eb16a2a98d4e5176",
+      "archive_sha256": "a961806d655923743471e4761e244be38bda7758903860810469ea498477ffe3"
+    },
+    {
+      "run": "fullstage-parent240-lr5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr5e-07-updates.jsonl.gz",
+      "original_sha256": "ede307c2d371e06c0a858102b263e8fad382e0284b827e89eaee33a0c4599c1d",
+      "archive_sha256": "666385263a70c4f075f60a5fe0614cc294f094f817602c89dafd75e90727c811"
+    },
+    {
+      "run": "fullstage-parent240-lr5e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr5e-07-fork.jsonl.gz",
+      "original_sha256": "78e108cba565a4cf4b8ea5eeacf4f07d65113723cb52824642983df5390f2100",
+      "archive_sha256": "d6365dd8ab90252cd784b578bf09ad6e2aad7e006f2db625b16de2a21df9ec21"
+    },
+    {
+      "run": "fullstage-parent240-lr8e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr8e-06-summary.json.gz",
+      "original_sha256": "0ba27d0136ab3d1544a1b1c7dc4ad6a3f7451c04c41417edfae8c352320bf921",
+      "archive_sha256": "a673bd9baab38a93b22f8028b1c8a7bb1e04d5c9fd0a7a1651d7fe253ee63ff6"
+    },
+    {
+      "run": "fullstage-parent240-lr8e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr8e-06-audits.jsonl.gz",
+      "original_sha256": "e12740aaadf90655c2edb7fa2f5c26e75d6f4e433219d08e6bde83dc58600aa7",
+      "archive_sha256": "b4219f1bbd1e6f2e8404e10264230327105a30d383c3ea5f1dc65f8a91124d9e"
+    },
+    {
+      "run": "fullstage-parent240-lr8e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr8e-06-updates.jsonl.gz",
+      "original_sha256": "1c5b00bc17fa070849ab7ae7aac14902cbb7fc07003d9d179e4ce2f82969530e",
+      "archive_sha256": "a7f213c88196c1158f72cfabfd4a2bd4849bbbcdd390a0534010cc90bc300143"
+    },
+    {
+      "run": "fullstage-parent240-lr8e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent240-lr8e-06-fork.jsonl.gz",
+      "original_sha256": "c2cee4a533ada3fad9f0834df77937eb5a76fab163d204451a2c875b1e54e721",
+      "archive_sha256": "7810fe23d5652c899c225e53cb0556f2fab6c27190183ce48e231f7430934809"
+    },
+    {
+      "run": "fullstage-parent40-lr1.25e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.25e-07-summary.json.gz",
+      "original_sha256": "1982062702911482d914456e2faabb5a010354d43b87f7a3a75d8a25b493b040",
+      "archive_sha256": "22ccd2a69cfc91f7fe7040d3b9cfde3135f99ba51a8967c5ced61ddcba819a89"
+    },
+    {
+      "run": "fullstage-parent40-lr1.25e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.25e-07-audits.jsonl.gz",
+      "original_sha256": "b5220c6605377998a6f0d62ffde52e4626f28525b0af4292f6670b751690d7e3",
+      "archive_sha256": "6b8728d87c36ad10fa3d0a33aa0a23b67ec963efc8ea7597735044fd40d3b6ee"
+    },
+    {
+      "run": "fullstage-parent40-lr1.25e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.25e-07-updates.jsonl.gz",
+      "original_sha256": "e81616eb5e28de11b5a72f4a732bda77c9d17d02f5dd709797edb9c9e212662a",
+      "archive_sha256": "473cdd413f89c72f3286688e9098370215ea961eeff910c0672c6e39481ec24f"
+    },
+    {
+      "run": "fullstage-parent40-lr1.25e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.25e-07-fork.jsonl.gz",
+      "original_sha256": "7b4ea777a7a15c128152d922f1ddaec86dcf16d278e3b8ca6f76fd8d8e352ab8",
+      "archive_sha256": "1e41fddf14ad98c999460be0b76c2636693991db0dd40cfc217db2453b420e3c"
+    },
+    {
+      "run": "fullstage-parent40-lr1.6e-05",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.6e-05-summary.json.gz",
+      "original_sha256": "daa4c066ab801f43b364102e28c823a3ce2118321ad9260e34b68e317ced4994",
+      "archive_sha256": "520fe471657b4ca3e260713c01d8515b1dd282572840083da2babeefd51b5b75"
+    },
+    {
+      "run": "fullstage-parent40-lr1.6e-05",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.6e-05-audits.jsonl.gz",
+      "original_sha256": "8ee13b5b45b0cd5942841a8b23d4c3fc0d5564b84b16a5ed48c6cbdbf43aed55",
+      "archive_sha256": "961b0265f5e8568fe70f49d5817badd6da7dc891485debafe7235121a3c1e5ad"
+    },
+    {
+      "run": "fullstage-parent40-lr1.6e-05",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.6e-05-updates.jsonl.gz",
+      "original_sha256": "cfb97f8e7a012b311737d86b9a4d9dd92105863c4480609161ab8e65444ca32d",
+      "archive_sha256": "496c9256b58758b60ff4a2b6b5ccdd6863457d0842a5664284dc649dbf2b428a"
+    },
+    {
+      "run": "fullstage-parent40-lr1.6e-05",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1.6e-05-fork.jsonl.gz",
+      "original_sha256": "a879a5c1197c0c4b47cd1a38c00929b6800b6764c55e188bb619c45d128e7fd3",
+      "archive_sha256": "8c7595f3c2141f95eb90b84e456596e68dd2adfa00423267d790fe4603e582d4"
+    },
+    {
+      "run": "fullstage-parent40-lr1e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1e-06-summary.json.gz",
+      "original_sha256": "549d88055cb4c1c8932525b254d7892d98ce795c5c52f150ffa40fbbe3e86901",
+      "archive_sha256": "682ffc6eda48624f38dbdcd96c64c47e5af96753d19b824244dc0994bf2e89cf"
+    },
+    {
+      "run": "fullstage-parent40-lr1e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1e-06-audits.jsonl.gz",
+      "original_sha256": "016df71a83706854e05deee938aaca369bcdeba11be468dd79c9f32f01c878f2",
+      "archive_sha256": "b0bc70913b46d17409f03d0851a1f3c66dd590abe4d4f3c3ec5131abc5b34cde"
+    },
+    {
+      "run": "fullstage-parent40-lr1e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1e-06-updates.jsonl.gz",
+      "original_sha256": "7b31175d58b7e7494f22d1e4cafb630b88ce46572296616829a3805c83e82a27",
+      "archive_sha256": "4d05592395b01beb1628fa472566d0cb3df063d19cee03e49ea828d01db644b7"
+    },
+    {
+      "run": "fullstage-parent40-lr1e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr1e-06-fork.jsonl.gz",
+      "original_sha256": "56620427fa5c224dcfe1abe9d4321a87b6c07c0b3e7226ccd498b9a9bae82518",
+      "archive_sha256": "1181c259f3852c2258cf9f49110872024b2c81ef088dedbe2c6d2c0e20eb871f"
+    },
+    {
+      "run": "fullstage-parent40-lr2.5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2.5e-07-summary.json.gz",
+      "original_sha256": "eb1a32aeaa4c436fc664d462dc14e0087a7f7c6b36441ee5cebb849a89f054e5",
+      "archive_sha256": "a07bc333322f68e57da803a4ee3b015672f537e933ccd99ec396d0e692ca9c5b"
+    },
+    {
+      "run": "fullstage-parent40-lr2.5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2.5e-07-audits.jsonl.gz",
+      "original_sha256": "5f8533795509431c0365922081ba4d38fbe498827ed8fb07ac270e898df0b15f",
+      "archive_sha256": "0688c368841ef6a4d4dc71de1076729908e7ba4a3b86503799e1a4c4575a947a"
+    },
+    {
+      "run": "fullstage-parent40-lr2.5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2.5e-07-updates.jsonl.gz",
+      "original_sha256": "52337eabf997fd238e866144b28bbc924cf71c6c149a021736197ede673c749d",
+      "archive_sha256": "3ffa4dbcae84ee1dca1a41aae8cfdc029f12a78a8b2bb5b559f0a951a3ece1e6"
+    },
+    {
+      "run": "fullstage-parent40-lr2.5e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2.5e-07-fork.jsonl.gz",
+      "original_sha256": "1f915685ef9bba3a47beab429c54e4eacb391bb7614c99a0b1b4ce6dd8c2ef5e",
+      "archive_sha256": "3e018ea77a833907db73b6d862fe29834c6bcbc80e574f63b4672cd20b5c0f56"
+    },
+    {
+      "run": "fullstage-parent40-lr2e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2e-06-summary.json.gz",
+      "original_sha256": "38f8849eb54f82415870522de0da75b26bdd2134ac7bec0833c082fbe044cb8b",
+      "archive_sha256": "84c31c049816d5b3b7d6aebf565c731914b282e03d78213cd21e9d364e746674"
+    },
+    {
+      "run": "fullstage-parent40-lr2e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2e-06-audits.jsonl.gz",
+      "original_sha256": "f38530f149e01bce8e18afa65321953efacdca5c2cd10ea47f2a30c852c6fc39",
+      "archive_sha256": "e8002b258496728164be5ab6759e8d0c50758be18ee8e78670984b4ad3327a3c"
+    },
+    {
+      "run": "fullstage-parent40-lr2e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2e-06-updates.jsonl.gz",
+      "original_sha256": "590e6c00efcff2677359022b636f07538c08b5e2d3d5ad2743e80ed413aa8431",
+      "archive_sha256": "41c9be75b6b618e7becb321de7d6ed5907a9c865b087f90dd687cc4c953cbbac"
+    },
+    {
+      "run": "fullstage-parent40-lr2e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr2e-06-fork.jsonl.gz",
+      "original_sha256": "3015dac531c04b17f2bd0a129990afa0be0aa904dac821c27a0b7f78a02939f6",
+      "archive_sha256": "6fd4e9b3564c4e2500767e8795ff5b637b77c4fa5403ce6cd8738b220967a55e"
+    },
+    {
+      "run": "fullstage-parent40-lr4e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr4e-06-summary.json.gz",
+      "original_sha256": "85a0343c5f16db345839ec3fa3a197cba0c7b23d651e267c82dc380332b037e5",
+      "archive_sha256": "2db2c6919722393a51bb7f4d65faf47b7a958235234db080b18c2aec0f914279"
+    },
+    {
+      "run": "fullstage-parent40-lr4e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr4e-06-audits.jsonl.gz",
+      "original_sha256": "1b9876f02ce3deb657090050c747ed3592625484af329cd9e8a031a9128a9627",
+      "archive_sha256": "55e9e031d5c293d00f3d0d6995cd26d6600a3a148e7b8ac6935a7120878f3f63"
+    },
+    {
+      "run": "fullstage-parent40-lr4e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr4e-06-updates.jsonl.gz",
+      "original_sha256": "1ef1b869e2ca1ad3fb9e82ef4c122663f5093530499fc20962109c291e49ca69",
+      "archive_sha256": "684ec13115cc654074155b6c843818e69feb1610c92da4578146ac37a09e7433"
+    },
+    {
+      "run": "fullstage-parent40-lr4e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr4e-06-fork.jsonl.gz",
+      "original_sha256": "eb9f881a38698d4c2586b19288ee8748379918c6e3a8921d105eedac365da605",
+      "archive_sha256": "148ccceb8d2436d785fef69245180c902a2d81615df30079ce0846630c22be8e"
+    },
+    {
+      "run": "fullstage-parent40-lr5e-07",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr5e-07-summary.json.gz",
+      "original_sha256": "ef740450f76a1956722c6a9b1b51a92a27d51b4fb5db15d0fc30a3a7e9c45e18",
+      "archive_sha256": "978ab51e80cc5aebbf92a182c3336103b57a5fd377bdf7dd210127ba17e02a95"
+    },
+    {
+      "run": "fullstage-parent40-lr5e-07",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr5e-07-audits.jsonl.gz",
+      "original_sha256": "92ac1112083e71c3dec70c811ca2ee29b8cbfb02de91847558d5ad5f26353931",
+      "archive_sha256": "38c9059c1ca5ecd7017166827809bcebb567faec1ebc3c4475f9020773121284"
+    },
+    {
+      "run": "fullstage-parent40-lr5e-07",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr5e-07-updates.jsonl.gz",
+      "original_sha256": "720fa5a119c2dd3c0dc58dbcf11b856d7e07cc997cea8d751d4eb7fa13a7a8e8",
+      "archive_sha256": "f804afc4f8d54305b6e5b612859cf7c43dae79ff51c0a50be808822591930b89"
+    },
+    {
+      "run": "fullstage-parent40-lr5e-07",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr5e-07-fork.jsonl.gz",
+      "original_sha256": "959179825d4b626fdb2c3512cd737fddd54e4b424d7d0193d092653670ead716",
+      "archive_sha256": "dca7e3c9b8d56d19d08b24261442283650d9747a40ecfb148ca6122203352320"
+    },
+    {
+      "run": "fullstage-parent40-lr8e-06",
+      "file": "summary.json",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/summary.json",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr8e-06-summary.json.gz",
+      "original_sha256": "0cbff73ce975ee2c7694d8786423a2de4796338352c581ffa8a0a74f4cb848e9",
+      "archive_sha256": "168439316ff2980a77aa355e6fca409b38f9ee6ded456943237e416170e63b98"
+    },
+    {
+      "run": "fullstage-parent40-lr8e-06",
+      "file": "audits.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/audits.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr8e-06-audits.jsonl.gz",
+      "original_sha256": "b360f4e2881293462cb59e21d37c8abbd0066fb162b60bae58c86c771bb8ec90",
+      "archive_sha256": "3a7770fed5980e665d8c013f789674a2c0fa1afb1a7d03536a3420be14c98eb8"
+    },
+    {
+      "run": "fullstage-parent40-lr8e-06",
+      "file": "updates.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/updates.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr8e-06-updates.jsonl.gz",
+      "original_sha256": "a7fe11374a8353c7ca987f61f4faad9c5a31f6da12f19c7fce3ba5d13661022d",
+      "archive_sha256": "c4aae8afdf79aa8e14fc6b144d045d64200f401fa13ddc5d8802d07d2de746cf"
+    },
+    {
+      "run": "fullstage-parent40-lr8e-06",
+      "file": "fork.jsonl",
+      "source": "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/fork.jsonl",
+      "archive": "results/scalar-large/fullpool-lr-study/fullstage/raw/fullstage-parent40-lr8e-06-fork.jsonl.gz",
+      "original_sha256": "57eca425050266b1d520f9fdec30915919c8a3ec9248132edc16e25cad915607",
+      "archive_sha256": "2875686d4404653516a851e6b8c18b8fc5505aeeb10ecadcf4ac1c91735ee054"
+    }
+  ]
+}

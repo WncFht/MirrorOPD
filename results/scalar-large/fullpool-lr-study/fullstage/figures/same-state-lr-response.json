@@ -1,0 +1,237 @@
+{
+  "stages": [
+    {
+      "parent_update": 40,
+      "initial_bpo_range": [
+        0.006676316427970836,
+        0.006676316427970836
+      ],
+      "initial_grad_norm_range": [
+        0.048072539269924164,
+        0.048072539269924164
+      ],
+      "one_step_gain_percent": [
+        [
+          0.125,
+          0.08132643074176826
+        ],
+        [
+          0.25,
+          0.1606076841778603
+        ],
+        [
+          0.5,
+          0.3135143922337269
+        ],
+        [
+          1.0,
+          0.5964897654744727
+        ],
+        [
+          2.0,
+          1.0719063778053095
+        ],
+        [
+          4.0,
+          1.6604290237663188
+        ],
+        [
+          8.0,
+          1.3936766283447422
+        ],
+        [
+          16.0,
+          -4.891609801448915
+        ]
+      ]
+    },
+    {
+      "parent_update": 120,
+      "initial_bpo_range": [
+        0.005538609070642098,
+        0.005538609070642098
+      ],
+      "initial_grad_norm_range": [
+        0.0012702920939773321,
+        0.0012702920939773321
+      ],
+      "one_step_gain_percent": [
+        [
+          0.125,
+          0.010412697671569049
+        ],
+        [
+          0.25,
+          0.02424117054208308
+        ],
+        [
+          0.5,
+          0.051195982730645184
+        ],
+        [
+          1.0,
+          0.10347119768153723
+        ],
+        [
+          2.0,
+          0.20600948309060785
+        ],
+        [
+          4.0,
+          0.41033429014726286
+        ],
+        [
+          8.0,
+          0.8133915354519572
+        ],
+        [
+          16.0,
+          1.5935320706547573
+        ]
+      ]
+    },
+    {
+      "parent_update": 240,
+      "initial_bpo_range": [
+        0.0051228627384418465,
+        0.0051228627384418465
+      ],
+      "initial_grad_norm_range": [
+        0.00034393678652122617,
+        0.00034393678652122617
+      ],
+      "one_step_gain_percent": [
+        [
+          0.125,
+          0.003077363813608347
+        ],
+        [
+          0.25,
+          0.008132869672139442
+        ],
+        [
+          0.5,
+          0.019786892691064928
+        ],
+        [
+          1.0,
+          0.041351589587601545
+        ],
+        [
+          2.0,
+          0.08433979072659525
+        ],
+        [
+          4.0,
+          0.16908302321216873
+        ],
+        [
+          8.0,
+          0.3379377453892274
+        ],
+        [
+          16.0,
+          0.6707923432584306
+        ]
+      ]
+    }
+  ],
+  "source_sha256": {
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/summary.json": "f3e74b4a35535efc4da5271204ed0f6494dc987da79c9f8cbff1ab1efe40a947",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/audits.jsonl": "dd8a8fc674e6a06fea1b760c6576d189637099ac7ad1ea6864455850d722ce14",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/updates.jsonl": "4f3e29a061a234974a45c4c593616c181bcfec3a0d6d1c9e8e41981ecff85b3f",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.25e-07/fork.jsonl": "6ef1dadc0b4c01a5abb32ee1fc2b6572f4f4af053540ece6ab477f0b784e6d0f",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/summary.json": "163a416410fe47724c5c9dfcd0144d86da544d935aa9a0a0dc8350a6e27976f2",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/audits.jsonl": "fa786089abf9bf980a0aa48060eca532f42d3acdc0da3a319a15da080e3afeea",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/updates.jsonl": "9f2c978215ed570878190659a1027bcafb47f3927edb7abf4114141cf069ea8e",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1.6e-05/fork.jsonl": "63c3a6caabe6e4cc5c4d0a93e7b947c115ede4cdfbd6e05129da1d034196bd4e",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/summary.json": "52046fec23f18e5ad1198e5cc22cc936f8a66cb334935eb20d7d61ae75ac70de",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/audits.jsonl": "80e69df22b807b655ad6d17d68075447e146622aace3c2c79949c23eea3d174e",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/updates.jsonl": "fad7a12c4c55fffc0edebe953c0c8ad089fa9caab71f1d137eed01a311b8e8c4",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr1e-06/fork.jsonl": "629832840254b87c0d8e54344f5870240cf4b3e11a89288aaaa39f6ee9bcf883",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/summary.json": "0b0b8965000192f1dc06d1ca809c47aee7aaef38d417018f65fce93d01a61669",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/audits.jsonl": "f6fd3aacd9a21a8c481a72ea8c9fdb232f4ec32abe1297ab1f2e5fe718bd82fe",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/updates.jsonl": "3e9fa8dcb58c7a52649fc32939589bd7df2106056f6a129471b99ce8bc1640e3",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2.5e-07/fork.jsonl": "1a7ba5214a5614ac5e186bd95fd8701d60a3f39fceaa3f846a5463abc22884d3",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/summary.json": "411d520b9b5b9805a60b987e191c30de814ad6a4e52ba4e213d25342d4e906cf",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/audits.jsonl": "fabcec51042d68c5331874b3fd23adb63fb548896dc22c0f91240b72510bae30",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/updates.jsonl": "9334aba9a54d6e54ba6bedb8f0336499ba4d46f17eb862380caf04905ba8091a",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr2e-06/fork.jsonl": "f29574e59766bb74d6c0f303ef307335943f980122cf206a79034ad5ce77c541",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/summary.json": "d990cbd4369e949be13c11368a1b21dfe3bbebde54ade1190ce15fcd27d4b55d",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/audits.jsonl": "2205c5d3d5d5b6976d7d5ec4c62e23ce3267726ef37655c2de001c3d44d44c64",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/updates.jsonl": "66f5c6516ad95dc547ccdba37604455cdb9dd8ef5112afa0d357c06d49a7818a",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr4e-06/fork.jsonl": "a8d6638afd2e9c1c6175c73085a09f93835fa2c7e9a113e1917af23c09c52a4f",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/summary.json": "da3092e117f7a43fd893a300ca1d7ab85e382e3c74a01ddc004431c4e7071a03",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/audits.jsonl": "2926f2eaa195f685cacfb32cdf735f664ec97fbec71badc8bda09ff238659be2",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/updates.jsonl": "df557a3b9df34b9e9f3bffea0f82f81d1857b2bf6b8210817de925222b1cc565",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr5e-07/fork.jsonl": "7116106c4df529f45ea7c9112f111898064e651810b4fc3113c5db495f2e1980",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/summary.json": "ae807b16139006e23899f7f13aa6d55349d4063ee4dbaef6d74e5e339a474633",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/audits.jsonl": "3a13047d7e09dc7ca85983aace52a5cbeed0ff229cb6d11d208b545ed6548a5c",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/updates.jsonl": "ed1264d057dd050885ff1d07a282adc2fb2c9a804d89ef844b1a07f441159948",
+    "runs/scalar-large/fullstage/fullstage-parent120-lr8e-06/fork.jsonl": "5f62c71a11a2adc0da1e7318d978bdd746b5eb72f83164adfb1ae613fa4b1e41",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/summary.json": "cc3158cde2afb908569dd655ff4128de681d024b1862bb0e22690c73b46181e9",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/audits.jsonl": "087d252180a0f954a8243066b0c692440b9982768743789ee33ddeb0b9d7a8fa",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/updates.jsonl": "0d87f42eeea2ab8be3a34935fd319b6a17baae56db41ae2921f0d96e5b7a6244",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.25e-07/fork.jsonl": "cc9d222236c3c2f7164a4e77dac1570da32e9e264622a87703483c2f1bfa7199",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/summary.json": "7c47ab7bca3b498ec2901b381da1451f7044e523e4a670cc6fd34df7933caacd",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/audits.jsonl": "4ac699bf2a59bde821f0a6d5600fd6a3760fc7be796a7664a491cd8b4f304a8d",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/updates.jsonl": "ae8d3b7cf596955302e1e735c26381cf3c96912134c04e3beb83a055e9131fbf",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1.6e-05/fork.jsonl": "328868b157a0ea25b2ff6351816c34678e0f5597a759374c255f15ea933d1035",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/summary.json": "417bc4a3313308c040ddb46952e3e82fd6aed75029a2838c2fb279d0b32c627a",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/audits.jsonl": "cceefaa3a2593347264004a57720a9d3dbd55c917ef480426330d99c9eef2c7d",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/updates.jsonl": "2ab6eab0d32579c177832b54539689fc89846ee96f873d7e2da0171b3af4bc20",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr1e-06/fork.jsonl": "570547de801edbd464c6e5f81c7d12f8213894056ab7b2b65ed66d5440bf6656",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/summary.json": "3a7933e914d5ace2bf01045c1ae538c242b633656f99ef7a409570b18db2584c",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/audits.jsonl": "1b692404520d34851be69eefeebcf3fc2c55bd37da049c673482a6d486434929",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/updates.jsonl": "0c4c2e585f2586a3513ef50ad4c3f565c38e6e66bad48780738bdcf542bbafce",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2.5e-07/fork.jsonl": "2e49be9c700d58db3afd0ec0c086c3391941b4ba64e981303cf0fabaab799fb4",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/summary.json": "3ee662b598b98a855855522587cfaffcac3ce34bd6424b347eb883453a4ee4fd",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/audits.jsonl": "62f504a51de275d9bc54d98b9afa84e73e300824f6af51f98dc7f4e09e8c0139",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/updates.jsonl": "afb0478966b7b8e4cca5127d35065f392b4cbf61e09400f3eedf274f72fc3b1b",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr2e-06/fork.jsonl": "48cc6805203cbfed41ce1a3f14cd18d5e3a6ddaadd4bc3539c102a0f90e802dd",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/summary.json": "ab7edf114e908dcb46d7f0ee39a19219ebf3a7c07061827470e7bd8c16fa5fd9",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/audits.jsonl": "d7cbb6261a7de082b4bd0bacf3babd64a8abd52ad239dd1d0be4423305e1e047",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/updates.jsonl": "94fcbecc0b45ffbe02661404a4e81888c1f34caefaec3e660aed0e40a761ca3f",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr4e-06/fork.jsonl": "1d4723734e7126a48f650ea2986e70ec56a3496421c6c4859c2fffd8b035228a",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/summary.json": "a6edd047ea222edd1859f81eac5897a513bcc7606c6a0647a594eb14771f1224",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/audits.jsonl": "246457901dabce1807e4afba5c567a501d3f282bf7d95f02eb16a2a98d4e5176",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/updates.jsonl": "ede307c2d371e06c0a858102b263e8fad382e0284b827e89eaee33a0c4599c1d",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr5e-07/fork.jsonl": "78e108cba565a4cf4b8ea5eeacf4f07d65113723cb52824642983df5390f2100",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/summary.json": "0ba27d0136ab3d1544a1b1c7dc4ad6a3f7451c04c41417edfae8c352320bf921",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/audits.jsonl": "e12740aaadf90655c2edb7fa2f5c26e75d6f4e433219d08e6bde83dc58600aa7",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/updates.jsonl": "1c5b00bc17fa070849ab7ae7aac14902cbb7fc07003d9d179e4ce2f82969530e",
+    "runs/scalar-large/fullstage/fullstage-parent240-lr8e-06/fork.jsonl": "c2cee4a533ada3fad9f0834df77937eb5a76fab163d204451a2c875b1e54e721",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/summary.json": "1982062702911482d914456e2faabb5a010354d43b87f7a3a75d8a25b493b040",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/audits.jsonl": "b5220c6605377998a6f0d62ffde52e4626f28525b0af4292f6670b751690d7e3",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/updates.jsonl": "e81616eb5e28de11b5a72f4a732bda77c9d17d02f5dd709797edb9c9e212662a",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.25e-07/fork.jsonl": "7b4ea777a7a15c128152d922f1ddaec86dcf16d278e3b8ca6f76fd8d8e352ab8",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/summary.json": "daa4c066ab801f43b364102e28c823a3ce2118321ad9260e34b68e317ced4994",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/audits.jsonl": "8ee13b5b45b0cd5942841a8b23d4c3fc0d5564b84b16a5ed48c6cbdbf43aed55",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/updates.jsonl": "cfb97f8e7a012b311737d86b9a4d9dd92105863c4480609161ab8e65444ca32d",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1.6e-05/fork.jsonl": "a879a5c1197c0c4b47cd1a38c00929b6800b6764c55e188bb619c45d128e7fd3",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/summary.json": "549d88055cb4c1c8932525b254d7892d98ce795c5c52f150ffa40fbbe3e86901",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/audits.jsonl": "016df71a83706854e05deee938aaca369bcdeba11be468dd79c9f32f01c878f2",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/updates.jsonl": "7b31175d58b7e7494f22d1e4cafb630b88ce46572296616829a3805c83e82a27",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr1e-06/fork.jsonl": "56620427fa5c224dcfe1abe9d4321a87b6c07c0b3e7226ccd498b9a9bae82518",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/summary.json": "eb1a32aeaa4c436fc664d462dc14e0087a7f7c6b36441ee5cebb849a89f054e5",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/audits.jsonl": "5f8533795509431c0365922081ba4d38fbe498827ed8fb07ac270e898df0b15f",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/updates.jsonl": "52337eabf997fd238e866144b28bbc924cf71c6c149a021736197ede673c749d",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2.5e-07/fork.jsonl": "1f915685ef9bba3a47beab429c54e4eacb391bb7614c99a0b1b4ce6dd8c2ef5e",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/summary.json": "38f8849eb54f82415870522de0da75b26bdd2134ac7bec0833c082fbe044cb8b",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/audits.jsonl": "f38530f149e01bce8e18afa65321953efacdca5c2cd10ea47f2a30c852c6fc39",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/updates.jsonl": "590e6c00efcff2677359022b636f07538c08b5e2d3d5ad2743e80ed413aa8431",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr2e-06/fork.jsonl": "3015dac531c04b17f2bd0a129990afa0be0aa904dac821c27a0b7f78a02939f6",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/summary.json": "85a0343c5f16db345839ec3fa3a197cba0c7b23d651e267c82dc380332b037e5",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/audits.jsonl": "1b9876f02ce3deb657090050c747ed3592625484af329cd9e8a031a9128a9627",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/updates.jsonl": "1ef1b869e2ca1ad3fb9e82ef4c122663f5093530499fc20962109c291e49ca69",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr4e-06/fork.jsonl": "eb9f881a38698d4c2586b19288ee8748379918c6e3a8921d105eedac365da605",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/summary.json": "ef740450f76a1956722c6a9b1b51a92a27d51b4fb5db15d0fc30a3a7e9c45e18",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/audits.jsonl": "92ac1112083e71c3dec70c811ca2ee29b8cbfb02de91847558d5ad5f26353931",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/updates.jsonl": "720fa5a119c2dd3c0dc58dbcf11b856d7e07cc997cea8d751d4eb7fa13a7a8e8",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr5e-07/fork.jsonl": "959179825d4b626fdb2c3512cd737fddd54e4b424d7d0193d092653670ead716",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/summary.json": "0cbff73ce975ee2c7694d8786423a2de4796338352c581ffa8a0a74f4cb848e9",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/audits.jsonl": "b360f4e2881293462cb59e21d37c8abbd0066fb162b60bae58c86c771bb8ec90",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/updates.jsonl": "a7fe11374a8353c7ca987f61f4faad9c5a31f6da12f19c7fce3ba5d13661022d",
+    "runs/scalar-large/fullstage/fullstage-parent40-lr8e-06/fork.jsonl": "57eca425050266b1d520f9fdec30915919c8a3ec9248132edc16e25cad915607"
+  }
+}
