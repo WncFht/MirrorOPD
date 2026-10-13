@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-13",
+  "kind": "Exact finite-vocabulary analytic diagnostics",
+  "question": "Distinguish signal scaling from uniform variance control; unify proximal targets",
+  "success_conditions": "Endpoint identities, divergence KKT conditions and finite-difference errors below 1e-8",
+  "rejection_conditions": "Any violated identity or bound rejects the proposed mathematical mapping",
+  "variable_choices": "Interpolation strength, power geometry, fitting loss and estimator are independent",
+  "seed": 20261013,
+  "variance_anchor": [
+    0.25,
+    0.75
+  ],
+  "variance_teacher": "(epsilon, 1-epsilon), epsilon=10^(-x), x in [2,120]",
+  "estimator": "One token score in first categorical logit; exact anchor conditional centering",
+  "limits": "Not an LLM training benchmark; no suffix returns, sample group normalization or PPO clipping",
+  "checks": {
+    "power_divergence_stationarity_max_error": 4.440921201252732e-11,
+    "geometric_limit_max_error": 8.765895769813348e-07,
+    "positive_tail_constant": 0.6476102378919149,
+    "tested_dimensions": [
+      3,
+      64,
+      1024
+    ],
+    "largest_second_moment_to_bound_ratio": 0.4691856254298578
+  },
+  "source_commit": "92c4eb873dcabde6ed51c3d8e1d0f10fb0d74eef",
+  "script_sha256": "58547b3594815ab25238c8eef0e623006e0cb1ba5ecfa304d9571ce1a446084e",
+  "versions": {
+    "numpy": "1.26.4",
+    "matplotlib": "3.10.9"
+  },
+  "reproduce": "uv run --no-project --with numpy --with matplotlib python experiments/analysis/proximal_family_geometry.py"
+}
