@@ -1,0 +1,355 @@
+{
+  "scope": {
+    "schema_version": 1,
+    "changed_date": "2026-10-13",
+    "reason": "User cancelled multiple seeds; current FP32 evidence is sufficient to deprioritize further precision runs. Retain seed42 online OPD and mirror-anchor ablations.",
+    "active_ids": [
+      "zero-bf16-s42",
+      "zero-fp32-s42",
+      "frozen-opd-bf16-lr5em7-s42",
+      "frozen-opd-bf16-lr1em6-s42",
+      "frozen-opd-bf16-lr2em6-s42",
+      "online-opd-bf16-lr5em7-s42",
+      "online-opd-bf16-lr1em6-s42",
+      "online-opd-bf16-lr2em6-s42",
+      "frozen-mdpo-bf16-reset0-s42",
+      "frozen-mdpo-bf16-reset16-s42",
+      "frozen-bpo-bf16-reset0-s42",
+      "frozen-bpo-bf16-reset16-s42"
+    ],
+    "retained_partial_ids": [
+      "frozen-opd-fp32-lr5em7-s42"
+    ],
+    "original_conditions": 45
+  },
+  "bf16_time_collapse": {
+    "grid_start": 30,
+    "grid_end": 150,
+    "raw_log_dispersion": 0.452079680831631,
+    "effective_log_dispersion": 0.10223834862099386,
+    "dispersion_reduction": 0.7738488302926609,
+    "preregistered_30_percent_reduction_passed": true,
+    "effective_geometric_max_min_ratio": 1.2561867195467786,
+    "full_effective_grid_start": 30,
+    "full_effective_grid_end": 300,
+    "effective_pair_relative_spread_max": 0.5000331603484862,
+    "effective_pair_relative_spread_median": 0.2193756146179291,
+    "preregistered_20_percent_pair_spread_passed": false
+  },
+  "formal_benchmarks": {
+    "frozen-opd-bf16-lr1em6-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 344,
+        "accuracy": 0.688,
+        "budget_exhausted_fraction": 0.414
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update200": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 337,
+        "accuracy": 0.674,
+        "budget_exhausted_fraction": 0.382
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 22,
+        "accuracy": 0.55,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "budget_exhausted_fraction": 0.9
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update300": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 351,
+        "accuracy": 0.702,
+        "budget_exhausted_fraction": 0.358
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 20,
+        "accuracy": 0.5,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.8666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr1em6-s42-update50": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 328,
+        "accuracy": 0.656,
+        "budget_exhausted_fraction": 0.414
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.65
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 355,
+        "accuracy": 0.71,
+        "budget_exhausted_fraction": 0.37
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.7
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.9
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update150": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 343,
+        "accuracy": 0.686,
+        "budget_exhausted_fraction": 0.404
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 21,
+        "accuracy": 0.525,
+        "budget_exhausted_fraction": 0.575
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update25": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 320,
+        "accuracy": 0.64,
+        "budget_exhausted_fraction": 0.418
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 20,
+        "accuracy": 0.5,
+        "budget_exhausted_fraction": 0.6
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 5,
+        "accuracy": 0.16666666666666666,
+        "budget_exhausted_fraction": 0.8333333333333334
+      }
+    },
+    "frozen-opd-bf16-lr2em6-s42-update50": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 338,
+        "accuracy": 0.676,
+        "budget_exhausted_fraction": 0.422
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 20,
+        "accuracy": 0.5,
+        "budget_exhausted_fraction": 0.65
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 6,
+        "accuracy": 0.2,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update100": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 350,
+        "accuracy": 0.7,
+        "budget_exhausted_fraction": 0.36
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 21,
+        "accuracy": 0.525,
+        "budget_exhausted_fraction": 0.575
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 1,
+        "accuracy": 0.03333333333333333,
+        "budget_exhausted_fraction": 0.9666666666666667
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update200": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 360,
+        "accuracy": 0.72,
+        "budget_exhausted_fraction": 0.362
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 22,
+        "accuracy": 0.55,
+        "budget_exhausted_fraction": 0.625
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "budget_exhausted_fraction": 0.9
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update400": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 361,
+        "accuracy": 0.722,
+        "budget_exhausted_fraction": 0.35
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 19,
+        "accuracy": 0.475,
+        "budget_exhausted_fraction": 0.675
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 2,
+        "accuracy": 0.06666666666666667,
+        "budget_exhausted_fraction": 0.9333333333333333
+      }
+    },
+    "frozen-opd-bf16-lr5em7-s42-update600": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 360,
+        "accuracy": 0.72,
+        "budget_exhausted_fraction": 0.344
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 18,
+        "accuracy": 0.45,
+        "budget_exhausted_fraction": 0.65
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "budget_exhausted_fraction": 0.9666666666666667
+      }
+    },
+    "initial-s42": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 364,
+        "accuracy": 0.728,
+        "budget_exhausted_fraction": 0.28
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 21,
+        "accuracy": 0.525,
+        "budget_exhausted_fraction": 0.5
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 7,
+        "accuracy": 0.23333333333333334,
+        "budget_exhausted_fraction": 0.8
+      }
+    },
+    "teacher": {
+      "MATH-500": {
+        "questions": 500,
+        "correct": 395,
+        "accuracy": 0.79,
+        "budget_exhausted_fraction": 0.23
+      },
+      "AMC23": {
+        "questions": 40,
+        "correct": 27,
+        "accuracy": 0.675,
+        "budget_exhausted_fraction": 0.475
+      },
+      "AIME25": {
+        "questions": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333,
+        "budget_exhausted_fraction": 0.7666666666666667
+      }
+    }
+  },
+  "fp32_partial_logged_updates": 330,
+  "online_progress": {
+    "updates_completed": 59,
+    "updates_requested": 600,
+    "elapsed_seconds": 8649.135332684964,
+    "state": "running"
+  },
+  "controller_state": {
+    "stage": "online-opd-bf16-lr5em7-s42",
+    "state": "running",
+    "phase": "train",
+    "pid": 139180,
+    "attempt": 1,
+    "output": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/oneshot-effective-time-20261012/online-opd-bf16-lr5em7-s42",
+    "owners": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/oneshot-effective-time-20261012/attempts/online-opd-bf16-lr5em7-s42-001/owners",
+    "updated_unix": 1791863979.2287369
+  },
+  "completed_bf16_arms": [
+    {
+      "id": "frozen-opd-bf16-lr5em7-s42",
+      "updates": 600,
+      "final_distance": 0.020719068784720792
+    },
+    {
+      "id": "frozen-opd-bf16-lr1em6-s42",
+      "updates": 300,
+      "final_distance": 0.02209617108113609
+    },
+    {
+      "id": "frozen-opd-bf16-lr2em6-s42",
+      "updates": 150,
+      "final_distance": 0.0246699896656244
+    }
+  ]
+}

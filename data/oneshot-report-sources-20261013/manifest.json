@@ -1,0 +1,59 @@
+{
+  "report": "docs/experiments/2026-10-13-OneShot与镜像蒸馏实验报告.md",
+  "sources": [
+    {
+      "path": "docs/experiments/2026-10-12-OneShot与内层KL收敛核验.md",
+      "sha256": "04a4885fac33664f7eceeb1f7791919b652f99e2eff14d40064aa9827eb4e2d9",
+      "bytes": 18578
+    },
+    {
+      "path": "docs/experiments/2026-10-12-OneShot长期吸收与有效时间消融设计.md",
+      "sha256": "d7d0160363928a3a4087f9fda9f918147e8aff93b71b11d5f11be6d66ca19bfe",
+      "bytes": 8055
+    },
+    {
+      "path": "docs/experiments/2026-10-12-OneShot长期吸收实验进展.md",
+      "sha256": "0f247ceeaf38c1130251c0f46967f51aa37e9f3a66df728d80dc25a2668021aa",
+      "bytes": 19184
+    },
+    {
+      "path": "docs/experiments/2026-10-13-FP32消融结果与后续实验调整.md",
+      "sha256": "d4a7d2e92fcc7a4e879a0add81c8ebbc84fcb8fff37ded3efd376fab1e15af07",
+      "bytes": 7676
+    },
+    {
+      "path": "docs/experiments/2026-10-13-OneShot学习率上限的历史数据验证.md",
+      "sha256": "50993392201c8690aa4ecaf35a6f048882497729eee7863a0a675fe7509f08c8",
+      "bytes": 12453
+    },
+    {
+      "path": "docs/experiments/2026-10-12-四卡数学蒸馏实验.md",
+      "sha256": "f66687c5edd667c2635c2fbe8ed62b82a5360d65186789623de3faa444040a34",
+      "bytes": 17611,
+      "previous_reference_sha256": "e966a6ac0377bbe33370ba5309ee247076c092882014df620bfb4150d6094be4",
+      "previous_reference_archive": "2026-10-12-四卡数学蒸馏实验.md.original-reference.gz"
+    },
+    {
+      "path": "docs/experiments/2026-10-12-四卡数学蒸馏完整比较.md",
+      "sha256": "62bb8cc224c32a0af3c485164ef83150d9deeb01bab24a08ccb5f439d5d5aea0",
+      "bytes": 10248,
+      "previous_reference_sha256": "51bf4a54816a58605d76e22ffe7cfdcdfcdaabe8d9fa6ecd7515776491d98eb0",
+      "previous_reference_archive": "2026-10-12-四卡数学蒸馏完整比较.md.original-reference.gz"
+    },
+    {
+      "path": "docs/experiments/2026-10-12-数学OPD五十步训练结果.md",
+      "sha256": "1e3806a7b5e82c44f2959703454fada849156dd78c98cabaf9d202fff5502100",
+      "bytes": 8233
+    },
+    {
+      "path": "docs/experiments/2026-10-12-数学MDPO五十轮训练结果.md",
+      "sha256": "8515c3713360e316cba5ac4f8b841f42130cd3d4cc303f967c52c61a4a0c4020",
+      "bytes": 9233
+    },
+    {
+      "path": "docs/experiments/2026-10-12-数学BPO五十轮训练结果.md",
+      "sha256": "e989ae7240991e30454593d1fea5d9773b1577cd3a07d29189256c4bb066c913",
+      "bytes": 6813
+    }
+  ]
+}

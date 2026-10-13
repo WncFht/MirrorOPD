@@ -1,0 +1,620 @@
+{
+  "distance_semantics": "negative signed sampled-token reward mean; on-policy reverse-KL Monte Carlo proxy, not full-vocabulary KL",
+  "primary_clock": "(logged_step - 1) * lr / 1e-6, update-before rollout distance",
+  "threshold_smoothing": "trailing u-window 30 with >=3 points; require all later smoothed values below threshold and >=30 u of observed persistence. LR=1e-4 too sparse for this smoother; its raw distances all exceed 0.02.",
+  "fit_protocol": "two positive exponentials plus floor, fitted only to LR 5e-7 and 1e-6 at u>=30; four other rates held out. All three diagnostics and both clocks retained.",
+  "stage_velocity_models": [
+    {
+      "phase": "held_out_1e-5_and_1e-4",
+      "effective_window": 30,
+      "distance_band": [
+        0.05,
+        0.02
+      ],
+      "fit_run_ids": [
+        "ybi7q89v",
+        "mdxt04lm",
+        "yj2w13fq",
+        "ml6mz58f"
+      ],
+      "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+      "a": 0.0008219367543828429,
+      "b": 6.420455065861073e-05,
+      "candidate_zero_rate_lr": 1.2801845756280665e-05,
+      "candidate_best_rate_lr": 6.400922878140332e-06,
+      "fit_relative_rmse": 0.057278178435629,
+      "measurements": [
+        {
+          "id": "ybi7q89v",
+          "lr": 5e-07,
+          "elapsed_updates": 83,
+          "rate": 0.00036144578313253013,
+          "log_rate": 0.011039647371977771,
+          "grad_norm_median_in_band": 0.20209573209285736
+        },
+        {
+          "id": "mdxt04lm",
+          "lr": 1e-06,
+          "elapsed_updates": 42,
+          "rate": 0.0007142857142857144,
+          "log_rate": 0.02181644599700369,
+          "grad_norm_median_in_band": 0.2193986028432846
+        },
+        {
+          "id": "yj2w13fq",
+          "lr": 2e-06,
+          "elapsed_updates": 21,
+          "rate": 0.0014285714285714288,
+          "log_rate": 0.04363289199400738,
+          "grad_norm_median_in_band": 0.30065967142581934
+        },
+        {
+          "id": "ml6mz58f",
+          "lr": 5e-06,
+          "elapsed_updates": 12,
+          "rate": 0.0025,
+          "log_rate": 0.07635756098951292,
+          "grad_norm_median_in_band": 0.4026211500167846
+        },
+        {
+          "id": "l0a6rsc1",
+          "lr": 1e-05,
+          "elapsed_updates": 11,
+          "rate": 0.0027272727272727275,
+          "log_rate": 0.083299157443105,
+          "grad_norm_median_in_band": 0.4253065288066864
+        }
+      ],
+      "held_out_1e-5_predicted_rate": 0.0017989124779673547,
+      "held_out_1e-4_predicted_rate": -0.5598518311478231,
+      "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+    },
+    {
+      "phase": "refit_all_usable_rates",
+      "effective_window": 30,
+      "distance_band": [
+        0.05,
+        0.02
+      ],
+      "fit_run_ids": [
+        "ybi7q89v",
+        "mdxt04lm",
+        "yj2w13fq",
+        "ml6mz58f",
+        "l0a6rsc1"
+      ],
+      "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+      "a": 0.0007569549175901794,
+      "b": 4.855593455782982e-05,
+      "candidate_zero_rate_lr": 1.5589338862145693e-05,
+      "candidate_best_rate_lr": 7.794669431072846e-06,
+      "fit_relative_rmse": 0.03711656517949632,
+      "measurements": [
+        {
+          "id": "ybi7q89v",
+          "lr": 5e-07,
+          "elapsed_updates": 83,
+          "rate": 0.00036144578313253013,
+          "log_rate": 0.011039647371977771,
+          "grad_norm_median_in_band": 0.20209573209285736
+        },
+        {
+          "id": "mdxt04lm",
+          "lr": 1e-06,
+          "elapsed_updates": 42,
+          "rate": 0.0007142857142857144,
+          "log_rate": 0.02181644599700369,
+          "grad_norm_median_in_band": 0.2193986028432846
+        },
+        {
+          "id": "yj2w13fq",
+          "lr": 2e-06,
+          "elapsed_updates": 21,
+          "rate": 0.0014285714285714288,
+          "log_rate": 0.04363289199400738,
+          "grad_norm_median_in_band": 0.30065967142581934
+        },
+        {
+          "id": "ml6mz58f",
+          "lr": 5e-06,
+          "elapsed_updates": 12,
+          "rate": 0.0025,
+          "log_rate": 0.07635756098951292,
+          "grad_norm_median_in_band": 0.4026211500167846
+        },
+        {
+          "id": "l0a6rsc1",
+          "lr": 1e-05,
+          "elapsed_updates": 11,
+          "rate": 0.0027272727272727275,
+          "log_rate": 0.083299157443105,
+          "grad_norm_median_in_band": 0.4253065288066864
+        }
+      ],
+      "held_out_1e-5_predicted_rate": 0.0027139557201188123,
+      "held_out_1e-4_predicted_rate": -0.40986385381928025,
+      "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+    },
+    {
+      "phase": "held_out_1e-5_and_1e-4",
+      "effective_window": 30,
+      "distance_band": [
+        0.02,
+        0.01
+      ],
+      "fit_run_ids": [
+        "mdxt04lm",
+        "yj2w13fq",
+        "ml6mz58f"
+      ],
+      "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+      "a": 0.00014568251033500215,
+      "b": 2.453187342673864e-06,
+      "candidate_zero_rate_lr": 5.938499184339291e-05,
+      "candidate_best_rate_lr": 2.9692495921696456e-05,
+      "fit_relative_rmse": 0.02762597485725499,
+      "measurements": [
+        {
+          "id": "mdxt04lm",
+          "lr": 1e-06,
+          "elapsed_updates": 73,
+          "rate": 0.000136986301369863,
+          "log_rate": 0.009495166856985551,
+          "grad_norm_median_in_band": 0.1228285357356071
+        },
+        {
+          "id": "yj2w13fq",
+          "lr": 2e-06,
+          "elapsed_updates": 35,
+          "rate": 0.00028571428571428574,
+          "log_rate": 0.01980420515885558,
+          "grad_norm_median_in_band": 0.1318224892020225
+        },
+        {
+          "id": "ml6mz58f",
+          "lr": 5e-06,
+          "elapsed_updates": 15,
+          "rate": 0.0006666666666666666,
+          "log_rate": 0.046209812037329684,
+          "grad_norm_median_in_band": 0.1810536608099937
+        },
+        {
+          "id": "l0a6rsc1",
+          "lr": 1e-05,
+          "elapsed_updates": 11,
+          "rate": 0.0009090909090909091,
+          "log_rate": 0.06301338005090412,
+          "grad_norm_median_in_band": 0.22589664161205286
+        }
+      ],
+      "held_out_1e-5_predicted_rate": 0.0012115063690826353,
+      "held_out_1e-4_predicted_rate": -0.009963622393238425,
+      "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+    },
+    {
+      "phase": "refit_all_usable_rates",
+      "effective_window": 30,
+      "distance_band": [
+        0.02,
+        0.01
+      ],
+      "fit_run_ids": [
+        "mdxt04lm",
+        "yj2w13fq",
+        "ml6mz58f",
+        "l0a6rsc1"
+      ],
+      "model": "v(x)=a*x-b*x^2, x=lr/1e-6; v is absolute proxy decrease per update",
+      "a": 0.00016733146741104257,
+      "b": 7.601793180242225e-06,
+      "candidate_zero_rate_lr": 2.201210470260527e-05,
+      "candidate_best_rate_lr": 1.1006052351302636e-05,
+      "fit_relative_rmse": 0.09041694459280665,
+      "measurements": [
+        {
+          "id": "mdxt04lm",
+          "lr": 1e-06,
+          "elapsed_updates": 73,
+          "rate": 0.000136986301369863,
+          "log_rate": 0.009495166856985551,
+          "grad_norm_median_in_band": 0.1228285357356071
+        },
+        {
+          "id": "yj2w13fq",
+          "lr": 2e-06,
+          "elapsed_updates": 35,
+          "rate": 0.00028571428571428574,
+          "log_rate": 0.01980420515885558,
+          "grad_norm_median_in_band": 0.1318224892020225
+        },
+        {
+          "id": "ml6mz58f",
+          "lr": 5e-06,
+          "elapsed_updates": 15,
+          "rate": 0.0006666666666666666,
+          "log_rate": 0.046209812037329684,
+          "grad_norm_median_in_band": 0.1810536608099937
+        },
+        {
+          "id": "l0a6rsc1",
+          "lr": 1e-05,
+          "elapsed_updates": 11,
+          "rate": 0.0009090909090909091,
+          "log_rate": 0.06301338005090412,
+          "grad_norm_median_in_band": 0.22589664161205286
+        }
+      ],
+      "held_out_1e-5_predicted_rate": 0.0009131353560862031,
+      "held_out_1e-4_predicted_rate": -0.05928478506131799,
+      "validation_limit": "1e-4 never reaches either lower band endpoint; its global failure is compatible with negative-rate prediction but is not a same-state local velocity test."
+    }
+  ],
+  "stage_velocity_sensitivity_file": "sensitivity-velocity-models.json",
+  "reference_fit": {
+    "clock_offset": 1,
+    "fit_run_ids": [
+      "ybi7q89v",
+      "mdxt04lm"
+    ],
+    "fit_min_u": 30,
+    "fit_max_u": 278.0,
+    "floor": 1.0000012770035269e-08,
+    "amplitudes": [
+      0.06421525855255847,
+      0.01834780432652028
+    ],
+    "rates_per_u": [
+      0.03191577584000459,
+      0.005091648646734465
+    ],
+    "training_log_rmse": 0.06854917462143918,
+    "hypothetical_two_mode_GD_upper_lr": 0.000125329868841422,
+    "upper_lr_semantics": "Not an AdamW stability guarantee; omits invisible fast modes and changing geometry.",
+    "predicted_threshold_u": {
+      "0.02": 99.04135632868152,
+      "0.01": 166.2300477581297,
+      "0.005": 286.04834747243996,
+      "0.002": 465.30054818459513
+    }
+  },
+  "historical_clock_fit": {
+    "clock_offset": 0,
+    "fit_run_ids": [
+      "ybi7q89v",
+      "mdxt04lm"
+    ],
+    "fit_min_u": 30,
+    "fit_max_u": 279.0,
+    "floor": 1.0000008155048942e-08,
+    "amplitudes": [
+      0.0656294337852403,
+      0.018494559286692417
+    ],
+    "rates_per_u": [
+      0.03202664407327494,
+      0.0051024141595325655
+    ],
+    "training_log_rmse": 0.06850769195720449,
+    "hypothetical_two_mode_GD_upper_lr": 0.000124896008175201,
+    "upper_lr_semantics": "Not an AdamW stability guarantee; omits invisible fast modes and changing geometry."
+  },
+  "runs": [
+    {
+      "id": "ybi7q89v",
+      "lr": 5e-07,
+      "fit_role": "fit",
+      "distance_initial": 0.1114027502671644,
+      "distance_final": 0.012706116502079,
+      "distance_tail_median30": 0.013692363297925,
+      "best_rolling20_median": 0.013545641275036449,
+      "best_rolling20_step": 279,
+      "tail_over_best_rolling20": 1.010831677874044,
+      "tail_over_previous30": 0.8690259143207624,
+      "grad_norm_tail_median30": 0.1348473355174064,
+      "fraction_norm_above_clip1": 0.16487455197132617,
+      "all_time_model_log_rmse": 0.0733559820293786,
+      "common_time_model_log_rmse": 0.0733559820293786,
+      "common_time_median_observed_over_model": 0.9921275371888197,
+      "end_observed_over_model": 1.015374318650723,
+      "historical_clock_common_log_rmse": 0.07346455275371166,
+      "reference_u_max": 139.0,
+      "observed_rebound_failure_25pct": false,
+      "threshold_hits": {
+        "0.02": {
+          "status": "right_censored_or_not_persistent",
+          "step": null,
+          "first_smoothed_step": 224
+        },
+        "0.01": {
+          "status": "not_reached",
+          "step": null
+        },
+        "0.005": {
+          "status": "not_reached",
+          "step": null
+        },
+        "0.002": {
+          "status": "not_reached",
+          "step": null
+        }
+      },
+      "observed_95pct_proximity": {
+        "step": 209,
+        "u_pre_update": 104.0,
+        "tail_reference": 0.013692363297925,
+        "definition": "retrospective tail reference; persistent rolling20 median; not an asymptotic floor"
+      }
+    },
+    {
+      "id": "mdxt04lm",
+      "lr": 1e-06,
+      "fit_role": "fit",
+      "distance_initial": 0.1084587397468495,
+      "distance_final": 0.0054776841561988,
+      "distance_tail_median30": 0.0056459046220142,
+      "best_rolling20_median": 0.00548385868138145,
+      "best_rolling20_step": 279,
+      "tail_over_best_rolling20": 1.0295496200846534,
+      "tail_over_previous30": 0.8675553714115455,
+      "grad_norm_tail_median30": 0.07462310045957565,
+      "fraction_norm_above_clip1": 0.0967741935483871,
+      "all_time_model_log_rmse": 0.0640239064891274,
+      "common_time_model_log_rmse": 0.07210963815068702,
+      "common_time_median_observed_over_model": 0.9819986629748212,
+      "end_observed_over_model": 1.0506315637061692,
+      "historical_clock_common_log_rmse": 0.0719785358181926,
+      "reference_u_max": 278.0,
+      "observed_rebound_failure_25pct": false,
+      "threshold_hits": {
+        "0.02": {
+          "status": "qualified",
+          "step": 113,
+          "smoothed_distance": 0.0199212946215165,
+          "u_pre_update": 112.0,
+          "u_historical": 113.0
+        },
+        "0.01": {
+          "status": "qualified",
+          "step": 186,
+          "smoothed_distance": 0.0098823150539043,
+          "u_pre_update": 185.0,
+          "u_historical": 186.0
+        },
+        "0.005": {
+          "status": "not_reached",
+          "step": null
+        },
+        "0.002": {
+          "status": "not_reached",
+          "step": null
+        }
+      },
+      "observed_95pct_proximity": {
+        "step": 171,
+        "u_pre_update": 170.0,
+        "tail_reference": 0.0056459046220142,
+        "definition": "retrospective tail reference; persistent rolling20 median; not an asymptotic floor"
+      }
+    },
+    {
+      "id": "yj2w13fq",
+      "lr": 2e-06,
+      "fit_role": "held-out",
+      "distance_initial": 0.1086648110275176,
+      "distance_final": 0.0029150961207135,
+      "distance_tail_median30": 0.0026889483452601,
+      "best_rolling20_median": 0.0026889483452601,
+      "best_rolling20_step": 268,
+      "tail_over_best_rolling20": 1.0,
+      "tail_over_previous30": 0.8915767746611872,
+      "grad_norm_tail_median30": 0.052348226308822604,
+      "fraction_norm_above_clip1": 0.03942652329749104,
+      "all_time_model_log_rmse": 0.2806151806221425,
+      "common_time_model_log_rmse": 0.06940469159228844,
+      "common_time_median_observed_over_model": 1.0149814804828168,
+      "end_observed_over_model": 2.313102105509013,
+      "historical_clock_common_log_rmse": 0.07849462238805081,
+      "reference_u_max": 556.0,
+      "observed_rebound_failure_25pct": false,
+      "threshold_hits": {
+        "0.02": {
+          "status": "qualified",
+          "step": 58,
+          "smoothed_distance": 0.0197893528139792,
+          "u_pre_update": 114.0,
+          "u_historical": 116.0
+        },
+        "0.01": {
+          "status": "qualified",
+          "step": 93,
+          "smoothed_distance": 0.00994609866212915,
+          "u_pre_update": 184.0,
+          "u_historical": 186.0
+        },
+        "0.005": {
+          "status": "qualified",
+          "step": 158,
+          "smoothed_distance": 0.0049510965467727,
+          "u_pre_update": 314.0,
+          "u_historical": 316.0
+        },
+        "0.002": {
+          "status": "not_reached",
+          "step": null
+        }
+      },
+      "observed_95pct_proximity": {
+        "step": 112,
+        "u_pre_update": 222.0,
+        "tail_reference": 0.0026889483452601,
+        "definition": "retrospective tail reference; persistent rolling20 median; not an asymptotic floor"
+      }
+    },
+    {
+      "id": "ml6mz58f",
+      "lr": 5e-06,
+      "fit_role": "held-out",
+      "distance_initial": 0.1112470386005886,
+      "distance_final": 0.0013075721115827,
+      "distance_tail_median30": 0.00129591138052215,
+      "best_rolling20_median": 0.0012680769251089499,
+      "best_rolling20_step": 277,
+      "tail_over_best_rolling20": 1.0219501316221875,
+      "tail_over_previous30": 0.9399947521327284,
+      "grad_norm_tail_median30": 0.04174844734370705,
+      "fraction_norm_above_clip1": 0.017921146953405017,
+      "all_time_model_log_rmse": 2.068946167580282,
+      "common_time_model_log_rmse": 0.21848590450814004,
+      "common_time_median_observed_over_model": 1.223264034209347,
+      "end_observed_over_model": 72.43938634451008,
+      "historical_clock_common_log_rmse": 0.26455954329670617,
+      "reference_u_max": 1390.0000000000002,
+      "observed_rebound_failure_25pct": false,
+      "threshold_hits": {
+        "0.02": {
+          "status": "qualified",
+          "step": 28,
+          "smoothed_distance": 0.0195829949623461,
+          "u_pre_update": 135.0,
+          "u_historical": 140.00000000000003
+        },
+        "0.01": {
+          "status": "qualified",
+          "step": 43,
+          "smoothed_distance": 0.0095833270610909,
+          "u_pre_update": 210.00000000000003,
+          "u_historical": 215.00000000000003
+        },
+        "0.005": {
+          "status": "qualified",
+          "step": 67,
+          "smoothed_distance": 0.0049444298946756,
+          "u_pre_update": 330.00000000000006,
+          "u_historical": 335.0
+        },
+        "0.002": {
+          "status": "qualified",
+          "step": 157,
+          "smoothed_distance": 0.00196959334444155,
+          "u_pre_update": 780.0000000000001,
+          "u_historical": 785.0000000000001
+        }
+      },
+      "observed_95pct_proximity": {
+        "step": 61,
+        "u_pre_update": 300.00000000000006,
+        "tail_reference": 0.00129591138052215,
+        "definition": "retrospective tail reference; persistent rolling20 median; not an asymptotic floor"
+      }
+    },
+    {
+      "id": "l0a6rsc1",
+      "lr": 1e-05,
+      "fit_role": "held-out",
+      "distance_initial": 0.1109178746007384,
+      "distance_final": 0.0013441167283807,
+      "distance_tail_median30": 0.0012533633666555002,
+      "best_rolling20_median": 0.00122907122503955,
+      "best_rolling20_step": 253,
+      "tail_over_best_rolling20": 1.0197646329366865,
+      "tail_over_previous30": 0.9242517697247089,
+      "grad_norm_tail_median30": 0.0480800494551658,
+      "fraction_norm_above_clip1": 0.007168458781362007,
+      "all_time_model_log_rmse": 5.918293756790493,
+      "common_time_model_log_rmse": 0.399737744589075,
+      "common_time_median_observed_over_model": 1.4775091249791537,
+      "end_observed_over_model": 53283.53642871359,
+      "historical_clock_common_log_rmse": 0.4841261779785984,
+      "reference_u_max": 2780.0000000000005,
+      "observed_rebound_failure_25pct": false,
+      "threshold_hits": {
+        "0.02": {
+          "status": "qualified",
+          "step": 20,
+          "smoothed_distance": 0.019960242333651,
+          "u_pre_update": 190.00000000000003,
+          "u_historical": 200.00000000000003
+        },
+        "0.01": {
+          "status": "qualified",
+          "step": 31,
+          "smoothed_distance": 0.0092082257474242,
+          "u_pre_update": 300.00000000000006,
+          "u_historical": 310.0
+        },
+        "0.005": {
+          "status": "qualified",
+          "step": 48,
+          "smoothed_distance": 0.00496144480316835,
+          "u_pre_update": 470.00000000000006,
+          "u_historical": 480.0000000000001
+        },
+        "0.002": {
+          "status": "qualified",
+          "step": 123,
+          "smoothed_distance": 0.0019184474555638499,
+          "u_pre_update": 1220.0000000000002,
+          "u_historical": 1230.0000000000002
+        }
+      },
+      "observed_95pct_proximity": {
+        "step": 48,
+        "u_pre_update": 470.00000000000006,
+        "tail_reference": 0.0012533633666555002,
+        "definition": "retrospective tail reference; persistent rolling20 median; not an asymptotic floor"
+      }
+    },
+    {
+      "id": "vmk256kl",
+      "lr": 0.0001,
+      "fit_role": "held-out",
+      "distance_initial": 0.109213431903299,
+      "distance_final": 0.0529333065625016,
+      "distance_tail_median30": 0.0494055535194583,
+      "best_rolling20_median": 0.03628996629579475,
+      "best_rolling20_step": 53,
+      "tail_over_best_rolling20": 1.3614108405822183,
+      "tail_over_previous30": 0.9618467527542767,
+      "grad_norm_tail_median30": 0.2215318754315376,
+      "fraction_norm_above_clip1": 0.010752688172043012,
+      "all_time_model_log_rmse": 14.821600977562907,
+      "common_time_model_log_rmse": 1.8396190773664134,
+      "common_time_median_observed_over_model": 6.294140223852102,
+      "end_observed_over_model": 5293323.896656875,
+      "historical_clock_common_log_rmse": 1.7019011651846085,
+      "reference_u_max": 27800.000000000004,
+      "observed_rebound_failure_25pct": true,
+      "threshold_hits": {
+        "0.02": {
+          "status": "insufficient_effective_time_resolution",
+          "step": null
+        },
+        "0.01": {
+          "status": "insufficient_effective_time_resolution",
+          "step": null
+        },
+        "0.005": {
+          "status": "insufficient_effective_time_resolution",
+          "step": null
+        },
+        "0.002": {
+          "status": "insufficient_effective_time_resolution",
+          "step": null
+        }
+      },
+      "observed_95pct_proximity": {
+        "step": 245,
+        "u_pre_update": 24400.000000000004,
+        "tail_reference": 0.0494055535194583,
+        "definition": "retrospective tail reference; persistent rolling20 median; not an asymptotic floor"
+      }
+    }
+  ],
+  "tested_usable_lr": 1e-05,
+  "tested_rebound_failure_lr": 0.0001,
+  "unknown_interval": [
+    1e-05,
+    0.0001
+  ],
+  "interval_semantics": "No test between these points; empirical usefulness endpoints, not a certified global maximum or numerical divergence bound."
+}

@@ -47,6 +47,8 @@
 - 配置 JSON/TOML：prettier/taplo；原始实验数据保持数值内容与校验关系。
 - GitHub Actions：actionlint；凭据：gitleaks；CI 与本地检查同源。
 
+OneShot、固定监督、精度和四卡数学蒸馏的实验设置、结果与分析统一维护在 [唯一实验报告](docs/experiments/2026-10-13-OneShot与镜像蒸馏实验报告.md)。后续更新同一份报告，不另建进展或单次结果文档；原预注册快照与过程记录放在 data/runs，图表放在 results。
+
 ## Agent 入口与提交
 
 `AGENTS.md` 与 `.agents/` 是入库的唯一事实源。`.claude/skills/` 是忽略的本机软链，通过 `scripts/agent-links.sh` 重建；预览链接通过 `scripts/crossnote-links.sh` 重建，信任工作区后启用 runtime。
