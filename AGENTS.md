@@ -8,7 +8,7 @@
 
 完整维护规范见 `docs/operations/2026-10-08-仓库维护规范.md`。
 
-固定监督下的 BPO 标量学习率、OPD 参照及相关消融统一维护在 `docs/experiments/2026-10-13-BPO标量调度实验总报告.md`。每个实验按 setting、结果、分析组织，区分完成、部分、取消和待执行；图表与原始数据继续放在 results/data。后续补充同一研究线只更新这份总报告，不为首批结果、进度、局部图或单项诊断另建正文。更新日期变化时可重命名这一份文件并同步引用，保持唯一入口；详细理论证明继续维护当前书稿。
+固定监督、OneShot、精度、生产镜像训练、BPO 标量学习率及 target/中心估计统一维护在 `docs/experiments/2026-10-15-固定监督蒸馏动力学与BPO优化实验报告.md`，实验正文按章位于 `docs/experiments/固定监督蒸馏实验/`，共同组成一份报告。每个实验必须包含背景与必要推导、Setting、带数值和图片的实验结果、详细实验分析及简短结论；共同动机、定义和设置只写一次。完成、部分、取消和待执行分别标明，图表和原始数据仍放 results/data。不再维护原 OneShot/BPO 两份独立报告或新增进展正文；详细理论继续维护当前书稿。
 
 ## 目录职责与唯一维护位置
 
@@ -48,8 +48,6 @@
 - Markdown：markdownlint、autocorrect/prettier；YAML：prettier 与注释宽度检查。
 - 配置 JSON/TOML：prettier/taplo；原始实验数据保持数值内容与校验关系。
 - GitHub Actions：actionlint；凭据：gitleaks；CI 与本地检查同源。
-
-OneShot、固定监督、精度和四卡数学蒸馏的实验设置、结果与分析统一维护在 [唯一实验报告](docs/experiments/2026-10-13-OneShot与镜像蒸馏实验报告.md)。后续更新同一份报告，不另建进展或单次结果文档；原预注册快照与过程记录放在 data/runs，图表放在 results。
 
 ## Agent 入口与提交
 

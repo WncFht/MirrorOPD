@@ -1,0 +1,131 @@
+{
+  "report_files": {
+    "docs/experiments/2026-10-15-固定监督蒸馏动力学与BPO优化实验报告.md": {
+      "sha256": "218b0e67f1b805bc15c8cba4b7561a87a80e60cd68afef9b51ccc14444e69aa5",
+      "lines": 364
+    },
+    "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md": {
+      "sha256": "fb5071ef12c39ec3900491c15af9f21e71ee446c8d87b6f511954ac18729fa2f",
+      "lines": 412
+    },
+    "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md": {
+      "sha256": "5a4604c3f3cd86f17852e58d532c93dd8f3934984d4c6e89bdff191f1615c4aa",
+      "lines": 400
+    },
+    "docs/experiments/固定监督蒸馏实验/2026-10-15-目标形状与中心估计实验.md": {
+      "sha256": "044698fd8d922d0924a47375ff614f6be682a6989a5d7d2b0258225024cf6cd0",
+      "lines": 192
+    }
+  },
+  "experiments": [
+    {
+      "number": 8,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 284
+    },
+    {
+      "number": 9,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 331
+    },
+    {
+      "number": 10,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 411
+    },
+    {
+      "number": 11,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 257
+    },
+    {
+      "number": 12,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 422
+    },
+    {
+      "number": 13,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 196
+    },
+    {
+      "number": 14,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 710
+    },
+    {
+      "number": 15,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 558
+    },
+    {
+      "number": 16,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-BPO标量优化实验.md",
+      "analysis_characters": 411
+    },
+    {
+      "number": 1,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 295
+    },
+    {
+      "number": 2,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 493
+    },
+    {
+      "number": 3,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 502
+    },
+    {
+      "number": 4,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 211
+    },
+    {
+      "number": 5,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 634
+    },
+    {
+      "number": 6,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 328
+    },
+    {
+      "number": 7,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-固定监督与生产训练.md",
+      "analysis_characters": 923
+    },
+    {
+      "number": 17,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-目标形状与中心估计实验.md",
+      "analysis_characters": 381
+    },
+    {
+      "number": 18,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-目标形状与中心估计实验.md",
+      "analysis_characters": 185
+    },
+    {
+      "number": 19,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-目标形状与中心估计实验.md",
+      "analysis_characters": 287
+    },
+    {
+      "number": 20,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-目标形状与中心估计实验.md",
+      "analysis_characters": 547
+    },
+    {
+      "number": 21,
+      "file": "docs/experiments/固定监督蒸馏实验/2026-10-15-目标形状与中心估计实验.md",
+      "analysis_characters": 510
+    }
+  ],
+  "local_links_checked": 63,
+  "unique_figures": 28,
+  "errors": [],
+  "gpu_training_launched": false
+}
