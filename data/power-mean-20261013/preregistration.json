@@ -91,7 +91,13 @@
         "square-root target with Hellinger/current-student actions",
         "square-root target with exact BPO/anchor actions"
       ],
-      "count": 5
+      "count": 5,
+      "planned_conditions": 9,
+      "additional_gradient_estimators": [
+        "q sample variance M2/M4",
+        "frozen mixture M4",
+        "anchor distinct pair M2"
+      ]
     },
     "gpu_fixed_prefix_training": {
       "kappas": [
@@ -179,8 +185,8 @@
         "final"
       ],
       "optimizer_update_budget": 18900,
-      "canary_update_budget": 10,
-      "exact_backward_plus_mc_probe_budget": 720,
+      "canary_update_budget": 18,
+      "exact_backward_plus_mc_probe_budget": 792,
       "primary_action_expectation": "Exact frozen-anchor full-vocabulary conditional expectation at the prefixes of one rollout per prompt slot; no extra actions in primary updates"
     },
     "math_evaluation": {
@@ -245,6 +251,39 @@
       "primary_action_sample_count": 0,
       "scope": "Cached t22 panel remains one prompt repeated across 64 slots and a single outer cycle. It validates inner fitting, not a completed multi-prompt fresh-outer algorithm.",
       "theory": "docs/book/sections/proximal_bpo_algorithm.tex; ideal anchor-Fisher-preconditioned BPO has exact finite-inner all-f-divergence teacher descent, but actual AdamW sweep does not assume this property."
+    },
+    {
+      "date": "2026-10-14",
+      "before_gpu_training": true,
+      "reason": "Keep the 63-condition exact-BPO main grid; four covariance-estimator canaries compare M2/M4 fresh anchor iid actions, M4 frozen 50/50 anchor/teacher mixture with pairwise importance weights, and a weighted nonrepeating anchor pair. Population target is unchanged; no additional responses.",
+      "canaries": 9,
+      "optimizer_updates": 18918,
+      "additional_probe_backwards": 792,
+      "new_conditions": [
+        "power-canary-bpo-u2",
+        "power-canary-bpo-u4",
+        "power-canary-bpo-u4-mix0.5",
+        "power-canary-bpo-distinct2"
+      ],
+      "settings": {
+        "kappa": 0.5,
+        "eta": 0.1,
+        "updates": 2,
+        "batch_size": 64,
+        "gradient_probe_draws": 8,
+        "probe_action_counts": [
+          2,
+          4
+        ],
+        "proposal_options": [
+          "anchor iid",
+          "frozen (q+T)/2",
+          "anchor conditional second action distinct from first"
+        ]
+      },
+      "success": "Finite gradients, native anchor sync, checked source snapshots, readable checkpoint and comparison to exact BPO backward; CPU enumeration proves equality of population loss/gradient.",
+      "rejection": "Do not expand sampled-BPO training before evaluating whole-parameter covariance, mean error, true fitting error and runtime; 8 draws are diagnostics, not a proof of unbiasedness.",
+      "scope": "Existing full-q/target cache is reused. Canaries do not establish sparse-teacher-cache deployment speedups or full-task accuracy improvements."
     }
   ]
 }

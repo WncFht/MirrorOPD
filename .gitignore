@@ -78,3 +78,5 @@ data/oneshot-lr-stability/*.csv
 
 # Conditional teacher-center audit restores from its versioned gzip archive.
 /data/power-center-20261014/prefix-audit.csv
+
+/data/power-center-extensions-20261014/prefix-audit.csv

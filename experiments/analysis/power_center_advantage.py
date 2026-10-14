@@ -50,10 +50,29 @@ def moments(q, teacher, kappa, eta):
             if kappa and eta < 1
             else None
         )
+    mix_variance = None
+    mix_max = None
+    mix_weight = None
+    mix_cap = None
+    if kappa > 0 and eta < 1:
+        mix_cap = -np.log1p(-eta) / (kappa * eta)
+        mix_weight = 1 / mix_cap
+        proposal = (1 - mix_weight) * q + mix_weight * teacher
+        z = q * positive / proposal
+        np.testing.assert_allclose(proposal @ z, center, atol=1e-10, rtol=1e-10)
+        assert np.min(z) >= -1e-10
+        assert np.max(z) <= mix_cap + 1e-10
+        mix_variance = float(proposal @ (z - center) ** 2)
+        mix_max = float(np.max(z))
+        assert mix_variance <= center * (mix_cap - center) + 1e-10
     return {
         "kappa": kappa,
         "eta": eta,
         "teacher_center": center,
+        "mixture_teacher_weight": mix_weight,
+        "mixture_center_estimator_variance": mix_variance,
+        "mixture_estimator_max": mix_max,
+        "mixture_estimator_cap": mix_cap,
         "teacher_reverse_kl": float(q @ np.log(q / teacher)),
         "advantage_variance": float(q @ advantage**2),
         "positive_center_estimator_variance": float(q @ (positive - center) ** 2),
@@ -226,6 +245,15 @@ def cached_figures(output, cached):
             marker="o",
             label=label,
         )
+    for eta in STRENGTHS:
+        rows = [cached["conditions"][f"k{k}-eta{eta}"] for k in SHAPES[1:]]
+        if all("mixture_center_estimator_variance" in r for r in rows):
+            axes[1, 0].plot(
+                SHAPES[1:],
+                [r["mixture_center_estimator_variance"] / r["advantage_variance"] for r in rows],
+                linestyle="--",
+                label=f"eta={eta}, envelope",
+            )
     axes[1, 0].axhline(1, color="gray", linestyle="--")
     titles = (
         "Mean exact K on 128 cached prefixes",
@@ -286,6 +314,38 @@ def local_estimator_figure(output):
         ax.legend(fontsize=8)
         ax.grid(alpha=0.15)
     save(fig, output, "local-center-estimator-variance")
+
+
+def bounded_proposal_figure(output):
+    eps = np.geomspace(1e-10, 1e-2, 120)
+    rows = [moments(np.array([e, 1 - e]), np.array([0.5, 0.5]), 0.5, 0.3) for e in eps]
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.3), layout="constrained")
+    for key, label in (
+        ("advantage_variance", "Signed q proposal"),
+        ("positive_center_estimator_variance", "Nonnegative q proposal"),
+        ("mixture_center_estimator_variance", "Bounded envelope proposal"),
+    ):
+        axes[0].loglog(eps, [r[key] for r in rows], label=label)
+    axes[0].set(
+        xlabel="Rare anchor probability",
+        ylabel="Single-sample center-estimator variance",
+        title="Envelope removes the positive estimator heavy tail",
+    )
+    for key, label in (
+        ("mixture_estimator_max", "Actual max of Z"),
+        ("mixture_estimator_cap", "Uniform cap c"),
+        ("teacher_center", "Exact center K"),
+    ):
+        axes[1].semilogx(eps, [r[key] for r in rows], label=label)
+    axes[1].set(
+        xlabel="Rare anchor probability",
+        ylabel="Estimator / mean",
+        title="Nonnegative unbiased estimate stays in [0,c]",
+    )
+    for ax in axes:
+        ax.legend(fontsize=8)
+        ax.grid(alpha=0.15)
+    save(fig, output, "bounded-mixture-center-estimator")
 
 
 def mathematical_checks():
@@ -404,6 +464,11 @@ def cached_audit(repo):
                 )
             }
             if kappa:
+                entry["mixture_center_estimator_variance"] = float(
+                    np.mean([r["mixture_center_estimator_variance"] for r in subset])
+                )
+                entry["mixture_teacher_weight"] = subset[0]["mixture_teacher_weight"]
+                entry["mixture_estimator_cap"] = subset[0]["mixture_estimator_cap"]
                 gaps = [r["center_upper"] - r["bucket_center_lower"] for r in subset]
                 entry["top16_interval_width_quantiles"] = np.quantile(
                     gaps, [0.5, 0.9, 0.99]
@@ -435,6 +500,7 @@ def main():
     figures(output)
     sharp_limit_figure(output)
     local_estimator_figure(output)
+    bounded_proposal_figure(output)
     if args.cached_models:
         summary["cached_models"] = cached_audit(repo)
     elif (output / "summary.json").exists():

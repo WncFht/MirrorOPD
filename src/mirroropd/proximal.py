@@ -138,3 +138,48 @@ def renyi_inner_bound(student_logp, target_logp, teacher_logp, orders=(0.01, 0.0
         for order in orders
     ]
     return torch.stack(bounds).amin(0)
+
+
+def sample_variance_bpo_loss(
+    student_logits, target_logp, actions, strength, importance_weights=None
+):
+    """Unbiased BPO sample-variance loss for iid frozen-anchor actions, M >= 2.
+
+    Actions are auxiliary tokens at one frozen prefix, not additional responses.
+    Optional detached weights apply to each unordered sample pair; for M=2
+    they may factor a correlated proposal joint weight.
+    Both conditional centers and logit normalization cancel. The M-1 denominator
+    is necessary. Fresh draws give a population gradient at fixed parameters;
+    reusing a finite draw optimizes its empirical loss only.
+    """
+    count = actions.shape[-1]
+    if count < 2 or not 0 < strength <= 1:
+        raise ValueError("BPO sample variance requires M >= 2 and positive strength <= 1")
+    if student_logits.shape != target_logp.shape:
+        raise ValueError("Student logits and target log weights must have the same shape")
+    logits = (
+        student_logits.float()
+        if student_logits.dtype in (torch.float16, torch.bfloat16)
+        else student_logits
+    )
+    residual = logits.gather(-1, actions) - target_logp.detach().gather(-1, actions)
+    if importance_weights is not None:
+        if importance_weights.shape != actions.shape:
+            raise ValueError("Proposal weights must align with auxiliary actions")
+        weights = importance_weights.detach()
+        difference = residual.unsqueeze(-1) - residual.unsqueeze(-2)
+        pair_weights = weights.unsqueeze(-1) * weights.unsqueeze(-2)
+        return {
+            "loss": (pair_weights * difference.square()).sum((-1, -2))
+            / (4 * strength * count * (count - 1)),
+            "coefficient": (
+                weights * (weights.unsqueeze(-2) * difference).sum(-1) / (strength * (count - 1))
+            ).detach(),
+            "importance_ratio": weights,
+        }
+    centered = residual - residual.mean(-1, keepdim=True)
+    return {
+        "loss": centered.square().sum(-1) / (2 * strength * (count - 1)),
+        "coefficient": centered.detach() * count / (strength * (count - 1)),
+        "importance_ratio": torch.ones_like(centered),
+    }

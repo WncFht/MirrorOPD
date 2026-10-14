@@ -230,3 +230,182 @@ def test_same_action_positive_center_estimate_cancels_teacher_shape(kappa):
     a = power_signal(rho.log(), kappa, 0.3) / 0.3
     positive_estimate = rho - 1 - a
     torch.testing.assert_close(a + positive_estimate, rho - 1, atol=1e-12, rtol=1e-12)
+
+
+@pytest.mark.parametrize("kappa", [0.25, 0.5, 1.0])
+@pytest.mark.parametrize("eta", [0.03, 0.3, 0.7])
+def test_envelope_center_estimator_is_nonnegative_unbiased_and_bounded(kappa, eta):
+    from mirroropd.proximal import power_signal
+
+    q = torch.tensor([1e-9, 0.7, 0.3 - 1e-9], dtype=torch.float64)
+    teacher = torch.tensor([0.6, 0.1, 0.3], dtype=torch.float64)
+    rho = teacher / q
+    a = power_signal(rho.log(), kappa, eta) / eta
+    center = -(q * a).sum()
+    phi = rho - 1 - a
+    cap = -math.log1p(-eta) / (kappa * eta)
+    proposal = (1 - 1 / cap) * q + teacher / cap
+    z = q * phi / proposal
+    assert torch.all(z >= -1e-12)
+    assert torch.all(z <= cap + 1e-12)
+    torch.testing.assert_close((proposal * z).sum(), center, atol=1e-12, rtol=1e-12)
+    variance = (proposal * (z - center).square()).sum()
+    assert variance <= center * (cap - center) + 1e-12
+
+
+def test_small_step_hellinger_mixture_estimator_halves_signed_variance_bound():
+    q = torch.tensor([0.6, 0.3, 0.1], dtype=torch.float64)
+    teacher = torch.tensor([0.1, 0.2, 0.7], dtype=torch.float64)
+    proposal = (q + teacher) / 2
+    z = 2 * (q.sqrt() - teacher.sqrt()).square() / (q + teacher)
+    center = (q.sqrt() - teacher.sqrt()).square().sum()
+    torch.testing.assert_close((proposal * z).sum(), center, atol=1e-12, rtol=1e-12)
+    variance = (proposal * (z - center).square()).sum()
+    signed_variance = center * (4 - center)
+    assert variance <= center * (2 - center) + 1e-12
+    assert variance <= signed_variance / 2 + 1e-12
+
+
+def test_teacher_center_error_only_biases_uncorrected_score_form():
+    from mirroropd.proximal import power_signal
+
+    q = torch.tensor([0.6, 0.3, 0.1], dtype=torch.float64)
+    teacher = torch.tensor([0.1, 0.2, 0.7], dtype=torch.float64)
+    eta = 0.3
+    f = power_signal((teacher / q).log(), 0.5, eta)
+    center = -(q * f).sum() / eta
+    delta = 0.2
+    z = torch.tensor([0.1, -0.4, 0.9], dtype=torch.float64, requires_grad=True)
+    lp = z.log_softmax(-1)
+    u = lp - q.log()
+    residual = u - (q * u).sum() - f - eta * (center + delta)
+    loss = (q * residual.square()).sum() / (2 * eta)
+    actual = torch.autograd.grad(loss, z, retain_graph=True)[0]
+    target = power_log_target(q.log(), teacher.log(), 0.5, eta)
+    exact_loss = target_divergence(lp, target, 0.5, "bpo", anchor_logp=q.log()) / eta
+    exact = torch.autograd.grad(exact_loss, z, retain_graph=True)[0]
+    torch.testing.assert_close(actual, exact, atol=1e-12, rtol=1e-12)
+    raw = (q * residual.detach() * lp).sum() / eta
+    raw_gradient = torch.autograd.grad(raw, z, retain_graph=True)[0]
+    torch.testing.assert_close(
+        raw_gradient - exact, -delta * (q - lp.exp()), atol=1e-12, rtol=1e-12
+    )
+    centered_score = (q * residual.detach() * (lp - (q * lp).sum())).sum() / eta
+    corrected = torch.autograd.grad(centered_score, z)[0]
+    torch.testing.assert_close(corrected, exact, atol=1e-12, rtol=1e-12)
+
+
+def test_small_kl_does_not_bound_geometric_teacher_advantage_variance():
+    from mirroropd.proximal import power_signal
+
+    results = []
+    for epsilon in (1e-3, 1e-6):
+        q = torch.tensor([epsilon, 1 - epsilon], dtype=torch.float64)
+        logt = torch.tensor([-(epsilon ** (-0.75)), 0.0], dtype=torch.float64).log_softmax(-1)
+        r = logt - q.log()
+        kl = -(q * r).sum()
+        raw_variance = (q * (r + kl).square()).sum()
+        a = power_signal(r, 0.5, 0.3) / 0.3
+        center = -(q * a).sum()
+        shaped_variance = (q * (a + center).square()).sum()
+        results.append((kl, raw_variance, shaped_variance))
+    assert results[1][0] < results[0][0]
+    assert results[1][1] > 10 * results[0][1]
+    assert results[1][2] < results[0][2]
+
+
+@pytest.mark.parametrize("sample_count", [2, 3, 4])
+@pytest.mark.parametrize("kappa", [0.0, 0.5, 1.0])
+def test_sample_variance_bpo_has_exact_population_loss_and_gradient(sample_count, kappa):
+    from itertools import product
+
+    from mirroropd.proximal import sample_variance_bpo_loss
+
+    q = torch.tensor([0.2, 0.3, 0.5], dtype=torch.float64)
+    teacher = torch.tensor([0.6, 0.35, 0.05], dtype=torch.float64)
+    target = power_log_target(q.log(), teacher.log(), kappa, 0.3)
+    z = torch.tensor([-0.7, 0.2, 0.8], dtype=torch.float64, requires_grad=True)
+    exact = target_divergence(z.log_softmax(-1), target, kappa, "bpo", anchor_logp=q.log()) / 0.3
+    empirical_mean = 0.0
+    for outcome in product(range(3), repeat=sample_count):
+        actions = torch.tensor(outcome)
+        empirical_mean += (
+            q[actions].prod() * sample_variance_bpo_loss(z, target, actions, 0.3)["loss"]
+        )
+    torch.testing.assert_close(empirical_mean, exact, atol=1e-12, rtol=1e-12)
+    torch.testing.assert_close(
+        torch.autograd.grad(empirical_mean, z)[0],
+        torch.autograd.grad(exact, z)[0],
+        atol=1e-12,
+        rtol=1e-12,
+    )
+    fields = sample_variance_bpo_loss(z, target, torch.tensor([0, 1]), 0.3)
+    shifted = sample_variance_bpo_loss(z + 123.0, target - 37.0, torch.tensor([0, 1]), 0.3)
+    torch.testing.assert_close(fields["loss"], shifted["loss"], atol=1e-11, rtol=1e-11)
+    at_target = target.clone().requires_grad_()
+    zero = sample_variance_bpo_loss(at_target, target, torch.tensor([0, 1, 2]), 0.3)["loss"]
+    assert float(zero.detach()) == 0
+    torch.testing.assert_close(torch.autograd.grad(zero, at_target)[0], torch.zeros_like(at_target))
+
+
+@pytest.mark.parametrize("sample_count", [2, 4])
+@pytest.mark.parametrize("kappa", [0.0, 0.5, 1.0])
+def test_mixture_weighted_bpo_preserves_population_target(sample_count, kappa):
+    from itertools import product
+
+    from mirroropd.proximal import sample_variance_bpo_loss
+
+    q = torch.tensor([0.2, 0.3, 0.5], dtype=torch.float64)
+    teacher = torch.tensor([0.6, 0.35, 0.05], dtype=torch.float64)
+    proposal = (q + teacher) / 2
+    target = power_log_target(q.log(), teacher.log(), kappa, 0.3)
+    z = torch.tensor([-0.7, 0.2, 0.8], dtype=torch.float64, requires_grad=True)
+    exact = target_divergence(z.log_softmax(-1), target, kappa, "bpo", anchor_logp=q.log()) / 0.3
+    expected = 0.0
+    for outcome in product(range(3), repeat=sample_count):
+        actions = torch.tensor(outcome)
+        weights = q[actions] / proposal[actions]
+        assert torch.all(weights <= 2)
+        loss = sample_variance_bpo_loss(z, target, actions, 0.3, importance_weights=weights)["loss"]
+        expected += proposal[actions].prod() * loss
+    torch.testing.assert_close(expected, exact, atol=1e-12, rtol=1e-12)
+    torch.testing.assert_close(
+        torch.autograd.grad(expected, z)[0],
+        torch.autograd.grad(exact, z)[0],
+        atol=1e-12,
+        rtol=1e-12,
+    )
+
+
+def test_distinct_pair_bpo_is_unbiased_and_reduces_parameter_covariance():
+    from mirroropd.proximal import sample_variance_bpo_loss
+
+    q = torch.tensor([0.8, 0.15, 0.05], dtype=torch.float64)
+    teacher = torch.tensor([0.1, 0.2, 0.7], dtype=torch.float64)
+    target = power_log_target(q.log(), teacher.log(), 0.5, 0.3)
+    z = torch.tensor([-0.7, 0.2, 0.8], dtype=torch.float64, requires_grad=True)
+    exact = target_divergence(z.log_softmax(-1), target, 0, "bpo", anchor_logp=q.log()) / 0.3
+    exact_gradient = torch.autograd.grad(exact, z, retain_graph=True)[0]
+    expected = 0.0
+    iid_moment = torch.zeros((), dtype=torch.float64)
+    distinct_moment = torch.zeros_like(iid_moment)
+    for a in range(3):
+        for b in range(3):
+            actions = torch.tensor([a, b])
+            base = sample_variance_bpo_loss(z, target, actions, 0.3)["loss"]
+            base_gradient = torch.autograd.grad(base, z, retain_graph=True)[0]
+            iid_moment += q[a] * q[b] * base_gradient.square().sum()
+            if a != b:
+                probability = q[a] * q[b] / (1 - q[a])
+                weights = torch.stack((torch.ones_like(q[a]), 1 - q[a]))
+                loss = sample_variance_bpo_loss(
+                    z, target, actions, 0.3, importance_weights=weights
+                )["loss"]
+                expected += probability * loss
+                gradient = torch.autograd.grad(loss, z, retain_graph=True)[0]
+                distinct_moment += probability * gradient.square().sum()
+    torch.testing.assert_close(expected, exact, atol=1e-12, rtol=1e-12)
+    torch.testing.assert_close(
+        torch.autograd.grad(expected, z)[0], exact_gradient, atol=1e-12, rtol=1e-12
+    )
+    assert distinct_moment <= iid_moment + 1e-12

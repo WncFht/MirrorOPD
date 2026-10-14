@@ -1,0 +1,201 @@
+{
+  "date": "2026-10-14",
+  "checks": {
+    "mixture_covariance_identity_max_error": 3.552713678800501e-15,
+    "tail_cases": 600,
+    "tail_mean_max_error": 3.3306690738754696e-16,
+    "covariance_trace_identity_max_error": 1.3322676295501878e-15
+  },
+  "cached": {
+    "bootstrap": "3000 response-cluster draws; same 64 responses, two fixed prefixes each; single-prompt scope",
+    "mixture_bpo": {
+      "proposal": "(q+T)/2",
+      "mean_u4_variance": 0.042652851261862634,
+      "mean_q_u4_variance": 0.04656596798402286,
+      "mean_distinct_u2_variance": 0.09245268961833428,
+      "mean_u2_variance": 0.12371521159797669,
+      "scope": "Same real q/T and logits metric; pairwise frozen q/proposal importance weights, no sample-weight normalization"
+    },
+    "prefixes": 128,
+    "responses": 64,
+    "native_anchor": "cached BF16; probabilities renormalized in FP64",
+    "kappa": 0.5,
+    "eta": 0.3,
+    "heads": {
+      "16": {
+        "width": 0.040872841580381916,
+        "variance": 0.00015466709417646344,
+        "raw_tail_variance": 0.0002217371568674321,
+        "global_envelope_variance": 0.023713014804554476,
+        "signed_center_variance": 0.1528369046526783,
+        "width_quantiles": [
+          0.00025123144083096454,
+          0.15467145241795915,
+          0.45938039969614813
+        ],
+        "interval_over_global_envelope_ratio": 0.006522455936170423,
+        "response_cluster_ci95": [
+          0.002855810560637721,
+          0.011941122964294391
+        ]
+      },
+      "64": {
+        "width": 0.01111807817183965,
+        "variance": 1.5411345128372545e-05,
+        "raw_tail_variance": 2.677849883621816e-05,
+        "global_envelope_variance": 0.023713014804554476,
+        "signed_center_variance": 0.1528369046526783,
+        "width_quantiles": [
+          8.341537826983496e-05,
+          0.026389184571527925,
+          0.1262979850403052
+        ],
+        "interval_over_global_envelope_ratio": 0.0006499108297867101,
+        "response_cluster_ci95": [
+          0.0002710695042144425,
+          0.001137504249961115
+        ]
+      },
+      "256": {
+        "width": 0.0030763494845224768,
+        "variance": 1.0315506423976255e-06,
+        "raw_tail_variance": 1.9235301058297778e-06,
+        "global_envelope_variance": 0.023713014804554476,
+        "signed_center_variance": 0.1528369046526783,
+        "width_quantiles": [
+          4.845155629104722e-05,
+          0.007045375271981806,
+          0.04383918198857245
+        ],
+        "interval_over_global_envelope_ratio": 4.350145482975447e-05,
+        "response_cluster_ci95": [
+          1.2268682437046584e-05,
+          9.408604243392427e-05
+        ]
+      }
+    },
+    "u_statistics_on_existing_20_cells": {
+      "k0.0-eta0.03": {
+        "oracle_4_action_variance": 0.04769842037694948,
+        "u4_variance": 0.0609745713365902,
+        "u2_variance": 0.17505374651174327,
+        "u4_over_oracle4_ratio": 1.2783352332157418
+      },
+      "k0.0-eta0.1": {
+        "oracle_4_action_variance": 0.04769842037694947,
+        "u4_variance": 0.0609745713365902,
+        "u2_variance": 0.17505374651174327,
+        "u4_over_oracle4_ratio": 1.278335233215742
+      },
+      "k0.0-eta0.3": {
+        "oracle_4_action_variance": 0.04769842037694948,
+        "u4_variance": 0.0609745713365902,
+        "u2_variance": 0.17505374651174327,
+        "u4_over_oracle4_ratio": 1.2783352332157418
+      },
+      "k0.0-eta0.7": {
+        "oracle_4_action_variance": 0.04769842037694946,
+        "u4_variance": 0.0609745713365902,
+        "u2_variance": 0.17505374651174327,
+        "u4_over_oracle4_ratio": 1.278335233215742
+      },
+      "k0.25-eta0.03": {
+        "oracle_4_action_variance": 0.03939083859201369,
+        "u4_variance": 0.04992228548279727,
+        "u2_variance": 0.141970358528729,
+        "u4_over_oracle4_ratio": 1.2673577732086867
+      },
+      "k0.25-eta0.1": {
+        "oracle_4_action_variance": 0.039394461789258865,
+        "u4_variance": 0.0499825169388257,
+        "u2_variance": 0.14231725447591884,
+        "u4_over_oracle4_ratio": 1.2687701435345853
+      },
+      "k0.25-eta0.3": {
+        "oracle_4_action_variance": 0.03983686696338216,
+        "u4_variance": 0.05067398470065858,
+        "u2_variance": 0.14469644035042295,
+        "u4_over_oracle4_ratio": 1.2720374006128004
+      },
+      "k0.25-eta0.7": {
+        "oracle_4_action_variance": 0.04275352679990317,
+        "u4_variance": 0.05456487603725482,
+        "u2_variance": 0.15637514902391617,
+        "u4_over_oracle4_ratio": 1.2762660795828988
+      },
+      "k0.5-eta0.03": {
+        "oracle_4_action_variance": 0.04141331464798221,
+        "u4_variance": 0.051505732254998236,
+        "u2_variance": 0.14338113493806062,
+        "u4_over_oracle4_ratio": 1.2436998268021457
+      },
+      "k0.5-eta0.1": {
+        "oracle_4_action_variance": 0.03950268597045073,
+        "u4_variance": 0.049388448762961175,
+        "u2_variance": 0.13831994869596406,
+        "u4_over_oracle4_ratio": 1.2502554585757868
+      },
+      "k0.5-eta0.3": {
+        "oracle_4_action_variance": 0.03689138407964713,
+        "u4_variance": 0.04656596798402288,
+        "u2_variance": 0.1318302715855486,
+        "u4_over_oracle4_ratio": 1.2622450782407264
+      },
+      "k0.5-eta0.7": {
+        "oracle_4_action_variance": 0.03816201557371896,
+        "u4_variance": 0.048627626231443816,
+        "u2_variance": 0.1391176950937869,
+        "u4_over_oracle4_ratio": 1.274241559319844
+      },
+      "k0.75-eta0.03": {
+        "oracle_4_action_variance": 0.05413316556703445,
+        "u4_variance": 0.06550126184967316,
+        "u2_variance": 0.17647490882990116,
+        "u4_over_oracle4_ratio": 1.2100024294452412
+      },
+      "k0.75-eta0.1": {
+        "oracle_4_action_variance": 0.04576638993804864,
+        "u4_variance": 0.05615348629808523,
+        "u2_variance": 0.15385535803631664,
+        "u4_over_oracle4_ratio": 1.226959049514218
+      },
+      "k0.75-eta0.3": {
+        "oracle_4_action_variance": 0.036817920067066405,
+        "u4_variance": 0.04605573217890344,
+        "u2_variance": 0.12906271280515497,
+        "u4_over_oracle4_ratio": 1.2509053225986073
+      },
+      "k0.75-eta0.7": {
+        "oracle_4_action_variance": 0.03453451314660608,
+        "u4_variance": 0.04393955340018428,
+        "u2_variance": 0.12549926781468135,
+        "u4_over_oracle4_ratio": 1.27233742122415
+      },
+      "k1.0-eta0.03": {
+        "oracle_4_action_variance": 0.08265701881069572,
+        "u4_variance": 0.09737902728617116,
+        "u2_variance": 0.253646088474244,
+        "u4_over_oracle4_ratio": 1.1781095990068593
+      },
+      "k1.0-eta0.1": {
+        "oracle_4_action_variance": 0.057306375310297544,
+        "u4_variance": 0.06912839757195022,
+        "u2_variance": 0.1855448841905111,
+        "u4_over_oracle4_ratio": 1.2062950622446424
+      },
+      "k1.0-eta0.3": {
+        "oracle_4_action_variance": 0.038302465873206466,
+        "u4_variance": 0.047508643346771934,
+        "u2_variance": 0.1318419965878055,
+        "u4_over_oracle4_ratio": 1.2403546942392922
+      },
+      "k1.0-eta0.7": {
+        "oracle_4_action_variance": 0.03183220560298802,
+        "u4_variance": 0.04043786978918583,
+        "u2_variance": 0.11529839632316294,
+        "u4_over_oracle4_ratio": 1.2703445778633073
+      }
+    },
+    "scope": "Exact scalar/logit conditional moments of actual q/T; ideal p-beta curves are analytic policies, not neural training histories"
+  }
+}

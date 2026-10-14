@@ -194,7 +194,8 @@ $0<\kappa<1$ 时此极限是 $(1-\kappa)D_\kappa(T\Vert q)$；$\kappa=1$ 的极�
  \lim_{\eta\to0}\sup_{q,T}V_{\kappa,\eta}
  =C_{\mathrm{vel}}(\kappa),\qquad0<\kappa\le1/2.
 \end{equation}
-所以前文 $\kappa_\star=0.4419283735$ 也最小化最坏的小步标量 advantage 方差，其锐值为 $3.5272748442$；平方根点的值为 4。这个准则不是全参数梯度信噪比，也不是数学任务正确率。
+所以前文 $\kappa_\star=0.4419283735$ 也最小化最坏的小步标量 advantage 方差，其锐值为 $3.5272748442$；平方根点的值为 4。这个准则不是全参数梯度信噪比，也不是数学任务正确率。 几何端点甚至不能仅从 KL 小推出低方差：取 $q=(\epsilon,1-\epsilon)$、$T=(e^{-\epsilon^{-3/4}},1-e^{-\epsilon^{-3/4}})$，则 $K_{0,\eta}\sim\epsilon^{1/4}\to0$，但 $\Var_qB_{0,\eta}\sim\epsilon^{-1/2}\to\infty$。固定正形状和固定 $\eta<1$ 的负尾部饱和会在同一族上使方差降至 $O(\epsilon)$。
+
 
 \begin{figure}[htbp]
  \centering
@@ -244,6 +245,58 @@ $\widehat K$ 单次可以为负；这不违背其非负期望。另一个逐样�
 
 $M>1$ 可以使用独立中心、leave-one-out 或无偏样本协方差系数；它们要求同一 prefix 下的独立动作，不能用不同前缀的 token 直接代替。本研究的主 BPO 路线采用完整条件求和，不引入 response 组。
 
+\subsubsection{有界非负无偏中心估计器}
+
+$q$ 提案下的非负估计会出现重尾，但可以利用已有 $K$ 上界构造另一个提案。令 $\kappa>0,\eta<1$，$c=-\log(1-\eta)/(\kappa\eta)\ge1$。由 $A\ge-c$ 与 $\phi\ge0$，逐 action 有
+\begin{equation}
+ 0\le q_a\phi(\rho_a)\le T_a+(c-1)q_a.
+\end{equation}
+右侧的总质量是 $c$，所以定义归一化包络提案
+\begin{equation}
+ \mu_c=(1-1/c)q+(1/c)T,\qquad
+ Z(a)=\frac{q_a}{\mu_c(a)}\phi(\rho_a),\quad a\sim\mu_c.
+ \label{eq:center-bounded-mixture-estimator}
+\end{equation}
+无需知道真实 $K$ 即可采样：以概率 $1/c$ 从教师抽一个 action，否则从锚点抽一个 action。它只估计本 prefix 的中心，不把 response rollout 改为这个提案，也不引入 response 组。
+
+\begin{theorem}[中心估计的最小统一样本上界]
+\label{thm:center-bounded-estimator}
+上述估计器满足
+\begin{equation}
+ \E_{\mu_c}Z=K,\qquad0\le Z\le c,\qquad
+ \Var_{\mu_c}Z\le K(c-K)\le c^2/4.
+\end{equation}
+对 $M$ 次独立抽样，$\widehat K_\mu=M^{-1}\sum_iZ_i$ 无偏、非负且不超过 $c$，其方差不超过 $K(c-K)/M$。所有分布上统一成立的无偏估计器样本上界不可能小于 $c$。
+\end{theorem}
+
+\begin{proof}
+定义给出 $\E_\mu Z=\sum_aq_a\phi(\rho_a)=K$。包络不等式给出 $0\le Z\le c$，于是 $Z^2\le cZ$，取期望再减 $K^2$ 得到方差界。独立平均将方差除以 $M$。若任意无偏估计器总被常数 $b$ 上界约束，则 $K=\E\widehat K\le b$；而前面的正支持见证可以使 $K\to c$，故 $b\ge c$。这个最优性只作用于统一样本上界，不宣称该提案在每个固定分布上具有最小方差。\hfill$\square$
+\end{proof}
+
+Hoeffding 不等式还给出明确的置信界
+\begin{equation}
+ \Pr\{ |\widehat K_\mu-K|\ge\epsilon\}
+ \le2\exp(-2M\epsilon^2/c^2).
+\end{equation}
+$\kappa=0$ 或 $\eta=1$ 的 KL 在分布类上无界，因此不能保持一个有限统一样本上界的无偏估计器。固定已知分布可以有有限界，不能与这个分布类结论混同。
+
+平方根的小步极限尤为直观：$c\to2$、$\mu_c\to(q+T)/2$、$\phi(\rho)\to(\sqrt\rho-1)^2$，于是
+\begin{equation}
+ Z_0(a)=\frac{2(\sqrt{T_a}-\sqrt{q_a})^2}{T_a+q_a}\in[0,2],
+ \qquad\E_{(q+T)/2}Z_0=H^2(q,T).
+\end{equation}
+记 $K_{\mathrm H}=H^2$，则 $\Var Z_0\le K_{\mathrm H}(2-K_{\mathrm H})$；而 $q$ 提案下的原始有符号中心估计在此极限具有方差 $K_{\mathrm H}(4-K_{\mathrm H})$。因此在每个固定完整支持分布对的平方根小步极限，包络估计方差至多为原始估计的一半。有限 $\eta$ 时不保证逐输入都优于原始有符号估计，真实条件矩仍需报告。 若当前 $q$ action 与 $M$ 个中心样本独立，则估计 advantage $\widehat B=A(a)+\widehat K_\mu$ 的方差为 $V+\Var Z/M$。平方根小步极限因此满足
+\begin{align}
+ \Var\widehat B
+ &\le K_{\mathrm H}(4-K_{\mathrm H})
+    +K_{\mathrm H}(2-K_{\mathrm H})/M\\
+ &\le4+\frac1{M(M+1)}.
+\end{align}
+第二步在 $K_{\mathrm H}\in[0,2]$ 上最大化该凹二次式，驻点为 $(2M+1)/(M+1)$。一个独立辅助中心 action 即 $M=1$ 时，上界为 4.5；使用有符号 $q$ 中心估计的对应统一界为 8。这个结论作用于冻结 prefix 的教师标量 advantage，并要求独立性；它不涵盖学生反馈项或直接成为全参数梯度方差定理。
+
+
+主 BPO 的完整条件求和无需这个辅助估计器。若使用它构造 sampled-action advantage，中心抽样仍须与当前 action 独立，或者给出相关性修正；有界中心估计不使 $A$ 的正尾部变为有界，也不自动解决整段 inner 的缓存误差。单样本中心只需本前缀辅助 action，不能把它解释为新增完整 response。
+
 \subsubsection{有限 head 与尾部质量的中心区间}
 
 令 $S$ 为任一保留 head，$\delta=\sum_{a\notin S}q_a$、$\tau_T=\sum_{a\notin S}T_a$，记 $K_S=-\sum_{a\in S}q_aA_a$。当 $\delta>0$，尾部的 $\rho$ 条件均值为 $\tau_T/\delta$。函数 $-A(\rho)$ 凸且不超过 $c$，由 Jensen 得到
@@ -254,7 +307,13 @@ $M>1$ 可以使用独立中心、leave-one-out 或无偏样本协方差系数；
 \end{equation}
 下界正是把尾部合并为一个 action 后的中心，亦为对应 $f$-divergence 的数据处理下界。区间宽度为 $\delta[c+A(\tau_T/\delta)]$，可直接计算；$\delta=0$ 时直接用完整 head 和。几何端点仍有 Jensen 下界，但没有仅靠两种尾部质量获得的有限统一上界。 对嵌套 head，拆分尾部由 Jensen 保证下界非减少；新增 action $a$ 对上界的改变量为 $q_a[-A_a-c]\le0$，所以上界非增加。可以持续扩大 head，直到区间宽度不超过 $\epsilon$，再取中点获得绝对中心误差不超过 $\epsilon/2$ 的确定性证书。
 
-以一个已估计中心代替精确 $K$，会给 BPO score 系数加入常数误差 $\Delta K$。若 $\Delta K=\widehat K-K$，当前学生不等于 $q$ 时，梯度偏差为 $-\Delta K\E_q\psi_p$，若 $\|\psi_p\|\le M$，其范数不超过 $M|\Delta K|$。因此区间既报告中心误差，也能给固定参数下的 score 偏差提供证书。
+以一个已估计中心代替精确 $K$，会给 BPO score 系数加入常数误差 $\Delta K$。若 $\Delta K=\widehat K-K$，当前学生不等于 $q$ 时，梯度偏差为 $-\Delta K\E_q\psi_p$，若 $\|\psi_p\|\le M$，其范数不超过 $M|\Delta K|$。因此区间既报告中心误差，也能给固定参数下的 score 偏差提供证书。 这个偏差结论作用于停止系数并使用原始 $\psi_p$ 的 score 更新。若精确微分学生条件中心，情况不同：固定的教师中心误差使完整平方损失仅增加 $\eta(\Delta K)^2/2$，不改变其梯度。对应无偏形式是
+\begin{equation}
+ g_{\mathrm{cscore}}=
+ [C_qU/\eta-A-\widehat K]\,[\psi_p-\E_q\psi_p].
+\end{equation}
+对于固定参数、精确学生中心和不依赖当前 action 的任意冻结 $\widehat K$，其 $q$ 期望等于真实 BPO 梯度。也可以通过停止系数乘以 $\log p(a)-\E_q\log p$ 实现这个梯度；教师中心于是只影响该估计器的方差；若其误差不消失，在 $p=m$ 处仍可能保留采样噪声，不能自动继承精确残差估计器的零噪声性质。若中心来自当前 action，或学生中心也只是有偏近似，则不能直接套用这项结论。
+
 
 \subsubsection{标量中心不等于最优梯度 baseline}
 

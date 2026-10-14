@@ -170,6 +170,43 @@ def canary_plan(plan):
         }
         for fit, sampler in (("power", "student"), ("bpo", "anchor"))
     )
+    canaries.extend(
+        plan[30]
+        | {
+            "id": f"power-canary-bpo-u{count}",
+            "updates": 2,
+            "sample_count": count,
+            "probe_sample_count": count,
+            "gradient_estimator": "sample_variance",
+            "gradient_probe_draws": 8,
+        }
+        for count in (2, 4)
+    )
+    canaries.append(
+        plan[30]
+        | {
+            "id": "power-canary-bpo-u4-mix0.5",
+            "updates": 2,
+            "sample_count": 4,
+            "probe_sample_count": 4,
+            "gradient_estimator": "sample_variance",
+            "sampler": "anchor_teacher_mixture",
+            "proposal_teacher_weight": 0.5,
+            "gradient_probe_draws": 8,
+        }
+    )
+    canaries.append(
+        plan[30]
+        | {
+            "id": "power-canary-bpo-distinct2",
+            "updates": 2,
+            "sample_count": 2,
+            "probe_sample_count": 2,
+            "gradient_estimator": "sample_variance",
+            "sampler": "anchor_distinct_pair",
+            "gradient_probe_draws": 8,
+        }
+    )
     return canaries
 
 

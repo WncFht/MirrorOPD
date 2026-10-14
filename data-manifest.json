@@ -897,8 +897,14 @@
         {
             "path": "data/power-center-20261014/prefix-audit.csv",
             "archive": "data/power-center-20261014/prefix-audit.csv.gz",
-            "sha256": "b48e3fe436d69f0181ab00bd48730547f68134490ff59daf2304470af9e51abd",
-            "bytes": 682553
+            "sha256": "1e123e0248c2ba5f0e1d36973db9ca8b2b8f2ae8b2eab7e2795c5e5926a16177",
+            "bytes": 844175
+        },
+        {
+            "path": "data/power-center-extensions-20261014/prefix-audit.csv",
+            "archive": "data/power-center-extensions-20261014/prefix-audit.csv.gz",
+            "bytes": 71200,
+            "sha256": "93414e6bde86afa270d57cbaad2ce2de62bd00377896241a282a892d90c3c615"
         }
     ]
 }
