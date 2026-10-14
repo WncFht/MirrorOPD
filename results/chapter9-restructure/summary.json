@@ -1,0 +1,320 @@
+{
+  "kind": "analytic_chapter_reconstruction",
+  "source": "experiments/plotting/plot_power_shape_criteria.py",
+  "minimax_shape": 0.44192837352858505,
+  "minimax_variance": 3.527274844172147,
+  "half_variance_ceiling": 4.0,
+  "counterexamples": [
+    {
+      "anchor": [
+        0.9,
+        0.1
+      ],
+      "teacher": [
+        0.01,
+        0.99
+      ],
+      "eta": 0.3,
+      "hellinger_after_step_kappa_0_half_1": [
+        0.5030924558928205,
+        0.6469700877982154,
+        0.6353401811096494
+      ]
+    },
+    {
+      "anchor": [
+        0.99,
+        0.01
+      ],
+      "teacher": [
+        0.5,
+        0.5
+      ],
+      "eta": 0.3,
+      "hellinger_after_step_kappa_0_half_1": [
+        0.3356548351424959,
+        0.2300275116387715,
+        0.14118234390476941
+      ]
+    }
+  ],
+  "checks": {
+    "deterministic_local_cases": 30,
+    "maximum_affinity_identity_error": 3.3306690738754696e-16,
+    "maximum_target_remainder_divided_by_epsilon_cubed": 0.008271161533457414,
+    "maximum_local_rate_error_at_epsilon_1e_minus_4": 2.193811623640851e-06,
+    "moment_witness_checks": [
+      {
+        "kappa": 0.25,
+        "order": 2,
+        "slope": 9.555683031193394e-07,
+        "expected": 0
+      },
+      {
+        "kappa": 0.5,
+        "order": 2,
+        "slope": -2.33578184813862e-06,
+        "expected": 0
+      },
+      {
+        "kappa": 0.75,
+        "order": 2,
+        "slope": -0.6666677782219821,
+        "expected": -0.6666666666666667
+      },
+      {
+        "kappa": 1.0,
+        "order": 2,
+        "slope": -1.0000019543615577,
+        "expected": -1.0
+      },
+      {
+        "kappa": 0.25,
+        "order": 4,
+        "slope": -7.689295204754473e-06,
+        "expected": 0
+      },
+      {
+        "kappa": 0.5,
+        "order": 4,
+        "slope": -2.000004671606692,
+        "expected": -2.0
+      },
+      {
+        "kappa": 0.75,
+        "order": 4,
+        "slope": -2.6666689790002676,
+        "expected": -2.666666666666667
+      },
+      {
+        "kappa": 1.0,
+        "order": 4,
+        "slope": -3.0000078173842017,
+        "expected": -3.0
+      }
+    ],
+    "sharp_relative_noise_witnesses": [
+      {
+        "kappa": 0.25,
+        "witness_mass": 1e-20,
+        "variance_over_divergence": 3.9999733333777785,
+        "sharp_divergence_constant": 4.0,
+        "variance_over_center": 5.333297777837038
+      },
+      {
+        "kappa": 0.44192837352858505,
+        "witness_mass": 1e-20,
+        "variance_over_divergence": 2.2628101285139715,
+        "sharp_divergence_constant": 2.262810129196915,
+        "variance_over_center": 4.054694811885182
+      },
+      {
+        "kappa": 0.5,
+        "witness_mass": 1e-20,
+        "variance_over_divergence": 2.0,
+        "sharp_divergence_constant": 2.0,
+        "variance_over_center": 4.0
+      }
+    ],
+    "random_vector_seed": 20261014,
+    "arithmetic": "CPU float64; exact finite-alphabet sums, no Monte Carlo"
+  },
+  "square_root_noise_path": {
+    "initial_anchor": [
+      0.999,
+      0.001
+    ],
+    "teacher": [
+      0.05,
+      0.95
+    ],
+    "eta": 0.3,
+    "path": [
+      {
+        "outer": 0,
+        "hellinger": 1.4913659271977702,
+        "variance": 0.29151445632027284,
+        "error_bound": 12.174415732226697,
+        "geometric_bound": 12.174415732226697
+      },
+      {
+        "outer": 1,
+        "hellinger": 0.8463913335328499,
+        "variance": 2.2703500437059914,
+        "error_bound": 6.909317008431429,
+        "geometric_bound": 8.522091012558688
+      },
+      {
+        "outer": 2,
+        "hellinger": 0.4477829832667491,
+        "variance": 1.700909767912682,
+        "error_bound": 3.6553712919734624,
+        "geometric_bound": 5.96546370879108
+      },
+      {
+        "outer": 3,
+        "hellinger": 0.22808099698612563,
+        "variance": 0.9799581771427216,
+        "error_bound": 1.8618856896826586,
+        "geometric_bound": 4.175824596153756
+      },
+      {
+        "outer": 4,
+        "hellinger": 0.11393402554403081,
+        "variance": 0.5103898778953906,
+        "error_bound": 0.9300736779104557,
+        "geometric_bound": 2.9230772173076294
+      },
+      {
+        "outer": 5,
+        "hellinger": 0.05636115390163002,
+        "variance": 0.25387274833629936,
+        "error_bound": 0.4600910522582043,
+        "geometric_bound": 2.04615405211534
+      },
+      {
+        "outer": 6,
+        "hellinger": 0.0277464247343153,
+        "variance": 0.12362699148060746,
+        "error_bound": 0.22650142640257392,
+        "geometric_bound": 1.4323078364807382
+      },
+      {
+        "outer": 7,
+        "hellinger": 0.013626994088633396,
+        "variance": 0.059679382173387696,
+        "error_bound": 0.11124076807047671,
+        "geometric_bound": 1.0026154855365166
+      },
+      {
+        "outer": 8,
+        "hellinger": 0.006684748502413113,
+        "variance": 0.02874627427651023,
+        "error_bound": 0.054569375529902965,
+        "geometric_bound": 0.7018308398755616
+      },
+      {
+        "outer": 9,
+        "hellinger": 0.0032773349230919534,
+        "variance": 0.013861035198617411,
+        "error_bound": 0.026753754474220032,
+        "geometric_bound": 0.49128158791289306
+      },
+      {
+        "outer": 10,
+        "hellinger": 0.0016063285180381451,
+        "variance": 0.006699777360287614,
+        "error_bound": 0.01311288586153588,
+        "geometric_bound": 0.34389711153902514
+      },
+      {
+        "outer": 11,
+        "hellinger": 0.0007872053061118173,
+        "variance": 0.003247238774709404,
+        "error_bound": 0.006426165764178101,
+        "geometric_bound": 0.2407279780773176
+      },
+      {
+        "outer": 12,
+        "hellinger": 0.00038575565387569355,
+        "variance": 0.001577859643445372,
+        "error_bound": 0.0031490257459240293,
+        "geometric_bound": 0.1685095846541223
+      },
+      {
+        "outer": 13,
+        "hellinger": 0.0001890262862715036,
+        "variance": 0.0007683231282678752,
+        "error_bound": 0.0015430717246653356,
+        "geometric_bound": 0.1179567092578856
+      },
+      {
+        "outer": 14,
+        "hellinger": 9.262432473525554e-05,
+        "variance": 0.00037475433495345217,
+        "error_bound": 0.000756116936614331,
+        "geometric_bound": 0.08256969648051991
+      },
+      {
+        "outer": 15,
+        "hellinger": 4.5386265941683906e-05,
+        "variance": 0.0001830214368207035,
+        "error_bound": 0.0003705001301361952,
+        "geometric_bound": 0.057798787536363944
+      },
+      {
+        "outer": 16,
+        "hellinger": 2.223935358395491e-05,
+        "variance": 8.946775388791592e-05,
+        "error_bound": 0.00018154574354248908,
+        "geometric_bound": 0.04045915127545475
+      },
+      {
+        "outer": 17,
+        "hellinger": 1.0897303249955299e-05,
+        "variance": 4.3765215176419385e-05,
+        "error_bound": 8.895757755065552e-05,
+        "geometric_bound": 0.028321405892818324
+      },
+      {
+        "outer": 18,
+        "hellinger": 5.339683393003675e-06,
+        "variance": 2.1419333293411078e-05,
+        "error_bound": 4.358925218778511e-05,
+        "geometric_bound": 0.019824984124972824
+      },
+      {
+        "outer": 19,
+        "hellinger": 2.6164460151791752e-06,
+        "variance": 1.0486625478286943e-05,
+        "error_bound": 2.1358742981054496e-05,
+        "geometric_bound": 0.013877488887480978
+      },
+      {
+        "outer": 20,
+        "hellinger": 1.2820588241787842e-06,
+        "variance": 5.135397322999826e-06,
+        "error_bound": 1.046578631982681e-05,
+        "geometric_bound": 0.009714242221236683
+      },
+      {
+        "outer": 21,
+        "hellinger": 6.282088902931425e-07,
+        "variance": 2.5152953656626736e-06,
+        "error_bound": 5.128235839127694e-06,
+        "geometric_bound": 0.006799969554865678
+      },
+      {
+        "outer": 22,
+        "hellinger": 3.0782237219725e-07,
+        "variance": 1.2321339783600411e-06,
+        "error_bound": 2.5128356914061225e-06,
+        "geometric_bound": 0.004759978688405975
+      },
+      {
+        "outer": 23,
+        "hellinger": 1.5083296620711943e-07,
+        "variance": 6.036217114283218e-07,
+        "error_bound": 1.231289520058118e-06,
+        "geometric_bound": 0.003331985081884182
+      },
+      {
+        "outer": 24,
+        "hellinger": 7.39081543611739e-08,
+        "variance": 2.9573207968448943e-07,
+        "error_bound": 6.033318723361136e-07,
+        "geometric_bound": 0.002332389557318927
+      },
+      {
+        "outer": 25,
+        "hellinger": 3.621499585781034e-08,
+        "variance": 1.4489410975536887e-07,
+        "error_bound": 2.956326192474314e-07,
+        "geometric_bound": 0.0016326726901232489
+      }
+    ],
+    "variance_increased_after_first_step": true,
+    "cumulative_uniform_bound": 40.58138577408899
+  },
+  "new_gpu_runs": 0
+}

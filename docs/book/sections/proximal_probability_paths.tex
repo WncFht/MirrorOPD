@@ -1,0 +1,16 @@
+\subsection{概率坐标、log-odds 与高维方向}
+
+词表维数为 $d$ 时，每个前缀的 token 分布位于 $\Delta^{d-1}$。算术 target $m_{1,\eta}=(1-\eta)q+\eta T$ 在概率坐标中是直线。几何 target $m_{0,\eta}\propto q^{1-\eta}T^\eta$ 的 log-odds 则满足
+\begin{equation}
+ \log\frac{m_{0,\eta,a}}{m_{0,\eta,b}}
+ =(1-\eta)\log\frac{q_a}{q_b}+\eta\log\frac{T_a}{T_b}.
+\end{equation}
+归一化常数在坐标差中消失；因此几何 target 在 log-odds 中是直线。这对应信息几何中的 mixture 路径和 exponential 路径\footnote{Shun-ichi Amari. Information Geometry and Its Applications: Convex Function and Dually Flat Manifold. ETVC 2008, LNCS 5416, 2009, pp. 75--102. \url{https://bsi-ni.brain.riken.jp/database/file/293/299.pdf}.}。当 teacher 极小概率接近零时，几何 target 的对应概率也可接近零，即使 $\eta$ 固定得很小；算术 target 则保留 $(1-\eta)q_a$ 的概率下界。
+
+对 $\eta$ 在零处求导，两个方向分别为
+\begin{equation}
+ \left.\partial_\eta m_{1,\eta}\right|_{\eta=0}=T-q,\qquad
+ \left.\partial_\eta m_{0,\eta,a}\right|_{\eta=0}
+ =q_a[\log(T_a/q_a)-\E_q\log(T/q)].
+\end{equation}
+第一式是概率插值的直接微分。第二式使用未归一化几何密度的导数 $q_a\log(T_a/q_a)$，再减去配分函数导数对应的条件均值。高维下两方向一般不共线；统一缩放步长不能纠正方向差异。只有全部 teacher/anchor 比率一致接近一时，$\log\rho=\rho-1+O((\rho-1)^2)$ 才使两方向一阶接近。

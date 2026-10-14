@@ -1,0 +1,70 @@
+\subsection{冻结锚点、教师与当前学生}
+
+教师分布为 $T(a\mid s)$，本轮冻结学生锚点为 $q_n(a\mid s)$，当前 inner 学生为 $p_{n,j}(a\mid s)=\pi_{\theta_{n,j}}(a\mid s)$。固定一个前缀 $s$ 时省略条件及索引，写成 $T,q,p$。词表 $\mathcal V$ 有限；本章的精确分布定理要求 $q_a,T_a,p_a>0$ 且各自归一化。两个基本概率比为
+\begin{equation}
+ \rho_a=\frac{T_a}{q_a},\qquad r_a=\log\rho_a,\qquad
+ U_\theta(a)=\log\frac{p_\theta(a)}{q_a},\qquad
+ C_qh=h-\E_qh.
+ \label{eq:power-chapter-ratios}
+\end{equation}
+对每个 prompt 槽位仅生成一条 $y\sim q_n(\cdot\mid x)$，再冻结所得到的有效前缀及归一化权重，形成经验测度 $\widehat d_n$。一个 batch 可以含 $B$ 个 prompt 槽位；$B$ 不表示同一 prompt 的候选组数。每个前缀可用完整词表求和或辅助 action 抽样来计算损失，辅助 action 不等于新增完整 response。
+
+\begin{center}
+\begin{tabular}{lp{108mm}}
+\toprule
+记号 & 含义与更新时点\\
+\midrule
+$\kappa\in[0,1]$ & 幂均值 target 的形状；同一理论迭代中固定\\
+$0<\eta<1$ & 教师插值强度；也是该 target 的精确 MD 步长\\
+$\tau$ & 固定教师目标后可另选的 MD 步长，通常 $0<\tau\le\eta$\\
+$\alpha_{\mathrm{opt}}$ & 实际 BPO 参数优化器的步长，与 $\eta,\tau$ 区分\\
+$\gamma_j,\xi_j$ & 理想 BPO 的 logit 松弛系数和累计拟合进度\\
+$\zeta$ & 辅助 action 提案中教师的混合权重\\
+$N,I,M,J$ & outer 预算、每轮 inner 次数、辅助 action 数、保留 head 大小\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+本章统一使用 $\eta$。早期解析图中的 $\lambda$、亲和度 $A$、拟合进度 $\beta$ 和连续时间 $\tau$，分别对应正文的 $\eta,a,\xi,t$。边界 $\eta=1$ 时所有 target 都为 $T$；$\eta=0$ 只用于极限或不更新的参照，不代入含 $1/\eta$ 的 BPO 损失。本轮 $q_n,T,\widehat d_n$ 和教师信号全部停止梯度，学生条件中心在每次 inner 重新计算。外层结束后才将拟合后的学生用作下一轮锚点。
+
+\subsection{目标构造、镜像下降与 BPO 拟合的关系}
+
+幂均值框架中有五个不同角色。重心散度 $D_\kappa$ 定义中间 target $m$；教师目标 $\mathcal J_{\kappa,\eta}$ 解释精确外层 MD；$\KL(p\Vert q)$ 保留负熵 mirror 几何；BPO 用冻结 $q$ 拟合 $m$；教师中心 $K_{\kappa,\eta}$ 将条件监督均值归零。重心问题与 BPO 的最小点是本轮 $m$，教师目标 $\mathcal J$ 的最小点是固定 $T$，KL 正则的最小点是 $q$。$m$ 是向教师目标执行一次 mirror 更新的结果，不是 $\mathcal J$ 的全局最小点；$K$ 在 inner 中则只是冻结中心。
+
+\begin{figure}[H]
+ \centering
+ \begin{tikzpicture}[every node/.style={font=\small},node distance=13mm]
+  \node[draw,rounded corners,align=center,text width=35mm] (source) {本轮冻结分布\\学生 $q_n$、教师 $T$};
+  \node[draw,rounded corners,align=center,text width=37mm,right=10mm of source] (target) {幂均值 target $m_n$\\重心 $D_\kappa$；MD 目标 $\mathcal J$};
+  \node[draw,rounded corners,align=center,text width=35mm,right=10mm of target] (fit) {BPO 拟合\\当前学生 $p_{n,j}$};
+  \node[draw,rounded corners,align=center,text width=35mm,below=of source] (roll) {每个 prompt 一条 rollout\\冻结前缀测度 $\widehat d_n$};
+  \node[draw,rounded corners,align=center,text width=37mm,below=of target] (loss) {冻结 $q_n$ 的条件方差\\$\Var_{q_n}[\log(p/m_n)]/(2\eta)$};
+  \node[draw,rounded corners,align=center,text width=35mm,below=of fit] (sync) {完成本轮 inner\\同步 $q_{n+1}=p_{n,I}$};
+  \draw[->] (source) -- node[above]{$\kappa,\eta$} (target);
+  \draw[->] (target) -- node[above]{监督} (fit);
+  \draw[->] (source) -- node[right]{$y\sim q_n$} (roll);
+  \draw[->] (roll) -- node[above]{权重} (loss);
+  \draw[->] (loss) -- (fit);
+  \draw[->] (fit) -- (sync);
+ \end{tikzpicture}
+ \caption{单教师、单 rollout 的主线。中间分布是监督 target；response 仍由学生锚点生成。精确求到 target 与神经网络有限步拟合分别承担外层和内层的数学条件。}
+ \label{fig:divergence-map-roles}
+\end{figure}
+
+\subsection{小插值强度与重尾监督的区别}
+
+对固定随机向量 $X$，$\Var(\eta X)=\eta^2\Var(X)$，其均值也缩小为 $\eta\E X$。若均值非零，相对噪声 $\Var(\eta X)/\|\eta\E X\|^2$ 不变。当前 BPO 损失带 $1/\eta$，其几何端点起始下降方向是 $\E_q[(C_qr)\psi_q]$，不会随 $\eta$ 整体缩小。减小教师参与程度与压制极端概率比是不同操作。
+
+取二元词表 $q=(v,1-v)$、$T_\epsilon=(\epsilon,1-\epsilon)$，其中 $0<v<1$、$v\ne1/2$。对第一个 categorical logit，$\psi_q(1)=1-v$、$\psi_q(2)=-v$。令
+\begin{equation}
+ r_1=\log(\epsilon/v),\qquad r_2=\log[(1-\epsilon)/(1-v)],\qquad D=r_1-r_2.
+\end{equation}
+精确条件中心化给出 $C_qr(1)=(1-v)D$、$C_qr(2)=-vD$。单 action 梯度 $X=(C_qr)\psi_q$ 分别取 $(1-v)^2D$、$v^2D$，因此
+\begin{align}
+ \E_qX&=v(1-v)D,\\
+ \Var_qX&=v(1-v)(1-2v)^2D^2.
+ \label{eq:proximal-binary-variance}
+\end{align}
+$D=\log\epsilon+O(1)$，所以 $\Var_qX\to\infty$，任意固定 $\eta>0$ 也不能使 $\eta^2\Var_qX$ 具有分布无关界。这个反例已有精确 baseline 和有界 score。$v=1/2$ 时中心化后的二元 score 梯度恰为常数，必须用非对称的 $q$ 才能证明梯度方差发散。
+
+本章的改进方向是改变冻结教师信号的形状，使负尾部饱和，同时保留局部教师差异的尺度。后续要分别证明固定正 $\eta$ 下的界、$\eta\to0$ 的统一界、残差趋零的噪声界，以及完整参数梯度所需的 score 条件。

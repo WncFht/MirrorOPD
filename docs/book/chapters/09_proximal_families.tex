@@ -1,152 +1,53 @@
-\chapter{近端教师族：方差控制与高维几何}
+\chapter{幂均值 MirrorOPD：目标、镜像更新与方差控制}
 \label{ch:proximal-families}
 
-小镜像系数、低采样方差与有界尾部是三个不同的性质。本章在固定 prefix、完整词表和精确条件期望下区分它们，再用归一化幂均值及散度重心统一几何 mirror target 与 TOP-D 的算术教师。数值图仅检验有限词表恒等式，不能替代语言模型训练效果实验。记冻结 anchor 为 $q$、teacher 为 $t$、当前 student 为 $p$；$\psi=\nabla_\theta\log p$。形状参数使用 $\kappa$，避免占用行为测度记号 $\beta$；插值强度使用 $\lambda$，TOP-D 的原文系数为 $\alpha=\lambda$。
+本章研究单教师、每个 prompt 一条 rollout、冻结锚点和 BPO 内层的 MirrorOPD。形状参数 $\kappa$ 改变学生与教师之间的目标分布；插值强度 $\eta$ 决定教师参与程度。推导围绕四个动作组织：构造 target、识别精确镜像目标、拟合 target、控制条件采样误差。前六节给出算法主线及形状选择的结论；后三节给出估计器、高维动力学和适用边界。所有条件分布定理都注明冻结测度、正支持和精确更新要求。
 
-\section{缩小绝对方差与控制极端尾部}
+\section{单教师问题与统一条件}
+\label{sec:power-setup}
+\input{sections/proximal_setup}
 
-对固定随机向量 $X$ 和标量 $\eta$，有 $\Var(\eta X)=\eta^2\Var(X)$。其均值也同时缩小，故 $\Var(\eta X)/\|\E[\eta X]\|^2=\Var(X)/\|\E X\|^2$，其中要求均值非零。固定分布下减小尺度确实降低绝对方差，却不改善这个相对噪声比；若再通过优化器步长抵消尺度，有效更新的方差也恢复原值。这里的向量方差定义为 $\E\|X-\E X\|^2$。
-
-\subsection{本书实际梯度中的镜像系数}
-
-记 $r=\log(t/q)$、$U=\log(p/q)$，$C_q h=h-\E_qh$。前文推导的三个下降方向，在固定 prefix 上是
-\begin{align}
- -\nabla\mathcal L_{\mathrm{Mean}}&=\E_q[(\eta C_qr-U)\psi],\\
- -\nabla\mathcal L_{\mathrm{BPO}}&=\E_q[(C_qr-C_qU/\eta)\psi],\\
- -\nabla\mathcal L_{\mathrm{MDPO}}&=\E_p[(r-U/\eta)\psi].
-\end{align}
-在 inner 起点 $p=q$，$U=0$ 且 $\E_q\psi=0$，因此
-\begin{equation}
- -\nabla\mathcal L_{\mathrm{Mean}}=\eta\E_q[C_qr\,\psi],\qquad
- -\nabla\mathcal L_{\mathrm{BPO}}=\E_q[C_qr\,\psi],\qquad
- -\nabla\mathcal L_{\mathrm{MDPO}}=\E_q[r\,\psi].
-\end{equation}
-所以本书归一化的 BPO 与 MDPO 起始梯度不随 $\eta$ 缩小。小 $\eta$ 增强后续 student--anchor 偏移的反馈，并改变最终 target；PMD-Mean 起点额外带有整体尺度。这些结论针对本书的损失归一化和固定 optimizer 步长，不能只由 target 插值系数推断梯度缩放。
-
-\subsection{带精确条件中心化的发散反例}
-
-取二元词表，$q=(v,1-v)$，$t_\varepsilon=(\varepsilon,1-\varepsilon)$，其中 $0<v<1$、$v\ne1/2$。独立 logits 中对第一个 logit 求导，在 $p=q$ 处有 $\psi(1)=1-v$、$\psi(2)=-v$。令
-\begin{equation}
- r_1=\log\frac\varepsilon v,\qquad r_2=\log\frac{1-\varepsilon}{1-v},\qquad D=r_1-r_2.
-\end{equation}
-条件中心化后，$C_qr(1)=(1-v)D$、$C_qr(2)=-vD$。单点 score 梯度 $X=\psi C_qr$ 的两个取值为 $(1-v)^2D$ 与 $v^2D$，故
-\begin{align}
- \E_qX&=v(1-v)D,\\
- \Var_qX&=v(1-v)(1-2v)^2D^2.
- \label{eq:proximal-binary-variance}
-\end{align}
-由于 $D=\log\varepsilon+O(1)$，对任意固定 $\eta>0$ 有
-\begin{equation}
- \Var_q(\eta X)=\eta^2v(1-v)(1-2v)^2[\log\varepsilon+O(1)]^2\longrightarrow\infty.
-\end{equation}
-取 $v=1/4$，前面的系数为 $3/64$。它直接适用于 PMD-Mean 起点的单点估计；BPO 起点没有 $\eta^2$ 因子。MDPO 的未中心化单点估计同样发散，因为
-\begin{equation}
- \Var_q(\psi r)=v(1-v)[(1-v)r_1+vr_2]^2\longrightarrow\infty.
-\end{equation}
-这个反例满足有界 score 和精确 baseline。$v=1/2$ 时中心化后的二元单点估计恰好是常数，因此不能用对称二元例子证明中心化梯度发散。命题不声称固定模型的实际方差一定很大；它否定的是仅凭一个固定小 $\eta$ 得到对所有 teacher 统一成立的上界。
-
-\subsection{TOP-D 的平滑与标准化边界}
-
-TOP-D\footnote{Zhengpeng Xie, Li Lyna Zhang, Zeke Xie, Mao Yang. Trust Region Policy Distillation. arXiv:2607.04751, 2026. \url{https://arxiv.org/html/2607.04751v1}. 本章的维数无关上界是利用归一化进一步推导的结果，不是原论文定理的原式。}使用 $f_\lambda(r)=\log(1-\lambda+\lambda e^r)$。它满足
-\begin{equation}
- f_\lambda\ge\log(1-\lambda),\quad
- f_\lambda'(r)=\frac{\lambda e^r}{1-\lambda+\lambda e^r},\quad
- \lim_{r\to-\infty}f_\lambda=\log(1-\lambda).
-\end{equation}
-负尾部被平滑，正尾部仍无硬上界。它在 $r=0$ 附近的斜率为 $\lambda$，与线性信号 $\lambda r$ 相同，但在极端负尾部具有不同形状。将式~\eqref{eq:proximal-binary-variance} 中的 $D$ 换成 $f_\lambda(r_1)-f_\lambda(r_2)$，方差就有有限极限。
-
-如果把条件中心化信号再除以精确标准差 $\sigma_f$，二元例子中 $\sigma_f^2=v(1-v)(f_1-f_2)^2$，于是
-\begin{equation}
- \Var_q[\psi C_qf/\sigma_f]=(1-2v)^2,
- \qquad f_1\ne f_2.
-\end{equation}
-单调的奖励变换在这个特例中被标准化完全抵消。一般词表下不一定完全抵消，但原始奖励方差趋零不意味着标准化后的梯度也趋零。论文的实际组内样本标准化还涉及相关样本、后缀 return、随机分母和 PPO ratio，不属于上述精确条件标准化模型。
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=\textwidth]{../../results/proximal-family-geometry/variance.pdf}
- \caption{信号尺度与尾部形状的区别。左图比较冻结信号；中图采用 $q=(1/4,3/4)$、$t=(\varepsilon,1-\varepsilon)$ 的精确条件中心化 score 方差；右图展示二元分布下标准化抵消差异的反例。曲线不代表实际 LLM 梯度方差。}
-\end{figure}
-
-\section{概率单纯形上的两条路径}
-
-词表维数为 $d$ 时，每个 prefix 的 token 分布位于 $\Delta^{d-1}$。算术 target 的路径为 $m_\lambda=(1-\lambda)q+\lambda t$，在概率坐标中是直线。几何 target 为 $g_\lambda\propto q^{1-\lambda}t^\lambda$，在 log-odds 坐标中满足
-\begin{equation}
- \log\frac{g_{\lambda,a}}{g_{\lambda,b}}
- =(1-\lambda)\log\frac{q_a}{q_b}+\lambda\log\frac{t_a}{t_b}.
-\end{equation}
-这分别是信息几何中的 mixture 与 exponential 路径\footnote{Shun-ichi Amari. Information Geometry and Its Applications: Convex Function and Dually Flat Manifold. ETVC 2008, LNCS 5416, 2009, pp. 75--102. \url{https://bsi-ni.brain.riken.jp/database/file/293/299.pdf}.}。当 teacher 极小概率接近单纯形边界时，几何 target 的对应坐标也可接近零，即使 $\lambda$ 固定得很小；算术 target 则保留 $(1-\lambda)q_a$ 的概率下界。
-
-两条路径的起始切向量为
-\begin{equation}
- \dot m_0=t-q,\qquad
- \dot g_{0,a}=q_a\left[\log(t_a/q_a)-\E_q\log(t/q)\right].
-\end{equation}
-高维下它们一般不共线；小系数不能纠正方向差异。只有 teacher 与 anchor 的概率比都接近一时，两条方向才一阶接近。
-
-\section{归一化幂均值及散度重心}
+\section{幂均值目标与散度重心}
 \label{sec:proximal-barycenters}
-
 \input{sections/proximal_divergence_map}
 \input{sections/proximal_barycenters}
-\input{sections/proximal_barycenter_moments}
-\input{sections/proximal_generalization}
-\input{sections/proximal_self_bounding}
-\input{sections/proximal_bpo_algorithm}
-\input{sections/proximal_teacher_center}
-\input{sections/proximal_center_extensions}
+
+\section{精确镜像下降的教师目标}
 \input{sections/proximal_md_objective}
+\input{sections/proximal_md_variants}
+
+\section{单 rollout 的 BPO 算法与内层拟合}
+\input{sections/proximal_bpo_algorithm}
+
+\section{教师监督的方差与误差控制}
+\label{sec:proximal-teacher-center}
+\input{sections/proximal_moment_bounds}
+\input{sections/proximal_barycenter_moments}
+\input{sections/proximal_teacher_center}
+\input{sections/proximal_md_noise}
+
+\section{平方根形状与最优性的判据}
+\label{sec:power-half-and-optimality}
+\input{sections/proximal_half_geometry}
+\input{sections/proximal_shape_criteria}
+\input{sections/proximal_half_conclusions}
+
+\section{中心估计与单轨迹的 action 估计}
+\label{sec:power-estimators}
+\label{sec:center-extensions}
+\input{sections/proximal_center_estimators}
+\input{sections/proximal_center_extensions}
+\input{sections/proximal_action_estimators}
+
+\section{高维动力学、投影与其他拟合目标}
+\label{sec:power-projection}
+\input{sections/proximal_probability_paths}
+\input{sections/proximal_generalization}
+\input{sections/proximal_dynamics}
+\input{sections/proximal_self_bounding}
+\input{sections/proximal_multi_teacher}
+
+\section{序列边界与可用性质}
+\label{sec:power-scope}
 \input{sections/proximal_sequence_scope}
-
-\section{通用冻结信号与维数无关的二阶矩界}
-
-上一节已给出形状相关的精确渐近阶数。本节对式~\eqref{eq:proximal-power-signal} 保留一个所有 $0<\kappa\le1$ 都适用的简便上界。
-通用 mirror 子问题取 $\eta=1$、冻结信号 $f_{\kappa,\lambda}$，则 Gibbs 解 $p\propto qe^f$ 恰好为 $m_{\kappa,\lambda}$。若再取一般 $\eta$，目标变为 $p\propto q^{1-\eta}m_{\kappa,\lambda}^\eta$；此时 $\eta$ 是额外的拟合步幅，不再与族内 $\lambda$ 混用。$\kappa=0$ 时，只需 $\eta f=\eta\lambda r$，等效于原始 mirror 系数 $\eta\lambda$。
-
-形状参数改变尾部而保持相同局部斜率：
-\begin{equation}
- f_{\kappa,\lambda}'(0)=\lambda,\quad
- f_{\kappa,\lambda}''(0)=\kappa\lambda(1-\lambda),\quad
- f_{\kappa,\lambda}\ge\frac{\log(1-\lambda)}\kappa.
-\end{equation}
-对 $\kappa>0$ 存在负下界；$\kappa\to0$ 时下界趋于负无穷，与几何信号的发散边界一致。$\lambda=1$ 则对所有 $\kappa$ 恢复 $f=r$，因此有限下界需要 $\lambda<1$。
-
-\begin{theorem}[幂均值信号的统一二阶矩界]
-\label{thm:proximal-power-variance}
-有限词表上 $q_a,t_a>0$，$0<\kappa\le1$、$0<\lambda<1$。若 score 满足 $\|\psi(a)\|\le M$，令
-\begin{equation}
- C_\star=\sup_{u>0}\frac{\log^2(1+u)}u<\infty,
- \qquad B_{\kappa,\lambda}
- =\frac{\log^2(1-\lambda)+C_\star\lambda}{\kappa^2}.
-\end{equation}
-则 $\E_qf^2\le B_{\kappa,\lambda}$，$\Var_q(\psi f)\le M^2B_{\kappa,\lambda}$，且 $\Var_q(\psi C_qf)\le M^2B_{\kappa,\lambda}$。这个上界不含词表维数，但仍假设 $M$ 是统一常数。
-\end{theorem}
-
-\begin{proof}
-记 $\rho_a=t_a/q_a$。若 $\rho_a<1$，则 $\log(1-\lambda)/\kappa\le f_a<0$，所以负区域的总二阶矩不超过 $\log^2(1-\lambda)/\kappa^2$。若 $\rho_a\ge1$，则
-\begin{equation}
- 0\le f_a\le\frac1\kappa\log(1+\lambda\rho_a^\kappa),\qquad
- f_a^2\le\frac{C_\star\lambda}{\kappa^2}\rho_a^\kappa.
-\end{equation}
-由于 $x^\kappa$ 对 $0<\kappa\le1$ 是凹函数，Jensen 不等式给出
-\begin{equation}
- \E_q\rho^\kappa\le(\E_q\rho)^\kappa=(\sum_at_a)^\kappa=1.
-\end{equation}
-合并两个区域，得到 $\E_q f^2\le B_{\kappa,\lambda}$。常数有限，因为 $\log^2(1+u)/u$ 在 $u\to0$ 与 $u\to\infty$ 都趋于零，在中间连续。最后
-\begin{equation}
- \Var_q(\psi f)\le\E_q\|\psi f\|^2\le M^2\E_qf^2,
- \qquad
- \Var_q(\psi C_qf)\le M^2\E_q(C_qf)^2\le M^2\E_qf^2.
-\end{equation}
-上述估计量使用 anchor 条件动作分布。重要性比率、未受控制的 student 残差或随机标准化分母需要额外的矩条件，不能直接用本定理覆盖完整训练更新。\hfill$\square$
-\end{proof}
-
-\section{将 target、拟合目标与估计器分别选择}
-
-幂均值族统一的是目标构造。对任一 target $m$，MDPO 可取 $\KL(p\Vert m)$，PMD-Part 可取 $\tfrac12\E_q[\log(p/m)^2]$，BPO 可取 $\tfrac12\Var_q[\log(p/m)]$。完整支持和可实现函数类下，三个损失均在 $p=m$ 取得零值，但它们的投影测度、曲率和有限步轨迹不同。PMD-Mean 的均值归一化近似不能据此获得同一 target 保证。
-
-TOP-D 的固定 advantage PPO 更新也不自动等价于这些目标。不同的 target 族、拟合损失、采样测度、中心化方式和 optimizer 可组合，但每个组合都应单独写清梯度与停止梯度。第~\ref{sec:proximal-barycenters}~节证明了精确分布更新的散度进展、escort 收缩与有限 inner 的数学条件；这些结果不自动覆盖神经网络拟合、prefix 测度变化或不同优化目标。
-
-可优先比较 $\kappa\in\{0,1/4,1/2,1\}$，固定同一 $\lambda$，使所有信号在 $r=0$ 的斜率相同。报告原始、中心化与标准化后的梯度方差，同时记录平均梯度、有效更新幅度和目标偏移；避免只比较一个会随整体尺度变化的方差数值。完整训练还需固定模型、prefix batch、inner 次数和优化器配置。
-
-图像、CSV 与核验 metadata 位于 \path{results/proximal-family-geometry/}，生成程序为 \path{experiments/analysis/proximal_family_geometry.py}。程序用精确有限词表求和验证两个端点、散度重心的一阶条件、有限差分梯度和二阶矩界；维数为 3、64、1024，随机向量的种子为 20261013。二元发散图完全由解析式生成，无 Monte Carlo 置信区间。具体版本和复现命令保存在同目录的 \texttt{summary.json}。
+\input{sections/proximal_scope_summary}
