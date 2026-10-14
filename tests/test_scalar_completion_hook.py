@@ -9,7 +9,7 @@ from training.scalar_completion_hook import audit_job, finish, open_pidfd, wait_
 
 
 def test_exit_event_is_ready_after_child_finishes():
-    child = subprocess.Popen([sys.executable, "-c", "pass"])  # noqa: S603 -- fixed local Python child
+    child = subprocess.Popen([sys.executable, "-c", "pass"])
     descriptor = open_pidfd(child.pid)
     try:
         wait_for_exit(descriptor)

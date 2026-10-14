@@ -45,7 +45,7 @@ def make_prompts(tokenizer, n: int, seed: int) -> list[str]:
     raw_path = data_dir / "wiki.valid.raw"
     if not raw_path.exists():
         url = "https://raw.githubusercontent.com/pytorch/examples/main/word_language_model/data/wikitext-2/valid.txt"
-        urllib.request.urlretrieve(url, raw_path)  # noqa: S310 - fixed trusted HTTPS source
+        urllib.request.urlretrieve(url, raw_path)
     texts = [
         line.strip()
         for line in raw_path.read_text(encoding="utf-8").splitlines()
