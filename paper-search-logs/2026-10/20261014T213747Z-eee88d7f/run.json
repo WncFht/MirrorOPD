@@ -1,0 +1,91 @@
+{
+    "schema_version": 1,
+    "run_id": "20261014T213747Z-eee88d7f",
+    "started_at": "2026-10-14T21:37:47.920778+00:00",
+    "finished_at": "2026-10-14T21:38:10.327740+00:00",
+    "duration_seconds": 22.407,
+    "status": "partial",
+    "argv": [
+        "/Users/fanghaotian/.cache/uv/environments-v2/search-papers-13d0f5a10bd424fa/bin/python",
+        "/Users/fanghaotian/.agents/skills/paper-search/scripts/search_papers.py",
+        "--queries",
+        "LLM f-divergence knowledge distillation|language model mirror descent divergence|LLM reverse KL forward KL Jensen Shannon distillation|on-policy distillation language models",
+        "--start-year",
+        "2018",
+        "--end-year",
+        "2026",
+        "--sources",
+        "arxiv",
+        "openreview",
+        "semantic_scholar",
+        "crossref",
+        "--max-papers",
+        "35",
+        "--format",
+        "markdown"
+    ],
+    "command": "/Users/fanghaotian/.cache/uv/environments-v2/search-papers-13d0f5a10bd424fa/bin/python /Users/fanghaotian/.agents/skills/paper-search/scripts/search_papers.py --queries 'LLM f-divergence knowledge distillation|language model mirror descent divergence|LLM reverse KL forward KL Jensen Shannon distillation|on-policy distillation language models' --start-year 2018 --end-year 2026 --sources arxiv openreview semantic_scholar crossref --max-papers 35 --format markdown",
+    "request": {
+        "queries": [
+            "LLM f-divergence knowledge distillation",
+            "language model mirror descent divergence",
+            "LLM reverse KL forward KL Jensen Shannon distillation",
+            "on-policy distillation language models"
+        ],
+        "start_year": 2018,
+        "end_year": 2026,
+        "min_score": null,
+        "max_papers": 35,
+        "sources": ["arxiv", "openreview", "semantic_scholar", "crossref"],
+        "parallel": true,
+        "start_date": null,
+        "end_date": null,
+        "source_options": {},
+        "enrich_citations": false
+    },
+    "sources": {
+        "arxiv": {
+            "status": "success",
+            "papers": 35,
+            "diagnostics": 0,
+            "diagnostic_details": [],
+            "duration_seconds": 13.249,
+            "worker_exit_code": 0
+        },
+        "openreview": {
+            "status": "success",
+            "papers": 35,
+            "diagnostics": 0,
+            "diagnostic_details": [],
+            "duration_seconds": 4.455,
+            "worker_exit_code": 0
+        },
+        "semantic_scholar": {
+            "status": "failed",
+            "papers": 0,
+            "diagnostics": 1,
+            "diagnostic_details": [
+                {
+                    "severity": "error",
+                    "query": "LLM f-divergence knowledge distillation",
+                    "type": "AnonymousRateLimitError",
+                    "message": "Semantic Scholar anonymous access was rate-limited (HTTP 429)."
+                }
+            ],
+            "duration_seconds": 22.266,
+            "worker_exit_code": 0
+        },
+        "crossref": {
+            "status": "success",
+            "papers": 35,
+            "diagnostics": 0,
+            "diagnostic_details": [],
+            "duration_seconds": 10.355,
+            "worker_exit_code": 0
+        }
+    },
+    "unique_papers": 102,
+    "report_path": "/Users/fanghaotian/src/mirroropd/paper-search-reports/20261015-053810-326026-llm-f-divergence-knowledge-distillation-language-model-mirror-de.md",
+    "stderr_path": "/Users/fanghaotian/src/mirroropd/paper-search-logs/2026-10/20261014T213747Z-eee88d7f/stderr.log",
+    "exit_code": 0
+}
