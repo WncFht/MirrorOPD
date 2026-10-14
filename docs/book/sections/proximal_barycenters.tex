@@ -1,4 +1,4 @@
-本节将幂均值从目标插值推进到完整的条件优化与外层动力学。所有分布位于同一个有限词表，$q_a,t_a>0$，$\sum_aq_a=\sum_at_a=1$；$\kappa\in[0,1]$、$\lambda\in(0,1)$ 固定。每个 prefix 独立推导，教师在外层更新中固定。这里的精确分布更新不包含神经网络投影和 prefix 测度变化。幂均值重心属于已有的 $\alpha$-integration 理论\footnote{Shun-ichi Amari. Integration of Stochastic Models by Minimizing $\alpha$-Divergence. Neural Computation 19(10), 2007, pp. 2780--2796. \url{https://doi.org/10.1162/neco.2007.19.10.2780}. 本节分别证明重心、自然梯度流、escort 动力学及矩阶数，不据此宣称研究新颖性。}；本节的用途是把其精确性质与 MirrorOPD 的目标、拟合误差和方差问题连接起来。
+幂均值重心的超额损失和外层动力学刻画理想条件优化。分布 $q,t$ 位于同一有限词表，严格为正且各自归一化。固定 $\kappa\in[0,1]$ 与 $\lambda\in(0,1)$。每个 prefix 独立推导，教师在外层更新中固定。这里的精确分布更新不包含神经网络投影和 prefix 测度变化。幂均值重心属于已有的 $\alpha$-integration 理论\footnote{Shun-ichi Amari. Integration of Stochastic Models by Minimizing $\alpha$-Divergence. Neural Computation 19(10), 2007, pp. 2780--2796. \url{https://doi.org/10.1162/neco.2007.19.10.2780}. 本节分别证明重心、自然梯度流、escort 动力学及矩阶数，不据此宣称研究新颖性。}；这些精确性质分别与 MirrorOPD 的目标、拟合误差和方差问题关联。
 
 \subsection{幂均值目标与两个端点}
 

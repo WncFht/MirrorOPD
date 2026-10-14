@@ -1,0 +1,158 @@
+\subsection{$f$ 散度、KL 端点与四种优化对象}
+\label{sec:proximal-divergence-map}
+
+本小节先固定散度方向，再区分定义 target 的重心目标、教师中心、BPO 拟合损失和 mirror 正则。后续全部推导在同一个有限词表上进行，分布严格为正且归一化。KL 本身属于 $f$ 散度；引入 $\kappa$ 是把 KL 端点扩展成一个散度族。这里仍使用 $\lambda$ 表示插值强度；在单教师 BPO 小节中改记为 $\eta=\lambda$。
+
+\subsubsection{生成函数与散度方向}
+
+对凸函数 $g:(0,\infty)\to\mathbb R$、$g(1)=0$，定义 Csisz\'ar $f$ 散度
+\begin{equation}
+ D_g(P\Vert Q)=\sum_a Q_a g(P_a/Q_a).
+ \label{eq:divergence-map-csiszar}
+\end{equation}
+其中采样或求和参照分布是第二个自变量 $Q$。加上任意线性项 $c(x-1)$ 不改变散度，因为 $\sum Q(P/Q-1)=0$。下面采用 $g(1)=g'(1)=0$ 的规范化生成函数；规范化不改变 KL 方向。
+
+\begin{theorem}[幂散度的 $f$ 表示、对偶与 KL 端点]
+\label{thm:divergence-map-power}
+设 $0<\kappa<1$，定义
+\begin{equation}
+ g_\kappa(x)=\frac{\kappa x+1-\kappa-x^\kappa}{\kappa(1-\kappa)}.
+ \label{eq:divergence-map-power-generator}
+\end{equation}
+则 $g_\kappa(1)=g_\kappa'(1)=0$、$g_\kappa''(x)=x^{\kappa-2}>0$，且
+\begin{equation}
+ D_{g_\kappa}(P\Vert Q)
+ =\frac{1-\sum_a P_a^\kappa Q_a^{1-\kappa}}{\kappa(1-\kappa)}
+ =D_\kappa(P\Vert Q).
+\end{equation}
+生成函数的连续端点为
+\begin{align}
+ g_0(x)&=x-1-\log x,&D_0(P\Vert Q)&=\KL(Q\Vert P),\\
+ g_1(x)&=x\log x-x+1,&D_1(P\Vert Q)&=\KL(P\Vert Q).
+ \label{eq:divergence-map-kl-endpoints}
+\end{align}
+交换分布与交换形状满足
+\begin{equation}
+ D_\kappa(P\Vert Q)=D_{1-\kappa}(Q\Vert P).
+ \label{eq:divergence-map-duality}
+\end{equation}
+采用 $H^2(P,Q)=\sum_a(\sqrt{P_a}-\sqrt{Q_a})^2$ 时，$D_{1/2}=2H^2$。因此两个 KL 方向是同一幂散度族的端点，平方根点是对称的 Hellinger 散度。
+\end{theorem}
+
+\begin{proof}
+直接微分得到 $g_\kappa'=(1-x^{\kappa-1})/(1-\kappa)$ 与 $g_\kappa''=x^{\kappa-2}$。求和时两个线性部分贡献 $\kappa\sum P+(1-\kappa)\sum Q=1$，幂部分贡献 $\sum P^\kappa Q^{1-\kappa}$，得到散度表示。严格凸性和 Jensen 不等式给出非负性；等号要求所有 $P_a/Q_a$ 相同，归一化后即 $P=Q$。
+
+令 $\ell=\log x$。当 $\kappa\to0$，$x^\kappa=1+\kappa\ell+O(\kappa^2)$，故分子为 $\kappa(x-1-\ell)+O(\kappa^2)$，分母为 $\kappa+O(\kappa^2)$。当 $\kappa=1-\epsilon\to1$，$x^\kappa=x-\epsilon x\ell+O(\epsilon^2)$，分子为 $\epsilon(x\ell-x+1)+O(\epsilon^2)$，分母为 $\epsilon+O(\epsilon^2)$。有限词表和正支持允许逐项取极限。相应求和分别是
+\begin{align}
+ \sum_aQ_a g_0(P_a/Q_a)
+ &=\sum_a(P_a-Q_a)-\sum_aQ_a\log(P_a/Q_a)=\KL(Q\Vert P),\\
+ \sum_aQ_a g_1(P_a/Q_a)
+ &=\sum_aP_a\log(P_a/Q_a)-\sum_a(P_a-Q_a)=\KL(P\Vert Q).
+\end{align}
+另外 $xg_{1-\kappa}(1/x)=g_\kappa(x)$，代入定义即得交换对偶。$\kappa=1/2$ 时
+\begin{equation}
+ D_{1/2}=4\left(1-\sum_a\sqrt{P_aQ_a}\right)
+ =2\sum_a(\sqrt{P_a}-\sqrt{Q_a})^2.
+\end{equation}
+\end{proof}
+
+这里的 reverse/forward 以 student 为相对于 teacher 的方向：$D_0(T\Vert p)=\KL(p\Vert T)$，$D_1(T\Vert p)=\KL(T\Vert p)$。同一个有序表达式 $D_g(T\Vert p)$ 可以包含这两种 KL；生成函数决定方向，不能只看括号中的分布顺序。
+
+两个端点对应的加权优化问题为
+\begin{align}
+ F_0(p)&=(1-\eta)\KL(p\Vert q)+\eta\KL(p\Vert T),\\
+ F_1(p)&=(1-\eta)\KL(q\Vert p)+\eta\KL(T\Vert p).
+ \label{eq:divergence-map-barycenter-endpoints}
+\end{align}
+它们的唯一解分别是 $m_0\propto q^{1-\eta}T^\eta$ 与 $m_1=(1-\eta)q+\eta T$。中间形状由 $(1-\eta)D_\kappa(q\Vert p)+\eta D_\kappa(T\Vert p)$ 定义，其重心和精确超额损失在后文证明。
+
+中间生成函数也不同于两个 KL 生成函数的固定线性组合。若存在仅依赖 $\kappa$ 的系数 $a,b$，使规范化生成函数满足 $g_\kappa=ag_0+bg_1$，则二阶导数强制
+\begin{equation}
+ x^{\kappa-2}=a/x^2+b/x,\qquad x^\kappa=a+bx.
+\end{equation}
+当 $0<\kappa<1$ 时左边的二阶导数为 $\kappa(\kappa-1)x^{\kappa-2}<0$，右边为零，不能对所有 $x>0$ 成立。这是通过生成函数的曲率连续改变散度，不能用 KL 权重插值替代。
+
+\subsubsection{教师中心属于另一个两参数散度族}
+
+为与单教师 BPO 保持一致，记 $\rho=T/q$、$0<\eta<1$，并定义
+\begin{equation}
+ A_{\kappa,\eta}(x)=\begin{cases}
+ \log x,&\kappa=0,\\
+ (\kappa\eta)^{-1}\log(1-\eta+\eta x^\kappa),&\kappa>0.
+ \end{cases}
+\end{equation}
+这里 $A$ 的自变量是概率比 $x$；对 log-ratio 求导时须另作链式变换。教师中心 $K_{\kappa,\eta}=-\E_qA_{\kappa,\eta}(\rho)$ 的生成函数是
+\begin{equation}
+ \phi_{\kappa,\eta}(x)=x-1-A_{\kappa,\eta}(x),\qquad
+ K_{\kappa,\eta}=D_{\phi_{\kappa,\eta}}(T\Vert q).
+ \label{eq:divergence-map-center-family}
+\end{equation}
+因为 $A'(x)=x^{\kappa-1}/(1-\eta+\eta x^\kappa)$，有
+\begin{equation}
+ \phi''(x)=\frac{x^{\kappa-2}[(1-\kappa)(1-\eta)+\eta x^\kappa]}
+ {(1-\eta+\eta x^\kappa)^2}>0.
+\end{equation}
+$\phi(1)=\phi'(1)=0$，所以它也是凸 $f$ 散度。其端点却是
+\begin{align}
+ K_{0,\eta}&=\KL(q\Vert T),\\
+ K_{1,\eta}&=\eta^{-1}\KL\big(q\Vert(1-\eta)q+\eta T\big),\\
+ K_{\kappa,1}&=\KL(q\Vert T).
+ \label{eq:divergence-map-center-endpoints}
+\end{align}
+因此 $K$ 的算术端点是对混合 target 的 reverse KL，不能把 $D_1(T\Vert q)$ 的 forward KL 端点搬到 $K_{1,\eta}$ 上。
+
+两族的准确联系出现在小插值强度极限。对固定正支持分布，令 $\eta\to0$，则
+\begin{align}
+ A_{\kappa,\eta}(x)&=\frac{x^\kappa-1}{\kappa}+O(\eta),\\
+ \phi_{\kappa,\eta}(x)&\longrightarrow
+ x-1-\frac{x^\kappa-1}{\kappa}=(1-\kappa)g_\kappa(x),\\
+ K_{\kappa,\eta}&\longrightarrow(1-\kappa)D_\kappa(T\Vert q),
+ \qquad 0<\kappa<1.
+ \label{eq:divergence-map-center-limit}
+\end{align}
+平方根点满足 $K_{1/2,\eta}\to H^2(q,T)$，而 $D_{1/2}(T\Vert q)=2H^2(q,T)$。在 $\kappa=1$ 处，令 $\delta=\rho-1$，有限词表 Taylor 展开进一步给出
+\begin{equation}
+ K_{1,\eta}=\frac\eta2\E_q\delta^2+O(\eta^2)
+ =\frac\eta2\chi^2(T\Vert q)+O(\eta^2)\longrightarrow0.
+\end{equation}
+这个零极限与 $D_1(T\Vert q)=\KL(T\Vert q)$ 一般非零形成直接区别。中心的界、方差及估计方法继续见第~\ref{sec:proximal-teacher-center}~小节。
+
+\subsubsection{BPO 是带冻结测度的拟合损失}
+
+对冻结 $q,m$，BPO population 损失是
+\begin{equation}
+ \mathcal L_{\mathrm{BPO}}(p;m,q)
+ =\frac1{2\eta}\Var_q\!\left[\log\frac p m\right].
+ \label{eq:divergence-map-bpo-loss}
+\end{equation}
+它一般不能写成仅以 $(p,m)$ 为自变量的 $D_g(p\Vert m)$。取二元词表，固定 $p,m$ 且 $\ell_1=\log(p_1/m_1)\ne\ell_2=\log(p_2/m_2)$，则
+\begin{equation}
+ \mathcal L_{\mathrm{BPO}}=\frac{q_1(1-q_1)}{2\eta}(\ell_1-\ell_2)^2.
+\end{equation}
+改变第三个分布 $q$ 会改变损失，任何固定生成函数的 $D_g(p\Vert m)$ 都不随 $q$ 改变。完整支持下，BPO 与 target 散度共享唯一零点 $p=m$，这一事实不意味着损失、曲率或有限步轨迹相同。
+
+取切向扰动 $p=m+v$、$\sum_av_a=0$，并令全部 $v_a/m_a$ 一致趋零。展开 $\log(1+v_a/m_a)$ 得到
+\begin{equation}
+ \mathcal L_{\mathrm{BPO}}(m+v;m,q)
+ =\frac1{2\eta}\left\{\sum_aq_a\frac{v_a^2}{m_a^2}
+ -\left(\sum_aq_a\frac{v_a}{m_a}\right)^2\right\}
+ +O\!\left(\max_a|v_a/m_a|^3\right).
+\end{equation}
+若 $q=m$，一次均值为 $\sum v=0$，二阶项恢复 $\sum v_a^2/m_a$ 的 Fisher 度量，另带 $1/\eta$。一般冻结 $q\ne m$ 时，BPO 的局部度量与 target 上的 Fisher 度量不同。若使用独立 logits $z$，则 $C_q\log(p/m)=C_q(z-\log m)$，全局 Hessian 为 $[\operatorname{diag}(q)-qq^\top]/\eta$，与 $\kappa$ 无关。
+
+\begin{figure}[htbp]
+ \centering
+ \begin{tikzpicture}[every node/.style={font=\small},node distance=14mm]
+  \node[draw,rounded corners,align=center,text width=47mm] (bary) {重心问题\\$(1-\eta)D_\kappa(q\Vert p)+\eta D_\kappa(T\Vert p)$};
+  \node[draw,rounded corners,align=center,text width=42mm,right=16mm of bary] (target) {归一化幂均值\\$m\propto[(1-\eta)q^\kappa+\eta T^\kappa]^{1/\kappa}$};
+  \node[draw,rounded corners,align=center,text width=47mm,below=of bary] (mirror) {熵镜像子问题\\$\max_p\{\E_pA-\eta^{-1}\KL(p\Vert q)\}$};
+  \node[draw,rounded corners,align=center,text width=42mm,below=of target] (fit) {BPO 内层拟合\\$\Var_q[\log(p/m)]/(2\eta)$};
+  \node[draw,rounded corners,align=center,text width=47mm,below=of mirror] (center) {教师中心\\$K=-\E_q A=D_\phi(T\Vert q)$};
+  \draw[->] (bary) -- node[above]{最优解} (target);
+  \draw[->] (mirror) -- node[above,sloped]{精确解} (target);
+  \draw[->] (target) -- node[right]{冻结监督} (fit);
+  \draw[->] (center) -- node[right,align=center]{条件均值\\零化系数} (fit);
+ \end{tikzpicture}
+ \caption{同一 target 的不同数学表示。$D_\kappa$ 定义重心，$D_\phi$ 给出教师中心，BPO 使用冻结 $q$ 拟合 target，KL 正则决定 entropy mirror 几何。四者共享一些恒等式，承担的优化角色不同。固定 $(\kappa,\eta)$ 时 mirror 信号还能积分成一个独立于 anchor 的新目标，见第~\ref{sec:proximal-md-objective}~小节。}
+ \label{fig:divergence-map-roles}
+\end{figure}

@@ -101,7 +101,7 @@
 \begin{equation}
  A_{\kappa,\eta}'(r)=\frac{e^{\kappa r}}{1-\eta+\eta e^{\kappa r}}.
 \end{equation}
-当 $0<\eta<1$ 时它不是恒等于一的常数，所以一般不能用一个标量重新设定步长恢复原来的 $-r$ 方向。式~\eqref{eq:power-bpo-mirror-subproblem} 是精确的 entropy mirror 子问题，但不能称为对原 $F_0$ 的同一个 MD 更新。$\eta=1$ 或 $q=T$ 是特殊退化情况。
+当 $0<\eta<1$ 时它不是恒等于一的常数，所以一般不能用一个标量重新设定步长恢复原来的 $-r$ 方向。式~\eqref{eq:power-bpo-mirror-subproblem} 是精确的 entropy mirror 子问题，但不能称为对原 $F_0$ 的同一个 MD 更新。$\eta=1$ 或 $q=T$ 是特殊退化情况。信号依赖 $\eta$ 不妨碍为每个固定 $(\kappa,\eta)$ 构造另一个不依赖 anchor 的目标；第~\ref{sec:proximal-md-objective}~小节完整证明其生成函数、归一化 JS 端点、精确 MD 解释与收敛率。
 
 可以进一步识别它的连续极限。设 $\rho=T/q$，固定正支持分布，令 $\eta\to0$，则
 \begin{align}

@@ -1,0 +1,19 @@
+{
+  "kind": "deterministic_analytic_figure",
+  "source": "experiments/plotting/plot_power_divergence_relations.py",
+  "eta": 0.3,
+  "curvature_kappa": 0.5,
+  "arithmetic_anchor": [
+    0.7,
+    0.3
+  ],
+  "curvature_log_ratio_range": [
+    -8,
+    8
+  ],
+  "teacher_probability_range": [
+    0.001,
+    0.999
+  ],
+  "interpretation": "Exact scalar formulas; no model inference, training or Monte Carlo"
+}
