@@ -191,44 +191,6 @@ def sweep_heatmaps(output, cells):
     save(fig, output, "eta-kappa-sweep")
 
 
-def update_document(repo, plan, cells, evaluations):
-    path = repo / "docs/experiments/2026-10-13-OneShot与镜像蒸馏实验报告.md"
-    source = path.read_text()
-    start, end = "<!-- power-sweep-cells:start -->", "<!-- power-sweep-cells:end -->"
-    if start not in source:
-        return
-    by_id = {c["id"]: c for c in cells}
-    rows = [
-        start,
-        "",
-        "| 实验 setting：ID；κ；η；fit / sampler | 结果 | 分析 |",
-        "| --- | --- | --- |",
-    ]
-    for config in plan:
-        c = by_id.get(config["id"])
-        shape = config.get("fit_kappa", config["kappa"]) if config["fit"] == "power" else 0
-        fit_label = f"{config['fit']}(κf={shape:.6g})" if config["fit"] != "bpo" else "bpo"
-        setting = f"{config['id']}；{config['kappa']:.6g}；{config['strength']:.6g}；{fit_label} / {config['sampler']}；N={config['updates']}, M={config['sample_count']}"
-        result, analysis = "待执行", "待结果；不作效果判断"
-        if c and c["heldout"]:
-            first, last = c["heldout"][0], c["heldout"][-1]
-            delta = last["teacher_reverse_kl"] - first["teacher_reverse_kl"]
-            result = f"{'完成' if c['completed'] else '运行中'} {last['update']}/{config['updates']}；保留 RKL={last['teacher_reverse_kl']:.6g}；Δ={delta:+.3g}"
-            analysis = "保留条件 RKL 下降" if delta < 0 else "保留条件 RKL 未下降"
-            analysis += "；单 prompt、单 seed"
-        if config["id"] in evaluations:
-            summary = evaluations[config["id"]]
-            result += "；" + "/".join(
-                f"{name}:{value['correct']}/{value['questions']}"
-                for name, value in summary.items()
-                if isinstance(value, dict) and "correct" in value and "questions" in value
-            )
-        rows.append(f"| {setting} | {result} | {analysis} |")
-    rows += ["", end]
-    a, b = source.index(start), source.index(end) + len(end)
-    path.write_text(source[:a] + "\n".join(rows) + source[b:])
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--suite", type=Path, required=True)
@@ -277,7 +239,6 @@ def main():
         "planned_training_cells": len(plan),
         "scope": "Cached model audit and training pilot are separate evidence levels; no completed GPU training is inferred from cached distributions",
     }
-    (args.output / "training-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     planned_grid(args.output)
     figures(args.output, cells)
     sweep_heatmaps(args.output, cells)
@@ -293,7 +254,8 @@ def main():
         }
         for c in canary_configs
     ]
-    update_document(repo, canary_configs + plan, canary_cells + cells, evaluations)
+    summary["canary_cells"] = canary_cells
+    (args.output / "training-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(
         json.dumps(
             {

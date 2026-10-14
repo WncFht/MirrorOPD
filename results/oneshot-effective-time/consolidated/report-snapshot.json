@@ -320,9 +320,9 @@
   },
   "fp32_partial_logged_updates": 330,
   "online_progress": {
-    "updates_completed": 59,
+    "updates_completed": 600,
     "updates_requested": 600,
-    "elapsed_seconds": 8649.135332684964,
+    "elapsed_seconds": 88109.35419836733,
     "state": "running"
   },
   "controller_state": {

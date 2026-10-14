@@ -1,0 +1,101 @@
+{
+  "figure": "paired-confirmation",
+  "caption": "600 updates; locked constant 5e-7; feedback seed442 cancelled",
+  "semantic_and_geometric_ledger": "Plot verified evidence for the unified distillation report with figure-viz.\n\nSemantic ledger: a series is one optimizer rule, rollout mode, or parent stage;\npoints are audited finite-budget aggregates, never independent repetitions.\nQuadratic/categorical panels use medians across the five original seeds;\nconfirmation points are paired response pools. The historical figure has only\nsaved table checkpoints, with no interpolation presented as measured history.\nGeometric ledger: x is the declared case, actual LR, parent update or update\ncount; y is the stated loss ratio, norm or distance. Equal categories have equal\nspacing. Log scales are used only for positive observations; horizontal unity\nis a neutral comparison reference, not an observed series. All figures use the\nskill palette, a bottom evidence caption, and the complete fv.audit pipeline.\n",
+  "values": [
+    {
+      "method": "search 1",
+      "seed": 42,
+      "geometric_loss_ratio": 1.5038277751478635,
+      "seconds_ratio": 2.6366398381099163
+    },
+    {
+      "method": "search 1",
+      "seed": 142,
+      "geometric_loss_ratio": 4.810798580836229,
+      "seconds_ratio": 2.059402730127102
+    },
+    {
+      "method": "search 1",
+      "seed": 242,
+      "geometric_loss_ratio": 1.3766582896330748,
+      "seconds_ratio": 2.2568944227990255
+    },
+    {
+      "method": "search 1",
+      "seed": 342,
+      "geometric_loss_ratio": 1.7543483151903092,
+      "seconds_ratio": 2.4956411366340014
+    },
+    {
+      "method": "search 1",
+      "seed": 442,
+      "geometric_loss_ratio": 5.130008045039711,
+      "seconds_ratio": 2.8581682886608015
+    },
+    {
+      "method": "search 4",
+      "seed": 42,
+      "geometric_loss_ratio": 1.3452806593312467,
+      "seconds_ratio": 1.3208791489453882
+    },
+    {
+      "method": "search 4",
+      "seed": 142,
+      "geometric_loss_ratio": 3.7932898362043197,
+      "seconds_ratio": 1.2638311995231828
+    },
+    {
+      "method": "search 4",
+      "seed": 242,
+      "geometric_loss_ratio": 3.496780083386591,
+      "seconds_ratio": 1.2317103316447697
+    },
+    {
+      "method": "search 4",
+      "seed": 342,
+      "geometric_loss_ratio": 2.2872079913844354,
+      "seconds_ratio": 1.2798718775802722
+    },
+    {
+      "method": "search 4",
+      "seed": 442,
+      "geometric_loss_ratio": 3.4542412292462643,
+      "seconds_ratio": 1.227146696825743
+    },
+    {
+      "method": "feedback",
+      "seed": 42,
+      "geometric_loss_ratio": 1.2125350349485733,
+      "seconds_ratio": 1.1816410102824406
+    },
+    {
+      "method": "feedback",
+      "seed": 142,
+      "geometric_loss_ratio": 1.1754834433312673,
+      "seconds_ratio": 1.1561144704543231
+    },
+    {
+      "method": "feedback",
+      "seed": 242,
+      "geometric_loss_ratio": 1.9107248077683912,
+      "seconds_ratio": 1.1504409990081568
+    },
+    {
+      "method": "feedback",
+      "seed": 342,
+      "geometric_loss_ratio": 2.2733624525981133,
+      "seconds_ratio": 1.193451976405479
+    }
+  ],
+  "source_sha256": {
+    "figure-viz/fvstyle.py": "a9670b726e4890688bad9bec5cf5f39dcc6a1604ceebff8043c26cee95726581",
+    "experiments/plotting/plot_distillation_study.py": "e8e1bf8757c8f2e96a5fdb96890487318e5cbbcfaaa9510fa034423294c1ce44",
+    "results/scalar-large/confirm-snapshot-24/runs.csv": "65df986f298f50ef18c7502d6ca1b14e889273b491c621565b61b45e38abb6a8"
+  },
+  "audit": {
+    "ran": true,
+    "errors": [],
+    "messages": []
+  }
+}

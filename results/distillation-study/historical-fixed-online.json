@@ -1,0 +1,65 @@
+{
+  "figure": "historical-fixed-online",
+  "caption": "Saved historical checkpoints; signed and absolute gaps use different definitions",
+  "semantic_and_geometric_ledger": "Plot verified evidence for the unified distillation report with figure-viz.\n\nSemantic ledger: a series is one optimizer rule, rollout mode, or parent stage;\npoints are audited finite-budget aggregates, never independent repetitions.\nQuadratic/categorical panels use medians across the five original seeds;\nconfirmation points are paired response pools. The historical figure has only\nsaved table checkpoints, with no interpolation presented as measured history.\nGeometric ledger: x is the declared case, actual LR, parent update or update\ncount; y is the stated loss ratio, norm or distance. Equal categories have equal\nspacing. Log scales are used only for positive observations; horizontal unity\nis a neutral comparison reference, not an observed series. All figures use the\nskill palette, a bottom evidence caption, and the complete fv.audit pipeline.\n",
+  "values": [
+    {
+      "mode": "frozen",
+      "step": 1,
+      "absolute": 0.236357,
+      "signed": 0.103141
+    },
+    {
+      "mode": "frozen",
+      "step": 30,
+      "absolute": 0.195393,
+      "signed": 0.095805
+    },
+    {
+      "mode": "frozen",
+      "step": 100,
+      "absolute": 0.052585,
+      "signed": 0.008415
+    },
+    {
+      "mode": "frozen",
+      "step": 200,
+      "absolute": 0.029131,
+      "signed": 0.003125
+    },
+    {
+      "mode": "frozen",
+      "step": 300,
+      "absolute": 0.022049,
+      "signed": 0.00119
+    },
+    {
+      "mode": "online",
+      "step": 30,
+      "absolute": 0.171506,
+      "signed": 0.063641
+    },
+    {
+      "mode": "online",
+      "step": 100,
+      "absolute": 0.046863,
+      "signed": 0.00578
+    },
+    {
+      "mode": "online",
+      "step": 300,
+      "absolute": 0.025069,
+      "signed": 0.001536
+    }
+  ],
+  "source_sha256": {
+    "figure-viz/fvstyle.py": "a9670b726e4890688bad9bec5cf5f39dcc6a1604ceebff8043c26cee95726581",
+    "experiments/plotting/plot_distillation_study.py": "e8e1bf8757c8f2e96a5fdb96890487318e5cbbcfaaa9510fa034423294c1ce44",
+    "data/distillation-report-sources-20261015/2026-10-13-OneShot\u4e0e\u955c\u50cf\u84b8\u998f\u5b9e\u9a8c\u62a5\u544a.md.gz": "c16a243087af705448a6288375e8f22cf7e18243c05e392b3de36e28236da261"
+  },
+  "audit": {
+    "ran": true,
+    "errors": [],
+    "messages": []
+  }
+}

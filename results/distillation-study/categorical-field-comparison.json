@@ -1,0 +1,89 @@
+{
+  "figure": "categorical-field-comparison",
+  "caption": "Five-seed medians; L: linear, N: nonlinear; fixed actions; update 500",
+  "semantic_and_geometric_ledger": "Plot verified evidence for the unified distillation report with figure-viz.\n\nSemantic ledger: a series is one optimizer rule, rollout mode, or parent stage;\npoints are audited finite-budget aggregates, never independent repetitions.\nQuadratic/categorical panels use medians across the five original seeds;\nconfirmation points are paired response pools. The historical figure has only\nsaved table checkpoints, with no interpolation presented as measured history.\nGeometric ledger: x is the declared case, actual LR, parent update or update\ncount; y is the stated loss ratio, norm or distance. Equal categories have equal\nspacing. Log scales are used only for positive observations; horizontal unity\nis a neutral comparison reference, not an observed series. All figures use the\nskill palette, a bottom evidence caption, and the complete fv.audit pipeline.\n",
+  "values": [
+    {
+      "case": [
+        "sampled",
+        1,
+        32
+      ],
+      "constant": 0.5857840822126797,
+      "search": 0.588321209762986
+    },
+    {
+      "case": [
+        "sampled",
+        8,
+        32
+      ],
+      "constant": 0.0001677908704841707,
+      "search": 0.0003730938478455848
+    },
+    {
+      "case": [
+        "sampled",
+        8,
+        8
+      ],
+      "constant": 0.07705237052674617,
+      "search": 0.423075460891878
+    },
+    {
+      "case": [
+        "sampled",
+        8,
+        1
+      ],
+      "constant": 0.14389939054480513,
+      "search": 0.7202387570769951
+    },
+    {
+      "case": [
+        "nonlinear",
+        1,
+        32
+      ],
+      "constant": 0.6234206562078101,
+      "search": 0.6295466633723249
+    },
+    {
+      "case": [
+        "nonlinear",
+        8,
+        32
+      ],
+      "constant": 0.050767599622849505,
+      "search": 0.09808784606500223
+    },
+    {
+      "case": [
+        "nonlinear",
+        8,
+        8
+      ],
+      "constant": 0.28699916503871614,
+      "search": 0.837559823640544
+    },
+    {
+      "case": [
+        "nonlinear",
+        8,
+        1
+      ],
+      "constant": 0.3722177453582513,
+      "search": 1.1555997378114167
+    }
+  ],
+  "source_sha256": {
+    "figure-viz/fvstyle.py": "a9670b726e4890688bad9bec5cf5f39dcc6a1604ceebff8043c26cee95726581",
+    "experiments/plotting/plot_distillation_study.py": "e8e1bf8757c8f2e96a5fdb96890487318e5cbbcfaaa9510fa034423294c1ce44",
+    "results/scalar-schedule/categorical-aggregate.csv": "215908435fd6324fe232953ac87542b57b5a9e406532230b46c2266559372191"
+  },
+  "audit": {
+    "ran": true,
+    "errors": [],
+    "messages": []
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "figure": "center-target-bias",
+  "caption": "40960 fixed prefixes; exact Gibbs target; means, not parameter gradients",
+  "semantic_and_geometric_ledger": "Plot verified evidence for the unified distillation report with figure-viz.\n\nSemantic ledger: a series is one optimizer rule, rollout mode, or parent stage;\npoints are audited finite-budget aggregates, never independent repetitions.\nQuadratic/categorical panels use medians across the five original seeds;\nconfirmation points are paired response pools. The historical figure has only\nsaved table checkpoints, with no interpolation presented as measured history.\nGeometric ledger: x is the declared case, actual LR, parent update or update\ncount; y is the stated loss ratio, norm or distance. Equal categories have equal\nspacing. Log scales are used only for positive observations; horizontal unity\nis a neutral comparison reference, not an observed series. All figures use the\nskill palette, a bottom evidence caption, and the complete fv.audit pipeline.\n",
+  "values": {
+    "seed": 1042,
+    "prefixes": 40960.0,
+    "eta": 0.3,
+    "reference": "exact Gibbs target; logit field bias, not neural parameter gradient",
+    "means": {
+      "initial_bpo": 0.0311339186044928,
+      "k16_head_mass": 0.9971932223139766,
+      "k16_teacher_kl_missing": 0.0016681838901929868,
+      "k16_target_residual_bias_sq": 2.4776100476643164e-06,
+      "k16_target_logit_field_norm": 9.765456251353518e-05,
+      "k64_head_mass": 0.999581706624196,
+      "k64_teacher_kl_missing": 0.0001870016559964714,
+      "k64_target_residual_bias_sq": 6.182572240727198e-08,
+      "k64_target_logit_field_norm": 1.1128595210336399e-05
+    }
+  },
+  "source_sha256": {
+    "figure-viz/fvstyle.py": "a9670b726e4890688bad9bec5cf5f39dcc6a1604ceebff8043c26cee95726581",
+    "experiments/plotting/plot_distillation_study.py": "e8e1bf8757c8f2e96a5fdb96890487318e5cbbcfaaa9510fa034423294c1ce44",
+    "results/scalar-large/center-bias-s1042.json": "055c4d7b04f7e20f6c7d9a0244d938904a1aa71b3e4089ef686d88e2a6ace088"
+  },
+  "audit": {
+    "ran": true,
+    "errors": [],
+    "messages": []
+  }
+}

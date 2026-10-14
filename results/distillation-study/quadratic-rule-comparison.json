@@ -1,0 +1,341 @@
+{
+  "figure": "quadratic-rule-comparison",
+  "caption": "Five-seed medians; gaps: not all reached; A: aligned, R: rotated",
+  "semantic_and_geometric_ledger": "Plot verified evidence for the unified distillation report with figure-viz.\n\nSemantic ledger: a series is one optimizer rule, rollout mode, or parent stage;\npoints are audited finite-budget aggregates, never independent repetitions.\nQuadratic/categorical panels use medians across the five original seeds;\nconfirmation points are paired response pools. The historical figure has only\nsaved table checkpoints, with no interpolation presented as measured history.\nGeometric ledger: x is the declared case, actual LR, parent update or update\ncount; y is the stated loss ratio, norm or distance. Equal categories have equal\nspacing. Log scales are used only for positive observations; horizontal unity\nis a neutral comparison reference, not an observed series. All figures use the\nskill palette, a bottom evidence caption, and the complete fv.audit pipeline.\n",
+  "values": [
+    {
+      "optimizer": "gd",
+      "case": [
+        10,
+        false
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 7.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        10,
+        true
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 7.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        1000,
+        false
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 432.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        1000,
+        true
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 387.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        100000,
+        false
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        100000,
+        true
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        10,
+        false
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 5.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        10,
+        true
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 5.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        1000,
+        false
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 350.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        1000,
+        true
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 362.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        100000,
+        false
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        100000,
+        true
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        10,
+        false
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 136.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        10,
+        true
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 135.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        1000,
+        false
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 341.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        1000,
+        true
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 308.0
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        100000,
+        false
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "gd",
+      "case": [
+        100000,
+        true
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        10,
+        false
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 34.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        10,
+        true
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 34.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        1000,
+        false
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 39.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        1000,
+        true
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 93.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        100000,
+        false
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": 307.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        100000,
+        true
+      ],
+      "method": "constant",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        10,
+        false
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 45.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        10,
+        true
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 46.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        1000,
+        false
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 48.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        1000,
+        true
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 123.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        100000,
+        false
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": 316.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        100000,
+        true
+      ],
+      "method": "search",
+      "median_steps_all_five_successful": null
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        10,
+        false
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 157.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        10,
+        true
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 157.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        1000,
+        false
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 161.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        1000,
+        true
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 166.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        100000,
+        false
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": 343.0
+    },
+    {
+      "optimizer": "adam",
+      "case": [
+        100000,
+        true
+      ],
+      "method": "feedback",
+      "median_steps_all_five_successful": null
+    }
+  ],
+  "source_sha256": {
+    "figure-viz/fvstyle.py": "a9670b726e4890688bad9bec5cf5f39dcc6a1604ceebff8043c26cee95726581",
+    "experiments/plotting/plot_distillation_study.py": "e8e1bf8757c8f2e96a5fdb96890487318e5cbbcfaaa9510fa034423294c1ce44",
+    "results/scalar-schedule/quadratic-aggregate.csv": "1f89e51314bcd6f0b0204769d9aa03d8b7afa8e14337bcf4cf0b1af507137f16"
+  },
+  "audit": {
+    "ran": true,
+    "errors": [],
+    "messages": []
+  }
+}

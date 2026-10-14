@@ -1,0 +1,153 @@
+{
+  "figure": "same-state-horizon",
+  "caption": "Same parameters and Adam moments within each parent; 64 full trajectories",
+  "semantic_and_geometric_ledger": "Plot verified evidence for the unified distillation report with figure-viz.\n\nSemantic ledger: a series is one optimizer rule, rollout mode, or parent stage;\npoints are audited finite-budget aggregates, never independent repetitions.\nQuadratic/categorical panels use medians across the five original seeds;\nconfirmation points are paired response pools. The historical figure has only\nsaved table checkpoints, with no interpolation presented as measured history.\nGeometric ledger: x is the declared case, actual LR, parent update or update\ncount; y is the stated loss ratio, norm or distance. Equal categories have equal\nspacing. Log scales are used only for positive observations; horizontal unity\nis a neutral comparison reference, not an observed series. All figures use the\nskill palette, a bottom evidence caption, and the complete fv.audit pipeline.\n",
+  "values": [
+    {
+      "parent_update": 40,
+      "initial_bpo_range": [
+        0.006676316427970836,
+        0.006676316427970836
+      ],
+      "initial_grad_norm_range": [
+        0.048072539269924164,
+        0.048072539269924164
+      ],
+      "one_step_gain_percent": [
+        [
+          0.125,
+          0.08132643074176826
+        ],
+        [
+          0.25,
+          0.1606076841778603
+        ],
+        [
+          0.5,
+          0.3135143922337269
+        ],
+        [
+          1.0,
+          0.5964897654744727
+        ],
+        [
+          2.0,
+          1.0719063778053095
+        ],
+        [
+          4.0,
+          1.6604290237663188
+        ],
+        [
+          8.0,
+          1.3936766283447422
+        ],
+        [
+          16.0,
+          -4.891609801448915
+        ]
+      ]
+    },
+    {
+      "parent_update": 120,
+      "initial_bpo_range": [
+        0.005538609070642098,
+        0.005538609070642098
+      ],
+      "initial_grad_norm_range": [
+        0.0012702920939773321,
+        0.0012702920939773321
+      ],
+      "one_step_gain_percent": [
+        [
+          0.125,
+          0.010412697671569049
+        ],
+        [
+          0.25,
+          0.02424117054208308
+        ],
+        [
+          0.5,
+          0.051195982730645184
+        ],
+        [
+          1.0,
+          0.10347119768153723
+        ],
+        [
+          2.0,
+          0.20600948309060785
+        ],
+        [
+          4.0,
+          0.41033429014726286
+        ],
+        [
+          8.0,
+          0.8133915354519572
+        ],
+        [
+          16.0,
+          1.5935320706547573
+        ]
+      ]
+    },
+    {
+      "parent_update": 240,
+      "initial_bpo_range": [
+        0.0051228627384418465,
+        0.0051228627384418465
+      ],
+      "initial_grad_norm_range": [
+        0.00034393678652122617,
+        0.00034393678652122617
+      ],
+      "one_step_gain_percent": [
+        [
+          0.125,
+          0.003077363813608347
+        ],
+        [
+          0.25,
+          0.008132869672139442
+        ],
+        [
+          0.5,
+          0.019786892691064928
+        ],
+        [
+          1.0,
+          0.041351589587601545
+        ],
+        [
+          2.0,
+          0.08433979072659525
+        ],
+        [
+          4.0,
+          0.16908302321216873
+        ],
+        [
+          8.0,
+          0.3379377453892274
+        ],
+        [
+          16.0,
+          0.6707923432584306
+        ]
+      ]
+    }
+  ],
+  "source_sha256": {
+    "figure-viz/fvstyle.py": "a9670b726e4890688bad9bec5cf5f39dcc6a1604ceebff8043c26cee95726581",
+    "experiments/plotting/plot_distillation_study.py": "e8e1bf8757c8f2e96a5fdb96890487318e5cbbcfaaa9510fa034423294c1ce44",
+    "results/scalar-large/fullpool-lr-study/fullstage/figures/same-state-lr-response.json": "cebc0407005c40f82e8cf41d92d9a33f8cbc0482efe74485be3993b26bdc2693",
+    "results/scalar-large/fullpool-lr-study/fullstage/runs.csv": "b7ad908737cdaf35e866f218c9e3521d79c8702dd88e1d8ce7b208e9ae0803b4"
+  },
+  "audit": {
+    "ran": true,
+    "errors": [],
+    "messages": []
+  }
+}

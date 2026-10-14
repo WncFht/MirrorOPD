@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-15",
+  "purpose": "Exact source snapshots before the authorized unified rewrite; historical data, not maintained reports",
+  "sources": [
+    {
+      "source": "docs/experiments/2026-10-13-OneShot与镜像蒸馏实验报告.md",
+      "archive": "data/distillation-report-sources-20261015/2026-10-13-OneShot与镜像蒸馏实验报告.md.gz",
+      "sha256": "8eb978f858224e62b8f0e95b05ea1b3f30a29d1c15355b985b6b3aecb4a4ff6c",
+      "archive_sha256": "c16a243087af705448a6288375e8f22cf7e18243c05e392b3de36e28236da261",
+      "bytes": 103653,
+      "restore_path": "runs/report-merge-20261015/sources/2026-10-13-OneShot与镜像蒸馏实验报告.md"
+    },
+    {
+      "source": "docs/experiments/2026-10-13-BPO标量调度实验总报告.md",
+      "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO标量调度实验总报告.md.gz",
+      "sha256": "f77b242441bdd9a0000625fd8c5be118ee9bd5f0ae7ce8284f6d0538660fa810",
+      "archive_sha256": "135d5fb3c81f3630d670cbd7b3dce447842f45f974c023d63efca6afa622956d",
+      "bytes": 83033,
+      "restore_path": "runs/report-merge-20261015/sources/2026-10-13-BPO标量调度实验总报告.md"
+    }
+  ]
+}

@@ -905,6 +905,18 @@
             "archive": "data/power-center-extensions-20261014/prefix-audit.csv.gz",
             "bytes": 71200,
             "sha256": "93414e6bde86afa270d57cbaad2ce2de62bd00377896241a282a892d90c3c615"
+        },
+        {
+            "path": "runs/report-merge-20261015/sources/2026-10-13-OneShot与镜像蒸馏实验报告.md",
+            "archive": "data/distillation-report-sources-20261015/2026-10-13-OneShot与镜像蒸馏实验报告.md.gz",
+            "sha256": "8eb978f858224e62b8f0e95b05ea1b3f30a29d1c15355b985b6b3aecb4a4ff6c",
+            "bytes": 103653
+        },
+        {
+            "path": "runs/report-merge-20261015/sources/2026-10-13-BPO标量调度实验总报告.md",
+            "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO标量调度实验总报告.md.gz",
+            "sha256": "f77b242441bdd9a0000625fd8c5be118ee9bd5f0ae7ce8284f6d0538660fa810",
+            "bytes": 83033
         }
     ]
 }
