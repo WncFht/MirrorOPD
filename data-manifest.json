@@ -1091,6 +1091,48 @@
             "archive": "data/refactor-20261015/legacy-source.tar.gz",
             "bytes": 1607680,
             "sha256": "43e2c4ec61940f4254b6b3f4af796953f538f5118d0578c7810296ca651b9e78"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/000.bin",
+            "archive": "data/refactor-20261015/benchmark-input-000.bin.gz",
+            "bytes": 10485760,
+            "sha256": "ec607566364ba8d385f8711b876ec426e07ea591163a95a433500ae73028c88a"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/001.bin",
+            "archive": "data/refactor-20261015/benchmark-input-001.bin.gz",
+            "bytes": 10485760,
+            "sha256": "2ec5588e3d6f6252eb1911bb0cee8264cbdbed4a7dad87100ecc57455308d410"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/002.bin",
+            "archive": "data/refactor-20261015/benchmark-input-002.bin.gz",
+            "bytes": 10485760,
+            "sha256": "51c149d471378d95f3648e4ed2075e088d6b7e8df8d6115f927d615fd9d1834b"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/003.bin",
+            "archive": "data/refactor-20261015/benchmark-input-003.bin.gz",
+            "bytes": 10485760,
+            "sha256": "9be5b48d52fd55052ff07582dd76803ccdffea01b791adea71608bb9a6aa9cfc"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/004.bin",
+            "archive": "data/refactor-20261015/benchmark-input-004.bin.gz",
+            "bytes": 10485760,
+            "sha256": "53d598c895d76e0a52de6682dd7cbf4d72d10867a57b91588422b75126426f0e"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/005.bin",
+            "archive": "data/refactor-20261015/benchmark-input-005.bin.gz",
+            "bytes": 10485760,
+            "sha256": "c4b0ddbf384a6dd9282bdfebf4ce604348d88dcd03a1bc2c6c62206427029549"
+        },
+        {
+            "path": "runs/refactor-20261015/benchmark-parts/006.bin",
+            "archive": "data/refactor-20261015/benchmark-input-006.bin.gz",
+            "bytes": 5034935,
+            "sha256": "548d33936b99bce398e4c8395f470165306c1aa1fd7e60c4672cee048d47e21c"
         }
     ]
 }

@@ -4,7 +4,9 @@ import argparse
 import gc
 import json
 import os
+import re
 import statistics
+import tempfile
 from pathlib import Path
 
 import torch
@@ -14,6 +16,41 @@ from mirroropd.core.config import CacheContext, Estimator, Objective, Signal
 from mirroropd.core.objectives import compute_loss
 from mirroropd.runtime.artifacts import atomic_json, file_digest
 from mirroropd.runtime.reservation import GpuReservation
+
+
+def input_fixture(path):
+    path = Path(path)
+    if path.suffix != ".json":
+        return path
+    manifest = json.loads(path.read_text())
+    digest = manifest["sha256"]
+    if manifest.get("schema_version") != 2 or not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise ValueError("Invalid benchmark fixture manifest")
+    directory = Path.home() / ".cache/mirroropd/benchmark-fixtures"
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / (digest + ".pt")
+    if destination.exists():
+        if file_digest(destination) != digest:
+            raise ValueError("Existing benchmark fixture differs")
+        return destination
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=directory, delete=False) as output:
+            temporary = Path(output.name)
+            for part in manifest["parts"]:
+                source = (path.parent / part["path"]).resolve()
+                if source.stat().st_size != part["bytes"] or file_digest(source) != part["sha256"]:
+                    raise ValueError("Benchmark fixture part differs from its manifest")
+                with source.open("rb") as stream:
+                    for chunk in iter(lambda: stream.read(8 * 1024**2), b""):
+                        output.write(chunk)
+        if temporary.stat().st_size != manifest["bytes"] or file_digest(temporary) != digest:
+            raise ValueError("Assembled benchmark fixture differs")
+        temporary.replace(destination)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    return destination
 
 
 def benchmark(inputs, objective, prefixes, *, iterations):
@@ -134,13 +171,14 @@ def main():
         raise RuntimeError("Benchmark must start before any CUDA context is initialized")
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    inputs = torch.load(args.inputs, map_location="cpu", weights_only=True)
+    fixture = input_fixture(args.inputs)
+    inputs = torch.load(fixture, map_location="cpu", weights_only=True)
     baseline = json.loads(args.baseline.read_text()) if args.baseline else []
     records = []
     metadata = {
         "schema_version": 2,
         "scope": "Objective forward/backward including selected diagnostic level; not whole-model throughput",
-        "input_sha256": file_digest(args.inputs),
+        "input_sha256": file_digest(fixture),
         "warmup_iterations": 3,
         "measured_iterations": args.iterations,
         "torch": torch.__version__,
