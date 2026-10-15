@@ -1,0 +1,25 @@
+{
+  "packages": {
+    "torch": "2.7.1+cu126",
+    "transformers": "4.57.6",
+    "vllm": "0.10.0+cu126",
+    "ray": "2.59.0",
+    "flash-attn": "2.8.3.post1",
+    "numpy": "1.26.4"
+  },
+  "torch_cuda": "12.6",
+  "physical_gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "gpu_name": "NVIDIA H800",
+  "backend_base": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+  "memory_total_mib": [
+    81559,
+    81559,
+    81559,
+    81559
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "weight_versions": [
+    0,
+    1
+  ],
+  "rollout_actor_probability_max_differences": [
+    0.029977738857269287,
+    0.030484437942504883
+  ],
+  "scope": "Version freshness and numerical engine differences are separate checks"
+}

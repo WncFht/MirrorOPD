@@ -1027,8 +1027,38 @@
             "sha256": "044ce7cfc10cb016a291478f181a35a7921681fa49e7c423ca7dd4744056dbc0"
         },
         {
+            "path": "runs/power-implementation-20261015/backend-patches/verl-bpo-full_vocab.patch",
+            "archive": "data/power-implementation-20261015/verl-bpo-full_vocab/backend.patch.gz",
+            "bytes": 76713,
+            "sha256": "4a1a9cbbfa1ecb653a3d1c177fe1cd8200e98a0f94af5906a4bb534079847c83"
+        },
+        {
             "path": "runs/power-implementation-20261015/source-archives/verl-bpo-full_vocab.tar",
             "archive": "data/power-implementation-20261015/verl-bpo-full_vocab/source.tar.gz",
+            "bytes": 174080,
+            "sha256": "1abd522be2c8ccba0592b9b4afa3e3a0ebafd35cbc3a105ed9c7883dd9e04fb4"
+        },
+        {
+            "path": "runs/power-implementation-20261015/backend-patches/verl-bpo-topj_tail.patch",
+            "archive": "data/power-implementation-20261015/verl-bpo-topj_tail/backend.patch.gz",
+            "bytes": 76713,
+            "sha256": "4a1a9cbbfa1ecb653a3d1c177fe1cd8200e98a0f94af5906a4bb534079847c83"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/verl-bpo-topj_tail.tar",
+            "archive": "data/power-implementation-20261015/verl-bpo-topj_tail/source.tar.gz",
+            "bytes": 174080,
+            "sha256": "1abd522be2c8ccba0592b9b4afa3e3a0ebafd35cbc3a105ed9c7883dd9e04fb4"
+        },
+        {
+            "path": "runs/power-implementation-20261015/backend-patches/verl-mdpo-full_vocab.patch",
+            "archive": "data/power-implementation-20261015/verl-mdpo-full_vocab/backend.patch.gz",
+            "bytes": 76713,
+            "sha256": "4a1a9cbbfa1ecb653a3d1c177fe1cd8200e98a0f94af5906a4bb534079847c83"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/verl-mdpo-full_vocab.tar",
+            "archive": "data/power-implementation-20261015/verl-mdpo-full_vocab/source.tar.gz",
             "bytes": 174080,
             "sha256": "1abd522be2c8ccba0592b9b4afa3e3a0ebafd35cbc3a105ed9c7883dd9e04fb4"
         }

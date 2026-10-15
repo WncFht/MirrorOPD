@@ -8,6 +8,7 @@ experiments/**/cache/
 results/**/*.json
 results/**/resolved-config.yaml
 data/**/*.json
+data/**/resolved-config.yaml
 runs/
 package-lock.json
 docs/book-old/

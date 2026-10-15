@@ -1,0 +1,1 @@
+{"state": "completed", "phase": "verl", "method": "mdpo", "estimator": "full_vocab", "outer_windows": 2, "optimizer_updates": 4, "response_budget": 32, "scope": "Short fresh-rollout integration check, not mathematical task evaluation"}

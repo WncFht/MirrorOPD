@@ -58,8 +58,11 @@ def production_fields(logits, cache, config):
 def load_data(args, config, rank):
     source = args.cache / f"rank-{rank}.pt"
     manifest = json.loads((args.cache / "manifest.json").read_text())
+    digest = hashlib.sha256()
     with source.open("rb") as stream:
-        cache_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
+        for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+            digest.update(block)
+    cache_sha256 = digest.hexdigest()
     if cache_sha256 != manifest["rank_sha256"][str(rank)]:
         raise RuntimeError("Historical model cache does not match its manifest")
     artifact = torch.load(source, map_location="cpu", weights_only=False)

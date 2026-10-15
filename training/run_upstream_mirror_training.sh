@@ -36,6 +36,8 @@ export MALLOC_ARENA_MAX=2
 export MALLOC_TRIM_THRESHOLD_=131072
 export TOKENIZERS_PARALLELISM=false
 export MIRROR_ALIGN_ROLLOUT_VOCAB=1
+# The patched asynchronous rollout server uses the v1 engine.
+export VLLM_USE_V1="${VLLM_USE_V1:-1}"
 export WANDB_MODE="${WANDB_MODE:-disabled}"
 export WANDB_DIR="${WANDB_DIR:-$repo_root/runs/wandb}"
 export WANDB_CACHE_DIR="${WANDB_CACHE_DIR:-$HOME/.cache/wandb}"

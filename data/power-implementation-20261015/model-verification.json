@@ -1,0 +1,24 @@
+[
+  {
+    "repo": "hbx/JustRL-DeepSeek-1.5B",
+    "revision": "0637e4096c789c67f9eecbe8355e0bdeddede1c2",
+    "verified_weight_files": [
+      {
+        "file": "model.safetensors",
+        "bytes": 3554214752,
+        "sha256": "1bedcdf243c4e2e633fa04c05617809cf6a1bbc1a07221609035f6347efecffb"
+      }
+    ]
+  },
+  {
+    "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "revision": "ad9f0ae0864d7fbcd1cd905e3c6c5b069cc8b562",
+    "verified_weight_files": [
+      {
+        "file": "model.safetensors",
+        "bytes": 3554214621,
+        "sha256": "58858233513d76b8703e72eed6ce16807b523328188e13329257fb9594462945"
+      }
+    ]
+  }
+]

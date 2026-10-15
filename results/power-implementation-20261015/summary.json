@@ -791,6 +791,158 @@
       "checkpoint_roundtrip": []
     }
   ],
+  "native": [
+    {
+      "id": "verl-bpo-full_vocab",
+      "completion": {
+        "state": "completed",
+        "phase": "verl",
+        "method": "bpo",
+        "estimator": "full_vocab",
+        "outer_windows": 2,
+        "optimizer_updates": 4,
+        "response_budget": 32,
+        "scope": "Short fresh-rollout integration check, not mathematical task evaluation"
+      },
+      "windows": [
+        {
+          "outer": 0,
+          "teacher_center": 0.02027464357293826,
+          "student_centers": [
+            5.195650049083511e-09,
+            0.00022972343479085743
+          ],
+          "valid_tokens": [
+            128.0,
+            128.0
+          ]
+        },
+        {
+          "outer": 1,
+          "teacher_center": 0.022709655608556867,
+          "student_centers": [
+            9.601131112368932e-09,
+            0.0002007677453389721
+          ],
+          "valid_tokens": [
+            128.0,
+            128.0
+          ]
+        }
+      ],
+      "rollout": {
+        "weight_versions": [
+          0,
+          1
+        ],
+        "rollout_actor_probability_max_differences": [
+          0.029977738857269287,
+          0.030136704444885254
+        ],
+        "scope": "Version freshness and numerical engine differences are separate checks"
+      }
+    },
+    {
+      "id": "verl-bpo-topj_tail",
+      "completion": {
+        "state": "completed",
+        "phase": "verl",
+        "method": "bpo",
+        "estimator": "topj_tail",
+        "outer_windows": 2,
+        "optimizer_updates": 4,
+        "response_budget": 32,
+        "scope": "Short fresh-rollout integration check, not mathematical task evaluation"
+      },
+      "windows": [
+        {
+          "outer": 0,
+          "teacher_center": 0.020269359534881876,
+          "student_centers": [
+            5.195553638853354e-09,
+            0.00024464656487729994
+          ],
+          "valid_tokens": [
+            128.0,
+            128.0
+          ]
+        },
+        {
+          "outer": 1,
+          "teacher_center": 0.024353283635583367,
+          "student_centers": [
+            1.1353856663765634e-08,
+            0.00021390246364597385
+          ],
+          "valid_tokens": [
+            128.0,
+            128.0
+          ]
+        }
+      ],
+      "rollout": {
+        "weight_versions": [
+          0,
+          1
+        ],
+        "rollout_actor_probability_max_differences": [
+          0.029977738857269287,
+          0.02856341004371643
+        ],
+        "scope": "Version freshness and numerical engine differences are separate checks"
+      }
+    },
+    {
+      "id": "verl-mdpo-full_vocab",
+      "completion": {
+        "state": "completed",
+        "phase": "verl",
+        "method": "mdpo",
+        "estimator": "full_vocab",
+        "outer_windows": 2,
+        "optimizer_updates": 4,
+        "response_budget": 32,
+        "scope": "Short fresh-rollout integration check, not mathematical task evaluation"
+      },
+      "windows": [
+        {
+          "outer": 0,
+          "teacher_center": 0.02027464357293826,
+          "student_centers": [
+            5.195650049083511e-09,
+            0.00018006921436827372
+          ],
+          "valid_tokens": [
+            128.0,
+            128.0
+          ]
+        },
+        {
+          "outer": 1,
+          "teacher_center": 0.025024994528733857,
+          "student_centers": [
+            1.4605183715210579e-08,
+            0.00028262497484187084
+          ],
+          "valid_tokens": [
+            128.0,
+            128.0
+          ]
+        }
+      ],
+      "rollout": {
+        "weight_versions": [
+          0,
+          1
+        ],
+        "rollout_actor_probability_max_differences": [
+          0.029977738857269287,
+          0.030484437942504883
+        ],
+        "scope": "Version freshness and numerical engine differences are separate checks"
+      }
+    }
+  ],
   "provenance": [
     {
       "path": "data/power-implementation-20261015/bpo-full-lifecycle/anchor-refresh.jsonl",
@@ -2225,8 +2377,8 @@
       "sha256": "308f91866411e31fb9bae8760654cbacb74fc12b4ef3793b5b09e6cfb833cee7"
     },
     {
-      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/backend.patch",
-      "sha256": "4a1a9cbbfa1ecb653a3d1c177fe1cd8200e98a0f94af5906a4bb534079847c83"
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/backend.patch.gz",
+      "sha256": "ff9d8cc1fc196f86c46dd438e491587e40846ac4b5ad8cad53ab7d86cc09f5a3"
     },
     {
       "path": "data/power-implementation-20261015/verl-bpo-full_vocab/command.json",
@@ -2249,8 +2401,80 @@
       "sha256": "3d46c35d9325f7d98b67c2c09b152028ef229a0be11d106c6ba8ce9ab4fe36e3"
     },
     {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/resolved-config.yaml",
+      "sha256": "ba37ffbb979d7423901e695920e383dff1f31e6a511e1b41cd52f58d3e139ff6"
+    },
+    {
       "path": "data/power-implementation-20261015/verl-bpo-full_vocab/source.tar.gz",
       "sha256": "732b732ab19dc6b046423f37bc649885edfe5fd3a19b8e2a1d8ab975af980ce9"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/rollout-validation.json",
+      "sha256": "4908c7b4b310818a9c22c641f1d213f269e422d27ea0aea36cf2cfb2a434702d"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/backend.patch.gz",
+      "sha256": "ff9d8cc1fc196f86c46dd438e491587e40846ac4b5ad8cad53ab7d86cc09f5a3"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/command.json",
+      "sha256": "1584631c3748f65512a1892211fe0aa28469cae1226bfdfcaf28cf3189950012"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/completion.jsonl",
+      "sha256": "9539c693a9e8f023c9d6b10d39fec9ace690dbb62f8e29bd9683c5330950d2d5"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/exit.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/host-memory.jsonl",
+      "sha256": "f9bac0fc01bf675a1818967322f56c890643e8f02eb9867ce6c978ef61530aa9"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/inner.jsonl",
+      "sha256": "768b8c14ed8f308f5a8982e344aeced3d8b6bb95075a47c9049f5c273c33f88d"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/source.tar.gz",
+      "sha256": "732b732ab19dc6b046423f37bc649885edfe5fd3a19b8e2a1d8ab975af980ce9"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-topj_tail/rollout-validation.json",
+      "sha256": "38f9bfe23b873b400c7eb2ff514a41482cc93c407b7db7a64aba6f3d90fbaf03"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/backend.patch.gz",
+      "sha256": "ff9d8cc1fc196f86c46dd438e491587e40846ac4b5ad8cad53ab7d86cc09f5a3"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/command.json",
+      "sha256": "34455c24ff314867b20190bb1cdf07fd181d55350b22a4a959fb604a188e6c94"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/completion.jsonl",
+      "sha256": "4be223c881d7faafcac58c7652a80144a28ada19a3225286c2db11ad5b26952e"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/exit.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/host-memory.jsonl",
+      "sha256": "4d3250fd52131c1aa7fb09f079170b356379b7a360e8f94513f1ee2f0013f6eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/inner.jsonl",
+      "sha256": "4d30df647944c867e098e1e5d1f4fa7ebc9370581d2a13cece584d8940acaffe"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/source.tar.gz",
+      "sha256": "732b732ab19dc6b046423f37bc649885edfe5fd3a19b8e2a1d8ab975af980ce9"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-mdpo-full_vocab/rollout-validation.json",
+      "sha256": "5257676548a9d15773250b47c231c9876a1ea0adec44016ee12a1fb4cfcb3deb"
     }
   ],
   "scope": "Fixed-parameter correctness and estimator comparison; single t22 prompt; no task-score or optimal-hyperparameter claim",
@@ -2286,6 +2510,32 @@
       "max_absolute_error": 5.551115123125783e-16,
       "kappa": 0.5,
       "eta": 0.3
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/oneshot-effective-time-20261012/seed-42/manifest.json",
+      "sha256": "815c953456a857d82603914594aa24353c6f41571df3a5fd59b3d673f97185c8"
+    },
+    {
+      "path": "../models/manifest.json",
+      "sha256": "c343f0b004bc919da277720dfa2d8fed5b5aec9b75812ac8a10fc581b5d25cd2"
+    },
+    {
+      "path": "../MD-OPD/data/math/DAPO-oneshot/t22.parquet",
+      "sha256": "af78c1b70ab81e6b242ba0faeaf8efa6c744320567205f1c285fa922e95b0653"
+    },
+    {
+      "path": "data/power-implementation-20261015/preregistration.json",
+      "sha256": "539e5b3305d7facbbe6826882d4dc6148867b30ea7f8d6ac5a399e8212fc7469"
+    },
+    {
+      "path": "data/power-implementation-20261015/runtime.json",
+      "sha256": "a3aa380561fb4e5f017e0420242430fb108a64ba1011445deb8ea969db0957ef"
+    },
+    {
+      "path": "data/power-implementation-20261015/model-verification.json",
+      "sha256": "afec03764a9fea0a7ffae4faad7a4c78f3cd59b3d3831003cd4d58d9a957753c"
     }
   ]
 }

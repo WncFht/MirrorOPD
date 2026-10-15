@@ -54,7 +54,7 @@ distillation.distillation_loss.mirror_center_mode=full_vocab \
 distillation.distillation_loss.mirror_action_mode=full_vocab
 ```
 
-固定监督四卡验证入口为 `PYTHONPATH=.:src python -m training.power_implementation_suite --phase audit`，随后依次运行 `canary`、`gradient`、`train`、`lifecycle`。模型、冻结轨迹、前缀切分及结果范围见报告；BPO 二样本恒等式及相关训练入口已退出当前实现。
+固定监督四卡验证入口为 `PYTHONPATH=.:src python -m training.power_implementation_suite --phase audit`，随后依次运行 `canary`、`gradient`、`precision`、`train`、`lifecycle`。模型、冻结轨迹、前缀切分及结果范围见报告；BPO 二样本恒等式及相关训练入口已退出当前实现。原生入口默认使用 vLLM V1 与短磁盘临时目录，保留显式环境变量覆盖。
 
 当前数学实验使用 DeepSeek-R1-Distill-Qwen-1.5B 学生和 JustRL-DeepSeek-1.5B 教师，在四张 H800 上比较 OPD、MDPO、BPO。设置、日志审计和图表见[数学三算法主报告](docs/experiments/2026-10-12-数学三算法日志审计与学习效率比较.md)，字段、事件轴和公式见[统一指标规范](docs/operations/2026-10-12-蒸馏统一日志与评测指标规范.md)。
 

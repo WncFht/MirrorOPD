@@ -2,10 +2,11 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from training.gpu_exclusive import GpuGroupLease, process_identity
-from training.oneshot_suite import run_worker
+from training.oneshot_suite import run_worker, write_status
 
 
 def plan(phase):
@@ -157,6 +158,13 @@ def main():
                 cache,
                 worker_entry="training/power_implementation_worker.py",
             )
+        write_status(
+            suite / "status.json",
+            state="phase_completed",
+            phase=args.phase,
+            completed=[config["id"] for config in configurations],
+            pid=os.getpid(),
+        )
     finally:
         lease.release()
 

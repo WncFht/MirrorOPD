@@ -5,6 +5,7 @@ import gzip
 import hashlib
 import io
 import json
+import re
 import shutil
 import tarfile
 from pathlib import Path
@@ -72,6 +73,32 @@ def main():
         destination.mkdir(exist_ok=True)
         for path in sorted(directory.iterdir()):
             if path.suffix not in (".json", ".jsonl", ".patch", ".yaml"):
+                continue
+            if path.suffix == ".patch":
+                raw = path.read_bytes()
+                target = destination / (path.name + ".gz")
+                with (
+                    target.open("wb") as stream,
+                    gzip.GzipFile(filename="", fileobj=stream, mode="wb", mtime=0) as compressed,
+                ):
+                    compressed.write(raw)
+                if gzip.decompress(target.read_bytes()) != raw:
+                    raise RuntimeError("Backend patch archive failed its bytewise roundtrip")
+                (destination / path.name).unlink(missing_ok=True)
+                archives.append(
+                    {
+                        "path": f"runs/power-implementation-20261015/backend-patches/{directory.name}.patch",
+                        "archive": str(target.relative_to(root)),
+                        "bytes": len(raw),
+                        "sha256": hashlib.sha256(raw).hexdigest(),
+                    }
+                )
+                provenance.append(
+                    {
+                        "path": str(target.relative_to(root)),
+                        "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+                    }
+                )
                 continue
             target = destination / path.name
             shutil.copy2(path, target)
@@ -176,8 +203,47 @@ def main():
             )
         elif completion["phase"] == "verl":
             rows = read_rows(directory / "inner.jsonl")
+            console = (directory / "console.log").read_text(errors="replace")
+            versions = [
+                int(value)
+                for value in re.findall(r"mirror/rollout_weight_version:([0-9]+)", console)
+            ]
+            if versions != [0, 1]:
+                raise RuntimeError("Native rollout weight versions are not the two fresh policies")
+            probability_differences = [
+                float(value)
+                for value in re.findall(r"training/rollout_probs_diff_max:([0-9.eE+-]+)", console)
+            ]
+            rollout_audit = {
+                "weight_versions": versions,
+                "rollout_actor_probability_max_differences": probability_differences,
+                "scope": "Version freshness and numerical engine differences are separate checks",
+            }
+            target = destination / "rollout-validation.json"
+            target.write_text(json.dumps(rollout_audit, indent=2) + "\n")
+            provenance.append(
+                {
+                    "path": str(target.relative_to(root)),
+                    "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+                }
+            )
             if len(rows) != 4:
                 raise RuntimeError("Native verl optimizer ledger is incomplete")
+            for row in rows:
+                metrics = row["metrics"]
+                if completion["estimator"] == "full_vocab":
+                    if (
+                        "mirror/full_loss/mean" not in metrics
+                        or "mirror/importance_ratio/mean" in metrics
+                    ):
+                        raise RuntimeError(
+                            "Native complete-action mode returned sampled diagnostics"
+                        )
+                elif (
+                    "mirror/score_coefficient/mean" not in metrics
+                    or "mirror/full_loss/mean" in metrics
+                ):
+                    raise RuntimeError("Native sampled mode did not execute its score path")
             windows = []
             for outer in (0, 1):
                 part = [row for row in rows if row["outer_call"] == outer]
@@ -195,7 +261,14 @@ def main():
                         "valid_tokens": [row["metrics"]["mirror/valid_tokens"] for row in part],
                     }
                 )
-            native.append({"id": directory.name, "completion": completion, "windows": windows})
+            native.append(
+                {
+                    "id": directory.name,
+                    "completion": completion,
+                    "windows": windows,
+                    "rollout": rollout_audit,
+                }
+            )
     audit = []
     if records:
         for method, topj in sorted({(r["method"], r["topj"]) for r in records}):
@@ -214,7 +287,7 @@ def main():
                 item[field + "_per_prefix"] = sum(r[field] for r in part) / weight
             audit.append(item)
         with (output / "cache-audit.csv").open("w") as stream:
-            writer = csv.DictWriter(stream, fieldnames=list(audit[0]))
+            writer = csv.DictWriter(stream, fieldnames=list(audit[0]), lineterminator="\n")
             writer.writeheader()
             writer.writerows(audit)
     result = {
@@ -228,11 +301,22 @@ def main():
         "provenance": provenance,
         "scope": "Fixed-parameter correctness and estimator comparison; single t22 prompt; no task-score or optimal-hyperparameter claim",
         "cpu_gradients": cpu_gradient_records(),
+        "inputs": [
+            {"path": name, "sha256": hashlib.sha256((root / name).read_bytes()).hexdigest()}
+            for name in (
+                "data/oneshot-effective-time-20261012/seed-42/manifest.json",
+                "../models/manifest.json",
+                "../MD-OPD/data/math/DAPO-oneshot/t22.parquet",
+                "data/power-implementation-20261015/preregistration.json",
+                "data/power-implementation-20261015/runtime.json",
+                "data/power-implementation-20261015/model-verification.json",
+            )
+        ],
     }
     (output / "summary.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
     manifest_path = root / "data-manifest.json"
     manifest = json.loads(manifest_path.read_text())
-    prefix = "runs/power-implementation-20261015/source-archives/"
+    prefix = "runs/power-implementation-20261015/"
     manifest["files"] = [
         entry for entry in manifest["files"] if not entry["path"].startswith(prefix)
     ] + archives

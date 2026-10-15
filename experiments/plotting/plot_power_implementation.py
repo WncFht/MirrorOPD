@@ -25,7 +25,8 @@ def save(fig, output, name, caption):
     problems = fv.audit(fig)
     (output / f"{name}-audit.json").write_text(json.dumps(problems, indent=2, default=str) + "\n")
     for extension in ("png", "pdf"):
-        fig.savefig(output / f"{name}.{extension}", dpi=180, bbox_inches="tight")
+        metadata = {"CreationDate": None, "ModDate": None} if extension == "pdf" else {}
+        fig.savefig(output / f"{name}.{extension}", dpi=180, bbox_inches="tight", metadata=metadata)
     plt.close(fig)
 
 
@@ -35,6 +36,45 @@ def main():
     summary = json.loads((output / "summary.json").read_text())
     fv.apply_rc("paper")
     colors = fv.series_colors("paper", 3)
+    if summary.get("native"):
+        native = summary["native"]
+        fig, axes = plt.subplots(2, len(native), figsize=(7.2, 4.5), sharey="row", squeeze=False)
+        fig.subplots_adjust(bottom=0.24, top=0.90, left=0.11, right=0.98, hspace=0.70, wspace=0.55)
+        handle = None
+        for column, case in enumerate(native):
+            directory = root / "data/power-implementation-20261015" / case["id"]
+            records = [
+                json.loads(line) for line in (directory / "inner.jsonl").read_text().splitlines()
+            ]
+            for row, (field, label) in enumerate(
+                (("teacher_center", "Teacher center"), ("student_center", "Student center"))
+            ):
+                ax = axes[row, column]
+                for outer in (0, 1):
+                    part = [r for r in records if r["outer_call"] == outer]
+                    (line,) = ax.plot(
+                        [2 * outer + r["inner_step"] for r in part],
+                        [r["metrics"][f"mirror/{field}/mean"] for r in part],
+                        marker="o",
+                        color=colors[0],
+                        label="Measured" if outer == 0 else "_nolegend_",
+                    )
+                    handle = line
+                ax.axvline(1.5, color=fv.NEUTRALS["baseline"], linestyle="--", linewidth=0.8)
+                ax.set_xticks(range(4), ["0:0", "0:1", "1:0", "1:1"], fontsize=7)
+                ax.set(xlabel="Outer:inner", ylabel=label)
+            method = case["completion"]["method"].upper()
+            estimator = "J16" if case["completion"]["estimator"] == "topj_tail" else "Full"
+            axes[0, column].set_title(f"{method} / {estimator}")
+        fig.legend(
+            [handle], ["Measured"], loc="lower center", bbox_to_anchor=(0.5, 0.09), fontsize=7
+        )
+        save(
+            fig,
+            output,
+            "native-cache-lifecycle",
+            "Fresh rollouts; teacher centers remain frozen within each outer window",
+        )
     if summary.get("cpu_gradients"):
         fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.9), sharey=True)
         fig.subplots_adjust(bottom=0.25, top=0.88, left=0.12, right=0.97, wspace=0.35)

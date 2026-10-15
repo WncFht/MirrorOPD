@@ -9,7 +9,7 @@ import subprocess
 from pathlib import Path
 
 from training.gpu_exclusive import gpu_processes
-from training.oneshot_suite import snapshot_sources
+from training.oneshot_suite import snapshot_sources, write_status
 from training.power_implementation_suite import acquire_lease
 
 
@@ -159,6 +159,15 @@ def main():
                 }
             )
             + "\n"
+        )
+        write_status(
+            suite / "status.json",
+            state="native_completed",
+            phase="verl",
+            run=output.name,
+            outer_windows=2,
+            optimizer_updates=len(rows),
+            pid=os.getpid(),
         )
     finally:
         lease.release()

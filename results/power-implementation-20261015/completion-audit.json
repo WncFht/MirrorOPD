@@ -1,0 +1,43 @@
+{
+  "status": "verified",
+  "core_commit": "44c5580",
+  "requirements": [
+    {
+      "requirement": "Retire pairwise BPO route from active code, plans and book",
+      "verified": true
+    },
+    {
+      "requirement": "Power-shaped BPO/MDPO with grouped-tail, exact centers and complete action integration",
+      "verified": true,
+      "evidence": "tests/test_power_production.py; three native runs with matching current core hashes"
+    },
+    {
+      "requirement": "Progressive real-model experiments restricted to physical GPUs 0--3",
+      "verified": true,
+      "training_arms": 17,
+      "main_optimizer_updates": 120,
+      "native_runs": 3,
+      "native_updates": 12
+    },
+    {
+      "requirement": "Six experiments with derivation, setting, results, analysis, conclusion and figures",
+      "verified": true
+    },
+    {
+      "requirement": "Source, input and result provenance and exact archive replay",
+      "verified": true,
+      "archives": 24
+    },
+    {
+      "requirement": "Preserve five pre-existing result edits; release validation GPU resources",
+      "verified": true
+    },
+    {
+      "requirement": "Defer kappa and eta optimization",
+      "verified": true,
+      "kappa": 0.5,
+      "eta": 0.3
+    }
+  ],
+  "known_scope": "Single t22 prompt, fixed-prefix fitting and short native integration; grouped-tail and cross-engine probability approximation explicitly documented"
+}
