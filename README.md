@@ -4,7 +4,7 @@ MirrorOPD 0.2 提供 on-policy、MDPO、BPO 的幂均值蒸馏内核、严格配
 
 ## 使用
 
-使用 Python3.12 独立环境安装本包，GPU 软件栈另按[已记录环境](environments)核对：
+使用 Python3.12 独立环境安装本包；GPU 软件栈还需核对 PyTorch、vLLM 与驱动的兼容性：
 
 ```bash
 python -m pip install -e '.[data,test,math]'
