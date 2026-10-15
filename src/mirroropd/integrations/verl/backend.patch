@@ -1,0 +1,1138 @@
+diff --git a/verl/verl/experimental/agent_loop/agent_loop.py b/verl/verl/experimental/agent_loop/agent_loop.py
+index 24d305f..b1455d5 100644
+--- a/verl/verl/experimental/agent_loop/agent_loop.py
++++ b/verl/verl/experimental/agent_loop/agent_loop.py
+@@ -47,8 +47,13 @@ from transformers import AutoProcessor, AutoTokenizer
+ 
+ from verl.experimental.agent_loop.utils import resolve_config_path
+ from verl.protocol import DataProto
++from mirroropd.integrations.verl.evaluation import response_tokens as effective_response_length
++from mirroropd.integrations.verl.evaluation import prompt_tokens as effective_prompt_length
++from mirroropd.integrations.verl.evaluation import phase_data as phase_data_config
++from mirroropd.runtime.evaluation import request_seed
+ from verl.tools.tool_registry import load_all_tools
+ from verl.trainer.distillation import is_distillation_enabled
++from mirroropd.integrations.verl.bridge import is_enabled as is_mirror_enabled
+ from verl.utils.chat_template import apply_chat_template, initialize_system_prompt
+ from verl.utils.config import omega_conf_to_dataclass
+ from verl.utils.dataset.rl_dataset import RLHFDataset, get_dataset_class
+@@ -342,7 +347,7 @@ class AgentLoopBase(ABC):
+         # ``_pad_token_ids`` (and downstream ``torch.cat``) can rely on uniform shapes.
+         # Multimodal prompts cannot be sliced here because placeholder tokens must remain
+         # aligned 1:1 with ``multi_modal_inputs`` features, so we fail loudly instead.
+-        prompt_length = self.rollout_config.prompt_length
++        prompt_length = self.data_config.get("max_prompt_length", self.rollout_config.prompt_length)
+         if len(prompt_ids) > prompt_length:
+             if images or videos or audios:
+                 raise ValueError(
+@@ -427,7 +432,9 @@ class AgentLoopWorker:
+         self.mm_processor_kwargs = config.data.get("mm_processor_kwargs", {})
+ 
+         # Online policy distillation
+-        self.distillation_enabled = is_distillation_enabled(config.distillation)
++        self.distillation_enabled = is_distillation_enabled(config.distillation) and not is_mirror_enabled(
++            config.distillation
++        )
+         if self.distillation_enabled:
+             from verl.experimental.teacher_loop.teacher_manager import AsyncTeacherLLMServerManager
+ 
+@@ -516,6 +523,7 @@ class AgentLoopWorker:
+             sampling_params["top_p"] = config.val_kwargs.top_p
+             sampling_params["top_k"] = config.val_kwargs.top_k
+             sampling_params["temperature"] = config.val_kwargs.temperature
++            sampling_params["max_tokens"] = effective_response_length(config, True)
+ 
+         # by default, we assume it's a single turn agent
+         if "agent_name" not in batch.non_tensor_batch:
+@@ -555,6 +563,12 @@ class AgentLoopWorker:
+             trace_this_sample = i in traced_indices
+             kwargs = {k: v[i] for k, v in batch.non_tensor_batch.items() if k != "__do_sample__"}
+             sample_sampling_params = dict(sampling_params)
++            if is_mirror_enabled(self.config.distillation):
++                sample_sampling_params["seed"] = request_seed(
++                    int(config.val_kwargs.seed if validate else config.seed),
++                    "evaluation" if validate else "train",
++                    int(batch.meta_info["mirror_generation_version"]),
++                    str(batch.non_tensor_batch["uid"][i]), int(batch.non_tensor_batch["sample_index"][i]))
+             if not validate and per_sample_do_sample is not None and not bool(per_sample_do_sample[i]):
+                 apply_greedy_sampling_params(sample_sampling_params)
+             tasks.append(
+@@ -598,7 +612,7 @@ class AgentLoopWorker:
+                 tokenizer=self.tokenizer,
+                 processor=self.processor,
+                 dataset_cls=self.dataset_cls,
+-                data_config=DictConfigWrap(self.config.data),
++                data_config=DictConfigWrap(phase_data_config(self.config.data, trajectory["validate"])),
+                 tools=ToolListWrap(self.tools),
+             )
+             output: AgentLoopOutput = await agent_loop.run(sampling_params, **kwargs)
+@@ -630,6 +644,7 @@ class AgentLoopWorker:
+     async def _agent_loop_postprocess(self, output, validate, **kwargs) -> _InternalAgentLoopOutput:
+         """Perform post-processing operations on the output of each individual agent loop."""
+         output.extra_fields["raw_prompt"] = kwargs["raw_prompt"]
++        response_length = effective_response_length(self.rollout_config, validate)
+ 
+         # Some AgentLoop may have already computed the reward score, e.g SWE-agent.
+ 
+@@ -654,28 +669,28 @@ class AgentLoopWorker:
+         # TODO(wuxibin): remove padding and use tensordict.
+         prompt_output = self._pad_token_ids(
+             output.prompt_ids,
+-            max_length=self.rollout_config.prompt_length,
++            max_length=effective_prompt_length(self.config.data, validate),
+             padding_side="left",
+             return_attention_mask=True,
+         )
+ 
+         response_output = self._pad_token_ids(
+             output.response_ids,
+-            max_length=self.rollout_config.response_length,
++            max_length=response_length,
+             padding_side="right",
+             return_attention_mask=True,
+         )
+ 
+         response_mask_output = self._pad_token_ids(
+             output.response_mask,
+-            max_length=self.rollout_config.response_length,
++            max_length=response_length,
+             padding_side="right",
+             return_attention_mask=False,
+         )
+ 
+         response_logprobs = None
+         if output.response_logprobs is not None:
+-            pad_size = self.rollout_config.response_length - len(output.response_logprobs)
++            pad_size = response_length - len(output.response_logprobs)
+             response_logprobs = torch.tensor(output.response_logprobs + [0.0] * pad_size).unsqueeze(0)
+ 
+         response_mask = response_mask_output["input_ids"] * response_output["attention_mask"]
+@@ -991,11 +1006,15 @@ class AgentLoopWorker:
+         if self.reward_loop_worker_handles is None and input_non_tensor_batch:
+             non_tensor_batch.update(input_non_tensor_batch)
+ 
++        non_tensor_batch["generation_finish_reason"] = np.array(
++            [item.extra_fields.get("generation_finish_reason") for item in inputs], dtype=object
++        )
++
+         # add reward_extra_info to non_tensor_batch
+         reward_extra_infos = [input.extra_fields.get("reward_extra_info", {}) for input in inputs]
+-        reward_extra_keys = list(reward_extra_infos[0].keys())
++        reward_extra_keys = sorted(set(key for info in reward_extra_infos for key in info))
+         for key in reward_extra_keys:
+-            non_tensor_batch[key] = np.array([info[key] for info in reward_extra_infos])
++            non_tensor_batch[key] = np.array([info.get(key) for info in reward_extra_infos], dtype=object)
+ 
+         # Add multi_modal_inputs to non_tensor_batch if any samples have them
+         multi_modal_inputs_list = [input.multi_modal_inputs for input in inputs]
+diff --git a/verl/verl/experimental/agent_loop/single_turn_agent_loop.py b/verl/verl/experimental/agent_loop/single_turn_agent_loop.py
+index 5324c69..31bdac0 100644
+--- a/verl/verl/experimental/agent_loop/single_turn_agent_loop.py
++++ b/verl/verl/experimental/agent_loop/single_turn_agent_loop.py
+@@ -37,6 +37,8 @@ class SingleTurnAgentLoop(AgentLoopBase):
+     @rollout_trace_op
+     async def run(self, sampling_params: dict[str, Any], **kwargs) -> AgentLoopOutput:
+         messages = list(kwargs["raw_prompt"])
++        # Match MD-OPD: read before the server consumes max_tokens.
++        response_length = int(sampling_params.get("max_tokens") or self.response_length)
+ 
+         # 1. extract multimodal inputs from messages
+         multi_modal_data = await self.process_multi_modal_info(messages)
+@@ -72,11 +74,11 @@ class SingleTurnAgentLoop(AgentLoopBase):
+ 
+         output: AgentLoopOutput = AgentLoopOutput(
+             prompt_ids=prompt_ids,
+-            response_ids=output.token_ids[: self.response_length],
+-            response_mask=response_mask[: self.response_length],
+-            response_logprobs=output.log_probs[: self.response_length] if output.log_probs else None,
++            response_ids=output.token_ids[: response_length],
++            response_mask=response_mask[: response_length],
++            response_logprobs=output.log_probs[: response_length] if output.log_probs else None,
+             routed_experts=(
+-                output.routed_experts[: len(prompt_ids) + self.response_length]
++                output.routed_experts[: len(prompt_ids) + response_length]
+                 if output.routed_experts is not None
+                 else None
+             ),
+diff --git a/verl/verl/models/transformers/monkey_patch.py b/verl/verl/models/transformers/monkey_patch.py
+index 7a5d6f0..26527fd 100644
+--- a/verl/verl/models/transformers/monkey_patch.py
++++ b/verl/verl/models/transformers/monkey_patch.py
+@@ -327,13 +327,11 @@ def apply_monkey_patch(
+     """Replace _flash_attention_forward to _ulysses_flash_attention_forward"""
+     module = sys.modules[model.__module__]
+ 
+-    try:
+-        num_attention_heads, num_key_value_heads = model.config.num_attention_heads, model.config.num_key_value_heads
+-    except AttributeError:
+-        num_attention_heads, num_key_value_heads = (
+-            model.config.text_config.num_attention_heads,
+-            model.config.text_config.num_key_value_heads,
+-        )
++    # GPT-NeoX uses ordinary multi-head attention and has no separate KV-head
++    # attribute. Multimodal models keep attention metadata in text_config.
++    attention_config = getattr(model.config, "text_config", model.config)
++    num_attention_heads = attention_config.num_attention_heads
++    num_key_value_heads = getattr(attention_config, "num_key_value_heads", num_attention_heads)
+ 
+     assert num_attention_heads % ulysses_sp_size == 0, (
+         f"num_attention_heads {num_attention_heads} must be divisible by ulysses_sp_size {ulysses_sp_size}"
+diff --git a/verl/verl/trainer/config/distillation/distillation.yaml b/verl/verl/trainer/config/distillation/distillation.yaml
+index a2f1871..5a65225 100644
+--- a/verl/verl/trainer/config/distillation/distillation.yaml
++++ b/verl/verl/trainer/config/distillation/distillation.yaml
+@@ -13,6 +13,9 @@ defaults:
+ # Whether to enable distillation.
+ enabled: false
+ 
++# Versioned first-party objective and model identities; native teacher pool stays empty.
++mirror: null
++
+ # distillation loss config
+ distillation_loss:
+ 
+@@ -111,4 +114,4 @@ teacher_models:
+       temperature: ${oc.select:actor_rollout_ref.rollout.temperature}
+ 
+ # Key to route examples to the appropriate teacher model in multi-teacher setups. Should correspond to a field in the data proto, e.g., task.
+-teacher_key: data_source
+\ No newline at end of file
++teacher_key: data_source
+diff --git a/verl/verl/trainer/config/rollout/rollout.yaml b/verl/verl/trainer/config/rollout/rollout.yaml
+index 1bb0f71..c5db2de 100644
+--- a/verl/verl/trainer/config/rollout/rollout.yaml
++++ b/verl/verl/trainer/config/rollout/rollout.yaml
+@@ -142,6 +142,9 @@ engine_kwargs:
+ # Sampling parameters used during validation.
+ val_kwargs:
+ 
++  # Validation-only response budget; null retains the training budget.
++  max_tokens: null
++
+   # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+   _target_: verl.workers.config.SamplingConfig
+ 
+diff --git a/verl/verl/trainer/distillation/losses.py b/verl/verl/trainer/distillation/losses.py
+index 1fb42a8..6f25d5a 100644
+--- a/verl/verl/trainer/distillation/losses.py
++++ b/verl/verl/trainer/distillation/losses.py
+@@ -21,6 +21,10 @@ from tensordict import TensorDict
+ from verl.base_config import BaseConfig
+ from verl.trainer.ppo.core_algos import agg_loss, get_policy_loss_fn, kl_penalty
+ from verl.utils.metric import AggregationType, Metric
++from verl.utils.ulysses import get_ulysses_sequence_parallel_world_size
++from mirroropd.integrations.verl import bridge as mirror
++
++MIRROR_API_VERSION = 2
+ from verl.workers.config import ActorConfig, DistillationConfig, DistillationLossConfig
+ from verl.workers.utils.losses import ppo_loss
+ from verl.workers.utils.padding import no_padding_2_padding
+@@ -36,6 +40,10 @@ DistillationLossFn = Callable[
+ ]
+ 
+ 
++
++
++
++
+ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
+     """Check if distillation is enabled based on the provided configuration."""
+     if config is None:
+@@ -44,6 +52,11 @@ def is_distillation_enabled(config: Optional[DistillationConfig]) -> bool:
+ 
+ 
+ 
++
++
++
++
++
+ @dataclass
+ class DistillationLossSettings(BaseConfig):
+     """
+@@ -156,6 +169,10 @@ def compute_topk_loss(
+ 
+             loss_mode = distillation_config.distillation_loss.loss_mode
+ 
++            if loss_mode == "mirror":
++                return mirror.loss_callback(student_logits, data, distillation_config, data_format,
++                                            sequence_parallel_size=get_ulysses_sequence_parallel_world_size())
++
+             if loss_mode == "reverse_kl_topk":
+                 distillation_loss_fn = fsdp_losses.compute_reverse_kl_topk
+             elif loss_mode in ("mopd_topk", "mopd_reverse_kl_topk"):
+@@ -241,7 +258,15 @@ def distillation_ppo_loss(
+ 
+     # Called as final policy loss
+     distillation_loss_config = distillation_config.distillation_loss
++    if mirror.is_enabled(distillation_config):
++        mirror.prepare_global_batch(config, data)
+     distill_loss, distill_metrics = distillation_loss(config, distillation_config, model_output, data)
++    if mirror.is_enabled(distillation_config):
++        # MirrorOPD already supplies the complete score surrogate. Evaluating
++        # a discarded PPO objective still imposes unrelated advantage/ratio
++        # requirements and can produce misleading metrics or numerical errors.
++        distill_metrics["distillation/loss"] = Metric(value=distill_loss, aggregation=AggregationType.SUM)
++        return distill_loss, distill_metrics
+     policy_loss, policy_metrics = ppo_loss(config, model_output, data, dp_group)
+     if not distillation_loss_config.use_task_rewards:
+         policy_loss = 0.0
+@@ -327,6 +352,14 @@ def distillation_loss(
+ 
+ 
+ 
++@register_distillation_loss(
++    DistillationLossSettings(names=["mirror"], use_topk=True, use_sampled_logprob=True)
++)
++def compute_mirror_loss(config, distillation_config, model_output, data):
++    return mirror.aggregate_loss(model_output, data)
++
++
++
+ @register_distillation_loss(
+     DistillationLossSettings(names=["kl", "k1", "abs", "mse", "k2", "low_var_kl", "k3"], use_estimator=True)
+ )  # type: ignore[arg-type]
+diff --git a/verl/verl/trainer/main_ppo.py b/verl/verl/trainer/main_ppo.py
+index 8f6cd41..8818e79 100644
+--- a/verl/verl/trainer/main_ppo.py
++++ b/verl/verl/trainer/main_ppo.py
+@@ -25,6 +25,7 @@ from omegaconf import OmegaConf
+ from verl.experimental.reward_loop import migrate_legacy_reward_impl
+ from verl.trainer.constants_ppo import get_ppo_ray_runtime_env
+ from verl.trainer.distillation import is_distillation_enabled
++from mirroropd.integrations.verl.bridge import is_enabled
+ from verl.trainer.ppo.ray_trainer import RayPPOTrainer
+ from verl.trainer.ppo.utils import need_critic, need_reference_policy
+ from verl.utils.config import validate_config
+@@ -135,7 +136,9 @@ class TaskRunner:
+         lora_rank = config.actor_rollout_ref.model.get("lora", {}).get("rank", 0)
+         if lora_rank <= 0:
+             lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
+-        ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
++        ref_in_actor = not is_enabled(config.get("distillation")) and (
++            lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
++        )
+         # Ref policy is fused into ActorRolloutRefWorker unless LoRA is used with a dedicated ref model.
+         if need_reference_policy(config) and not ref_in_actor:
+             role = Role.ActorRolloutRef
+@@ -176,7 +179,7 @@ class TaskRunner:
+             config.reward.reward_model.n_gpus_per_node = config.trainer.n_gpus_per_node
+ 
+         distillation_config = config.get("distillation")
+-        if is_distillation_enabled(distillation_config):
++        if is_distillation_enabled(distillation_config) and not is_enabled(distillation_config):
+             if distillation_config.n_gpus_per_node <= 0:
+                 raise ValueError("config.distillation.n_gpus_per_node must be greater than 0")
+             if distillation_config.nnodes <= 0:
+@@ -206,7 +209,9 @@ class TaskRunner:
+         """Add teacher model worker if enabled."""
+         from verl.trainer.ppo.ray_trainer import Role
+ 
+-        if is_distillation_enabled(config.get("distillation")):
++        if is_distillation_enabled(config.get("distillation")) and not is_enabled(
++            config.get("distillation")
++        ):
+             # we do not use teacher model workers, so we only register teacher model in resource pool
+             # without registering a teacher model worker in role-worker mapping
+             self.mapping[Role.TeacherModel] = "teacher_pool"
+diff --git a/verl/verl/trainer/ppo/ray_trainer.py b/verl/verl/trainer/ppo/ray_trainer.py
+index d1eaa7b..cb98e66 100644
+--- a/verl/verl/trainer/ppo/ray_trainer.py
++++ b/verl/verl/trainer/ppo/ray_trainer.py
+@@ -38,7 +38,9 @@ from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
+ from verl.single_controller.ray import RayClassWithInitArgs, RayWorkerGroup, ResourcePoolManager
+ from verl.single_controller.ray.base import create_colocated_worker_cls
+ from verl.trainer.config import AlgoConfig
+-from verl.trainer.distillation.losses import is_distillation_enabled
++from verl.trainer.distillation.losses import (
++    is_distillation_enabled,
++)
+ from verl.trainer.ppo import core_algos
+ from verl.trainer.ppo.core_algos import AdvantageEstimator, agg_loss
+ from verl.trainer.ppo.metric_utils import (
+@@ -63,6 +65,11 @@ from verl.utils.config import omega_conf_to_dataclass
+ from verl.utils.debug import marked_timer
+ from verl.utils.import_utils import deprecated, load_class_from_fqn
+ from verl.utils.metric import reduce_metrics
++from mirroropd.integrations.verl import bridge as mirror
++from mirroropd.integrations.verl import evaluation as mirror_evaluation
++from mirroropd.runtime.events import phase
++from mirroropd.runtime.evaluation import question_uids
++from mirroropd.integrations.verl.evaluation import phase_data as phase_data_config
+ from verl.utils.py_functional import rename_dict
+ from verl.utils.rollout_skip import RolloutSkip
+ from verl.utils.seqlen_balancing import calculate_workload, get_seqlen_balanced_partitions, log_seqlen_unbalance
+@@ -329,6 +336,29 @@ class RayPPOTrainer:
+         self.tokenizer = tokenizer
+         self.processor = processor
+         self.config = config
++        self.mirror_enabled = mirror.is_enabled(config.get("distillation"))
++        if self.mirror_enabled:
++            rollout = config.actor_rollout_ref.rollout
++            if not (0 < rollout.temperature < float("inf")):
++                raise ValueError("MirrorOPD requires a finite positive rollout temperature")
++            if rollout.top_p != 1 or rollout.top_k not in (-1, 0) or rollout.get("repetition_penalty", 1) != 1:
++                raise ValueError("MirrorOPD requires untruncated categorical rollout without repetition penalty")
++            if not rollout.do_sample or rollout.skip.enable or rollout.quantization is not None:
++                raise ValueError("MirrorOPD requires fresh stochastic rollout without quantization")
++            agent = rollout.agent
++            if (rollout.multi_turn.enable or agent.default_agent_loop != "single_turn_agent"
++                    or agent.agent_loop_config_path or agent.get("agent_loop_manager_class")
++                    or agent.custom_async_server.path):
++                raise ValueError("MirrorOPD currently requires the standard single-turn rollout agent")
++            if config.algorithm.get("adv_estimator") == "remax":
++                raise ValueError("MirrorOPD cannot use per-prompt greedy REMAX rollout overrides")
++            correction = config.algorithm.get("rollout_correction")
++            if correction and any(correction.get(key) for key in ("rollout_is", "rollout_rs", "bypass_mode")):
++                raise ValueError("MirrorOPD already defines its sampling correction; disable rollout_correction")
++            if config.algorithm.use_kl_in_reward or config.actor_rollout_ref.actor.use_kl_loss:
++                raise ValueError("MirrorOPD teacher reference must not add an extra PPO KL objective")
++            if config.actor_rollout_ref.actor.entropy_coeff != 0:
++                raise ValueError("MirrorOPD validation requires entropy_coeff=0")
+ 
+         self.hybrid_engine = config.actor_rollout_ref.hybrid_engine
+         assert self.hybrid_engine, "Currently, only support hybrid engine"
+@@ -358,6 +388,8 @@ class RayPPOTrainer:
+         if lora_rank <= 0:
+             lora_rank = config.actor_rollout_ref.model.get("lora_rank", 0)
+         self.ref_in_actor = lora_rank > 0 or config.actor_rollout_ref.model.get("lora_adapter_path") is not None
++        if self.mirror_enabled:
++            self.ref_in_actor = False
+ 
+         # define in-reward KL control
+         # kl loss control currently not suppoorted
+@@ -389,7 +421,7 @@ class RayPPOTrainer:
+         if val_dataset is None:
+             val_dataset = create_rl_dataset(
+                 self.config.data.val_files,
+-                self.config.data,
++                phase_data_config(self.config.data, True),
+                 self.tokenizer,
+                 self.processor,
+                 max_samples=self.config.data.get("val_max_samples", -1),
+@@ -597,6 +629,8 @@ class RayPPOTrainer:
+         return batch_reward
+ 
+     def _validate(self, merged: bool = False):
++        if self.mirror_enabled:
++            return mirror_evaluation.evaluate(self)
+         data_source_lst = []
+         reward_extra_infos_dict: dict[str, list] = defaultdict(list)
+ 
+@@ -721,6 +755,7 @@ class RayPPOTrainer:
+         data_sources = np.concatenate(data_source_lst, axis=0)
+         return self._val_metrics_update(data_sources, sample_uids, reward_extra_infos_dict, sample_turns)
+ 
++
+     def _val_metrics_update(self, data_sources, sample_uids, reward_extra_infos_dict, sample_turns):
+         data_src2var2metric2val = process_validation_metrics(data_sources, sample_uids, reward_extra_infos_dict)
+         metric_dict = {}
+@@ -748,6 +783,7 @@ class RayPPOTrainer:
+ 
+         return metric_dict
+ 
++
+     def _merge_validation_results(self, result_a, result_b):
+         if result_a is None and result_b is None:
+             return {}
+@@ -926,6 +962,8 @@ class RayPPOTrainer:
+         else:
+             self.teacher_model_manager = None
+             self.distillation_config = None
++        if self.mirror_enabled:
++            self.distillation_config = omega_conf_to_dataclass(self.config.distillation)
+ 
+         # Support custom AgentLoopManager via config
+         manager_class_fqn = self.config.actor_rollout_ref.rollout.get("agent", {}).get("agent_loop_manager_class")
+@@ -1256,6 +1294,8 @@ class RayPPOTrainer:
+     def _compute_old_log_prob(self, batch: DataProto):
+         # TODO: remove step 1, 2, 4 after we make the whole training tensordict and padding free
+         # step 1: convert dataproto to tensordict.
++        if self.mirror_enabled:
++            return mirror.anchor_pass(self, batch)
+         batch_td = batch.to_tensordict()
+         # step 2: convert from padding to nopadding
+         batch_td = left_right_2_no_padding(batch_td)
+@@ -1290,6 +1330,11 @@ class RayPPOTrainer:
+         old_log_prob = DataProto.from_tensordict(old_log_prob)
+         return old_log_prob, old_log_prob_mfu
+ 
++
++    def _compute_mirror_teacher_cache(self, batch):
++        return mirror.teacher_pass(self, batch)
++
++
+     def _update_actor(self, batch: DataProto) -> DataProto:
+         rollout_config = self.config.actor_rollout_ref.rollout
+         batch.meta_info["multi_turn"] = rollout_config.multi_turn.enable
+@@ -1397,6 +1442,7 @@ class RayPPOTrainer:
+             logger.log(data=val_metrics, step=self.global_steps)
+             if self.config.trainer.get("val_only", False):
+                 self._shutdown_dump_executor()
++                logger.finish(exit_code=0)
+                 return
+ 
+         if self.config.actor_rollout_ref.rollout.skip.get("enable", False):
+@@ -1436,16 +1482,26 @@ class RayPPOTrainer:
+                 batch.meta_info["temperature"] = self.config.actor_rollout_ref.rollout.temperature
+ 
+                 # add uid to batch
+-                batch.non_tensor_batch["uid"] = np.array(
+-                    [str(uuid.uuid4()) for _ in range(len(batch.batch))], dtype=object
+-                )
++                if self.mirror_enabled:
++                    batch.non_tensor_batch["uid"] = np.array(question_uids(
++                        batch.non_tensor_batch["data_source"], batch.non_tensor_batch["raw_prompt"],
++                        batch.non_tensor_batch.get("uid")), dtype=object)
++                    batch.meta_info["mirror_generation_version"] = self.global_steps - 1
++                else:
++                    batch.non_tensor_batch["uid"] = np.array(
++                        [str(uuid.uuid4()) for _ in range(len(batch.batch))], dtype=object)
++
+ 
+                 gen_batch = self._get_gen_batch(batch)
+ 
+                 # pass global_steps to trace
+                 gen_batch.meta_info["global_steps"] = self.global_steps
++                if self.mirror_enabled:
++                    gen_batch.meta_info["mirror_generation_version"] = self.global_steps - 1
+                 rollout_n = self.config.actor_rollout_ref.rollout.n
+                 gen_batch_output = gen_batch.repeat(repeat_times=rollout_n, interleave=True)
++                if self.mirror_enabled:
++                    gen_batch_output.non_tensor_batch["sample_index"] = np.tile(np.arange(rollout_n), len(gen_batch))
+ 
+                 if self.config.algorithm.adv_estimator == AdvantageEstimator.REMAX:
+                     # NOTE: REMAX needs one sampled rollout plus one greedy baseline per prompt.
+@@ -1467,7 +1523,8 @@ class RayPPOTrainer:
+                     with marked_timer("gen", timing_raw, color="red"):
+                         if curr_step_profile:
+                             self.llm_server_manager.start_profile()
+-                        combined_gen_output = self.async_rollout_manager.generate_sequences(combined_gen_batch)
++                        with phase("rollout", outer=self.global_steps - 1):
++                            combined_gen_output = self.async_rollout_manager.generate_sequences(combined_gen_batch)
+                         self.checkpoint_manager.sleep_replicas()
+                         if curr_step_profile:
+                             self.llm_server_manager.stop_profile()
+@@ -1476,6 +1533,12 @@ class RayPPOTrainer:
+                         combined_gen_output.meta_info.pop("timing", None)
+ 
+                     gen_batch_output = combined_gen_output.slice(0, num_sampled_prompts)
++                    if self.mirror_enabled:
++                        metrics.update(mirror.validate_rollout_versions(
++                            gen_batch_output.non_tensor_batch,
++                            expected_version=self.global_steps - 1,
++                            batch_size=len(gen_batch_output),
++                        ))
+                     if "__do_sample__" in gen_batch_output.non_tensor_batch:
+                         gen_batch_output.pop(non_tensor_batch_keys=["__do_sample__"])
+ 
+@@ -1541,21 +1604,16 @@ class RayPPOTrainer:
+                     else:  # Recompute old_log_probs
+                         with marked_timer("old_log_prob", timing_raw, color="blue"):
+                             old_log_prob, old_log_prob_mfu = self._compute_old_log_prob(batch)
+-                            entropys = old_log_prob.batch["entropys"]
++                            entropys = old_log_prob.batch.get("entropys")
+                             response_masks = batch.batch["response_mask"]
+                             actor_config = self.config.actor_rollout_ref.actor
+-                            entropy_agg = agg_loss(
+-                                loss_mat=entropys,
+-                                loss_mask=response_masks,
+-                                loss_agg_mode=actor_config.loss_agg_mode,
+-                                loss_scale_factor=actor_config.loss_scale_factor,
+-                            )
+-                            old_log_prob_metrics = {
+-                                "actor/entropy": entropy_agg.detach().item(),
+-                                "perf/mfu/actor_infer": old_log_prob_mfu,
+-                            }
+-                            metrics.update(old_log_prob_metrics)
+-                            old_log_prob.batch.pop("entropys")
++                            metrics["perf/mfu/actor_infer"] = old_log_prob_mfu
++                            if entropys is not None:
++                                metrics["actor/entropy"] = agg_loss(
++                                    loss_mat=entropys, loss_mask=response_masks,
++                                    loss_agg_mode=actor_config.loss_agg_mode,
++                                    loss_scale_factor=actor_config.loss_scale_factor).detach().item()
++                                old_log_prob.batch.pop("entropys")
+                             if "routed_experts" in batch.batch and "routed_experts" in old_log_prob.batch:
+                                 raise ValueError(
+                                     "Detected conflicting router replay configuration: "
+@@ -1573,7 +1631,10 @@ class RayPPOTrainer:
+ 
+                     assert "old_log_probs" in batch.batch, f'"old_log_prob" not in {batch.batch.keys()=}'
+ 
+-                    if self.use_reference_policy:
++                    if self.mirror_enabled:
++                        with marked_timer("mirror_teacher_cache", timing_raw, color="olive"):
++                            batch = batch.union(self._compute_mirror_teacher_cache(batch))
++                    elif self.use_reference_policy:
+                         # compute reference log_prob
+                         with marked_timer(str(Role.RefPolicy), timing_raw, color="olive"):
+                             ref_log_prob = self._compute_ref_log_prob(batch)
+@@ -1585,52 +1646,55 @@ class RayPPOTrainer:
+                             values = self._compute_values(batch)
+                             batch = batch.union(values)
+ 
+-                    with marked_timer("adv", timing_raw, color="brown"):
+-                        # we combine with rule-based rm
+-                        reward_extra_infos_dict: dict[str, list]
++                    if self.mirror_enabled:
+                         batch.batch["token_level_scores"] = reward_tensor
+-
+-                        if reward_extra_infos_dict:
+-                            batch.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})
+-
+-                        # compute rewards. apply_kl_penalty if available
+-                        if self.config.algorithm.use_kl_in_reward:
+-                            batch, kl_metrics = apply_kl_penalty(
+-                                batch, kl_ctrl=self.kl_ctrl_in_reward, kl_penalty=self.config.algorithm.kl_penalty
++                    else:
++                        with marked_timer("adv", timing_raw, color="brown"):
++                            # we combine with rule-based rm
++                            reward_extra_infos_dict: dict[str, list]
++                            batch.batch["token_level_scores"] = reward_tensor
++
++                            if reward_extra_infos_dict:
++                                batch.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})
++
++                            # compute rewards. apply_kl_penalty if available
++                            if self.config.algorithm.use_kl_in_reward:
++                                batch, kl_metrics = apply_kl_penalty(
++                                    batch, kl_ctrl=self.kl_ctrl_in_reward, kl_penalty=self.config.algorithm.kl_penalty
++                                )
++                                metrics.update(kl_metrics)
++                            else:
++                                batch.batch["token_level_rewards"] = batch.batch["token_level_scores"]
++
++                            # Compute rollout correction: IS weights, rejection sampling, and metrics
++                            # Only runs in decoupled mode (computes once per batch using stable π_old)
++                            # In bypass mode, this is skipped - actor computes metrics from evolving π_θ vs π_rollout
++                            if (
++                                rollout_corr_config is not None
++                                and "rollout_log_probs" in batch.batch
++                                and not bypass_recomputing_logprobs  # Only in decoupled mode
++                            ):
++                                from verl.trainer.ppo.rollout_corr_helper import compute_rollout_correction_and_add_to_batch
++
++                                # Compute IS weights, apply rejection sampling, compute metrics
++                                batch, is_metrics = compute_rollout_correction_and_add_to_batch(batch, rollout_corr_config)
++                                # IS and off-policy metrics already have rollout_corr/ prefix
++                                metrics.update(is_metrics)
++
++                            # compute advantages, executed on the driver process
++                            norm_adv_by_std_in_grpo = self.config.algorithm.get(
++                                "norm_adv_by_std_in_grpo", True
++                            )  # GRPO adv normalization factor
++
++                            batch = compute_advantage(
++                                batch,
++                                adv_estimator=self.config.algorithm.adv_estimator,
++                                gamma=self.config.algorithm.gamma,
++                                lam=self.config.algorithm.lam,
++                                num_repeat=self.config.actor_rollout_ref.rollout.n,
++                                norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
++                                config=self.config.algorithm,
+                             )
+-                            metrics.update(kl_metrics)
+-                        else:
+-                            batch.batch["token_level_rewards"] = batch.batch["token_level_scores"]
+-
+-                        # Compute rollout correction: IS weights, rejection sampling, and metrics
+-                        # Only runs in decoupled mode (computes once per batch using stable π_old)
+-                        # In bypass mode, this is skipped - actor computes metrics from evolving π_θ vs π_rollout
+-                        if (
+-                            rollout_corr_config is not None
+-                            and "rollout_log_probs" in batch.batch
+-                            and not bypass_recomputing_logprobs  # Only in decoupled mode
+-                        ):
+-                            from verl.trainer.ppo.rollout_corr_helper import compute_rollout_correction_and_add_to_batch
+-
+-                            # Compute IS weights, apply rejection sampling, compute metrics
+-                            batch, is_metrics = compute_rollout_correction_and_add_to_batch(batch, rollout_corr_config)
+-                            # IS and off-policy metrics already have rollout_corr/ prefix
+-                            metrics.update(is_metrics)
+-
+-                        # compute advantages, executed on the driver process
+-                        norm_adv_by_std_in_grpo = self.config.algorithm.get(
+-                            "norm_adv_by_std_in_grpo", True
+-                        )  # GRPO adv normalization factor
+-
+-                        batch = compute_advantage(
+-                            batch,
+-                            adv_estimator=self.config.algorithm.adv_estimator,
+-                            gamma=self.config.algorithm.gamma,
+-                            lam=self.config.algorithm.lam,
+-                            num_repeat=self.config.actor_rollout_ref.rollout.n,
+-                            norm_adv_by_std_in_grpo=norm_adv_by_std_in_grpo,
+-                            config=self.config.algorithm,
+-                        )
+ 
+                     # update critic
+                     if self.use_critic:
+@@ -1646,7 +1710,13 @@ class RayPPOTrainer:
+                     else:
+                         # update actor
+                         with marked_timer("update_actor", timing_raw, color="red"):
+-                            actor_output = self._update_actor(batch)
++                            with phase("optimization", outer=self.global_steps - 1):
++                                actor_output = self._update_actor(batch)
++                        # MirrorOPD workers append reduced per-inner-step
++                        # diagnostics to JSONL.  Upload them from the driver
++                        # into the already initialized W&B run so Ray actors
++                        # never create duplicate runs or race on SDK state.
++                        logger.log_distillation_events()
+ 
+                         # Check if the ESI (Elastic Server Instance)/training plan is close to expiration.
+                         esi_close_to_expiration = should_save_ckpt_esi(
+@@ -1717,7 +1787,8 @@ class RayPPOTrainer:
+                     }
+                 )
+                 # collect metrics
+-                metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
++                metrics.update(mirror.batch_metrics(batch) if self.mirror_enabled else
++                               compute_data_metrics(batch=batch, use_critic=self.use_critic))
+                 # GDPO per-component reward metrics
+                 gdpo_reward_keys = self.config.algorithm.get("gdpo_reward_keys", None)
+                 if gdpo_reward_keys and self.config.algorithm.adv_estimator in ("gdpo", AdvantageEstimator.GDPO):
+@@ -1734,7 +1805,8 @@ class RayPPOTrainer:
+                 metrics.update(compute_throughout_metrics(batch=batch, timing_raw=timing_raw, n_gpus=n_gpus))
+                 # compute variance proxy metrics
+                 gradient_norm = metrics.get("actor/grad_norm", None)
+-                metrics.update(compute_variance_proxy_metrics(batch=batch, gradient_norm=gradient_norm))
++                if not self.mirror_enabled:
++                    metrics.update(compute_variance_proxy_metrics(batch=batch, gradient_norm=gradient_norm))
+                 # Note: mismatch metrics (KL, PPL, etc.) are collected at line 1179 after advantage computation
+ 
+                 # Per-request spec decode metrics.
+@@ -1758,6 +1830,7 @@ class RayPPOTrainer:
+                     self._shutdown_dump_executor()
+                     pprint(f"Final validation metrics: {last_val_metrics}")
+                     progress_bar.close()
++                    logger.finish(exit_code=0)
+                     return
+ 
+                 # this is experimental and may be changed/removed in the future
+diff --git a/verl/verl/trainer/ppo/utils.py b/verl/verl/trainer/ppo/utils.py
+index 876eaad..cf1acd2 100644
+--- a/verl/verl/trainer/ppo/utils.py
++++ b/verl/verl/trainer/ppo/utils.py
+@@ -19,6 +19,7 @@ from omegaconf import DictConfig
+ 
+ from verl.single_controller.base import Worker
+ from verl.trainer.distillation import is_distillation_enabled
++from mirroropd.integrations.verl.bridge import is_enabled
+ from verl.trainer.ppo.core_algos import AdvantageEstimator
+ 
+ WorkerType = type[Worker]
+@@ -76,14 +77,20 @@ def need_reference_policy(
+     config: DictConfig,
+ ) -> bool:
+     """Given the config, do we need ref policy."""
+-    return config.algorithm.get("use_kl_in_reward", False) or config.actor_rollout_ref.actor.use_kl_loss
++    return (
++        is_enabled(config.get("distillation"))
++        or config.algorithm.get("use_kl_in_reward", False)
++        or config.actor_rollout_ref.actor.use_kl_loss
++    )
+ 
+ 
+ def need_teacher_policy(
+     config: DictConfig,
+ ) -> bool:
+     """Given the config, do we need distillation policy."""
+-    return is_distillation_enabled(config.get("distillation"))
++    return is_distillation_enabled(config.get("distillation")) and not is_enabled(
++        config.get("distillation")
++    )
+ 
+ 
+ def need_reward_model(
+diff --git a/verl/verl/utils/tracking.py b/verl/verl/utils/tracking.py
+index 0fdede9..9128885 100644
+--- a/verl/verl/utils/tracking.py
++++ b/verl/verl/utils/tracking.py
+@@ -67,6 +67,7 @@ class Tracking:
+                 assert backend in self.supported_backend, f"{backend} is not supported"
+ 
+         self.logger = {}
++        self._finished = False
+ 
+         if "tracking" in default_backend or "wandb" in default_backend:
+             import os
+@@ -180,14 +181,31 @@ class Tracking:
+         if "file" in default_backend:
+             self.logger["file"] = FileLogger(project_name, experiment_name)
+ 
++        if config and config.get("distillation", {}).get("distillation_loss", {}).get("loss_mode") == "mirror":
++            from mirroropd.runtime.tracking import RunTracker
++            sdk = self.logger.pop("wandb", None)
++            self.logger["mirror"] = RunTracker(config, sdk)
++
+     def log(self, data, step, backend=None):
+         for default_backend, logger_instance in self.logger.items():
+             if backend is None or default_backend in backend:
+                 logger_instance.log(data=data, step=step)
+ 
+-    def __del__(self):
++    def log_distillation_events(self):
++        tracker = self.logger.get("mirror")
++        return tracker.drain() if tracker is not None else 0
++
++    def finish(self, exit_code=0):
++        if self._finished:
++            return
++        self._finished = True
++        if "mirror" in self.logger:
++            tracker = self.logger["mirror"]
++            tracker.drain()
++            if tracker.sdk is not None:
++                tracker.sdk.finish(exit_code=exit_code)
+         if "wandb" in self.logger:
+-            self.logger["wandb"].finish(exit_code=0)
++            self.logger["wandb"].finish(exit_code=exit_code)
+         if "swanlab" in self.logger:
+             self.logger["swanlab"].finish()
+         if "vemlp_wandb" in self.logger:
+@@ -201,6 +219,9 @@ class Tracking:
+         if "file" in self.logger:
+             self.logger["file"].finish()
+ 
++    def __del__(self):
++        self.finish(exit_code=0)
++
+ 
+ class ClearMLLogger:
+     def __init__(self, project_name: str, experiment_name: str, config):
+diff --git a/verl/verl/utils/vllm/patch.py b/verl/verl/utils/vllm/patch.py
+index 951c5ca..4162c6a 100644
+--- a/verl/verl/utils/vllm/patch.py
++++ b/verl/verl/utils/vllm/patch.py
+@@ -115,6 +115,10 @@ def patch_vllm_moe_model_weight_loader(model):
+     # Get inner model (either model.model or model.language_model)
+     inner_model = getattr(model, "model", None) or getattr(model, "language_model", None)
+     if inner_model is None:
++        # Dense architectures such as GPT-NeoX have differently named trunks
++        # and do not need the MoE-specific weight loader patch.
++        if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)):
++            return
+         raise ValueError("The provided model does not have a valid 'model' or 'language_model' attribute.")
+ 
+     if not isinstance(model, tuple(SUPPORTED_MOE_MODELS)) and not isinstance(inner_model, tuple(SUPPORTED_MOE_MODELS)):
+diff --git a/verl/verl/workers/config/distillation.py b/verl/verl/workers/config/distillation.py
+index 2bfd200..5f3ba7e 100644
+--- a/verl/verl/workers/config/distillation.py
++++ b/verl/verl/workers/config/distillation.py
+@@ -87,6 +87,10 @@ class DistillationLossConfig(BaseConfig):
+     loss_settings: Optional[dict] = None
+ 
+     def __post_init__(self):
++        if self.loss_mode == "mirror":
++            if (self.use_policy_gradient or self.use_task_rewards
++                    or self.loss_max_clamp is not None or self.log_prob_min_clamp is not None):
++                raise ValueError("Mirror requires direct loss, no task reward, and no clamps")
+         self._mutable_fields.add("loss_settings")
+         from verl.trainer.distillation.losses import DistillationLossSettings, get_distillation_loss_settings
+ 
+@@ -253,12 +257,20 @@ class DistillationConfig(BaseConfig):
+     nnodes: int = 0
+     teacher_models: dict[str, DistillationTeacherModelConfig] = field(default_factory=dict)
+     teacher_key: str = "data_source"
++    mirror: Optional[dict] = None
+     distillation_loss: DistillationLossConfig = field(default_factory=DistillationLossConfig)
+ 
+     def __post_init__(self):
+         if not self.enabled:
+             return
+ 
++        if self.distillation_loss.loss_mode == "mirror":
++            from mirroropd.integrations.verl.bridge import settings
++            settings(self)
++            if self.n_gpus_per_node != 0 or self.nnodes != 0:
++                raise ValueError("Mirror uses the frozen FSDP reference model, not a teacher RPC pool")
++            return
++
+         self.teacher_models = self._resolve_teacher_models()
+         teacher_world_size_sum = 0
+         for teacher_model in self.teacher_models.values():
+diff --git a/verl/verl/workers/config/model.py b/verl/verl/workers/config/model.py
+index 9581466..39c2164 100644
+--- a/verl/verl/workers/config/model.py
++++ b/verl/verl/workers/config/model.py
+@@ -109,6 +109,7 @@ class HFModelConfig(BaseConfig):
+ 
+     # custom chat template for the model
+     custom_chat_template: Optional[str] = None
++    mirror_policy: bool = False
+ 
+     external_lib: Optional[str] = None
+ 
+diff --git a/verl/verl/workers/config/rollout.py b/verl/verl/workers/config/rollout.py
+index 8162f8b..419fee5 100644
+--- a/verl/verl/workers/config/rollout.py
++++ b/verl/verl/workers/config/rollout.py
+@@ -60,6 +60,8 @@ class SamplingConfig(BaseConfig):
+     top_p: float = 1.0
+     do_sample: bool = True
+     n: int = 1
++    max_tokens: Optional[int] = None
++    seed: int = 42
+ 
+ 
+ @dataclass
+@@ -170,6 +172,7 @@ class RolloutConfig(BaseConfig):
+     }
+ 
+     name: Optional[str] = MISSING
++    seed: int = 42
+     mode: str = "async"
+     nnodes: int = 0
+     n_gpus_per_node: int = 8
+diff --git a/verl/verl/workers/engine/fsdp/transformer_impl.py b/verl/verl/workers/engine/fsdp/transformer_impl.py
+index afbf7ec..7bda16d 100644
+--- a/verl/verl/workers/engine/fsdp/transformer_impl.py
++++ b/verl/verl/workers/engine/fsdp/transformer_impl.py
+@@ -62,6 +62,7 @@ from verl.utils.fsdp_utils import (
+ from verl.utils.model import convert_weight_keys, extract_multi_modal_inputs
+ from verl.utils.py_functional import convert_to_regular_types
+ from verl.utils.torch_functional import logprobs_from_logits
++from verl.utils.ulysses import get_ulysses_sequence_parallel_world_size
+ from verl.utils.ulysses import (
+     gather_outputs_and_unpad,
+     get_ulysses_sequence_parallel_group,
+@@ -111,6 +112,28 @@ class FSDPEngine(BaseEngine):
+         self.optimizer_config = optimizer_config
+         self.checkpoint_config = checkpoint_config
+ 
++        # FlashAttention kernels accept fp16/bf16 inputs only.  A control run
++        # may deliberately request fp32 weights for numerical diagnostics;
++        # select PyTorch SDPA for that combination while preserving FlashAttention
++        # for the normal bf16 training path.
++        from verl.utils.torch_dtypes import PrecisionType
++
++        model_dtype = PrecisionType.to_dtype(self.engine_config.model_dtype)
++        mixed_precision = self.engine_config.mixed_precision
++        mixed_param_dtype = None
++        if isinstance(mixed_precision, dict):
++            mixed_param_dtype = mixed_precision.get("param_dtype")
++        forward_dtype = model_dtype
++        if mixed_param_dtype is not None:
++            forward_dtype = PrecisionType.to_dtype(mixed_param_dtype)
++        attention_impl = getattr(self.model_config.hf_config, "_attn_implementation", None)
++        if forward_dtype == torch.float32 and attention_impl in {None, "flash_attention_2", "flash_attention_3"}:
++            self.model_config.hf_config._attn_implementation = "sdpa"
++            logger.warning(
++                "Switching attention implementation from %s to sdpa for fp32 FSDP forward",
++                attention_impl,
++            )
++
+         self.mode = None
+ 
+         self.rank = torch.distributed.get_rank()
+@@ -379,14 +402,17 @@ class FSDPEngine(BaseEngine):
+             # cpu_offload:
+             # - actor: None
+             # - critic: None
+-            # - ref: CPUOffload(offload_params=True)
++            # - ref: explicit parameter offload at inference phase boundaries
+ 
+-            # We force reference policy to use CPUOffload to save memory.
+             # We force turn off CPUOffload for actor because it causes incorrect results when using grad accumulation
+             cpu_offload = None
+             if self.engine_config.forward_only:
+-                cpu_offload = CPUOffload(offload_params=True)
+-                self._is_offload_param = False
++                if os.environ.get("MIRROR_INFERENCE_EXPLICIT_OFFLOAD", "0") == "1":
++                    module.requires_grad_(False)
++                    self._is_offload_param = True
++                else:
++                    cpu_offload = CPUOffload(offload_params=True)
++                    self._is_offload_param = False
+                 self._is_offload_optimizer = False
+ 
+             module = FSDP(
+@@ -545,6 +571,9 @@ class FSDPEngine(BaseEngine):
+ 
+         # Load base model with specified configuration and dtype
+         module = self._build_module()
++        if self.model_config.mirror_policy:
++            from mirroropd.integrations.verl.model import prepare_policy_model
++            prepare_policy_model(module)
+         # Apply LoRA adapters if low-rank adaptation is enabled
+         if self._is_lora:
+             module = self._build_lora_module(module)
+@@ -731,7 +760,10 @@ class FSDPEngine(BaseEngine):
+         """
+         super().to(device=device, model=model, optimizer=optimizer, grad=grad)
+ 
+-        if self.engine_config.forward_only:
++        if self.engine_config.forward_only and not (
++            self.engine_config.strategy == "fsdp"
++            and os.environ.get("MIRROR_INFERENCE_EXPLICIT_OFFLOAD", "0") == "1"
++        ):
+             # force cpu_offload
+             return
+ 
+@@ -1079,6 +1111,11 @@ class FSDPEngineWithLMHead(FSDPEngine):
+             data=micro_batch, key="calculate_sum_pi_squared", default=False
+         )
+         distillation_use_topk = tu.get_non_tensor_data(data=micro_batch, key="distillation_use_topk", default=False)
++        mirror_stage = tu.get_non_tensor_data(data=micro_batch, key="mirror_stage", default=None)
++        if mirror_stage is not None and (use_fused_kernels or self.use_ulysses_sp):
++            raise NotImplementedError("MirrorOPD cache inference requires full logits and sequence parallel size 1")
++        if mirror_stage is not None and distillation_use_topk:
++            raise ValueError("cache scoring and distillation training must be separate passes")
+ 
+         if calculate_sum_pi_squared and use_fused_kernels:
+             raise NotImplementedError(
+@@ -1086,6 +1123,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
+                 "fused kernels do not materialize the full logits tensor needed for Σπ²."
+             )
+ 
++        if self.model_config.mirror_policy:
++            if use_fused_kernels:
++                raise NotImplementedError("Rollout support alignment requires non-fused logits")
++            from mirroropd.core.vocabulary import align_logits
++
++            output.logits = align_logits(output.logits, len(self.model_config.tokenizer))
++
+         model_output = {}
+ 
+         input_ids = micro_batch["input_ids"]
+@@ -1119,13 +1163,20 @@ class FSDPEngineWithLMHead(FSDPEngine):
+ 
+                 # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)
+                 inplace_backward = True
+-                if calculate_entropy:
++                if calculate_entropy or distillation_use_topk or mirror_stage is not None:
+                     inplace_backward = False
+                 log_probs = logprobs_from_logits(
+                     logits=logits_rmpad,
+                     labels=input_ids_rmpad_rolled,
+                     inplace_backward=inplace_backward,
+                 )
++                if mirror_stage is not None:
++                    from mirroropd.integrations.verl.bridge import cache_callback
++
++                    outputs = cache_callback(logits_rmpad, micro_batch, mirror_stage,
++                                             sequence_parallel_size=get_ulysses_sequence_parallel_world_size())
++                    for key, value in outputs.items():
++                        model_output[key] = torch.nested.nested_tensor_from_jagged(value, input_ids.offsets())
+ 
+                 # compute entropy
+                 if calculate_entropy:
+@@ -1218,6 +1269,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
+                     logits_rmpad = torch.cat([t for t in logits.unbind()])
+                     input_ids_rmpad_rolled = output_args["input_ids_rmpad_rolled"]
+                     log_probs = logprobs_from_logits(logits=logits_rmpad, labels=input_ids_rmpad_rolled)
++                    if mirror_stage is not None:
++                        from mirroropd.integrations.verl.bridge import cache_callback
++
++                    outputs = cache_callback(logits_rmpad, micro_batch, mirror_stage,
++                                             sequence_parallel_size=get_ulysses_sequence_parallel_world_size())
++                    for key, value in outputs.items():
++                            model_output[key] = torch.nested.nested_tensor_from_jagged(value, cu_seqlens)
+ 
+                     # Mirror the use_remove_padding=True branch (see verl#6293).
+                     # No Ulysses SP gather here: this branch is the no-SP path
+@@ -1258,6 +1316,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
+ 
+     def forward_step(self, micro_batch: TensorDict, loss_function, forward_only):
+         device_name = get_device_name()
++        if tu.get_non_tensor_data(micro_batch, key="mirror_stage", default=None) is not None:
++            if not forward_only or loss_function is not None:
++                raise ValueError("MirrorOPD cache scoring must run inference with compute_loss=False")
+         # actually, we should avoid assigning like this...
+         micro_batch = micro_batch.to(get_device_id())
+         model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
+diff --git a/verl/verl/workers/engine_workers.py b/verl/verl/workers/engine_workers.py
+index c4c7d8f..73a7987 100644
+--- a/verl/verl/workers/engine_workers.py
++++ b/verl/verl/workers/engine_workers.py
+@@ -304,7 +304,8 @@ class TrainingWorker(Worker, DistProfilerExtension):
+             if self.engine.is_mp_src_rank_with_outputs():
+                 actor_output = [tu.get(output, "metrics") for output in output_lst]
+                 metrics = {}
+-                for output in actor_output:
++                has_mirror = any(key.startswith("distill/raw/") for item in actor_output for key in item)
++                for inner_index, output in enumerate(actor_output):
+                     for key, val in output.items():
+                         # flattn dp and micro batch
+                         if isinstance(val, list):
+@@ -313,6 +314,12 @@ class TrainingWorker(Worker, DistProfilerExtension):
+                                 if isinstance(val[0], Metric)
+                                 else list(chain.from_iterable(val))
+                             )
++                    if has_mirror:
++                        from mirroropd.integrations.verl.bridge import finish_update
++                        output = finish_update(output, data, inner=inner_index, epochs=epochs,
++                                               dp_size=self.engine.get_data_parallel_size(),
++                                               global_rank=torch.distributed.get_rank(),
++                                               clip_grad=self.engine.optimizer_config.clip_grad)
+                     append_to_dict(metrics, output)
+ 
+                 output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
+@@ -514,7 +521,28 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+             ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
+ 
+             # The ref model does not need to enable MTP; force it to false.
+-            ref_config.model_config = deepcopy(model_config)
++            from mirroropd.integrations.verl import bridge as mirror
++
++            if mirror.is_enabled(self.distillation_config):
++                # Construct a fresh HF config: copying the actor then replacing
++                # only its path retains cached tokenizer/config metadata.
++                ref_config.model_config = HFModelConfig(
++                    path=mirror.settings(self.distillation_config).teacher_model_path,
++                    mirror_policy=True,
++                    custom_chat_template=model_config.custom_chat_template,
++                    trust_remote_code=model_config.trust_remote_code,
++                    use_remove_padding=model_config.use_remove_padding,
++                    enable_gradient_checkpointing=False,
++                    use_fused_kernels=False,
++                )
++                from mirroropd.core.vocabulary import validate_tokenizers
++
++                validate_tokenizers(model_config.tokenizer, ref_config.model_config.tokenizer)
++                if not ref_config.engine.forward_only:
++                    raise ValueError("MirrorOPD teacher reference engine must be forward_only")
++                ref_config.engine.use_fused_kernels = False
++            else:
++                ref_config.model_config = deepcopy(model_config)
+             ref_config.model_config.mtp = MtpConfig(enable=False)
+ 
+             # construct TrainingWorkerConfig
+diff --git a/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py b/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
+index 3b24590..134993a 100644
+--- a/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
++++ b/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
+@@ -553,6 +553,7 @@ class vLLMHttpServer:
+                 log_probs=None,
+                 routed_experts=None,
+                 stop_reason="aborted",
++                extra_fields={"generation_finish_reason": "abort"},
+             )
+ 
+         extra_fields = {"global_steps": self.global_steps}
+@@ -572,6 +573,8 @@ class vLLMHttpServer:
+ 
+         # Determine stop reason from finish_reason
+         finish_reason = final_res.outputs[0].finish_reason
++        extra_fields["generation_finish_reason"] = finish_reason
++        extra_fields["generation_seed"] = sampling_params.seed
+         if finish_reason == "abort":
+             stop_reason = "aborted"
+         elif finish_reason in ("stop", "length"):
+diff --git a/verl/verl/workers/utils/padding.py b/verl/verl/workers/utils/padding.py
+index 6d537ea..df6c828 100644
+--- a/verl/verl/workers/utils/padding.py
++++ b/verl/verl/workers/utils/padding.py
+@@ -107,6 +107,10 @@ def left_right_2_no_padding(data: TensorDict) -> TensorDict:
+         data["teacher_sampled_logprob"] = teacher_sampled_logprob_nested
+         # print(f"padding: {teacher_sampled_logprob.shape}")
+ 
++    from mirroropd.integrations.verl.adapter import unpad_cache_fields
++    for key, value in unpad_cache_fields(data, indices, cu_seqlens).items():
++        data[key] = value
++
+     return data
+ 
+ 

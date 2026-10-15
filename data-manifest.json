@@ -1085,6 +1085,12 @@
             "archive": "data/math-avg-k05-e02-20261015/delivery-check.log.gz",
             "bytes": 1953,
             "sha256": "0297c947f128821d6629cf8c04536a5e797a05a185a695c79a85099839c25960"
+        },
+        {
+            "path": "runs/refactor-20261015/legacy-source.tar",
+            "archive": "data/refactor-20261015/legacy-source.tar.gz",
+            "bytes": 1607680,
+            "sha256": "43e2c4ec61940f4254b6b3f4af796953f538f5118d0578c7810296ca651b9e78"
         }
     ]
 }

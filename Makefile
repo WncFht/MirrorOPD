@@ -1,3 +1,4 @@
+PYTHON ?= python
 BOOK_DIR := docs/book
 BOOK := 2026-10-08-固定测度Token级MirrorOPD
 
@@ -6,36 +7,13 @@ book:
 	cd $(BOOK_DIR) && latexmk -xelatex -interaction=nonstopmode -halt-on-error $(BOOK).tex
 
 upstream:
-	bash scripts/bootstrap-upstream.sh
+	PYTHONPATH=src $(PYTHON) -m mirroropd backend --output upstream/TA-OPD-v2
 
 data:
 	python3 scripts/restore-data.py
 
 test:
-	PYTHONPATH=.:src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_power_targets.py tests/test_power_suite.py tests/test_power_production.py tests/test_power_onpolicy.py -q
-	PYTHONPATH=src uv run --with numpy --with pandas --with scipy --with pytest python -m pytest tests/test_oneshot_lr_stability.py -q
-	PYTHONPATH=src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_scalar_schedule.py tests/test_scalar_large_analysis.py tests/test_scalar_full_pool_study.py -q
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_math_evaluation.py
-	python3 tests/test_kl_theory_identities.py
-	python3 tests/test_kl_unified_framework.py
-	PYTHONPATH=src python3 tests/test_gsm8k_evaluation.py
-	PYTHONPATH=src uv run --with pytest python -m pytest tests/test_live_wandb_logging.py -q
-	PYTHONPATH=src python3 tests/test_tracking_layout.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_baselines.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_topk_overlap.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_training_metrics.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_global_inner_writer.py
-	PYTHONPATH=src uv run --with torch --with numpy --with pytest python -m pytest tests/test_rollout_support_alignment.py -q
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mean_bpo.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_kl_estimators.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_outer_inner.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_upstream_opd_semantics.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_upstream_mirror_wiring.py
-	PYTHONPATH=src uv run --with torch --with numpy --with transformers python tests/test_upstream_mirror_lm.py
-	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_mean_analysis.py
-	PYTHONPATH=src uv run --with torch --with numpy --with transformers python tests/test_opd_lm.py
+	$(PYTHON) -m pytest -q
 
 bootstrap:
 	npm ci

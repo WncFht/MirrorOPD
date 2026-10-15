@@ -17,6 +17,7 @@ class Models:
     student: str
     teacher: str
     chat_template: str | None = None
+    trust_remote_code: bool = False
 
     def __post_init__(self):
         if not self.student or not self.teacher:
@@ -192,7 +193,6 @@ class Logging:
 @dataclass(frozen=True, slots=True)
 class Checkpoints:
     every: int = 0
-    resume_from: str | None = None
 
     def __post_init__(self):
         if not isinstance(self.every, int) or self.every < 0:

@@ -139,6 +139,8 @@ def record_update(
         outer=outer,
         inner=inner,
         update=outer * epochs + inner,
+        updates_completed=outer * epochs + inner + 1,
+        measurement="pre_update",
         algorithm=algorithm,
         loss_kind=loss_kind,
         metrics=values,

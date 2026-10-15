@@ -113,15 +113,17 @@ class EventWriter:
             )
 
 
-@lru_cache(maxsize=16)
 def environment_writer(source):
     directory = os.environ.get("MIRROR_EVENT_DIR")
     run_id = os.environ.get("MIRROR_RUN_ID")
     if not directory or not run_id:
         return None
-    return EventWriter(
-        directory, run_id, source, context={"config_id": os.environ.get("MIRROR_CONFIG_ID")}
-    )
+    return _environment_writer(directory, run_id, source, os.environ.get("MIRROR_CONFIG_ID"))
+
+
+@lru_cache(maxsize=16)
+def _environment_writer(directory, run_id, source, config_id):
+    return EventWriter(directory, run_id, source, context={"config_id": config_id})
 
 
 @contextlib.contextmanager

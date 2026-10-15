@@ -52,7 +52,7 @@ Algorithm 5 统一使用 $\theta\gets\theta-\alpha G$。BPO 的负号与 $\eta^{
 
 独立主动作及 $m$ 个独立 center 动作构造的 BPO 平方 residual，其期望为 $(1+1/m)\operatorname{Var}_q(\eta f-U)$。直接对该平方反向传播需乘 $m/(m+1)$；leave-one-out 使用 $m-1$ 个 center 动作时乘 $(m-1)/m$。Mean reward center 不依赖 student，其采样误差只给期望平方损失增加参数无关项。
 
-[test_mean_bpo.py](../../tests/test_mean_bpo.py) 检查了 48 组随机问题：词表维数为 2、4、8，$\eta$ 为 0.1、0.5、1、2。解析梯度、逐坐标有限差分、损失及梯度恒等式、Mean 归一化/KKT/驻点、Part/BPO 的 Gibbs 零损失、初始化方向尺度、恒定信号、完整枚举的有限样本修正和 off-behavior 双样本权重全部通过。
+[test_mean_bpo.py](../../data/refactor-20261015/legacy-source.tar.gz#tests/test_mean_bpo.py) 检查了 48 组随机问题：词表维数为 2、4、8，$\eta$ 为 0.1、0.5、1、2。解析梯度、逐坐标有限差分、损失及梯度恒等式、Mean 归一化/KKT/驻点、Part/BPO 的 Gibbs 零损失、初始化方向尺度、恒定信号、完整枚举的有限样本修正和 off-behavior 双样本权重全部通过。
 
 二动作例子 $q=(0.5,0.5)$、$T=(0.75,0.25)$、$\eta=1$ 的 Mean 解为 $(0.7291869550174757,0.2708130449825245)$，乘子为 $0.117928665874$；Gibbs 解为 teacher。该反例排除了 Mean 在 $\eta=1$ 时一步精确恢复 teacher 的旧结论。
 

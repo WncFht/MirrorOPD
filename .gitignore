@@ -80,3 +80,7 @@ data/oneshot-lr-stability/*.csv
 /data/power-center-20261014/prefix-audit.csv
 
 /data/power-center-extensions-20261014/prefix-audit.csv
+
+# Python build products
+/build/
+/dist/

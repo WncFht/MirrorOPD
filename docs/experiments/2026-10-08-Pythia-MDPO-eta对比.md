@@ -193,7 +193,7 @@ $$
 
 每组使用相同 64 条验证文本、8,128 个 prefix、4,096 个真实 continuation token，HF FP32 前向与 FP64 词表概率聚合。outer 0、8、16、24、32 分别记录双向 KL、熵和 NLL。每组的配对 bootstrap 以文本为单位，5,000 次抽样，用于评价相对初始化的变化；它不衡量训练随机种子的差异。
 
-原始日志与 checkpoint 留在 archbox `~/src/mirroropd/runs/pythia-mdpo-eta-*`，可引用归档在本机 `results/training/` 同名目录；原始生成文本进入 `data/pythia-wikitext/rollouts-eta-*`。扫描程序位于 [run_pythia_eta_scan.sh](../../training/run_pythia_eta_scan.sh)，聚合程序位于 [pythia_eta_scan.py](../../experiments/analysis/pythia_eta_scan.py)，绘图复用 [plot_pythia_mdpo.py](../../experiments/plotting/plot_pythia_mdpo.py) 的 `--eta-scan` 选项。
+原始日志与 checkpoint 留在 archbox `~/src/mirroropd/runs/pythia-mdpo-eta-*`，可引用归档在本机 `results/training/` 同名目录；原始生成文本进入 `data/pythia-wikitext/rollouts-eta-*`。扫描程序位于 [run_pythia_eta_scan.sh](../../data/refactor-20261015/legacy-source.tar.gz#training/run_pythia_eta_scan.sh)，聚合程序位于 [pythia_eta_scan.py](../../data/refactor-20261015/legacy-source.tar.gz#experiments/analysis/pythia_eta_scan.py)，绘图复用 [plot_pythia_mdpo.py](../../data/refactor-20261015/legacy-source.tar.gz#experiments/plotting/plot_pythia_mdpo.py) 的 `--eta-scan` 选项。
 
 Hydra override 的 `.inf` 会解析为字符串；入口使用 `1e309`，经解析得到浮点正无穷。实际解析配置中为 `.inf` 数值，Python 核心验证只有 MDPO 支持该端点；PMD-Mean 与 BPO 继续要求有限正 $\eta$。启动失败的配置日志独立保留，未混入成功训练的指标。
 

@@ -1,0 +1,7 @@
+{
+    "name": "TA-OPD",
+    "url": "https://github.com/HuipengHuang/TA-OPD.git",
+    "base_commit": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+    "api_version": 2,
+    "patch": "backend.patch"
+}

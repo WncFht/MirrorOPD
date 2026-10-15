@@ -59,7 +59,7 @@ Pythia 是基础语言模型，本轮使用自然文本续写。没有添加 cha
 
 ### 冻结设置
 
-正式配置位于 [Pythia MDPO 配置](../../training/configs/pythia-mdpo.json)。训练启动入口复用现有 [TA-OPD/verl 启动程序](../../training/run_upstream_mirror_training.sh)，不另写 trainer。
+正式配置位于 [Pythia MDPO 配置](../../data/refactor-20261015/legacy-source.tar.gz#training/configs/pythia-mdpo.json)。训练启动入口复用现有 [TA-OPD/verl 启动程序](../../data/refactor-20261015/legacy-source.tar.gz#training/run_upstream_mirror_training.sh)，不另写 trainer。
 
 | 参数                         | 主实验                                    | 学习率对照           |
 | ---------------------------- | ----------------------------------------- | -------------------- |
@@ -282,18 +282,18 @@ archbox 的实际框架源码位于 `~/src/mirroropd-taopd/verl`，第一方核�
 
 GPT-NeoX 接入修复了两个架构假设：普通多头注意力没有 `num_key_value_heads` 时，取 `num_attention_heads`；vLLM 的 MoE 专用 patch 对无需该 patch 的 dense 模型直接返回。先前失败停在模型初始化阶段，修复后 2 outer × 2 inner 的 smoke 和两组完整实验均通过。集成补丁在干净官方基线上成功 apply，并通过 Python 编译验证。
 
-| 内容                           | 本机位置                                                                             |
-| ------------------------------ | ------------------------------------------------------------------------------------ |
-| 固定输入、source IDs、校验信息 | [data/pythia-wikitext](../../data/pythia-wikitext/)                                  |
-| 主实验生成文本                 | [rollouts](../../data/pythia-wikitext/rollouts/)                                     |
-| 低学习率对照生成文本           | [rollouts-low-lr](../../data/pythia-wikitext/rollouts-low-lr/)                       |
-| 主实验配置、全部指标与评分     | [results/training/pythia-mdpo](../../results/training/pythia-mdpo/)                  |
-| 对照配置、全部指标与评分       | [results/training/pythia-mdpo-low-lr](../../results/training/pythia-mdpo-low-lr/)    |
-| 训练算法核心                   | [losses.py](../../src/mirroropd/training/losses.py)                                  |
-| 框架缓存与位置适配             | [fsdp.py](../../src/mirroropd/integrations/verl/fsdp.py)                             |
-| 精确前缀评价程序               | [checkpoint diagnostics](../../experiments/scoring/pythia_checkpoint_diagnostics.py) |
-| 聚合、配对区间                 | [report program](../../experiments/analysis/pythia_mdpo_report.py)                   |
-| 可复现绘图                     | [plot program](../../experiments/plotting/plot_pythia_mdpo.py)                       |
+| 内容                           | 本机位置                                                                                                                         |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| 固定输入、source IDs、校验信息 | [data/pythia-wikitext](../../data/pythia-wikitext/)                                                                              |
+| 主实验生成文本                 | [rollouts](../../data/pythia-wikitext/rollouts/)                                                                                 |
+| 低学习率对照生成文本           | [rollouts-low-lr](../../data/pythia-wikitext/rollouts-low-lr/)                                                                   |
+| 主实验配置、全部指标与评分     | [results/training/pythia-mdpo](../../results/training/pythia-mdpo/)                                                              |
+| 对照配置、全部指标与评分       | [results/training/pythia-mdpo-low-lr](../../results/training/pythia-mdpo-low-lr/)                                                |
+| 训练算法核心                   | [losses.py](../../data/refactor-20261015/legacy-source.tar.gz#src/mirroropd/training/losses.py)                                  |
+| 框架缓存与位置适配             | [fsdp.py](../../data/refactor-20261015/legacy-source.tar.gz#src/mirroropd/integrations/verl/fsdp.py)                             |
+| 精确前缀评价程序               | [checkpoint diagnostics](../../data/refactor-20261015/legacy-source.tar.gz#experiments/scoring/pythia_checkpoint_diagnostics.py) |
+| 聚合、配对区间                 | [report program](../../data/refactor-20261015/legacy-source.tar.gz#experiments/analysis/pythia_mdpo_report.py)                   |
+| 可复现绘图                     | [plot program](../../data/refactor-20261015/legacy-source.tar.gz#experiments/plotting/plot_pythia_mdpo.py)                       |
 
 每组结果目录保存原始 `console.log`、`inner.jsonl`、`outer.jsonl`、GPU CSV、Hydra 完整解析配置、参数覆盖列表、数据 manifest、源码 provenance、退出码和各 checkpoint 的逐 prefix 评价。解析配置作为运行证据保持原始格式。图经过 figure-viz 审计和目检，PNG、PDF、审计文件与聚合 CSV 共同保存。
 

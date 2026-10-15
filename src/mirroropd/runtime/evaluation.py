@@ -131,37 +131,86 @@ def complete_metrics(data_sources, uids, scores, sample_indices, protocol, expec
 
 
 def audit_rows(rows, protocol, expected_questions, *, model_version):
-    metrics = complete_metrics(
-        [r["data_source"] for r in rows],
-        [r["question_uid"] for r in rows],
-        [r["score"] for r in rows],
-        [r["sample_index"] for r in rows],
-        protocol,
-        expected_questions,
-    )
+    audit = EvaluationAudit(protocol, expected_questions, model_version)
     for row in rows:
-        if (
-            row.get("schema_version") != API_VERSION
-            or row.get("protocol_id") != protocol.protocol_id
-        ):
-            raise ValueError("Generation artifact schema/protocol mismatch")
-        if row.get("model_version") != model_version:
-            raise ValueError("Generation artifact has a stale student weight version")
-        if row["finish_reason"] not in {"stop", "length"}:
-            raise ValueError("Evaluation contains unfinished generation")
-        count = row["response_tokens"]
-        if not isinstance(count, int) or not 0 < count <= protocol.response_tokens:
-            raise ValueError("Invalid response token count")
-        if row["finish_reason"] == "length" and count != protocol.response_tokens:
-            raise ValueError("Length-terminated output did not preserve the full budget")
-        expected = request_seed(
-            protocol.seed, "evaluation", model_version, row["question_uid"], row["sample_index"]
-        )
-        if row.get("request_seed") != expected:
-            raise ValueError("Generation did not report the requested deterministic sample seed")
-    return metrics
+        audit.add(row)
+    return audit.finish()
 
 
 def audit_file(path, protocol, expected_questions, *, model_version):
-    rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
-    return audit_rows(rows, protocol, expected_questions, model_version=model_version)
+    with path.open() as stream:
+        return audit_rows(
+            (json.loads(line) for line in stream if line.strip()),
+            protocol,
+            expected_questions,
+            model_version=model_version,
+        )
+
+
+class EvaluationAudit:
+    """Streaming artifact validation retains scores/identities, never response text."""
+
+    def __init__(self, protocol, expected_questions, model_version):
+        self.protocol = protocol
+        self.expected_questions = expected_questions
+        self.model_version = model_version
+        self.groups = defaultdict(dict)
+        self.lengths = defaultdict(lambda: [0, 0, 0, 0])
+        self.protocol_id = protocol.protocol_id
+
+    def add(self, row):
+        if row.get("schema_version") != API_VERSION or row.get("protocol_id") != self.protocol_id:
+            raise ValueError("Generation artifact schema/protocol mismatch")
+        if type(row.get("model_version")) is not int or row["model_version"] != self.model_version:
+            raise ValueError("Generation artifact has a stale student weight version")
+        sample = row["sample_index"]
+        if not isinstance(sample, Integral) or isinstance(sample, bool):
+            raise TypeError("Sample indices must be integers")
+        key = (str(row["data_source"]), str(row["question_uid"]))
+        if sample in self.groups[key]:
+            raise ValueError("Duplicated question/sample identity")
+        score = float(row["score"])
+        if not math.isfinite(score) or (
+            self.protocol.score_kind == "binary" and score not in {0.0, 1.0}
+        ):
+            raise ValueError("Score is outside the declared evaluation domain")
+        count = row["response_tokens"]
+        if type(count) is not int or not 0 < count <= self.protocol.response_tokens:
+            raise ValueError("Invalid response token count")
+        reason = row["finish_reason"]
+        if reason not in {"stop", "length"}:
+            raise ValueError("Evaluation contains unfinished generation")
+        if reason == "length" and count != self.protocol.response_tokens:
+            raise ValueError("Length-terminated output did not preserve the full budget")
+        expected = request_seed(
+            self.protocol.seed, "evaluation", self.model_version, key[1], int(sample)
+        )
+        if row.get("request_seed") != expected:
+            raise ValueError("Generation did not report its requested deterministic sample seed")
+        self.groups[key][int(sample)] = score
+        stats = self.lengths[key[0]]
+        stats[0] += 1
+        stats[1] += count
+        stats[2] += int(reason == "length")
+        stats[3] += int(row.get("eos_terminated", False))
+
+    def finish(self):
+        sources, uids, scores, indices = [], [], [], []
+        for (source, uid), samples in self.groups.items():
+            for index, score in samples.items():
+                sources.append(source)
+                uids.append(uid)
+                scores.append(score)
+                indices.append(index)
+        result = complete_metrics(
+            sources, uids, scores, indices, self.protocol, self.expected_questions
+        )
+        for source, (count, total, length, eos) in self.lengths.items():
+            result.update(
+                {
+                    f"evaluation/{source}/response_tokens/mean": total / count,
+                    f"evaluation/{source}/budget_exhausted_fraction": length / count,
+                    f"evaluation/{source}/eos_fraction": eos / count,
+                }
+            )
+        return result
