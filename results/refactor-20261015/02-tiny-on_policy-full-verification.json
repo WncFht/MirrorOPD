@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "passed": true,
+  "run_id": "02-tiny-on_policy-full",
+  "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+  "config_id": "sha256:344863a00a036685dc2d3bf44f0c50248d092f88a91dff09ff273ca62f0c8526",
+  "algorithm": "on_policy",
+  "loss_kind": "score_surrogate",
+  "outer_steps": 2,
+  "optimizer_updates": 2,
+  "evaluations": [
+    {
+      "model_version": 0,
+      "metrics": {
+        "evaluation/generated_examples": 8,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 2,
+        "evaluation/synthetic-qa/mean@2": 0.0,
+        "evaluation/synthetic-qa/pass@2": 0.0,
+        "evaluation/synthetic-qa/response_tokens/mean": 23.125,
+        "evaluation/synthetic-qa/budget_exhausted_fraction": 0.625,
+        "evaluation/synthetic-qa/eos_fraction": 0.375
+      }
+    },
+    {
+      "model_version": 2,
+      "metrics": {
+        "evaluation/generated_examples": 8,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 2,
+        "evaluation/synthetic-qa/mean@2": 0.0,
+        "evaluation/synthetic-qa/pass@2": 0.0,
+        "evaluation/synthetic-qa/response_tokens/mean": 22.875,
+        "evaluation/synthetic-qa/budget_exhausted_fraction": 0.5,
+        "evaluation/synthetic-qa/eos_fraction": 0.5
+      }
+    }
+  ],
+  "expected_questions": 4,
+  "protocol": {
+    "samples_per_question": 2,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": -1,
+    "prompt_tokens": 64,
+    "response_tokens": 32,
+    "max_context_tokens": 96,
+    "seed": 42,
+    "scorer_id": "sha256:1d74a8af65daa975efdf786607877a1098e989e992a2181ad7a9f3d7c55e3d0c",
+    "score_kind": "binary",
+    "schema_version": 2
+  }
+}

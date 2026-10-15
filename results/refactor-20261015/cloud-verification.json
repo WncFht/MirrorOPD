@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "wandb": {
+    "schema_version": 2,
+    "entity": "generate_rec",
+    "project": "mirroropd-v2",
+    "id": "x750cj4p",
+    "url": "https://wandb.ai/generate_rec/mirroropd-v2/runs/x750cj4p"
+  },
+  "config_id": "sha256:02ec61ff2327ce5b3902dd58b40eeccf91675aa31584d0d452a7d6d1181fc5ca",
+  "optimizer_updates": 2,
+  "evaluations": 2,
+  "evaluation_examples_each": 64,
+  "independent_axes_verified": true,
+  "metric_units_verified": true,
+  "history_rows": 5
+}

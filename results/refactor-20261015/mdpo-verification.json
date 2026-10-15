@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "passed": true,
+  "run_id": "mdpo",
+  "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+  "config_id": "sha256:79456a43ff1eaf2b10f6f7004a27e7bf0c1fa772984e9aa8ce47af09f2e2bbe8",
+  "algorithm": "mdpo",
+  "loss_kind": "score_surrogate",
+  "outer_steps": 2,
+  "optimizer_updates": 4,
+  "evaluations": [
+    {
+      "model_version": 0,
+      "metrics": {
+        "evaluation/generated_examples": 8,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 2,
+        "evaluation/MATH-500/mean@2": 0.0,
+        "evaluation/MATH-500/pass@2": 0.0,
+        "evaluation/MATH-500/response_tokens/mean": 128.0,
+        "evaluation/MATH-500/budget_exhausted_fraction": 1.0,
+        "evaluation/MATH-500/eos_fraction": 0.0
+      }
+    },
+    {
+      "model_version": 2,
+      "metrics": {
+        "evaluation/generated_examples": 8,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 2,
+        "evaluation/MATH-500/mean@2": 0.0,
+        "evaluation/MATH-500/pass@2": 0.0,
+        "evaluation/MATH-500/response_tokens/mean": 128.0,
+        "evaluation/MATH-500/budget_exhausted_fraction": 1.0,
+        "evaluation/MATH-500/eos_fraction": 0.0
+      }
+    }
+  ],
+  "expected_questions": 4,
+  "protocol": {
+    "samples_per_question": 2,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": -1,
+    "prompt_tokens": 4096,
+    "response_tokens": 128,
+    "max_context_tokens": 4224,
+    "seed": 42,
+    "scorer_id": "sha256:1d74a8af65daa975efdf786607877a1098e989e992a2181ad7a9f3d7c55e3d0c",
+    "score_kind": "binary",
+    "schema_version": 2
+  }
+}

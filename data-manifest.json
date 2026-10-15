@@ -1133,6 +1133,12 @@
             "archive": "data/refactor-20261015/benchmark-input-006.bin.gz",
             "bytes": 5034935,
             "sha256": "548d33936b99bce398e4c8395f470165306c1aa1fd7e60c4672cee048d47e21c"
+        },
+        {
+            "path": "runs/refactor-20261015/validation-evidence.tar",
+            "archive": "data/refactor-20261015/validation-evidence.tar.gz",
+            "bytes": 42598400,
+            "sha256": "a50d3763587261f72bb22553604ea41b97fe10d6e82855b8aad1d10302b5b6b8"
         }
     ]
 }

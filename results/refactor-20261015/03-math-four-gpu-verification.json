@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "passed": true,
+  "run_id": "03-math-four-gpu",
+  "source_id": "sha256:1f5b14ea6cf23f21a864d9d6b1deba032436afc8f9e94a555bd6653655f179fa",
+  "config_id": "sha256:02ec61ff2327ce5b3902dd58b40eeccf91675aa31584d0d452a7d6d1181fc5ca",
+  "algorithm": "on_policy",
+  "loss_kind": "score_surrogate",
+  "outer_steps": 2,
+  "optimizer_updates": 2,
+  "evaluations": [
+    {
+      "model_version": 0,
+      "metrics": {
+        "evaluation/generated_examples": 64,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.71875,
+        "evaluation/MATH-500/pass@16": 1.0,
+        "evaluation/MATH-500/response_tokens/mean": 6348.203125,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.015625,
+        "evaluation/MATH-500/eos_fraction": 0.984375
+      }
+    },
+    {
+      "model_version": 2,
+      "metrics": {
+        "evaluation/generated_examples": 64,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.71875,
+        "evaluation/MATH-500/pass@16": 1.0,
+        "evaluation/MATH-500/response_tokens/mean": 6028.953125,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.03125,
+        "evaluation/MATH-500/eos_fraction": 0.96875
+      }
+    }
+  ],
+  "expected_questions": 4,
+  "protocol": {
+    "samples_per_question": 16,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": -1,
+    "prompt_tokens": 4096,
+    "response_tokens": 31744,
+    "max_context_tokens": 35840,
+    "seed": 42,
+    "scorer_id": "sha256:b29730745f739efeec7ff9b034a4cad37c63d79390252cf22a1b0bb95a283486",
+    "score_kind": "binary",
+    "schema_version": 2
+  }
+}
