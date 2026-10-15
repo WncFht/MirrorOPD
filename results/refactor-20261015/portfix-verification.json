@@ -1,0 +1,127 @@
+{
+  "version": "0.2.1",
+  "passed": true,
+  "tests_passed": 270,
+  "backend": {
+    "base_commit": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+    "patch_sha256": "82e3a730fa04ce4c7200f21570c1e00670a7cc6d7822a4ebf1357783182f6b9e"
+  },
+  "wheel": {
+    "wheel": "runs/refactor-20261015/v021-dist/mirroropd-0.2.1-py3-none-any.whl",
+    "sha256": "70558057a76a8b47314ca29091981c6210f5cecc6e2d39d1e4c6050f04de9aa8",
+    "profile_plan_passed": true,
+    "legacy_modules_absent": true,
+    "bundled_runtime_files_present": true,
+    "outside_repository_cwd": true,
+    "file_store_executor_bundled": true
+  },
+  "native": {
+    "passed": true,
+    "version": "0.2.1",
+    "verification": {
+      "schema_version": 2,
+      "passed": true,
+      "run_id": "portfix-native-02",
+      "source_id": "sha256:5fb1d9b83b23c6f46d592a10cdd0623ca9be876130cd53a777b9a9f7e1e5a63a",
+      "config_id": "sha256:3ad3cd296369d0c054836ff07482c8833daaff6624ed513e2fa4f70d45f60841",
+      "algorithm": "on_policy",
+      "loss_kind": "score_surrogate",
+      "outer_steps": 2,
+      "optimizer_updates": 2,
+      "evaluations": [
+        {
+          "model_version": 0,
+          "metrics": {
+            "evaluation/generated_examples": 8,
+            "evaluation/unique_questions": 4,
+            "evaluation/samples_per_question": 2,
+            "evaluation/MATH-500/mean@2": 0.0,
+            "evaluation/MATH-500/pass@2": 0.0,
+            "evaluation/MATH-500/response_tokens/mean": 128.0,
+            "evaluation/MATH-500/budget_exhausted_fraction": 1.0,
+            "evaluation/MATH-500/eos_fraction": 0.0
+          }
+        },
+        {
+          "model_version": 2,
+          "metrics": {
+            "evaluation/generated_examples": 8,
+            "evaluation/unique_questions": 4,
+            "evaluation/samples_per_question": 2,
+            "evaluation/MATH-500/mean@2": 0.0,
+            "evaluation/MATH-500/pass@2": 0.0,
+            "evaluation/MATH-500/response_tokens/mean": 128.0,
+            "evaluation/MATH-500/budget_exhausted_fraction": 1.0,
+            "evaluation/MATH-500/eos_fraction": 0.0
+          }
+        }
+      ],
+      "expected_questions": 4,
+      "protocol": {
+        "samples_per_question": 2,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "top_k": -1,
+        "prompt_tokens": 4096,
+        "response_tokens": 128,
+        "max_context_tokens": 4224,
+        "seed": 42,
+        "scorer_id": "sha256:b29730745f739efeec7ff9b034a4cad37c63d79390252cf22a1b0bb95a283486",
+        "score_kind": "binary",
+        "schema_version": 2
+      }
+    },
+    "singleton_file_stores": [
+      {
+        "backend": "file",
+        "component": "vllm_executor",
+        "data_parallel_size": 1,
+        "init_method": "file:///root/.cache/mopd/je23999f0/t/vllm-3e870b0df4894e64b609e76656f83b51.store",
+        "world_size": 1
+      },
+      {
+        "backend": "file",
+        "component": "vllm_executor",
+        "data_parallel_size": 1,
+        "init_method": "file:///root/.cache/mopd/je23999f0/t/vllm-72958e73972b4d5cb4cc0822493680d1.store",
+        "world_size": 1
+      },
+      {
+        "backend": "file",
+        "component": "vllm_executor",
+        "data_parallel_size": 1,
+        "init_method": "file:///root/.cache/mopd/je23999f0/t/vllm-39e43df05bda41adbf36b5b3e95aaf69.store",
+        "world_size": 1
+      },
+      {
+        "backend": "file",
+        "component": "vllm_executor",
+        "data_parallel_size": 1,
+        "init_method": "file:///root/.cache/mopd/je23999f0/t/vllm-83ca6d52eba2480cafd2d0159d23f799.store",
+        "world_size": 1
+      }
+    ]
+  },
+  "global_token_counts_match_rollouts": true,
+  "core_unchanged_since_v020": [
+    "src/mirroropd/core/__init__.py",
+    "src/mirroropd/core/cache.py",
+    "src/mirroropd/core/config.py",
+    "src/mirroropd/core/diagnostics.py",
+    "src/mirroropd/core/distributions.py",
+    "src/mirroropd/core/objectives.py",
+    "src/mirroropd/core/signal.py",
+    "src/mirroropd/core/vocabulary.py"
+  ],
+  "failed_formal_start": {
+    "directory": "runs/math-four-gpu-v02-20261015",
+    "optimizer_updates": 0,
+    "cause": "vLLM TCPStore port 32775 already in use"
+  },
+  "prototype_audit": {
+    "directory": "runs/refactor-20261015/portfix-native-01",
+    "native_training_passed": true,
+    "file_rendezvous_events": 0,
+    "accepted": false
+  }
+}
