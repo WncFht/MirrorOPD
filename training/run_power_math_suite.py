@@ -14,6 +14,14 @@ from training.oneshot_suite import snapshot_sources, write_status
 from training.power_implementation_suite import acquire_lease
 
 
+def rendezvous_path(name):
+    return Path.home() / ".cache/mopd-avg-rdzv" / (name + ".store")
+
+
+def rendezvous_override(name):
+    return f'+ray_kwargs.ray_init.runtime_env.env_vars.DIST_INIT_METHOD="file://{rendezvous_path(name)}"'
+
+
 def plan(suite_name):
     shared = [
         "distillation.distillation_loss.mirror_kappa=0.5",
@@ -21,6 +29,7 @@ def plan(suite_name):
         "distillation.distillation_loss.mirror_center_mode=topj_tail",
         "distillation.distillation_loss.mirror_action_mode=sampled",
         '+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1="1"',
+        '+ray_kwargs.ray_init.runtime_env.env_vars.USE_LIBUV="0"',
         "ray_kwargs.ray_init.object_store_memory=4294967296",
     ]
     return [
@@ -29,13 +38,18 @@ def plan(suite_name):
             "method": "mirror_opd_onpolicy",
             "overrides": [
                 *shared,
+                rendezvous_override(suite_name + "-canary"),
                 "trainer.total_training_steps=2",
                 "trainer.test_freq=2",
                 "data.val_max_samples=4",
             ],
         },
         *[
-            {"name": suite_name + "-" + name, "method": method, "overrides": shared}
+            {
+                "name": suite_name + "-" + name,
+                "method": method,
+                "overrides": [*shared, rendezvous_override(suite_name + "-" + name)],
+            }
             for name, method in (
                 ("onpolicy", "mirror_opd_onpolicy"),
                 ("mdpo", "mirror_mdpo"),
@@ -120,6 +134,11 @@ def main():
     stages = plan(args.suite_name)
     if args.canary_only:
         stages = stages[:1]
+    for stage in stages:
+        rendezvous = rendezvous_path(stage["name"])
+        rendezvous.parent.mkdir(parents=True, exist_ok=True)
+        if rendezvous.exists():
+            raise ValueError("Rendezvous path already exists; use a new suite name")
     (suite / "plan.json").write_text(json.dumps(stages, indent=2) + "\n")
     snapshot_sources(root, suite / "source")
     frozen = source_hashes(root, backend)
@@ -134,6 +153,7 @@ def main():
         "MIRROR_RAY_TMPDIR": str(Path.home() / ".cache/mopd-avg-ray"),
         "MIRROR_TMPDIR": str(Path.home() / ".cache/mopd-avg-tmp"),
         "VLLM_USE_V1": "1",
+        "USE_LIBUV": "0",
         "WANDB_RUN_GROUP": args.suite_name,
     }
     lease = acquire_lease(root, suite)
