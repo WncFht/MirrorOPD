@@ -2,13 +2,11 @@
 
 import torch
 
-torch.set_default_dtype(torch.float64)
-
 
 def main():
     torch.manual_seed(7)
-    logits = torch.tensor([0.7, -0.2, 1.1, -1.0], requires_grad=True)
-    q_logits = torch.tensor([-0.3, 0.4, 0.2, -0.8])
+    logits = torch.tensor([0.7, -0.2, 1.1, -1.0], dtype=torch.float64, requires_grad=True)
+    q_logits = torch.tensor([-0.3, 0.4, 0.2, -0.8], dtype=torch.float64)
     p = torch.softmax(logits, 0)
     q = torch.softmax(q_logits, 0)
     exact_value = torch.sum(p * (torch.log(p) - torch.log(q)))
