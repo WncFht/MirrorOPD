@@ -21,7 +21,7 @@ MirrorOPD 当前维护 0.2 接口。用户明确要求全面重构、清理旧�
 
 ## 数学与验证
 
-理论推导来源在 `theory/`，由用户 review 和合并；它们不是工程文档或已审定结论。现有书稿构建入口为 `theory/book/2026-10-08-固定测度Token级MirrorOPD.tex`。保持完整推导、假设和来源，不因工程维护删除理论正文或合并不同稿件；修改理论源文件时同步其 PDF。历史实验报告和数据保留。
+理论推导来源在 `theory/`，由用户 review 和合并；它们不是工程文档或已审定结论。现有书稿构建入口为 `theory/book/2026-10-08-固定测度Token级MirrorOPD.tex`。保持完整推导、假设和来源，不因工程维护删除理论正文或合并不同稿件；修改理论源文件时同步其 PDF。历史实验的有效结论、方法、负结果和数据保留；旧正文按用户授权逐篇重写、合并或删除，不能把保留证据解释为保留每篇文章。
 
 公式明确冻结锚点、教师、当前学生、prefix/action 测度、停止梯度、更新和同步顺序。区分 score surrogate 与条件目标、reward 中心与普通 KL、训练 token 加权与评测按题平均。on-policy 每个新 batch 只做一次完整更新。
 
@@ -43,7 +43,7 @@ GPU 列表、模型目录、数据路径、后端和运行目录显式配置。�
 
 维护接入、检查边界及来源见[维护指南](docs/maintenance.md)。`make check-docs` 检查当前文档与 Notes，`make test-maintenance` 验证维护工具，`make check-maintenance` 供 pre-push 与 CI 执行；产品测试仍由 `make test` 负责。pre-commit 对真正的 index 快照检查契约，不能用未暂存内容证明提交正确。
 
-旧文档和历史决策的重写、归类与转为 Notes 等待用户另行启动。维护规则从接入起适用于新增或修改内容；原样保留的旧文档只享有文件哈希限定的延期，不代表其中命令和结论已核验。理论资料的 `theory/Notes/` 与 `.agents/notes/` 的工程决策各有归属。
+用户已启动旧文档与历史决策整理。实验报告按研究问题维护，规范见 docs/AGENTS.md；提取独有有效内容后删除被替代正文，不建立平行历史汇编。理论资料的 `theory/Notes/` 与 `.agents/notes/` 的工程决策各有归属。
 
 使用英文 Conventional Commits，独立逻辑变更独立提交，不绕过 hook。保留用户已有的未提交工作。默认运行 `make test`；原生源码集成测试通过 `MIRROR_TEST_BACKEND` 指定已准备的固定后端。提交前执行 `make check`。理论或书稿图片变化执行 `make book`。
 

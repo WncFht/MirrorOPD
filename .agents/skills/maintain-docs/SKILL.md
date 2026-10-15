@@ -1,6 +1,6 @@
 ---
 name: maintain-docs
-description: 编写、重组或审计 README、教程与参考文档时使用；核对读者、事实归属、操作证据和生成来源。
+description: 编写、重组或审计 README、教程、参考文档与实验报告时使用；核对读者、事实归属、操作证据和生成来源。
 ---
 
 # 维护文档
@@ -12,5 +12,7 @@ description: 编写、重组或审计 README、教程与参考文档时使用；
 按文中最终写法执行命令与配置。字段、默认值、失败和平台差异从当前实现、测试或运行结果核对；缺环境时明确未验证内容，不从记忆或邻包类推。先确认对象究竟是可安装应用、插件、库还是组合配置，再给对应操作。
 
 来源先改，生成器和派生内容随后更新。移动时修复入链。对外不兼容变化按[升级指南](../../references/upgrade-guides.md)编写迁移路径。清理重复规则、手写清单、当前文档中的历史叙述和实施记录中的计划；不得为减少字数删除失败、限制、资源归属和必要例子。
+
+实验报告先读[实验报告维护](../../references/experiment-reports.md)，按研究问题归并协议、结果和限制；更新结论时保留纠正依据及负结果，过程日志另存。可选用[实验报告骨架](../../templates/experiment-report.md)，不把 CPU 检查、链路 canary 和任务效果混为同一证据。
 
 按 [maintain-prose](../maintain-prose/SKILL.md) 做句级审阅，再执行目标已有文档检查、示例验证和 diff 检查。需要长期理由时使用 [maintain-decision-notes](../maintain-decision-notes/SKILL.md)。报告实际范围、未核验断言和运行过的命令。
