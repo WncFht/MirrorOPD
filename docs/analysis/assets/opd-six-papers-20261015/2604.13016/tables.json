@@ -1,0 +1,477 @@
+[
+    {
+        "id": "A1.T1",
+        "caption": "Table 1 : Training hyperparameters of GRPO for Qwen3-4B-Base-GRPO.",
+        "rows": [
+            ["Hyper-parameter", "Value"],
+            ["Base model", "Qwen3-4B-Base"],
+            ["RL algorithm", "GRPO"],
+            ["Training epochs", "1"],
+            ["Train batch size", "64"],
+            ["Micro batch size", "64"],
+            ["Rollout $n$", "8"],
+            ["Maximum prompt length", "1,024"],
+            ["Maximum response length", "7,168"],
+            ["Validation max response length", "31,744"],
+            ["Learning rate", "$1\\times 10^{-6}$"],
+            ["Temperature", "1.0"],
+            ["Top- $p$", "1.0"],
+            ["KL regularization", "0.0"],
+            ["Loss aggregation", "token-mean"],
+            ["KL Coefficient", "0.0"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A1.T2",
+        "caption": "Table 2 : Default hyperparameters for OPD.",
+        "rows": [
+            ["Item", "Value"],
+            ["Training temperature", "1.0"],
+            ["Global batch size", "64"],
+            ["Mini batch size", "64"],
+            ["Rollout number", "4"],
+            ["LogProb top- $K$", "16"],
+            ["Top- $K$ strategy", "Student Top- $K$"],
+            ["Top- $p$", "1.0"],
+            ["Max prompt length", "1024"],
+            ["Max response length", "7168"],
+            ["Learning rate", "1e-6"],
+            ["Epoch", "1"],
+            ["KL Coefficient", "0.0"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T3",
+        "caption": "Table 3 : SFT hyperparameters for cold-start distillation from Qwen3-4B (Non-thinking) to Qwen3-1.7B-Base.",
+        "rows": [
+            ["Hyper-parameter", "Value"],
+            ["Student model", "Qwen3-1.7B-Base"],
+            ["Training objective", "Full-parameter SFT"],
+            ["Template", "qwen3"],
+            ["Training epochs", "1"],
+            ["Sequence length", "14,336"],
+            ["Per-device batch size", "8"],
+            ["Gradient accumulation steps", "1"],
+            ["Learning rate", "$1\\times 10^{-5}$"],
+            ["LR scheduler", "Cosine"],
+            ["Warmup ratio", "0.05"],
+            ["Precision", "BF16"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    }
+]

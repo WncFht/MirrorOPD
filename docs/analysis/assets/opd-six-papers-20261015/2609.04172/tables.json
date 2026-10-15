@@ -1,0 +1,947 @@
+[
+    {
+        "id": "S3.T1",
+        "caption": "Table 1: Student–teacher pairs used in our experiments.",
+        "rows": [
+            ["Setting", "Student", "Teacher"],
+            [
+                "Mathematical reasoning",
+                "DeepSeek-R1-Distill-Qwen-1.5B (R1-Distill-1.5B)",
+                "JustRL-DeepSeek-1.5B (JustRL-1.5B)"
+            ],
+            [
+                "Llama-3.2-3B-Instruct (Llama-3B-It)",
+                "GT-Llama-3.2-3B-Instruct-MATH (GT-Llama-3B-Math)"
+            ],
+            [
+                "OLMo-3-7B-Instruct-DPO (OLMo-7B-It-DPO)",
+                "OLMo-3-7B-Instruct (OLMo-7B-It)"
+            ],
+            [
+                "Code generation",
+                "DeepSeek-R1-Distill-Qwen-1.5B (R1-Distill-1.5B)",
+                "Nemotron-Research-Reasoning-Qwen-1.5B-v2-RLVE (Nemotron-1.5B)"
+            ],
+            [
+                "Instruction following",
+                "DeepSeek-R1-Distill-Qwen-1.5B (R1-Distill-1.5B)",
+                "UltraData-IF-1.5B"
+            ],
+            [
+                "Agentic tool use",
+                "Qwen2.5-Coder-1.5B-Instruct (Qwen-Coder-1.5B)",
+                "Hammer2.1-1.5b (Hammer-1.5B)"
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 3,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A1.T2",
+        "caption": "Table 2: Mathematical queries used in the query-difficulty experiment, labelled by the student’s pass rate before OPD training.",
+        "rows": [
+            ["Difficulty", "ID", "Query"],
+            [
+                "Easy",
+                "t59",
+                "In triangle $ABC$ , let $D$ be the foot of the altitude from $A$ . Suppose that $AD=4$ , $BD=3$ , $CD=2$ , and $AB$ is extended past $B$ to a point $E$ such that $BE=5$ . Determine the value of $CE^{2}$ ."
+            ],
+            [
+                "Medium",
+                "t22",
+                "Let $S$ be the set of triples $(a,b,c)$ of non-negative integers such that $a+b+c$ is even. Determine the value of $\\sum_{(a,b,c)\\in S}\\frac{1}{2^{a}3^{b}5^{c}}$ .\nThis sum can be expressed as $\\frac{m}{n}$ , where $m$ and $n$ are relatively prime positive integers. Compute $m+n$ ."
+            ],
+            [
+                "Hard",
+                "t56",
+                "Byan is playing a game called “raven, raven, falcon” with his three friends. His friends sit in a circle, and Byan walks clockwise around them, tapping each friend he passes on the head and saying either “raven” or “falcon,” each with probability $\\frac{1}{2}$ . The game ends when Byan has said “falcon” twice. The probability that one of his friends will be called a “falcon” twice can be expressed as $\\frac{m}{n}$ , where $m$ and $n$ are relatively prime positive integers. Find $100m+n$ ."
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A1.T3",
+        "caption": "Table 3 : Default hyperparameters for OPD.",
+        "rows": [
+            ["Item", "Value"],
+            ["Rollout batch size", "64"],
+            ["Mini batch size", "64"],
+            ["Responses per prompt", "1"],
+            ["KL coefficient", "0.0"],
+            ["LogProb top- $K$", "0(default) / 16"],
+            ["Top- $K$ strategy", "Student Top- $K$"],
+            ["Loss aggregation", "token-mean"],
+            ["Training temperature", "1.0"],
+            ["Top- $p$", "1.0"],
+            [
+                "Optimizer",
+                "AdamW ( $\\beta_{1}{=}0.9$ , $\\beta_{2}{=}0.999$ , wd $=0.01$ )"
+            ],
+            ["Learning rate", "1e-6"],
+            ["Gradient clip norm", "1.0"],
+            ["Max prompt length", "1024 (math); 4096 (code, IF, agentic)"],
+            ["Max response length", "7168 (math, code, IF); 2048 (agentic)"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A2.T4",
+        "caption": "Table 4: Full-data-anchored training-state coverage at step $300$ under different cluster counts $K$ .",
+        "rows": [
+            ["$K$", "1-shot", "4-shot", "16-shot", "Full data (held-out)"],
+            ["50", "0.755", "0.829", "1.000", "1.000"],
+            ["100", "0.727", "0.803", "1.000", "1.000"],
+            ["200", "0.715", "0.798", "0.989", "1.000"],
+            ["500", "0.564", "0.695", "0.904", "0.956"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A2.T5",
+        "caption": "Table 5: Training-state coverage under alternative cluster constructions, at $K=200$ .",
+        "rows": [
+            [
+                "Reference construction",
+                "1-shot",
+                "4-shot",
+                "16-shot",
+                "Full data (held-out)"
+            ],
+            ["Full-data anchored", "0.663", "0.773", "0.953", "0.998"],
+            ["Equal-size pooled", "0.750", "0.845", "0.958", "0.966"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A2.T6",
+        "caption": "Table 6: Reference-distance diagnostics across query-set sizes. AUROC compares each setting with the held-out full-data states. The last row is the complete full-data pool, including the rollouts that built the clusters, so its exceedance rate need not equal the $5\\%$ the threshold is set at.",
+        "rows": [
+            ["Setting", "Exceedance (%)", "Mean distance", "AUROC"],
+            ["1-shot", "17.2", "0.283", "0.552"],
+            ["4-shot", "4.4", "0.218", "0.477"],
+            ["16-shot", "3.8", "0.231", "0.512"],
+            ["Full data (all)", "4.0", "0.215", "0.476"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T7",
+        "caption": "Table 7: Alignment dynamics over steps $30$ – $300$ for on-policy OPD, at the default learning rate.",
+        "rows": [
+            ["Setting (queries)", "1", "4", "16", "Full data"],
+            ["$d_{300}/d_{30}$", "0.16", "0.17", "0.18", "0.22"],
+            ["$v_{50}/v_{200}$", "5.6", "5.2", "4.2", "6.4"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A4.T8",
+        "caption": "Table 8 : Default hyperparameters for MOPD (multi-teacher on-policy distillation).",
+        "rows": [
+            ["Item", "Value"],
+            ["Number of teachers", "3 (math / code / IF)"],
+            ["LogProb top- $k$", "0"],
+            ["KL coefficient", "0.0"],
+            ["Loss aggregation", "seq-mean-token-mean"],
+            ["Rollout batch size", "64"],
+            ["Mini batch size", "64"],
+            ["Responses per prompt", "1"],
+            ["Training temperature", "1.0"],
+            ["Top- $p$", "1.0"],
+            [
+                "Optimizer",
+                "AdamW ( $\\beta_{1}{=}0.9$ , $\\beta_{2}{=}0.999$ , wd $=0.01$ )"
+            ],
+            ["Learning rate", "1e-6"],
+            ["Gradient clipping", "1.0"],
+            ["Max prompt length", "4096"],
+            ["Max response length", "7680"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    }
+]

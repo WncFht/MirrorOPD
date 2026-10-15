@@ -1,0 +1,1456 @@
+[
+    {
+        "id": "S1.T1",
+        "caption": "Table 1: Comparison of different paradigms.",
+        "rows": [
+            [
+                "Method",
+                "Sampling",
+                "Reward Signal",
+                "Training Stability",
+                "Theoretical Guarantee"
+            ],
+            ["Supervised Fine-Tuning", "off-policy", "dense", "high", "weak"],
+            [
+                "Reinforcement Learning with Verifiable Rewards",
+                "on-policy",
+                "sparse",
+                "low",
+                "weak"
+            ],
+            ["On-Policy Distillation", "on-policy", "dense", "low", "weak"],
+            [
+                "Trust Region Policy Distillation",
+                "on-policy",
+                "dense",
+                "high",
+                "strong"
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "S5.T2",
+        "caption": "Table 2: Performance comparison of the Qwen3-8B-Base across various mathematical benchmarks.",
+        "rows": [
+            ["Student Model", "Paradigm", "Method", "Teacher Model"],
+            ["Qwen3-30B-A3B-Instruct-2507"],
+            ["avg@32", "avg@8"],
+            ["AIME24", "AIME25", "AIME26", "AMC23", "MATH-500", "Olympiad"],
+            [
+                "Qwen3-8B-Base",
+                "Base",
+                "-",
+                "9.38",
+                "8.02",
+                "6.15",
+                "53.13",
+                "75.23",
+                "40.08"
+            ],
+            [
+                "RLVR",
+                "GRPO",
+                "30.10",
+                "22.08",
+                "21.67",
+                "56.33",
+                "76.83",
+                "44.92"
+            ],
+            ["DAPO", "32.92", "27.81", "32.29", "65.39", "81.65", "44.23"],
+            [
+                "Distillation",
+                "OPD",
+                "24.58",
+                "23.33",
+                "25.42",
+                "76.88",
+                "87.98",
+                "59.29"
+            ],
+            [
+                "TOP-D (Ours)",
+                "50.42 (+25.84)",
+                "34.06 (+10.73)",
+                "44.06 (+18.64)",
+                "88.13 (+11.25)",
+                "91.23 (+3.25)",
+                "64.67 (+5.38)"
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 6
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 6
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 4
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 2
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 5,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 2,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 2,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "S5.T3",
+        "caption": "Table 3: Performance comparison of the Qwen3-1.7B-Base across AIME benchmarks.",
+        "rows": [
+            ["Student Model", "Paradigm", "Method", "Teacher Model"],
+            ["Qwen3-30B-A3B-Instruct-2507", "Qwen3-14B"],
+            ["avg@32"],
+            ["AIME24", "AIME25", "AIME26", "AIME24", "AIME25", "AIME26"],
+            [
+                "Qwen3-1.7B-Base",
+                "Base",
+                "-",
+                "3.44",
+                "1.98",
+                "1.88",
+                "3.44",
+                "1.98",
+                "1.88"
+            ],
+            ["RLVR", "GRPO", "10.52", "7.19", "4.69", "10.52", "7.19", "4.69"],
+            ["DAPO", "12.29", "11.56", "8.54", "12.29", "11.56", "8.54"],
+            [
+                "Distillation",
+                "OPD",
+                "8.96",
+                "7.50",
+                "5.94",
+                "7.81",
+                "8.33",
+                "5.63"
+            ],
+            [
+                "TOP-D (Ours)",
+                "20.31 (+11.35)",
+                "17.71 (+10.21)",
+                "13.75 (+7.81)",
+                "12.81 (+5.00)",
+                "14.69 (+6.36)",
+                "9.69 (+4.06)"
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 6
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 3
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 3
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 6
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 5,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 2,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 2,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A1.T4",
+        "caption": "Table 4: Performance comparison of the Qwen3-1.7B-Base across various mathematical benchmarks.",
+        "rows": [
+            ["Student Model", "Paradigm", "Method", "Teacher Model"],
+            ["Qwen3-30B-A3B-Instruct-2507"],
+            ["avg@32", "avg@8"],
+            ["AIME24", "AIME25", "AIME26", "AMC23", "MATH-500", "Olympiad"],
+            [
+                "Qwen3-1.7B-Base",
+                "Base",
+                "-",
+                "3.44",
+                "1.98",
+                "1.88",
+                "27.27",
+                "56.80",
+                "24.00"
+            ],
+            [
+                "RLVR",
+                "GRPO",
+                "10.52",
+                "7.19",
+                "4.69",
+                "35.55",
+                "54.73",
+                "18.47"
+            ],
+            ["DAPO", "12.29", "11.56", "8.54", "37.50", "61.88", "26.63"],
+            [
+                "Distillation",
+                "OPD",
+                "8.96",
+                "7.50",
+                "5.94",
+                "45.70",
+                "71.13",
+                "35.83"
+            ],
+            [
+                "TOP-D (Ours)",
+                "20.31 (+11.35)",
+                "17.71 (+10.21)",
+                "13.75 (+7.81)",
+                "54.38 (+8.68)",
+                "77.33 (+6.20)",
+                "43.06 (+7.23)"
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 4,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 6
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 6
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 4
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 2
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 5,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 2,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 2,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A2.T5",
+        "caption": "Table 5: Detailed hyperparameters for different methods.",
+        "rows": [
+            [
+                "Hyperparameter",
+                "GRPO [ 13 ]",
+                "DAPO [ 20 ]",
+                "OPD [ 10 ]",
+                "TOP-D (Ours)"
+            ],
+            ["General"],
+            ["Max prompt length", "2048", "2048", "2048", "2048"],
+            ["Optimization"],
+            ["Global batch size", "512", "512", "512", "512"],
+            ["Mini-batch size", "32", "32", "512", "32"],
+            ["Mini-batches", "16", "16", "1", "16"],
+            ["Group size", "8", "8", "8", "8"],
+            ["Off-policy epoch", "1", "1", "-", "1"],
+            ["Optimizer", "AdamW", "AdamW", "AdamW", "AdamW"],
+            ["Learning rate", "1e-6", "1e-6", "1e-6", "1e-6"],
+            ["Warmup steps", "10", "10", "-", "-"],
+            ["Sampling"],
+            ["Rollout max response length", "16384", "16384", "16384", "16384"],
+            ["Rollout temperature", "1.0", "1.0", "1.0", "1.0"],
+            ["Rollout top- $p$", "1.0", "1.0", "1.0", "1.0"],
+            [
+                "Validation max response length",
+                "16384",
+                "16384",
+                "16384",
+                "16384"
+            ],
+            ["Validation temperature", "1.0", "1.0", "1.0", "1.0"],
+            ["Validation top- $p$", "0.7", "0.7", "0.7", "0.7"],
+            ["Algorithm-specific"],
+            ["$\\epsilon_{\\mathrm{low}}$", "0.2", "0.2", "-", "0.2"],
+            ["$\\epsilon_{\\mathrm{high}}$", "0.2", "0.28", "-", "0.2"],
+            ["Interpolation $\\alpha$", "-", "-", "-", "0.1 / 0.2"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    }
+]

@@ -1,0 +1,1766 @@
+[
+    {
+        "id": "S2.T1",
+        "caption": "Table 1: bf16-aware update sparsity. OPD lies between SFT and RLVR in the controlled Qwen3-8B comparison, and remains stable across OPD variants.\nPublished checkpoints are used only as external reference points.\nIn OPD variant names, T $x$ B denotes a teacher model with $x$ B parameters, e.g., OPD-4B-T8B uses a 4B student and an 8B teacher.\nMixed † denotes a mixture of math, code, STEM, logic, and instruction data.",
+        "rows": [
+            [
+                "Base Model",
+                "Finetuned (FT) Model",
+                "Algorithm",
+                "Data",
+                "sparsity bf16"
+            ],
+            ["Controlled comparison: SFT $<$ OPD $<$ RLVR"],
+            ["Qwen3-8B-Base", "Qwen3-8B-SFT", "SFT", "Math", "8.1%"],
+            ["Qwen3-8B-SFT", "OPD-8B-T32B", "OPD", "Math", "51.6%"],
+            ["Qwen3-8B-SFT", "RLVR-8B", "GRPO", "Math", "77.2%"],
+            ["OPD robustness across teacher / student / data"],
+            ["Qwen3-4B-SFT", "OPD-4B-T8B", "OPD", "Math", "50.3%"],
+            ["Qwen3-4B-SFT", "OPD-4B-T14B", "OPD", "Math", "51.1%"],
+            ["Qwen3-4B-SFT", "OPD-4B-T32B", "OPD", "Math", "51.7%"],
+            ["Qwen3-14B-SFT", "OPD-14B-T32B", "OPD", "Math", "56.6%"],
+            ["Qwen3-8B-SFT", "OPD-8B-T32B-Code", "OPD", "Code", "57.1%"],
+            ["Qwen3-8B-SFT", "OPD-8B-T32B-MoE", "OPD", "Math", "48.6%"],
+            ["Published reference points"],
+            [
+                "Qwen3-8B-Base",
+                "Klear-Reasoner-8B-SFT",
+                "SFT",
+                "Math+Code",
+                "0.6%"
+            ],
+            [
+                "Qwen3-14B-Base",
+                "UniReason-14B-think-SFT",
+                "SFT",
+                "Mixed †",
+                "18.8%"
+            ],
+            [
+                "Klear-Reasoner-8B-SFT",
+                "Klear-Reasoner-8B",
+                "GRPO",
+                "Math+Code",
+                "69.9%"
+            ],
+            ["Qwen3-8B-Base", "GT-Qwen3-8B-Base", "GRPO", "Math", "79.0%"],
+            ["Qwen3-4B", "Polaris-4B-Preview", "DAPO", "Math", "79.9%"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 5
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T2",
+        "caption": "Table 2: Shared settings used in the main training runs.",
+        "rows": [
+            ["Item", "Shared setting"],
+            ["Model family", "Qwen3"],
+            ["Main backbone", "Qwen3-8B"],
+            ["Evaluation", "AIME 2024 avg@8"],
+            ["Precision", "bf16 training"],
+            ["Gradient accumulation", "fp32"],
+            ["Attention softmax", "fp32"],
+            ["Hardware", "H200 80GB GPUs"],
+            ["Dropout", "0.0"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T3",
+        "caption": "Table 3: Default SFT setting used to produce the shared anchor checkpoint.",
+        "rows": [
+            ["Item", "SFT default setting"],
+            ["Initialization", "Qwen3-8B-Base"],
+            ["Objective", "Supervised next-token prediction"],
+            ["Loss mask", "Qwen3 loss mask"],
+            ["Training data", "Dolci-Think SFT data"],
+            ["Epochs", "5"],
+            ["Final checkpoint", "iter_0005375"],
+            ["Global batch size", "256"],
+            ["Learning rate", "$10^{-5}$"],
+            ["Schedule", "Cosine decay to $10^{-6}$"],
+            ["Warmup", "10% of training steps"],
+            ["Optimizer", "Adam"],
+            ["Weight decay", "0.1"],
+            ["Adam betas", "$(0.9,0.95)$"],
+            ["Save interval", "256 steps"],
+            ["Eval interval", "256 steps"],
+            ["Role", "Produces the shared SFT anchor"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T4",
+        "caption": "Table 4: Default OPD setting used in the main experiments.",
+        "rows": [
+            ["Item", "OPD default setting"],
+            ["Initialization", "SFT anchor iter_0005375"],
+            ["Student", "Qwen3-8B"],
+            ["Teacher", "Qwen3-32B"],
+            ["Training data", "dapo-math-17k"],
+            ["Rollout policy", "Student-generated, on-policy"],
+            ["Rollout prompts", "300 per step"],
+            ["Samples per prompt", "8"],
+            ["Rollout temperature", "1.0"],
+            ["Training steps", "299"],
+            ["Save interval", "64 steps"],
+            ["Objective", "On-policy distillation"],
+            ["Teacher supervision", "Token log-probabilities"],
+            ["OPD coefficient", "1.0"],
+            ["Advantage estimator", "GRPO"],
+            ["KL loss", "Disabled"],
+            ["Entropy bonus", "Disabled"],
+            ["Global batch size", "64"],
+            ["Learning rate", "$10^{-6}$"],
+            ["Schedule", "Constant"],
+            ["Optimizer", "Adam"],
+            ["Weight decay", "0.1"],
+            ["Adam betas", "$(0.9,0.98)$"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T5",
+        "caption": "Table 5: Default RLVR setting used in the main experiments.",
+        "rows": [
+            ["Item", "RLVR default setting"],
+            ["Initialization", "SFT anchor iter_0005375"],
+            ["Student", "Qwen3-8B"],
+            ["Teacher", "None"],
+            ["Training data", "dapo-math-17k"],
+            ["Rollout policy", "Student-generated, on-policy"],
+            ["Rollout prompts", "1024 per step"],
+            ["Samples per prompt", "8"],
+            ["Rollout temperature", "1.0"],
+            ["Training steps", "1023"],
+            ["Objective", "Verifier-reward GRPO"],
+            ["Reward", "Binary DeepScaler math accuracy"],
+            ["Advantage estimator", "GRPO"],
+            ["KL loss", "Disabled"],
+            ["Entropy bonus", "Disabled"],
+            [
+                "PPO clipping",
+                "$\\epsilon=0.2$ , $\\epsilon_{\\mathrm{high}}=0.28$"
+            ],
+            ["Dynamic filter", "Skip batches with zero reward variance"],
+            ["Global batch size", "512"],
+            ["Learning rate", "$10^{-6}$"],
+            ["Schedule", "Constant"],
+            ["Optimizer", "Adam"],
+            ["Weight decay", "0.1"],
+            ["Adam betas", "$(0.9,0.98)$"],
+            ["Adam epsilon", "$10^{-15}$"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T6",
+        "caption": "Table 6: OPD variant runs used for robustness checks in\nTable 1 .",
+        "rows": [
+            ["Variant", "Student", "Teacher", "Changed factor"],
+            ["Baseline", "Qwen3-8B", "Qwen3-32B", "Reference"],
+            [
+                "MoE teacher",
+                "Qwen3-8B",
+                "Qwen3-30B-A3B",
+                "Teacher architecture"
+            ],
+            ["4B $\\rightarrow$ 8B", "Qwen3-4B", "Qwen3-8B", "Teacher scale"],
+            ["4B $\\rightarrow$ 14B", "Qwen3-4B", "Qwen3-14B", "Teacher scale"],
+            ["4B $\\rightarrow$ 32B", "Qwen3-4B", "Qwen3-32B", "Teacher scale"],
+            [
+                "14B $\\rightarrow$ 32B",
+                "Qwen3-14B",
+                "Qwen3-32B",
+                "Student scale"
+            ],
+            ["Code domain", "Qwen3-8B", "Qwen3-32B", "Data domain"],
+            ["Multi-seed", "Qwen3-8B", "Qwen3-32B", "Random seed"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A3.T7",
+        "caption": "Table 7: Additional notes for OPD variant runs.",
+        "rows": [
+            ["Variant", "Additional setting"],
+            [
+                "Code domain",
+                "Uses DeepCoder data and LiveCodeBench v5 evaluation"
+            ],
+            ["MoE teacher", "Uses Qwen3-30B-A3B as the teacher model"],
+            [
+                "Multi-seed",
+                "Uses the same Qwen3-8B/Qwen3-32B math setting with different random seeds"
+            ]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A7.T8",
+        "caption": "Table 8: Shared setup for OPD control experiments.",
+        "rows": [
+            ["Item", "Setting"],
+            ["Student model", "Qwen3-8B"],
+            ["Teacher model", "Qwen3-32B"],
+            ["Student initialization", "Qwen3-8B SFT anchor, iter_0005375"],
+            ["Training data", "dapo-math-17k"],
+            ["Training length", "300 steps"],
+            ["Checkpoint steps", "63, 127, 191, 255, 299"],
+            ["Baseline rollout", "Student-generated, 8 samples per prompt"],
+            ["Analyzed matrices", "36 layers $\\times$ 4 attention weights"],
+            ["Primary diagnostic", "Stable rank"],
+            ["Auxiliary diagnostics", "Frobenius norm, Hill tail estimate"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    },
+    {
+        "id": "A7.T9",
+        "caption": "Table 9: Controlled variables in Section 5 . Each intervention\nchanges one target factor while keeping the remaining OPD setup fixed where\npossible.",
+        "rows": [
+            [
+                "Dimension",
+                "Baseline",
+                "Token sparse",
+                "Off-policy",
+                "Alpha mix"
+            ],
+            ["Rollout policy", "Student", "Student", "Teacher", "Student"],
+            ["Token coverage", "100%", "25/50%", "100%", "100%"],
+            ["Objective signal", "OPD", "OPD", "OPD", "OPD/RLVR mix"],
+            ["Reward module", "OPD", "OPD", "OPD", "Mixed reward"],
+            ["Other settings", "–", "Same", "Same", "Same"]
+        ],
+        "cell_spans": [
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ],
+            [
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                },
+                {
+                    "rowspan": 1,
+                    "colspan": 1
+                }
+            ]
+        ]
+    }
+]

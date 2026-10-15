@@ -1,0 +1,1361 @@
+{
+    "retrieved_on": "2026-10-15",
+    "papers": [
+        {
+            "arxiv_id": "2604.13016",
+            "version": "2604.13016v2",
+            "html_url": "https://arxiv.org/html/2604.13016v2",
+            "html_sha256": "9a1fa72fa24c3bba8bcf71ad1fa624f2975014c5d29aa7160ccd77c81b5fec02",
+            "tables": 3,
+            "assets": [
+                {
+                    "figure_id": "S3.F2",
+                    "base": "figure-02",
+                    "url": "https://arxiv.org/html/2604.13016v2/3_1_metrics.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-02.svg",
+                    "caption": "Figure 2 : OPD from two teachers with different thinking patterns into the same student (Qwen3-1.7B-Base). The GRPO teacher achieves stronger performance (left) and higher initial overlap ratio (right), suggesting that thinking pattern compatibility governs OPD effectiveness.",
+                    "sha256": "9b7f69601c005fc825ec803cc2fe2543035f204929dc1ef00f0df618406d9425",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-02.png",
+                    "preview_sha256": "d77ef1b7ee4a70680e2a758506f48baac8c382c284cdc01b2ad368ba1e6fed84"
+                },
+                {
+                    "figure_id": "S3.F3",
+                    "base": "figure-03",
+                    "url": "https://arxiv.org/html/2604.13016v2/5_1_teacher_perf.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-03.svg",
+                    "caption": "Figure 3 : Validation performance of the two teachers (Qwen3-4B Non-thinking vs. Qwen3-4B-Base-GRPO) on AIME 2024, AIME 2025, and AMC 2023.",
+                    "sha256": "2aae09120249f60de7d1a3b1a0748049e697dd3d4d237571ee53078c2edac4b8",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-03.png",
+                    "preview_sha256": "dfdee7982bc4e8a475432d7fffe6ecf839917a68a28c8f806e1729115c54229d"
+                },
+                {
+                    "figure_id": "S3.F4",
+                    "base": "figure-04",
+                    "url": "https://arxiv.org/html/2604.13016v2/Figure5A.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-04.svg",
+                    "caption": "Figure 4 : Comparison of OPD performance with and without additional teacher RL post-training across two model families. Left: DeepSeek family. Right: Qwen family.\nPost-trained teachers yield substantially stronger gains and higher teacher-student gap recovery rate .",
+                    "sha256": "6da4c503a7c8b1740ce49bda1a48007d8d04bd699f3af38c601950fa680396b7",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-04.png",
+                    "preview_sha256": "ef8710d9e4da00d8ef00680067e40af8447c4387d44e1f3c98a40e5a8f3d7540"
+                },
+                {
+                    "figure_id": "S3.F4",
+                    "base": "figure-04-part2",
+                    "url": "https://arxiv.org/html/2604.13016v2/Figure5B.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-04-part2.svg",
+                    "caption": "Figure 4 : Comparison of OPD performance with and without additional teacher RL post-training across two model families. Left: DeepSeek family. Right: Qwen family.\nPost-trained teachers yield substantially stronger gains and higher teacher-student gap recovery rate .",
+                    "sha256": "d2dcbc747b14c96bb5b907bfbe82566b46f5ea66d4ff82b9c875e44ac2cec8db",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-04-part2.png",
+                    "preview_sha256": "b341b66405fcdce8107cb0134e0f86b8e9457a60dbb0d2a3be64d2a1b273d78a"
+                },
+                {
+                    "figure_id": "S3.F5",
+                    "base": "figure-05",
+                    "url": "https://arxiv.org/html/2604.13016v2/JustRL_val.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-05.svg",
+                    "caption": "Figure 5 : Reverse distillation with JustRL-1.5B as the student and two same-family teachers (R1-Distill-1.5B and R1-Distill-7B). Both runs cause the student to regress to approximately the same level despite R1-Distill-7B scoring higher than JustRL-1.5B, indicating that OPD training dynamics are governed by thinking pattern rather than benchmark performance.",
+                    "sha256": "c110e47aecd3e4a2c8b112c8e36ae53b95f853ac1dfc10ace72fcdaef7a1c236",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-05.png",
+                    "preview_sha256": "60649406a9aacad396ea30ca615ba526855ec2ce3387c1a3dabb082726154263"
+                },
+                {
+                    "figure_id": "S4.F6",
+                    "base": "figure-06",
+                    "url": "https://arxiv.org/html/2604.13016v2/5_1_combined.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-06.svg",
+                    "caption": "Figure 6 : Successful vs. failing OPD with the same student (R1-Distill-1.5B) and two teachers. Top: avg@16 accuracy on three benchmarks. Dashed lines indicate teacher performance. Bottom: three dynamics over training. Successful distillation (JustRL-1.5B) shows rising overlap and narrowing entropy gap, and these trends are absent in the failing run (R1-Distill-7B).",
+                    "sha256": "d4fc7a181cf4cc42d214c5e88bd9d66cf1d800abf891e19464b96f94b8dfcf14",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-06.png",
+                    "preview_sha256": "7c88d574693e45949a66efa9c7523241d3947f4c85503c041932c025c8395705"
+                },
+                {
+                    "figure_id": "S4.F7",
+                    "base": "figure-07",
+                    "url": "https://arxiv.org/html/2604.13016v2/5_2_combined.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-07.svg",
+                    "caption": "Figure 7 : Ablation on the optimization support in Top- k k OPD. Overlap Top- k k matches Student Top- k k , while Non-Overlap Top- k k is substantially weaker.",
+                    "sha256": "d383315d2bb6262882b3382fd3fa360d3a63b8b06befc2b2621827f1dce8b39a",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-07.png",
+                    "preview_sha256": "50bebadd34b934e63350a4e63982a1fb3ed2d6c2b0dca4c565023953de23186c"
+                },
+                {
+                    "figure_id": "S5.F8",
+                    "base": "figure-08",
+                    "url": "https://arxiv.org/html/2604.13016v2/4_2_combined.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-08.svg",
+                    "caption": "Figure 8 : Effect of off-policy cold start before OPD, using fixed teacher Qwen3-4B (Non-thinking). The two curves correspond to OPD from Qwen3-1.7B-SFT and Qwen3-1.7B-Base.",
+                    "sha256": "b51993c262d92138e3f0638829707d4451b9258d30991a0897f124cf28be587a",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-08.png",
+                    "preview_sha256": "41b055fcfa929b797663747b92b26c54832526c6309880ca6b2318cdc56345d9"
+                },
+                {
+                    "figure_id": "S5.F9",
+                    "base": "figure-09",
+                    "url": "https://arxiv.org/html/2604.13016v2/4_3_Same.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-09.svg",
+                    "caption": "Figure 9 : Effect of prompt template alignment. The teacher-aligned template yields higher accuracy and overlap growth throughout training.",
+                    "sha256": "f499076552de153832eb296d6890ad6be2ed6da758fd9e71b973a94d647d6bb2",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-09.png",
+                    "preview_sha256": "cec86180a8e6e5eb5681135d13742cf37f8b5426984d91868bcd8c47edd30dc6"
+                },
+                {
+                    "figure_id": "S5.F10",
+                    "base": "figure-10",
+                    "url": "https://arxiv.org/html/2604.13016v2/4_3_Diff.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-10.svg",
+                    "caption": "Figure 10 : Effect of prompt content alignment. The teacher-aligned prompt contents yield stronger performance, with higher mass concentration on shared tokens and notably lower entropy.",
+                    "sha256": "17905c876d02889a25f082b7b063b60a1f7af23d6a629f0d54934380af563cd1",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-10.png",
+                    "preview_sha256": "3ea9547c465811688bf312fb1aa684c409db86f4495be1b508a387b18e850b01"
+                },
+                {
+                    "figure_id": "S6.F11",
+                    "base": "figure-11",
+                    "url": "https://arxiv.org/html/2604.13016v2/6_1_response_summary.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-11.svg",
+                    "caption": "Figure 11 : (a) Validation accuracy on three benchmarks under different response lengths.\n(b) Accuracy gain from teacher continuation under different student prefix truncation lengths.",
+                    "sha256": "dde8801162cfb881f39a67c9d3d38a0545bd3774eea05229cbd89afe9219ef2e",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-11.png",
+                    "preview_sha256": "fe2aaca215159457d8c36e3b53ae4990d3f27b69a8e53be000381da75c373305"
+                },
+                {
+                    "figure_id": "S6.F12",
+                    "base": "figure-12",
+                    "url": "https://arxiv.org/html/2604.13016v2/6_1_resp_length.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-12.svg",
+                    "caption": "Figure 12 : Training dynamics under different maximum response lengths for OPD.",
+                    "sha256": "e1c7365bf519adbb8fdea7a542f7e5ceeb20e4e146e3ebde32479f62251a4270",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-12.png",
+                    "preview_sha256": "a7a1f42bf9016d890c0109c18f5c4e84a0a811a729900406ee75f548d760052a"
+                },
+                {
+                    "figure_id": "S6.F13",
+                    "base": "figure-13",
+                    "url": "https://arxiv.org/html/2604.13016v2/Figure12_student_entropy.png",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-13.png",
+                    "caption": "Figure 13 : Average student entropy across decoding positions during OPD training with 15K max response length, measured on student-generated trajectories from Step 180 to Step 250.",
+                    "sha256": "bf7d119206a26ac5714c61454dd3979b50fce08b9bb978a31adb9498342f5678",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-13.png",
+                    "preview_sha256": "bf7d119206a26ac5714c61454dd3979b50fce08b9bb978a31adb9498342f5678"
+                },
+                {
+                    "figure_id": "S6.F14",
+                    "base": "figure-14",
+                    "url": "https://arxiv.org/html/2604.13016v2/reward_landscape.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-14.svg",
+                    "caption": "Figure 14 : Sequence mean reward distributions for correct and incorrect student rollouts. Both teachers assign higher reward to correct rollouts with comparable AUROC (0.73 and 0.75).",
+                    "sha256": "0f09b20a7696d0581df56ea3636019ab80a3d0a982223cd30bdf3d95a177ebf4",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-14.png",
+                    "preview_sha256": "e8bd9a46ab656a87f805d5248e9fcfca3a1848097c0d339ce237cc14ad7a4f2d"
+                },
+                {
+                    "figure_id": "S6.F15",
+                    "base": "figure-15",
+                    "url": "https://arxiv.org/html/2604.13016v2/5_1_effect_of_k_topk.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-15.svg",
+                    "caption": "Figure 15 : Effect of the support size k k in Top- k k OPD. All numbers are reported as avg@16.",
+                    "sha256": "f68851e88f083d295426e7020f99e0160a684942b0e41723b9d403b4e87a4f9f",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-15.png",
+                    "preview_sha256": "a7101da59746e155299693969f858ebb7e6c74d6c4bcc42e56548e015390adc5"
+                },
+                {
+                    "figure_id": "S6.F16",
+                    "base": "figure-16",
+                    "url": "https://arxiv.org/html/2604.13016v2/6_2_combined.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-16.svg",
+                    "caption": "Figure 16 : Training dynamics under different support sizes k k for Top- k k OPD.",
+                    "sha256": "77ada7c7b0fbc8722133a3c1981116eabd807522266a1e7dde8eb01e916e40cd",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-16.png",
+                    "preview_sha256": "217e951265d4b663faf1a5b92669e676124468d2b399b75484e15e229a8e86ec"
+                },
+                {
+                    "figure_id": "A1.F17",
+                    "base": "figure-17",
+                    "url": "https://arxiv.org/html/2604.13016v2/3_1_metrics_benchmarks.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-17.svg",
+                    "caption": "Figure 17 : Benchmark-wise breakdown of the average validation accuracy shown in Figure 2 . We report results on AIME 2024, AIME 2025, and AMC 2023 separately. Distillation from Qwen3-4B-Base-GRPO consistently matches or outperforms distillation from Qwen3-4B (Non-thinking) across the three benchmarks.",
+                    "sha256": "e30fe92f0da1e928834301c8ac32f735a96d32a4a3263ab2a69cef4e8d355c46",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-17.png",
+                    "preview_sha256": "39347b3e3d1ae6373b921b57c2ea042740ea8b3d8f04a2a5ca8a8eac2bdd95d1"
+                },
+                {
+                    "figure_id": "A2.F18",
+                    "base": "figure-18",
+                    "url": "https://arxiv.org/html/2604.13016v2/appendix_sum_p.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-18.svg",
+                    "caption": "Figure 18 : Probability mass assigned to overlap tokens during training.\nFor both the student and teacher distributions, the overlap tokens consistently account for roughly 97%–99% of the total probability mass, indicating that the overlap is not only increasing at the set level but also dominates the probability distribution.",
+                    "sha256": "580dc6e1fefc4088f4fe498e4807d37ae7859e2e01094a2fa814ab011963a52e",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-18.png",
+                    "preview_sha256": "12ed139e6aa23313b0a25448ba22bb8aa0167e99dcb04e726d1e62c15d8e31a9"
+                },
+                {
+                    "figure_id": "A2.F19",
+                    "base": "figure-19",
+                    "url": "https://arxiv.org/html/2604.13016v2/auxiliary_dynamics.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-19.svg",
+                    "caption": "Figure 19 : Auxiliary optimization diagnostics for the contrastive OPD setting in Section 4.1 , using R1-Distill-1.5B as the student and comparing JustRL-1.5B against R1-Distill-7B as the teacher. Left: batch-averaged OPD training loss ( PG Loss ) over training. Middle: gradient norm over training. Right: probability difference p t ​ ( v ) − q t ​ ( v ) p_{t}(v)-q_{t}(v) measured on the token with the largest absolute advantage.\nThe successful run exhibits a large reduction in optimization loss, sustained gradient magnitude, and a steady decrease in extreme-token probability mismatch. By contrast, the failing run starts with and maintains much weaker gradients, and its extreme-token probability discrepancy remains noticeably larger throughout training.",
+                    "sha256": "808674cf48a54ba459cbb73dc16d81b4f2540abea8bf6627f3fa2c2e13cd4c34",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-19.png",
+                    "preview_sha256": "e59226ef9cc4082afdfde188e5aeeaef21fa1cab92ad1f3aadf00fffce673b20"
+                },
+                {
+                    "figure_id": "A2.F20",
+                    "base": "figure-20",
+                    "url": "https://arxiv.org/html/2604.13016v2/7B_5_1_combined.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-20.svg",
+                    "caption": "Figure 20 : Cross-model validation with a fixed student (R1-Distill-7B) and two teachers. Top: avg@16 accuracy on AIME 2024, AIME 2025, and AMC 2023. Bottom: overlap ratio, overlap-token advantage, and absolute entropy gap over training.\nThe successful run is again accompanied by increasing high-probability-token alignment, while the stagnating run is not.",
+                    "sha256": "6801cbba542394835c3d69cb7bb4f526d983d92e65fb21da12e701d51e9b94ce",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-20.png",
+                    "preview_sha256": "b02da0a287262c09eeeb1aef41f4ab13ff2f1a22e93ac4b3857af17c8230f779"
+                },
+                {
+                    "figure_id": "A3.F21",
+                    "base": "figure-21",
+                    "url": "https://arxiv.org/html/2604.13016v2/5_1_appendix_sum_p.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-21.svg",
+                    "caption": "Figure 21 : Student overlap mass and teacher overlap mass during training for SFT-initialized and base-initialized students.",
+                    "sha256": "4d3f53d6e96d00550c4cf416d24a85c17eea010f9b099f0c741220a89f6a8e55",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-21.png",
+                    "preview_sha256": "a462113fb38d283e98ad6440d2ea27b32d5dbdbc35abf47d2a6a72a6c6968b67"
+                },
+                {
+                    "figure_id": "A3.F22",
+                    "base": "figure-22",
+                    "url": "https://arxiv.org/html/2604.13016v2/4_3_Same_benchmarks.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-22.svg",
+                    "caption": "Figure 22 : Benchmark-wise breakdown of the average validation accuracy shown in Figure 9 . Using the teacher-aligned template consistently matches or outperforms the original DAPO template across the three benchmarks.",
+                    "sha256": "63f7aa5d469887ffcf055b9c2313e285f518cea52716b93fe7c6ba8bebf9896c",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-22.png",
+                    "preview_sha256": "eb5df25527d32736539d41342157536b48fca07bf56d795d54b0b85d70da8020"
+                },
+                {
+                    "figure_id": "A4.F23",
+                    "base": "figure-23",
+                    "url": "https://arxiv.org/html/2604.13016v2/teacher_entropy_heatmap.png",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-23.png",
+                    "caption": "Figure 23 : Average teacher entropy across decoding positions during OPD training with 15K max response length, measured on student-generated trajectories from Step 180 to Step 250. Elevated entropy first emerges in the suffix and gradually propagates toward earlier output positions over training.",
+                    "sha256": "ee68eaecc430860894ec4f715e1269761b00fb540d621d6aa80f42f9846a204e",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2604.13016/figure-23.png",
+                    "preview_sha256": "ee68eaecc430860894ec4f715e1269761b00fb540d621d6aa80f42f9846a204e"
+                }
+            ],
+            "pdf_url": "https://arxiv.org/pdf/2604.13016v2",
+            "pdf_sha256": "7b43c679b5179aade605a2d9636c6a03e49234e0561bb5245e4de4ca6fcee53a",
+            "model_and_dataset_links": []
+        },
+        {
+            "arxiv_id": "2606.07082",
+            "version": "2606.07082v3",
+            "html_url": "https://arxiv.org/html/2606.07082v3",
+            "html_sha256": "71ffd50594753266ca6c689be8c9e04a723e77da28e3f4bb2a1b18f167e4e366",
+            "tables": 9,
+            "assets": [
+                {
+                    "figure_id": "S0.F1",
+                    "base": "figure-01",
+                    "url": "https://arxiv.org/html/2606.07082v3/Main.png",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-01.png",
+                    "caption": "Figure 1: Optimization geometry of OPD compared with SFT and RLVR.\n(a) OPD occupies a relaxed off-principal regime between dense principal-aligned SFT updates and sparse off-principal RLVR updates.\n(b) OPD rapidly enters a locked low-dimensional subspace during training.\n(c) The lock is robust to token and rollout perturbations, but sensitive to objective composition.",
+                    "sha256": "b60dfd762050b6d948ff65c9e2cd545ce9bfa64ed4570eed96db948f3a4d4016",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-01.png",
+                    "preview_sha256": "b60dfd762050b6d948ff65c9e2cd545ce9bfa64ed4570eed96db948f3a4d4016"
+                },
+                {
+                    "figure_id": "S2.F2",
+                    "base": "figure-02",
+                    "url": "https://arxiv.org/html/2606.07082v3/fig1_spectral_geometry.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-02.svg",
+                    "caption": "Figure 2: Parameter-space diagnostics. SFT induces larger subspace rotation and spectral drift, RLVR preserves the\npretrained geometry most strongly, and OPD lies between them.\nHere, k k denotes the rank index of\nprincipal angles or singular values; the all-layer panels enumerate analyzed\nweight matrices across layers and module types.",
+                    "sha256": "b751e108aaec1b93ecb5694cb36a4b6b6996f006fdf503cd05512c4093f8def9",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-02.png",
+                    "preview_sha256": "35b898bd08f7381210d6234aaf2fd348d75163a99b7651bcc358816db2187ec2"
+                },
+                {
+                    "figure_id": "S3.F3",
+                    "base": "figure-03",
+                    "url": "https://arxiv.org/html/2606.07082v3/principal.png",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-03.png",
+                    "caption": "Figure 3: Update-mask localization. We compare where bf16-visible updates land relative to principal and low-magnitude masks.\nOPD shifts updates away from principal weights and toward low-magnitude regions, while remaining less selective than RLVR.",
+                    "sha256": "8a9b2a3e2c4711074c5048c085f04f86edfb67d8f7a9713f26ef59d65ae69089",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-03.png",
+                    "preview_sha256": "8a9b2a3e2c4711074c5048c085f04f86edfb67d8f7a9713f26ef59d65ae69089"
+                },
+                {
+                    "figure_id": "S3.F4",
+                    "base": "figure-04",
+                    "url": "https://arxiv.org/html/2606.07082v3/intrinsic_metrics_3panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-04.svg",
+                    "caption": "Figure 4: Intrinsic update geometry. We track cumulative updates Δ ​ W t \\Delta W_{t} .\nOPD stays in a narrow stable-rank band, whereas SFT expands and\nRLVR contracts. Frobenius norms rule out a small-update explanation:\nOPD moves more than RLVR while ending with comparable stable rank.\nHill estimates provide an auxiliary spectral-shape check.",
+                    "sha256": "c02e9010cc187f443b642f0f3f046adfc9b32aa11017ed65b5d4ba5f01db1b9c",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-04.png",
+                    "preview_sha256": "f8edf4bfbf4c3e9aa8ddb8c0fbc6b4d2f487754025c3eed289ec0f570eedd280"
+                },
+                {
+                    "figure_id": "S4.F5",
+                    "base": "figure-05",
+                    "url": "https://arxiv.org/html/2606.07082v3/similarity.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-05.svg",
+                    "caption": "Figure 5: Subspace emergence. Top- 16 16 subspace similarity to the final update shows that OPD locks\nonto its final update channel earlier than SFT and RLVR.",
+                    "sha256": "38ce1236caba9623cb8baf057993a9f919d4b2bc99906918cfbba514ca872aef",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-05.png",
+                    "preview_sha256": "e469caa89899fadc329acb6dad142d523da77c4325a9fb6b2899a8eef8837ca0"
+                },
+                {
+                    "figure_id": "S4.F6",
+                    "base": "figure-06",
+                    "url": "https://arxiv.org/html/2606.07082v3/figures/k16_projection_percent.png",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-06.png",
+                    "caption": "Figure 6: Rank- 16 16 projected training. Rank- 16 16 projection leaves OPD intact but degrades SFT.",
+                    "sha256": "4fc102f8492314a0c79d6e1c78fbad9f88d5e603935dd4ed9be8cea55dc90c5c",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-06.png",
+                    "preview_sha256": "4fc102f8492314a0c79d6e1c78fbad9f88d5e603935dd4ed9be8cea55dc90c5c"
+                },
+                {
+                    "figure_id": "S4.F7",
+                    "base": "figure-07",
+                    "url": "https://arxiv.org/html/2606.07082v3/control_stable_rank_new_color.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-07.svg",
+                    "caption": "Figure 7: Controls on subspace locking. Runtime perturbations preserve the OPD stable-rank trajectory, whereas objective-level interpolation changes it, identifying objective composition as the sensitive control axis.",
+                    "sha256": "da5657e66153e4bd4ad0c46a1b2c8974028f97e1aac5c4792f527cd8967c92ec",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-07.png",
+                    "preview_sha256": "a01f6b1a6af5df8152b471fcda6d3bcd5661fdc671318dae7545a7c4fe13b2a2"
+                },
+                {
+                    "figure_id": "A6.F8",
+                    "base": "figure-08",
+                    "url": "https://arxiv.org/html/2606.07082v3/fig_k16_projection_allbench.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-08.svg",
+                    "caption": "Figure 8: Additional evaluation of rank-constrained training. We compare unconstrained training and rank- 16 16 projected training\nacross five reasoning benchmarks. Across benchmarks, OPD is consistently\nless affected by the rank- 16 16 bottleneck than SFT. Green diamonds\ndenote the shared anchor checkpoint, and dashed vertical lines denote\nthe projection start.",
+                    "sha256": "0f2429c76a92bb3578e06dec2ef4985cf206fd7a1c053b0fb4e316d3be7dd066",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-08.png",
+                    "preview_sha256": "7eb885a8effbf1f83b22f586024e0de8e32f5fe52096e917b2e1a4816d865bd9"
+                },
+                {
+                    "figure_id": "A7.F9",
+                    "base": "figure-09",
+                    "url": "https://arxiv.org/html/2606.07082v3/fig_s3_combined.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-09.svg",
+                    "caption": "Figure 9: Auxiliary metrics for control experiments. We report update scale and spectral-shape diagnostics for the same\nperturbations analyzed in Figure 7 . Runtime\nperturbations preserve the OPD-like spectral profile up to modest scale\nchanges, whereas objective interpolation induces a distinct trajectory.",
+                    "sha256": "aaed18b349829d202982fd0665817fa955707ea81080842dbfa8ca787c15cf00",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2606.07082/figure-09.png",
+                    "preview_sha256": "19e2f632a4c11bfa411cc4cbea0a36911d49bf075f5dafb106cc7a3934991255"
+                }
+            ],
+            "pdf_url": "https://arxiv.org/pdf/2606.07082v3",
+            "pdf_sha256": "282e606beb5366f6f05444b4fcf0c32a80100318f8fbbd871b6e7031005a8e97",
+            "model_and_dataset_links": []
+        },
+        {
+            "arxiv_id": "2607.04751",
+            "version": "2607.04751v1",
+            "html_url": "https://arxiv.org/html/2607.04751v1",
+            "html_sha256": "27afe29cd6f256155662a6c31d446a33d23701346112f12e60dd883744fae21c",
+            "tables": 5,
+            "assets": [
+                {
+                    "figure_id": "S0.F1",
+                    "base": "figure-01",
+                    "url": "https://arxiv.org/html/2607.04751v1/teaser.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-01.svg",
+                    "caption": "Figure 1: While standard OPD forces direct teacher supervision and suffers from unstable optimization, TOP-D ensures stable training by dynamically constructing a proximal teacher at every iteration.",
+                    "sha256": "2e69d9e693ee4276a6d93f0c577ae6a21d86b0f1b9ffd387668193765d162bbb",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-01.png",
+                    "preview_sha256": "77cced4facb82bbfa6c2f4f312863f516ce7d4987b6a306f891d3c99d66c3a3f"
+                },
+                {
+                    "figure_id": "S0.F2",
+                    "base": "figure-02",
+                    "url": "https://arxiv.org/html/2607.04751v1/aime_performance.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-02.svg",
+                    "caption": "Figure 2: The avg@32 accuracy on several AIME benchmarks for RLVR applied to the Qwen3-8B-Base model, and for OPD and TOP-D using Qwen3-30B-A3B-Instruct-2507 as the teacher model.",
+                    "sha256": "520cf992c3b61cf9bcb58c51e40163d5f644474f23c849af9445dc5e3830ad56",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-02.png",
+                    "preview_sha256": "adcbbea76edee4c31e2d47c5ffb4262d93db01849b5c56db50679adb7a5e66c5"
+                },
+                {
+                    "figure_id": "S3.F3",
+                    "base": "figure-03",
+                    "url": "https://arxiv.org/html/2607.04751v1/reward_comparison.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-03.svg",
+                    "caption": "Figure 3: Reward curves of r k r_{k} and r ~ k \\tilde{r}_{k} .",
+                    "sha256": "50d3228f525025c4932c57a566e848b86bc171d435930737f537bd0605a874dc",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-03.png",
+                    "preview_sha256": "bd2666b1d02db4d0d7dbee61e9bfdb2fd24d26e191aae46d98b97a67f4f88ae9"
+                },
+                {
+                    "figure_id": "S3.F4",
+                    "base": "figure-04",
+                    "url": "https://arxiv.org/html/2607.04751v1/adv.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-04.svg",
+                    "caption": "Figure 4: In contrast to sequence-level advantage normalization, we perform token-level normalization across the responses generated for a given prompt to better leverage the dense reward signal.",
+                    "sha256": "1d62b6ad67d8e87732272ec8a7b8fc623508c7523cfa38ebf0955deedaceb197",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-04.png",
+                    "preview_sha256": "4b47be26593061a63cc1e40788dcb14b53f1b08c1147e96d629603ea4deddd1d"
+                },
+                {
+                    "figure_id": "S5.F5",
+                    "base": "figure-05",
+                    "url": "https://arxiv.org/html/2607.04751v1/ablation_curves.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-05.svg",
+                    "caption": "Figure 5: Learning curves for the ablation study on the Qwen3-1.7B-Base. We isolate the effects of the external proximal teacher ( α = 1.0 \\alpha=1.0 ) and the internal trust region iterations (w/o off-policy).",
+                    "sha256": "ed1a03b85f45a49507c150a25a550882d0dfd67ea5f2712394914f16aaeea956",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2607.04751/figure-05.png",
+                    "preview_sha256": "be55c513d1cd3f5739a691e6b67bcdc722653ffb666e406445cc0cdc25e68b62"
+                }
+            ],
+            "pdf_url": "https://arxiv.org/pdf/2607.04751v1",
+            "pdf_sha256": "99ace474d46d1d0a44486f65a4b9357aec89610845d45b7b417e3971b991802b",
+            "model_and_dataset_links": []
+        },
+        {
+            "arxiv_id": "2608.16647",
+            "version": "2608.16647v2",
+            "html_url": "https://arxiv.org/html/2608.16647v2",
+            "html_sha256": "acbdc390ddb96d0e45e6a8adb904cf6544ab4f54642365c4ef2896dad29df337",
+            "tables": 6,
+            "assets": [
+                {
+                    "figure_id": "S3.F1.sf1",
+                    "base": "figure-01-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/32b_to_8b_math_teacher_pass_rate_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-01-1.svg",
+                    "caption": "((a)) Qwen3-32B → \\rightarrow Qwen3-8B-SFT",
+                    "sha256": "9686fef9ea7bee1f48728936c9b6a4eaa7d378037752837252270d677c8e18b3",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-01-1.png",
+                    "preview_sha256": "6cecca0aaced90e792b08cebb4b67cce5a159c7218945090a6f6a6a63de1b7f4"
+                },
+                {
+                    "figure_id": "S3.F1.sf2",
+                    "base": "figure-01-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_to_1d5b_math_teacher_pass_rate_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-01-2.svg",
+                    "caption": "((b)) Polaris-7B → \\rightarrow DS-distill-1.5B",
+                    "sha256": "4213cdf0078e81df596e003ce5383e63d46ea999318486233e7d1b51cd2a3575",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-01-2.png",
+                    "preview_sha256": "de6213b9f44455c651ad902dd5bbf1d9ed869a76db90efe102dcd90545237363"
+                },
+                {
+                    "figure_id": "S3.F1.sf3",
+                    "base": "figure-01-3",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_to_7b_math_teacher_pass_rate_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-01-3.svg",
+                    "caption": "((c)) Polaris-7B → \\rightarrow DS-distill-7B",
+                    "sha256": "cf2ad120e103174c3a60d423a63bfae67bea8de2e925e2806eb85d191cb14de9",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-01-3.png",
+                    "preview_sha256": "9fc033537aa0bcaeecf1b82c02b1de3dd3c7863052f7f617c50a54ee74ece660"
+                },
+                {
+                    "figure_id": "S3.F2.sf1",
+                    "base": "figure-02-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_same_different_source_comparison_math_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-02-1.svg",
+                    "caption": "((a)) DS-distill-1.5B",
+                    "sha256": "0d976c0052a4588339ee1485496897998c5f0d74414817c585e64a88ebb9d89a",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-02-1.png",
+                    "preview_sha256": "7672b69067061debf444b89de941f244d7ee6b033c5ac70305d4c088c6eafe91"
+                },
+                {
+                    "figure_id": "S3.F2.sf2",
+                    "base": "figure-02-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_same_different_source_comparison_math_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-02-2.svg",
+                    "caption": "((b)) DS-distill-7B",
+                    "sha256": "9918fb55bec26d95b824ef9c8de0133c896e74a1a2e12ff8d551e59e9a654641",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-02-2.png",
+                    "preview_sha256": "f8a24e0adb953cdb9f8baf0720706650184fb24d1a07d97e747596cbafbd15ed"
+                },
+                {
+                    "figure_id": "S3.F3.sf1",
+                    "base": "figure-03-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_cross_domain_generalization_code_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-1.svg",
+                    "caption": "((a)) LiveCodeBench (DS-distill-1.5B)",
+                    "sha256": "c7f77e08325a5b717cb000e3a88057860f44fdd9ec57faea779d7452bc50ba61",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-1.png",
+                    "preview_sha256": "a37d52657dd3b5c05ee9bb727de7e8225836b843642aa5b31c7ac0ca1a6a5bdd"
+                },
+                {
+                    "figure_id": "S3.F3.sf2",
+                    "base": "figure-03-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_cross_domain_generalization_code_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-2.svg",
+                    "caption": "((b)) LiveCodeBench (DS-distill-7B)",
+                    "sha256": "bbe9838d8a434e0e115c61fa86d9b62700d1e8db1b582ed7e0163f4d83b8a5fa",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-2.png",
+                    "preview_sha256": "64b6759e425b9a094c722393d57c23e24e729196cf816b9c1f9641e37e69a29d"
+                },
+                {
+                    "figure_id": "S3.F3.sf3",
+                    "base": "figure-03-3",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_cross_domain_generalization_science_gpqa_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-3.svg",
+                    "caption": "((c)) GPQA-Diamond (DS-distill-1.5B)",
+                    "sha256": "951212224f3d91abda9c5a54f227967c488f27b7b806f0622531beca88564d0c",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-3.png",
+                    "preview_sha256": "831c702c70c4f577f278c3d77de4de7711779d788fe26fc05898f386817bbed7"
+                },
+                {
+                    "figure_id": "S3.F3.sf4",
+                    "base": "figure-03-4",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_cross_domain_generalization_others_to_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-4.svg",
+                    "caption": "((d)) Training on non-math domains, evaluating on math (DS-distill-7B)",
+                    "sha256": "9b3f648f8fb2363de01802e881352ee8f09f8c12bd59b7e08d574a10403d441e",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-03-4.png",
+                    "preview_sha256": "f9453bf0375a5beef3e88a5dba23dba7aca9a6968188f8063583e0be822179e6"
+                },
+                {
+                    "figure_id": "S4.F4.sf1",
+                    "base": "figure-04-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_nemo10step_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-04-1.svg",
+                    "caption": "((a)) Setting 1. Math teacher: JustRL-1.5B; Science/IF teacher: Nemotron-1.5B; student: Dev-1.5B.",
+                    "sha256": "62df406262502f0139dcb6393dfd63e73e483ddc46b290ab0f311163cdc0a98d",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-04-1.png",
+                    "preview_sha256": "dfef8b2950917f5fd22b864b5daa7c84f895a0f66432db73ca1df7db1b78ec72"
+                },
+                {
+                    "figure_id": "S4.F4.sf2",
+                    "base": "figure-04-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_reverse_teacher_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-04-2.svg",
+                    "caption": "((b)) Setting 2. Math teacher: Nemotron-1.5B; Science/IF teacher: JustRL-1.5B; student: DS-distill-1.5B.",
+                    "sha256": "3c0fed6d72a9b627b07d3770104330102365ec0479a46eadfcf222779d86d330",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-04-2.png",
+                    "preview_sha256": "9b53bb6d8c52c204d4ff336291b0f84a2f48d4e043cc47a645b1cb3755138941"
+                },
+                {
+                    "figure_id": "S4.F5.sf1",
+                    "base": "figure-05-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_forward_teacher_aime24_horizon2.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-05-1.svg",
+                    "caption": "((a)) JustRL-Math, Nemotron-Science/IF",
+                    "sha256": "c770c8faac71310bde1dd0ae1d4b78c422304544a1fc02044bd2d4251aea3768",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-05-1.png",
+                    "preview_sha256": "10c173c162144d1db7239b2dcd571d52d072bd613c35888fb28bb43a5ebb9fe4"
+                },
+                {
+                    "figure_id": "S4.F5.sf2",
+                    "base": "figure-05-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_reverse_teacher_aime24_horizon2.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-05-2.svg",
+                    "caption": "((b)) JustRL-Science/IF, Nemotron-Math",
+                    "sha256": "b65ec371872f6cba0e8c2f03ca050de6e1a5a5971d71c976610212dd12e71bfb",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-05-2.png",
+                    "preview_sha256": "3f9f9aa08439d198ffce22bac9e63aba23e2abe384552d6ed13797caf6676066"
+                },
+                {
+                    "figure_id": "S4.F5.sf3",
+                    "base": "figure-05-3",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_teacher_switch_gpqa.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-05-3.svg",
+                    "caption": "((c)) Cascaded OPD, GPQA-Diamond",
+                    "sha256": "6c70b2983f8d87555f7e0c1cf70d19097fbd6a6d268d0ddef456e7f83e6bcbbf",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-05-3.png",
+                    "preview_sha256": "61acdfd022bbd48006cb901f99e2c9486e296d3fdd3450ded77aaad6c29948c3"
+                },
+                {
+                    "figure_id": "S5.F6.sf1",
+                    "base": "figure-06-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/to_dpsk1d5b_top16_overlap.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-06-1.svg",
+                    "caption": "((a)) DS-distill-1.5B OPD Experiments",
+                    "sha256": "b2cb142e20742bbcbabda35abe26c08bbba387321eab05a2dc727fa089f613f1",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-06-1.png",
+                    "preview_sha256": "180bb84618af60e54480e3e0eb63ac6ddc3000674b57af223b2be4cbe2dde9b2"
+                },
+                {
+                    "figure_id": "S5.F6.sf2",
+                    "base": "figure-06-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/to_dpsk7b_top16_overlap.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-06-2.svg",
+                    "caption": "((b)) DS-distill-7B OPD Experiments",
+                    "sha256": "8283b62d6a8e5f34d0ce28944de630dc593bd45850f65a0e85f5fd2ff61b74f1",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-06-2.png",
+                    "preview_sha256": "01fbb2d249ec0ce92bcd4f1da59f466292e4373ca22639b7809814a091f0aa57"
+                },
+                {
+                    "figure_id": "S5.F7",
+                    "base": "figure-07",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_light_14b_7b_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-07.svg",
+                    "caption": "Figure 7 : The MOPD experiment results of DS-distill-7B (student), Light-R1-7B (math teacher), and Light-R1-14B (science/IF teacher). The legends refer to the expert data mix ratio of different MOPD experiments (Light-R1-14B/Light-R1-7B ∈ { 1 / 0 , 1 / 1 , 8 / 25 , 4 / 25 , 2 / 25 , 0 / 1 } \\in\\{1/0,1/1,8/25,4/25,2/25,0/1\\} ).",
+                    "sha256": "1e94afe136cb6b8f23896f3a6f722fddaf5ab428a7f76c326fee9d9d5614929d",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-07.png",
+                    "preview_sha256": "e27a64489c722425850a386a51cc92b02b1cc02f74566b35987266fbdc846888"
+                },
+                {
+                    "figure_id": "S5.F8",
+                    "base": "figure-08",
+                    "url": "https://arxiv.org/html/2608.16647v2/mopd_polaris_light_math_scienceif_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-08.svg",
+                    "caption": "Figure 8 : MOPD on DS-distill-7B (student) with Light-R1-14B as the math expert and Polaris-7B as the science/IF expert, evaluated on four math benchmarks (AMC2023, AIME2024 (Horizon 2), AIME2026, OlymMATH-en-easy). Solid lines are MOPD runs at math/science-IF data mix ratios Light-R1-14B/Polaris-7B ∈ { 8 / 25 , 1 / 1 , 25 / 8 } \\in\\{8/25,1/1,25/8\\} ; the dashed orange line is single-teacher OPD with only the math expert Light-R1-14B; the dashed grey line marks the science/IF expert Polaris-7B’s own math accuracy.",
+                    "sha256": "2ca5fbc274e85369ff190b83f712de810fe7c7ee39ca738330324d64207aefe5",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-08.png",
+                    "preview_sha256": "2547fc4bbbdcb066b947b61cb9374aaeab88665e9f99434c0814f5f1fb527ad3"
+                },
+                {
+                    "figure_id": "A3.F9.sf1",
+                    "base": "figure-09-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_to_1d5b_math_teacher_difficulty_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-09-1.svg",
+                    "caption": "((a)) JustRL-1.5B → \\rightarrow DS-distill-1.5B",
+                    "sha256": "cab15245e8bdd6fe695d839e5d7a9ecf03b915063849b7e93f961f76a1a017fc",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-09-1.png",
+                    "preview_sha256": "e535184ef36e7961e9dd3d51e88983b46c85af6585154f959123369650504643"
+                },
+                {
+                    "figure_id": "A3.F9.sf2",
+                    "base": "figure-09-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_to_1d5b_math_teacher_difficulty_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-09-2.svg",
+                    "caption": "((b)) Polaris-7B → \\rightarrow DS-distill-1.5B",
+                    "sha256": "f855f61995979345d6c191cccb9b7d06dfccc6963cb2c7e6023094b5ba4ec1fd",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-09-2.png",
+                    "preview_sha256": "bb7bc334a49b1cb405e19dc2788ebd75c4e471753fc158c286dd75c0d7fad8b7"
+                },
+                {
+                    "figure_id": "A3.F9.sf3",
+                    "base": "figure-09-3",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_to_7b_math_teacher_difficulty_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-09-3.svg",
+                    "caption": "((c)) Polaris-7B → \\rightarrow DS-distill-7B",
+                    "sha256": "85b16f98c395609e4dba490d71adf452248fa92e797428cf510a2d90f0c2b1a5",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-09-3.png",
+                    "preview_sha256": "309575c1de307adbdb7e25c2a655d7a70d8171e7f0a33e27f0bb7c806d392735"
+                },
+                {
+                    "figure_id": "A3.F10.sf1",
+                    "base": "figure-10-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/4b_polaris4b_qwen3_generalization_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-10-1.svg",
+                    "caption": "((a)) Polaris-4B to Qwen3-4B",
+                    "sha256": "195e6256c7384cea3519b075463bbc23f742a7e69f4520d6ee63be201b1502b8",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-10-1.png",
+                    "preview_sha256": "1909a8993223f04652297994ca0e503ee86badb505843c97cfbfdedc8fda5cf4"
+                },
+                {
+                    "figure_id": "A3.F10.sf2",
+                    "base": "figure-10-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/8b_qwen32b_bigmath_generalization_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-10-2.svg",
+                    "caption": "((b)) Qwen3-32B to Qwen3-8B-SFT",
+                    "sha256": "2f1c822f916cf824189aed56f0a7ef384f55f5f000093cbe43e753d257299bef",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-10-2.png",
+                    "preview_sha256": "0d9bf08abfac81993095deb8da61d6d16da2a4b291d055dd9d1fbda207c3d678"
+                },
+                {
+                    "figure_id": "A3.F10.sf3",
+                    "base": "figure-10-3",
+                    "url": "https://arxiv.org/html/2608.16647v2/14b_lightr1_bigmath_generalization_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-10-3.svg",
+                    "caption": "((c)) Light-R1-14B to DS-distill-14B",
+                    "sha256": "dd1d56a11b1817cc261e27b58a599750a16aeff41ae3d642ca1bf90523d0ae4e",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-10-3.png",
+                    "preview_sha256": "469c2ffbd3f456c52441c704639f01c538ebc998b5b901459c3deb75237bf19a"
+                },
+                {
+                    "figure_id": "A3.F11.sf1",
+                    "base": "figure-11-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_cross_domain_generalization_others_to_math_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-1.svg",
+                    "caption": "((a)) English Math (DS-distill-1.5B)",
+                    "sha256": "bfa522ad70506c61b0faba660dcb969c04cb64b15c90ca18116cb1da73506284",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-1.png",
+                    "preview_sha256": "5b29b0f20683c96c4cb0a4b78a491cde24c9627c1e4275971c89900ba8442ef2"
+                },
+                {
+                    "figure_id": "A3.F11.sf2",
+                    "base": "figure-11-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_cross_domain_generalization_others_to_math_zh_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-2.svg",
+                    "caption": "((b)) Chinese Math (DS-distill-1.5B)",
+                    "sha256": "e5099aefff53e0d7ae72f3c22d3a25d9971a8565d815f3d13cf3271706abc6dc",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-2.png",
+                    "preview_sha256": "9ca7e7216c4df5159f867c6429accd84e41ea2af55d8ab1a5821297cad05763f"
+                },
+                {
+                    "figure_id": "A3.F11.sf3",
+                    "base": "figure-11-3",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_cross_domain_generalization_others_to_math_horizon_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-3.svg",
+                    "caption": "((c)) Long-Horizon Math (DS-distill-1.5B)",
+                    "sha256": "113cd3fc0daa8e8f9bae1b722d42a5145c080c497b8806daa7a17178b98fd8b2",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-3.png",
+                    "preview_sha256": "fb6cb979d5a6ba81db010a4046ef126f42aae9e927e059084ac5de26bbfa07bb"
+                },
+                {
+                    "figure_id": "A3.F11.sf4",
+                    "base": "figure-11-4",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_cross_domain_generalization_others_to_math_mainmath6_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-4.svg",
+                    "caption": "((d)) English Math (DS-distill-7B)",
+                    "sha256": "c1be947c4d273fba548588a8db7f9dd1499442ed1cafa099abce3d4b42499182",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-4.png",
+                    "preview_sha256": "a2286b22424d05ce9790fe163ce4ff9e70526c6c35ffc09cd1469fc8452b727b"
+                },
+                {
+                    "figure_id": "A3.F11.sf5",
+                    "base": "figure-11-5",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_cross_domain_generalization_others_to_math_zh_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-5.svg",
+                    "caption": "((e)) Chinese Math (DS-distill-7B)",
+                    "sha256": "8762e5984a7328cbf14a8cae344e1ed83efa6f03489641046ea768940fea00e6",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-5.png",
+                    "preview_sha256": "122e3fe69f8d7b2172d0776d6169bea444faeadf2ca70537d8ce45769ee738ec"
+                },
+                {
+                    "figure_id": "A3.F11.sf6",
+                    "base": "figure-11-6",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_cross_domain_generalization_others_to_math_horizon_avg.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-6.svg",
+                    "caption": "((f)) Long-Horizon Math (DS-distill-7B)",
+                    "sha256": "3fdd2bf041f85362f9e6d0f175da5b80f6a09968767598a6893f865f2d5e8a08",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-11-6.png",
+                    "preview_sha256": "8a3f17ee4ad9785a73412f375b8cbe3b95cb75f61ef34258cc58002de13e7252"
+                },
+                {
+                    "figure_id": "A3.F12.sf1",
+                    "base": "figure-12-1",
+                    "url": "https://arxiv.org/html/2608.16647v2/1d5b_nemo_if_to_math_generalization_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-12-1.svg",
+                    "caption": "((a)) Nemotron-1.5B to DS-distill-1.5B",
+                    "sha256": "587298d4bbe4883be5159f1cda584d6533a549a2b45fda18a4d78ce45a3d331e",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-12-1.png",
+                    "preview_sha256": "a7dd2a1d9306615e1b9c48f774dc7718c19181d351575dc04a73c34bfc9dbf38"
+                },
+                {
+                    "figure_id": "A3.F12.sf2",
+                    "base": "figure-12-2",
+                    "url": "https://arxiv.org/html/2608.16647v2/7b_polaris_if_to_math_generalization_math_panel.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-12-2.svg",
+                    "caption": "((b)) Polaris-7B to DS-distill-7B",
+                    "sha256": "d088188eca1687509cbd47cc6a510ed3aadb82e4327713f0036516dc5b364761",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2608.16647/figure-12-2.png",
+                    "preview_sha256": "8cbfab987e9a2277634d80071e1f5e4bc076f5dd469d7a6ecbd1aa3849fadbd3"
+                }
+            ],
+            "pdf_url": "https://arxiv.org/pdf/2608.16647v2",
+            "pdf_sha256": "1b733f203ff11c695a52244d4007725de35e61943c8b475d434c015a961573bf",
+            "model_and_dataset_links": [
+                "https://huggingface.co/datasets/ByteDance-Seed/BeyondAIME"
+            ]
+        },
+        {
+            "arxiv_id": "2609.04172",
+            "version": "2609.04172v1",
+            "html_url": "https://arxiv.org/html/2609.04172v1",
+            "html_sha256": "255c7feb826e5d6ca973dcbe891206ba8f64d85a479aae053dc87d7248f86040",
+            "tables": 8,
+            "assets": [
+                {
+                    "figure_id": "S0.F1",
+                    "base": "pdf-figure-01",
+                    "url": "https://arxiv.org/pdf/2609.04172v1",
+                    "pdf_page": 1,
+                    "clip_points": [60, 273, 535, 505],
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/pdf-figure-01.png",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/pdf-figure-01.png",
+                    "sha256": "81f22752ceb808d3d1619ad392accc9c36ee293a0473b67e8f9c170c3f05854b",
+                    "caption": "PDF Figure 1: one-shot and MOPD results, missing graphics in HTML.",
+                    "preview_sha256": "81f22752ceb808d3d1619ad392accc9c36ee293a0473b67e8f9c170c3f05854b"
+                },
+                {
+                    "figure_id": "S1.F2",
+                    "base": "figure-02",
+                    "url": "https://arxiv.org/html/2609.04172v1/main2.png",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-02.png",
+                    "caption": "Figure 2 : OPD is data-overfed but algorithm-starved. Data: one query already covers most of the states full-data OPD visits. Algorithm: the student absorbs an ever smaller proportion of the remaining teacher–student gap, no matter how many queries it trains on.",
+                    "sha256": "ce27d3a94cddac774e1328ea3b97d6dbc708020f57dff98775bcb7cd8d74d2ad",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-02.png",
+                    "preview_sha256": "ce27d3a94cddac774e1328ea3b97d6dbc708020f57dff98775bcb7cd8d74d2ad"
+                },
+                {
+                    "figure_id": "S3.F3",
+                    "base": "figure-03",
+                    "url": "https://arxiv.org/html/2609.04172v1/3_oneshot_math300.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-03.svg",
+                    "caption": "Figure 3 : Validation accuracy and Training dynamics of one-shot OPD on mathematical reasoning.",
+                    "sha256": "1c86463f92ee7e02a1b591147cedadeb91600f710eb5f4ae0efd6322c4b10e22",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-03.png",
+                    "preview_sha256": "bf08b30d792e2a4bc0a4ee7fc9b0b9322b35c82ae08b8bc06924554cdd6aa4bb"
+                },
+                {
+                    "figure_id": "S3.F4",
+                    "base": "figure-04",
+                    "url": "https://arxiv.org/html/2609.04172v1/3_cross_family.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-04.svg",
+                    "caption": "Figure 4 : Validation accuracy of one-shot OPD across 3 student–teacher families, on mathematical reasoning averaged over MATH-500 and AMC 2023. AIME 2025 is excluded because the Llama pair scores near zero on it.",
+                    "sha256": "48c50a4c6a4968a0b5f56d0be5e64f1c08867e176e0b248cc6ed29b4f1428f38",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-04.png",
+                    "preview_sha256": "b88c1dc3fa4030af4a27ef38a94a8275e66ed70cc645deb80f3ce96e1dbeb4f6"
+                },
+                {
+                    "figure_id": "S3.F5",
+                    "base": "figure-05",
+                    "url": "https://arxiv.org/html/2609.04172v1/3_cross_domain.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-05.svg",
+                    "caption": "Figure 5 : Validation accuracy of one-shot OPD across three task domains.",
+                    "sha256": "e88ee6ce802c6b2e2cbe5e819ccb59f9a1c71d8e534e805863069689c03da2db",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-05.png",
+                    "preview_sha256": "c286918365784c58fba5f7b3a08ef3d7228999584ffb81416ebd26ac92eb15a9"
+                },
+                {
+                    "figure_id": "S3.F6",
+                    "base": "figure-06",
+                    "url": "https://arxiv.org/html/2609.04172v1/3_ablations.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-06.svg",
+                    "caption": "Figure 6 : Validation Accuracy of one-shot OPD under varying query difficulty, response-length cap on the hard query, and sampling temperature on the medium query.",
+                    "sha256": "fb6f8ca454e109490a9dc51e9c29800fba380fc9c3a55aabcdc697a8505a07fa",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-06.png",
+                    "preview_sha256": "bcc5a647579eccad2cb6f9ad95878824ed5af30d959271d486f22674d9eb6a7b"
+                },
+                {
+                    "figure_id": "S4.F7",
+                    "base": "figure-07",
+                    "url": "https://arxiv.org/html/2609.04172v1/4_state_coverage_oneshot.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-07.svg",
+                    "caption": "Figure 7 : State coverage and validation accuracy of one-shot OPD on the medium query, against full-data OPD. Coverage is measured against the state space full-data OPD reaches, which is therefore the 1.0 1.0 level rather than a separate curve.",
+                    "sha256": "c3ef8b67f471d1c99efc2dae9ad0af39f2ea629a07d79b96e77756129b8e66a0",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-07.png",
+                    "preview_sha256": "92eea818ea968176bbd8e5432b4ee3fad7f448e632e201eb866c2a3dbe2ed047"
+                },
+                {
+                    "figure_id": "S4.F8",
+                    "base": "figure-08",
+                    "url": "https://arxiv.org/html/2609.04172v1/4_state_diversity.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-08.svg",
+                    "caption": "Figure 8 : Validation accuracy and state coverage as the training data is made more diverse, on the response side by off-policy training on distinct trajectories and on the query side by on-policy training on distinct queries.",
+                    "sha256": "e767bd06002ce739366381b96a4bc092e6dcb86dee1d5ad48e44ea9b926d86f6",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-08.png",
+                    "preview_sha256": "5214b8ed727d9eeda596e4fe9112785a074a9f751ea8a4e4caabebc50e59ec24"
+                },
+                {
+                    "figure_id": "S5.F9",
+                    "base": "figure-09",
+                    "url": "https://arxiv.org/html/2609.04172v1/5_digestion_rate_v2.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-09.svg",
+                    "caption": "Figure 9 : Teacher–student alignment for OPD trained on 1, 4, 16, and all DAPO-Math-17k queries. Distance (left) and absorption rate (right) are both on logarithmic vertical axes against linear steps.",
+                    "sha256": "27d14a2e593836554c1a0ff721f54b542acbdd35d4b52f1088bf66f42d40a177",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-09.png",
+                    "preview_sha256": "64a3bed60154ccd510e17d7ad54d842e35703397b84d3ba64b2bf6c1e38a58a0"
+                },
+                {
+                    "figure_id": "S5.F10",
+                    "base": "figure-10",
+                    "url": "https://arxiv.org/html/2609.04172v1/5_online_offline.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-10.svg",
+                    "caption": "Figure 10 : Validation accuracy and alignment metrics for the on-policy and off-policy one-shot runs.",
+                    "sha256": "0e74ee6af3651c8268c0ada2fb18f4aa9a5b739c64f6b1252230ab649dc73e72",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-10.png",
+                    "preview_sha256": "73f66a26934e5c03ca05399eded812692b3c8784c7c68677e5d478b05892c476"
+                },
+                {
+                    "figure_id": "S6.F11",
+                    "base": "figure-11",
+                    "url": "https://arxiv.org/html/2609.04172v1/6_mopd_curves.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-11.svg",
+                    "caption": "Figure 11 : Validation accuracy of one-shot, 16-shot, and full-data MOPD.",
+                    "sha256": "d326ee401902f0fc565eff6c852d3a74d9c0e207f100a4c49353bb8d3cddee07",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-11.png",
+                    "preview_sha256": "7a4ecd17f065145c4d53ce2b8b0d7d9d1cd26846b1e1b2b58a2bdc1b90f78bfb"
+                },
+                {
+                    "figure_id": "S7.F13",
+                    "base": "figure-13",
+                    "url": "https://arxiv.org/html/2609.04172v1/7_template_wildchat.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-13.svg",
+                    "caption": "Figure 13 : Validation accuracy and actor entropy for mathematics OPD trained on the real training set, on a content-light template, or on general-domain WildChat queries.",
+                    "sha256": "73d4458847d13b115bfb4edee67b5256ef620bde9e2ba0ffb804d74b2fd40b5f",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-13.png",
+                    "preview_sha256": "17af240774463bb7866c1855994c416c8a167974a552dceccd3365c813f1e132"
+                },
+                {
+                    "figure_id": "S7.F14",
+                    "base": "figure-14",
+                    "url": "https://arxiv.org/html/2609.04172v1/7_opd_vs_rlvr.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-14.svg",
+                    "caption": "Figure 14 : Validation accuracy and training dynamics for one-shot OPD and one-shot RLVR on the same query. Both take a batch of 64 64 queries per step. RLVR draws 8 8 rollouts per query and scores each by outcome under GRPO. OPD draws 1 1 and scores every sampled token against the teacher. Training accuracy is the fraction of rollouts that solve the training query.",
+                    "sha256": "7cf7ddffd56084dd947f5aaf5c74f559ffc638c7456c5745df3177e42e271840",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-14.png",
+                    "preview_sha256": "e6c178917d3a5d8fc1289c5bd5749a1bee88411b9df84aa56fdedba98c68a529"
+                },
+                {
+                    "figure_id": "A1.F15",
+                    "base": "figure-15",
+                    "url": "https://arxiv.org/html/2609.04172v1/3A_ablations_training_acc.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-15.svg",
+                    "caption": "Figure 15 : Fraction of the 64 rollouts per step that solve the training query itself, for the three queries of Table 2 .",
+                    "sha256": "019f2106bde6a369c2f07a609f38b455d98e71602312355fd4b6be5fd30fcc27",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-15.png",
+                    "preview_sha256": "4d202df0a997a257e9779a5856f1bc0d3205055ef240400cf4ec422ed2efee32"
+                },
+                {
+                    "figure_id": "A2.F16",
+                    "base": "figure-16",
+                    "url": "https://arxiv.org/html/2609.04172v1/4A_state_extraction_positions.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-16.svg",
+                    "caption": "Figure 16 : Training-state coverage under alternative state-extraction positions, at K = 200 K=200 . Error bars show one standard deviation over rollout subsamples.",
+                    "sha256": "2c55a3e569a9ec6349a0f5b39c7e4bb7626e0be4daa0114b2ef00158c2ea1dae",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-16.png",
+                    "preview_sha256": "378345d5304a53579a95fc7c3ddbd78d126b662b58c95a14f5b674ac469820e7"
+                },
+                {
+                    "figure_id": "A2.F17",
+                    "base": "figure-17",
+                    "url": "https://arxiv.org/html/2609.04172v1/4A_nshot_diversity.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-17.svg",
+                    "caption": "Figure 17 : Two 16-shot query sets that differ only in diversity, against full-data OPD.",
+                    "sha256": "fac99d4cd95e0097fb6c5193190d62470b66863c46a0479ff9cdab9837047040",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-17.png",
+                    "preview_sha256": "d43428b64d8ea2f8e0a90e9d414cbeac6191904ab32bcfbbc496bcf0b6102bcd"
+                },
+                {
+                    "figure_id": "A2.F18",
+                    "base": "figure-18",
+                    "url": "https://arxiv.org/html/2609.04172v1/4A_2shot_schedule.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-18.svg",
+                    "caption": "Figure 18 : Effect of query scheduling in 2-shot OPD. The vertical dotted line marks the query switch in the sequential schedule.",
+                    "sha256": "73b9d193a9ac452ec0a62bfbf12275caac16830c65afe35f59a87a2134aa8068",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-18.png",
+                    "preview_sha256": "c57e9571bf34a7fe3dd5d04e442f233a0318961126221c94b3ac4d1e629b7721"
+                },
+                {
+                    "figure_id": "A3.F19",
+                    "base": "figure-19",
+                    "url": "https://arxiv.org/html/2609.04172v1/5A_lr_collapse_v2.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-19.svg",
+                    "caption": "Figure 19 : Validation accuracy and teacher–student distance for one-shot OPD at half, one, and twice the default learning rate. Distance is on a logarithmic vertical axis against linear time.",
+                    "sha256": "8843d3a098639eab90ab4670e0cc0b8b8f0ff7157b93bdc856e49317d3f1d348",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-19.png",
+                    "preview_sha256": "129e43ecad8587919b76f18774e8789e67d5377c5bc33fc83865d3e796d1201d"
+                },
+                {
+                    "figure_id": "A5.F20",
+                    "base": "figure-20",
+                    "url": "https://arxiv.org/html/2609.04172v1/7A_template_wildchat_code.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-20.svg",
+                    "caption": "Figure 20 : Validation accuracy and actor entropy for code-generation OPD.",
+                    "sha256": "b14131a55237d010a0baeea1f21a403e39e650f726a665184b675e33bd3b00de",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2609.04172/figure-20.png",
+                    "preview_sha256": "eb6624cba4b666dc95a377eb68d113f67f9834049744bf9dec001dd07d7f1dae"
+                }
+            ],
+            "pdf_url": "https://arxiv.org/pdf/2609.04172v1",
+            "pdf_sha256": "addcfc1fb00273de054d2a9bcd86d37ee046fd59bd97f92f0c85fdc555fe4dd5",
+            "model_and_dataset_links": [
+                "https://huggingface.co/datasets/open-r1/codeforces",
+                "https://huggingface.co/datasets/openbmb/UltraData-SFT-2605"
+            ]
+        },
+        {
+            "arxiv_id": "2610.11291",
+            "version": "2610.11291v1",
+            "html_url": "https://arxiv.org/html/2610.11291v1",
+            "html_sha256": "7d840425b74c01b525bbb24d7b11ce46ee153db415e38ea03f00ebac6e330f21",
+            "tables": 4,
+            "assets": [
+                {
+                    "figure_id": "S0.F1",
+                    "base": "figure-01",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_overlap_combo.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-01.svg",
+                    "caption": "Figure 1 : Semi-OPD outperforms standard OPD when the initial teacher–student overlap is low. (a) Accuracy gain vs. initial top-64 overlap across 17 pairs ranging from 1.5B to 235B,\nspanning thinking and non-thinking modes and multiple model families, with a Pearson\ncorrelation of r = − 0.73 r=-0.73 . Accuracy gain is the area between the Semi-OPD and OPD accuracy curves\ndivided by their shared training horizon, averaged over AIME 24/25/26 and HMMT Feb 26. (b) Training curves for three pairs of increasing overlap (AIME 24/25 avg@32,\nmean of 3 seeds). At low overlap, Semi-OPD outperforms OPD which can even degrade;\nat high overlap, Semi-OPD can slightly lag behind.",
+                    "sha256": "18004b810cedb9c389f56935c98583e12fb1229b7a85a936573cd94e6ca6a7c8",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-01.png",
+                    "preview_sha256": "5d4e670e6ab17d0cc54e526f8e21b34d1f72e2d4d25b045920a818076d1fe6ac"
+                },
+                {
+                    "figure_id": "S2.F2",
+                    "base": "figure-02",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig3_allpairs.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-02.svg",
+                    "caption": "Figure 2 : Semi-OPD vs. OPD across 17 model pairs. Each panel represents one student–teacher pair, with its title containing the pair’s initial top-64 overlap. Accuracy is measured as the mean avg@32 over AIME 2024/2025/2026 and HMMT February 2026. The number in each panel is the gain plotted in Fig. 1 a, defined as the area between the two curves divided by the training horizon.",
+                    "sha256": "fdc404fea2859699f5293fb618ba171645017a4876d9a8dec4523b614f721caa",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-02.png",
+                    "preview_sha256": "eccb5903f4f3d2185220afca1d69320c6865cd2418e0d94257bae830229bd968"
+                },
+                {
+                    "figure_id": "S2.F3",
+                    "base": "figure-03",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_sft.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-03.svg",
+                    "caption": "Figure 3 : Teacher-rollout SFT improves overlap ratios but reduces final performance after Semi-OPD. (a) SFT on teacher rollouts slightly increases the initial top-64 overlap. (b) SFT on teacher rollouts followed by Semi-OPD still outperforms OPD but underperforms Semi-OPD alone. (c, d) SFT on teacher rollouts negatively impacts final performance when combined with Semi-OPD.",
+                    "sha256": "5f5fb8908d768bfb1c3ea0baecb94d79d0323d1250bbaf75e133e6e785a55e06",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-03.png",
+                    "preview_sha256": "4669a873bba1d9ebe51ef40b0208c6e45e3d657e9f3bd528902ac3ecd611986d"
+                },
+                {
+                    "figure_id": "S3.F4",
+                    "base": "figure-04",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_source_coverage.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-04.svg",
+                    "caption": "Figure 4 : Both rollout source and reasoning coverage matter for distillation. (a, b) Semi-OPD outperforms teacher-rollout distillation (and OPD) on both pairs. (c, d) We compare Semi-OPD trained on the first 1 / 4 1/4 , 1 / 2 1/2 , 3 / 4 3/4 , or all of each rollout, while keeping the total number of training tokens fixed by scaling the number of rollouts per prompt. Distillation on all stages performs best.",
+                    "sha256": "ecae18969523405ce6532493e04caea4a8f000ab1cb57dd70a9fecf813318653",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-04.png",
+                    "preview_sha256": "b9ceb9aa335b6672d2f611f7351a40237f70c15a7af2ddfc8f260214b08961a8"
+                },
+                {
+                    "figure_id": "S3.F5",
+                    "base": "figure-05",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_rollout_len.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-05.svg",
+                    "caption": "Figure 5 : Longer rollouts hurt the low-overlap pair (left) but not the high-overlap pair (right).",
+                    "sha256": "e38b099dbef7fd9696be22e9ef13ca42671065d0db7f11a7c3ba2917e5d8c229",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-05.png",
+                    "preview_sha256": "db1c4590629efaa66f28ec9afd0b08e2907e64346f2366cc9fa22a0608b25640"
+                },
+                {
+                    "figure_id": "S3.F7.fig1",
+                    "base": "figure-07",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_signal.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-07.svg",
+                    "caption": "Figure 6 : The percentage of tokens with positive rewards , i.e., fraction of training\ntokens with p T > p S p_{T}>p_{S} under Semi-OPD and OPD.",
+                    "sha256": "10e18d81b06dda5119b95b4fbbf5a8d1e6f05574fdf988d6825ee2a21854e6f9",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-07.png",
+                    "preview_sha256": "56744e72be54ce34bb96114b2525108ac55234c21b9ab9bbc843699f9a5e81e5"
+                },
+                {
+                    "figure_id": "S3.F7.fig2",
+                    "base": "figure-07-part2",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_objective.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-07-part2.svg",
+                    "caption": "Figure 7 : Semi-OPD vs. OPD under two distillation objectives , i.e.,\nthe sampled-token and top- k k reverse KL objectives.",
+                    "sha256": "7868175cb3a4329e8058366187b73e3261a19bfd80f285fda347e10b52782c7b",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-07-part2.png",
+                    "preview_sha256": "a5b4811e18446e5aea7c9651324a082a4dbbe2920f3c6b2fb53fa036f047b420"
+                },
+                {
+                    "figure_id": "S3.F8",
+                    "base": "figure-08",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_handoff.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-08.svg",
+                    "caption": "Figure 8 : Switching to OPD converges toward a rollout-determined equilibrium, largely independent of initialization. OPD eval accuracy trajectories when initialized from the initial student, a Semi-OPD checkpoint, or a teacher-rollout distillation checkpoint. Switching to OPD can either decrease or improve performance (see Fig. 9 ), with trajectories approaching the performance level of OPD trained from scratch under the same rollout cap. Dashed lines indicate training before switching to OPD.",
+                    "sha256": "6a5f2903bd59d072a0df3a9c19f4e4746def369f52f82c43f8391d7d7f58f40a",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-08.png",
+                    "preview_sha256": "fa49a9b5c478762220350803f0cd6aaf26eab93b3eeff6963b6557a19d3f32c4"
+                },
+                {
+                    "figure_id": "S5.F9",
+                    "base": "figure-09",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_cache_switch_polaris.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-09.svg",
+                    "caption": "Figure 9 : Switching from Semi-OPD to OPD on a high-overlap pair with an initial top-64 overlap ratio of 86.8% closes the gap with OPD applied from scratch.",
+                    "sha256": "c6f9f3ba0be01260c8e9bc5772504e855cd0354142eb6113def916780e1334de",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-09.png",
+                    "preview_sha256": "e240ccec192d49fe2f90c05ea44993f7b737b2d7ee100088ae6086a1dcc6047b"
+                },
+                {
+                    "figure_id": "S5.F10",
+                    "base": "figure-10",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_crossdomain.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-10.svg",
+                    "caption": "Figure 10 : Transfer to coding. Code performance of models\ndistilled on math only (Qwen3-1.7B ← \\leftarrow Qwen3-4B-Instruct-2507).",
+                    "sha256": "15fdc6697e2e86289e19f7e6214422a6018a5c9baf4ae9ce40ce99470c7dea0c",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-10.png",
+                    "preview_sha256": "5dffd4ad4988c66a5bae29137403994a5a8fb02fe87da82396c23981e81d4cb0"
+                },
+                {
+                    "figure_id": "S5.F11",
+                    "base": "figure-11",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_basestudent.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-11.svg",
+                    "caption": "Figure 11 : Initial student competence. Semi-OPD vs. OPD with the same\nteacher, from base (left) and instruction-tuned (right) students.",
+                    "sha256": "d4a7743979c028e698cb90a959b4ec207156b5ceea3a0ed521fc4dd9e6534fcc",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-11.png",
+                    "preview_sha256": "297d779df0e75a03266eb59b5ee8e537e2cbdecbd7d7a303e70af560dcf65aca"
+                },
+                {
+                    "figure_id": "A2.F12",
+                    "base": "figure-12",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_allpairs_length.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-12.svg",
+                    "caption": "Figure 12 : Training rollout length. Mean generated tokens per\ntraining rollout. The number in each panel is how much longer OPD’s rollouts\nare than Semi-OPD’s over the last 10 shared steps; the dotted line is the\nteacher’s length, where available.",
+                    "sha256": "0a16c93896d4d964bafe6669434de056784a18685c39213d7be8985ce510ab3a",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-12.png",
+                    "preview_sha256": "b0661a710a6e913c90affdb486118b487f01ce359d0889105a3e4cc7353f930a"
+                },
+                {
+                    "figure_id": "A2.F13",
+                    "base": "figure-13",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_allpairs_signal.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-13.svg",
+                    "caption": "Figure 13 : Positively supervised tokens. Share of training tokens\nwith p T > p S p_{T}>p_{S} . The number in each panel is Semi-OPD minus OPD, in points,\nover the last 10 shared steps.",
+                    "sha256": "7063864fdfde3f6dabf8f0b35c9cacc1712d70a00243c15cb30766fb220fa504",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-13.png",
+                    "preview_sha256": "c3843f71f48e82392099d83a21bf31239cdaff1c682ffc13d0d8ce3f1aa87028"
+                },
+                {
+                    "figure_id": "A2.F14",
+                    "base": "figure-14",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_allpairs_student_entropy.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-14.svg",
+                    "caption": "Figure 14 : Student entropy. Mean next-token entropy of the student\n(nats) on the training tokens.",
+                    "sha256": "bb426eabebd9b12b74840fdeedd286878e6d42e12275ffa82ae806a49e0219b6",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-14.png",
+                    "preview_sha256": "0eb21b7d48aee1dc42e3766dbc2877ead4c6120afc4a770fcc05fc2fb6405cb9"
+                },
+                {
+                    "figure_id": "A2.F15",
+                    "base": "figure-15",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_allpairs_teacher_entropy.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-15.svg",
+                    "caption": "Figure 15 : Teacher entropy. Mean next-token entropy of the teacher\n(nats) on the same training tokens, i.e. how uncertain the teacher is on\nthe rollouts it supervises.",
+                    "sha256": "75c9bf404d1c495a3f9d7733fc4bf14fe2a3526c18ea6b769fe1fa00fadb17d1",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-15.png",
+                    "preview_sha256": "bfada974052aefdd49ebb373451d981439db4a760692b7d5d47d86bdc03f453d"
+                },
+                {
+                    "figure_id": "A2.F16",
+                    "base": "figure-16",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_allpairs_overlap.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-16.svg",
+                    "caption": "Figure 16 : Teacher–student overlap on the training rollouts. Top-64 overlap\nbetween the current student and the teacher, computed on each method’s own training\ntokens with the same metric as the initial overlap in Section 2 . The number in\neach panel is Semi-OPD minus OPD, in points, over the last 10 shared steps. For the two\nSFT-initialized pairs, overlap was measured only at initialization and at step 110.",
+                    "sha256": "bc688136fa5cfcbc9a054cb9f4f2a546a8f9b8d6be64beb5e390d448b33018c4",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-16.png",
+                    "preview_sha256": "77009af6c233b6925f5a954b340584940ded74c124a00c5977b611f1bdf61139"
+                },
+                {
+                    "figure_id": "A4.F17",
+                    "base": "figure-17",
+                    "url": "https://arxiv.org/html/2610.11291v1/fig_inflation.svg",
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-17.svg",
+                    "caption": "Figure 17 : On-policy rollouts inflate during OPD. Rollout length (left three panels) and self-correction word density (right\nthree panels) of the training rollouts. OPD rollouts grow longer and use more\nself-correction words, eventually exceeding the teacher (dotted), while the\nfrozen rollouts sampled once from the initial student π 0 \\pi_{0} do not.",
+                    "sha256": "e61fd8df4a47de6f7d81fc7e8c8a5cc47e5f99a1b303aa25f24131054efbef3a",
+                    "preview_path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/figure-17.png",
+                    "preview_sha256": "95e0a96d4c8d7637a0e56159e25d48e18e520dfee9b01980e20595428cef6244"
+                }
+            ],
+            "pdf_url": "https://arxiv.org/pdf/2610.11291v1",
+            "pdf_sha256": "4c7d5b6e8b1aeb2928e6f7e564d0b665c2d32d2a2897578645d2c89d2ae28c68",
+            "pdf_only_assets": [
+                {
+                    "figure": 1,
+                    "pdf_page": 1,
+                    "path": "docs/analysis/assets/opd-six-papers-20261015/2610.11291/pdf-figure-01.png",
+                    "clip_points": [60, 395, 535, 675],
+                    "sha256": "4d9d29e1e7b4d109f66d257c9ef6c4e5a5f22e043512f19ac9efd314cba92027"
+                }
+            ],
+            "model_and_dataset_links": [
+                "https://huggingface.co/POLARIS-Project/Polaris-7B-Preview",
+                "https://huggingface.co/Qwen/Qwen3-1.7B",
+                "https://huggingface.co/Qwen/Qwen3-14B",
+                "https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507",
+                "https://huggingface.co/Qwen/Qwen3-235B-A22B-Thinking-2507",
+                "https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507",
+                "https://huggingface.co/Qwen/Qwen3-30B-A3B-Thinking-2507",
+                "https://huggingface.co/Qwen/Qwen3-4B",
+                "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507",
+                "https://huggingface.co/Qwen/Qwen3-8B",
+                "https://huggingface.co/agentica-org/DeepCoder-14B-Preview",
+                "https://huggingface.co/datasets/open-r1/DAPO-Math-17k-Processed",
+                "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+                "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+                "https://huggingface.co/hbx/JustRL-DeepSeek-1.5B",
+                "https://huggingface.co/qihoo360/Light-R1-14B-DS"
+            ],
+            "model_pairs": [
+                {
+                    "pair": "n",
+                    "student_checkpoint": "Qwen3-1.7B",
+                    "teacher_checkpoint": "Qwen3-30B-A3B-Thinking",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-30B-A3B-Thinking-2507"
+                    ]
+                },
+                {
+                    "pair": "a",
+                    "student_checkpoint": "Qwen3-1.7B",
+                    "teacher_checkpoint": "Qwen3-4B-Instruct-2507",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507"
+                    ]
+                },
+                {
+                    "pair": "p",
+                    "student_checkpoint": "Qwen3-4B",
+                    "teacher_checkpoint": "Qwen3-30B-A3B-Thinking",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-4B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-30B-A3B-Thinking-2507"
+                    ]
+                },
+                {
+                    "pair": "o",
+                    "student_checkpoint": "Qwen3-14B",
+                    "teacher_checkpoint": "Qwen3-235B-A22B-Thinking",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-14B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-235B-A22B-Thinking-2507"
+                    ]
+                },
+                {
+                    "pair": "b",
+                    "student_checkpoint": "Qwen3-1.7B",
+                    "teacher_checkpoint": "Qwen3-30B-A3B-Instruct-2507",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507"
+                    ]
+                },
+                {
+                    "pair": "f",
+                    "student_checkpoint": "Qwen3-4B",
+                    "teacher_checkpoint": "Qwen3-30B-A3B-Instruct-2507",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-4B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507"
+                    ]
+                },
+                {
+                    "pair": "c",
+                    "student_checkpoint": "Qwen3-1.7B",
+                    "teacher_checkpoint": "Qwen3-235B-A22B-Instruct-2507",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-235B-A22B-Instruct-2507"
+                    ]
+                },
+                {
+                    "pair": "g",
+                    "student_checkpoint": "Qwen3-1.7B (SFT)",
+                    "teacher_checkpoint": "Qwen3-4B-Instruct-2507",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507"
+                    ]
+                },
+                {
+                    "pair": "h",
+                    "student_checkpoint": "Qwen3-4B (SFT)",
+                    "teacher_checkpoint": "Qwen3-30B-A3B-Instruct-2507",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-4B"],
+                    "teacher_urls": [
+                        "https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507"
+                    ]
+                },
+                {
+                    "pair": "d",
+                    "student_checkpoint": "Qwen3-1.7B",
+                    "teacher_checkpoint": "Qwen3-4B",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": ["https://huggingface.co/Qwen/Qwen3-4B"]
+                },
+                {
+                    "pair": "m",
+                    "student_checkpoint": "R1-Distill-7B",
+                    "teacher_checkpoint": "DeepCoder-14B",
+                    "student_urls": [
+                        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+                    ],
+                    "teacher_urls": [
+                        "https://huggingface.co/agentica-org/DeepCoder-14B-Preview"
+                    ]
+                },
+                {
+                    "pair": "e",
+                    "student_checkpoint": "Qwen3-1.7B",
+                    "teacher_checkpoint": "Qwen3-8B",
+                    "student_urls": ["https://huggingface.co/Qwen/Qwen3-1.7B"],
+                    "teacher_urls": ["https://huggingface.co/Qwen/Qwen3-8B"]
+                },
+                {
+                    "pair": "j",
+                    "student_checkpoint": "R1-Distill-1.5B",
+                    "teacher_checkpoint": "Polaris-7B",
+                    "student_urls": [
+                        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+                    ],
+                    "teacher_urls": [
+                        "https://huggingface.co/POLARIS-Project/Polaris-7B-Preview"
+                    ]
+                },
+                {
+                    "pair": "q",
+                    "student_checkpoint": "Cascade-2-30B-A3B",
+                    "teacher_checkpoint": "Cascade-2-Math-Expert †",
+                    "student_urls": [],
+                    "teacher_urls": []
+                },
+                {
+                    "pair": "l",
+                    "student_checkpoint": "R1-Distill-7B",
+                    "teacher_checkpoint": "Light-R1-14B",
+                    "student_urls": [
+                        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+                    ],
+                    "teacher_urls": [
+                        "https://huggingface.co/qihoo360/Light-R1-14B-DS"
+                    ]
+                },
+                {
+                    "pair": "k",
+                    "student_checkpoint": "R1-Distill-7B",
+                    "teacher_checkpoint": "Polaris-7B",
+                    "student_urls": [
+                        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+                    ],
+                    "teacher_urls": [
+                        "https://huggingface.co/POLARIS-Project/Polaris-7B-Preview"
+                    ]
+                },
+                {
+                    "pair": "i",
+                    "student_checkpoint": "R1-Distill-1.5B",
+                    "teacher_checkpoint": "JustRL-1.5B",
+                    "student_urls": [
+                        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+                    ],
+                    "teacher_urls": [
+                        "https://huggingface.co/hbx/JustRL-DeepSeek-1.5B"
+                    ]
+                }
+            ]
+        }
+    ],
+    "code_sources": [
+        {
+            "repository": "https://github.com/Thinking-Space/Rethinking-OPD",
+            "commit": "ac26e38d6f1572eb027597b48a9f4e01f6915ef8",
+            "files": [
+                "README.md",
+                "on_policy_distillation.sh",
+                "grpo.sh",
+                "verl/verl/workers/actor/dp_actor.py",
+                "verl/verl/trainer/ppo/core_algos.py",
+                "LlamaFactory/examples/train_full/qwen3_base_full_sft.yaml"
+            ],
+            "file_sha256": {
+                "README.md": "a25153d2d5fe91c7e27f041c9bcb9de45a5d4740757f4f6c8a2a55fcda02aad3",
+                "on_policy_distillation.sh": "8377cb1b7bec6ebf380f8274623ce0188591ce90c95216ccd85b6d7aa36974a1",
+                "grpo.sh": "a79466f8c426916439514a3747dbcbd28677727e01e13db3d7105f17b594dd10",
+                "verl/verl/workers/actor/dp_actor.py": "ae706f1d20d3677bcd952fad8fb054180159747b4f2e61cab002f1328fd18d6f",
+                "verl/verl/trainer/ppo/core_algos.py": "d7a2796319d9de5e0672138ae131e458b82ae0e54e9e121e44d415ece9a24bc3",
+                "LlamaFactory/examples/train_full/qwen3_base_full_sft.yaml": "6cba0d574040079e2ad8d5169057ca9f5370bde3acdb0f9f681bb1fe7db3682b"
+            }
+        },
+        {
+            "repository": "https://github.com/Thinking-Space/One-Shot-OPD",
+            "commit": "6b6b1782cc3f04749dd077de19353f839f6bc048",
+            "files": [
+                "README.md",
+                "recipe/_common.sh",
+                "recipe/opd.sh",
+                "recipe/grpo.sh",
+                "recipe/mopd.sh",
+                "eval/run_if_eval.py"
+            ],
+            "file_sha256": {
+                "README.md": "8cca85be2af01e01a9c882c90e34dbf20461f8c033858013bf3da3aa3bef09bf",
+                "recipe/_common.sh": "72adca4a6af51e69760598d96db1cb8bddae22e164bafa3a926a9999d869fe37",
+                "recipe/opd.sh": "69836810c142e4c858ee83c08035226e84607074f4aa93ff043b3e27fa37de5d",
+                "recipe/grpo.sh": "ac134c0db99767c667e0a917688928049a9de0615f339c670f722677500116b1",
+                "recipe/mopd.sh": "a91cd0f84e402d0f43e44d3ec94932a66be45701bad25c784bd607f9373ccbf5",
+                "eval/run_if_eval.py": "779e9ac33e61cce42c6b4a8b0461e8baddac1fe423845b41e20be9fc73b75166"
+            }
+        }
+    ]
+}
