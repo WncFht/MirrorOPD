@@ -12,7 +12,8 @@ from functools import lru_cache
 from pathlib import Path
 
 from mirroropd.core.config import API_VERSION
-from mirroropd.runtime.artifacts import atomic_json, canonical_json
+from mirroropd.identity import canonical_json
+from mirroropd.runtime.artifacts import atomic_json
 
 _PRIVATE_FIELDS = frozenset(
     {"api_key", "access_token", "refresh_token", "password", "secret", "authorization"}

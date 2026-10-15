@@ -26,6 +26,12 @@ def _matches_type(value, expected):
         return isinstance(value, list) and all(
             _matches_type(item, get_args(expected)[0]) for item in value
         )
+    if origin is dict:
+        key_type, value_type = get_args(expected)
+        return isinstance(value, dict) and all(
+            _matches_type(key, key_type) and _matches_type(item, value_type)
+            for key, item in value.items()
+        )
     if expected is float:
         return type(value) in {int, float}
     return type(value) is expected
@@ -101,6 +107,14 @@ class Objective:
 
     def to_dict(self):
         return asdict(self)
+
+    @property
+    def loss_kind(self):
+        return (
+            "conditional_objective"
+            if self.estimator.integration == "full" and self.algorithm != "on_policy"
+            else "score_surrogate"
+        )
 
 
 @dataclass(frozen=True, slots=True)

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import torch
 
-from mirroropd.core.diagnostics import full_diagnostics, student_statistics
+from mirroropd.core.diagnostics import diagnostic_names, full_diagnostics, student_statistics
 from mirroropd.core.distributions import Distribution, probability_dtype
 from mirroropd.core.signal import power_reward
 
@@ -60,26 +60,33 @@ def compute_loss(student_logits, cache, objective, *, anchor_version):
     all_valid = bool(flat_valid.all())
     flat_logits = student_logits.reshape(-1, cache.context.vocab_size)
     logits = flat_logits if all_valid else flat_logits[flat_valid]
-    kind = (
-        "conditional_objective"
-        if objective.estimator.integration == "full" and objective.algorithm != "on_policy"
-        else "score_surrogate"
-    )
+    kind = objective.loss_kind
     if len(logits) == 0:
         zero = student_logits[..., 0].to(dtype).nan_to_num().mul(0)
-        return LossResult(zero, {}, kind)
+        return LossResult(
+            zero, {name: zero.detach().clone() for name in diagnostic_names(objective)}, kind
+        )
     values = {}
     for name, tensor in cache.tensors().items():
         trailing = tensor.shape[cache.valid.ndim :]
         value = tensor.reshape(flat_valid.numel(), *trailing)
         values[name] = value if all_valid else value[flat_valid]
-    distribution = Distribution.from_logits(logits)
+    distribution = Distribution.from_logits(
+        logits,
+        materialize=(objective.estimator.integration == "full" or objective.diagnostics == "full"),
+    )
     logp = distribution.full() if objective.estimator.integration == "full" else None
     center = head = tail = None
     if objective.diagnostics != "none" or (
         objective.algorithm == "bpo" and objective.estimator.integration == "sampled"
     ):
-        center, head, tail = student_statistics(distribution, values, cache.context, logp=logp)
+        center, head, tail = student_statistics(
+            distribution,
+            values,
+            cache.context,
+            logp=logp,
+            include_support=objective.diagnostics == "full",
+        )
     coefficient = reward = u = None
     if logp is not None:
         loss = integrated_loss(
@@ -104,11 +111,13 @@ def compute_loss(student_logits, cache, objective, *, anchor_version):
                 center,
                 objective.signal.eta,
             )
-        if not torch.isfinite(coefficient).all():
-            raise FloatingPointError("Nonfinite distillation score; ratios are never clipped")
         loss = coefficient * action_lp
-    if not torch.isfinite(loss).all():
-        raise FloatingPointError("Nonfinite distillation loss")
+    with torch.no_grad():
+        finite = torch.isfinite(loss).all()
+        if coefficient is not None:
+            finite = finite & torch.isfinite(coefficient).all()
+    if not finite:
+        raise FloatingPointError("Nonfinite distillation loss/score; ratios are never clipped")
     diagnostics = {}
     if objective.diagnostics != "none":
         with torch.no_grad():
@@ -122,10 +131,10 @@ def compute_loss(student_logits, cache, objective, *, anchor_version):
                 "frozen_reward_center": values["reward_center"],
                 "student_anchor_kl": center,
             }
+            if objective.algorithm == "on_policy":
+                diagnostics["on_policy_baseline"] = values["reward_center"]
             if coefficient is not None:
                 diagnostics.update(reward=reward, score_coefficient=coefficient, log_anchor_ratio=u)
-                if objective.algorithm == "on_policy":
-                    diagnostics["on_policy_baseline"] = values["reward_center"]
                 if objective.algorithm == "mdpo":
                     diagnostics["importance_ratio"] = u.exp()
             if kind == "conditional_objective":

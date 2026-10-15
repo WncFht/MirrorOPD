@@ -5,10 +5,38 @@ import torch
 from mirroropd.core.distributions import grouped_kl, support_overlap
 
 
+def diagnostic_names(objective):
+    if objective.diagnostics == "none":
+        return ()
+    names = ["action_nll", "frozen_reward_center", "student_anchor_kl"]
+    if objective.algorithm == "on_policy":
+        names.append("on_policy_baseline")
+    if objective.estimator.integration == "sampled":
+        names += ["reward", "score_coefficient", "log_anchor_ratio"]
+        if objective.algorithm == "mdpo":
+            names.append("importance_ratio")
+    elif objective.algorithm != "on_policy":
+        names.append("conditional_objective")
+    if objective.diagnostics == "full":
+        names += [
+            "student_entropy",
+            "anchor_head_mass",
+            "anchor_tail_mass",
+            "student_head_mass",
+            "student_tail_mass",
+            "student_anchor_support_jaccard",
+            "student_teacher_support_jaccard",
+            "anchor_teacher_support_jaccard",
+        ]
+    return tuple(names)
+
+
 @torch.no_grad()
-def student_statistics(distribution, values, context, *, logp=None):
-    head = distribution.selected(values["head_ids"])
-    tail = distribution.tail(values["head_ids"], context.estimator.chunk_size)
+def student_statistics(distribution, values, context, *, logp=None, include_support=False):
+    head = tail = None
+    if context.estimator.center != "full" or include_support:
+        head = distribution.selected(values["head_ids"])
+        tail = distribution.tail(values["head_ids"], context.estimator.chunk_size)
     if context.estimator.center == "full":
         qlog = values["anchor_full"]
         plog = distribution.full() if logp is None else logp

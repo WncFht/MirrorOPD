@@ -9,13 +9,14 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from mirroropd.core.config import API_VERSION, Objective, decode, strict_fields
-from mirroropd.runtime.artifacts import content_id
+from mirroropd.identity import content_id
 
 
 @dataclass(frozen=True, slots=True)
 class Models:
     student: str
     teacher: str
+    chat_template: str | None = None
 
     def __post_init__(self):
         if not self.student or not self.teacher:
@@ -26,12 +27,27 @@ class Models:
 class Scorer:
     name: str = "exact"
     kind: str = "binary"
+    parameters: dict[str, str | int | float | bool | None] = field(default_factory=dict)
 
     def __post_init__(self):
         if self.kind not in {"binary", "scalar"}:
             raise ValueError("Scorer kind must be binary or scalar")
         if self.name not in {"exact", "gsm8k", "math"} and ":" not in self.name:
             raise ValueError("Custom scorer must use module:function syntax")
+        if set(self.parameters) & {"data_source", "solution_str", "ground_truth", "extra_info"}:
+            raise ValueError("Scorer parameters cannot override example fields")
+        if any(
+            isinstance(value, float) and not math.isfinite(value)
+            for value in self.parameters.values()
+        ):
+            raise ValueError("Scorer parameters must contain finite JSON values")
+
+
+@dataclass(frozen=True, slots=True)
+class Columns:
+    prompt: str = "prompt"
+    answer: str = "reward_model.ground_truth"
+    source: str = "data_source"
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,6 +55,10 @@ class Dataset:
     train: list[str]
     validation: list[str]
     scorer: Scorer = field(default_factory=Scorer)
+    columns: Columns = field(default_factory=Columns)
+    source_name: str | None = None
+    ability: str = "general"
+    requires_validation_reference: bool = True
 
     def __post_init__(self):
         if not self.train or not self.validation:
@@ -97,6 +117,8 @@ class Training:
                 raise ValueError(f"training.{name} must be finite and positive")
         if not math.isfinite(self.weight_decay) or self.weight_decay < 0:
             raise ValueError("training.weight_decay must be finite and nonnegative")
+        if not 0 <= self.seed < 2**31:
+            raise ValueError("training.seed must be in [0, 2**31)")
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,6 +146,8 @@ class Evaluation:
             raise ValueError("evaluation.top_k must be -1 or positive")
         if self.question_limit is not None and self.question_limit < 1:
             raise ValueError("evaluation.question_limit must be positive or null")
+        if not 0 <= self.seed < 2**31:
+            raise ValueError("evaluation.seed must be in [0, 2**31)")
 
 
 @dataclass(frozen=True, slots=True)

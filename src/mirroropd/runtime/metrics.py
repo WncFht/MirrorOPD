@@ -61,7 +61,16 @@ def token_moments(diagnostics, mask):
             ):
                 result[f"distill/raw/{name}/{stat}"] = (reduction, packed[index * 4 + column])
         return result
-    return {"distill/raw/count": ("sum", count.cpu().item())}
+    result = {"distill/raw/count": ("sum", count.cpu().item())}
+    for name in names:
+        for stat, reduction, value in (
+            ("sum", "sum", 0.0),
+            ("sum_sq", "sum", 0.0),
+            ("min", "min", float("inf")),
+            ("max", "max", float("-inf")),
+        ):
+            result[f"distill/raw/{name}/{stat}"] = (reduction, value)
+    return result
 
 
 def finalize_moments(metrics, dp_size):

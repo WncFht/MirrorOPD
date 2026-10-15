@@ -1,0 +1,34 @@
+{
+    "license": "Apache-2.0",
+    "math_source": "https://github.com/WncFht/MD-OPD",
+    "math_commit": "cef14fa0b552b40033f8b7296ce3853d10bf479b",
+    "fallback_source": "https://github.com/HuipengHuang/TA-OPD",
+    "fallback_base": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+    "adaptation": "Retain math grading only; remove unrelated legacy code/FC routing. Fallback includes the previously validated thread-safe process-pool integration.",
+    "files": [
+        {
+            "source_path": "MD-OPD/verl/verl/utils/reward_score/ttrl_math/__init__.py",
+            "path": "ttrl_math/__init__.py",
+            "source_sha256": "2877ba6447cdf64e22a8bb50f47ce3f57ca4e826f2f2bbf2e09c382cd8763fc7",
+            "sha256": "8a2313af03a36e808506c5ff0051f2f30de3691013adee40c87f6c6a030ac14b"
+        },
+        {
+            "source_path": "MD-OPD/verl/verl/utils/reward_score/ttrl_math/math_utils.py",
+            "path": "ttrl_math/math_utils.py",
+            "source_sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822",
+            "sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822"
+        },
+        {
+            "source_path": "MD-OPD/verl/verl/utils/reward_score/_timeout.py",
+            "path": "_timeout.py",
+            "source_sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5",
+            "sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5"
+        },
+        {
+            "source_path": "MirrorOPD/runs/integration-power-20261015/verl/verl/utils/reward_score/math_verify.py",
+            "path": "math_verify.py",
+            "source_sha256": "1242011cddc041ea6cb19fc9a1872ebab742d8ae7e8ebd3342f6b3b8b6e2ba15",
+            "sha256": "1242011cddc041ea6cb19fc9a1872ebab742d8ae7e8ebd3342f6b3b8b6e2ba15"
+        }
+    ]
+}

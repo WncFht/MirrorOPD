@@ -7,7 +7,8 @@ extend-exclude = [
   ".claude",
   "node_modules",
   "runs",
-  "experiments/plotting/vendor", # Unmodified third-party figure-viz style.
+  "experiments/plotting/vendor",  # Unmodified third-party figure-viz style.
+  "src/mirroropd/scoring/vendor", # Pinned mathematical graders retain upstream formatting.
 ]
 
 [lint]

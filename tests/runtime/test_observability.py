@@ -7,7 +7,8 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 import torch
 
-from mirroropd.runtime.artifacts import atomic_json, content_id
+from mirroropd.identity import content_id
+from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.events import EventReader, EventWriter
 from mirroropd.runtime.metrics import finalize_moments, record_update, token_moments
 
@@ -72,9 +73,12 @@ def test_padding_nonfinite_and_empty_diagnostics():
     assert result["distill/reward/mean"] == 3
     assert result["distill/reward/std"] == 1
     assert token_moments({}, mask) == {"distill/raw/count": ("sum", 2.0)}
-    assert token_moments({"reward": values}, torch.zeros_like(mask)) == {
-        "distill/raw/count": ("sum", 0.0)
-    }
+    empty = token_moments({"reward": values}, torch.zeros_like(mask))
+    assert empty["distill/raw/count"] == ("sum", 0.0)
+    reduced = finalize_moments(reduce_ranks([empty, token_moments({"reward": values}, mask)]), 2)
+    assert reduced["distill/valid_tokens"] == 2
+    assert reduced["distill/reward/min"] == 2
+    assert reduced["distill/reward/max"] == 4
     with pytest.raises(FloatingPointError):
         token_moments({"reward": values}, torch.ones_like(mask))
     with pytest.raises(ValueError, match="Unregistered"):
