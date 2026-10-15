@@ -1,9 +1,0 @@
-\paragraph*{MDPO 的完整词表实现。}
-前文已经给出 action-level IS 版本。若 teacher、anchor 和 student 都能输出完整词表分布，MDPO 也可以直接计算
-\[
-\sum_{v\in\mathcal V}\pi_\theta(v\mid s_i)
-\left[\log T(v\mid s_i)-\log\pi_k(v\mid s_i)\right]
--\frac1\eta\sum_{v\in\mathcal V}\pi_\theta(v\mid s_i)
-\log\frac{\pi_\theta(v\mid s_i)}{\pi_k(v\mid s_i)}.
-\]
-这是一条对每个历史 的可微 KL objective；它不需要显式的 sampled action ratio。工程实现通常将第二项写成 logits 上的 reverse-KL penalty，或使用 token-level sampled-KL estimator。只有当数据由 replay action 测度 $\beta$ 产生、而目标 expectation 属于当前 anchor历史测度时，才需要额外的 $\omega_i^k$；action-level $\rho_{ij}^{\theta}$ 与历史-level $\omega_i^k$ 负责两个不同的测度变换。
