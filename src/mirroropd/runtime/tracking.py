@@ -56,6 +56,11 @@ class RunTracker:
         run.summary["schema_version"] = 2
         run.summary["objective"] = self.job.objective.to_dict()
         run.summary["config_id"] = self.job.config_id
+        identity_path = self.directory / "identity.json"
+        if identity_path.exists():
+            identity = json.loads(identity_path.read_text())
+            run.summary["run_identity"] = identity
+            self.sdk.config.update({"mirroropd": self.job.to_dict(), "run_identity": identity})
         atomic_json(
             self.directory / "wandb.json",
             {
@@ -63,6 +68,7 @@ class RunTracker:
                 "entity": run.entity,
                 "project": run.project,
                 "id": run.id,
+                "run_id": os.environ.get("MIRROR_RUN_ID"),
                 "mode": self.job.logging.wandb.effective_mode,
                 "url": run.url if self.job.logging.wandb.effective_mode != "offline" else None,
             },

@@ -1,5 +1,6 @@
 """Compile one validated job to resolved backend YAML without shell interpolation."""
 
+from dataclasses import asdict
 from pathlib import Path
 
 
@@ -35,9 +36,11 @@ def backend_values(job, evidence, run_dir, source_root, environment):
         "use_kl_loss": False,
         "grad_clip": training.clip_grad,
         "optim": {
+            **{key: value for key, value in asdict(training.optim).items() if key != "eps"},
             "lr": training.learning_rate,
             "weight_decay": training.weight_decay,
             "clip_grad": training.clip_grad,
+            "override_optimizer_config": {"eps": training.optim.eps},
         },
         "fsdp_config": {
             "model_dtype": precision.parameters,
@@ -47,7 +50,7 @@ def backend_values(job, evidence, run_dir, source_root, environment):
             "mixed_precision": mixed,
         },
         "checkpoint": {
-            "save_contents": ["model", "optimizer", "extra"] if job.checkpoints.every else []
+            "save_contents": job.checkpoints.save_contents if job.checkpoints.every else []
         },
     }
     reference = micro | {
@@ -135,9 +138,9 @@ def backend_values(job, evidence, run_dir, source_root, environment):
         "validation_data_dir": str(run_dir / "validation"),
         "rollout_data_dir": None,
         "log_val_generations": 0,
-        "max_actor_ckpt_to_keep": 2,
+        "max_actor_ckpt_to_keep": job.checkpoints.max_to_keep,
         "project_name": job.logging.wandb.project,
-        "experiment_name": job.name,
+        "experiment_name": environment.get("WANDB_NAME", job.name),
         "logger": ["file"] + (["wandb"] if job.logging.wandb.enabled else []),
         "mirror_protocol": evidence["protocol"],
         "mirror_expected_questions": evidence["evaluation_questions"],

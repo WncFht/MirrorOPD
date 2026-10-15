@@ -1,0 +1,7 @@
+{
+    "schema_version": 2,
+    "recipe": "smoke",
+    "models": "deepseek-justrl",
+    "dataset": "dapo-math",
+    "evaluation": "smoke"
+}

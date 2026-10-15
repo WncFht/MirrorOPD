@@ -1,0 +1,13 @@
+{
+    "schema_version": 2,
+    "name": "math-bpo-lr-v1",
+    "base": {
+        "task": "math-four-gpu",
+        "algorithm": "bpo",
+        "overrides": ["logging.wandb.mode=offline", "checkpoints.every=5"]
+    },
+    "grid": {
+        "training.learning_rate": [0.0000005, 0.000001, 0.000002],
+        "training.seed": [42, 43, 44]
+    }
+}

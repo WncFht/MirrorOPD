@@ -1,0 +1,10 @@
+{
+    "every": 5,
+    "before_training": true,
+    "samples_per_question": 16,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "prompt_tokens": 4096,
+    "response_tokens": 31744,
+    "seed": 42
+}

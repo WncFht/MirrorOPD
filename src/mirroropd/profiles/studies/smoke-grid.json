@@ -1,0 +1,12 @@
+{
+    "schema_version": 2,
+    "name": "math-smoke-grid",
+    "base": {
+        "task": "math-smoke",
+        "algorithm": "on_policy"
+    },
+    "grid": {
+        "training.learning_rate": [0.000001, 0.000002],
+        "training.seed": [42, 43]
+    }
+}

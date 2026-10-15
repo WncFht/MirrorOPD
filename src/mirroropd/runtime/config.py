@@ -84,6 +84,43 @@ class Precision:
 
 
 @dataclass(frozen=True, slots=True)
+class Optimizer:
+    """Validated options implemented by the pinned verl FSDP optimizer.
+
+    The native worker advances its scheduler once per outer, after all inner
+    updates. Warmup and decay therefore use outer units, not optimizer updates.
+    """
+
+    optimizer: str = "AdamW"
+    betas: list[float] = field(default_factory=lambda: [0.9, 0.999])
+    eps: float = 1e-8
+    lr_scheduler_type: str = "constant"
+    lr_warmup_steps: int = -1
+    lr_warmup_steps_ratio: float = 0.0
+    min_lr_ratio: float = 0.0
+    num_cycles: float = 0.5
+
+    def __post_init__(self):
+        if self.optimizer not in {"Adam", "AdamW"}:
+            raise ValueError("The pinned FSDP integration supports torch.optim Adam/AdamW")
+        if len(self.betas) != 2 or any(not math.isfinite(x) or not 0 <= x < 1 for x in self.betas):
+            raise ValueError("Optimizer betas must contain two finite values in [0, 1)")
+        if not math.isfinite(self.eps) or self.eps <= 0:
+            raise ValueError("Optimizer eps must be finite and positive")
+        if self.lr_scheduler_type not in {"constant", "cosine"}:
+            raise ValueError("lr_scheduler_type must be constant or cosine")
+        if self.lr_warmup_steps < -1:
+            raise ValueError("lr_warmup_steps must be -1 or nonnegative")
+        if any(
+            not math.isfinite(x) or not 0 <= x <= 1
+            for x in (self.lr_warmup_steps_ratio, self.min_lr_ratio)
+        ):
+            raise ValueError("Warmup and minimum learning-rate ratios must be in [0, 1]")
+        if not math.isfinite(self.num_cycles) or self.num_cycles <= 0:
+            raise ValueError("num_cycles must be finite and positive")
+
+
+@dataclass(frozen=True, slots=True)
 class Training:
     outer_steps: int = 50
     inner_steps: int = 16
@@ -100,6 +137,7 @@ class Training:
     gradient_checkpointing: bool = True
     parameter_offload: bool = True
     optimizer_offload: bool = True
+    optim: Optimizer = field(default_factory=Optimizer)
 
     def __post_init__(self):
         for name in (
@@ -120,6 +158,10 @@ class Training:
             raise ValueError("training.weight_decay must be finite and nonnegative")
         if not 0 <= self.seed < 2**31:
             raise ValueError("training.seed must be in [0, 2**31)")
+        if self.optim.lr_warmup_steps > self.outer_steps:
+            raise ValueError("Optimizer warmup cannot exceed training.outer_steps")
+        if self.optim.lr_warmup_steps > 0 and self.optim.lr_warmup_steps_ratio != 0:
+            raise ValueError("Set either warmup steps or a warmup ratio, not both")
 
 
 @dataclass(frozen=True, slots=True)
@@ -183,10 +225,17 @@ class Wandb:
     project: str = "mirroropd"
     entity: str | None = None
     group: str | None = None
+    tags: list[str] = field(default_factory=list)
 
     def __post_init__(self):
         if self.mode not in {"online", "offline"}:
             raise ValueError("W&B mode must be online or offline; enabled=false disables tracking")
+        if not self.project.strip() or (self.group is not None and not self.group.strip()):
+            raise ValueError("W&B project and an explicitly supplied group must be nonempty")
+        if any(not tag.strip() or len(tag) > 64 or "," in tag for tag in self.tags) or len(
+            set(self.tags)
+        ) != len(self.tags):
+            raise ValueError("W&B tags must be distinct strings of 1–64 characters without commas")
 
     @property
     def effective_mode(self):
@@ -202,10 +251,23 @@ class Logging:
 @dataclass(frozen=True, slots=True)
 class Checkpoints:
     every: int = 0
+    max_to_keep: int = 2
+    save_contents: list[str] = field(default_factory=lambda: ["model", "optimizer", "extra"])
 
     def __post_init__(self):
         if not isinstance(self.every, int) or self.every < 0:
             raise ValueError("checkpoints.every must be nonnegative; zero disables saving")
+        if self.max_to_keep < 1:
+            raise ValueError("checkpoints.max_to_keep must be positive")
+        if (
+            not self.save_contents
+            or len(set(self.save_contents)) != len(self.save_contents)
+            or set(self.save_contents) - {"model", "optimizer", "extra", "hf_model"}
+            or not set(self.save_contents) & {"model", "hf_model"}
+        ):
+            raise ValueError(
+                "Checkpoint contents must be distinct supported fields including model or hf_model"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -303,17 +365,32 @@ def set_override(data, override):
     current[parts[-1]] = value
 
 
-def load_job(recipe, *, models=None, dataset=None, variables=None, overrides=()):
+def load_job(
+    recipe,
+    *,
+    models=None,
+    dataset=None,
+    evaluation=None,
+    variables=None,
+    overrides=(),
+    algorithm=None,
+):
     data = json.loads(Path(recipe).read_text())
     if models is not None:
         data["models"] = json.loads(Path(models).read_text())
     if dataset is not None:
         data["data"] = json.loads(Path(dataset).read_text())
+    if evaluation is not None:
+        data["evaluation"] = json.loads(Path(evaluation).read_text())
     data = _expand(data, variables or {})
     # Materialize defaults once before applying strict, path-checked overrides.
     complete = materialize_defaults(Job, data)
     for override in overrides:
         set_override(complete, override)
+    if algorithm is not None:
+        complete["objective"]["algorithm"] = algorithm
+        if algorithm == "on_policy":
+            complete["training"]["inner_steps"] = 1
     return Job.from_dict(complete)
 
 

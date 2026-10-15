@@ -15,7 +15,7 @@ def main():
     if "site-packages" not in origin.parts:
         raise SystemExit(f"Expected an installed wheel, imported {origin}")
     package = files("mirroropd")
-    for category in ("models", "datasets", "recipes"):
+    for category in ("models", "datasets", "recipes", "evaluations", "tasks", "studies"):
         profiles = list((package / "profiles" / category).iterdir())
         if not profiles:
             raise SystemExit(f"Missing packaged profiles: {category}")
@@ -53,6 +53,23 @@ def main():
             "on_policy",
         ],
         check=True,
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "mirroropd",
+            "study",
+            "plan",
+            "--config",
+            "smoke-grid",
+            "--var",
+            "model_root=/models",
+            "--var",
+            "data_root=/data",
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
     )
     print(f"Installed wheel resources and CLI verified: {origin}")
 

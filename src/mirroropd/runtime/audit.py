@@ -18,6 +18,14 @@ def audit_run(directory):
     config_id = content_id(recorded_job)
     inputs = json.loads((directory / "inputs.json").read_text())
     manifest = json.loads((directory / "run.json").read_text())
+    if "requested_config_id" in manifest:
+        requested = json.loads((directory / "requested-job.json").read_text())
+        if content_id(requested) != manifest["requested_config_id"]:
+            raise ValueError("Requested job identity changed")
+    if "identity" in manifest:
+        identity = json.loads((directory / "identity.json").read_text())
+        if identity != manifest["identity"] or identity["run_id"] != manifest["run_id"]:
+            raise ValueError("Execution identity changed")
     exit_state = json.loads((directory / "backend-exit.json").read_text())
     if exit_state["return_code"] != 0:
         raise ValueError("Native training did not exit successfully")
@@ -92,6 +100,7 @@ def audit_run(directory):
         "run_id": manifest["run_id"],
         "source_id": manifest["source_id"],
         "config_id": config_id,
+        "requested_config_id": manifest.get("requested_config_id", config_id),
         "algorithm": job.objective.algorithm,
         "loss_kind": job.objective.loss_kind,
         "outer_steps": len(outer),

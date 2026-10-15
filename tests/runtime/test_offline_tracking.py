@@ -80,12 +80,17 @@ def test_real_offline_sdk_records_survive_manual_transfer(tmp_path, monkeypatch)
     run = wandb.init(project="mirroropd-offline-test", mode="offline", dir=str(directory / "wandb"))
     try:
         tracker = RunTracker({}, wandb)
-        worker = EventWriter(directory / "events", directory.name, "worker-0")
+        execution = json.loads((directory / "identity.json").read_text())
+        worker = EventWriter(directory / "events", execution["run_id"], "worker-0")
         worker.emit(
             "optimization.step", update=0, outer=0, inner=0, metrics={"distill/reward/mean": 0.5}
         )
         assert tracker.drain() == 1
         assert run.settings.mode == "offline"
+        assert run.id == execution["run_id"]
+        assert run.name == execution["name"]
+        assert run.group == execution["group"]
+        assert run.config["mirroropd"] == spec.to_dict()
     finally:
         run.finish()
     assert list((directory / "wandb").rglob("*.wandb"))

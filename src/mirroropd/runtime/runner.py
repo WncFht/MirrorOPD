@@ -13,6 +13,7 @@ from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.audit import audit_run
 from mirroropd.runtime.control import controller_identity
 from mirroropd.runtime.events import EventReader, EventWriter
+from mirroropd.runtime.experiments import execution_identity
 from mirroropd.runtime.preflight import prepare_inputs
 from mirroropd.runtime.processes import launch
 from mirroropd.runtime.provenance import snapshot_sources, verify_backend
@@ -21,10 +22,11 @@ from mirroropd.runtime.reservation import GpuReservation
 
 def public_environment(job, directory, scratch):
     directory, scratch = Path(directory), Path(scratch)
+    identity = execution_identity(directory, job)
     return {
         "MIRROR_RUN_DIR": str(directory),
         "MIRROR_JOB_PATH": str(directory / "job.json"),
-        "MIRROR_RUN_ID": directory.name,
+        "MIRROR_RUN_ID": identity["run_id"],
         "MIRROR_CONFIG_ID": job.config_id,
         "MIRROR_EVENT_DIR": str(directory / "events"),
         "VLLM_USE_V1": "1",
@@ -39,6 +41,15 @@ def public_environment(job, directory, scratch):
         "PYTHONPATH": str(directory / "source"),
         "VERL_FILE_LOGGER_PATH": str(directory / "backend-metrics.jsonl"),
         "WANDB_MODE": job.logging.wandb.effective_mode,
+        "WANDB_RUN_ID": identity["run_id"],
+        "WANDB_NAME": identity["name"],
+        "WANDB_RUN_GROUP": identity["group"],
+        "WANDB_TAGS": ",".join(
+            dict.fromkeys(
+                [job.objective.algorithm, f"seed:{job.training.seed}", *job.logging.wandb.tags]
+            )
+        ),
+        "WANDB_RESUME": "never",
         "WANDB_DIR": str(directory / "wandb"),
         "WANDB_CACHE_DIR": str(directory / "wandb-cache"),
         "WANDB_DATA_DIR": str(directory / "wandb-data"),
@@ -85,11 +96,15 @@ def run_job(
     directory = Path(directory).expanduser().resolve()
     if not directory_created:
         directory.mkdir(parents=True, exist_ok=False)
+    identity = execution_identity(directory, job)
+    run_id = identity["run_id"]
+    requested_config_id = job.config_id
+    atomic_json(directory / "requested-job.json", job.to_dict())
     backend = Path(backend).expanduser().resolve()
     package = Path(__file__).resolve().parents[1]
     integration = package / "integrations/verl"
     upstream = json.loads((integration / "backend.json").read_text())
-    writer = EventWriter(directory / "events", directory.name, "controller")
+    writer = EventWriter(directory / "events", run_id, "controller")
     state_path = directory / "state.json"
     source = None
     tree = None
@@ -100,7 +115,7 @@ def run_job(
             state_path,
             {
                 "schema_version": 2,
-                "run_id": directory.name,
+                "run_id": run_id,
                 "state": name,
                 **controller_identity(),
                 "updated_unix": time.time(),
@@ -137,7 +152,9 @@ def run_job(
             directory / "run.json",
             {
                 "schema_version": 2,
-                "run_id": directory.name,
+                "run_id": run_id,
+                "identity": identity,
+                "requested_config_id": requested_config_id,
                 "config_id": job.config_id,
                 "source_id": source["source_id"],
                 "backend": backend_record,
@@ -175,7 +192,7 @@ def run_job(
             previous_handlers[signum] = signal.signal(signum, interrupted)
         reader = EventReader(directory / "events")
         with GpuReservation(
-            job.resources.gpu_ids, lease_root, directory.name, borrowed_slot=borrowed_slot
+            job.resources.gpu_ids, lease_root, run_id, borrowed_slot=borrowed_slot
         ) as reservation:
             if reservation.borrowed_parent:
                 atomic_json(directory / "borrowed-reservation.json", reservation.borrowed_parent)

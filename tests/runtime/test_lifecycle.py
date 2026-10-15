@@ -12,6 +12,7 @@ from mirroropd.runtime.audit import audit_run
 from mirroropd.runtime.config import Job
 from mirroropd.runtime.evaluation import Protocol, audit_rows, request_seed
 from mirroropd.runtime.events import EventWriter, environment_writer
+from mirroropd.runtime.experiments import execution_identity
 from mirroropd.runtime.provenance import FingerprintCache, snapshot_sources, verify_snapshot
 from mirroropd.runtime.tracking import RunTracker
 
@@ -198,6 +199,32 @@ def test_new_tracking_defaults_do_not_change_a_persisted_job_identity(tmp_path):
     manifest["config_id"] = content_id(recorded)
     atomic_json(tmp_path / "run.json", manifest)
     assert audit_run(tmp_path)["config_id"] == manifest["config_id"]
+
+
+def test_audit_binds_requested_job_and_execution_identity(tmp_path):
+    completed_run(tmp_path)
+    spec = job()
+    identity = execution_identity(tmp_path, spec)
+    atomic_json(tmp_path / "requested-job.json", spec.to_dict())
+    manifest = json.loads((tmp_path / "run.json").read_text())
+    manifest.update(
+        run_id=identity["run_id"], identity=identity, requested_config_id=spec.config_id
+    )
+    atomic_json(tmp_path / "run.json", manifest)
+    for path in (tmp_path / "events").glob("*.jsonl"):
+        rows = [
+            json.loads(line) | {"run_id": identity["run_id"]}
+            for line in path.read_text().splitlines()
+        ]
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+    assert audit_run(tmp_path)["requested_config_id"] == spec.config_id
+    atomic_json(tmp_path / "requested-job.json", spec.to_dict() | {"name": "edited"})
+    with pytest.raises(ValueError, match="Requested job identity"):
+        audit_run(tmp_path)
+    atomic_json(tmp_path / "requested-job.json", spec.to_dict())
+    atomic_json(tmp_path / "identity.json", identity | {"name": "edited"})
+    with pytest.raises(ValueError, match="Execution identity"):
+        audit_run(tmp_path)
 
 
 def test_snapshot_preserves_non_python_runtime_files_and_detects_changes(tmp_path):

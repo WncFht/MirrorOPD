@@ -9,18 +9,12 @@ from mirroropd import __version__
 from mirroropd.core.config import ALGORITHMS
 from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.audit import audit_run
-from mirroropd.runtime.config import load_job, with_algorithm
+from mirroropd.runtime.config import Job
 from mirroropd.runtime.control import run_status, start_run, stop_run, wait_run
+from mirroropd.runtime.experiments import run_budget
+from mirroropd.runtime.profiles import Selection, profile
 
-
-def profile(value, category):
-    path = Path(value).expanduser()
-    if path.is_file():
-        return path.resolve()
-    path = Path(__file__).parent / "profiles" / category / (value + ".json")
-    if not path.is_file():
-        raise ValueError(f"Unknown {category} profile: {value}")
-    return path
+__all__ = ["main", "profile"]
 
 
 def variables(items):
@@ -36,9 +30,11 @@ def variables(items):
 
 
 def job_arguments(parser):
-    parser.add_argument("--recipe", required=True)
+    parser.add_argument("--task")
+    parser.add_argument("--recipe")
     parser.add_argument("--models")
     parser.add_argument("--dataset")
+    parser.add_argument("--evaluation")
     parser.add_argument("--var", action="append", default=[])
     parser.add_argument("--set", dest="overrides", action="append", default=[])
     parser.add_argument("--algorithm", choices=sorted(ALGORITHMS))
@@ -47,15 +43,16 @@ def job_arguments(parser):
 
 
 def load_arguments(args):
-    job = load_job(
-        profile(args.recipe, "recipes"),
-        models=profile(args.models, "models") if args.models else None,
-        dataset=profile(args.dataset, "datasets") if args.dataset else None,
+    job = Selection(
+        task=args.task,
+        recipe=args.recipe,
+        models=args.models,
+        dataset=args.dataset,
+        evaluation=args.evaluation,
         variables=variables(args.var),
         overrides=args.overrides,
-    )
-    if args.algorithm:
-        job = with_algorithm(job, args.algorithm)
+        algorithm=args.algorithm,
+    ).load()
     if args.name:
         value = job.to_dict()
         value["name"] = args.name
@@ -67,6 +64,56 @@ def load_arguments(args):
             value["logging"]["wandb"]["mode"] = args.wandb
         job = type(job).from_dict(value)
     return job
+
+
+def launch_arguments(parser):
+    parser.add_argument("--backend", type=Path, required=True)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--python", default=sys.executable)
+    parser.add_argument("--lease-root", type=Path)
+    parser.add_argument("--borrowed-slot", type=Path)
+    parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument(
+        "--detach", action="store_true", help="Run in background; write controller.log"
+    )
+
+
+def launch_job(args, job, *, study=None):
+    child, record = start_run(
+        job,
+        backend=args.backend,
+        directory=args.output,
+        python=args.python,
+        algorithms=args.algorithms if args.command == "suite" else None,
+        lease_root=args.lease_root,
+        borrowed_slot=args.borrowed_slot,
+        prepare_only=args.prepare_only,
+        study=study,
+    )
+    if args.detach:
+        print(json.dumps(record, indent=2))
+        return 0
+    print(json.dumps({"directory": record["directory"], "run_id": record["run_id"]}), flush=True)
+    return wait_run(child, record["directory"])
+
+
+def study_command(args):
+    from mirroropd.runtime.study import plan_study, retry_study, summarize_study
+
+    if args.study_command == "status":
+        print(json.dumps(summarize_study(args.directory), indent=2))
+        return 0
+    plan = (
+        retry_study(args.directory)
+        if args.study_command == "retry"
+        else plan_study(args.config, variables=variables(args.var), overrides=args.overrides)
+    )
+    if args.study_command == "plan":
+        if args.output:
+            atomic_json(args.output, plan)
+        print(json.dumps(plan, indent=2))
+        return 0
+    return launch_job(args, Job.from_dict(plan["trials"][0]["job"]), study=plan)
 
 
 def main(argv=None):  # noqa: PLR0911 -- each CLI subcommand returns its own exit status
@@ -81,15 +128,7 @@ def main(argv=None):  # noqa: PLR0911 -- each CLI subcommand returns its own exi
     for name in ("run", "suite"):
         run = commands.add_parser(name)
         job_arguments(run)
-        run.add_argument("--backend", type=Path, required=True)
-        run.add_argument("--output", type=Path, required=True)
-        run.add_argument("--python", default=sys.executable)
-        run.add_argument("--lease-root", type=Path)
-        run.add_argument("--borrowed-slot", type=Path)
-        run.add_argument("--prepare-only", action="store_true")
-        run.add_argument(
-            "--detach", action="store_true", help="Run in background; write controller.log"
-        )
+        launch_arguments(run)
         if name == "suite":
             run.add_argument(
                 "--algorithms",
@@ -97,6 +136,22 @@ def main(argv=None):  # noqa: PLR0911 -- each CLI subcommand returns its own exi
                 choices=sorted(ALGORITHMS),
                 default=["on_policy", "mdpo", "bpo"],
             )
+    study = commands.add_parser(
+        "study", help="Plan, execute, summarize or retry a small parameter grid"
+    )
+    study_commands = study.add_subparsers(dest="study_command", required=True)
+    for name in ("plan", "run", "retry", "status"):
+        command = study_commands.add_parser(name)
+        if name in {"plan", "run"}:
+            command.add_argument("--config", required=True)
+            command.add_argument("--var", action="append", default=[])
+            command.add_argument("--set", dest="overrides", action="append", default=[])
+        else:
+            command.add_argument("directory", type=Path)
+        if name in {"run", "retry"}:
+            launch_arguments(command)
+        elif name == "plan":
+            command.add_argument("--output", type=Path)
     for name in ("status", "audit", "stop"):
         command = commands.add_parser(name)
         command.add_argument("directory", type=Path)
@@ -115,6 +170,8 @@ def main(argv=None):  # noqa: PLR0911 -- each CLI subcommand returns its own exi
     unpack.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
+        if args.command == "study":
+            return study_command(args)
         if args.command == "backend":
             from mirroropd.integrations.verl.bootstrap import prepare_backend
 
@@ -149,25 +206,12 @@ def main(argv=None):  # noqa: PLR0911 -- each CLI subcommand returns its own exi
             return 0
         job = load_arguments(args)
         if args.command == "plan":
-            value = {"config_id": job.config_id, "job": job.to_dict()}
+            value = {"config_id": job.config_id, "job": job.to_dict(), "budget": run_budget(job)}
             if args.output:
                 atomic_json(args.output, value)
             print(json.dumps(value, indent=2))
             return 0
-        child, record = start_run(
-            job,
-            backend=args.backend,
-            directory=args.output,
-            python=args.python,
-            algorithms=args.algorithms if args.command == "suite" else None,
-            lease_root=args.lease_root,
-            borrowed_slot=args.borrowed_slot,
-            prepare_only=args.prepare_only,
-        )
-        if args.detach:
-            print(json.dumps(record, indent=2))
-        else:
-            return wait_run(child, args.output)
+        return launch_job(args, job)
     except (ValueError, TypeError, RuntimeError, OSError) as error:
         print(f"mirroropd: {error}", file=sys.stderr)
         return 1
