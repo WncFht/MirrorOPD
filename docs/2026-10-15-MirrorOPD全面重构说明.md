@@ -1,6 +1,6 @@
 # MirrorOPD 0.2 全面重构说明
 
-状态：0.2 实现、核心测试、完整词表、多模型和长预算原生验证已通过。本文说明当前实现、验证证据和适用范围；正式三算法 50 outer 实验另按冻结配置运行，只有完整审计通过后才计为完成。
+状态：当前版本为 0.2.1。实现、核心测试、完整词表、多模型、长预算原生验证及单进程推理组的 FileStore 启动验证已通过。本文说明当前实现、验证证据和适用范围；正式三算法 50 outer 实验另按冻结配置运行，只有完整审计通过后才计为完成。
 
 ## 重构范围与版本边界
 
@@ -43,7 +43,7 @@ flowchart LR
 
 运行层的 `config.py` 组合 profile，`data.py` 规范化输入，`preflight.py` 把模型、数据和评测协议绑定到内容身份。`provenance.py` 核验后端并冻结源码，`reservation.py` 管理 GPU 预约，`processes.py` 管理任务进程树。`events.py` 提供结构化流，`metrics.py` 归约有效 token 的充分统计量，`tracking.py` 将同一批记录投影到 W&B。`evaluation.py` 校验逐题样本和统计口径，`audit.py` 判断实验是否完整，`runner.py` 组合上述生命周期。
 
-后端接入中，`compiler.py` 将 Job 编译为原生配置；`adapter.py` 处理 padding、ragged 布局与预测位置；`bridge.py` 接管缓存、损失和更新回调；`model.py` 处理合法词表与 dropout；`reward.py` 只负责任务判分；`evaluation.py` 调度采样并保存逐题产物；`bootstrap.py` 准备固定上游及补丁。评测编排与纯评测审计分开，数学判分与训练 reward 分开，分别由对应模块维护。
+后端接入中，`compiler.py` 将 Job 编译为原生配置；`adapter.py` 处理 padding、ragged 布局与预测位置；`bridge.py` 接管缓存、损失和更新回调；`model.py` 处理合法词表与 dropout；`reward.py` 只负责任务判分；`evaluation.py` 调度采样并保存逐题产物；`bootstrap.py` 准备固定上游及补丁；`rendezvous.py` 和 GPU 专用的 `vllm_executor.py` 在实际 EngineCore 进程中配置单进程推理组的 FileStore。评测编排与纯评测审计分开，数学判分与训练 reward 分开，分别由对应模块维护。
 
 ## 算法语义
 
@@ -152,6 +152,16 @@ $$
 
 完成审计检查预定更新数、窗口和 inner 坐标、有限数、fresh anchor、rollout version、完整评测轮次、每题样本组、协议与实际预算，核对逐行数据和摘要。退出码 0 单独不足以判定完成。
 
+## 单进程推理组的启动
+
+训练使用四卡 FSDP 数据并行，每个 vLLM replica 的 executor group 为 world size=1、内部 DP=1。vLLM 0.10 的默认实现先选取空闲 TCP 端口、关闭临时 socket，再等待 worker 启动并监听，存在端口竞争窗口。0.2.1 为这些独立的单进程组配置不同的 FileStore；训练进程组仍使用自己的共享 store。
+
+vLLM 的 EngineCore 通过 spawn 启动，父进程的模块赋值不会自动保留。原生后端选择 `SingletonFileStoreExecutor` 类，在实际 EngineCore 的 executor 初始化入口安装 rendezvous，然后继续使用上游的 worker、消息队列和模型执行实现。较大的 executor group 或内部 DP 会被拒绝，不会误用彼此独立的 store。
+
+新增四卡 canary 实际记录了四个 EngineCore 的四条不同 FileStore URI，完成两次更新及前后评测。270 项测试、干净补丁重放和新 wheel 的隔离检查均通过；所有 `core/` 源文件与 `v0.2.0` 逐字节相同。失败的 TCP 启动和未通过 FileStore 审计的初版尝试保留在[修复验证归档](../data/refactor-20261015/portfix-evidence.tar.gz)中。
+
+更新包后需使用匹配的新后端目录；运行器会拒绝旧补丁，不覆盖旧后端。正式实验重启使用新输出目录，保留失败现场。
+
 ## 入口与产物
 
 GPU 命令要求已准备匹配的软件环境、固定后端、本地模型和数据，以及可预约的 GPU。数学配方默认启用 W&B，需使用已有凭据；不使用云端记录时配置 `logging.wandb.enabled=false`，本地事件和审计仍保留。下例的 `/models`、`/data` 和 `/backend` 均需替换为实际目录，内置模型与数据 profile 的相对结构见包内 JSON。
@@ -179,9 +189,9 @@ GPU 预约以物理设备身份为单位。借用预约需确认原 owner 是同
 
 ## 验证与成本
 
-244 项当前测试已经通过，包含独立目标梯度、归一化端点、缓存 schema 与冻结、padding/EOS/预算末 action、真实模型参数梯度、ragged 运输、不等长与空 rank 全局统计、数据和 scorer、并发预约、事件隔离、完成审计，以及执行原生控制流的测试。固定补丁已在干净基线重放后再次运行全部测试。
+270 项当前全仓测试已经通过，包含独立目标梯度、归一化端点、缓存 schema 与冻结、padding/EOS/预算末 action、真实模型参数梯度、ragged 运输、不等长与空 rank 全局统计、数据和 scorer、并发预约、事件隔离、完成审计、原生控制流、维护工具契约，以及占用 TCP 端口下的 FileStore 和 executor 初始化位置测试。固定补丁已在干净基线重放后再次运行全部测试。
 
-机器可读结果保存在 [验证摘要](../results/refactor-20261015/summary.json)、[kernel 基准](../results/refactor-20261015/kernel-benchmark.json)、[环境版本](../results/refactor-20261015/environment.json) 和 [云端日志核验](../results/refactor-20261015/cloud-verification.json)。[原生验证归档](../data/refactor-20261015/validation-evidence.tar.gz) 包含实际运行配置、输入身份、源码快照、事件、回答、日志和审计结果，由 `data-manifest.json` 记录解压后 SHA-256；归档不包含原模型权重、派生训练 parquet 或 checkpoint；数据准备按输入文件 SHA-256 和记录的配置重建。
+机器可读结果保存在 [0.2.0 基线摘要](../results/refactor-20261015/summary.json)、[kernel 基准](../results/refactor-20261015/kernel-benchmark.json)、[环境版本](../results/refactor-20261015/environment.json)、[云端日志核验](../results/refactor-20261015/cloud-verification.json) 和 [0.2.1 启动修复验证](../results/refactor-20261015/portfix-verification.json)。[原生验证归档](../data/refactor-20261015/validation-evidence.tar.gz) 包含实际运行配置、输入身份、源码快照、事件、回答、日志和审计结果，由 `data-manifest.json` 记录解压后 SHA-256；归档不包含原模型权重、派生训练 parquet 或 checkpoint；数据准备按输入文件 SHA-256 和记录的配置重建。
 
 wheel 在仓库外目录解包验证：内置 profiles、后端补丁和判分许可证完整；CLI plan 可用；旧 `training` 模块不在 wheel 中。GPU 软件环境仍按已验证环境清单准备，wheel 不代替 CUDA/vLLM/FlashAttention 安装。
 
@@ -227,7 +237,7 @@ PYTHONPATH=src python experiments/benchmarks/native_validation.py \
 
 当前原生后端验证范围为单机 FSDP、SP=1、rollout TP=1；核心要求完整合法词表。支持的模型还受固定版本 HF/verl/vLLM 的能力约束，不能据模型配置可解析就宣称所有架构可运行。checkpoint 保存频率可配置，默认保持原配方关闭；没有增加跨版本或位级一致的恢复承诺。
 
-正式三组 50 outer 使用[已提交的冻结配置](../results/training/math-four-gpu-v02-20261015/plans/requirements.json)：on-policy 共 50 次更新，MDPO/BPO 各 800 次更新；570 题各采样 16 次，在 outer 0、5、10、…、50 评测，共 11 轮。运行目录为 `runs/math-four-gpu-v02-20261015/{on_policy,mdpo,bpo}`，每组以自己的 `verification.json` 为完成依据。配置已冻结，正式完成状态由运行记录更新；单一 seed、不同 inner 更新量与跨引擎数值误差仍需在研究结论中说明。
+正式三组 50 outer 使用[已提交的冻结配置](../results/training/math-four-gpu-v02-20261015/plans/requirements.json)：on-policy 共 50 次更新，MDPO/BPO 各 800 次更新；570 题各采样 16 次，在 outer 0、5、10、…、50 评测，共 11 轮。0.2.1 的重启目录为 `runs/math-four-gpu-v02-20261015-attempt-02/{on_policy,mdpo,bpo}`，每组以自己的 `verification.json` 为完成依据。配置已冻结，正式完成状态由运行记录更新；单一 seed、不同 inner 更新量与跨引擎数值误差仍需在研究结论中说明。
 
 ## 后续改进的优先级
 
