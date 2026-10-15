@@ -1,0 +1,111 @@
+{
+  "config_id": "sha256:1d9c8ea42c2cfa965494258c435b257302fbe6ae5e652e8fb7610235589fa07a",
+  "job": {
+    "name": "math-four-gpu-v02-20261015-bpo",
+    "models": {
+      "student": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/DeepSeek-R1-Distill-Qwen-1.5B",
+      "teacher": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/JustRL-DeepSeek-1.5B",
+      "chat_template": null,
+      "trust_remote_code": false
+    },
+    "data": {
+      "train": [
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/DAPO/train.parquet"
+      ],
+      "validation": [
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/MATH-500/test.parquet",
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AMC23/test.parquet",
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AIME25/test.parquet"
+      ],
+      "scorer": {
+        "name": "math",
+        "kind": "binary",
+        "parameters": {}
+      },
+      "columns": {
+        "prompt": "prompt",
+        "answer": "reward_model.ground_truth",
+        "source": "data_source"
+      },
+      "source_name": null,
+      "ability": "general",
+      "requires_validation_reference": true
+    },
+    "objective": {
+      "algorithm": "bpo",
+      "signal": {
+        "kappa": 0.5,
+        "eta": 0.2
+      },
+      "estimator": {
+        "center": "topj_tail",
+        "integration": "sampled",
+        "topj": 16,
+        "chunk_size": 64
+      },
+      "diagnostics": "full"
+    },
+    "training": {
+      "outer_steps": 50,
+      "inner_steps": 16,
+      "batch_size": 64,
+      "micro_batch_size": 1,
+      "responses_per_prompt": 1,
+      "learning_rate": 1e-06,
+      "weight_decay": 0.0,
+      "clip_grad": 2.0,
+      "prompt_tokens": 2048,
+      "response_tokens": 7168,
+      "temperature": 1.0,
+      "seed": 42,
+      "gradient_checkpointing": true,
+      "parameter_offload": true,
+      "optimizer_offload": true
+    },
+    "evaluation": {
+      "every": 5,
+      "before_training": true,
+      "samples_per_question": 16,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": -1,
+      "prompt_tokens": 4096,
+      "response_tokens": 31744,
+      "question_limit": null,
+      "seed": 42
+    },
+    "precision": {
+      "parameters": "fp32",
+      "teacher": "bf16",
+      "forward": "bf16",
+      "reduction": "fp32",
+      "buffers": "fp32"
+    },
+    "resources": {
+      "gpu_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "cpus": 24,
+      "rollout_memory_fraction": 0.25,
+      "max_sequences": 32,
+      "max_batch_tokens": 9216,
+      "object_store_bytes": 4294967296
+    },
+    "logging": {
+      "console": true,
+      "wandb": {
+        "enabled": true,
+        "project": "mirroropd-v2",
+        "entity": null,
+        "group": "math-four-gpu-v02-20261015"
+      }
+    },
+    "checkpoints": {
+      "every": 0
+    },
+    "schema_version": 2
+  }
+}

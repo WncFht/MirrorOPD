@@ -1,0 +1,36 @@
+{
+  "algorithms": [
+    "on_policy",
+    "mdpo",
+    "bpo"
+  ],
+  "outer_steps_each": 50,
+  "inner_steps": {
+    "on_policy": 1,
+    "mdpo": 16,
+    "bpo": 16
+  },
+  "optimizer_updates": {
+    "on_policy": 50,
+    "mdpo": 800,
+    "bpo": 800
+  },
+  "evaluation_questions": 570,
+  "evaluation_samples_each": 16,
+  "evaluation_versions": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50
+  ],
+  "kappa": 0.5,
+  "eta": 0.2,
+  "state": "awaiting_final_validation_and_version_freeze"
+}
