@@ -48,3 +48,5 @@ mirroropd audit runs/my-canary
 运行目录保存 `job.json`、`inputs.json`、`backend.yaml`、`run.json`、冻结源码、分来源事件流、GPU 采样、逐题评测和最终验证结果。W&B 是可选展示，本地事件和原始回答是完成审计的依据。
 
 理论主稿保持在 [固定测度 Token 级 MirrorOPD](docs/book/2026-10-08-固定测度Token级MirrorOPD.tex)。历史实验报告和数据保留；旧源码通过 Git 标签 `archive/pre-refactor-20261015` 或 [源码归档](data/refactor-20261015/legacy-source.tar.gz) 恢复，旧报告中的命令不代表当前 API。
+
+当前代码结构、κ/η 展开、验证证据和后续改进见 [0.2 全面重构说明](docs/2026-10-15-MirrorOPD全面重构说明.md)。
