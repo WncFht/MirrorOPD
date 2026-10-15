@@ -1,0 +1,195 @@
+\chapter{形状、概率路径与监督矩}
+\label{app:shape}
+\section{覆盖界与目标半径}
+对 $0<\kappa\le1$，幂均值不等式给 $h_a\le(1-\eta)q_a+\eta T_a$，所以 $Z\le1$。令 $r=1/\kappa\ge1$，非负 $x,y$ 满足 $(x+y)^r\ge x^r+y^r$；例如对固定 $x$，两侧之差对 $y$ 的导数非负，且在 $y=0$ 为零。因此
+\begin{equation}
+(1-\eta)^{1/\kappa}+\eta^{1/\kappa}\le Z\le1,\qquad
+m_a\ge(1-\eta)^{1/\kappa}q_a+\eta^{1/\kappa}T_a.
+\end{equation}
+逐坐标取对数并按相应分布平均，得到
+\begin{equation}
+\KL(q\Vert m)\le-\kappa^{-1}\log(1-\eta),\quad
+\KL(T\Vert m)\le-\kappa^{-1}\log\eta.
+\end{equation}
+固定教师的精确刷新 $q^+=m$ 还给后续概率比 $(T_a/q_a^+)^\kappa\le1/\eta$，所以下一轮
+\begin{equation}
+-c_{\kappa,\eta}\le A_{\kappa,\eta}(T_a/q_a^+)
+\le\frac{\log(2-\eta)}{\kappa\eta}.
+\end{equation}
+这个双侧界依赖精确刷新产生的覆盖；任意初始锚点只有单侧下界。
+
+\begin{proposition}[目标到锚点的半径]
+固定 $q,T,\kappa$。对任意凸 $\varphi$、$\varphi(1)=0$，$D_\varphi(m_{\kappa,\eta}\Vert q)$ 随 $\eta\in[0,1]$ 非减。若 $q\ne T$ 且 $\varphi$ 严格凸，内部严格递增。
+\end{proposition}
+\begin{proof}
+取 $0<\eta_1<\eta_2<1$，令 $\rho=T/q$、$u_i=m_{\eta_i}/q$。$u_1$ 随 $\rho$ 递增，而
+\begin{equation}
+\frac{m_{\eta_2}}{m_{\eta_1}}
+=\frac{Z_{\eta_1}}{Z_{\eta_2}}
+\left(\frac{1-\eta_2+\eta_2\rho^\kappa}
+{1-\eta_1+\eta_1\rho^\kappa}\right)^{1/\kappa}
+\end{equation}
+也严格递增：括号对 $\rho^\kappa$ 的导数为 $(\eta_2-\eta_1)/(1-\eta_1+\eta_1\rho^\kappa)^2>0$。几何端点的比值为常数乘 $\rho^{\eta_2-\eta_1}$。该比值在 $m_{\eta_1}$ 下均值一，故存在交点 $\rho_\star$ 使比值等于一。
+
+记 $u_\star=u_1(\rho_\star)$。低于交点时 $u_2\le u_1\le u_\star$，高于交点时 $u_2\ge u_1\ge u_\star$。取 $b\in\partial\varphi(u_\star)$，则 $\varphi(u)-bu$ 在 $u_\star$ 两侧向外非减，逐点得到 $\varphi(u_2)-bu_2\ge\varphi(u_1)-bu_1$。按 $q$ 求和，因两组 $u$ 的均值均为一，线性项抵消。严格凸与不同目标保证至少一项严格；端点由连续性得到。
+\end{proof}
+
+\section{精确目标同时改善凸生成散度}
+\begin{theorem}[共同交点的散度进展]
+对任意凸 $\varphi$、$\varphi(1)=0$，精确幂均值目标满足
+\begin{equation}
+D_\varphi(m\Vert T)\le D_\varphi(q\Vert T).
+\end{equation}
+\end{theorem}
+\begin{proof}
+写 $s_a=q_a/T_a$、$m_a=T_aG(s_a)/Z$，其中 $G(s)=[(1-\eta)s^\kappa+\eta]^{1/\kappa}$，几何端点为 $G(s)=s^{1-\eta}$。$G$ 递增，$G(s)/s$ 递减，因为
+\begin{equation}
+\frac d{d\log s}\log[G(s)/s]
+=-\frac{\eta s^{-\kappa}}{1-\eta+\eta s^{-\kappa}}<0.
+\end{equation}
+又有 $Z=\sum_aq_aG(s_a)/s_a$，所以存在 $s_\star$ 使 $G(s_\star)/s_\star=Z$。若 $s_a<s_\star$，则 $s_a\le G(s_a)/Z\le s_\star$；若 $s_a>s_\star$，不等号反向排列。取 $\varphi$ 在 $s_\star$ 的次梯度 $b$，函数 $\varphi(s)-bs$ 向 $s_\star$ 移动时非增。逐项比较后按 $T$ 求和，归一化消去线性项，得到结论。
+\end{proof}
+
+这个更新还可由保持 $T$ 的可逆 Markov 核表示。令 $\delta_a=m_a-q_a$，正质量接收集合为 $L$，输出集合为 $H$，总转移量 $D=\sum_L\delta_a$。若 $D=0$ 取恒等核；否则对 $a\in L,b\in H$，定义
+\begin{equation}
+w_{ab}=w_{ba}=\frac{\delta_a(-\delta_b)}{D(s_b-s_a)},\qquad
+P_{ab}=w_{ab}/T_a,
+\end{equation}
+其余非对角项为零，对角项补足行和。由共同交点，$\delta_a/T_a\le s_\star-s_a$、$(-\delta_b)/T_b\le s_b-s_\star$，故 $\sum_bw_{ab}\le T_a$、$\sum_aw_{ab}\le T_b$，核非负。详细平衡 $T_aP_{ab}=T_bP_{ba}$ 保证 $TP=T$；而接收坐标有 $(qP)_a-q_a=\sum_bw_{ab}(s_b-s_a)=\delta_a$，输出坐标同理，故 $qP=m$。这是数学表示，无需实际构造词表平方大小的矩阵。
+
+\section{教师中心的性质}
+写 $\rho=T/q$，则 $A(1)=0$、$A'>0$ 且 $A''\le0$。Jensen 给出 $\E_qA(\rho)\le A(\E_q\rho)=0$；结合 $A\ge-c$，
+\begin{equation}
+0\le K_T=-\E_qA\le c_{\kappa,\eta}.
+\end{equation}
+上界为锐上确界：取 $q=(\epsilon,1-\epsilon)$、$T=(1-\epsilon^2,\epsilon^2)$。常见动作的 $-A\to c$，稀有动作的贡献为 $O(\epsilon|\log\epsilon|)\to0$。
+
+固定概率比时，$A$ 随 $\kappa$ 非减：函数 $L(u)=\log(1-\eta+\eta e^{u\log\rho})$ 凸且 $L(0)=0$，故 $L(u)/u$ 在 $u>0$ 非减。另一方面，令 $y=1+\eta(\rho^\kappa-1)$，有
+\begin{equation}
+\partial_\eta A=\frac{1-y^{-1}-\log y}{\kappa\eta^2}\le0.
+\end{equation}
+不等式来自 $\log y\ge1-y^{-1}$。因此 $K_T$ 随 $\kappa$ 非增，随 $\eta$ 非减。标量方差没有由此得到同一排序。
+
+小步极限及局部尺度分别为
+\begin{align}
+\lim_{\eta\downarrow0}K_T
+&=\frac{1-\E_q\rho^\kappa}{\kappa}=(1-\kappa)D_\kappa(T\Vert q),\\
+K_T&=\frac{1-\kappa(1-\eta)}2\E_q(\rho-1)^2
++O(\E_q|\rho-1|^3).
+\end{align}
+第一式对 $\kappa=1$ 取零；第二式要求所有比率一致趋近一。$\eta=1$ 时所有形状恢复 $A=\log\rho$ 与 $K_T=\KL(q\Vert T)$，统一有界性不再成立。
+
+\section{固定强度的矩界与小步阈值}
+定义 $C_\star=\sup_{u>0}\log^2(1+u)/u<\infty$。函数在零与无穷远都趋零，故上确界有限。对 $f=\eta A$，在 $\rho<1$ 上 $|f|\le|\log(1-\eta)|/\kappa$；在 $\rho\ge1$ 上
+\begin{equation}
+0\le f\le\kappa^{-1}\log(1+\eta\rho^\kappa),\qquad
+f^2\le C_\star\eta\rho^\kappa/\kappa^2.
+\end{equation}
+凹性给出 $\E_q\rho^\kappa\le1$，所以
+\begin{equation}
+\E_qf^2\le\frac{\log^2(1-\eta)+C_\star\eta}{\kappa^2}.
+\label{eq:raw-moment}
+\end{equation}
+标准化监督 $A$ 的界需再除以 $\eta^2$。
+
+\begin{theorem}[小步矩阈值]
+固定 $r\ge1$、$0<\kappa\le1$。在所有有限正概率分布上取上确界，有
+\begin{equation}
+\sup_{q,T}\E_q|A|^r
+=\Theta_{\kappa,r}(\eta^{\min\{r,1/\kappa\}-r}),\qquad
+\sup_{q,T}\E_q|C_qA|^r
+=\Theta_{\kappa,r}(\eta^{\min\{r,1/\kappa\}-r})
+\end{equation}
+当 $\eta\downarrow0$。$\kappa=0$ 对任何正 $\eta$ 都没有有限统一矩界。
+\end{theorem}
+\begin{proof}
+先估计 $f$。负区域为 $O_{\kappa,r}(\eta^r)$。若 $r\kappa\le1$，用 $\log(1+x)\le x$ 和 $\E_q\rho^{r\kappa}\le1$ 得正区域也是 $O(\eta^r)$。若 $r\kappa>1$，令 $s=1/\kappa<r$。函数 $\log^r(1+x)/x^s$ 在零处按 $x^{r-s}$ 趋零，在无穷处也趋零，故有有限上界 $C_{r,s}$。于是
+\begin{equation}
+\E_q[|f|^r\mathbf1_{\rho\ge1}]
+\le\kappa^{-r}C_{r,s}\eta^{1/\kappa}\E_q\rho
+=O(\eta^{1/\kappa}).
+\end{equation}
+除以 $\eta^r$ 得未中心化上界。由 $|X-\E X|^r\le2^{r-1}(|X|^r+|\E X|^r)$ 及 Jensen，中心化矩不超过 $2^r\E|X|^r$。
+
+当 $r\kappa\le1$，任意固定不同的二元正分布使 $A\to(\rho^\kappa-1)/\kappa$，其原始与中心化矩均为严格正常数，给出下界。当 $r\kappa>1$，取 $q_1=\eta^{1/\kappa}/2$、$T_1=1/2$。稀有动作有 $A_1=\log(2-\eta)/(\kappa\eta)$，另一动作 $A_2=O(1)$。所以 $q_1|A_1|^r=\Omega(\eta^{1/\kappa-r})$；中心化后的稀有值为 $(1-q_1)(A_1-A_2)$，具有同阶贡献。几何端点取固定非退化 $q$，令一个教师概率趋零，即使中心化，正质量动作上的对数差也无界。
+\end{proof}
+
+二阶矩阈值是 $\kappa\le1/2$，四阶矩阈值是 $\kappa\le1/4$。固定分布的小步 Taylor 展开不能替代这类允许分布随 $\eta$ 改变的最坏情形论证。
+
+\section{误差相关方差与锐常数}
+令 $a_\kappa=\E_q\rho^\kappa$。当 $0<\kappa\le1/2$，函数 $h(x)=\log(1-\eta+\eta x)/(\kappa\eta)$ 的 Lipschitz 常数不超过 $1/[\kappa(1-\eta)]$。独立同分布 $X,X'$ 满足 $\Var h(X)=\frac12\E[h(X)-h(X')]^2$，故
+\begin{equation}
+V_{\kappa,\eta}\le\frac{\Var_q(\rho^\kappa)}{\kappa^2(1-\eta)^2}
+\le\frac{1-a_\kappa^2}{\kappa^2(1-\eta)^2}.
+\end{equation}
+第二步用 $\E_q\rho^{2\kappa}\le1$。
+
+为得到与教师误差相关的界，令 $a(u)=\E_q\rho^u$。其二阶导数为 $\E_q[\rho^u\log^2\rho]\ge0$，所以对 $2\kappa\in[\kappa,1]$，
+\begin{equation}
+a(2\kappa)\le\frac{1-2\kappa}{1-\kappa}a(\kappa)+\frac{\kappa}{1-\kappa}.
+\end{equation}
+减去 $a(\kappa)^2$ 并因式分解：
+\begin{equation}
+\Var_q(\rho^\kappa)
+\le\frac{(1-a_\kappa)[\kappa+(1-\kappa)a_\kappa]}{1-\kappa}
+\le\frac{1-a_\kappa}{1-\kappa}.
+\end{equation}
+代入散度定义得到式~\eqref{eq:error-variance-main}。最后一步利用 $\log(1+\eta x)\le\eta x$ 得 $K_T\ge(1-a_\kappa)/\kappa$。
+
+在小步极限 $A^0_\kappa=(\rho^\kappa-1)/\kappa$，
+\begin{equation}
+\sup_{q\ne T}\frac{\Var_qA^0_\kappa}{D_\kappa(T\Vert q)}=\frac1\kappa,\qquad
+\sup_{q\ne T}\frac{\Var_qA^0_\kappa}{K_T^0}=\frac1{\kappa(1-\kappa)}.
+\end{equation}
+上界已证。锐性取 $q=(v,1-v)$、$T=(v^2,1-v^2)$，此时 $\rho=(v,1+v)$。当 $v\downarrow0$，
+\begin{equation}
+a_\kappa=1-(1-\kappa)v+o(v),\quad
+\Var_qA^0_\kappa=v/\kappa^2+o(v),\quad
+D_\kappa=v/\kappa+o(v).
+\end{equation}
+两比值逼近所列常数。对 $\kappa>1/2$，取 $q=(v,1-v),T=(1/2,1/2)$，方差按 $v^{1-2\kappa}$ 发散；内部幂散度有界，$\kappa=1$ 的 KL 只按 $\log(1/v)$ 增长。$\kappa=0$ 用固定非对称 $q$ 与趋零教师概率，方差按对数平方增长，而 KL 按一次对数增长。故相对准则的唯一最优点为 $\kappa=1/2$。
+
+\section{绝对最坏方差的不同最优点}
+对 $0<\kappa<1/2$，令 $X=\rho^\kappa$、$r=1/\kappa>2$，则 $\E_qX^r=1$。Hölder 给出
+\begin{equation}
+\E X^2\le(\E X)^{(r-2)/(r-1)}.
+\end{equation}
+具体地，将 $X^2=X^{(r-2)/(r-1)}(X^r)^{1/(r-1)}$，取共轭指数 $(r-1)/(r-2)$ 与 $r-1$ 即得。令 $a=\E X$、$\gamma=(1-2\kappa)/(1-\kappa)$，则 $\Var X\le a^\gamma-a^2$。最大值处 $a^{2-\gamma}=\gamma/2$，得到
+\begin{equation}
+\sup_{q,T}\Var A^0_\kappa
+=C_{\rm vel}(\kappa)
+=\frac{b^{1-2\kappa}(1-b)}{\kappa^2},
+\qquad b=\frac{1-2\kappa}{2(1-\kappa)}.
+\end{equation}
+取 $q=(b,1-b)$、$T\to(1,0)$，Hölder 与驻点条件同时取等，证明锐性。$\kappa=1/2$ 的上确界为四。对最优 $b$ 使用包络求导，
+\begin{equation}
+\frac d{d\kappa}\log C_{\rm vel}=-2/\kappa-2\log b.
+\end{equation}
+唯一根满足 $\log[(1-2\kappa)/(2(1-\kappa))]=-1/\kappa$。左侧加 $1/\kappa$ 严格递减，端点分别趋于正、负无穷，故根唯一，数值为 $\kappa_\star\simeq0.441928$。这个准则最小化绝对最坏方差，不等于相对误差准则，也不等于任务表现。
+
+\section{平方根流、局部速率与噪声可求和性}
+平方根点令 $a=\sum\sqrt{qT}$。小步 Fisher 速度满足 $\|v_{1/2}\|_q^2=4(1-a^2)$，且 $D_{1/2}=4(1-a)$。因此沿连续自然梯度流，
+\begin{equation}
+\dot a=1-a^2,\qquad a(t)=\tanh[t+\operatorname{artanh}a(0)]
+\end{equation}
+对 $q\ne T$ 成立；在 $q=T$ 处流恒定。又有 $\dot D=-(1+a)D$，故 $D(0)e^{-2t}\le D(t)\le D(0)e^{-t}$。离散精确更新的 Hellinger 收缩由正文式~\eqref{eq:hellinger-contraction-main} 证明。
+
+固定 $T>0$，写 $q=T+\epsilon h$、$\sum h=0$、$S_h=\sum h_a^2/T_a$。两次二项式展开并除以归一化常数，得到
+\begin{equation}
+m_a=T_a+(1-\eta)\epsilon h_a
++\frac{(\kappa-1)(1-\eta)\eta}{2}\epsilon^2
+\left(\frac{h_a^2}{T_a}-T_aS_h\right)+O(\epsilon^3).
+\end{equation}
+未归一化展开中二阶项为 $(\kappa-1)(1-\eta)\eta\epsilon^2h_a^2/(2T_a)$；其总和正是需要减去的归一化项。几何端点直接展开 $q^{1-\eta}T^\eta$ 给出相同结果。任何在一处二阶曲率为正的光滑 $f$-散度都满足局部比值 $(1-\eta)^2+O(\epsilon)$。
+
+最后，固定 $0<\kappa\le1/2,\eta<1$ 并精确刷新，式~\eqref{eq:center-sandwich} 与三点求和给出
+\begin{equation}
+\sum_{n=1}^\infty V_n
+\le\frac{\KL(T\Vert q_0)}{\kappa(1-\kappa)(1-\eta)^2\eta}.
+\end{equation}
+平方根点可用更直接的 Hellinger 界：
+\begin{equation}
+V_n\le\frac{4H^2(q_n,T)}{(1-\eta)^2}
+\le\frac{4(1-\eta)^nH^2(q_0,T)}{(1-\eta)^2}.
+\end{equation}
+上界包络下降，不保证实际方差逐步单调；所有这些结论固定同一前缀、教师和参数。

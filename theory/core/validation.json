@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-15",
+  "scope": "CPU finite-simplex mathematical audits; no model training",
+  "commands": [
+    {
+      "command": "python -m pytest -q tests/reference/test_core_monograph.py",
+      "result": "46 passed",
+      "elapsed_seconds": 3.48
+    },
+    {
+      "command": "make test",
+      "result": "316 passed",
+      "elapsed_seconds": 68.5
+    },
+    {
+      "command": "make check",
+      "result": "passed"
+    },
+    {
+      "command": "make book",
+      "result": "up-to-date"
+    }
+  ],
+  "environment": {
+    "python": "3.10.19",
+    "torch": "2.6.0+cu124"
+  },
+  "new_test_dimensions": [
+    2,
+    3,
+    6,
+    7
+  ],
+  "quadrature_order": 96,
+  "new_audits": [
+    "Integrated teacher objective and gradient",
+    "Barycenter gap and progress",
+    "Exact MDPO Hessian",
+    "U-statistic variance and no-repeat PSD covariance",
+    "TOP-D target, signal, JS and contraction",
+    "Rare-action variance witness",
+    "Restricted projection and BPO counterexample",
+    "Conditional versus sequence improvement",
+    "Mean local cubic KL coefficient"
+  ],
+  "proof_status": "Numerical checks are finite-instance checks, not a replacement for analytical proofs.",
+  "source_sha256": {
+    "2026-10-15-MirrorOPD核心推导-正文.tex": "8f3bf74b27de958bb774a4b90b0e4fa6c4d1d1697d29a186ba5b355f987a8239",
+    "2026-10-15-MirrorOPD核心推导.tex": "8b6e6a91dc0cf321d3aaef422f43892ec5813b5d8030042410843114fb0623cb",
+    "appendices/a_measure.tex": "1ed631c05e4a87d6ea43c40cde98e5ca99ef49117e4c1b3b351b2825939b3601",
+    "appendices/b_objective.tex": "cfc624aa0549b07972a9f0d9561312fb8eba902c0c4acc4e6e05edba7fc47b87",
+    "appendices/c_inner.tex": "376d1f66ec1106b587f11b827d56465cfcbec802d210d4cb2e1cdcf6c3d5b1af",
+    "appendices/d_shape.tex": "b8122411d605da680f80b85548237219d2108f06628c6ff8394064686ee301c7",
+    "appendices/e_estimation.tex": "79d364d79c9b08d9877b25dc359600084d8c6e05030c5a5be67e4b268d2dc1b3",
+    "appendices/f_centers.tex": "e1269835a8a60a1d0a5250a8dc82ee0a3ddba5942521bb99c4ca348ac8fddeaf",
+    "appendices/g_dynamics.tex": "ccfe7d926ac285956c854a606fb41467303bff1f2b8ed3082e5ead513e7182d3",
+    "appendices/h_topd.tex": "113d62e7392de2f0b7eacee03f8dc67cd36cf9e552050122831468a8ff8d0d0f",
+    "sections/01_target.tex": "964056124d6f5eac5d086edc1f98e821a2f8f4fa20e6dfab31bc99533e82f626",
+    "sections/02_objective.tex": "392c1d2fdd3b1bc46f8404a49c86824ca3381b8f4118123a8834ff941670a430",
+    "sections/03_inner.tex": "657703b979d472ecf43cb7481064f49af4346007bec6e5357af3a351bb1a2781",
+    "sections/04_parameters.tex": "22fed556fe9b109651d8ffe0759f939a4822550fdc150eae3e4847862c0fdc83",
+    "sections/05_finite.tex": "a90ae42e84cec39fb9b7b6f2e530ca9340d15073bfe006e4001f19e8992de125",
+    "sections/reading.tex": "29663588c4ec48357e12d743b2d05c4ff17f5dc8b8e7ce65b2702da28e84e253",
+    "sections/sources.tex": "c20799604ddbef8a976b2be300b9de05c1e994883071e30bd9d09ac2af542278",
+    "sections/verification.tex": "17e4bf5d664718a62fafa782d120e0d8ec81aabdfe212cbca413e070ae5fcee4",
+    "references.bib": "f3acc85bbb4744823527bc762eb880774f1aa881896bb364b6dd823b8d4c077d"
+  },
+  "template": {
+    "path": "theory/book/elegantbook.cls",
+    "sha256": "d2cdb802b3de46b1d659d1a8eb36979aecd761402d3e95296936f433f97549eb"
+  },
+  "pdfs": {
+    "2026-10-15-MirrorOPD核心推导-正文.pdf": {
+      "pages": 13,
+      "sha256": "777f0fc7e02489273eec9922f9a7460e3fdc906a9e21c325b815440d49ae2301"
+    },
+    "2026-10-15-MirrorOPD核心推导.pdf": {
+      "pages": 48,
+      "sha256": "5d9816ac67278bb4a65003a145d22addd7b1d0326a4c9038f602aa1eae74625f"
+    }
+  },
+  "build_status": "Both ElegantBook PDFs built; no LaTeX warnings, undefined references or overfull boxes."
+}

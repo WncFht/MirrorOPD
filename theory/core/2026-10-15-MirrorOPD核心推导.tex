@@ -1,0 +1,84 @@
+\RequirePackage{xr-hyper}
+\documentclass[lang=cn,scheme=chinese,openany]{elegantbook}
+\usepackage{mathtools,bm,algorithm,algpseudocode,longtable}
+\usepackage{cleveref,xurl}
+\makeatletter
+\providecommand{\theHALG@line}{}
+\renewcommand{\theHALG@line}{\thealgorithm.\arabic{ALG@line}}
+\makeatother
+\newcommand{\E}{\mathbb E}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\osc}{\operatorname{osc}}
+\newcommand{\sg}{\operatorname{stopgrad}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\R}{\mathbb R}
+\newcommand{\JS}{\operatorname{JS}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\ifdefined\CoreOnly
+  \externaldocument[full-]{2026-10-15-MirrorOPD核心推导}[2026-10-15-MirrorOPD核心推导.pdf]
+  \newcommand{\appref}[1]{完整稿附录~\ref*{full-#1}}
+\else
+  \newcommand{\appref}[1]{附录~\ref{#1}}
+\fi
+\addbibresource{references.bib}
+\hypersetup{pdftitle={MirrorOPD 核心推导：目标教师、内层拟合与参数性质},
+  pdfauthor={MirrorOPD Research Notes},bookmarksnumbered=true}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{2}
+\allowdisplaybreaks[2]
+\title{MirrorOPD 核心推导}
+\author{MirrorOPD Research Notes}
+\date{2026 年 10 月 15 日}
+\begin{document}
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\centering
+\vspace*{28mm}
+{\Huge\bfseries MirrorOPD 核心推导\par}
+\vspace{12mm}
+{\Large 目标教师、内层拟合与参数性质\par}
+\vspace{12mm}
+{\color{structurecolor}\rule{0.78\textwidth}{1pt}\par}
+\vspace{12mm}
+{\large 从加权散度最优化到 $(\kappa,\eta)$ 镜像更新\par}
+\vspace{7mm}
+\ifdefined\CoreOnly
+{\large 正文阅读版；证明扩展见同源完整稿\par}
+\else
+{\large 正文与八组技术附录\par}
+\fi
+\vfill
+{\large MirrorOPD Research Notes\par}
+\vspace{5mm}
+{\large 2026 年 10 月 15 日\par}
+\vspace{18mm}
+\end{titlepage}
+\frontmatter
+\hypersetup{pageanchor=true}
+\input{sections/reading}
+\tableofcontents
+\mainmatter
+\input{sections/01_target}
+\input{sections/02_objective}
+\input{sections/03_inner}
+\input{sections/04_parameters}
+\input{sections/05_finite}
+\ifdefined\CoreOnly\else
+\appendix
+\input{appendices/a_measure}
+\input{appendices/b_objective}
+\input{appendices/c_inner}
+\input{appendices/d_shape}
+\input{appendices/e_estimation}
+\input{appendices/f_centers}
+\input{appendices/g_dynamics}
+\input{appendices/h_topd}
+\input{sections/sources}
+\fi
+\backmatter
+\printbibliography[heading=bibintoc,title={参考文献}]
+\end{document}

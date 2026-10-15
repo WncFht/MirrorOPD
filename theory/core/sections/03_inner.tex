@@ -1,0 +1,96 @@
+\chapter{固定目标教师的内层拟合}
+\label{ch:inner}
+\section{最优性方程与四种损失}
+本轮固定 $q,T,m$ 与 $f=\eta A(T/q)$，当前学生为 $p=p_\theta$。记
+\begin{equation}
+U_a=\log(p_a/q_a),\qquad G=C_qf,\qquad
+K_S=\KL(q\Vert p)=-\E_qU,\qquad K_T=-\E_qA.
+\end{equation}
+目标教师满足 $U^\star=f-\log Z$。将该方程转成可训练目标，有以下四种方式：
+\begin{align}
+L_{\rm MDPO}(p)&=\frac1\eta\{\KL(p\Vert q)-\E_pf\}
+=\frac1\eta\KL(p\Vert m)-\frac{\log Z}{\eta},\label{eq:mdpo}\\
+L_{\rm Part}(p)&=\frac12\E_q(U-f+\log Z)^2,\label{eq:part}\\
+L_{\rm BPO}(p)&=\frac1{2\eta}\E_q[C_q(U-f)]^2
+=\frac1{2\eta}\Var_q\log(p/m),\label{eq:bpo}\\
+L_{\rm Mean}(p)&=\frac12\E_q(U-G)^2.\label{eq:mean}
+\end{align}
+MDPO 保留原镜像子问题；Part 回归完整的对数比方程；BPO 回归中心化后的方程；Mean 用 $\E_qf$ 近似 $\log Z$。Mean 的定义与 PMD-mean 原始分析一致，整体损失尺度在此统一\footfullcite{pmd2026}。
+
+\begin{proposition}[共同目标与 Mean 的偏离]
+\label{prop:inner-roots}
+在完整支持、精确期望和可实现的分布类中，MDPO、Part、BPO 的唯一最优分布均为 $m$。若 $f$ 非恒定，Mean 的最优分布一般不等于 $m$。
+\end{proposition}
+\begin{proof}
+MDPO 的结论由式~\eqref{eq:mdpo} 的 KL 分解给出。Part 的零损失要求 $\log(p/m)=0$。BPO 的零损失要求 $\log(p/m)$ 在全部动作上为常数，归一化再强制常数为零。
+
+Mean 满足约束 $\E_qe^U=1$，其拉格朗日一阶条件是
+\begin{equation}
+U_a-G_a+\lambda e^{U_a}=0.
+\label{eq:mean-kkt-main}
+\end{equation}
+Gibbs 解满足 $U_a=G_a-\Delta$，其中 $\Delta=\log\E_qe^G>0$。代入后要求 $\lambda e^{G_a-\Delta}=\Delta$ 对所有 $a$ 成立；非恒定 $G$ 使其不可能。Mean 的存在唯一性及 Lambert-$W$ 解见\appref{app:inner}。
+\end{proof}
+
+Mean 与 BPO 的差异还可精确写成
+\begin{equation}
+L_{\rm Mean}=\eta L_{\rm BPO}+\frac12K_S^2.
+\label{eq:mean-bpo}
+\end{equation}
+因为 $U-G=C_q(U-f)-K_S$，而第一项的 $q$ 均值为零，平方交叉项消失。额外的 $K_S^2/2$ 改变最优分布与梯度；它不能当成不影响优化的常数。
+
+\section{精确梯度与采样测度}
+令 $\psi_a=\nabla_\theta\log p_\theta(a)$、$\bar\psi_q=\E_q\psi$，则 $\E_p\psi=0$，但 $\bar\psi_q$ 通常不为零。定义
+\begin{equation}
+R_P=U-f+\log Z,\quad R_M=U-G,\quad
+R_B=C_q(U-f)=U+K_S-\eta(A+K_T).
+\end{equation}
+直接求导得到
+\begin{align}
+\nabla L_{\rm Part}&=\E_q[R_P\psi],&
+\nabla L_{\rm Mean}&=\E_q[R_M\psi],\\
+\nabla L_{\rm BPO}
+&=\eta^{-1}\E_q[R_B(\psi-\bar\psi_q)]
+=\eta^{-1}\E_q[R_B\psi],\label{eq:bpo-gradient}\\
+\nabla L_{\rm MDPO}
+&=\eta^{-1}\E_p[(U-f)\psi]
+=\eta^{-1}\E_q[(p/q)(U-f)\psi].\label{eq:mdpo-gradient}
+\end{align}
+BPO 第二个等号使用 $\E_qR_B=0$；MDPO 删除常数项使用 $\E_p\psi=0$。这两次抵消发生在不同测度下。
+
+完整词表求和时，可直接对真实损失求导。使用解析 score 形式时，把整个系数停止梯度，再乘以 $\log p_\theta(a)$，实现上述向量。这个代理标量的数值不等于真实损失。Part、Mean、BPO 的动作测度是 $q$，MDPO 的动作测度是 $p$；从 $q$ 采样 MDPO 时需乘 $p/q$。
+
+在 $p=q$ 处，BPO 和 MDPO 的梯度相同，Part、Mean 的梯度等于它们的 $\eta$ 倍。离开锚点后，损失的度量、中心与测度不同，不能用起点相等推断整个轨迹相等。
+
+\section{接入前缀与外层同步}
+恢复条件变量 $s$，内层实际优化
+\begin{equation}
+\mathcal L_k(\theta)=\E_{s\sim d_k}L_k(p_\theta(\cdot\mid s)).
+\end{equation}
+$d_k$ 在本轮冻结；有限 rollout 用经验测度 $\widehat d_k$ 代替。教师信号 $f,K_T$ 整轮冻结，学生中心 $K_S$ 随每次参数更新重算。每个前缀的一条实际动作观测，不等于该前缀全部动作的期望；辅助动作抽样与新增完整回复是两种不同操作。
+
+\begin{algorithm}[ht]
+\caption{固定前缀的 MirrorOPD\\{\small\textit{Semantics: 根据条件目标重构；动作期望使用完整词表}}}
+\begin{algorithmic}[1]
+\Require teacher $T$, initial student $\theta_0$, $\kappa\in[0,1]$, $0<\eta<1$, finite budgets $K,N$
+\For{$k=0,\ldots,K-1$}
+    \State $q_k\gets p_{\theta_k}$; freeze $q_k$
+    \State sample prompts and one response per prompt from $q_k$ with full action support
+    \State form $\widehat d_k$ from valid response tokens, including EOS
+    \If{the batch has no valid response tokens}
+        \State terminate with an invalid-batch error
+    \EndIf
+    \State cache frozen $f_k=\sg(\eta A_{\kappa,\eta}(T/q_k))$ and required teacher integrals
+    \State $\theta_{k,0}\gets\theta_k$
+    \For{$n=0,\ldots,N-1$}
+        \State recompute $p_{\theta_{k,n}}$ and all student-dependent integrals
+        \State $g_{k,n}\gets\nabla_\theta\E_{\widehat d_k}L_k(p_{\theta_{k,n}})$
+        \State $\theta_{k,n+1}\gets\theta_{k,n}-\alpha_{k,n}g_{k,n}$
+    \EndFor
+    \State $\theta_{k+1}\gets\theta_{k,N}$; discard the old rollout for the next outer
+\EndFor
+\State \Return $\theta_K$
+\end{algorithmic}
+\end{algorithm}
+
+算法以普通梯度下降明确更新语义。替换为其他优化器时，目标定义保持不变，数值轨迹需另行分析。共享参数可能无法同时表示所有 $m_k(\cdot\mid s)$；此时三种具有相同自由分布解的方法，也可能具有不同的受限投影。

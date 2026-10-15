@@ -1,0 +1,136 @@
+\chapter{TOP-D 目标教师的退化与性质}
+\label{app:topd}
+\section{参数对应与精确可达性}
+本附录比较 TOP-D 的目标教师及相关分布性质，依据其 v1 第 3.1 节、定理 4.2、4.4 和附录 C.1、C.2\footfullcite{topd2026}。固定同一前缀，TOP-D 的教师混合权重记为 $\alpha$，教师为 $T$，构造混合时的学生记为 $q$。本文对应关系是
+\begin{equation}
+\boxed{\kappa=1,\qquad \eta=\alpha,\qquad
+m_{1,\eta}=(1-\eta)q+\eta T.}
+\label{eq:topd-match}
+\end{equation}
+这在目标分布上是精确等式，无需小步近似，也无需对两分布接近作假设。两者必须作用于同一个条件分布空间。
+
+目标教师由正文的算术端点最优化问题产生：
+\begin{equation}
+m_{1,\eta}=\argmin_{p\in\Delta}
+\{(1-\eta)\KL(q\Vert p)+\eta\KL(T\Vert p)\}.
+\end{equation}
+其概率梯度为 $-[(1-\eta)q_a+\eta T_a]/p_a$。约束乘子使 $p_a$ 与分子成比例；分子总和已经为一，所以 $p=m$。完整误差恒等式是
+\begin{equation}
+F(p)-F(m)=\KL(m\Vert p).
+\end{equation}
+因此原问题的最优分布与 TOP-D 目标教师完全重合。
+
+在本文三个精确拟合目标中，MDPO、Part、BPO 都能在完整可实现条件下到达该分布。Mean 一般仍有 Lambert-$W$ 目标偏离。可达性指总体最优分布；有限参数更新是否到达，应由拟合误差证书判断。
+
+\section{监督信号、中心与教师目标}
+算术端点的配分函数恒为一，故
+\begin{equation}
+f_{1,\eta}=\log(m/q)=\log(1-\eta+\eta T/q),\qquad
+A_{1,\eta}=f_{1,\eta}/\eta,\qquad
+K_T=\KL(q\Vert m)/\eta.
+\label{eq:topd-signal}
+\end{equation}
+第一项恢复 TOP-D 式（5）的未缩放信号。第二项是本文内层归一化使用的信号，比较方差时需保留 $1/\eta^2$。
+
+本文由逆向积分定义的教师目标在此端点为
+\begin{equation}
+J_{1,\eta}(p;T)=
+\frac{(1-\eta)\KL(p\Vert M_p)+\eta\KL(T\Vert M_p)}
+{\eta(1-\eta)},\qquad M_p=(1-\eta)p+\eta T.
+\end{equation}
+推导已在附录~\ref{app:objective} 给出。这里 $M_p$ 随候选学生 $p$ 变化，用于定义同一个教师目标；本轮目标 $m=M_q$ 在内层冻结。对 $J$ 在 $q$ 处执行步长 $\eta$ 的负熵镜像下降，恰好得到算术目标。这是本文对该目标教师的变分解释，不把它与其他同名目标混用。
+
+\section{覆盖与散度收缩}
+由算术混合逐坐标有 $m_a\ge(1-\eta)q_a$、$m_a\ge\eta T_a$，因此
+\begin{equation}
+f_{1,\eta}\ge\log(1-\eta),\quad
+\KL(q\Vert m)\le-\log(1-\eta),\quad
+\KL(T\Vert m)\le-\log\eta.
+\end{equation}
+前者控制教师极小概率造成的负监督尾部，后两者控制到两端分布的覆盖代价。
+
+对于精确更新，
+\begin{equation}
+m-T=(1-\eta)(q-T),\qquad
+\|m-T\|_1=(1-\eta)\|q-T\|_1.
+\end{equation}
+反复精确更新的闭式为 $q_k=T+(1-\eta)^k(q_0-T)$。所以原文定理 4.4 所用的算术收缩结构在这个条件分布空间直接恢复。
+
+\begin{proposition}[算术端点的凸散度收缩]
+对任意凸函数 $\varphi$、$\varphi(1)=0$，
+\begin{equation}
+D_\varphi(m\Vert T)\le(1-\eta)D_\varphi(q\Vert T).
+\label{eq:topd-all-f}
+\end{equation}
+\end{proposition}
+\begin{proof}
+逐坐标有 $m_a/T_a=(1-\eta)q_a/T_a+\eta$。凸性给
+\begin{equation}
+\varphi(m_a/T_a)
+\le(1-\eta)\varphi(q_a/T_a)+\eta\varphi(1).
+\end{equation}
+乘以 $T_a$ 并求和，第二项为零。取 $\varphi(x)=x\log x$、$-\log x$、$(\sqrt x-1)^2$、$|x-1|/2$，分别得到两个 KL 方向、平方 Hellinger 和 TV 的界。
+\end{proof}
+
+式~\eqref{eq:topd-all-f} 是算术映射自身的凸性结论。一般幂均值保留所有凸生成散度的非增性，但不自动具有同一个 $(1-\eta)$ 全局因子；平方根点的 Hellinger 因子由它的球面结构另行给出。
+
+\section{有限拟合的误差累积}
+令 $\epsilon_k=\|q_{k+1}-m(q_k,T)\|_1$。三角不等式给
+\begin{equation}
+\|q_{k+1}-T\|_1\le(1-\eta)\|q_k-T\|_1+\epsilon_k.
+\end{equation}
+归纳展开：
+\begin{equation}
+\|q_K-T\|_1\le(1-\eta)^K\|q_0-T\|_1
++\sum_{k=0}^{K-1}(1-\eta)^{K-1-k}\epsilon_k.
+\label{eq:topd-errors}
+\end{equation}
+若 $\limsup\epsilon_k\le\epsilon_\infty$，对任意 $\delta>0$ 取足够晚的 $k_0$ 使 $\epsilon_k\le\epsilon_\infty+\delta$。有限前缀和趋零，后段几何和不超过 $(\epsilon_\infty+\delta)/\eta$。令 $\delta\downarrow0$，得到 $\limsup\|q_K-T\|_1\le\epsilon_\infty/\eta$。这恢复原文误差累积与稳态上界的形式。
+
+固定前缀测度下可以逐条件取平均，再用同一个线性递推。如果用 MDPO 的超额损失 $\delta_k$，Pinsker 给 $\epsilon_k\le\sqrt{2\eta\delta_k}$；若用 BPO，则先应用附录~\ref{app:dynamics} 的跨度证书。本文在这里补上的是不同 inner loss 到外层输出误差的接口。
+
+\section{方差定理的尺度对应}
+TOP-D 定理 4.2 在有限词表和 score 范数不超过 $S$ 的条件下，给未缩放信号的梯度方差上界
+\begin{equation}
+S^2|\mathcal V|\max\{\log^2(1-\eta),C_\star\eta\}.
+\end{equation}
+在同一条件下，利用概率归一化可以得到无词表大小因子的界。对 $f=\log(1-\eta+\eta\rho)$，将 $\rho<1$ 与 $\rho\ge1$ 分开：
+\begin{align}
+\E_q[f^2\mathbf1_{\rho<1}]&\le\log^2(1-\eta),\\
+\E_q[f^2\mathbf1_{\rho\ge1}]
+&\le C_\star\eta\E_q[\rho\mathbf1_{\rho\ge1}]
+\le C_\star\eta.
+\end{align}
+其中 $C_\star=\sup_{u>0}\log^2(1+u)/u$，和原文单变量上界使用同一个常数。因此
+\begin{equation}
+\Var_q(f\psi)\le S^2[\log^2(1-\eta)+C_\star\eta].
+\end{equation}
+这个推导控制条件单动作梯度；前缀加权后只要使用同一 score 上界，二阶矩界仍成立。
+
+未缩放信号的最坏二阶矩在 $\eta\downarrow0$ 时为 $\Theta(\eta)$。上界由前式，下界取 $q_1=\eta/2,T_1=1/2$，稀有动作 $f_1=\log(2-\eta)$，贡献至少 $\eta\log^2(2-\eta)/2$。对二元分布，中心化方差 $q_1q_2(f_1-f_2)^2$ 也有同阶，因为另一项 $f_2=O(\eta)$。
+
+所以本文标准化监督满足
+\begin{equation}
+\sup_{q,T}\Var_qA_{1,\eta}=\Theta(\eta^{-1}).
+\end{equation}
+这与未缩放信号随小 $\eta$ 衰减相容：两者相差 $\eta^2$。它也说明算术端点虽有固定强度方差界，却不属于统一小步标准化方差有界的 $0<\kappa\le1/2$ 区间。
+
+\section{比较结论的作用范围}
+\begin{center}
+\small
+\begin{tabular}{p{38mm}p{93mm}}
+\toprule
+对象 & 精确对应或进一步性质\\
+\midrule
+目标教师 & $\kappa=1,\eta=\alpha$ 时完全一致，$Z=1$\\
+未缩放信号 & $f=\log(1-\eta+\eta T/q)$ 完全一致\\
+最优化来源 & 加权正向 KL 重心，超额损失为 $\KL(m\Vert p)$\\
+教师目标解释 & 本文的 $J_{1,\eta}$ 是归一化加权 JS，其熵镜像步等于混合教师\\
+精确与近似外层 & 算术 $L_1$ 收缩、几何误差累积、$\epsilon_\infty/\eta$ 稳态界\\
+其他教师散度 & 凸性给任意凸生成散度的 $(1-\eta)$ 上界\\
+监督方差 & 未缩放 $f$ 与标准化 $A=f/\eta$ 分开比较\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+上述比较针对相同的条件分布空间。若直接在完整序列空间定义算术混合，同一代数也成立；逐 token 固定权重混合一般不等于完整序列混合，不能把两个空间的距离直接认作同一指标。这里保留目标教师与定理层面的对应。

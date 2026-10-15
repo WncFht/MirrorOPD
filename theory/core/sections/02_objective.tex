@@ -1,0 +1,93 @@
+\chapter{教师目标与精确镜像更新}
+\label{ch:objective}
+\section{由目标分布识别教师信号}
+为解释外层在优化哪个教师目标，定义概率比函数
+\begin{equation}
+A_{\kappa,\eta}(x)=
+\begin{cases}
+\dfrac{\log(1-\eta+\eta x^\kappa)}{\kappa\eta},&\kappa>0,\\[1mm]
+\log x,&\kappa=0,
+\end{cases}
+\quad f_a=\eta A_{\kappa,\eta}(T_a/q_a).
+\label{eq:signal}
+\end{equation}
+则 $q_ae^{f_a}=h_a$，目标教师写为 $m_a=q_ae^{f_a}/Z$。整个内层中 $q,T,f,Z$ 冻结。
+
+本轮重心目标 $F_k$ 的最小点是 $m_k$。下面定义一个不依赖锚点、最小点为原教师 $T$ 的目标。两个函数的作用不同。
+
+\begin{theorem}[教师目标的构造与镜像解释]
+\label{thm:J}
+定义
+\begin{equation}
+\omega_{\kappa,\eta}(x)=x\int_1^x\frac{A_{\kappa,\eta}(u)}{u^2}\,du,
+\qquad
+J_{\kappa,\eta}(p;T)=\sum_ap_a\omega_{\kappa,\eta}(T_a/p_a).
+\label{eq:J}
+\end{equation}
+则 $J\ge0$，且在概率单纯形上唯一零点为 $p=T$。在正正交象限中，
+\begin{equation}
+\partial_{p_a}J(p;T)=-A_{\kappa,\eta}(T_a/p_a).
+\label{eq:J-gradient}
+\end{equation}
+对 $J$ 在 $q$ 处执行步长 $\eta$ 的负熵镜像下降，恰好得到目标教师：
+\begin{equation}
+\boxed{m=\argmin_{p\in\Delta}
+\left\{\langle\nabla J(q;T),p-q\rangle+\eta^{-1}\KL(p\Vert q)\right\}.}
+\label{eq:MD}
+\end{equation}
+\end{theorem}
+\begin{proof}
+对积分求导，
+\begin{align}
+\omega'(x)&=\int_1^x A(u)u^{-2}\,du+A(x)/x,\\
+\omega(x)-x\omega'(x)&=-A(x),\\
+\omega''(x)&=A'(x)/x
+=\frac{x^{\kappa-2}}{1-\eta+\eta x^\kappa}>0.
+\end{align}
+最后一式在 $\kappa=0$ 时取 $x^{-2}$。由 $A(1)=0$，有 $\omega(1)=\omega'(1)=0$，所以严格凸的 $\omega$ 只在一处取零。正权重求和给出 $J\ge0$，且 $J=0$ 要求 $T_a/p_a=1$ 对每个 $a$ 成立。链式法则给出
+\begin{equation}
+\partial_{p_a}[p_a\omega(T_a/p_a)]
+=\omega(x)-x\omega'(x)=-A(x).
+\end{equation}
+式~\eqref{eq:MD} 的一阶条件为 $-A(T_a/q_a)+\eta^{-1}[\log(p_a/q_a)+1]+\nu=0$。消去公共乘子并归一化，即得 $p_a\propto q_ae^{\eta A(T_a/q_a)}$。KL 正则严格凸，故解唯一。
+\end{proof}
+
+\section{下降保证与参数角色}
+负熵势记为 $\Phi(p)=\sum_ap_a\log p_a$。令 $x_a=T_a/p_a$，则
+\begin{equation}
+\nabla^2J(p;T)
+=\diag\left(\frac1{p_a}\frac{x_a^\kappa}{1-\eta+\eta x_a^\kappa}\right)
+\preceq\eta^{-1}\nabla^2\Phi(p).
+\label{eq:relative-smooth}
+\end{equation}
+沿线段积分 Hessian，得到相对光滑不等式
+\begin{equation}
+J(p)\le J(q)+\langle\nabla J(q),p-q\rangle+\eta^{-1}\KL(p\Vert q).
+\end{equation}
+镜像最优性条件与 $m-q$ 作内积，给出
+\begin{equation}
+\langle\nabla J(q),m-q\rangle
+=-\eta^{-1}[\KL(m\Vert q)+\KL(q\Vert m)].
+\end{equation}
+所以 $J(q)-J(m)\ge\eta^{-1}\KL(q\Vert m)$，非平凡精确更新严格下降。对同一条件分布反复精确刷新，三点恒等式进一步给出
+\begin{equation}
+J(q_K;T)\le\frac{\KL(T\Vert q_0)}{\eta K}.
+\label{eq:J-rate}
+\end{equation}
+完整望远镜求和、边界排除和可变镜像步长证明见\appref{app:objective}。
+
+在整个递推中固定 $\kappa,\eta,T$，$J_{\kappa,\eta}$ 才是同一个函数。改变 $\eta$ 一般同时改变目标形状和镜像步长。若要保持 $J$ 不变而调整步长，应另用 $\tau$，更新 $p^+\propto q\exp[\tau A_{\kappa,\eta}(T/q)]$。参数优化器的学习率 $\alpha_{\rm opt}$ 又是第三个量。
+
+\section{散度、教师目标与中心}
+三个容易混用的对象分别是
+\begin{equation}
+D_\kappa(T\Vert p),\qquad J_{\kappa,\eta}(p;T),\qquad
+K_T(q,T)=-\E_q A_{\kappa,\eta}(T/q).
+\end{equation}
+它们依次用于定义重心、解释精确镜像更新、中心化本轮监督。$K_T$ 在内层冻结。端点关系为
+\begin{equation}
+J_{0,\eta}(p;T)=\KL(p\Vert T),\quad
+\lim_{\eta\downarrow0}J_{\kappa,\eta}(p;T)=D_\kappa(T\Vert p),\quad
+\lim_{\eta\uparrow1}J_{\kappa,\eta}(p;T)=\KL(p\Vert T).
+\end{equation}
+当 $\kappa=1$、$0<\eta<1$，$J$ 是归一化加权 JS，而 $D_1(T\Vert p)$ 是正向 KL。有限步幂均值一般不是对固定 $D_\kappa$ 做同一步长的熵镜像下降；两者在小步极限才一阶一致。

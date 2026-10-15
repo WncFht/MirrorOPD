@@ -1,0 +1,240 @@
+\chapter{信息访问与条件积分估计}
+\label{app:estimation}
+\section{四个积分对象与可观测信息}
+本附录局部记当前学生为 $P=P_\theta$、冻结参考为 $Q$、动作提案为 $\beta$；三者职责不同。令 $\ell_a=\log(P_a/Q_a)$、$\psi_a=\nabla_\theta\log P_a$。双向 KL 及其梯度为
+\begin{equation}
+K=\E_P\ell,\quad g=\E_P[\ell\psi],\qquad
+K^{\rm F}=-\E_Q\ell,\quad g^{\rm F}=-\E_Q\psi.
+\label{eq:four-integrals}
+\end{equation}
+$g$ 的求导先产生 $\E_P[(\ell+1)\psi]$，再利用 $\E_P\psi=0$。参考为锚点时可代入 $Q=q$；BPO 学生中心 $\KL(q\Vert p)$ 对应这里的正向积分。
+
+完整词表概率允许精确有限求和。头部查询只给出集合 $S$ 上的 $Q_a$ 和尾部总质量；实际动作查询再给出该动作的一项概率。若 $S$ 是教师真正的 Top-$K_{\rm head}$，未知尾部还满足排名约束 $Q_a\le\min_{b\in S}Q_b$。接口是否确定某个量，应检查它在全部符合这些观测的分布上是否相同。
+
+只保留桶质量时，不能恢复桶内形状。若实际动作落在尾部，其额外概率观测必须计入信息；也不能把一次尾部查询当成全部尾部已知。固定支持集的微分与每步重新选 Top-K 的程序是不同对象，以下推导均冻结分区。
+
+\section{粗粒化、下界与不可识别性}
+设 $\mathcal C$ 为词表分区，定义 $P_C=\sum_{a\in C}P_a$、$Q_C=\sum_{a\in C}Q_a$、$\ell_C=\log(P_C/Q_C)$、$P^C_a=P_a/P_C$、$Q^C_a=Q_a/Q_C$。逐点有
+\begin{equation}
+\ell_a=\ell_C+\log(P_a^C/Q_a^C).
+\end{equation}
+乘 $P_a$，先桶内求和再跨桶求和，得到
+\begin{equation}
+\KL(P\Vert Q)=K_{\mathcal C}+\sum_CP_C\KL(P^C\Vert Q^C),
+\qquad K_{\mathcal C}=\sum_CP_C\ell_C.
+\label{eq:partition-chain}
+\end{equation}
+交换 $P,Q$ 给出正向版本。细化分区时，新旧粗化 KL 的差为每个旧桶内细桶标签 KL 的加权和，故非负。全 singleton 分区恢复完整值。
+
+在只知道 $Q_C$ 的信息类上，$K_{\mathcal C}$ 是完整 KL 的锐下包络，由 $Q_a=Q_CP_a^C$ 唯一达到；两个方向同时成立。加入真实 Top-K 排名后该构造可能不可行。例如 $P=(0.1,0.8,0.1)$，已知 $Q_1=0.4,Q_2+Q_3=0.6$ 且动作一是 Top-1；质量约束最优构造给 $Q_2=8/15>0.4$，违反排名。因此 Tail-aware 仍是下界，但不必是完整信息类上的锐下界。
+
+相同头部信息也不控制逆向 KL 上界。固定 $P=(0.4,0.2,0.4)$ 与 $Q_\epsilon=(0.7,\epsilon,0.3-\epsilon)$、$0<\epsilon<0.15$，Top-1 和尾部质量完全相同，而 $0.2\log(0.2/\epsilon)\to\infty$。该反例依赖至少两个仍未知的尾部坐标。
+
+记 $\bar\psi_C=\nabla\log P_C=\E_{P^C}\psi$。对粗化目标求导：
+\begin{align}
+\nabla K_{\mathcal C}
+&=\sum_C(\ell_C+1)\nabla P_C
+=\sum_CP_C\ell_C\bar\psi_C,\\
+g-\nabla K_{\mathcal C}
+&=\sum_CP_C\{\Cov_{P^C}(\ell-\ell_C,\psi)
++\KL(P^C\Vert Q^C)\bar\psi_C\}.
+\end{align}
+最后一步对桶内乘积期望分解。标量误差只含条件 KL，梯度误差还依赖 score 相关性；标量下界改善不推出梯度偏差范数单调改善。
+
+\section{精确积分加残差抽样}
+\begin{theorem}[统一估计与协方差]
+设目标 $I_\nu(h)=\sum_a\nu_ah_a$，$h_a$ 可为向量。选择可精确积分的代理 $b_a$，令 $R_a=h_a-b_a$。若 $\nu_a\|R_a\|>0$ 时 $\beta_a>0$，则对 $A\sim\beta$，
+\begin{equation}
+\widehat I=I_\nu(b)+\frac{\nu_A}{\beta_A}R_A
+\end{equation}
+无偏，且
+\begin{equation}
+\Cov(\widehat I)=\sum_{\beta_a>0}\frac{\nu_a^2}{\beta_a}R_aR_a^\top
+-I_\nu(R)I_\nu(R)^\top.
+\label{eq:master-cov}
+\end{equation}
+\end{theorem}
+\begin{proof}
+随机修正的均值为 $\sum_{\beta_a>0}\nu_aR_a=I_\nu(R)$，支持条件使缺失动作贡献为零；与确定积分相加即得目标。随机项外积的期望为式~\eqref{eq:master-cov} 的求和项，减去均值外积得到协方差。取迹得到向量方差，无偏性使其等于均方误差。$M$ 个条件独立样本的平均协方差除以 $M$。
+\end{proof}
+
+若确定积分有误差 $\delta$，使用错误权重 $\widetilde w$ 或缺失支持 $\mathcal D^c$，偏差恰为
+\begin{equation}
+\delta+\sum_{a\in\mathcal D}(\beta_a\widetilde w_a-\nu_a)R_a
+-\sum_{a\notin\mathcal D}\nu_aR_a.
+\end{equation}
+这是对实际期望与目标直接相减的结果。精确覆盖的零残差动作可以没有采样支持；未知残差则不能由有限权重恢复。
+
+固定代理时，迹方差最优提案为
+\begin{equation}
+\beta_a^\star=\frac{\nu_a\|R_a\|}{\sum_b\nu_b\|R_b\|},\quad
+V_{\min}=\left(\sum_a\nu_a\|R_a\|\right)^2-\|I_\nu(R)\|^2.
+\end{equation}
+证明对 $\sum_a[\nu_a\|R_a\|/\sqrt{\beta_a}]\sqrt{\beta_a}$ 用 Cauchy--Schwarz；取比例提案时等号成立。全部残差为零时直接返回确定积分。这个 oracle 提案通常需要未知尾部值，不能仅凭公式称其可实现。
+
+若有多个已知积分控制 $h_j$，令 $X=(\nu_A/\beta_A)h_A$、$U_j=(\nu_A/\beta_A)h_{j,A}-I_\nu(h_j)$、$\Gamma_{ij}=\E\langle U_i,U_j\rangle$、$d_j=\E\langle U_j,X-\E X\rangle$。估计器 $X-\sum_jc_jU_j$ 的方差为
+\begin{equation}
+V_0-2c^\top d+c^\top\Gamma c.
+\end{equation}
+若 $z\in\ker\Gamma$，则 $\sum_jz_jU_j=0$ 几乎处处，所以 $z^\top d=0$。因此 $d\in\operatorname{range}\Gamma$，最优系数为 $\Gamma^\dagger d+\ker\Gamma$，超额方差为 $(c-\Gamma^\dagger d)^\top\Gamma(c-\Gamma^\dagger d)$。这最小化协方差迹，不一般同时最小化每个方向。
+
+\section{头尾估计器作为统一定理的实例}
+令 $\tau_P=P(S^c)$、$\tau_Q=Q(S^c)$、$J_A=\mathbf1\{A\notin S\}$，并定义
+\begin{equation}
+H=\sum_{a\in S}P_a\ell_a,\quad
+l=\log(\tau_P/\tau_Q),\quad
+B=\tau_P\KL(P^{\rm tail}\Vert Q^{\rm tail}).
+\end{equation}
+则 $K=H+\tau_Pl+B$。Truncated 返回 $H$，偏差为 $-\tau_Pl-B$；Tail-aware 返回 $H+\tau_Pl$，偏差为 $-B$；Normalized 返回
+\begin{equation}
+K_{\rm norm}=H/P_S+\log(Q_S/P_S),
+\end{equation}
+它是头部条件分布的 KL。后者改变积分权重，不能当成只删除尾部项。
+
+在 $A\sim P$ 下，标量控制族
+\begin{equation}
+\widehat K(c)=H+\tau_Pc+J_A(\ell_A-c)
+\end{equation}
+无偏。设 $\mu_\ell=\E_{P^{\rm tail}}\ell$、$V_\ell=\Var_{P^{\rm tail}}\ell$，全方差公式给出
+\begin{equation}
+\Var\widehat K(c)=\tau_PV_\ell+P_S\tau_P(\mu_\ell-c)^2.
+\end{equation}
+头部精确、尾部采样（Head-Exact Tail-Sampled，HETS）取 $c=0$，桶残差修正取 $c=l$，oracle 取 $c=\mu_\ell$。残差修正优于 HETS 当且仅当 $|\mu_\ell-l|<|\mu_\ell|$。
+
+对梯度令 $h_g=\sum_SP_a\ell_a\psi_a$、$\mu_g=\E_{P^{\rm tail}}(\ell\psi)$、$\bar\psi_{\rm tail}=\nabla\log\tau_P$、$b_{\rm TA}=l\bar\psi_{\rm tail}$。统一向量控制为
+\begin{equation}
+\widehat g(b)=h_g+\tau_Pb+J_A(\ell_A\psi_A-b),
+\end{equation}
+\begin{equation}
+\Cov\widehat g(b)=\tau_P\Cov_{\rm tail}(\ell\psi)
++P_S\tau_P(\mu_g-b)(\mu_g-b)^\top.
+\end{equation}
+HETS 为 $b=0$，ResOPD 为 $b=b_{\rm TA}$。常向量只改变头尾事件间的均值差，不改变尾部内部协方差。
+
+再加入尾部条件零均值方向 $\chi_a=l(\psi_a-\bar\psi_{\rm tail})$，定义
+\begin{equation}
+\widehat g(b,\vartheta)=h_g+\tau_Pb+J_A(\ell_A\psi_A-b-\vartheta\chi_A).
+\end{equation}
+尾部内部与事件控制正交，因为 $\E_{\rm tail}\chi=0$。因此最优 $b=\mu_g$，最优 $\vartheta=D_\chi/V_\chi$，其中
+\begin{equation}
+V_\chi=\E_{\rm tail}\|\chi\|^2,\qquad
+D_\chi=\E_{\rm tail}\langle\ell\psi-\mu_g,\chi\rangle.
+\end{equation}
+配方给出精确代价
+\begin{equation}
+V(b,\vartheta)-V_{\min}
+=P_S\tau_P\|b-\mu_g\|^2
++\tau_PV_\chi(\vartheta-D_\chi/V_\chi)^2.
+\end{equation}
+$V_\chi=0$ 时内部控制不起作用。SC-TA 对应 $b=b_{\rm TA},\vartheta=1$；它比 ResOPD 方差小当且仅当 $2D_\chi>V_\chi$。
+
+即使头部精确，方差也不必比直接抽样小。对任意 integrand $u$，令 $I=\E_Pu$、$H_u=\sum_SP_au_a$，直接展开二阶矩：
+\begin{equation}
+\Var(u_A)-\Var(H_u+J_Au_A)
+=\sum_SP_a\|u_a\|^2-2\langle I,H_u\rangle+\|H_u\|^2.
+\end{equation}
+右侧可负。数值反例 $P=(0.18,0.819,0.001)$、$Q=(0.08,0.67,0.25)$、$S=\{2\}$（按一开始编号），直接 log-ratio 方差约为 $0.088913$，HETS 为 $0.129131$。真实 Rao--Blackwell 化应取条件期望 $\E_P[\ell\mid C]=\ell_C+\KL(P^C\Vert Q^C)$；只知道桶质量时缺少第二项。
+
+\section{提案变化、分层采样与正向 KL}
+从 $\beta$ 采样时，所有残差改为 $J_A(P_A/\beta_A)(h_A-b)$。二阶矩权重是 $P^2/\beta$，所以原有 on-policy 最优控制通常改变。令
+\begin{equation}
+W=\sum_{S^c}P_a^2/\beta_a,\quad U=\sum_{S^c}(P_a^2/\beta_a)h_a,\quad
+T_h=\sum_{S^c}P_ah_a,
+\end{equation}
+展开关于 $b$ 的二次式，最优 $b=(U-\tau_PT_h)/(W-\tau_P^2)$。若 $W=\tau_P^2$，Cauchy--Schwarz 等号要求 $\beta=P^{\rm tail}$，控制项逐样本抵消。此时直接尾部条件采样的方差为 $\tau_P^2\Var_{\rm tail}(h)/M$，不超过同样本数的 on-policy 头尾估计方差。
+
+更一般，分区内独立采样 $M_C$ 次，方差为 $\sum_CP_C^2\sigma_C^2/M_C$。固定连续预算 $\sum_CM_C=M$，Cauchy--Schwarz 给出最优分配 $M_C\propto P_C\sigma_C$；零方差桶直接返回常值，整数预算需另行取整。控制拟合与评估共用随机动作时，$\E U=0$ 不保证 $\E[c(A)U]=0$；应条件化于独立校准数据，或使用交叉拟合并保留折间相关性。
+
+正向 KL 使用同一积分定理取 $\nu=Q,h=-\ell$ 或 $-\psi$。令 $H^{\rm F}=-\sum_SQ_a\ell_a$，则
+\begin{equation}
+K^{\rm F}=H^{\rm F}-\tau_Ql+\tau_Q\KL(Q^{\rm tail}\Vert P^{\rm tail}),
+\end{equation}
+无偏标量控制为 $H^{\rm F}+\tau_Qc+J_A(Q_A/\beta_A)(-\ell_A-c)$。其支持要求覆盖未知的 $Q$ 尾部。直接微分粗化正向 KL 得 $-\sum_CQ_C\bar\psi_C$，其中 $\bar\psi_C$ 仍是 $P^C$ 下的 score 均值。
+
+\section{数值估计与反传的独立核验}
+令 $A\sim P$，$\ell=\ell_A$，并定义 $c_A=P_\theta(A)/\sg(P_\theta(A))$。固定动作求导有
+\begin{equation}
+\nabla\phi(\ell)=\phi'(\ell)\psi,\qquad
+\nabla[c_A\phi(\ell)]=[\phi(\ell)+\phi'(\ell)]\psi.
+\end{equation}
+第二式的期望由式~\eqref{eq:measure-derivative} 恰好恢复积分导数。数值与反传分类如下，均先讨论无截断的解析对象：
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+程序 & 前向值 & 固定样本反传\\
+\midrule
+K1 & $\ell$ & $\psi$\\
+K2 & $\ell^2/2$ & $\ell\psi$\\
+K3 & $e^{-\ell}+\ell-1$ & $(1-e^{-\ell})\psi$\\
+K4：$c_A\sg(\ell)$ & $\ell$ & $\ell\psi$\\
+live K4：$c_A\ell$ & $\ell$ & $(\ell+1)\psi$\\
+K3$^{++}$：$c_A(e^{-\ell}+\ell-1)$ & $e^{-\ell}+\ell-1$ & $\ell\psi$\\
+\bottomrule
+\end{tabular}
+\end{center}
+K1、K3 的数值对逆向 KL 无偏，因为 $\E_Pe^{-\ell}=1$；K2 一般有偏，其反传却是逆向 KL 的无偏 score 梯度。K3 的裸反传期望是 $-\E_Q\psi$，对应正向 KL。K4 与 K3$^{++}$ 的逐样本反传相同，前向方差不同。Top-K 和相应 score 构造的外部背景见 EMA-PG\footfullcite{ema2026}；这里按明确公式区分命名。
+
+若需要正向 KL 的数值与 score 反传同时匹配，可取
+\begin{equation}
+K5=-\sg(e^{-\ell})\ell+\log P_A-\sg(\log P_A).
+\end{equation}
+其前向为 $-e^{-\ell}\ell$，期望为 $K^{\rm F}$；反传为 $(1-e^{-\ell})\psi$，期望为 $g^{\rm F}$。正支持和实际采样测度是这些恒等式的必要条件。
+
+确定性头部数值的真实导数也应保留概率权重项。令 $d_S=\nabla P_S$，则
+\begin{equation}
+\nabla H=h_g+d_S,\quad
+\nabla(H+\tau_Pl)=h_g-ld_S,\quad
+\nabla K_{\rm norm}=\frac{h_g}{P_S}-\frac{H}{P_S^2}d_S.
+\end{equation}
+最后一式对商 $H/P_S$ 求导并与 $-\log P_S$ 的导数抵消得到，分母明确为标量 $P_S^2$。
+
+头尾 score 常数必须匹配：$h_g+\upsilon d_S+J_A(\ell_A+\upsilon)\psi_A$ 对任意固定 $\upsilon$ 无偏，因为 $\E_PJ_A\psi_A=-d_S$。只在头部或尾部保留一个常数项，会分别留下 $\pm d_S$ 偏差。
+
+可以用 $\sg(F)+L-\sg(L)$ 让前向显示 $F$、反向使用 $L$ 的导数；这不意味着前向的普通导数就是更新场。HETS 与 ResOPD 的固定样本势分别为
+\begin{equation}
+H-P_S+\tfrac12J_A\ell_A^2,\qquad
+K_{\rm TA}+\tfrac12J_A(\ell_A^2-l^2).
+\end{equation}
+SC-TA 的场 $\nabla K_{\rm TA}+J_A(\ell_A-l)\nabla\ell_A$ 一般非保守，其交叉偏导差是
+\begin{equation}
+-J_A[(\partial_i l)\psi_j-(\partial_j l)\psi_i].
+\end{equation}
+取三动作 softmax、$S=\{1\},A=2$，$(i,j)=(1,2)$ 时该差为 $P_1P_3/(1-P_1)>0$。总体期望仍可为真实梯度，因为参数依赖采样测度的导数补上了额外项。
+
+\section{配分函数估计与可控展开}
+固定 $q,f$，$Z=\E_qe^f$。精确头部加尾部样本均值无偏估计 $Z$，但若 $\widehat Z>0$、$\E|\log\widehat Z|<\infty$，Jensen 给
+\begin{equation}
+\E\log\widehat Z\le\log Z,
+\end{equation}
+非退化时严格。这个结论只针对 plug-in，不排除其他信息条件下无偏估计 $\log Z$。例如有限词表完全覆盖事件 $E$ 的概率 $c>0$ 已知时，$\mathbf1_E\log Z/c$ 是无偏构造，方差为 $(c^{-1}-1)(\log Z)^2$，但通常成本很高。
+
+对固定有限正分布，设 $\widehat Z_M$ 是有界独立尾部变量的均值加确定头部，且有与 $M$ 无关的正下界。令 $\epsilon=\widehat Z_M-Z$，尾部单样本方差为 $V$。则
+\begin{equation}
+\E\epsilon=0,\quad \E\epsilon^2=V/M,\quad
+\E\epsilon^4=O(M^{-2}),\quad \E|\epsilon|^3=O(M^{-3/2}).
+\end{equation}
+第四矩展开仅留下四索引相同和两两配对项，分别为 $O(M)$、$O(M^2)$，除以 $M^4$ 得结论；第三绝对矩由 Cauchy--Schwarz 控制。$\log$ 的三阶导数在统一正区间有界，因此全区间 Taylor 余项满足 $|R_3|\le C|\epsilon|^3$。取期望得到
+\begin{equation}
+\E\log\widehat Z_M-\log Z=-\frac{V}{2MZ^2}+O(M^{-3/2}).
+\end{equation}
+方差中线性项贡献 $V/(MZ^2)$，其与二次项的交叉由第三矩控制，二次项平方由第四矩控制，故 $\Var\log\widehat Z_M=V/(MZ^2)+O(M^{-3/2})$。
+
+几何信号 $f=\eta r$ 时可改用累积量展开。令 $\varphi(t)=\log\E_qe^{tr}$，指数倾斜分布为 $q_t\propto qe^{tr}$。逐项微分得 $\varphi^{(j)}(t)$ 为 $q_t$ 下第 $j$ 阶累积量。有限阶 Taylor 公式给出
+\begin{equation}
+\varphi(\eta)=\sum_{j=1}^L\frac{\eta^j}{j!}\varphi^{(j)}(0)
++\frac{\eta^{L+1}}{L!}\int_0^1(1-u)^L\varphi^{(L+1)}(u\eta)\,du.
+\end{equation}
+每阶累积量可按集合分拆 $\pi$ 写成
+\begin{equation}
+\kappa_j(r)=\sum_{\pi\in\mathcal P_j}(|\pi|-1)!(-1)^{|\pi|-1}
+\prod_{B\in\pi}\E r^{|B|}.
+\end{equation}
+用互异样本索引的乘积平均替代每个矩乘积，即得到无偏估计，要求样本数 $M\ge j$。独立性逐项保证均值正确。固定阶有界核的两项乘积只在索引交叠时可能有协方差，交叠概率为 $O(1/M)$，故方差及各阶协方差均为 $O(1/M)$。截断估计的偏差正是上式积分余项的负值；无限级数还需位于收敛半径内。
+
+另一种展开从确定头部 $Z_H>0$ 开始。令 $\tau=\E_qu$ 为尾部贡献，若 $\tau/Z_H<1$，则
+\begin{equation}
+\log(Z_H+\tau)=\log Z_H+\sum_{j=1}^L\frac{(-1)^{j+1}}j(\tau/Z_H)^j+R_{L+1},
+\quad |R_{L+1}|\le\frac{(\tau/Z_H)^{L+1}}{L+1}.
+\end{equation}
+用互异索引乘积的 U-统计量无偏估计 $\tau^j$，样本数 $M\ge L$，留下可控的确定截断偏差。尾部均值小不自动提供逐样本小上界，实际方差仍要由核的矩计算。

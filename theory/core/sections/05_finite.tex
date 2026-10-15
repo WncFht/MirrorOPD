@@ -1,0 +1,55 @@
+\chapter{有限拟合与外层进展}
+\label{ch:finite}
+\section{从本轮拟合到教师接近度}
+\begin{theorem}[重心进展恒等式]
+\label{thm:progress}
+对任意候选 $p$，令 $c_\kappa=Z^\kappa$，端点 $\kappa=0,1$ 取 $c_\kappa=1$，则
+\begin{align}
+\eta[D_\kappa(T\Vert q)-D_\kappa(T\Vert p)]
+={}&(1-\eta)D_\kappa(q\Vert p)\nonumber\\
+&+c_\kappa[D_\kappa(m\Vert q)-D_\kappa(m\Vert p)].
+\label{eq:progress}
+\end{align}
+因此 $D_\kappa(m\Vert p)\le D_\kappa(m\Vert q)$ 是教师散度非增的充分条件。精确更新 $p=m$ 在 $q\ne T$ 时严格改善。
+\end{theorem}
+\begin{proof}
+重心定义给出 $F(q)=\eta D_\kappa(T\Vert q)$。另一方面，定理~\ref{thm:target} 给出 $F(q)-F(p)=c_\kappa[D_\kappa(m\Vert q)-D_\kappa(m\Vert p)]$。代入 $F(p)$ 并移项得到恒等式。条件成立时右侧两项非负。若 $p=m$ 且 $q\ne T$，则 $m\ne q$，右侧第一项严格为正。
+\end{proof}
+
+精确幂均值更新还有更强性质：它同时降低所有凸生成的教师 $f$-散度。证明使用概率比的共同交点，见\appref{app:shape}。有限 inner 降低某个拟合损失却不足以自动继承这一性质。
+
+\section{拟合误差证书}
+MDPO 的超额损失 $\delta$ 精确对应 $\KL(p\Vert m)=\eta\delta$，由 Pinsker 不等式得到 $\TV(p,m)\le\sqrt{\eta\delta/2}$。BPO 控制的是按 $q$ 加权的对数比方差。若另有 $q_a\ge q_{\min}>0$，则
+\begin{equation}
+d_H(p,m):=\osc_a\log(p_a/m_a)
+\le2\sqrt{\eta L_{\rm BPO}/q_{\min}},
+\quad
+\TV(p,m)\le\tanh[d_H(p,m)/4].
+\label{eq:bpo-certificate-main}
+\end{equation}
+最小锚点概率极小时，这个证书可能很弱；推导与锐 TV 界见\appref{app:measure}、\appref{app:dynamics}。
+
+这种限制确实会发生。取
+\begin{equation}
+q=(0.4999995,0.4999995,10^{-6}),\quad
+T=(0.8,0.199999,10^{-6}),\quad
+\kappa=\tfrac12,\quad\eta=0.3,
+\end{equation}
+并令 $p\propto m\exp(0,0,12)$。直接求和得到
+\begin{equation}
+L_{\rm BPO}(q)\simeq0.062277,\quad L_{\rm BPO}(p)\simeq0.000240,
+\qquad
+\KL(q\Vert T)\simeq0.223145,\quad\KL(p\Vert T)\simeq1.654219.
+\end{equation}
+稀有动作的对数误差在 $q$ 下权重很小，却可以改变归一化后的学生质量。因此需要区分 loss 下降与目标教师拟合证书。
+
+\section{有效保证的条件}
+从 $q$ 出发，使用精确锚点 Fisher 预条件的 BPO 产生理想路径
+\begin{equation}
+p_\xi\propto q\exp(\xi f),\qquad 0\le\xi\le1.
+\end{equation}
+沿这条路径，所有凸生成的教师散度非增。该结论依赖路径、完整期望与自由 logits；普通神经网络优化器不自动位于这条路径上，证明见\appref{app:inner}。
+
+固定教师的精确外层收敛，允许通过输出误差递推扩展到近似拟合。应先由内层损失、中心误差和表示限制建立输出误差，再分析多轮累积；梯度估计的方差不能直接替代输出误差。
+
+最后，正文的目标是固定前缀测度下的条件目标。完整序列 KL 使用随策略变化的访问权重；条件 KL 逐前缀下降，也可能同时让学生更频繁进入误差较大的分支。序列反例、后缀价值修正和同步边界见\appref{app:dynamics}。TOP-D 的目标教师由算术端点精确恢复，其收缩与方差性质见\appref{app:topd}。

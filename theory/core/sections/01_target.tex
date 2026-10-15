@@ -1,0 +1,73 @@
+\chapter{加权最优化与目标教师}
+\label{ch:target}
+\section{每轮外层的最优化问题}
+固定一个前缀，词表 $\mathcal V$ 有限，$|\mathcal V|\ge2$。教师 $T$ 与本轮冻结学生 $q=q_k$ 都严格为正且归一化。先允许每个前缀的候选分布独立变化；参数化约束在第~\ref{ch:inner} 章引入。令 $\Delta$ 为闭概率单纯形，$\Delta^\circ$ 为其内部。
+
+采用如下幂散度约定\footfullcite{cichocki2010}：
+\begin{equation}
+D_\kappa(P\Vert Q)=
+\frac{1-\sum_aP_a^\kappa Q_a^{1-\kappa}}{\kappa(1-\kappa)},
+\qquad 0<\kappa<1.
+\label{eq:power-divergence}
+\end{equation}
+两个连续端点为 $D_0(P\Vert Q)=\KL(Q\Vert P)$、$D_1(P\Vert Q)=\KL(P\Vert Q)$。因此以教师为第一自变量时，$\kappa=0$ 给出学生逆向 KL，$\kappa=1$ 给出学生正向 KL。
+
+从一开始引入形状 $\kappa\in[0,1]$ 和教师权重 $\eta\in(0,1)$：
+\begin{equation}
+\boxed{m_k=\argmin_{p\in\Delta}F_k(p),\qquad
+F_k(p)=(1-\eta)D_\kappa(q_k\Vert p)+\eta D_\kappa(T\Vert p).}
+\label{eq:barycenter-problem}
+\end{equation}
+这个问题同时惩罚偏离锚点和偏离教师。$\eta$ 指定两者的权重，$\kappa$ 指定散度形状。所得 $m_k$ 称为本轮目标教师；实际回复仍可由 $q_k$ 生成。
+
+\section{唯一解与拟合误差}
+\begin{theorem}[归一化幂均值目标]
+\label{thm:target}
+对 $0<\kappa\le1$，定义
+\begin{equation}
+h_a=[(1-\eta)q_a^\kappa+\eta T_a^\kappa]^{1/\kappa},
+\qquad Z=\sum_ah_a,\qquad m_a=h_a/Z.
+\label{eq:target}
+\end{equation}
+它是式~\eqref{eq:barycenter-problem} 的唯一解。$\kappa=0$ 的连续端点为 $m_a=q_a^{1-\eta}T_a^\eta/Z$。当 $0<\kappa<1$ 时，
+\begin{equation}
+F(p)-F(m)=Z^\kappa D_\kappa(m\Vert p).
+\label{eq:barycenter-gap}
+\end{equation}
+端点 $\kappa=0,1$ 的超额损失分别为 $\KL(p\Vert m)$、$\KL(m\Vert p)$。
+\end{theorem}
+\begin{proof}
+令 $S_a=(1-\eta)q_a^\kappa+\eta T_a^\kappa$。对内点 $p$，
+\begin{equation}
+F(p)=\frac{1-\sum_aS_ap_a^{1-\kappa}}{\kappa(1-\kappa)},\quad
+\partial_{p_a}F=-\frac{S_a}{\kappa}p_a^{-\kappa},\quad
+\partial^2_{p_a}F=S_ap_a^{-\kappa-1}>0.
+\end{equation}
+加入约束乘子 $\nu$，一阶条件为 $S_ap_a^{-\kappa}=\kappa\nu$，归一化即得 $p=m$。为同时覆盖边界并证明全局唯一性，利用 $S_a=Z^\kappa m_a^\kappa$ 直接写出
+\begin{equation}
+F(p)=\frac{1-Z^\kappa}{\kappa(1-\kappa)}
++Z^\kappa D_\kappa(m\Vert p).
+\end{equation}
+Hölder 不等式给出 $\sum_am_a^\kappa p_a^{1-\kappa}\le1$，等号要求两个归一化向量相同；边界上也只有 $p=m$ 可以取等。因此得到唯一解与超额损失。
+
+在 $\kappa=0$ 时，展开加权 KL 得 $F(p)=\KL(p\Vert m)-\log Z$。在 $\kappa=1$ 时，令 $m=(1-\eta)q+\eta T$，逐项相减得
+\begin{equation}
+F(p)-F(m)=\sum_am_a\log(m_a/p_a).
+\end{equation}
+两端的 KL 非负性给出相同的唯一性结论。最后对 $q_a^\kappa,T_a^\kappa$ 在零处展开，得到 $\log h_a\to(1-\eta)\log q_a+\eta\log T_a$，证明连续端点。
+\end{proof}
+
+幂均值重心属于已有的 $\alpha$ 散度模型汇合框架\footfullcite{amari2007}。本文使用它组织外层目标、内层投影与误差分析。最优化问题与拟合误差的精确关系是式~\eqref{eq:barycenter-gap}，不只是一条最优点相同的结论。
+
+\section{三个代表形状}
+\begin{equation}
+\begin{aligned}
+m_{0,\eta}&\propto q^{1-\eta}T^\eta,\\
+m_{1/2,\eta}&\propto[(1-\eta)\sqrt q+\eta\sqrt T]^2,\\
+m_{1,\eta}&=(1-\eta)q+\eta T.
+\end{aligned}
+\label{eq:three-targets}
+\end{equation}
+几何端点在 log-odds 坐标中走直线；算术端点在概率坐标中走直线；平方根点在平方根概率单位球面上走短弧。$\eta$ 对平方根点通常不是弧长比例。所有形状在 $\eta=0,1$ 分别到达 $q,T$，端点通过连续延拓理解。
+
+只有算术端点的归一化常数恒为一。一般情况下不能删除 $Z$，也不能把幂均值目标当成概率的算术加权。其几何、覆盖界与多教师推广见\appref{app:objective}、\appref{app:shape}。

@@ -1,0 +1,189 @@
+\chapter{重心、教师目标与镜像下降}
+\label{app:objective}
+\section{密度比矩、散度与几何重加权}
+固定教师 $T$，当前学生 $p=p_\theta$，令 $\rho=T/p$，定义 $g(u)=\E_p\rho^u=\sum_aT_a^up_a^{1-u}$。有限正支持下可逐项求导：
+\begin{equation}
+g(0)=g(1)=1,\quad g'(u)=\E_p[\rho^u\log\rho],\quad
+g''(u)=\E_p[\rho^u\log^2\rho]\ge0.
+\end{equation}
+两个端点斜率为 $g'(0)=-\KL(p\Vert T)$、$g'(1)=\KL(T\Vert p)$。因此 $D_\kappa(T\Vert p)=[1-g(\kappa)]/[\kappa(1-\kappa)]$ 在两个端点连续恢复对应 KL；严格凸性或 Hölder 给 $g(\kappa)<1$，除非 $p=T$。
+
+对学生参数求导，$T$ 冻结，概率项 $p_a^{1-\kappa}$ 的导数为 $(1-\kappa)p_a^{1-\kappa}\psi_a$。所以
+\begin{equation}
+-\nabla_\theta D_\kappa(T\Vert p)
+=\frac1\kappa\E_p[\rho^\kappa\psi]
+=\E_p\left[\frac{\rho^\kappa-1}{\kappa}\psi\right].
+\end{equation}
+第二式使用 $\E_p\psi=0$。$\kappa\downarrow0$ 给逆向 KL 的 log-ratio 方向；$\kappa=1$ 给 $\E_T\psi$。令 $\pi_\kappa\propto T^\kappa p^{1-\kappa}$，相同梯度也写成 $g(\kappa)\E_{\pi_\kappa}\psi/\kappa$。这个几何重加权测度随当前学生变化，解释每次冻结测度后的局部最大似然方向。
+
+在 $\kappa\downarrow0$，$\pi_\kappa=p[1+\kappa C_p\log(T/p)]+O(\kappa^2)$，所以 $\E_{\pi_\kappa}\psi$ 的零阶项为零，一阶项与外部 $1/\kappa$ 抵消。这里的 $\pi_\kappa$ 是梯度积分的测度，通常不等于重心问题的 $m_{\kappa,\eta}$；后者还包含独立的插值参数 $\eta$。
+
+\section{加权重心的两个端点与多教师形式}
+对 $\kappa=0$，令 $Z_0=\sum_aq_a^{1-\eta}T_a^\eta$。展开各对数可得
+\begin{equation}
+(1-\eta)\KL(p\Vert q)+\eta\KL(p\Vert T)
+=\KL(p\Vert m_{0,\eta})-\log Z_0.
+\end{equation}
+对 $\kappa=1$，$m=(1-\eta)q+\eta T$，因此
+\begin{align}
+&(1-\eta)\KL(q\Vert p)+\eta\KL(T\Vert p)\\
+&\quad=\KL(m\Vert p)+(1-\eta)\KL(q\Vert m)+\eta\KL(T\Vert m).
+\end{align}
+两式既确定最优分布，也确定有限误差应使用哪个 KL 方向。
+
+对任意有限个正分布 $T^{(j)}$ 与非负权重 $w_j$、$\sum_jw_j=1$，令 $S_a=\sum_jw_j(T_a^{(j)})^\kappa$。正文证明逐项保持不变，得到
+\begin{equation}
+m_a=\frac{S_a^{1/\kappa}}{\sum_bS_b^{1/\kappa}},
+\qquad
+\sum_jw_jD_\kappa(T^{(j)}\Vert p)
+-\sum_jw_jD_\kappa(T^{(j)}\Vert m)
+=Z^\kappa D_\kappa(m\Vert p).
+\end{equation}
+几何端点取 $m\propto\prod_j(T^{(j)})^{w_j}$，算术端点取加权概率和。锚点可作为一个分布加入。多教师重心并不意味着每个教师距离都下降；各教师目标可能冲突。
+
+对 $0<\kappa<1$，重心目标在最优点的概率 Hessian 为 $Z^\kappa\diag(1/m)$。若参数化模型恰好实现 $m$，令概率 Jacobian 为 $B_\theta=\partial p/\partial\theta$，则
+\begin{equation}
+\nabla_\theta^2F(p_\theta)\big|_{p=m}
+=Z^\kappa B_\theta^\top\diag(1/m)B_\theta.
+\end{equation}
+链式法则的另一项为 $\sum_a(\partial F/\partial p_a)\nabla_\theta^2p_a$；最优点的概率梯度是常数向量，该项由 $\sum_ap_a=1$ 消失。离开可实现最优点时不能删除这项。
+
+\section{逆向构造的唯一性与通用信号}
+若要求 $D_\omega(T\Vert p)$ 的逐坐标梯度是 $-A(T/p)$，透视函数求导强制 $\omega-x\omega'=-A$。于是
+\begin{equation}
+(\omega(x)/x)'=A(x)/x^2.
+\end{equation}
+加上 $\omega(1)=0$ 唯一确定正文积分式；$A(1)=0$ 再保证 $\omega'(1)=0$。若只指定单纯形上的梯度，允许添加不改变散度的线性规范项；这里的规范化消除了该自由度。
+
+更一般，若 $S(1)=0$、$S'(x)>0$，定义
+\begin{equation}
+\omega_S(x)=x\int_1^xS(u)u^{-2}\,du,\qquad
+J_S(p;T)=D_{\omega_S}(T\Vert p).
+\end{equation}
+则 $\omega_S''=S'/x>0$、$\nabla_pJ_S=-S(T/p)$，熵镜像步为 $p^+\propto q e^{\tau S(T/q)}$。若 $L_S=\sup_{x>0}xS'(x)<\infty$，则
+\begin{equation}
+\nabla_p^2J_S=\diag[x_aS'(x_a)/p_a]\preceq L_S\nabla^2\Phi.
+\end{equation}
+这证明相对光滑性。它本身不保证统一方差、可估计中心或有限神经网络拟合。
+
+\section{完整的下降与收敛推导}
+固定 $\kappa,\eta,T$，记 $J=J_{\kappa,\eta}$，另取 $0<\tau\le\eta$。$p^+$ 最小化 $\langle\nabla J(q),p-q\rangle+\KL(p\Vert q)/\tau$。一阶条件与概率差作内积，得
+\begin{equation}
+\langle\nabla J(q),p^+-q\rangle
+=-\tau^{-1}[\KL(p^+\Vert q)+\KL(q\Vert p^+)].
+\end{equation}
+将它代入相对光滑式：
+\begin{equation}
+J(q)-J(p^+)\ge\tau^{-1}\KL(q\Vert p^+)
++(\tau^{-1}-\eta^{-1})\KL(p^+\Vert q).
+\label{eq:J-descent-app}
+\end{equation}
+凸性给出 $J(q)\le\langle\nabla J(q),q-T\rangle$，因为 $J(T)=0$。因此
+\begin{align}
+J(p^+)
+&\le\langle\nabla J(q),p^+-T\rangle+\eta^{-1}\KL(p^+\Vert q)\\
+&=\tau^{-1}[\KL(T\Vert q)-\KL(T\Vert p^+)]
+-(\tau^{-1}-\eta^{-1})\KL(p^+\Vert q).
+\label{eq:J-three-point}
+\end{align}
+第二行可直接核对：最优性条件使梯度与 $-\tau^{-1}\log(p^+/q)$ 相差常数，常数与 $p^+-T$ 的内积为零；展开三个 KL 即得到该式。
+
+每步重新计算信号并刷新 $q_{k+1}=p^+(q_k)$，对式~\eqref{eq:J-three-point} 求和：
+\begin{equation}
+\sum_{k=0}^{K-1}\tau_kJ(q_{k+1})\le\KL(T\Vert q_0).
+\end{equation}
+由式~\eqref{eq:J-descent-app}，$J(q_K)\le J(q_{k+1})$，故
+\begin{equation}
+J(q_K)\le\frac{\KL(T\Vert q_0)}{\sum_{k<K}\tau_k}.
+\end{equation}
+固定正 $\tau$ 或 $\sum_k\tau_k=\infty$ 时目标趋于零。对 $\kappa=0$，KL 的连续延拓与唯一零点给出 $q_k\to T$。对 $\kappa>0$，还需排除边界极限。令
+\begin{equation}
+d_\infty=\int_1^\infty A(u)u^{-2}\,du.
+\end{equation}
+$0<A(u)\le(\log u)/\eta$ 在 $u>1$ 上成立，故 $0<d_\infty\le1/\eta$。若某坐标 $p_a\to0$，则 $p_a\omega(T_a/p_a)\to T_ad_\infty>0$。因此目标趋零的序列不可能在边界聚集；内点零点唯一为 $T$，结合有限单纯形紧性得到整个序列收敛。
+
+上述求和要求同一个 $J$。逐轮改变 $\eta$ 或 $\kappa$ 时，不能直接把各轮不同函数的下降式望远镜相消。固定前缀测度的正加权和保留推导；策略变化引起的访问测度刷新另见附录~\ref{app:dynamics}。
+
+\section{端点、JS 与曲率插值}
+在固定正 $x$ 的紧积分区间上，
+\begin{equation}
+A_{0,\eta}(x)=\log x,\qquad
+\lim_{\eta\downarrow0}A_{\kappa,\eta}(x)=\frac{x^\kappa-1}{\kappa},
+\qquad
+\lim_{\eta\uparrow1}A_{\kappa,\eta}(x)=\log x.
+\end{equation}
+分母在紧区间内有统一正下界，故可在 $\omega$ 的有限积分中取极限。对应二阶导数及在一处的两项规范化条件唯一确定生成函数，得到正文的三个 $J$ 端点。
+
+对 $\kappa=1$，令 $b=1-\eta$、$B=b+\eta x$。分部积分给出
+\begin{align}
+\omega_{1,\eta}(x)
+&=-\eta^{-1}\log B+x\int_1^x\frac{du}{u(b+\eta u)}\\
+&=\frac{x\log x}{b}-\left(\eta^{-1}+\frac xb\right)\log B
+=\frac{\eta x\log x-B\log B}{\eta b}.
+\end{align}
+代入 $x=T_a/p_a$ 并求和，记 $M_p=bp+\eta T$：
+\begin{align}
+J_{1,\eta}(p;T)
+&=\frac{\eta\KL(T\Vert p)-\KL(M_p\Vert p)}{\eta b}\\
+&=\frac{b\KL(p\Vert M_p)+\eta\KL(T\Vert M_p)}{\eta b}
+=\frac{\JS_\eta(p,T)}{\eta(1-\eta)}.
+\label{eq:JS}
+\end{align}
+第二个等号由 $M_p=bp+\eta T$ 展开对数得到。一般 $\kappa$ 的曲率满足
+\begin{equation}
+\frac1{\omega_{\kappa,\eta}''(x)}
+=(1-\eta)x^{2-\kappa}+\eta x^2
+=\frac{1-\eta}{g_\kappa''(x)}+\frac{\eta}{g_0''(x)}.
+\end{equation}
+因此这里插值的是生成函数曲率的倒数，通常不是两个散度的线性组合。各生成函数均有 $\omega''(1)=1$，故不同 $\eta$ 的目标也不能一般通过整体缩放互相替代。
+
+\section{统一有界性与教师中心}
+当 $\kappa>0,\eta<1$，令 $c=-\log(1-\eta)/(\kappa\eta)$。由 $A(x)\to-c$ 当 $x\downarrow0$，可得
+\begin{equation}
+\lim_{x\downarrow0}\omega(x)=c,\qquad
+\lim_{x\to\infty}\omega(x)/x=d_\infty.
+\end{equation}
+第一式把积分拆为 $[x,b]$ 与 $[b,1]$：选小 $b$ 使 $|A(u)+c|\le\epsilon$，前段误差不超过 $\epsilon x(1/x-1/b)$，后段乘 $x$ 趋零。凸函数导数不超过无穷远渐近斜率，所以 $\omega(x)\le c+d_\infty x$。于是
+\begin{equation}
+0\le J(p;T)\le c+d_\infty.
+\end{equation}
+取 $p=(\epsilon,1-\epsilon)$、$T=(1-\epsilon,\epsilon)$，两坐标分别趋于 $d_\infty,c$，证明这是锐上确界。
+
+教师中心有生成函数 $\phi(x)=x-1-A(x)$，因为 $\E_q(T/q-1)=0$：
+\begin{equation}
+K_T=D_\phi(T\Vert q).
+\end{equation}
+计算得
+\begin{equation}
+\frac{\phi''(x)}{\omega''(x)}
+=1-\frac{\kappa(1-\eta)}{1-\eta+\eta x^\kappa}\in[1-\kappa,1].
+\end{equation}
+两生成函数在一处的值和一阶导数均为零。对二阶导数差积分两次，可知 $\phi-(1-\kappa)\omega$ 与 $\omega-\phi$ 均非负。因此
+\begin{equation}
+(1-\kappa)J(q;T)\le K_T\le J(q;T).
+\label{eq:center-sandwich}
+\end{equation}
+中心作为当前分布函数时，梯度为
+\begin{equation}
+\partial_{p_a}K_T(p,T)
+=-A(x_a)+\frac{x_a^\kappa}{1-\eta+\eta x_a^\kappa}-1.
+\end{equation}
+额外项一般随动作变化，所以中心不是教师目标 $J$ 的替代梯度。
+
+\section{固定幂散度的镜像步与小步流}
+若直接固定目标 $D_\kappa(T\Vert p)$，可取概率梯度代表 $(1-(T/p)^\kappa)/\kappa$。其步长 $\tau$ 的熵镜像解是
+\begin{equation}
+\widetilde m_a\propto q_a
+\exp\left[\frac{\tau}{\kappa}\big((T_a/q_a)^\kappa-1\big)\right].
+\end{equation}
+它与幂均值目标仅一阶一致。对后者展开 $h_a=q_a[1+\eta(\rho_a^\kappa-1)/\kappa+O(\eta^2)]$，除以其总和得到式~\eqref{eq:velocity-main}。在 Fisher 内积 $\langle v,w\rangle_q=\sum_av_aw_a/q_a$ 下，任意切向量 $w$ 满足
+\begin{equation}
+\langle v_\kappa,w\rangle_q
+=-\sum_aw_a\,\partial_{q_a}D_\kappa(T\Vert q),
+\end{equation}
+因为 $\sum_aw_a=0$ 消去常数。连续流 $\dot q=v_\kappa$ 因而有
+\begin{equation}
+\frac d{dt}D_\kappa(T\Vert q)
+=-\|v_\kappa\|_q^2=-\frac{\Var_q(\rho^\kappa)}{\kappa^2}.
+\end{equation}
+这些展开固定正分布，余项不对任意极端密度比统一。

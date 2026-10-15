@@ -1,0 +1,73 @@
+\chapter{形状与插值强度的性质}
+\label{ch:parameters}
+\section{路径、覆盖与局部速度}
+固定 $q,T$ 时，$\eta$ 从零增加到一，把目标教师从锚点移向教师。对固定 $\kappa$，任意凸生成散度 $D_\varphi(m_{\kappa,\eta}\Vert q)$ 随 $\eta$ 非减；不同 $\kappa$ 下，相同 $\eta$ 不代表相同距离。其交点证明见\appref{app:shape}。
+
+正形状有一个分布无关的覆盖保证：
+\begin{equation}
+m_a\ge(1-\eta)^{1/\kappa}q_a+\eta^{1/\kappa}T_a,\qquad 0<\kappa\le1.
+\label{eq:coverage-main}
+\end{equation}
+证明使用 $h_a\le(1-\eta)q_a+\eta T_a$，故 $Z\le1$；以及 $(x+y)^{1/\kappa}\ge x^{1/\kappa}+y^{1/\kappa}$。于是 $m_a=h_a/Z\ge h_a$ 给出下界。几何端点没有统一的正教师覆盖系数。
+
+对固定严格正分布，小步展开为
+\begin{equation}
+m_a=q_a+\eta v_{\kappa,a}+O(\eta^2),\qquad
+v_{\kappa,a}=\frac{q_a}{\kappa}
+\left[(T_a/q_a)^\kappa-\E_q(T/q)^\kappa\right].
+\label{eq:velocity-main}
+\end{equation}
+$\kappa=0$ 时取连续极限 $v_{0,a}=q_aC_q\log(T_a/q_a)$。这是 $D_\kappa(T\Vert q)$ 在 Fisher 度量下的负自然梯度。形状改变高维方向，不能通常由一个学习率缩放替代。
+
+\section{监督尾部与方差阈值}
+当 $\kappa>0,\eta<1$ 时，
+\begin{equation}
+A_{\kappa,\eta}(x)\ge-c_{\kappa,\eta},\qquad
+c_{\kappa,\eta}=-\frac{\log(1-\eta)}{\kappa\eta}.
+\end{equation}
+正尾部仍无逐点统一上界，但在 $q$ 下利用 $\E_q(T/q)=1$ 可以控制矩。令 $V_{\kappa,\eta}=\Var_q A_{\kappa,\eta}(T/q)$。对每个固定正 $\eta<1$ 和 $\kappa>0$，$V$ 在所有有限正概率分布上有统一有限上界。
+
+更强的小步问题需要另一个结论：
+\begin{equation}
+\sup_{q,T}V_{\kappa,\eta}
+=\Theta_\kappa\!\left(\eta^{\min\{2,1/\kappa\}-2}\right),
+\qquad \eta\downarrow0,\quad\kappa>0.
+\label{eq:variance-threshold-main}
+\end{equation}
+所以保持统一小步方差有界的区间为 $0<\kappa\le1/2$。几何端点对任意固定正 $\eta$ 都没有分布无关界。这里上确界允许分布随 $\eta$ 改变；固定一对正分布时，每种形状的小步极限都有限。
+
+对 $0<\kappa\le1/2$，还有误差相关界
+\begin{equation}
+V_{\kappa,\eta}
+\le\frac{D_\kappa(T\Vert q)}{\kappa(1-\eta)^2}
+\le\frac{K_T}{\kappa(1-\kappa)(1-\eta)^2}.
+\label{eq:error-variance-main}
+\end{equation}
+若 score 范数统一不超过 $S$，中心化教师梯度的协方差迹不超过 $S^2V$。标量监督方差与完整参数梯度方差由这个额外条件连接；精确均值中心本身不保证 score 梯度的方差最小。
+
+\section{平方根点的作用与限制}
+令 $a=\sum_v\sqrt{q_vT_v}$、$w=1-\eta$。平方根目标满足
+\begin{equation}
+\sqrt m=\frac{w\sqrt q+\eta\sqrt T}{\sqrt Z},\qquad
+Z=w^2+\eta^2+2w\eta a.
+\end{equation}
+因为 $Z\le1$，
+\begin{equation}
+\sum_v\sqrt{m_vT_v}=\frac{wa+\eta}{\sqrt Z}\ge wa+\eta,
+\quad
+H^2(m,T)\le(1-\eta)H^2(q,T).
+\label{eq:hellinger-contraction-main}
+\end{equation}
+这是精确分布更新的全局收缩。所有形状在固定正教师附近却共享
+\begin{equation}
+m_{\kappa,\eta}(T+\delta,T)
+=T+(1-\eta)\delta+O(\|\delta\|^2).
+\label{eq:local-rate-main}
+\end{equation}
+因此平方根的全局 Hellinger 保证不代表更好的局部一阶概率收缩率。
+
+平方根点唯一最小化小步监督方差相对于自身教师散度的最坏比值；若改为最小化绝对最坏方差，最优形状约为 $0.441928$。两种准则的推导在\appref{app:shape}。固定 $q,\eta$ 时，BPO 的独立 logits Hessian 为
+\begin{equation}
+\nabla_z^2L_{\rm BPO}=\eta^{-1}[\diag(q)-qq^\top],
+\end{equation}
+其中不含 $\kappa$。形状改变目标和初始残差，不能由此宣称改善该二次问题的条件数。

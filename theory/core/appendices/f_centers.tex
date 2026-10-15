@@ -1,0 +1,169 @@
+\chapter{条件中心与有限样本拟合}
+\label{app:centers}
+\section{中心估计代入损失后的对象}
+固定前缀、锚点和候选参数，记 $h_a=U_a-f_a$、$R=C_qh$、$\psi_a=\nabla\log p_a$。BPO 梯度为 $\eta^{-1}\Cov_q(h,\psi)$。这里中心化是损失定义的一部分；用于 score 估计的额外 baseline 是另一个选择。
+
+对 Mean，设 $\widehat c_f$ 与主动作 $A\sim q$ 独立，且其分布不依赖学生参数，$\E\widehat c_f=\E_qf$。平方展开给出
+\begin{equation}
+\E\left[\tfrac12(U_A-f_A+\widehat c_f)^2\right]
+=L_{\rm Mean}+\tfrac12\Var(\widehat c_f).
+\end{equation}
+独立零均值误差使交叉项消失，最后一项与学生无关，因此梯度无偏。只知道数值估计无偏而没有独立性时，不能做此抵消。
+
+对 BPO，令主动作 $A$ 和 $M$ 个辅助动作 $B_j$ 独立同分布于 $q$。记 $\bar h_B=M^{-1}\sum_jh_{B_j}$。独立性给出
+\begin{equation}
+\E(h_A-\bar h_B)^2=(1+M^{-1})\Var_qh.
+\end{equation}
+因此 $\frac{M}{M+1}(h_A-\bar h_B)^2/(2\eta)$ 对损失和直接反传梯度均无偏。与 Mean 不同，辅助中心含有学生参数，额外方差项的导数不能丢掉。同前缀共 $M\ge2$ 个动作的留一中心对应倍率 $(M-1)/M$。
+
+\section{无中心样本方差与 U-统计量}
+两个独立动作给出
+\begin{equation}
+L_{\rm BPO}=\frac1{4\eta}\E_{a,b\sim q}(h_a-h_b)^2,\qquad
+\bm G=\nabla L_{\rm BPO}
+=\E_{a,b}\frac{(h_a-h_b)(\psi_a-\psi_b)}{2\eta}.
+\label{eq:pairwise}
+\end{equation}
+逐项展开利用 $\E h_a h_b=(\E h)^2$ 即证。若 $p=\operatorname{softmax}(z)$，$h_a-h_b=z_a-z_b-\log(q_a/q_b)-(f_a-f_b)$，学生配分函数与两个条件中心全部消失。
+
+对 $M\ge2$ 个独立动作，定义
+\begin{equation}
+\widehat L_M=\frac{\sum_i(h_i-\bar h)^2}{2\eta(M-1)},\qquad
+\nabla\widehat L_M=\frac{\sum_i(h_i-\bar h)\psi_i}{\eta(M-1)}.
+\end{equation}
+恒等式 $\sum_{i<j}(h_i-h_j)^2=M\sum_i(h_i-\bar h)^2$ 使其等于成对核的 U-统计量平均。每一对的均值正确，故整体无偏；各对相互相关，不能把方差简单除以对数。
+
+\begin{theorem}[消去中心的精确方差代价]
+令成对梯度核 $H(a,b)=(h_a-h_b)(\psi_a-\psi_b)/(2\eta)$ 的迹方差为 $V_2$。令精确双中心估计器
+\begin{equation}
+g_c(a)=\frac{(h_a-\E_qh)(\psi_a-\E_q\psi)}{\eta},
+\qquad V_c=\Var_qg_c.
+\end{equation}
+则
+\begin{equation}
+\Var(\nabla\widehat L_M)
+=\frac{(M-2)V_c+2V_2}{M(M-1)},\qquad
+\Var(\nabla\widehat L_M)-\frac{V_c}{M}
+=\frac{2V_2-V_c}{M(M-1)}\ge0.
+\end{equation}
+\end{theorem}
+\begin{proof}
+对 $b$ 条件积分，展开乘积得到 $\E_bH(a,b)=[g_c(a)+\bm G]/2$。令
+\begin{equation}
+H_1(a)=\E_bH(a,b)-\bm G=(g_c(a)-\bm G)/2,\quad
+H_2(a,b)=H(a,b)-\bm G-H_1(a)-H_1(b).
+\end{equation}
+有 $\E H_1=0$、$\E[H_2(a,b)\mid a]=\E[H_2(a,b)\mid b]=0$。因此一阶项与二阶余项正交，两不同配对的二阶余项即使共用一个索引，其协方差也由条件零均值消失。单对核给出 $V_2=2\Var H_1+\Var H_2=V_c/2+\Var H_2$。
+
+样本平均核的中心化表达为
+\begin{equation}
+\frac2M\sum_iH_1(a_i)+\binom M2^{-1}\sum_{i<j}H_2(a_i,a_j).
+\end{equation}
+第一项方差为 $4\Var H_1/M$，第二项为 $\Var H_2/\binom M2$，交叉项为零。代入 $\Var H_1=V_c/4$ 与 $\Var H_2=V_2-V_c/2$ 并整理，即得公式及非负性。
+\end{proof}
+
+\begin{proposition}[排除重复动作的半正定改进]
+先抽 $a\sim q$，再抽 $b\sim q(\cdot\mid b\ne a)$，使用加权核 $H_{\rm nr}=(1-q_a)H(a,b)$。则均值仍为 $\bm G$，且
+\begin{equation}
+\Cov_{q\otimes q}H-\Cov_{\rm nr}H_{\rm nr}
+=\E_{q\otimes q}[q_aH(a,b)H(a,b)^\top]\succeq0.
+\end{equation}
+\end{proposition}
+\begin{proof}
+有序对概率为 $q_aq_b/(1-q_a)$，且 $H(a,a)=0$。乘以一个 $(1-q_a)$ 后求和恢复独立抽样均值；外积含两个权重，故二阶矩变为 $\E_{q\otimes q}[(1-q_a)HH^\top]$。两个均值相同，协方差之差等于二阶矩之差，每项均为非负权重的外积。正支持且至少二动作保证 $1-q_a>0$。
+\end{proof}
+
+若两个独立动作来自另一个提案 $\beta$，成对损失需乘 $(q_a/\beta_a)(q_b/\beta_b)$。先对单动作 residual 乘权重再平方，会产生错误的权重平方。
+
+\section{教师中心的有符号与非负估计}
+记 $\rho=T/q$、$A=A_{\kappa,\eta}$、$\phi(\rho)=\rho-1-A(\rho)$。两个无偏估计为
+\begin{equation}
+\widehat K_-=-M^{-1}\sum_iA(\rho_i),\qquad
+\widehat K_+=M^{-1}\sum_i\phi(\rho_i),\qquad a_i\overset{\rm iid}\sim q.
+\end{equation}
+$\phi$ 凸且在一处值与导数为零，所以第二个逐样本非负。第一种方差为 $V_{\kappa,\eta}/M$。非负不保证更小方差：取 $q=(\epsilon,1-\epsilon)$、$T=(1/2,1/2)$，固定正 $\kappa,\eta<1$。稀有项的 $A=O(\log(1/\epsilon))$，有符号估计方差趋零；$\phi\sim1/(2\epsilon)$，非负估计方差按 $1/(4\epsilon)$ 发散。
+
+局部情况不同。若 $\rho=1+\epsilon u$、$\E_qu=0$ 且 $u$ 有界，令 $c_0=1-\kappa(1-\eta)$，则
+\begin{equation}
+-A=-\epsilon u+\tfrac12c_0\epsilon^2u^2+O(\epsilon^3),\qquad
+\phi=\tfrac12c_0\epsilon^2u^2+O(\epsilon^3).
+\end{equation}
+两种方差分别为 $\epsilon^2\E_qu^2+O(\epsilon^3)$ 与 $\frac14c_0^2\epsilon^4\Var_qu^2+O(\epsilon^5)$。这需要比率一致接近一，不能只用 KL 小替代。
+
+同动作估计中心尤其需要核对：若用该动作的 $\phi$ 补到 $A$ 上，逐样本有 $A+\phi=\rho-1$，形状变换被完全抵消。若用同一组 $M$ 个样本减去经验均值，
+\begin{equation}
+\E\left[M^{-1}\sum_i(A_i-\bar A)\psi_i\right]
+=\frac{M-1}{M}\Cov_q(A,\psi).
+\end{equation}
+展开双重和，同索引项 $M$ 个、异索引项 $M(M-1)$ 个，即得到该系数；$M=1$ 时更新为零。
+
+固定前缀的精确中心化不改变标量条件方差。跨冻结前缀测度 $d$，记 $V_s=\Var_{q(\cdot\mid s)}A_s$，则全方差公式给出 $\Var_{d,q}A=\E_dV_s+\Var_dK_T(s)$，而 $\Var_{d,q}(A+K_T)=\E_dV_s$。中心化移除不同前缀的均值差异；这不直接推出乘以 score 后的参数梯度方差排序。
+
+\section{有界包络与头尾区间}
+当 $\kappa>0,\eta<1$，$c=-\log(1-\eta)/(\kappa\eta)>1$，且 $0\le\phi(x)\le x+c-1$。定义
+\begin{equation}
+\mu_c=(1-1/c)q+T/c,\qquad Z(a)=q_a\phi(\rho_a)/\mu_c(a).
+\end{equation}
+则 $\E_{\mu_c}Z=K_T$、$0\le Z\le c$。由于 $Z^2\le cZ$，
+\begin{equation}
+\Var_{\mu_c}Z\le K_T(c-K_T)\le c^2/4.
+\end{equation}
+独立平均 $M$ 次后方差除以 $M$，Hoeffding 给 $\Pr(|\widehat K-K_T|\ge\epsilon)\le2e^{-2M\epsilon^2/c^2}$。整个分布类上 $K_T$ 可逼近 $c$，所以任何无偏估计器的统一样本上界不能低于 $c$。
+
+一般混合 $\mu_\zeta=(1-\zeta)q+\zeta T$ 的逐样本上确界为
+\begin{equation}
+C_\zeta=\max\{(c-1)/(1-\zeta),1/\zeta\}.
+\end{equation}
+两个值分别由 $\rho\to0,\infty$ 逼近。使统一范围最小的唯一权重是 $\zeta=1/c$。固定输入的方差则为 $\E_q[\phi(\rho)^2/(1+\zeta(\rho-1))]-K_T^2$，二阶导数为
+\begin{equation}
+2\E_q\frac{\phi(\rho)^2(\rho-1)^2}{[1+\zeta(\rho-1)]^3}\ge0.
+\end{equation}
+所以输入方差最优权重可经一维凸优化得到，但一般不同于最小统一范围权重。
+
+保留头部 $S$，尾部质量为 $\delta=q(S^c)$、$\tau=T(S^c)$。令 $K_S^T=-\sum_Sq_aA(\rho_a)$。尾部条件均值 $\E_{q^{\rm tail}}\rho=\tau/\delta$，由 $-A$ 凸以及 $-A\le c$，
+\begin{equation}
+K_S^T-\delta A(\tau/\delta)\le K_T\le K_S^T+\delta c.
+\label{eq:center-interval}
+\end{equation}
+扩大嵌套头部时，下界由 Jensen 非减，上界每加入动作减少 $q_a[c+A(\rho_a)]\ge0$，故非增。尾部为空时直接取精确头部值，不计算零质量比。
+
+还能构造始终落在区间内的无偏估计。令 $r_0=\tau/\delta$、$H=\sum_Sq\phi$，
+\begin{equation}
+L=H+\delta\phi(r_0),\quad U=H+\tau+(c-1)\delta,\quad w=U-L.
+\end{equation}
+取凸余项 $g(x)=\phi(x)-\phi(r_0)-\phi'(r_0)(x-r_0)$，令 $u=A'(r_0)>0$、$v=c+A(r_0)-r_0u\ge0$。$v\ge0$ 来自凹函数 $A$ 的切线在零处不低于 $A(0)=-c$。于是 $0\le g(x)\le ux+v$，且
+\begin{equation}
+\sum_{S^c}q_ag(\rho_a)=K_T-L,\quad u\tau+v\delta=w.
+\end{equation}
+若 $w>0$，在尾部取 $\nu_a=(uT_a+vq_a)/w$、$Y=q_ag(\rho_a)/\nu_a$，则 $0\le Y\le w$。因此
+\begin{equation}
+\widehat K=L+M^{-1}\sum_iY_i,\quad
+\E\widehat K=K_T,\quad L\le\widehat K\le U,\quad
+\Var\widehat K\le(K_T-L)(U-K_T)/M.
+\end{equation}
+证明分别由期望相消和 $Y^2\le wY$ 得到。$w=0$ 时直接返回 $L$。该方案要求能从条件尾部分布采样并查询抽中动作概率；只有头部和尾部总质量时不能恢复未知尾部形状。
+
+\section{中心误差、baseline 与更新场}
+设学生、教师中心误差分别为 $e_S=\widehat K_S-K_S$、$e_T=\widehat K_T-K_T$。原始 score 形式的梯度误差为
+\begin{equation}
+\widehat g-g=(e_S/\eta-e_T)\E_q\psi.
+\label{eq:center-gradient-bias}
+\end{equation}
+在 $p=q$ 时该均值为零，一般内层不为零。若中心与主动作相关，需保留 $\E[e(A)\psi_A]$，不能把误差提出期望。
+
+若学生中心精确、教师误差为冻结常数 $e_T$，直接微分平方损失时，残差变为 $R-\eta e_T$。由于 $\E_qR=0$，损失仅增加 $\eta e_T^2/2$，梯度不变；对应的 score 应为 $(R/\eta-e_T)(\psi-\E_q\psi)$。在目标点 $p=m$，其采样噪声为
+\begin{equation}
+e_T^2\E_q\|\psi-\E_q\psi\|^2.
+\end{equation}
+完整求和精确抵消该噪声，单动作抽样则保留。用学生反馈 $y=C_qU/\eta-A$ 估计同一个教师中心时，$\E_qy=K_T$ 且 $\Var_qy=2L_{\rm BPO}/\eta$，噪声可随拟合消失。
+
+若 $e_S$ 随参数变化，式~\eqref{eq:center-gradient-bias} 的场含 $-(e_S/\eta-e_T)\nabla K_S$。其反对称 Jacobian 一般不为零，因为 $\nabla e_S$ 与 $\nabla K_S$ 未必平行。直接微分含近似中心的平方损失则多出 $\E_q\widehat R\,\nabla\widehat K_S/\eta$，得到另一个保守场。有限中心近似后，两种反传方式需要分别定义。
+
+在锚点 $p=q$，action-independent baseline $b$ 不改变 $\E_q[(A-b)\psi]$ 的均值。最小迹方差的选择为
+\begin{equation}
+b_\star=\frac{\E_q[A\|\psi\|^2]}{\E_q\|\psi\|^2},\quad
+V_g(b)-V_g(b_\star)=\E_q\|\psi\|^2(b-b_\star)^2.
+\end{equation}
+这是对加权二次式配方的结果，不一般等于 $\E_qA$。重要性采样估计器改用权重 $(p/q)^2\|\psi_p\|^2$。对普通 BPO 的 $q$ 测度，离开锚点后随意改 baseline 会改变均值，除非保留补偿或使用精确中心化 score。
+
+独立随机 baseline 额外增加其方差乘以相应 score 二阶矩。同样本 baseline 即使数值无偏也可能有偏：取 baseline 等于该动作的信号，整个更新逐样本为零。跨前缀 token 不能替代同前缀独立辅助动作。
