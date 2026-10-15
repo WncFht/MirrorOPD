@@ -1,0 +1,4 @@
+{
+    "student": "${model_root}/DeepSeek-R1-Distill-Qwen-1.5B",
+    "teacher": "${model_root}/JustRL-DeepSeek-1.5B"
+}

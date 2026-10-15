@@ -1,0 +1,9 @@
+{
+    "train": ["${data_root}/math/DAPO/train.parquet"],
+    "validation": [
+        "${data_root}/math/MATH-500/test.parquet",
+        "${data_root}/math/AMC23/test.parquet",
+        "${data_root}/math/AIME25/test.parquet"
+    ],
+    "scorer": { "name": "math", "kind": "binary" }
+}

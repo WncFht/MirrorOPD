@@ -1,0 +1,36 @@
+{
+    "schema_version": 2,
+    "name": "math-four-gpu",
+    "objective": {
+        "algorithm": "bpo",
+        "signal": { "kappa": 0.5, "eta": 0.2 },
+        "estimator": {
+            "center": "topj_tail",
+            "integration": "sampled",
+            "topj": 16
+        },
+        "diagnostics": "full"
+    },
+    "training": {
+        "outer_steps": 50,
+        "inner_steps": 16,
+        "batch_size": 64,
+        "micro_batch_size": 1,
+        "learning_rate": 0.000001,
+        "clip_grad": 2.0,
+        "prompt_tokens": 2048,
+        "response_tokens": 7168,
+        "seed": 42
+    },
+    "evaluation": {
+        "every": 5,
+        "before_training": true,
+        "samples_per_question": 16,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "prompt_tokens": 4096,
+        "response_tokens": 31744,
+        "seed": 42
+    },
+    "logging": { "wandb": { "enabled": true, "project": "mirroropd-v2" } }
+}

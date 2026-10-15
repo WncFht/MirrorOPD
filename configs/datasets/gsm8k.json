@@ -1,0 +1,5 @@
+{
+    "train": ["${data_root}/train.parquet"],
+    "validation": ["${data_root}/test.parquet"],
+    "scorer": { "name": "gsm8k", "kind": "binary" }
+}

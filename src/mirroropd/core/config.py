@@ -1,7 +1,9 @@
 """Versioned, orthogonal algorithm, signal, estimator and diagnostic settings."""
 
 import math
-from dataclasses import asdict, dataclass, field, fields
+from dataclasses import asdict, dataclass, field, fields, is_dataclass
+from types import UnionType
+from typing import Union, get_args, get_origin
 
 API_VERSION = 2
 ALGORITHMS = frozenset({"on_policy", "mdpo", "bpo"})
@@ -14,6 +16,36 @@ def strict_fields(cls, value):
     if unknown:
         raise ValueError(f"Unknown {cls.__name__} fields: {sorted(unknown)}")
     return value
+
+
+def _matches_type(value, expected):
+    origin = get_origin(expected)
+    if origin in {UnionType, Union}:
+        return any(_matches_type(value, item) for item in get_args(expected))
+    if origin is list:
+        return isinstance(value, list) and all(
+            _matches_type(item, get_args(expected)[0]) for item in value
+        )
+    if expected is float:
+        return type(value) in {int, float}
+    return type(value) is expected
+
+
+def decode(cls, value):
+    data = dict(strict_fields(cls, value))
+    for item in fields(cls):
+        if item.name not in data:
+            continue
+        value = data[item.name]
+        if is_dataclass(item.type):
+            data[item.name] = decode(item.type, value)
+        elif not _matches_type(value, item.type):
+            raise TypeError(
+                f"{cls.__name__}.{item.name} expects {item.type}, got {type(value).__name__}"
+            )
+        elif item.type is float:
+            data[item.name] = float(value)
+    return cls(**data)
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,12 +97,7 @@ class Objective:
 
     @classmethod
     def from_dict(cls, value):
-        data = dict(strict_fields(cls, value))
-        if "signal" in data:
-            data["signal"] = Signal(**strict_fields(Signal, data["signal"]))
-        if "estimator" in data:
-            data["estimator"] = Estimator(**strict_fields(Estimator, data["estimator"]))
-        return cls(**data)
+        return decode(cls, value)
 
     def to_dict(self):
         return asdict(self)
@@ -110,7 +137,4 @@ class CacheContext:
 
     @classmethod
     def from_dict(cls, value):
-        data = dict(strict_fields(cls, value))
-        data["signal"] = Signal(**strict_fields(Signal, data["signal"]))
-        data["estimator"] = Estimator(**strict_fields(Estimator, data["estimator"]))
-        return cls(**data)
+        return decode(cls, value)

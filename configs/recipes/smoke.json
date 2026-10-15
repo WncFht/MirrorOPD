@@ -1,0 +1,22 @@
+{
+    "schema_version": 2,
+    "name": "smoke",
+    "training": {
+        "outer_steps": 2,
+        "inner_steps": 2,
+        "batch_size": 4,
+        "response_tokens": 32
+    },
+    "evaluation": {
+        "every": 2,
+        "samples_per_question": 2,
+        "response_tokens": 128,
+        "question_limit": 4
+    },
+    "resources": {
+        "cpus": 16,
+        "rollout_memory_fraction": 0.15,
+        "max_sequences": 4,
+        "max_batch_tokens": 4096
+    }
+}
