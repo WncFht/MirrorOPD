@@ -1,0 +1,345 @@
+\documentclass[UTF8,fontset=none,11pt,a4paper]{ctexart}
+\setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold},ItalicFont={Noto Serif CJK SC},SlantedFont={Noto Serif CJK SC}]
+\setCJKsansfont{Noto Sans CJK SC}
+\setCJKmonofont{Noto Sans Mono CJK SC}
+\usepackage[margin=23mm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage[backend=biber,style=numeric,sorting=none,giveninits=true,maxbibnames=99,url=false]{biblatex}
+\addbibresource{references.bib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={从密度比到 α 散度：两个 KL 方向的统一推导},pdfauthor={MirrorOPD Research Notes}}
+\newcommand{\E}{\mathbb E}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\sg}{\operatorname{stopgrad}}
+\newcommand{\dd}{\,\mathrm d}
+\setlength{\emergencystretch}{2em}
+\ctexset{paragraph={runin=true,beforeskip=1.1ex,afterskip=0.7em}}
+\title{从密度比到 $\alpha$ 散度\\\large 两个 KL 方向的统一推导}
+\author{MirrorOPD Research Notes}
+\date{2026 年 10 月 15 日}
+
+\begin{document}
+\pagestyle{plain}
+\maketitle
+
+\noindent
+设 $q(x)$ 为固定的教师密度，$p_\theta(x)$ 为学生的边缘密度，$p_\theta(x,z)$ 为学生的联合密度；$z$ 表示潜变量。对于 Kullback--Leibler（KL）散度，本文采用正向 $\KL(q\Vert p_\theta)$、反向 $\KL(p_\theta\Vert q)$ 的方向约定。假设二者在与 $\theta$ 无关的共同支撑集上为正，所需矩与导数可积，并允许下文的求导、极限与积分交换；具体条件见附录。评估器（critic）$f_\psi(x)$ 用于估计教师与学生的对数密度比。沿用所据材料的缩写 DLD，表示下文以密度比重加权的蒸馏更新。
+
+\paragraph{两种散度都是密度比函数的期望。}
+记教师与学生边缘分布之间的密度比为 $r(x)=q(x)/p_\theta(x)$；评估器估计它的对数，即 $f_\psi\approx\log r$。支撑条件保证密度比满足归一化恒等式
+\setcounter{equation}{21}
+\begin{equation}
+\E_{p_\theta}[r]
+=\int p_\theta(x)\frac{q(x)}{p_\theta(x)}\dd x
+=\int q(x)\dd x
+=1.
+\label{eq:normalization}
+\end{equation}
+两个 KL 散度都能写成学生分布下某个 $r$ 的函数的期望。对于正向 KL，在被积函数中同时乘除 $p_\theta$；对于反向 KL，使用 $\log(p_\theta/q)=-\log r$：
+\begin{align}
+\KL(q\Vert p_\theta)
+&=\int q\log\frac{q}{p_\theta}\dd x
+=\int p_\theta\frac{q}{p_\theta}\log\frac{q}{p_\theta}\dd x
+=\E_{p_\theta}[r\log r],
+\label{eq:forward-kl}\\
+\KL(p_\theta\Vert q)
+&=\int p_\theta\log\frac{p_\theta}{q}\dd x
+=\E_{p_\theta}[-\log r].
+\label{eq:reverse-kl}
+\end{align}
+两个目标的差别仅在于被平均的函数：一个是 $r\log r$，另一个是 $-\log r$。下面用同一个函数族连接这两个表达式。
+
+\paragraph{两种散度都是同一条曲线的斜率。}
+定义标量函数
+\begin{equation}
+g(\alpha)
+=\E_{p_\theta}[r^\alpha]
+=\int q^\alpha p_\theta^{1-\alpha}\dd x,
+\qquad \alpha\in[0,1].
+\label{eq:g}
+\end{equation}
+它的端点值为 $g(0)=\E_{p_\theta}[1]=1$ 和 $g(1)=\E_{p_\theta}[r]=1$。为计算导数，将 $r^\alpha$ 写成 $e^{\alpha\log r}$，于是
+\[
+\frac{\mathrm d}{\mathrm d\alpha}r^\alpha
+=(\log r)e^{\alpha\log r}
+=r^\alpha\log r.
+\]
+在上述正则条件下，交换导数与期望得到
+\begin{equation}
+g'(\alpha)=\E_{p_\theta}[r^\alpha\log r],
+\qquad
+g''(\alpha)=\E_{p_\theta}[r^\alpha(\log r)^2]\geq0.
+\label{eq:g-derivatives}
+\end{equation}
+在两个端点计算一阶导数，并与式~\eqref{eq:forward-kl}--\eqref{eq:reverse-kl} 比较，得到
+\begin{equation}
+\begin{aligned}
+g'(1)&=\E_{p_\theta}[r\log r]=\KL(q\Vert p_\theta),\\
+g'(0)&=\E_{p_\theta}[\log r]=-\KL(p_\theta\Vert q).
+\end{aligned}
+\label{eq:endpoint-slopes}
+\end{equation}
+正向 KL 是 $g$ 在 $\alpha=1$ 处的斜率，反向 KL 是 $g$ 在 $\alpha=0$ 处斜率的相反数。二阶导数只有在 $\log r=0$ 对 $p_\theta$ 几乎处处成立时才为零，即只有在 $q=p_\theta$ 时才为零；否则 $g$ 严格凸。严格凸函数在两个端点之间严格位于弦的下方，而连接 $(0,1)$ 与 $(1,1)$ 的弦正是高度为 $1$ 的水平线。因此
+\begin{equation}
+g(\alpha)<1,
+\qquad \alpha\in(0,1),
+\qquad\text{除非 }q=p_\theta.
+\label{eq:g-bound}
+\end{equation}
+这也可由 H\"older 不等式得到：
+\[
+\int q^\alpha p_\theta^{1-\alpha}\dd x
+\leq
+\left(\int q\dd x\right)^\alpha
+\left(\int p_\theta\dd x\right)^{1-\alpha}
+=1.
+\]
+
+\paragraph{散度的构造。}
+弦与曲线之间的差 $1-g(\alpha)$ 非负，而且只有在 $q=p_\theta$ 时为零，因此它已经是一个散度。但在两个端点，这个差恒为零，因为 $g(0)=g(1)=1$。将它除以一个在相同两个端点消失的因子，就能把每个端点变成一个值由斜率决定的 $0/0$ 型极限：
+\begin{equation}
+D_\alpha(q\Vert p_\theta)
+=\frac{1-g(\alpha)}{\alpha(1-\alpha)}
+=\frac{\E_{p_\theta}[r^\alpha]-1}{\alpha(\alpha-1)},
+\qquad \alpha\in(0,1).
+\label{eq:alpha-divergence}
+\end{equation}
+第二种写法只是同时改变分子与分母的符号。这就是 $\alpha$ 散度的一种标准参数化\cite{cichocki2010,nielsen2022}。
+
+\paragraph{两个端点极限。}
+当 $\alpha\to1$ 时，由式~\eqref{eq:endpoint-slopes} 在 $\alpha=1$ 附近展开：
+\[
+g(\alpha)
+=1+\KL(q\Vert p_\theta)(\alpha-1)
++O((\alpha-1)^2).
+\]
+代入散度定义，得到
+\begin{equation}
+\begin{aligned}
+D_\alpha
+&=\frac{\KL(q\Vert p_\theta)(\alpha-1)+O((\alpha-1)^2)}{\alpha(\alpha-1)}\\
+&=\frac{\KL(q\Vert p_\theta)}{\alpha}+O(\alpha-1)
+\xrightarrow[\alpha\to1]{}\KL(q\Vert p_\theta).
+\end{aligned}
+\label{eq:limit-one}
+\end{equation}
+当 $\alpha\to0$ 时，在 $\alpha=0$ 附近展开：
+\[
+g(\alpha)=1-\KL(p_\theta\Vert q)\alpha+O(\alpha^2).
+\]
+因此
+\begin{equation}
+\begin{aligned}
+D_\alpha
+&=\frac{-\KL(p_\theta\Vert q)\alpha+O(\alpha^2)}{\alpha(\alpha-1)}\\
+&=\frac{\KL(p_\theta\Vert q)}{1-\alpha}+O(\alpha)
+\xrightarrow[\alpha\to0]{}\KL(p_\theta\Vert q).
+\end{aligned}
+\label{eq:limit-zero}
+\end{equation}
+于是可按连续性定义 $D_1=\KL(q\Vert p_\theta)$ 和 $D_0=\KL(p_\theta\Vert q)$。族的内部还有两个性质。同时交换 $q\leftrightarrow p_\theta$ 和 $\alpha\leftrightarrow1-\alpha$，积分保持不变，因此
+\[
+D_\alpha(q\Vert p_\theta)=D_{1-\alpha}(p_\theta\Vert q).
+\]
+两个方向互为镜像。在中点，$g(\tfrac12)=\int\sqrt{qp_\theta}\dd x$，而
+\[
+D_{1/2}
+=4\left(1-\int\sqrt{qp_\theta}\dd x\right)
+=2\int(\sqrt q-\sqrt{p_\theta})^2\dd x.
+\]
+它与平方 Hellinger 距离成正比，并且对称地对待两个方向。若采用 $H^2(q,p)=\tfrac12\int(\sqrt q-\sqrt p)^2\dd x$ 的定义，则 $D_{1/2}=4H^2(q,p_\theta)$\cite{nielsen2022}。
+
+\paragraph{梯度与加权最大似然更新。}
+在积分形式 $g(\alpha)=\int q^\alpha p_\theta^{1-\alpha}\dd x$ 中，只有 $p_\theta$ 依赖 $\theta$，因此可以直接求梯度。使用
+\[
+\nabla_\theta p_\theta^{1-\alpha}
+=(1-\alpha)p_\theta^{-\alpha}\nabla_\theta p_\theta,
+\qquad
+\nabla_\theta p_\theta=p_\theta\nabla_\theta\log p_\theta,
+\]
+得到
+\begin{equation}
+\begin{aligned}
+\nabla_\theta g(\alpha)
+&=(1-\alpha)\int q^\alpha p_\theta^{-\alpha}\nabla_\theta p_\theta\dd x\\
+&=(1-\alpha)\int q^\alpha p_\theta^{1-\alpha}\nabla_\theta\log p_\theta\dd x\\
+&=(1-\alpha)\E_{p_\theta}[r^\alpha\nabla_\theta\log p_\theta].
+\end{aligned}
+\label{eq:g-parameter-gradient}
+\end{equation}
+将它代入 $D_\alpha=(1-g)/(\alpha(1-\alpha))$，因子 $1-\alpha$ 抵消：
+\begin{equation}
+\nabla_\theta D_\alpha
+=-\frac{\nabla_\theta g(\alpha)}{\alpha(1-\alpha)}
+=-\frac1\alpha\E_{p_\theta}[r^\alpha\nabla_\theta\log p_\theta].
+\label{eq:gradient}
+\end{equation}
+下降方向为 $-\nabla_\theta D_\alpha$。由于
+\[
+\E_{p_\theta}[\nabla_\theta\log p_\theta]
+=\int\nabla_\theta p_\theta\dd x
+=\nabla_\theta1=0,
+\]
+可在期望中减去常数基线 $1/\alpha$，而不改变结果。再由条件期望将边缘形式改写为联合形式（推导见附录），得到
+\begin{equation}
+\begin{gathered}
+-\nabla_\theta D_\alpha
+=\E_{p_\theta(x,z)}
+\left[A_\alpha(x)\nabla_\theta\log p_\theta(x,z)\right],\\
+A_\alpha(x)=\frac{r(x)^\alpha-1}{\alpha}.
+\end{gathered}
+\label{eq:advantage}
+\end{equation}
+在 $\alpha=1$ 时，优势函数为 $A_1=r-1$。又因为
+\[
+\E_{p_\theta}[r\nabla_\theta\log p_\theta]
+=\int q\nabla_\theta\log p_\theta\dd x
+=\E_q[\nabla_\theta\log p_\theta],
+\]
+更新正是最大似然梯度。因此，以密度比为权重的最大似然蒸馏，是这个族的 $\alpha=1$ 成员。当 $\alpha\to0$ 时，逐点展开 $r^\alpha=1+\alpha\log r+O(\alpha^2)$，得到 $A_\alpha\to\log r$。这与直接对反向 KL 求导一致：
+\[
+\begin{aligned}
+\nabla_\theta\KL(p_\theta\Vert q)
+&=\int\nabla_\theta p_\theta\log\frac{p_\theta}{q}\dd x
++\int p_\theta\nabla_\theta\log p_\theta\dd x\\
+&=-\E_{p_\theta}[\log r\,\nabla_\theta\log p_\theta]+0.
+\end{aligned}
+\]
+每个中间的 $\alpha$ 都对应一个精确散度，而非端点目标的近似；同一个对数密度比评估器即可提供所需权重，因为 $r^\alpha\approx\exp(\alpha f_\psi)$。使用近似评估器时，实际更新也相应带有密度比估计误差。
+
+\paragraph{这个族插值的是测度。}
+由于 $p_\theta r^\alpha=q^\alpha p_\theta^{1-\alpha}$，同一个更新也可以写成
+\begin{equation}
+\begin{gathered}
+-\nabla_\theta D_\alpha
+=\frac{Z_\alpha}{\alpha}\E_{\pi_\alpha}[\nabla_\theta\log p_\theta],\\
+\pi_\alpha(x)=\frac{q(x)^\alpha p_\theta(x)^{1-\alpha}}{Z_\alpha},
+\qquad
+Z_\alpha=\int q^\alpha p_\theta^{1-\alpha}\dd x=g(\alpha).
+\end{gathered}
+\label{eq:bridge}
+\end{equation}
+每个 $\alpha$ 都给出学生与教师之间几何插值分布 $\pi_\alpha$ 下的最大似然方向，乘以正系数 $Z_\alpha/\alpha$。这个几何路径也是退火重要性采样（annealed importance sampling，AIS）使用的路径\cite{neal2001}。在 $\alpha=1$ 时，$\pi_1=q$，更新就是教师分布下的最大似然梯度。当 $\alpha\to0$ 时，$\pi_\alpha\to p_\theta$，此时对数概率梯度的期望为零；经过 $1/\alpha$ 缩放后保留下来的，是几何路径在学生端的一阶变化
+\[
+\E_{p_\theta}[\log r\,\nabla_\theta\log p_\theta].
+\]
+因此，反向 KL 对应这条测度路径从学生端出发的一阶变化，正向 KL 对应路径到达教师端时的更新。这里的最大似然解释针对每一步冻结当前 $\pi_\alpha$ 的局部方向；$\pi_\alpha$ 本身也随学生参数变化。
+
+\paragraph{EMD 通过搬运插值；DLD 通过重加权插值。}
+EM 蒸馏（EM Distillation，EMD）\cite{xie2024} 沿另一条路线连接这两个方向。它的 E 步从学生样本出发，执行 $K$ 步 Langevin 更新，朝教师边缘分布与学生条件后验构成的联合目标 $q(x)p_\theta(z\mid x)$ 采样。仅对 $x$ 作一步更新，采用其步长约定下的单位步长、抵消噪声，并保持 $z$ 不变时，可以精确恢复 Diff-Instruct／变分分数蒸馏（Variational Score Distillation，VSD）的梯度；对 $(x,z)$ 充分进行联合采样，则在链收敛且离散化误差受控时接近最大似然更新。单步等价关系见 EMD 的第 3.4 节、式（13）--（14）；其第 5.1 节与图 3(c)(d) 的消融显示，在所测设置下，增加 Langevin 步数会使 Fr\'echet Inception Distance（FID）降低、Recall 提高。
+
+DLD 保留样本，通过权重改变用于更新的分布。两条路线面对不同的困难：搬运需要足够混合的采样链，因此计算代价较高；EMD 的上述分析识别了两个端点，却没有给出每个有限步数对应的特定 $\alpha$ 散度。重加权无需运行混合链，而且每个中间 $\alpha$ 都有明确的散度；但在学生覆盖不足的区域，$r^\alpha$ 会产生集中的权重。$f$-distill\cite{xu2025} 的第 4 节与图 5(a) 分析了正向 KL 的高权重方差。降低 $\alpha$ 可减缓大密度比权重的增长；在缓和接近正向 KL 时的计算或估计困难这一层面，它与 EMD 使用较少 Langevin 步数具有可比性，二者没有由此建立参数等价关系。
+
+蒸馏中的散度族已有先例：$f$-distill 已经用密度比的函数对教师与学生的空间分数差进行加权。这里的推导给出同类散度族的 REINFORCE 形式，即基于对数概率梯度的蒙特卡洛估计；一个估计 $\log r$ 的评估器即可通过标量 $\alpha$ 构造这个族的更新权重。
+
+\appendix
+\section{正则条件与梯度语义}
+
+\subsection{支撑、可积性与端点展开}
+前文为同时讨论两个有限 KL 端点，采用共同正支撑的条件。仅要保证式~\eqref{eq:normalization}，只需教师分布对学生分布绝对连续；若教师在学生取零的集合上仍有正质量，则该式不能直接成立。共同正支撑仍不足以保证 KL 或其梯度有限，还需要相应的可积性条件。
+
+对固定的 $\theta$，保证前文 $g$ 的二阶求导和两个二阶余项的一组充分条件是
+\[
+\int (p_\theta+q)(\log r)^2\dd x<\infty.
+\]
+原因是对 $\alpha\in[0,1]$，加权算术--几何平均不等式给出
+\[
+q^\alpha p_\theta^{1-\alpha}
+\leq\alpha q+(1-\alpha)p_\theta
+\leq q+p_\theta,
+\]
+从而 $q^\alpha p_\theta^{1-\alpha}(\log r)^2$ 有统一的可积控制函数，$g''$ 在闭区间上连续且有界。参数求导还要求 $p_\theta$ 对 $\theta$ 可微，并在所考察参数的邻域内有可积控制函数支配 $\nabla_\theta p_\theta$ 和 $q^\alpha p_\theta^{-\alpha}\nabla_\theta p_\theta$。涉及 $\alpha\to0$ 的向量期望极限时，还需对相应的 $\log r\,\nabla_\theta\log p_\theta$ 项满足控制收敛条件。离散分布的公式相同，只需将积分替换为求和。
+
+\subsection{从边缘分布到联合分布}
+记 $s_\theta(x)=\nabla_\theta\log p_\theta(x)$。在允许潜变量积分与求导交换时，
+\[
+\begin{aligned}
+\E_{p_\theta(z\mid x)}[\nabla_\theta\log p_\theta(x,z)]
+&=\frac1{p_\theta(x)}\int\nabla_\theta p_\theta(x,z)\dd z\\
+&=\frac{\nabla_\theta p_\theta(x)}{p_\theta(x)}
+=s_\theta(x).
+\end{aligned}
+\]
+因 $A_\alpha$ 只依赖 $x$，条件期望公式得到
+\[
+\begin{aligned}
+&\E_{p_\theta(x,z)}[A_\alpha(x)\nabla_\theta\log p_\theta(x,z)]\\
+&\quad=\E_{p_\theta(x)}\!
+\left[A_\alpha(x)\E_{p_\theta(z\mid x)}[\nabla_\theta\log p_\theta(x,z)]\right]\\
+&\quad=\E_{p_\theta(x)}[A_\alpha(x)s_\theta(x)].
+\end{aligned}
+\]
+这证明式~\eqref{eq:advantage} 中的边缘形式与联合形式相等。潜变量 $z$ 必须与 $x$ 一同来自所写的学生联合分布。
+
+\subsection{停止梯度与局部代理损失}
+真实密度比依赖学生参数：$\nabla_\theta\log r=-s_\theta$。因此，直接对目标 $\E_{p_\theta}[r^\alpha]$ 求导时，必须同时计入分布和权重的导数：
+\[
+\begin{aligned}
+\nabla_\theta\E_{p_\theta}[r^\alpha]
+&=\E_{p_\theta}[r^\alpha s_\theta+\nabla_\theta r^\alpha]\\
+&=\E_{p_\theta}[r^\alpha s_\theta-\alpha r^\alpha s_\theta]\\
+&=(1-\alpha)\E_{p_\theta}[r^\alpha s_\theta].
+\end{aligned}
+\]
+实现已经推导出的式~\eqref{eq:advantage} 时，权重则充当固定的梯度系数。具体地，固定当前参数 $\theta_t$，用 $p_{\theta_t}(x,z)$ 采样，定义局部代理损失
+\[
+L_{\mathrm{sur}}(\theta;\theta_t)
+=-\E_{p_{\theta_t}(x,z)}
+\left[\sg(A_{\alpha,\theta_t}(x))\log p_\theta(x,z)\right].
+\]
+其中 $\sg$ 表示停止梯度，采样得到的 $x,z$ 也视为固定输入。于是
+\[
+\left.\nabla_\theta L_{\mathrm{sur}}(\theta;\theta_t)\right|_{\theta=\theta_t}
+=\left.\nabla_\theta D_\alpha(q\Vert p_\theta)\right|_{\theta=\theta_t}.
+\]
+这个等式针对真实密度比的期望梯度。有限样本近似和近似评估器分别引入采样误差与密度比估计误差。常数基线保持期望不变，本身不保证完整梯度估计的方差最小。
+
+\section{几何路径的一阶变化与 \texorpdfstring{$f$}{f}-distill 的权重}
+
+\subsection{学生端的一阶变化}
+固定 $\theta$，记 $\ell(x)=\log r(x)$、$m=\E_{p_\theta}[\ell]$。在前述可积性条件下，
+\[
+Z_\alpha=1+\alpha m+O(\alpha^2),
+\qquad
+\pi_\alpha(x)
+=p_\theta(x)\left[1+\alpha(\ell(x)-m)\right]+o(\alpha).
+\]
+后一个展开由 $e^{\alpha\ell}=1+\alpha\ell+o(\alpha)$ 与 $1/Z_\alpha=1-\alpha m+o(\alpha)$ 相乘得到。使用 $\E_{p_\theta}[s_\theta]=0$，得到
+\[
+\begin{aligned}
+\E_{\pi_\alpha}[s_\theta]
+&=\E_{p_\theta}[s_\theta]
++\alpha\E_{p_\theta}[(\ell-m)s_\theta]+o(\alpha)\\
+&=\alpha\E_{p_\theta}[\ell s_\theta]+o(\alpha).
+\end{aligned}
+\]
+因此
+\[
+\lim_{\alpha\to0}\frac{Z_\alpha}{\alpha}\E_{\pi_\alpha}[s_\theta]
+=\E_{p_\theta}[\log r\,s_\theta].
+\]
+式~\eqref{eq:bridge} 在学生端的有限极限由一阶项决定：期望的一阶消失与外部的 $1/\alpha$ 抵消。AIS 使用相同形式的几何中间分布，但 AIS 还包括一系列马尔可夫转移和路径重要性权重；式~\eqref{eq:bridge} 本身没有执行这些步骤\cite{neal2001}。
+
+\subsection{同一密度比幂次的两种梯度形式}
+在本文记号下，$f$ 散度写为 $D_f(q\Vert p)=\E_p[f(q/p)]$。取
+\[
+f_\alpha(u)
+=\frac{u^\alpha-1-\alpha(u-1)}{\alpha(\alpha-1)},
+\qquad 0<\alpha<1.
+\]
+由 $\E_p[r-1]=0$，它产生的 $f$ 散度恰为式~\eqref{eq:alpha-divergence}。求两次导数得到
+\[
+f_\alpha'(u)=\frac{u^{\alpha-1}-1}{\alpha-1},
+\qquad
+f_\alpha''(u)=u^{\alpha-2}>0.
+\]
+因此，代入 $f$-distill 第 3 节定理 1 的权重形式 $h(r)=f''(r)r^2$，有
+\[
+h_\alpha(r)=r^\alpha.
+\]
+这个对应关系把本文的对数概率梯度形式与该文的空间分数差形式联系起来。前者使用 $\nabla_\theta\log p_\theta$，后者使用 $\nabla_x\log q-\nabla_x\log p_\theta$ 以及生成器雅可比，二者所乘的完整向量不同；$h_\alpha$ 与减去基线后的 $A_\alpha$ 也不是同一个函数。$f$-distill 对权重方差的分析不能直接证明式~\eqref{eq:advantage} 的完整梯度方差随 $\alpha$ 单调变化\cite{xu2025}。
+
+\printbibliography[title={参考文献}]
+\end{document}
