@@ -998,7 +998,7 @@
     }
   },
   "running_update_counts": {
-    "online-opd-bf16-lr5em7-s42": 167,
+    "online-opd-bf16-lr5em7-s42": 600,
     "online-opd-bf16-lr1em6-s42": 0,
     "online-opd-bf16-lr2em6-s42": 0,
     "frozen-mdpo-bf16-reset0-s42": 0,
@@ -1052,5 +1052,5 @@
   ],
   "all_evaluations_complete": false,
   "all_training_complete": false,
-  "observed_optimizer_updates": 1225
+  "observed_optimizer_updates": 1658
 }
