@@ -1101,10 +1101,21 @@ index c4c7d8f..73a7987 100644
  
              # construct TrainingWorkerConfig
 diff --git a/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py b/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
-index 3b24590..134993a 100644
+index 3b24590..fd2eb45 100644
 --- a/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
 +++ b/verl/verl/workers/rollout/vllm_rollout/vllm_async_server.py
-@@ -553,6 +553,7 @@ class vLLMHttpServer:
+@@ -387,6 +387,10 @@ class vLLMHttpServer:
+         usage_context = UsageContext.OPENAI_API_SERVER
+         vllm_config = engine_args.create_engine_config(usage_context=usage_context)
+         vllm_config.parallel_config.data_parallel_master_port = self._dp_master_port
++        if self.model_config.mirror_policy:
++            from mirroropd.integrations.verl.vllm_executor import SingletonFileStoreExecutor
++
++            vllm_config.parallel_config.distributed_executor_backend = SingletonFileStoreExecutor
+ 
+         fn_args = set(dict(inspect.signature(AsyncLLM.from_vllm_config).parameters).keys())
+         kwargs = {}
+@@ -553,6 +557,7 @@ class vLLMHttpServer:
                  log_probs=None,
                  routed_experts=None,
                  stop_reason="aborted",
@@ -1112,7 +1123,7 @@ index 3b24590..134993a 100644
              )
  
          extra_fields = {"global_steps": self.global_steps}
-@@ -572,6 +573,8 @@ class vLLMHttpServer:
+@@ -572,6 +577,8 @@ class vLLMHttpServer:
  
          # Determine stop reason from finish_reason
          finish_reason = final_res.outputs[0].finish_reason
