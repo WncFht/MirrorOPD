@@ -1,0 +1,84 @@
+\subsection*{\texorpdfstring{对偶性}{对偶性}}
+\(\alpha\) 散度和 \(\alpha\)–\(\gamma\) 散度具有以下对偶关系：
+
+\setcounter{equation}{92}
+\begin{equation}
+\label{FD100-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = c^{- 1}D_{A}^{(1 - \alpha)}{(c\,\mathbf{Q}\,||\, c\,\mathbf{P})},\quad D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AG}^{(1 - \gamma)}(c_{1}{\mathbf{Q}\,||\,}c_{2}{\mathbf{P})}}
+\end{equation}
+
+要为 \(\beta\) 散度建立对偶性，需要先将其写成稍一般的双参数散度形式：
+
+\setcounter{equation}{93}
+\begin{equation}
+\label{FD101-entropy-12-01532}
+\fitmath{D_{AB}^{(\beta_{1},\beta_{2})}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\beta_{1}\,\beta_{2}{(\beta_{1} + \beta_{2})}}\int\left( {\beta_{1}\, p^{\beta_{1} + \beta_{2}} + \beta_{2}\, q^{\beta_{1} + \beta_{2}} - {(\beta_{1} + \beta_{2})}p^{\beta_{1}}q^{\beta_{2}}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+此时，\(\beta\) 散度的对偶性可表示为
+
+\setcounter{equation}{94}
+\begin{equation}
+\label{FD102-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AB}^{(1,\beta - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = c^{- \beta}D_{AB}^{(\beta - 1,1)}{(c\,\mathbf{Q}\,||\, c\,\mathbf{P})}}
+\end{equation}
+
+或更一般地表示为
+
+\setcounter{equation}{95}
+\begin{equation}
+\label{FD103-entropy-12-01532}
+\fitmath{D_{AB}^{(\beta_{1},\beta_{2})}{(\mathbf{P}\,||\,\mathbf{Q})} = c^{- (\beta_{1} + \beta_{2})}D_{AB}^{(\beta_{2},\beta_{1})}{(c\,\mathbf{Q}\,||\, c\,\mathbf{P})}}
+\end{equation}
+
+类似地，将非对称 \(\gamma\) 散度族定义为更一般的双参数形式：
+
+\setcounter{equation}{96}
+\begin{equation}
+\label{FD104-entropy-12-01532}
+\fitmath{\begin{array}{r}
+{D_{ABG}^{(\gamma_{1},\gamma_{2})}{(\mathbf{P} \parallel \mathbf{Q})} = \log\frac{\left( {\int p^{\gamma_{1} + \gamma_{2}}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma_{2}{(\gamma_{1} + \gamma_{2})}}}\left( {\int q^{\gamma_{1} + \gamma_{2}}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma_{1}{(\gamma_{1} + \gamma_{2})}}}}{\left( {\int p^{\gamma_{1}}q^{\gamma_{2}}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma_{1}\gamma_{2}}}}}
+\end{array}}
+\end{equation}
+
+
+
+
+于是，\(\beta\)–\(\gamma\) 散度，即基本 \(\gamma\) 散度，具有以下对偶性质：
+
+\setcounter{equation}{97}
+\begin{equation}
+\label{FD105-entropy-12-01532}
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{ABG}^{(1,\gamma - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{ABG}^{(\gamma - 1,1)}(c_{1}{\,\mathbf{Q}\,||\,}c_{2}{\,\mathbf{P})}}
+\end{equation}
+
+或更一般地表示为
+
+\setcounter{equation}{98}
+\begin{equation}
+\label{FD106-entropy-12-01532}
+\fitmath{D_{ABG}^{(\gamma_{1},\gamma_{2})}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{ABG}^{(\gamma_{2},\gamma_{1})}(c_{1}{\mathbf{Q}\,||\,}c_{2}{\mathbf{P})}}
+\end{equation}
+
+
+
+
+\setcounter{section}{5}
+\setcounter{subsection}{0}
+\subsection{\texorpdfstring{结论与讨论}{结论与讨论}}
+本文的主要目标是建立并扩展几类散度之间的联系。主要结果汇总于\hyperref[entropy-12-01532-t002]{表 2}、\hyperref[entropy-12-01532-t003]{表 3}、\hyperref[entropy-12-01532-t004]{表 4}和\hyperref[entropy-12-01532-t005]{表 5}。我们扩展并统一了几个重要的散度类，给出了它们之间的联系与对应关系。本文提出的参数化广义散度族，尤其是 \(\alpha\) 散度、\(\alpha\)–Rényi 散度和 \(\beta\) 散度，使我们能够在同一框架下考察各种常用基本散度之间的平滑连接。例如，\(\beta\) 散度族通过广义 KL 的 I 散度，平滑地连接平方欧氏距离，即 \(L_{2}\) 范数距离，与广义扩展的 Itakura–Saito 型距离。我们还说明，在 \(\beta = 0\) 时，可以从 \(\beta\) 散度生成整个扩展的稳健 Itakura–Saito 型距离族；它们具有尺度不变性，在语音处理等领域具有潜在应用。
+
+
+我们还说明，可以分别从 \(\beta\) 散度和 \(\alpha\) 散度生成两个不同的 \(\gamma\) 散度族。\(\gamma\) 散度具有与参数 \(\gamma\) 的取值无关的全局尺度不变性，以及高度稳健性。本文回顾并扩展了 \(\gamma\) 散度的基本性质；所用方法也能够生成广泛的新散度，尤其是 \(\gamma\) 散度及扩展的 Itakura–Saito 型距离族。本文特别讨论了调节参数取奇异值 \(0,1\) 时的散度。
+
+
+这些散度族具有灵活性、对离群值的稳健性等性质，而且只涉及一个调节参数，即 \(\alpha\)、\(\beta\) 或 \(\gamma\)。信息几何的分析可以进一步阐明这些散度的基本结构与几何性质[\hyperlink{B1-entropy-12-01532}{1},\allowbreak \hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B7-entropy-12-01532}{7}]。
+
+
+与之前密切相关的工作相比，本文明确研究了 \(\alpha\)、\(\beta\) 和 \(\gamma\) 三个广泛的散度类，讨论了它们的性质，以及它们与 Csiszár–Morimoto 散度、Bregman 散度的联系。本文给出的部分性质，尤其是 \(\gamma\) 散度的一些性质，是新的结果。
+
+
+利用本文讨论的散度性质，我们开发了一族用于独立成分分析和非负矩阵分解的稳健算法，并在近期的其他工作中给出[\hyperlink{B30-entropy-12-01532}{30}--\hyperlink{B34-entropy-12-01532}{34},\allowbreak \hyperlink{B68-entropy-12-01532}{68}--\hyperlink{B71-entropy-12-01532}{71}]。它们在许多应用中具有潜力，尤其是对统计相关的稀疏源、平滑源或兼具二者的源进行盲分离，以及特征提取和分类问题[\hyperlink{B30-entropy-12-01532}{30}]。
+
+
+一个重要但仍未解决、本文也未讨论的问题，是如何依据现有数据集的分布，以及噪声或离群值的情况，设定调节参数 \(\alpha,\beta\) 和 \(\gamma\)。近期一些工作研究了这个问题[\hyperlink{B69-entropy-12-01532}{69},\allowbreak \hyperlink{B71-entropy-12-01532}{71},\allowbreak \hyperlink{B84-entropy-12-01532}{84}]。通常，稳健性与统计效率之间存在权衡[\hyperlink{B35-entropy-12-01532}{35},\allowbreak \hyperlink{B37-entropy-12-01532}{37},\allowbreak \hyperlink{B71-entropy-12-01532}{71}]。例如，当调节参数 \(\gamma\) 较大时，\(\gamma\) 散度的稳健性较强，但统计效率可能较低；当该参数取较小的正值时，方法的稳健性较弱，但统计效率较高[\hyperlink{B35-entropy-12-01532}{35}]。统计效率与调节参数之间的关系，已由多位作者讨论，参见 Jones 等[\hyperlink{B85-entropy-12-01532}{85}]、Basu 等[\hyperlink{B67-entropy-12-01532}{67}]以及 Fujisawa 和 Eguchi[\hyperlink{B35-entropy-12-01532}{35}]。

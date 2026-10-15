@@ -1,0 +1,84 @@
+\subsection*{\texorpdfstring{Duality}{Duality}}
+Note that we can easily establish the following dualities for the Alpha and Alpha-Gamma divergences:
+
+\setcounter{equation}{92}
+\begin{equation}
+\label{FD100-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = c^{- 1}D_{A}^{(1 - \alpha)}{(c\,\mathbf{Q}\,||\, c\,\mathbf{P})},\quad D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AG}^{(1 - \gamma)}(c_{1}{\mathbf{Q}\,||\,}c_{2}{\mathbf{P})}}
+\end{equation}
+
+ However, in order to establish duality for the Beta-divergence, we need represent it in slightly more general form as two set parameters divergence:
+
+\setcounter{equation}{93}
+\begin{equation}
+\label{FD101-entropy-12-01532}
+\fitmath{D_{AB}^{(\beta_{1},\beta_{2})}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\beta_{1}\,\beta_{2}{(\beta_{1} + \beta_{2})}}\int\left( {\beta_{1}\, p^{\beta_{1} + \beta_{2}} + \beta_{2}\, q^{\beta_{1} + \beta_{2}} - {(\beta_{1} + \beta_{2})}p^{\beta_{1}}q^{\beta_{2}}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ In this case, we can express a duality of the Beta-divergence as
+
+\setcounter{equation}{94}
+\begin{equation}
+\label{FD102-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AB}^{(1,\beta - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = c^{- \beta}D_{AB}^{(\beta - 1,1)}{(c\,\mathbf{Q}\,||\, c\,\mathbf{P})}}
+\end{equation}
+
+ or more generally
+
+\setcounter{equation}{95}
+\begin{equation}
+\label{FD103-entropy-12-01532}
+\fitmath{D_{AB}^{(\beta_{1},\beta_{2})}{(\mathbf{P}\,||\,\mathbf{Q})} = c^{- (\beta_{1} + \beta_{2})}D_{AB}^{(\beta_{2},\beta_{1})}{(c\,\mathbf{Q}\,||\, c\,\mathbf{P})}}
+\end{equation}
+
+ Analogously, we define family of the asymmetric Gamma divergences in more general form as a two-set parameter divergence:
+
+\setcounter{equation}{96}
+\begin{equation}
+\label{FD104-entropy-12-01532}
+\fitmath{\begin{array}{r}
+{D_{ABG}^{(\gamma_{1},\gamma_{2})}{(\mathbf{P} \parallel \mathbf{Q})} = \log\frac{\left( {\int p^{\gamma_{1} + \gamma_{2}}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma_{2}{(\gamma_{1} + \gamma_{2})}}}\left( {\int q^{\gamma_{1} + \gamma_{2}}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma_{1}{(\gamma_{1} + \gamma_{2})}}}}{\left( {\int p^{\gamma_{1}}q^{\gamma_{2}}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma_{1}\gamma_{2}}}}}
+\end{array}}
+\end{equation}
+
+
+
+
+Hence, we express duality property for the Beta-Gamma (basic Gamma) -divergence as follows
+
+\setcounter{equation}{97}
+\begin{equation}
+\label{FD105-entropy-12-01532}
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{ABG}^{(1,\gamma - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{ABG}^{(\gamma - 1,1)}(c_{1}{\,\mathbf{Q}\,||\,}c_{2}{\,\mathbf{P})}}
+\end{equation}
+
+ or more generally
+
+\setcounter{equation}{98}
+\begin{equation}
+\label{FD106-entropy-12-01532}
+\fitmath{D_{ABG}^{(\gamma_{1},\gamma_{2})}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{ABG}^{(\gamma_{2},\gamma_{1})}(c_{1}{\mathbf{Q}\,||\,}c_{2}{\mathbf{P})}}
+\end{equation}
+
+
+
+
+\setcounter{section}{5}
+\setcounter{subsection}{0}
+\subsection{\texorpdfstring{Conclusions and Discussion}{Conclusions and Discussion}}
+The main goal of this paper was to establish and widen bridges between several classes of divergences. The main results are summarized in \hyperref[entropy-12-01532-t002]{Table 2}, \hyperref[entropy-12-01532-t003]{Table 3}, \hyperref[entropy-12-01532-t004]{Table 4} and \hyperref[entropy-12-01532-t005]{Table 5}. We have extended and unified several important classes of divergence and provided links and correspondences among them. The parametric families of the generalized divergences presented in this paper, especially the Alpha-, Alpha-Rényi and Beta-divergences, enable us to consider smooth connections of various pairs of well-known and frequently used fundamental divergences under one “umbrella”. For example, the family of Beta-divergences smoothly connects the squared Euclidean distance (\(L_{2}\)-norm) with a generalized extended version of Itakura–Saito like distances and through the the generalized KL I-divergences. In fact, we have shown how to generate the whole family of the extended robust Itakura–Saito like distances from Beta-divergences for \(\beta = 0\), which are scale invariant and can be used in many potential applications, especially in speech processing.
+
+
+Furthermore, we have shown that two different families of Gamma-divergences can be generated one from Beta-divergences and the other one from Alpha-divergences. The Gamma-divergences characterized by the global scale invariance (independent of value of parameter \(\gamma\)) and high robustness. We have reviewed and extended fundamental properties of the Gamma-divergences. Moreover, our approach allows us to generate a wide class of new divergences, especially Gamma-divergences and family of extended Itakura–Saito like distances. Special emphasis is given to divergences for singular values of tuning parameters \(0,1\).
+
+
+These families have many desirable properties such as flexibility, robustness to outliers and they involve only one single tuning parameter (\(\alpha\), \(\beta\), or \(\gamma\)). An insight using information geometry may further elucidates the fundamental structures of such divergences and geometry [\hyperlink{B1-entropy-12-01532}{1},\allowbreak \hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B7-entropy-12-01532}{7}].
+
+
+In comparison to previous closely related works, we explicitly investigated three wide class of divergences (Alpha, Beta- Gama), discussed their properties and links to Csiszár–Morimoto and Bregman divergences. Some provided properties, especially for Gamma-divergences are new.
+
+
+The properties of divergences discussed in this paper allowed us to develop a wide family of robust algorithms for Independent Component Analysis (ICA) and Nonnegative Matrix Factorization (NMF) presented in separated recent works [\hyperlink{B30-entropy-12-01532}{30}--\hyperlink{B34-entropy-12-01532}{34},\allowbreak \hyperlink{B68-entropy-12-01532}{68}--\hyperlink{B71-entropy-12-01532}{71}]. They have great potential in many applications, especially in blind separation of statistically dependent sparse and/or smooth sources and in feature extractions and classification problems [\hyperlink{B30-entropy-12-01532}{30}].
+
+
+One of the important and still open problem (not discussed in this paper) is how to set tuning parameters \(\alpha,\beta\) and \(\gamma\) depending on distributions of available data sets and noise or outliers. Some recent works address this problem [\hyperlink{B69-entropy-12-01532}{69},\allowbreak \hyperlink{B71-entropy-12-01532}{71},\allowbreak \hyperlink{B84-entropy-12-01532}{84}]. Usually, there is some trade off between robustness and efficiency [\hyperlink{B35-entropy-12-01532}{35},\allowbreak \hyperlink{B37-entropy-12-01532}{37},\allowbreak \hyperlink{B71-entropy-12-01532}{71}]. For example, if the tuning parameter \(\gamma\) is large, then the robustness of the Gamma divergence will be strong but the efficiency could be lower, and vice versa, if the tuning parameter has small positive value, then the robustness of the method would be not strong but the efficiency will be higher [\hyperlink{B35-entropy-12-01532}{35}]. The relation between the efficiency and the tuning parameters was discussed by several authors (see Jones et al. [\hyperlink{B85-entropy-12-01532}{85}], Basu et al. [\hyperlink{B67-entropy-12-01532}{67}], and Fujisawa and Eguchi [\hyperlink{B35-entropy-12-01532}{35}]).

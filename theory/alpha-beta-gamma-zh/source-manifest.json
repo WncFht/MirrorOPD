@@ -1,0 +1,41 @@
+{
+    "title": "Families of Alpha- Beta- and Gamma- Divergences: Flexible and Robust Measures of Similarities",
+    "authors": ["Andrzej Cichocki", "Shun-ichi Amari"],
+    "doi": "10.3390/e12061532",
+    "year": 2010,
+    "retrieved": "2026-10-15",
+    "license": "CC-BY-3.0",
+    "author_tex_source_obtained": false,
+    "latex_provenance": "Recovered from publisher XML using Pandoc 3.9 / texmath; Chinese prose translated in full",
+    "originals": [
+        {
+            "file": "original/entropy-12-01532.xml",
+            "url": "https://mdpi-res.com/d_attachment/entropy/entropy-12-01532/article_deploy/entropy-12-01532.xml",
+            "bytes": 1347763,
+            "sha256": "467ef5efb44951ccb66baf9afa4b726c16a2b55842c567047ce1570a52060a22"
+        },
+        {
+            "file": "original/entropy-12-01532.pdf",
+            "url": "https://mdpi-res.com/d_attachment/entropy/entropy-12-01532/article_deploy/entropy-12-01532.pdf",
+            "bytes": 536007,
+            "sha256": "1aa4c01f9c74fedbe86767d9374902f78056c085ab3700fcfbfc910eb6cbb8c5"
+        }
+    ],
+    "source_structure": {
+        "numbered_equations": 128,
+        "display_formulas": 141,
+        "inline_formulas": 414,
+        "mathml_objects": 555,
+        "tables": 5,
+        "references": 85,
+        "appendices": 3
+    },
+    "layout_changes": [
+        "Landscape pagination for the five tables",
+        "Promote three long inline definitions to unnumbered display math",
+        "Render MathML combining underlines as LaTeX underline",
+        "Translate mathematical connective words and localize cross-reference labels",
+        "Restore two MathML spaces of 3.33333pt mis-converted by texmath to 600mu in equation 13"
+    ],
+    "translated_text_units": 225
+}

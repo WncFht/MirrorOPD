@@ -1,0 +1,394 @@
+\setcounter{section}{2}
+\section{\texorpdfstring{\(\beta\) 散度族}{β 散度族}}
+\label{sec3-entropy-12-01532}
+基本的 \(\beta\) 散度由 Basu 等[\hyperlink{B67-entropy-12-01532}{67}]以及 Minami 和 Eguchi[\hyperlink{B15-entropy-12-01532}{15}]提出，许多研究者研究了它的应用，包括文献[\hyperlink{B8-entropy-12-01532}{8},\allowbreak \hyperlink{B13-entropy-12-01532}{13},\allowbreak \hyperlink{B30-entropy-12-01532}{30}--\hyperlink{B34-entropy-12-01532}{34},\allowbreak \hyperlink{B37-entropy-12-01532}{37},\allowbreak \hyperlink{B37-entropy-12-01532}{37},\allowbreak \hyperlink{B68-entropy-12-01532}{68}--\hyperlink{B72-entropy-12-01532}{72}]及其中的参考文献。从应用角度，研究 \(\beta\) 散度的主要动机，是为聚类、特征提取、分类和盲源分离开发对离群值高度稳健的学习算法。\(\beta\) 散度已成功用于稳健主成分分析（Principal Component Analysis，PCA）与聚类[\hyperlink{B71-entropy-12-01532}{71}]、稳健独立成分分析（Independent Component Analysis，ICA）[\hyperlink{B15-entropy-12-01532}{15},\allowbreak \hyperlink{B68-entropy-12-01532}{68},\allowbreak \hyperlink{B69-entropy-12-01532}{69}]，以及稳健 NMF 和非负张量分解（Non-negative Tensor Factorization，NTF）[\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B70-entropy-12-01532}{70},\allowbreak \hyperlink{B73-entropy-12-01532}{73}--\hyperlink{B76-entropy-12-01532}{76}]。
+
+
+先定义两个未归一化密度函数之间的基本非对称 \(\beta\) 散度：
+
+\setcounter{equation}{45}
+\begin{equation}
+\label{FD47-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\;\mathbf{Q})} = \int\left( {p{(\mathbf{x})}\;\frac{p^{\beta - 1}{(\mathbf{x})} - q^{\beta - 1}{(\mathbf{x})}}{\beta - 1} - \frac{p^{\beta}{(\mathbf{x})} - q^{\beta}{(\mathbf{x})}}{\beta}} \right)d\mu{(\mathbf{x})},\;\;\beta \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+其中 \(\beta\) 为实数；在 \(\beta = 0,1\) 时，通过连续性定义，详见下文。
+
+
+对于概率质量函数为 \(\mathbf{P} = \lbrack p_{1},p_{2},\ldots,p_{n}\rbrack\) 和 \(\mathbf{Q} = \lbrack q_{1},q_{2},\ldots,q_{n}\rbrack\) 的离散概率测度，离散 \(\beta\) 散度定义为
+
+\setcounter{equation}{46}
+\begin{equation}
+\label{FD48-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\;\mathbf{Q})} = \sum\limits_{i = 1}^{n}d_{B}^{\;(\beta)}(p_{i}{\,||\,}q_{i}{) =}\sum\limits_{i = 1}^{n}\left( {p_{i}\;\frac{p_{i}^{\beta - 1} - q_{i}^{\beta - 1}}{\beta - 1} - \frac{p_{i}^{\beta} - q_{i}^{\beta}}{\beta}} \right)\;\;\beta \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+\(\beta\) 散度也可通过广义 KL 散度表示：
+
+\setcounter{equation}{47}
+\begin{equation}
+\label{FD49-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\;\mathbf{Q})} = D_{GKL}^{(\beta^{- 1})}(\mathbf{P}^{\beta}{\,||\;}\mathbf{Q}^{\beta}{) = -}\frac{1}{\beta}\int\left( {p^{\beta}\log_{(\frac{1}{\beta})}\left( \frac{q^{\beta}}{p^{\beta}} \right) + p^{\beta} - q^{\beta}} \right)d\mu{(\mathbf{x})}\;\;\beta \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+这一表示说明，在某些调节参数 \(\beta\) 的取值下，\(\beta\) 散度对离群值具有稳健性，因而更适合某些应用。例如，在声音处理中，语音功率谱可以用指数族密度建模；当 \(\beta = 0\) 时，\(\beta\) 散度正是 Itakura–Saito 距离，也称 Itakura–Saito 散度、Itakura–Saito 失真度量或 Burg 交叉熵[\hyperlink{B12-entropy-12-01532}{12},\allowbreak \hyperlink{B13-entropy-12-01532}{13},\allowbreak \hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B76-entropy-12-01532}{76}--\hyperlink{B79-entropy-12-01532}{79}]。具体地，\(\beta\) 散度在 \(\left. \beta\rightarrow 0 \right.\) 的极限情形下，必须定义为 Itakura–Saito 距离：
+
+\setcounter{equation}{48}
+\begin{equation}
+\label{FD50-entropy-12-01532}
+\fitmath{D_{IS}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\beta\rightarrow 0}D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {\log\frac{q}{p} + \frac{p}{q} - 1} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+Itakura 和 Saito 的距离源于语音谱的最大似然（Maximum Likelihood，ML）估计[\hyperlink{B77-entropy-12-01532}{77}]，用于衡量两个频谱之间的失真或拟合优度。它具有尺度不变性，重建信号的感知效果较好，因此常被语音处理领域用作标准度量。尺度不变性使 p 的低能量分量与高能量分量具有相同的相对重要性。当 p 的系数具有很大动态范围时，例如短时音频谱，这一点尤其重要[\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B76-entropy-12-01532}{76},\allowbreak \hyperlink{B79-entropy-12-01532}{79}]。
+
+
+当 \(\beta = 2\) 时，得到标准的平方欧氏距离，即 \(L_{2}\) 范数距离；对于奇异情形 \(\beta = 1\)，则得到 KL 的 I 散度：
+
+\setcounter{equation}{49}
+\begin{equation}
+\label{FD51-entropy-12-01532}
+\fitmath{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\beta\rightarrow 1}D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {p\;\log\frac{p}{q} - p + q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+这里使用了恒等式 \(\lim_{\beta\rightarrow 0}\frac{p^{\beta} - q^{\beta}}{\beta} = \log{(p/q)}\) 和 \(\lim_{\beta\rightarrow 0}\frac{p^{\beta} - 1}{\beta} = \log p\)。
+
+
+因此，\(\beta\) 散度可以更明确地表示为
+
+\setcounter{equation}{50}
+\begin{equation}
+\label{FD52-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int\left( {p^{\beta}{(\mathbf{x})} + {(\beta - 1)}q^{\beta}{(\mathbf{x})} - \beta p{(\mathbf{x})}q^{\beta - 1}{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\beta \neq 0,1} \\
+{\int\left( {p{(\mathbf{x})}\;\log{(\frac{p(\mathbf{x})}{q(\mathbf{x})})} - p{(\mathbf{x})} + q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\;\;\beta = 1} \\
+{\int\left( {\log{(\frac{q(\mathbf{x})}{p(\mathbf{x})})} + \frac{p(\mathbf{x})}{q(\mathbf{x})} - 1} \right)d\mu{(\mathbf{x})},\;\;\;\beta = 0}
+\end{array} \right.}
+\end{equation}
+
+基本的 \(\beta\) 散度平滑地连接 Itakura–Saito 距离和平方欧氏 \(L_{2}\) 范数距离，并经过 KL 的 I 散度 \(D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})}\)。\(\alpha\) 散度族无法给出这样的参数化连接。
+
+
+调节参数 \(\beta\) 的选择取决于数据集的统计分布。例如，对正态分布，最优参数为 \(\beta = 2\)；对伽马分布，为 \(\beta = 0\)；对泊松分布，为 \(\beta = 1\)；对复合泊松分布，为 \(\beta \in (1,2){}\)[\hyperlink{B15-entropy-12-01532}{15},\allowbreak \hyperlink{B31-entropy-12-01532}{31}--\hyperlink{B34-entropy-12-01532}{34},\allowbreak \hyperlink{B68-entropy-12-01532}{68},\allowbreak \hyperlink{B69-entropy-12-01532}{69}]。
+
+
+\(\beta\) 散度可以从 Bregman 散度导出。Bregman 散度是衡量两个密度函数值 \(p(\mathbf{x})\) 和 \(q(\mathbf{x})\) 之间差异的伪距离[\hyperlink{B9-entropy-12-01532}{9},\allowbreak \hyperlink{B16-entropy-12-01532}{16},\allowbreak \hyperlink{B80-entropy-12-01532}{80}]：
+
+\setcounter{equation}{51}
+\begin{equation}
+\label{FD53-entropy-12-01532}
+\fitmath{d_{\Phi}{(p||q)} = \Phi{(p)} - \Phi{(q)} - {(p - q)}\Phi'{(q)}}
+\end{equation}
+
+其中 \(\Phi(t)\) 为严格凸的实值函数，\(\Phi'{(q)}\) 是关于 q 的导数。两个函数 \(p(\mathbf{x})\) 和 \(q(\mathbf{x})\) 之间的总差异为
+
+\setcounter{equation}{52}
+\begin{equation}
+\label{FD54-entropy-12-01532}
+\fitmath{D_{\Phi}{(\mathbf{P}||\mathbf{Q})} = \int\left\lbrack {\Phi{(p{(\mathbf{x})})} - \Phi{(q{(\mathbf{x})})} - {(p{(\mathbf{x})} - q{(\mathbf{x})})}\Phi'{(q{(\mathbf{x})})}} \right\rbrack d\mu{(\mathbf{x})}}
+\end{equation}
+
+它对应于连续概率测度 \(p(\mathbf{x}) \geq 0\) 的 \(\Phi\) 熵，定义为
+
+\setcounter{equation}{53}
+\begin{equation}
+\label{FD55-entropy-12-01532}
+\fitmath{H_{\Phi}{(\mathbf{P})} = - \int\Phi{(p{(x)})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+说明：散度与熵的概念密切相关。设 \(\mathbf{Q}_{0}\) 为均匀分布，满足
+
+\setcounter{equation}{54}
+\begin{equation}
+\label{FD56-entropy-12-01532}
+\fitmath{\mathbf{Q}_{0}{(\mathbf{x})} = const}
+\end{equation}
+
+当 \(\mathbf{x}\) 是无限空间 \(\mathbb{R}^{n}\) 时，它可能不是概率分布，但仍是一个测度。于是
+
+\setcounter{equation}{55}
+\begin{equation}
+\label{FD57-entropy-12-01532}
+\fitmath{H{(\mathbf{P})} = - D(\mathbf{P}||\mathbf{Q}_{0}) + const}
+\end{equation}
+
+可视为相应的熵，即从 \(\mathbf{P}\) 到均匀分布的散度的负值。反过来，给定凹的熵函数 \(H(\mathbf{P})\)，可由凸函数 \(\Phi(\mathbf{P}) = - H(\mathbf{P})\) 导出 Bregman 散度，作为相应的散度。
+
+
+若 \(\mathbf{x}\) 在某个空间上取离散值，可分离 Bregman 散度定义为
+\[
+\fitmath{D_{\Phi}{(\mathbf{P}||\mathbf{Q})} = \sum_{i = 1}d_{\Phi}(p_{i}{||}q_{i}{) =}\sum_{i = 1}^{n}\left\lbrack {\Phi{(p_{i})} - \Phi{(q_{i})} - {(p_{i} - q_{i})}\Phi'{(q_{i})})} \right\rbrack}
+\]
+，其中 \(\Phi'{(q)}\) 表示关于 q 的导数。对于一般的不可分离情形，两个向量 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 之间的 Bregman 散度定义为
+\[
+\fitmath{D_{\Phi}{(\mathbf{P}||\mathbf{Q})} = \Phi{(\mathbf{P})} - \Phi{(\mathbf{Q})} - {(\mathbf{P} - \mathbf{Q})}^{T}\nabla\Phi{(\mathbf{Q})}}
+\]
+，其中 \(\nabla\Phi(\mathbf{Q})\) 为 \(\Phi\) 在 \(\mathbf{Q}\) 处的梯度。
+
+
+\(D_{\Phi}{(\mathbf{P}||\mathbf{Q})}\) 等于 \(\Phi(\mathbf{P})\) 在 \(\mathbf{Q}\) 处一阶 Taylor 展开的余项。Bregman 散度包含许多重要的相异性度量，例如平方欧氏距离、Mahalanobis 距离、广义 Kullback–Leibler 散度和 Itakura–Saito 距离。
+
+
+取如下严格凸的连续函数，即可从 Bregman 散度生成 \(\beta\) 散度[\hyperlink{B36-entropy-12-01532}{36},\allowbreak \hyperlink{B81-entropy-12-01532}{81}]：
+
+\setcounter{equation}{56}
+\begin{equation}
+\label{FD58-entropy-12-01532}
+\fitmath{\Phi{(t)} = \left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\left( {t^{\beta} - \beta t + \beta - 1} \right),\beta \neq 0,1} \\
+{t\log(t) - t + 1,\beta = 1} \\
+{t - \log(t) - 1,\;\;\;\beta = 0}
+\end{array} \right.}
+\end{equation}
+
+同一个生成函数 \(f{(u)} = \Phi{(t)}_{|t = u}\)，在 \(\alpha = \beta\) 的条件下，也可以通过 Csiszár–Morimoto 的 f 散度 \(D_{f}{(\mathbf{P}||\mathbf{Q})} = \int q\, f{(p/q)}\, d\mu{(\mathbf{x})}\) 生成 \(\alpha\) 散度。
+
+
+\(\beta\) 散度还可以由一种广义 f 散度生成：
+
+\setcounter{equation}{57}
+\begin{equation}
+\label{FD59-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{f}{(\mathbf{P}||\mathbf{Q})} = \int\, q^{\beta}f{(p/q)}\, d\mu{(\mathbf{x})} = \int\, q^{\beta}\widetilde{f}\left( \frac{p^{\beta}}{q^{\beta}} \right)\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+其中 \(f{(u)} = \Phi{(t)}_{|t = u}\)，并且 \(u = p/q\)；函数
+
+\setcounter{equation}{58}
+\begin{equation}
+\label{FD60-entropy-12-01532}
+\fitmath{\widetilde{f}{(\widetilde{u})} = \frac{1}{1 - \beta}\left( {{\widetilde{u}}^{\frac{1}{\beta}} - \frac{1}{\beta}\widetilde{u} + \frac{1}{\beta} - 1} \right)}
+\end{equation}
+
+是凸生成函数，满足 \(\widetilde{u} = p^{\beta}/q^{\beta}\)。
+
+
+Bregman 散度与 \(\beta\) 散度之间的联系很重要，因为 Bregman 散度的许多基本性质同样适用于 \(\beta\) 散度[\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B82-entropy-12-01532}{82}]：
+
+\begin{enumerate}
+\item 凸性：Bregman 散度 \(D_{\Phi}{(\mathbf{P}||\mathbf{Q})}\) 关于第一个变量 \(\mathbf{P}\) 始终为凸函数，但关于第二个变量 \(\mathbf{Q}\) 常常不是凸函数。
+
+
+\item 非负性：Bregman 散度非负，即 \(D_{\Phi}{(\mathbf{P}||\mathbf{Q})} \geq 0\)，其零点满足 \(\mathbf{P} = \mathbf{Q}\)。
+
+
+\item 线性：Bregman 散度的任意正系数线性组合仍为 Bregman 散度，即
+
+\setcounter{equation}{59}
+\begin{equation}
+\label{FD61-entropy-12-01532}
+\fitmath{D_{c_{1}\Phi_{1} + c_{2}\Phi_{2}}{(\mathbf{P}||\mathbf{Q})} = c_{1}D_{\Phi_{1}}{(\mathbf{P}||\mathbf{Q})} + c_{2}D_{\Phi_{2}}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+其中 \(c_{1},c_{2}\) 为正常数，\(\Phi_{1},\Phi_{2}\) 为严格凸函数。
+
+
+\item 不变性：对于正测度 \(\mathbf{P}\) 和 \(\mathbf{Q}\)，泛函形式的 Bregman 散度在给生成函数加入线性项和任意常数项的仿射变换 \(\Gamma{(\mathbf{Q})} = \Phi{(\mathbf{Q})} + \int a{(x - x')}q{(x')}dx' + c\) 下保持不变[\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B82-entropy-12-01532}{82}]，即
+
+\setcounter{equation}{60}
+\begin{equation}
+\label{FD62-entropy-12-01532}
+\fitmath{D_{\Gamma}{(\mathbf{P}||\mathbf{Q})} = D_{\Phi}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+
+
+
+\item 三点性质推广了余弦定理：
+
+\setcounter{equation}{61}
+\begin{equation}
+\label{FD63-entropy-12-01532}
+\fitmath{D_{\Phi}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{\Phi}{(\mathbf{P}\,||\,\mathbf{Z})} + D_{\Phi}{(\mathbf{Z}\,||\,\mathbf{Q})} - {(\mathbf{P} - \mathbf{Z})}^{T}{(\frac{\delta}{\delta\mathbf{Q}}\Phi{(\mathbf{Q})} - \frac{\delta}{\delta\mathbf{Z}}\Phi{(\mathbf{Z})})}}
+\end{equation}
+
+
+
+
+\item 广义勾股定理：
+
+\setcounter{equation}{62}
+\begin{equation}
+\label{FD64-entropy-12-01532}
+\fitmath{D_{\Phi}{(\mathbf{P}\,||\,\mathbf{Q})} \geq D_{\Phi}{(\mathbf{P}\,||\,}P_{\Omega}{{(\mathbf{Q})}) +}D_{\Phi}(P_{\Omega}{{(\mathbf{Q})}\,||\,\mathbf{Q})}}
+\end{equation}
+
+其中 \(P_{\Omega}{(\mathbf{Q})} = \underset{\mathbf{\omega} \in \Omega}{\arg\min}D_{\Phi}{(\mathbf{\omega}||\mathbf{Q})}\) 是到凸集 \(\Omega\) 的 Bregman 投影，并且 \(\mathbf{P} \in \Omega\)。若 \(\Omega\) 是仿射集，则等号成立。从信息几何的角度，这就是广义勾股关系。
+
+\end{enumerate}
+
+
+
+
+
+\(\beta\) 散度（\hyperref[FD47-entropy-12-01532]{46}）关于 \(\mathbf{Q}\) 的一阶和二阶 Fréchet 导数为[\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B76-entropy-12-01532}{76}]：
+
+\setcounter{equation}{63}
+\begin{equation}
+\label{FD65-entropy-12-01532}
+\fitmath{\frac{\delta D_{B}^{(\beta)}}{\delta q} = q^{\beta - 2}{(q - p)},\text{\quad\quad}\frac{\delta^{2}D_{B}^{(\beta)}}{\delta q^{2}} = q^{\beta - 3}{({(\beta - 1)}q - {(\beta - 2)}p)}}
+\end{equation}
+
+因此，\(\beta\) 散度在 \(\mathbf{P} = \mathbf{Q}\) 时具有唯一的全局极小值零，并随 \(|p - q|\) 增大。对于 \(q(\mathbf{x}) > 0\)，\(\beta\) 散度仅在 \(\beta \in \lbrack 1,2\rbrack\) 时严格凸。当 \(\beta = 0\)，即 Itakura–Saito 距离的情形，它在 \(\int q^{- 3}{(2p - q)}d\mu{(\mathbf{x})} \geq 0\)，也就是 \(q/p \leq 2\) 时为凸函数[\hyperlink{B78-entropy-12-01532}{78}]。
+
+
+\setcounter{section}{3}
+\setcounter{subsection}{0}
+\subsection{\texorpdfstring{从 \(\alpha\) 散度族直接生成 \(\beta\) 散度族}{从 α 散度族直接生成 β 散度族}}
+\label{sec3dot1-entropy-12-01532}
+原始工作[\hyperlink{B15-entropy-12-01532}{15},\allowbreak \hyperlink{B67-entropy-12-01532}{67}--\hyperlink{B69-entropy-12-01532}{69}]只讨论了 \(\beta \geq 1\) 时的 \(\beta\) 散度函数，没有覆盖参数 \(\beta\) 的全部非正取值，尤其没有讨论 \(\beta = 0\) 时重要的 Itakura–Saito 距离。此外，与 \(\alpha\) 散度类似，还存在相应的 \(\beta\) 散度族，其中包含一族广义 Itakura–Saito 型距离。由此需要说明如何生成整个 \(\beta\) 散度族，以及 \(\alpha\) 散度与 \(\beta\) 散度之间的联系和对应关系。根据前面的讨论，可以从 \(\alpha\) 散度得到完整的 \(\beta\) 散度族；反过来，也可以直接从 \(\beta\) 散度得到 \(\alpha\) 散度。
+
+
+要从一个 \(\alpha\) 散度得到与之对应的 \(\beta\) 散度，需要采用以下非线性变换：
+
+\setcounter{equation}{64}
+\begin{equation}
+\label{FD66-entropy-12-01532}
+\fitmath{\left. p\rightarrow p^{\beta}, q\rightarrow q^{\beta}\text{且}\alpha = \beta^{- 1} \right.}
+\end{equation}
+
+
+
+
+例如，对基本的非对称 \(\alpha\) 散度（\hyperref[FD4-entropy-12-01532]{4}）作上述变换或代换，并假设 \(\alpha = {(\beta)}^{- 1}\)，得到
+
+\setcounter{equation}{65}
+\begin{equation}
+\label{FD67-entropy-12-01532}
+\fitmath{D_{A}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \beta^{2}\int\left( \frac{- \beta p\, q^{\beta - 1} + p^{\beta} + {(\beta - 1)}\, q^{\beta}}{\beta(\beta - 1)} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+忽略缩放因子 \(\beta^{2}\) 后，就得到式（\hyperref[FD47-entropy-12-01532]{46}）定义的基本非对称 \(\beta\) 散度。
+
+
+整个 \(\alpha\) 散度族与 \(\beta\) 散度族之间都存在这种联系，见\hyperref[entropy-12-01532-t002]{表 2}。
+
+
+例如，可以从第一类对称 \(\alpha\) 散度（\hyperref[FD38-entropy-12-01532]{38}）导出对称 \(\beta\) 散度：
+
+\[
+\fitmath{\begin{array}{clr}
+{D_{BS1}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{B}^{(\beta)}{(\mathbf{Q}\,||\,\mathbf{P})}} \\
+ & = & {\frac{1}{\beta - 1}\int\left( {{(p - q)}{(p^{\beta - 1} - q^{\beta - 1})}} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\]
+
+
+
+
+在若干特例中，可以得到以下结果。
+
+
+对称 KL 散度，即 J 散度[\hyperlink{B65-entropy-12-01532}{65}]：
+
+\setcounter{equation}{66}
+\begin{equation}
+\label{FD69-entropy-12-01532}
+\fitmath{D_{BS1}^{(1)} = \lim\limits_{\beta\rightarrow 1}D_{BS1}^{(\beta)} = \int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+以及对称卡方散度[\hyperlink{B54-entropy-12-01532}{54}]：
+
+\setcounter{equation}{67}
+\begin{equation}
+\label{FD70-entropy-12-01532}
+\fitmath{D_{BS1}^{(0)} = \lim\limits_{\beta\rightarrow 0}D_{BS1}^{(\beta)} = \int\frac{{(p - q)}^{2}}{pq}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+类似地，从第二类对称 \(\alpha\) 散度可得
+
+\setcounter{equation}{68}
+\begin{equation}
+\label{FD71-entropy-12-01532}
+\fitmath{D_{BS2}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\beta - 1}\int\left( {{p^{\beta} + q^{\beta}} - {(p^{\beta - 1} + q^{\beta - 1})}\left( \frac{p^{\beta} + q^{\beta}}{2} \right)^{\frac{1}{\beta}}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{1}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{\(\alpha\) 散度族及其对应的 \(\beta\) 散度族。使用的变换为 \(\left. p\rightarrow p^{\beta},\;\; q\rightarrow q^{\beta},\;\;\alpha = 1/\beta \right.\)。其中 \(D_{A}^{(1)}{({\mathbf{P}||\mathbf{Q}})} = D_{B}^{(1)}{({\mathbf{P}||\mathbf{Q}})}\)，它们在 \(\alpha = \beta = 1\) 时给出扩展的 KL 散度族；在 \(\beta = 0\) 时，\(\beta\) 散度给出广义的、扩展的 Itakura–Saito 型距离族。}\label{entropy-12-01532-t002}\\
+\toprule
+\cellmath{\alpha} 散度 \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})}} & \cellmath{\beta} 散度 \cellmath{D_{B}^{(\beta)}{({\mathbf{P}||\mathbf{Q}})}} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}\, q^{1 - \alpha} - \alpha p + {(\alpha - 1)}\, q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int\left( {p^{\beta} + {(\beta - 1)}\, q^{\beta} - \beta\, p\, q^{\beta - 1}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\log\left( \frac{q}{p} \right) + \frac{p}{q} - 1} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {{(\frac{p + q}{2})}^{\alpha}q^{1 - \alpha} - \frac{\alpha}{2}p + {(\frac{\alpha}{2} - 1)}\, q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {q\log\left( \frac{2q}{p + q} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {p^{\beta} + {(2\beta - 1)}q^{\beta} - 2\beta q^{\beta - 1}\left( \frac{p^{\beta} + q^{\beta}}{2} \right)^{\frac{1}{\beta}}} \right)d\mu{(\mathbf{x})}}{\beta(\beta - 1)},} \\
+{\int\left( {\log{(\frac{q}{p})} + 2{(\sqrt{\frac{p}{q}} - 1)}} \right)\, d\mu{(\mathbf{x})},\beta = 0} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p_{1} + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int{(p - q)}\left\lbrack {\left( \frac{p + q}{2q} \right)^{\alpha - 1} - 1} \right\rbrack d\mu{(\mathbf{x})},} \\
+{\int\frac{{(p - q)}^{2}}{p + q}d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int{(p^{\beta} - q^{\beta})}\left( {1 - \frac{2^{\frac{\beta - 1}{\beta}}q^{\beta - 1}}{\left( {p^{\beta} + q^{\beta}} \right)^{\frac{\beta - 1}{\beta}}}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\sqrt{\frac{p}{q}} - 1} \right)\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}q^{1 - \alpha} + p^{1 - \alpha}q^{\alpha} - p - q} \right)d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\alpha = 0,1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta - 1}\int\left( {p^{\beta} + q^{\beta} - pq^{\beta - 1} - p^{\beta - 1}q} \right)d\mu{(\mathbf{x})},} \\
+{\int\frac{{(p - q)}^{2}}{pq}d\mu{(\mathbf{x})},\beta = 0} \\
+{\int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{1 - \alpha}\int\left( {\frac{p + q}{2} - \left( \frac{p^{\alpha} + q^{\alpha}}{2} \right)^{\frac{1}{\alpha}}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( \frac{\sqrt{p} - \sqrt{q})^{2}}{2} \right)d\mu{(\mathbf{x})},\;\;\alpha = 0} \\
+{H_{S}\left( \frac{\mathbf{P} + \mathbf{Q}}{2} \right) - \frac{H_{S}{(\mathbf{P})} + H_{S}{(\mathbf{Q})}}{2},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int\left( {\frac{p^{\beta} + q^{\beta}}{2} - \left( \frac{p + q}{2} \right)^{\beta}} \right)d\mu{(\mathbf{x})},} \\
+{\int\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{H_{S}\left( \frac{\mathbf{P} + \mathbf{Q}}{2} \right) - \frac{H_{S}{(\mathbf{P})} + H_{S}{(\mathbf{Q})}}{2},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {{(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha} - p - q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {p\log\left( \frac{2p}{p + q} \right) + q\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\;\;\alpha = 0} \\
+{\int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta - 1}\int\left( {p^{\beta} + q^{\beta} - {(p^{\beta - 1} + q^{\beta - 1})}\left( \frac{p^{\beta} + q^{\beta}}{2} \right)^{\frac{1}{\beta}}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\sqrt{\frac{p}{q}} + \sqrt{\frac{q}{p}} - 2} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{\int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+
+在若干特例中，得到以下结果。
+
+
+算术–几何散度[\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39}]：
+
+\setcounter{equation}{69}
+\begin{equation}
+\label{FD72-entropy-12-01532}
+\fitmath{D_{BS2}^{(1)} = \lim\limits_{\beta\rightarrow 1}D_{BS2}^{(\beta)} = \int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},}
+\end{equation}
+
+以及对称化的 Itakura–Saito 距离，也称 COSH 距离[\hyperlink{B12-entropy-12-01532}{12},\allowbreak \hyperlink{B13-entropy-12-01532}{13}]：
+
+\setcounter{equation}{70}
+\begin{equation}
+\label{FD73-entropy-12-01532}
+\fitmath{D_{BS2}^{(0)} = \lim\limits_{\beta\rightarrow 0}D_{BS2}^{(\beta)} = \int\left( {\sqrt{\frac{p}{q}} + \sqrt{\frac{q}{p}} - 2} \right)d\mu{(\mathbf{x})} = \int\frac{{(\sqrt{p} - \sqrt{q})}^{2}}{\sqrt{pq}}d\mu{(\mathbf{x})}}
+\end{equation}

@@ -1,0 +1,124 @@
+\section{\texorpdfstring{Tsallis 熵与 Rényi 熵}{Tsallis 熵与 Rényi 熵}}\label{app3-entropy-12-01532}
+Rényi 的 \(\alpha\) 熵与 Tsallis 的 \(\alpha\) 熵通过以下单调关系相联系：
+
+\setcounter{equation}{115}
+\begin{equation}
+\label{FD113-entropy-12-01532}
+\fitmath{H_{R}^{(\alpha)}{(\overline{\mathbf{p}})} = \frac{1}{1 - \alpha}\log\left( {1 + {(1 - \alpha)}H_{T}^{(\alpha)}{(\overline{\mathbf{p}})}} \right)}
+\end{equation}
+
+或者使用 \(\alpha\) 对数写为
+
+\setcounter{equation}{116}
+\begin{equation}
+\label{FD114-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{p}})} = \log_{\,\alpha}e^{\; H_{R}^{(\alpha)}{(\overline{\mathbf{p}})}}}
+\end{equation}
+
+\(\Psi_{R}^{(\alpha)} = - H_{R}^{(\alpha)}\) 是 \(\overline{\mathbf{p}}\) 的凸函数，因此可以构造相应的散度。
+
+
+Bregman 散度可以定义为以下更一般的形式。
+
+
+若 \(\left. \Phi{(\overline{\mathbf{p}})}:\;\mathbb{R}^{n}\rightarrow\mathbb{R} \right.\) 是严格凸的 \(C^{1}\) 函数，即一阶可微函数，则离散正测度上相应的 Bregman 距离或散度定义为
+
+\setcounter{equation}{117}
+\begin{equation}
+\label{FD115-entropy-12-01532}
+\fitmath{D_{\Phi}(\overline{\mathbf{p}}{\,||\,}\overline{\mathbf{q}}{) = \Phi}{(\overline{\mathbf{p}})} - \Phi{(\overline{\mathbf{q}})} - {(\overline{\mathbf{p}} - \overline{\mathbf{q}})}^{T}\nabla\Phi{(\overline{\mathbf{q}})}}
+\end{equation}
+
+其中 \(\nabla\Phi(\overline{\mathbf{q}})\) 表示 \(\Phi\) 在 \(\overline{\mathbf{q}}\) 处的梯度。
+
+
+由 Rényi 熵导出的离散概率密度上的 Bregman 散度为
+
+\setcounter{equation}{118}
+\begin{equation}
+\label{FD116-entropy-12-01532}
+\fitmath{D_{R}^{(\alpha)}(\overline{\mathbf{p}}{\,||\,}\overline{\mathbf{q}}{) =}\frac{1}{1 - \alpha}\log\frac{h_{\alpha}{(\overline{\mathbf{q}})}}{h_{\alpha}{(\mathbf{p})}} - \frac{\alpha}{1 - \alpha}\frac{1}{h_{\alpha}{(\overline{\mathbf{q}})}}{(1 - \sum\limits_{i}{\overline{p}}_{i}\,{\overline{q}}_{i}^{\alpha - 1})}}
+\end{equation}
+
+Tsallis 熵与概率分布的 \(\alpha\) 指数族密切相关。由向量参数 \(\mathbf{\theta}\) 参数化的一族概率分布 \(S = \left\{ {\overline{p}{(\mathbf{x},\mathbf{\theta})}} \right\}\)，若能写为
+
+\setcounter{equation}{119}
+\begin{equation}
+\label{FD117-entropy-12-01532}
+\fitmath{\log_{\,\alpha}\overline{p}{(\mathbf{x},\mathbf{\theta})} = \sum\limits_{i}\theta_{i}x_{i} - \Psi{(\mathbf{\theta})}}
+\end{equation}
+
+其中 \(\Psi(\mathbf{\theta})\) 为凸函数，则称为 \(\alpha\) 指数族。这与文献[\hyperlink{B6-entropy-12-01532}{6}]定义的 \(\alpha\) 族相同。对于任意 \(\alpha\)，离散概率分布集合 \(S = \left\{ \mathbf{p} \right\}\) 都构成 \(\alpha\) 指数族。为说明这一点，引入随机变量 \(\mathbf{x} = (x)\)：
+
+\setcounter{equation}{120}
+\begin{equation}
+\label{FD118-entropy-12-01532}
+\fitmath{x_{i} = \delta_{i}}
+\end{equation}
+
+当结果为 i 时，它取值为 1，该结果的概率为 \(\overline{p}\)。
+
+
+于是，概率可以写为
+
+\setcounter{equation}{121}
+\begin{equation}
+\label{FD119-entropy-12-01532}
+\fitmath{\log_{\,\alpha}\overline{p}{(\mathbf{x},\mathbf{\theta})} = \sum\limits_{i}\theta_{i}\delta_{i} - \Psi{(\mathbf{\theta})}}
+\end{equation}
+
+其中
+
+\setcounter{equation}{122}
+\begin{equation}
+\label{FD120-entropy-12-01532}
+\fitmath{\theta_{i} = \log_{\,\alpha}{\overline{p}}_{i}}
+\end{equation}
+
+由于 \(\sum{\overline{p}}_{i} = 1\) 成立，或者写成
+
+\setcounter{equation}{123}
+\begin{equation}
+\label{FD121-entropy-12-01532}
+\fitmath{\sum\delta_{i} = 1}
+\end{equation}
+
+因此，\(\mathbf{\theta}\) 的自由变量为 \(n - 1\)，记为 \(\left( {\theta_{1},\cdots,\theta_{n - 1}} \right)\)。此时，\(\theta_{n}\) 是其余变量的函数，得到
+
+\setcounter{equation}{124}
+\begin{equation}
+\label{FD122-entropy-12-01532}
+\fitmath{\Psi{(\mathbf{\theta})} = - \log_{\,\alpha}\theta_{n}}
+\end{equation}
+
+
+
+
+可以由这个凸函数 \(\Psi(\mathbf{\theta})\) 导出散度。不过，使用 \(\Psi(\mathbf{\theta})\) 的对偶函数更直观，该对偶函数为
+
+\setcounter{equation}{125}
+\begin{equation}
+\label{FD123-entropy-12-01532}
+\fitmath{\varphi{(\mathbf{\eta})} = \frac{1}{1 - \alpha}\left( {\frac{1}{h_{\alpha}{(\overline{\mathbf{p}})}} - 1} \right)}
+\end{equation}
+
+其中 \(\mathbf{\eta}\) 是 \(\mathbf{\theta}\) 通过 Legendre 变换得到的对偶变量：
+
+\setcounter{equation}{126}
+\begin{equation}
+\label{FD124-entropy-12-01532}
+\fitmath{\mathbf{\eta} = \nabla_{\mathbf{\theta}}\Psi{(\mathbf{\theta})}}
+\end{equation}
+
+
+
+
+得到的散度为
+
+\setcounter{equation}{127}
+\begin{equation}
+\label{FD125-entropy-12-01532}
+\fitmath{D_{\exp}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})} = \frac{1}{h_{\alpha}{(\overline{\mathbf{p}})}}D_{T}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})}}
+\end{equation}
+
+这是 \(\alpha\) 散度的共形变换[\hyperlink{B7-entropy-12-01532}{7}]。共形变换也称共形映射或保角变换，它保持任意两条直线或曲线在交点处的局部夹角。

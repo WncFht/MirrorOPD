@@ -1,0 +1,40 @@
+\documentclass[UTF8,fontset=none,11pt,a4paper]{ctexart}
+\errorcontextlines=40
+\setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold},ItalicFont={Noto Serif CJK SC},SlantedFont={Noto Serif CJK SC}]
+\setCJKsansfont{Noto Sans CJK SC}
+\usepackage[margin=23mm]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm,graphicx,adjustbox,booktabs,longtable,pdflscape,xurl,xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=blue]{hyperref}
+\setlength{\LTcapwidth}{\textwidth}
+\newcommand{\fitmath}[1]{\mbox{\begin{adjustbox}{max width=.94\linewidth}$\displaystyle #1$\end{adjustbox}}}
+\newcommand{\cellmath}[1]{\mbox{\begin{adjustbox}{max width=\linewidth}$\displaystyle #1$\end{adjustbox}}}
+\setlength{\emergencystretch}{3em}
+\setcounter{secnumdepth}{2}
+\pagestyle{plain}
+
+\title{$\alpha$、$\beta$ 和 $\gamma$ 散度族：\\灵活而稳健的相似性度量}
+\author{Andrzej Cichocki \and Shun-ichi Amari}
+\date{Entropy 2010, 12, 1532--1568\\中文编译版：2026 年 10 月 15 日}
+\begin{document}
+\maketitle
+{\small\noindent 1. 日本理化学研究所脑科学研究所，高级脑信号处理实验室，日本和光市。\\2. 波兰科学院系统研究所，波兰。\\3. 日本理化学研究所脑科学研究所，数学神经科学实验室，日本和光市。\\Andrzej Cichocki 属于机构 1、2，为通讯作者；Shun-ichi Amari 属于机构 3。\\通讯邮箱：\href{mailto:a.cichocki@riken.jp}{a.cichocki@riken.jp}；电话：+81-48467-9668；传真：+81-48467-9686。\\收稿：2010 年 4 月 26 日；录用：2010 年 6 月 1 日；发表：2010 年 6 月 14 日。\par}
+\begin{quote}\small 本译文依据出版社 XML 全文恢复 LaTeX 后翻译；未取得作者原始 .tex 文件。保留原文公式、表格、章节和参考文献编号。原文 DOI：\href{https://doi.org/10.3390/e12061532}{10.3390/e12061532}。原作 © 2010 作者，采用 \href{https://creativecommons.org/licenses/by/3.0/}{CC BY 3.0} 许可；本稿的改动为中文翻译及排版调整。\end{quote}
+\begin{abstract}
+本文扩展并综述 \(\alpha\)、\(\beta\) 和 \(\gamma\) 散度的若干广泛族，讨论它们的基本性质。现有文献通常只考虑某一种非对称散度，即 \(\alpha\)、\(\beta\) 或 \(\gamma\) 散度。本文说明，这些散度各自构成具有一致性质的族。通过适当的非线性变换，我们建立不同散度之间的联系与对应关系。例如，可以从 \(\alpha\) 散度直接生成 \(\beta\) 散度，反之亦然。我们还说明，一类新的 \(\gamma\) 散度既可以从 \(\beta\) 散度族生成，也可以从 \(\alpha\) 散度族生成。本文连接这些散度，并说明它们与 Tsallis 熵及 Rényi 熵的关系。其中大多数散度都有自然的信息论解释。
+\end{abstract}
+\noindent 关键词：相似性度量；广义散度；扩展的 Itakura–Saito 型距离；Csiszár–Morimoto 散度与 Bregman 散度；Tsallis 熵与 Rényi 熵
+\tableofcontents
+\clearpage
+\input{sections/01-section}
+\input{sections/02-section}
+\input{sections/03-section}
+\input{sections/04-section}
+\input{sections/05-section}
+\input{sections/06-section}
+\appendix
+\input{sections/appendix-a}
+\input{sections/appendix-b}
+\input{sections/appendix-c}
+\input{references}
+\bigskip\noindent\small © 2010 作者；被许可方：MDPI，瑞士巴塞尔。原文为开放获取文章，按知识共享署名许可（CC BY 3.0）发布。
+\end{document}

@@ -1,0 +1,394 @@
+\setcounter{section}{2}
+\section{\texorpdfstring{Family of Beta-Divergences}{Family of Beta-Divergences}}
+\label{sec3-entropy-12-01532}
+The basic Beta-divergence was introduced by Basu et al. [\hyperlink{B67-entropy-12-01532}{67}] and Minami and Eguchi [\hyperlink{B15-entropy-12-01532}{15}] and many researchers investigated their applications including [\hyperlink{B8-entropy-12-01532}{8},\allowbreak \hyperlink{B13-entropy-12-01532}{13},\allowbreak \hyperlink{B30-entropy-12-01532}{30}--\hyperlink{B34-entropy-12-01532}{34},\allowbreak \hyperlink{B37-entropy-12-01532}{37},\allowbreak \hyperlink{B37-entropy-12-01532}{37},\allowbreak \hyperlink{B68-entropy-12-01532}{68}--\hyperlink{B72-entropy-12-01532}{72}], and references therein. The main motivation to investigate the beta divergence, at least from the practical point of view, is to develop highly robust in respect to outliers learning algorithms for clustering, feature extraction, classification and blind source separation. Until now the Beta-divergence has been successfully applied for robust PCA (Principal Component Analysis) and clustering [\hyperlink{B71-entropy-12-01532}{71}], robust ICA (Independent Component Analysis) [\hyperlink{B15-entropy-12-01532}{15},\allowbreak \hyperlink{B68-entropy-12-01532}{68},\allowbreak \hyperlink{B69-entropy-12-01532}{69}], and robust NMF/NTF [\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B70-entropy-12-01532}{70},\allowbreak \hyperlink{B73-entropy-12-01532}{73}--\hyperlink{B76-entropy-12-01532}{76}].
+
+
+First, let us define the basic asymmetric Beta-divergence between two unnormalized density functions by
+
+\setcounter{equation}{45}
+\begin{equation}
+\label{FD47-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\;\mathbf{Q})} = \int\left( {p{(\mathbf{x})}\;\frac{p^{\beta - 1}{(\mathbf{x})} - q^{\beta - 1}{(\mathbf{x})}}{\beta - 1} - \frac{p^{\beta}{(\mathbf{x})} - q^{\beta}{(\mathbf{x})}}{\beta}} \right)d\mu{(\mathbf{x})},\;\;\beta \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+ where \(\beta\) is a real number and, for \(\beta = 0,1\), is defined by continuity (see below for more explanation).
+
+
+For discrete probability measures with mass functions \(\mathbf{P} = \lbrack p_{1},p_{2},\ldots,p_{n}\rbrack\) and \(\mathbf{Q} = \lbrack q_{1},q_{2},\ldots,q_{n}\rbrack\) the discrete Beta-divergence is defined as
+
+\setcounter{equation}{46}
+\begin{equation}
+\label{FD48-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\;\mathbf{Q})} = \sum\limits_{i = 1}^{n}d_{B}^{\;(\beta)}(p_{i}{\,||\,}q_{i}{) =}\sum\limits_{i = 1}^{n}\left( {p_{i}\;\frac{p_{i}^{\beta - 1} - q_{i}^{\beta - 1}}{\beta - 1} - \frac{p_{i}^{\beta} - q_{i}^{\beta}}{\beta}} \right)\;\;\beta \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+ The Beta-divergence can be expressed via a generalized KL divergence as follows
+
+\setcounter{equation}{47}
+\begin{equation}
+\label{FD49-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\;\mathbf{Q})} = D_{GKL}^{(\beta^{- 1})}(\mathbf{P}^{\beta}{\,||\;}\mathbf{Q}^{\beta}{) = -}\frac{1}{\beta}\int\left( {p^{\beta}\log_{(\frac{1}{\beta})}\left( \frac{q^{\beta}}{p^{\beta}} \right) + p^{\beta} - q^{\beta}} \right)d\mu{(\mathbf{x})}\;\;\beta \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+ The above representation of the Beta-divergence indicates why it is robust to outliers for some values of the tuning parameter \(\beta\) and therefore, it is often better suited than others for some specific applications. For example, in sound processing, the speech power spectra can be modeled by exponential family densities of the form, whose for \(\beta = 0\) the Beta-divergence is no less than the Itakura–Saito distance (called also Itakura–Saito divergence or Itakura–Saito distortion measure or Burg cross entropy) [\hyperlink{B12-entropy-12-01532}{12},\allowbreak \hyperlink{B13-entropy-12-01532}{13},\allowbreak \hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B76-entropy-12-01532}{76}--\hyperlink{B79-entropy-12-01532}{79}]. In fact, the Beta-divergence has to be defined in limiting case for \(\left. \beta\rightarrow 0 \right.\) as the Itakura–Saito distance:
+
+\setcounter{equation}{48}
+\begin{equation}
+\label{FD50-entropy-12-01532}
+\fitmath{D_{IS}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\beta\rightarrow 0}D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {\log\frac{q}{p} + \frac{p}{q} - 1} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ The Itakura and Saito distance was derived from the maximum likelihood (ML) estimation of speech spectra [\hyperlink{B77-entropy-12-01532}{77}]. It was used as a measure of the distortion or goodness of fit between two spectra and is often used as a standard measure in the speech processing community due to the good perceptual properties of the reconstructed signals since it is scale invariant, Due to scale invariance low energy components of p have the same relative importance as high energy ones. This is especially important in the scenario in which the coefficients of p have a large dynamic range, such as in short-term audio spectra [\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B76-entropy-12-01532}{76},\allowbreak \hyperlink{B79-entropy-12-01532}{79}].
+
+
+It is also interesting to note that, for \(\beta = 2\), we obtain the standard squared Euclidean (\(L_{2}\)-norm) distance, while for the singular case \(\beta = 1\), we obtain the KL I-divergence:
+
+\setcounter{equation}{49}
+\begin{equation}
+\label{FD51-entropy-12-01532}
+\fitmath{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\beta\rightarrow 1}D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {p\;\log\frac{p}{q} - p + q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ Note, that we used here, the following formulas \(\lim_{\beta\rightarrow 0}\frac{p^{\beta} - q^{\beta}}{\beta} = \log{(p/q)}\) and \(\lim_{\beta\rightarrow 0}\frac{p^{\beta} - 1}{\beta} = \log p\)
+
+
+Hence, the Beta-divergence can be represented in a more explicit form:
+
+\setcounter{equation}{50}
+\begin{equation}
+\label{FD52-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int\left( {p^{\beta}{(\mathbf{x})} + {(\beta - 1)}q^{\beta}{(\mathbf{x})} - \beta p{(\mathbf{x})}q^{\beta - 1}{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\beta \neq 0,1} \\
+{\int\left( {p{(\mathbf{x})}\;\log{(\frac{p(\mathbf{x})}{q(\mathbf{x})})} - p{(\mathbf{x})} + q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\;\;\beta = 1} \\
+{\int\left( {\log{(\frac{q(\mathbf{x})}{p(\mathbf{x})})} + \frac{p(\mathbf{x})}{q(\mathbf{x})} - 1} \right)d\mu{(\mathbf{x})},\;\;\;\beta = 0}
+\end{array} \right.}
+\end{equation}
+
+ We have shown that the basic Beta-divergence smoothly connects the Itakura–Saito distance and the squared Euclidean \(L_{2}\)-norm distance and passes through the KL I-divergence \(D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})}\). Such a parameterized connection is impossible in the family of the Alpha-divergences.
+
+
+The choice of the tuning parameter \(\beta\) depends on the statistical distribution of data sets. For example, the optimal choice of the parameter \(\beta\) for the normal distribution is \(\beta = 2\), for the gamma distribution it is \(\beta = 0\), for the Poisson distribution \(\beta = 1\), and for the compound Poisson distribution \(\beta \in (1,2){}\) [\hyperlink{B15-entropy-12-01532}{15},\allowbreak \hyperlink{B31-entropy-12-01532}{31}--\hyperlink{B34-entropy-12-01532}{34},\allowbreak \hyperlink{B68-entropy-12-01532}{68},\allowbreak \hyperlink{B69-entropy-12-01532}{69}].
+
+
+It is important to note that the Beta divergence can be derived from the Bregman divergence. The Bregman divergence is a pseudo-distance for measuring discrepancy between two values of density functions \(p(\mathbf{x})\) and \(q(\mathbf{x})\) [\hyperlink{B9-entropy-12-01532}{9},\allowbreak \hyperlink{B16-entropy-12-01532}{16},\allowbreak \hyperlink{B80-entropy-12-01532}{80}]:
+
+\setcounter{equation}{51}
+\begin{equation}
+\label{FD53-entropy-12-01532}
+\fitmath{d_{\Phi}{(p||q)} = \Phi{(p)} - \Phi{(q)} - {(p - q)}\Phi'{(q)}}
+\end{equation}
+
+ where \(\Phi(t)\) is strictly convex real-valued function and \(\Phi'{(q)}\) is the derivative with respect to q. The total discrepancy between two functions \(p(\mathbf{x})\) and \(q(\mathbf{x})\) is given by
+
+\setcounter{equation}{52}
+\begin{equation}
+\label{FD54-entropy-12-01532}
+\fitmath{D_{\Phi}{(\mathbf{P}||\mathbf{Q})} = \int\left\lbrack {\Phi{(p{(\mathbf{x})})} - \Phi{(q{(\mathbf{x})})} - {(p{(\mathbf{x})} - q{(\mathbf{x})})}\Phi'{(q{(\mathbf{x})})}} \right\rbrack d\mu{(\mathbf{x})}}
+\end{equation}
+
+ and it corresponds to the \(\Phi\)-entropy of continuous probability measure \(p(\mathbf{x}) \geq 0\) defined by
+
+\setcounter{equation}{53}
+\begin{equation}
+\label{FD55-entropy-12-01532}
+\fitmath{H_{\Phi}{(\mathbf{P})} = - \int\Phi{(p{(x)})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+Remark: The concept of divergence and entropy are closely related. Let \(\mathbf{Q}_{0}\) be a uniform distribution for which
+
+\setcounter{equation}{54}
+\begin{equation}
+\label{FD56-entropy-12-01532}
+\fitmath{\mathbf{Q}_{0}{(\mathbf{x})} = const}
+\end{equation}
+
+ (When \(\mathbf{x}\) is an infinite space \(\mathbb{R}^{n}\) this might not be a probability distribution but is a measure). Then,
+
+\setcounter{equation}{55}
+\begin{equation}
+\label{FD57-entropy-12-01532}
+\fitmath{H{(\mathbf{P})} = - D(\mathbf{P}||\mathbf{Q}_{0}) + const}
+\end{equation}
+
+ is regarded as the related entropy. This the negative of the divergence form \(\mathbf{P}\) to the uniform distribution. On the other hand, given a concave entropy \(H(\mathbf{P})\), we can define the related divergence as the Bregman divergence derived from a convex function \(\Phi(\mathbf{P}) = - H(\mathbf{P})\).
+
+
+If \(\mathbf{x}\) takes discrete values on a certain space, the separable Bregman divergence is defined as
+\[
+\fitmath{D_{\Phi}{(\mathbf{P}||\mathbf{Q})} = \sum_{i = 1}d_{\Phi}(p_{i}{||}q_{i}{) =}\sum_{i = 1}^{n}\left\lbrack {\Phi{(p_{i})} - \Phi{(q_{i})} - {(p_{i} - q_{i})}\Phi'{(q_{i})})} \right\rbrack}
+\]
+, where \(\Phi'{(q)}\) denotes derivative with respect to q. In a general (nonseparable) case for two vectors \(\mathbf{P}\) and \(\mathbf{Q}\), the Bregman divergence is defined as
+\[
+\fitmath{D_{\Phi}{(\mathbf{P}||\mathbf{Q})} = \Phi{(\mathbf{P})} - \Phi{(\mathbf{Q})} - {(\mathbf{P} - \mathbf{Q})}^{T}\nabla\Phi{(\mathbf{Q})}}
+\]
+, where \(\nabla\Phi(\mathbf{Q})\) is the gradient of \(\Phi\) evaluated at \(\mathbf{Q}\).
+
+
+Note that \(D_{\Phi}{(\mathbf{P}||\mathbf{Q})}\) equals the tail of the first-order Taylor expansion of \(\Phi(\mathbf{P})\) at \(\mathbf{Q}\). Bregman divergences include many prominent dissimilarity measures like the squared Euclidean distance, the Mahalanobis distance, the generalized Kullback–Leibler divergence and the Itakura–Saito distance.
+
+
+It is easy to check that the Beta-divergence can be generated from the Bregman divergence using the following strictly convex continuous function [\hyperlink{B36-entropy-12-01532}{36},\allowbreak \hyperlink{B81-entropy-12-01532}{81}]
+
+\setcounter{equation}{56}
+\begin{equation}
+\label{FD58-entropy-12-01532}
+\fitmath{\Phi{(t)} = \left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\left( {t^{\beta} - \beta t + \beta - 1} \right),\beta \neq 0,1} \\
+{t\log(t) - t + 1,\beta = 1} \\
+{t - \log(t) - 1,\;\;\;\beta = 0}
+\end{array} \right.}
+\end{equation}
+
+ It is also interesting to note that the same generating function \(f{(u)} = \Phi{(t)}_{|t = u}\) (with \(\alpha = \beta\)) can be used to generate the Alpha-divergence using the Csiszár–Morimoto f-divergence \(D_{f}{(\mathbf{P}||\mathbf{Q})} = \int q\, f{(p/q)}\, d\mu{(\mathbf{x})}\).
+
+
+Furthermore, the Beta-divergence can be generated by a generalized f-divergence:
+
+\setcounter{equation}{57}
+\begin{equation}
+\label{FD59-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{f}{(\mathbf{P}||\mathbf{Q})} = \int\, q^{\beta}f{(p/q)}\, d\mu{(\mathbf{x})} = \int\, q^{\beta}\widetilde{f}\left( \frac{p^{\beta}}{q^{\beta}} \right)\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+ where \(f{(u)} = \Phi{(t)}_{|t = u}\) with \(u = p/q\) and
+
+\setcounter{equation}{58}
+\begin{equation}
+\label{FD60-entropy-12-01532}
+\fitmath{\widetilde{f}{(\widetilde{u})} = \frac{1}{1 - \beta}\left( {{\widetilde{u}}^{\frac{1}{\beta}} - \frac{1}{\beta}\widetilde{u} + \frac{1}{\beta} - 1} \right)}
+\end{equation}
+
+ is convex generating function with \(\widetilde{u} = p^{\beta}/q^{\beta}\).
+
+
+The links between the Bregman and Beta-divergences are important, since the many well known fundamental properties of the Bregman divergence are also valid for the Beta-divergence [\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B82-entropy-12-01532}{82}]:
+
+\begin{enumerate}
+\item Convexity: The Bregman divergence \(D_{\Phi}{(\mathbf{P}||\mathbf{Q})}\) is always convex in the first argument \(\mathbf{P}\), but is often not in the second argument \(\mathbf{Q}\).
+
+
+\item Nonnegativity: The Bregman divergence is nonnegative \(D_{\Phi}{(\mathbf{P}||\mathbf{Q})} \geq 0\) with zero \(\mathbf{P} = \mathbf{Q}\).
+
+
+\item Linearity: Any positive linear combination of Bregman divergences is also a Bregman divergence, i.e.,
+
+\setcounter{equation}{59}
+\begin{equation}
+\label{FD61-entropy-12-01532}
+\fitmath{D_{c_{1}\Phi_{1} + c_{2}\Phi_{2}}{(\mathbf{P}||\mathbf{Q})} = c_{1}D_{\Phi_{1}}{(\mathbf{P}||\mathbf{Q})} + c_{2}D_{\Phi_{2}}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+ where \(c_{1},c_{2}\) are positive constants and \(\Phi_{1},\Phi_{2}\) are strictly convex functions.
+
+
+\item Invariance: The functional Bregman divergence is invariant under affine transforms \(\Gamma{(\mathbf{Q})} = \Phi{(\mathbf{Q})} + \int a{(x - x')}q{(x')}dx' + c\) for positive measures \(\mathbf{P}\) and \(\mathbf{Q}\) to linear and arbitrary constant terms [\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B82-entropy-12-01532}{82}], i.e.,
+
+\setcounter{equation}{60}
+\begin{equation}
+\label{FD62-entropy-12-01532}
+\fitmath{D_{\Gamma}{(\mathbf{P}||\mathbf{Q})} = D_{\Phi}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+
+
+
+\item The three-point property generalizes the “Law of Cosines”:
+
+\setcounter{equation}{61}
+\begin{equation}
+\label{FD63-entropy-12-01532}
+\fitmath{D_{\Phi}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{\Phi}{(\mathbf{P}\,||\,\mathbf{Z})} + D_{\Phi}{(\mathbf{Z}\,||\,\mathbf{Q})} - {(\mathbf{P} - \mathbf{Z})}^{T}{(\frac{\delta}{\delta\mathbf{Q}}\Phi{(\mathbf{Q})} - \frac{\delta}{\delta\mathbf{Z}}\Phi{(\mathbf{Z})})}}
+\end{equation}
+
+
+
+
+\item Generalized Pythagoras Theorem:
+
+\setcounter{equation}{62}
+\begin{equation}
+\label{FD64-entropy-12-01532}
+\fitmath{D_{\Phi}{(\mathbf{P}\,||\,\mathbf{Q})} \geq D_{\Phi}{(\mathbf{P}\,||\,}P_{\Omega}{{(\mathbf{Q})}) +}D_{\Phi}(P_{\Omega}{{(\mathbf{Q})}\,||\,\mathbf{Q})}}
+\end{equation}
+
+ where \(P_{\Omega}{(\mathbf{Q})} = \underset{\mathbf{\omega} \in \Omega}{\arg\min}D_{\Phi}{(\mathbf{\omega}||\mathbf{Q})}\) is the Bregman projection onto the convex set \(\Omega\) and \(\mathbf{P} \in \Omega\). When \(\Omega\) is an affine set then it holds with equality. This is proved to be the generalized Pythagorean relation in terms of information geometry.
+
+\end{enumerate}
+
+
+
+
+
+For the Beta-divergence (\hyperref[FD47-entropy-12-01532]{46}) the first and second-order Fréchet derivative with respect to \(\mathbf{Q}\) are given by [\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B76-entropy-12-01532}{76}]
+
+\setcounter{equation}{63}
+\begin{equation}
+\label{FD65-entropy-12-01532}
+\fitmath{\frac{\delta D_{B}^{(\beta)}}{\delta q} = q^{\beta - 2}{(q - p)},\text{\quad\quad}\frac{\delta^{2}D_{B}^{(\beta)}}{\delta q^{2}} = q^{\beta - 3}{({(\beta - 1)}q - {(\beta - 2)}p)}}
+\end{equation}
+
+ Hence, we conclude that the Beta-divergence has a single global minimum equal to zero for \(\mathbf{P} = \mathbf{Q}\) and increases with \(|p - q|\). Moreover, the Beta divergence is strictly convex for \(q(\mathbf{x}) > 0\) only for \(\beta \in \lbrack 1,2\rbrack\). For \(\beta = 0\) (Itakura–Saito distance), it is convex if \(\int q^{- 3}{(2p - q)}d\mu{(\mathbf{x})} \geq 0\) i.e., if \(q/p \leq 2\) [\hyperlink{B78-entropy-12-01532}{78}].
+
+
+\setcounter{section}{3}
+\setcounter{subsection}{0}
+\subsection{\texorpdfstring{Generation of Family of Beta-divergences Directly from Family of Alpha-Divergences}{Generation of Family of Beta-divergences Directly from Family of Alpha-Divergences}}
+\label{sec3dot1-entropy-12-01532}
+It should be noted that in the original works [\hyperlink{B15-entropy-12-01532}{15},\allowbreak \hyperlink{B67-entropy-12-01532}{67}--\hyperlink{B69-entropy-12-01532}{69}] they considered only the Beta-divergence function for \(\beta \geq 1\). Moreover, they did not consider the whole range of non-positive values for parameter \(\beta\), especially \(\beta = 0\), for which we have the important Itakura–Saito distance. Furthermore, similar to the Alpha-divergences there exist an associated family of Beta-divergences and as special cases a family of generalized Itakura–Saito like distances. The fundamental question arises: How to generate a whole family of Beta-divergences or what is the relationships or correspondences between the Alpha- and Beta-divergences. In fact, on the basis of our considerations above, it is easy to find that the complete set of Beta-divergences can be obtained from the Alpha-divergences and conversely the Alpha-divergences, can obtained directly from Beta-divergences.
+
+
+In order to obtain a Beta-divergence from the corresponding (associated) Alpha-divergence, we need to apply the following nonlinear transformations:
+
+\setcounter{equation}{64}
+\begin{equation}
+\label{FD66-entropy-12-01532}
+\fitmath{\left. p\rightarrow p^{\beta}, q\rightarrow q^{\beta}\text{and}\alpha = \beta^{- 1} \right.}
+\end{equation}
+
+
+
+
+For example, using these transformations (substitutions) for a basic asymmetric Alpha-divergence (\hyperref[FD4-entropy-12-01532]{4}) and assuming that \(\alpha = {(\beta)}^{- 1}\), we obtain the following divergence
+
+\setcounter{equation}{65}
+\begin{equation}
+\label{FD67-entropy-12-01532}
+\fitmath{D_{A}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \beta^{2}\int\left( \frac{- \beta p\, q^{\beta - 1} + p^{\beta} + {(\beta - 1)}\, q^{\beta}}{\beta(\beta - 1)} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+Observe that, by ignoring the scaling factor \(\beta^{2}\), we obtain the basic asymmetric Beta-divergence defined by Equation (\hyperref[FD47-entropy-12-01532]{46}).
+
+
+In fact, there exists the same link between the whole family of Alpha-divergences and the family of Beta-divergences (see \hyperref[entropy-12-01532-t002]{Table 2}).
+
+
+For example, we can derive a symmetric Beta-divergence from the symmetric Alpha-divergence (Type-1) (\hyperref[FD38-entropy-12-01532]{38}):
+
+\[
+\fitmath{\begin{array}{clr}
+{D_{BS1}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{B}^{(\beta)}{(\mathbf{Q}\,||\,\mathbf{P})}} \\
+ & = & {\frac{1}{\beta - 1}\int\left( {{(p - q)}{(p^{\beta - 1} - q^{\beta - 1})}} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\]
+
+
+
+
+It is interesting to note that, in special cases, we obtain:
+
+
+Symmetric KL of J-divergence [\hyperlink{B65-entropy-12-01532}{65}]:
+
+\setcounter{equation}{66}
+\begin{equation}
+\label{FD69-entropy-12-01532}
+\fitmath{D_{BS1}^{(1)} = \lim\limits_{\beta\rightarrow 1}D_{BS1}^{(\beta)} = \int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ and symmetric Chi-square divergence [\hyperlink{B54-entropy-12-01532}{54}]
+
+\setcounter{equation}{67}
+\begin{equation}
+\label{FD70-entropy-12-01532}
+\fitmath{D_{BS1}^{(0)} = \lim\limits_{\beta\rightarrow 0}D_{BS1}^{(\beta)} = \int\frac{{(p - q)}^{2}}{pq}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+Analogously, from the symmetric Alpha-divergence (Type-2), we obtain
+
+\setcounter{equation}{68}
+\begin{equation}
+\label{FD71-entropy-12-01532}
+\fitmath{D_{BS2}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\beta - 1}\int\left( {{p^{\beta} + q^{\beta}} - {(p^{\beta - 1} + q^{\beta - 1})}\left( \frac{p^{\beta} + q^{\beta}}{2} \right)^{\frac{1}{\beta}}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{1}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{Family of Alpha-divergences and corresponding Beta-divergences. We applied the following transformations \(\left. p\rightarrow p^{\beta},\;\; q\rightarrow q^{\beta},\;\;\alpha = 1/\beta \right.\). Note that \(D_{A}^{(1)}{({\mathbf{P}||\mathbf{Q}})} = D_{B}^{(1)}{({\mathbf{P}||\mathbf{Q}})}\) and they represents for \(\alpha = \beta = 1\) extended family of KL divergences. Furthermore, Beta-divergences for \(\beta = 0\) describe the family of generalized (extended) Itakura–Saito like distances.}\label{entropy-12-01532-t002}\\
+\toprule
+Alpha-divergence \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})}} & Beta-divergence \cellmath{D_{B}^{(\beta)}{({\mathbf{P}||\mathbf{Q}})}} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}\, q^{1 - \alpha} - \alpha p + {(\alpha - 1)}\, q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int\left( {p^{\beta} + {(\beta - 1)}\, q^{\beta} - \beta\, p\, q^{\beta - 1}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\log\left( \frac{q}{p} \right) + \frac{p}{q} - 1} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {{(\frac{p + q}{2})}^{\alpha}q^{1 - \alpha} - \frac{\alpha}{2}p + {(\frac{\alpha}{2} - 1)}\, q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {q\log\left( \frac{2q}{p + q} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {p^{\beta} + {(2\beta - 1)}q^{\beta} - 2\beta q^{\beta - 1}\left( \frac{p^{\beta} + q^{\beta}}{2} \right)^{\frac{1}{\beta}}} \right)d\mu{(\mathbf{x})}}{\beta(\beta - 1)},} \\
+{\int\left( {\log{(\frac{q}{p})} + 2{(\sqrt{\frac{p}{q}} - 1)}} \right)\, d\mu{(\mathbf{x})},\beta = 0} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p_{1} + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int{(p - q)}\left\lbrack {\left( \frac{p + q}{2q} \right)^{\alpha - 1} - 1} \right\rbrack d\mu{(\mathbf{x})},} \\
+{\int\frac{{(p - q)}^{2}}{p + q}d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int{(p^{\beta} - q^{\beta})}\left( {1 - \frac{2^{\frac{\beta - 1}{\beta}}q^{\beta - 1}}{\left( {p^{\beta} + q^{\beta}} \right)^{\frac{\beta - 1}{\beta}}}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\sqrt{\frac{p}{q}} - 1} \right)\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}q^{1 - \alpha} + p^{1 - \alpha}q^{\alpha} - p - q} \right)d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\alpha = 0,1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta - 1}\int\left( {p^{\beta} + q^{\beta} - pq^{\beta - 1} - p^{\beta - 1}q} \right)d\mu{(\mathbf{x})},} \\
+{\int\frac{{(p - q)}^{2}}{pq}d\mu{(\mathbf{x})},\beta = 0} \\
+{\int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{1 - \alpha}\int\left( {\frac{p + q}{2} - \left( \frac{p^{\alpha} + q^{\alpha}}{2} \right)^{\frac{1}{\alpha}}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( \frac{\sqrt{p} - \sqrt{q})^{2}}{2} \right)d\mu{(\mathbf{x})},\;\;\alpha = 0} \\
+{H_{S}\left( \frac{\mathbf{P} + \mathbf{Q}}{2} \right) - \frac{H_{S}{(\mathbf{P})} + H_{S}{(\mathbf{Q})}}{2},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta(\beta - 1)}\int\left( {\frac{p^{\beta} + q^{\beta}}{2} - \left( \frac{p + q}{2} \right)^{\beta}} \right)d\mu{(\mathbf{x})},} \\
+{\int\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{H_{S}\left( \frac{\mathbf{P} + \mathbf{Q}}{2} \right) - \frac{H_{S}{(\mathbf{P})} + H_{S}{(\mathbf{Q})}}{2},\beta = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {{(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha} - p - q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {p\log\left( \frac{2p}{p + q} \right) + q\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\;\;\alpha = 0} \\
+{\int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\beta - 1}\int\left( {p^{\beta} + q^{\beta} - {(p^{\beta - 1} + q^{\beta - 1})}\left( \frac{p^{\beta} + q^{\beta}}{2} \right)^{\frac{1}{\beta}}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\sqrt{\frac{p}{q}} + \sqrt{\frac{q}{p}} - 2} \right)d\mu{(\mathbf{x})},\beta = 0} \\
+{\int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\beta = 1}
+\end{array} \right.} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+
+ It should be noted that in special cases, we obtain:
+
+
+The Arithmetic-Geometric divergence [\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39}]:
+
+\setcounter{equation}{69}
+\begin{equation}
+\label{FD72-entropy-12-01532}
+\fitmath{D_{BS2}^{(1)} = \lim\limits_{\beta\rightarrow 1}D_{BS2}^{(\beta)} = \int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},}
+\end{equation}
+
+ and a symmetrized Itakura–Saito distance (called also the COSH distance) [\hyperlink{B12-entropy-12-01532}{12},\allowbreak \hyperlink{B13-entropy-12-01532}{13}]:
+
+\setcounter{equation}{70}
+\begin{equation}
+\label{FD73-entropy-12-01532}
+\fitmath{D_{BS2}^{(0)} = \lim\limits_{\beta\rightarrow 0}D_{BS2}^{(\beta)} = \int\left( {\sqrt{\frac{p}{q}} + \sqrt{\frac{q}{p}} - 2} \right)d\mu{(\mathbf{x})} = \int\frac{{(\sqrt{p} - \sqrt{q})}^{2}}{\sqrt{pq}}d\mu{(\mathbf{x})}}
+\end{equation}

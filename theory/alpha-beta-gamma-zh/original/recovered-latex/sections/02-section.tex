@@ -1,0 +1,676 @@
+\setcounter{section}{1}
+\section{\texorpdfstring{Family of Alpha-Divergences}{Family of Alpha-Divergences}}
+\label{sec2-entropy-12-01532}
+The Alpha-divergences can be derived from the Csiszár–Morimoto f-divergence and as shown recently by Amari using some tricks also from the Bregman divergence [\hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B6-entropy-12-01532}{6}] (see also \hyperref[app1-entropy-12-01532]{Appendix A}). The Alpha-divergence was proposed by Chernoff [\hyperlink{B41-entropy-12-01532}{41}] and have been extensively investigated and extended by Amari [\hyperlink{B1-entropy-12-01532}{1},\allowbreak \hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B5-entropy-12-01532}{5},\allowbreak \hyperlink{B6-entropy-12-01532}{6}] and other researchers. For some modifications and/or extensions see for example works of Liese and Vajda [\hyperlink{B36-entropy-12-01532}{36}], Minka [\hyperlink{B42-entropy-12-01532}{42}], Taneja [\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39},\allowbreak \hyperlink{B43-entropy-12-01532}{43}], Cressie–Read [\hyperlink{B44-entropy-12-01532}{44}], Zhu–Rohwer [\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}] and Zhang [\hyperlink{B22-entropy-12-01532}{22}--\hyperlink{B25-entropy-12-01532}{25}]. One of our motivation to investigate and explore the family of Alpha-divergences is to develop flexible and efficient learning algorithms for nonnegative matrix and tensor factorizations which unify and extend existing algorithms including such algorithms as EMML (Expectation Maximization Maximum Likelihood) and ISRA (Image Space Reconstruction Algorithm) (see [\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B45-entropy-12-01532}{45}] and references therein).
+
+
+\setcounter{section}{2}
+\setcounter{subsection}{0}
+\subsection{\texorpdfstring{Asymmetric Alpha-Divergences}{Asymmetric Alpha-Divergences}}
+\label{sec2dot1-entropy-12-01532}
+The basic asymmetric Alpha-divergence can be defined as [\hyperlink{B3-entropy-12-01532}{3}]:
+
+\setcounter{equation}{3}
+\begin{equation}
+\label{FD4-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\,\alpha}{(\mathbf{x})}\, q^{\, 1 - \alpha}{(\mathbf{x})} - \alpha\, p{(\mathbf{x})} + {(\alpha - 1)}\, q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+ where \(p(\mathbf{x})\) and \(q(\mathbf{x})\) do not need to be normalized.
+
+
+The Alpha-divergence can be expressed via a generalized KL divergence as follows
+
+\setcounter{equation}{4}
+\begin{equation}
+\label{FD5-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\;\mathbf{Q})} = D_{GKL}^{(\alpha)}{(\mathbf{P}\,||\;\mathbf{Q})} = - \frac{1}{\alpha}\int\left( {p\log_{\,\alpha}\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\;\;\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+
+
+
+For discrete probability measures with mass functions \(\mathbf{P} = \lbrack p_{1},p_{2},\ldots,p_{n}\rbrack\) and \(\mathbf{Q} = \lbrack q_{1},q_{2},\ldots,q_{n}\rbrack\), the discrete Alpha-divergence is formulated as a separable divergence:
+
+\setcounter{equation}{5}
+\begin{equation}
+\label{FD6-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \sum\limits_{i = 1}^{n}d_{A}^{(\alpha)}(p_{i}{\,||\,}q_{i}{) =}\frac{1}{\alpha(\alpha - 1)}\sum\limits_{i = 1}^{n}\left( {p_{i}^{\alpha}\, q_{i}^{1 - \alpha} - \alpha\, p_{i} + {(\alpha - 1)}\, q_{i}} \right),\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+ where \(d_{A}^{(\alpha)}(p_{i}{\,||\,}q_{i}{) =}\left( {p_{i}^{\alpha}q_{i}^{1 - \alpha} - \alpha p_{i} + {(\alpha - 1)}q_{i}} \right)/\left( {\alpha(\alpha - 1)} \right).\)
+
+
+Note that this form of Alpha-divergence differs slightly from the loss function given by [\hyperlink{B1-entropy-12-01532}{1}], because it was defined only for probability distributions, i.e., under assumptions that \(\int p(\mathbf{x})d\mu(\mathbf{x}) = 1\) and \(\int q(\mathbf{x})d\mu(\mathbf{x}) = 1\). It was extended by Zhu and Rohwer in [\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}] (see also Amari and Nagaoka [\hyperlink{B3-entropy-12-01532}{3}]) for positive measures, by incorporating additional terms. These terms are needed to allow de-normalized densities (positive measures), in the same way that the generalized Kullback–Leibler divergences (I-divergence).
+
+
+Extending the Kullback–Leibler divergence into the family of Alpha-divergence is a crucial step for a unified view of a wide class of divergence functions, since it demonstrates that the nonnegativity of alpha-divergences may be viewed as arising not only from Jensen’s inequality but the arithmetic-geometric inequality. As has been pointed out by Jun Zhang this can be fully exploited as a consequence of the inequality of convex functions or more generally by his convex-based approach [\hyperlink{B22-entropy-12-01532}{22}].
+
+
+For normalized densities: \(\overline{p}{(\mathbf{x})} = p{(\mathbf{x})}/\int p{(\mathbf{x})}d\mu{(\mathbf{x})}\) and \(\overline{q}{(\mathbf{x})} = q{(\mathbf{x})}/\int q{(\mathbf{x})}d\mu{(\mathbf{x})}\) the Alpha-divergence simplifies to [\hyperlink{B1-entropy-12-01532}{1},\allowbreak \hyperlink{B44-entropy-12-01532}{44}]:
+
+\setcounter{equation}{6}
+\begin{equation}
+\label{FD7-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) =}\frac{1}{\alpha(\alpha - 1)}\left( {\int{\overline{p}}^{\,\alpha}{(\mathbf{x})}\,{\overline{q}}^{\, 1 - \alpha}{(\mathbf{x})}d\mu{(\mathbf{x})} - 1} \right),\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+ and is related to the Tsallis divergence and the Tsallis entropy [\hyperlink{B46-entropy-12-01532}{46}] (see \hyperref[app1-entropy-12-01532]{Appendix A}):
+
+\setcounter{equation}{7}
+\begin{equation}
+\label{FD8-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{P}})} = \frac{1}{1 - \alpha}\left( {\int{\overline{p}}^{\,\alpha}{(\mathbf{x})}\, d\mu{(\mathbf{x})} - 1} \right) = - \int{\overline{p}}^{\,\alpha}{(\mathbf{x})}\log_{\;\alpha}\overline{p}{(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+ provided integrals on the right exist.
+
+
+In fact, the Tsallis entropy was first defined by Havrda and Charvat in 1967 [\hyperlink{B47-entropy-12-01532}{47}] and almost forgotten and rediscovered by Tsallis in 1988 [\hyperlink{B46-entropy-12-01532}{46}] in different context (see \hyperref[app1-entropy-12-01532]{Appendix A}).
+
+
+Various authors use the parameter \(\alpha\) in different ways. For example, using the Amari notation, \(\alpha_{A}\) with \(\alpha = (1 - \alpha_{A})/2\), the Alpha-divergence takes the following form [\hyperlink{B1-entropy-12-01532}{1}--\hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11},\allowbreak \hyperlink{B22-entropy-12-01532}{22}--\hyperlink{B25-entropy-12-01532}{25},\allowbreak \hyperlink{B44-entropy-12-01532}{44},\allowbreak \hyperlink{B48-entropy-12-01532}{48},\allowbreak \hyperlink{B49-entropy-12-01532}{49}]:
+
+\setcounter{equation}{8}
+\begin{equation}
+\label{FD9-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{A}^{(\alpha_{A})}{(\underline{P}\,||\, \underline{Q})} = \frac{4}{1 - \alpha_{A}^{2}}\int\left( {\frac{1 - \alpha_{A}}{2}\, p + \frac{1 + \alpha_{A}}{2}\, q - p^{\frac{1 - \alpha_{A}}{2}}q^{\frac{1 + \alpha_{A}}{2}}} \right)d\mu{(\mathbf{x})},\;\;\alpha_{A} \in \mathbb{R} \smallsetminus {\{ \pm 1\}}}
+\end{equation}
+
+
+
+
+When \(\alpha\) takes values from 0 to 1, \(\alpha_{A}\) takes values from \(- 1\) to 1. The duality exists between \(\alpha_{A}\) and \(- \alpha_{A}\), in the sense that \({\widetilde{D}}_{A}^{(\alpha_{A})}{(\mathbf{P}\,||\,\mathbf{Q})} = {\widetilde{D}}_{A}^{( - \alpha_{A})}{(\mathbf{Q}\,||\,\mathbf{P})}\).
+
+
+In the special cases for \(\alpha = 2,0.5, - 1\), we obtain from (\hyperref[FD4-entropy-12-01532]{4}) the well known Pearson Chi-square, Hellinger and inverse Pearson, also called the Neyman Chi-square distances, given respectively by
+
+\setcounter{equation}{9}
+\begin{equation}
+\label{FD10-entropy-12-01532}
+\fitmath{\begin{array}{rlr}
+{D_{A}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {D_{P}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p{(\mathbf{x})} - q{(\mathbf{x})})}^{2}}{q(\mathbf{x})}d\mu{(\mathbf{x})}} \\
+{D_{A}^{(1/2)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {2D_{H}{(\mathbf{P}\,||\,\mathbf{Q})} = 2\int{(\sqrt{p(\mathbf{x})} - \sqrt{q(\mathbf{x})})}^{2}d\mu{(\mathbf{x})}} \\
+{D_{A}^{( - 1)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {D_{N}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p{(\mathbf{x})} - q{(\mathbf{x})})}^{2}}{p(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+
+
+
+For the singular values \(\alpha = 1\) and \(\alpha = 0\) the Alpha-divergences (\hyperref[FD4-entropy-12-01532]{4}) have to be defined as limiting cases respectively for \(\left. \alpha\rightarrow 1 \right.\) and \(\left. \alpha\rightarrow 0 \right.\). When this limit is evaluated (using the L’Hôpital’s rule) for \(\left. \alpha\rightarrow 1 \right.\), we obtain the Kullback–Leibler divergence:
+
+\setcounter{equation}{10}
+\begin{equation}
+\label{FD11-entropy-12-01532}
+\fitmath{\begin{array}{cl}
+{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})}} & {= \lim\limits_{\alpha\rightarrow 1}D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\alpha\rightarrow 1}\int\frac{p^{\,\alpha}q^{\, 1 - \alpha}\log p - p^{\,\alpha}q^{1 - \alpha}\log q - p + q}{2\alpha - 1}d\mu{(\mathbf{x})}} \\
+ & {= \int\left( {p\;\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+ with the conventions \(0/0 = 0,\; 0\log(0) = 0\) and \(p/0 = \infty\) for \(p > 0\).
+
+
+From the inequality \(p\log p \geq p - 1\), it follows that the KL I-divergence is nonnegative and achieves zero if and only if \(\mathbf{P} = \mathbf{Q}\).
+
+
+Similarly, for \(\left. \alpha\rightarrow 0 \right.\), we obtain the reverse Kullback–Leibler divergence:
+
+\setcounter{equation}{11}
+\begin{equation}
+\label{FD12-entropy-12-01532}
+\fitmath{D_{KL}{(\mathbf{Q}||\mathbf{P})} = \lim\limits_{\alpha\rightarrow 0}D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {q\log\left( \frac{q}{p} \right) - q + p} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+Hence, the Alpha-divergence can be evaluated in a more explicit form as
+
+\setcounter{equation}{12}
+\begin{equation}
+\label{FD13-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \left\{ \begin{matrix}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {q{(\mathbf{x})}\left\lbrack {\left( \frac{p(\mathbf{x})}{q(\mathbf{x})} \right)^{\alpha} - 1} \right\rbrack - \alpha\,{\lbrack p{(\mathbf{x})} - q{(\mathbf{x})}\rbrack}} \right)d\mu{(\mathbf{x})},\hspace{3.33333pt}\hspace{3.33333pt}\alpha \neq 0,1} \\
+ \\
+{\int\left( {q{(\mathbf{x})}\log\frac{q(\mathbf{x})}{p(\mathbf{x})} + p{(\mathbf{x})} - q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+ \\
+{\int\left( {p{(\mathbf{x})}\log\frac{p(\mathbf{x})}{q(\mathbf{x})} - p{(\mathbf{x})} + q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{matrix} \right.}
+\end{equation}
+
+
+
+
+In fact, the Alpha-divergence smoothly connects the I-divergence \(D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})}\) with the reverse I-divergence \(D_{KL}{(\mathbf{Q}\,||\,\mathbf{P})}\) and passes through the Hellinger distance [\hyperlink{B50-entropy-12-01532}{50}]. Moreover, it also smoothly connects the Pearson Chi-square and Neyman Chi-square divergences and passes through the I-divergences [\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}].
+
+
+The Alpha-divergence is a special case of Csiszár–Morimoto f-divergence [\hyperlink{B17-entropy-12-01532}{17},\allowbreak \hyperlink{B19-entropy-12-01532}{19}] proposed later by Ali and Silvey [\hyperlink{B20-entropy-12-01532}{20}]). This class of divergences were also independently defined by Morimoto [\hyperlink{B51-entropy-12-01532}{51}]. The Csiszár–Morimoto f-divergence is associated to any function \(f(u)\) that is convex over \((0,\infty)\) and satisfies \(f(1) = 0\):
+
+\setcounter{equation}{13}
+\begin{equation}
+\label{FD14-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}\,||\,\mathbf{Q})} = \int q{(\mathbf{x})}f\left( \frac{p(\mathbf{x})}{q(\mathbf{x})} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+We define \(0f(0/0) = 0\) and
+\[
+\fitmath{0f{(a/0)} = \lim_{t\rightarrow 0}tf{(a/t)} = \lim_{u\rightarrow\infty}f{(u)}/u}
+\]
+. Indeed, assuming \(f{(u)} = {(u^{\alpha} - \alpha u + \alpha - 1)}{)/}{(\alpha^{2} - \alpha)}\) yields the formula (\hyperref[FD4-entropy-12-01532]{4}).
+
+
+The Csiszár–Morimoto f-divergence has many beautiful properties [\hyperlink{B6-entropy-12-01532}{6},\allowbreak \hyperlink{B17-entropy-12-01532}{17},\allowbreak \hyperlink{B18-entropy-12-01532}{18},\allowbreak \hyperlink{B20-entropy-12-01532}{20},\allowbreak \hyperlink{B22-entropy-12-01532}{22},\allowbreak \hyperlink{B36-entropy-12-01532}{36},\allowbreak \hyperlink{B52-entropy-12-01532}{52},\allowbreak \hyperlink{B53-entropy-12-01532}{53}]:
+
+\begin{itemize}
+\item Nonnegativity: The Csiszár–Morimoto f-divergence is always nonnegative, and equal to zero if and only if probability densities \(p(\mathbf{x})\) and \(q(\mathbf{x})\) coincide. This follows immediately from the Jensens inequality (for normalized densities):
+
+\setcounter{equation}{14}
+\begin{equation}
+\label{FD15-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = \int qf\left( \frac{p}{q} \right)d\mu{(\mathbf{x})} \geq f\left( {\int q{(\frac{p}{q})}d\mu{(\mathbf{x})}} \right) = f{(1)} = 0.}
+\end{equation}
+
+
+
+
+\item Generalized entropy: It corresponds to a generalized f-entropy of the form:
+
+\setcounter{equation}{15}
+\begin{equation}
+\label{FD16-entropy-12-01532}
+\fitmath{H_{f}{(\mathbf{P})} = - \int f{(p{(\mathbf{x})})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+ for which the Shannon entropy is a special case for \(f(p) = p\log(p)\). Note that \(H_{f}\) is concave while f is convex.
+
+
+\item Convexity: For any \(0 \leq \lambda \leq 1\)
+
+\setcounter{equation}{16}
+\begin{equation}
+\label{FD17-entropy-12-01532}
+\fitmath{D_{f}{(\lambda}\mathbf{P}_{1} + {(1 - \lambda)}\mathbf{P}_{2}{\,||\,\lambda}\mathbf{Q}_{1} + {(1 - \lambda)}\mathbf{Q}_{2}{) \leq \lambda}D_{f}(\mathbf{P}_{1}{||}\mathbf{Q}_{1}{) + {(1 - \lambda)}}D_{f}(\mathbf{P}_{2}{||}\mathbf{Q}_{2}{).}}
+\end{equation}
+
+
+
+
+\item Scaling: For any positive constant \(c > 0\) we have
+
+\setcounter{equation}{17}
+\begin{equation}
+\label{FD18-entropy-12-01532}
+\fitmath{cD_{f}{(\mathbf{P}||\mathbf{Q})} = D_{cf}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+
+
+
+\item Invariance: The f-divergence is invariant to bijective transformations [\hyperlink{B6-entropy-12-01532}{6},\allowbreak \hyperlink{B20-entropy-12-01532}{20}]. This means that, when \(\mathbf{x}\) is transformed to \(\mathbf{y}\) bijectively by
+
+\setcounter{equation}{18}
+\begin{equation}
+\label{FD19-entropy-12-01532}
+\fitmath{\mathbf{y} = \mathbf{k}(\mathbf{x})}
+\end{equation}
+
+ probability distribution \(\mathbf{P}(\mathbf{x})\) changes to \(\widetilde{\mathbf{P}}{(\mathbf{y})}\). However,
+
+\setcounter{equation}{19}
+\begin{equation}
+\label{FD20-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = D_{f}(\widetilde{\mathbf{P}}{||}\widetilde{\mathbf{Q}})}
+\end{equation}
+
+ Additionally,
+
+\setcounter{equation}{20}
+\begin{equation}
+\label{FD21-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = D_{\widetilde{f}}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+ for \(\widetilde{f}{(u)} = f{(u)} - c{(u - 1)}\) for an arbitrary constant c, and
+
+\setcounter{equation}{21}
+\begin{equation}
+\label{FD22-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = D_{f^{*}}{(\mathbf{Q}||\mathbf{P})}}
+\end{equation}
+
+ where \(f^{*}{(u)} = uf{(1/u)}\) is called a conjugate function.
+
+
+\item Symmetricity: For an arbitrary Csiszár–Morimoto f-divergence, it is possible to construct a symmetric divergence for \(f_{sym}{(u)} = f{(u)} + f^{*}{(u)}\).
+
+
+\item Boundedness The Csiszár–Morimoto f-divergence for positive measures (densities) is bounded (if limit exists and it is finite) [\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B36-entropy-12-01532}{36}]
+
+\setcounter{equation}{22}
+\begin{equation}
+\label{FD23-entropy-12-01532}
+\fitmath{0 \leq D_{f}{(\mathbf{P}||\mathbf{Q})} \leq \lim\limits_{u\rightarrow 0^{+}}\left\{ {f{(u)} + uf{(\frac{1}{u})}} \right\}}
+\end{equation}
+
+ Furthermore [\hyperlink{B54-entropy-12-01532}{54}],
+
+\setcounter{equation}{23}
+\begin{equation}
+\label{FD24-entropy-12-01532}
+\fitmath{0 \leq D_{f}{(\mathbf{P}||\mathbf{Q})} \leq \int{(p - q)}f'{(\frac{p}{q})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\end{itemize}
+
+
+
+
+
+Using fundamental properties of the Csiszár–Morimoto f-divergence we can establish basic properties of the Alpha-divergences [\hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B6-entropy-12-01532}{6},\allowbreak \hyperlink{B22-entropy-12-01532}{22},\allowbreak \hyperlink{B40-entropy-12-01532}{40},\allowbreak \hyperlink{B42-entropy-12-01532}{42}].
+
+
+The Alpha-divergence (\hyperref[FD4-entropy-12-01532]{4}) has the following basic properties:
+
+\begin{enumerate}
+\item Convexity: \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})}\) is convex with respect to both \(\mathbf{P}\) and \(\mathbf{Q}\).
+
+
+\item Strict Positivity: \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})} \geq 0\) and \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})} = 0\) if and only if \(\mathbf{P} = \mathbf{Q}\).
+
+
+\item Continuity: The Alpha-divergence is continuous function of real variable \(\alpha\) in the whole range including singularities.
+
+
+\item Duality: \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})} = D_{A}^{(1 - \alpha)}{(\mathbf{Q}||\mathbf{P})}\).
+
+
+\item Exclusive/Inclusive Properties: [\hyperlink{B42-entropy-12-01532}{42}]
+
+\begin{itemize}
+\item For \(\left. \alpha\rightarrow - \infty \right.\), the estimation of \(q(\mathbf{x})\) that approximates \(p(\mathbf{x})\) is exclusive, that is \(q(\mathbf{x}) \leq p(\mathbf{x})\) for all \(\mathbf{x}\). This means that the minimization of \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})}\) with respect to \(q(\mathbf{x})\) will force \(q(\mathbf{x})\) to be exclusive approximation, i.e., the mass of \(q(\mathbf{x}\)) will lie within \(p(\mathbf{x})\) (see detail and graphical illustrations in [\hyperlink{B42-entropy-12-01532}{42}]).
+
+
+\item For \(\left. \alpha\rightarrow\infty \right.\), the estimation of \(q(\mathbf{x})\) that approximates \(p(\mathbf{x})\) is inclusive, that is \(q(\mathbf{x}) \geq p(\mathbf{x})\) for all \(\mathbf{x}\). In other words, the mass of \(q(\mathbf{x})\) includes all the mass of \(p(\mathbf{x})\).
+
+\end{itemize}
+
+
+
+
+
+\item Zero-forcing and zero-avoiding properties: [\hyperlink{B42-entropy-12-01532}{42}]
+
+Here, we treat the case where \(p(\mathbf{x})\) and \(q(\mathbf{x})\) are not necessary mutually absolutely continuous. In such a case the divergence may diverges to \(\infty\). However, the following two properties hold:
+
+\begin{itemize}
+\item For \(\alpha \leq 0\) the estimation of \(q(\mathbf{x})\) that approximates \(p(\mathbf{x})\) is zero-forcing (coercive), that is, \(p(\mathbf{x}) = 0\) forces \(q(\mathbf{x}) = 0\).
+
+
+\item For \(\alpha \geq 1\) the estimation of \(q(\mathbf{x})\) that approximates \(p(\mathbf{x})\) is zero-avoiding, that is, \(p(\mathbf{x}) > 0\) implies \(q(\mathbf{x}) > 0\).
+
+\end{itemize}
+
+
+
+
+\end{enumerate}
+
+
+
+
+
+One of the most important property of the Alpha-divergence is that it is a convex function with respect to \(\mathbf{P}\) and \(\mathbf{Q}\) and has a unique minimum for \(\mathbf{P} = \mathbf{Q}\) (see e.g. [\hyperlink{B22-entropy-12-01532}{22}]).
+
+
+\setcounter{section}{2}
+\setcounter{subsection}{1}
+\subsection{\texorpdfstring{Alpha-Rényi Divergence}{Alpha-Rényi Divergence}}
+\label{sec2dot2-entropy-12-01532}
+It is interesting to note that the Alpha-divergence is closely related to the Rényi divergence. We define an Alpha-Rényi divergence as
+
+\setcounter{equation}{24}
+\begin{equation}
+\label{FD25-entropy-12-01532}
+\fitmath{\begin{array}{ccrl}
+{D_{AR}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {\frac{1}{\alpha(\alpha - 1)}\log\left( {1 + \alpha{(\alpha - 1)}D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q}}} \right)} \\
+ & & = & {\frac{1}{\alpha(\alpha - 1)}\log\left( {\int\left( {p^{\,\alpha}q^{1 - \alpha} - \alpha p + {(\alpha - 1)}\, q} \right)d\mu{(\mathbf{x})} + 1} \right),\;\;\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{array}}
+\end{equation}
+
+
+
+
+For \(\alpha = 0\) and \(\alpha = 1\) the Alpha-Rényi divergence simplifies to the Kullback–Leibler divergences:
+
+\setcounter{equation}{25}
+\begin{equation}
+\label{FD26-entropy-12-01532}
+\fitmath{\begin{array}{ccrl}
+{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\alpha\rightarrow 1}D_{AR}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {\lim\limits_{\alpha\rightarrow 1}\frac{1}{2\alpha - 1}\frac{\int(p^{\,\alpha}q^{\, 1 - \alpha}{(\log p - \log q)} - p + q)d\mu{(\mathbf{x})}}{\int(p^{\,\alpha}q^{\, 1 - \alpha} - \alpha p - {(\alpha - 1)}q)d\mu{(\mathbf{x})} + 1}} \\
+ & & = & {\int\left( {p\;\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+ and
+
+\setcounter{equation}{26}
+\begin{equation}
+\label{FD27-entropy-12-01532}
+\fitmath{\begin{array}{r}
+{D_{KL}{(\mathbf{Q}||\mathbf{P})} = \lim\limits_{\alpha\rightarrow 0}D_{AR}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {q\log\left( \frac{q}{p} \right) - q + p} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+
+
+
+We define the Alpha-Rényi divergence for normalized probability densities as follows:
+
+\setcounter{equation}{27}
+\begin{equation}
+\label{FD28-entropy-12-01532}
+\fitmath{D_{AR}^{(\alpha)}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) =}\frac{1}{\alpha(\alpha - 1)}\log\left( {\int{\overline{p}}^{\alpha}{\overline{q}}^{1 - \alpha}d\mu{(\mathbf{x})}} \right) = \frac{1}{\alpha - 1}\log\left( {\int\overline{q}\left( \frac{\overline{p}}{\overline{q}} \right)^{\alpha}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\alpha}}}
+\end{equation}
+
+ which corresponds to the Rényi entropy [\hyperlink{B55-entropy-12-01532}{55}--\hyperlink{B57-entropy-12-01532}{57}] (see \hyperref[app2-entropy-12-01532]{Appendix B})
+
+\setcounter{equation}{28}
+\begin{equation}
+\label{FD29-entropy-12-01532}
+\fitmath{H_{R}^{(\alpha)}{(\overline{\mathbf{P}})} = - \frac{1}{\alpha - 1}\log\left( {\int{\overline{p}}^{\alpha}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+
+
+
+Note that we used different scaling factor than in the original Rényi divergence [\hyperlink{B56-entropy-12-01532}{56},\allowbreak \hyperlink{B57-entropy-12-01532}{57}]. In general, the Alpha-Rényi divergence make sense only for the (normalized) probability densities (since, otherwise the function (\hyperref[FD25-entropy-12-01532]{25}) can be complex-valued for some positive non-normalized measures).
+
+
+Furthermore, the Alpha-divergence is convex with respect to positive densities p and q for any parameter of \(\alpha \in \mathbb{R}\), while the Alpha-Rényi divergence (\hyperref[FD28-entropy-12-01532]{28}) is convex jointly in p and q for \(\alpha \in \lbrack 0,1\rbrack\) and it is not convex for \(\alpha > 1\). Convexity implies that \(D_{AR}^{(\alpha)}\) is increasing in \(\alpha\) when p and q are fixed. Actually, the Rényi divergence is increasing in \(\alpha\) on the whole set \((0,\infty)\) [\hyperlink{B58-entropy-12-01532}{58}--\hyperlink{B60-entropy-12-01532}{60}].
+
+
+\setcounter{section}{2}
+\setcounter{subsection}{2}
+\subsection{\texorpdfstring{Extended Family of Alpha-Divergences}{Extended Family of Alpha-Divergences}}
+\label{sec2dot3-entropy-12-01532}
+There are several ways to extend the asymmetric Alpha-divergence. For example, instead of q, we can take the average of q and p, under the assumption that if p and q are similar, they should be “close” to their average, so we can define the modified Alpha-divergence as
+
+\setcounter{equation}{29}
+\begin{equation}
+\label{FD30-entropy-12-01532}
+\fitmath{D_{Am1}^{(\alpha)}{(\mathbf{P}\,||\,}\widetilde{\mathbf{Q}}{) =}\frac{1}{\alpha(\alpha - 1)}\int\left( {\widetilde{q}\left\lbrack {\left( \frac{p}{\widetilde{q}} \right)^{\,\alpha} - 1} \right\rbrack - \alpha\;{(p - \widetilde{q})}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ whereas an adjoint Alpha-divergence is given by
+
+\setcounter{equation}{30}
+\begin{equation}
+\label{FD31-entropy-12-01532}
+\fitmath{D_{Am2}^{(\alpha)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{\alpha(\alpha - 1)}\int\left( {p\left\lbrack {\left( \frac{\widetilde{q}}{p} \right)^{\alpha} - 1} \right\rbrack + \alpha\;{(p - \widetilde{q})}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ where \(\widetilde{\mathbf{Q}} = {(\mathbf{P} + \mathbf{Q})}/2\) and \(\widetilde{q} = {(p + q)}/2\).
+
+
+For the singular values \(\alpha = 1\) and \(\alpha = 0\), the Alpha-divergences (\hyperref[FD30-entropy-12-01532]{30}) can be evaluated as
+
+\[
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{Am1}^{(\alpha)}{(\mathbf{P}\,||}\widetilde{\mathbf{Q}}{) = \int}\left( {\widetilde{q}\;\log\left( \frac{\widetilde{q}}{p} \right) + p - \widetilde{q}} \right)d\mu{(\mathbf{x})} = \int\left( {\frac{p + q}{2}\;\log\left( \frac{p + q}{2p} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})}}
+\]
+
+ and
+
+\[
+\fitmath{\lim\limits_{\alpha\rightarrow 1}D_{Am1}^{(\alpha)}{(\mathbf{P}\,||\,}\widetilde{Q}{) = \int}\left( {p\log\left( \frac{p}{\widetilde{q}} \right) - p + \widetilde{q}} \right)d\mu{(\mathbf{x})} = \int\left( {p\log\left( \frac{2p}{p + q} \right) + \frac{q - p}{2}} \right)d\mu{(\mathbf{x})}}
+\]
+
+ As examples, we consider the following prominent cases for (\hyperref[FD31-entropy-12-01532]{31}):
+
+
+1. Triangular Discrimination (TD) [\hyperlink{B61-entropy-12-01532}{61}]
+
+\setcounter{equation}{31}
+\begin{equation}
+\label{FD32-entropy-12-01532}
+\fitmath{D_{Am2}^{( - 1)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{4}D_{TD}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{4}\int\frac{{(p - q)}^{2}}{p + q}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+2. Relative Jensen–Shannon divergence [\hyperlink{B62-entropy-12-01532}{62}--\hyperlink{B64-entropy-12-01532}{64}]
+
+\setcounter{equation}{32}
+\begin{equation}
+\label{FD33-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{Am2}^{(\alpha)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = D_{RJS}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {p\log\left( \frac{2p}{p + q} \right) - p + q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+3. Relative Arithmetic-Geometric divergence proposed by Taneya [\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39},\allowbreak \hyperlink{B43-entropy-12-01532}{43}]
+
+\setcounter{equation}{33}
+\begin{equation}
+\label{FD34-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 1}D_{Am2}^{(\alpha)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{2}D_{RAG}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {{(p + q)}\log\left( \frac{p + q}{2p} \right) + p - q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+3. Neyman Chi-square divergence
+
+\setcounter{equation}{34}
+\begin{equation}
+\label{FD35-entropy-12-01532}
+\fitmath{D_{Am2}^{(2)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{8}D_{\chi^{2}}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{8}\int\frac{{(p - q)}^{2}}{p}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+The asymmetric Alpha-divergences can be expressed formally as the Csiszár–Morimoto f-divergence, as shown in \hyperref[entropy-12-01532-t001]{Table 1} [\hyperlink{B30-entropy-12-01532}{30}].
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{0}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{Asymmetric Alpha-divergences and associated convex Csiszár-Morimoto functions [\protect\hyperlink{B30-entropy-12-01532}{30}].}\label{entropy-12-01532-t001}\\
+\toprule
+Divergence \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})} = \int qf^{(\alpha)}\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}} & Csiszár function \cellmath{f^{(\alpha)}{(u)}, u = p/q} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {q\left\lbrack {\left( \frac{p}{q} \right)^{\alpha} - 1} \right\rbrack - \alpha{(p - q)}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\frac{q}{p} + p - q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\frac{p}{q} - p + q} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{matrix}
+{\frac{u^{\alpha} - 1 - \alpha{(u - 1)}}{\alpha(\alpha - 1)},\alpha \neq 0,1} \\
+ \\
+{u - 1 - \log u,\alpha = 0,} \\
+ \\
+{1 - u + u\log u,\;\alpha = 1.}
+\end{matrix} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p\left\lbrack {\left( \frac{q}{p} \right)^{\alpha} - 1} \right\rbrack + \alpha{(p - q)}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\frac{p}{q} - p + q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\frac{q}{p} + p - q} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{matrix}
+{\frac{u^{1 - \alpha} + {(\alpha - 1)}u - \alpha}{\alpha(\alpha - 1)},\alpha \neq 0,1,} \\
+ \\
+{1 - u + u\log u,\alpha = 0} \\
+ \\
+{u - 1 - \log u,\alpha = 1.}
+\end{matrix} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {q\left( \frac{p + q}{2q} \right)^{\alpha} - q - \alpha\frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\left( \frac{2q}{p + q} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{\left( \frac{u + 1}{2} \right)^{\alpha} - 1 - \alpha\left( \frac{u - 1}{2} \right)}{\alpha(\alpha - 1)},\;\;\alpha \neq 0,1,} \\
+{\frac{u - 1}{2} + \log\left( \frac{2}{u + 1} \right),\;\;\alpha = 0,} \\
+{\frac{1 - u}{2} + \frac{u + 1}{2}\log\left( \frac{u + 1}{2} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p\left( \frac{p + q}{2p} \right)^{\alpha} - p + \alpha\frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\left( \frac{2p}{p + q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2p} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{u\left( \frac{u + 1}{2u} \right)^{\alpha} - u - \alpha\left( \frac{1 - u}{2} \right)}{\alpha(\alpha - 1)},\;\alpha \neq 0,1,} \\
+{\frac{1 - u}{2} - u\log\left( \frac{u + 1}{2u} \right),\;\alpha = 0,} \\
+{\frac{u - 1}{2} + \left( \frac{u + 1}{2} \right)\log\left( \frac{u + 1}{2u} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int{(p - q)}\left\lbrack {\left( \frac{p + q}{2q} \right)^{\alpha - 1} - 1} \right\rbrack d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{{(u - 1)}\left\lbrack {\left( \frac{u + 1}{2} \right)^{\alpha - 1} - 1} \right\rbrack}{\alpha - 1},\alpha \neq 1,} \\
+{{(u - 1)}\log\left( \frac{u + 1}{2} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int{(q - p)}\left\lbrack {\left( \frac{p + q}{2p} \right)^{\alpha - 1} - 1} \right\rbrack d\mu{(\mathbf{x})},} \\
+{\int{(q - p)}\log\left( \frac{p + q}{2p} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{{(1 - u)}\left\lbrack {\left( \frac{u + 1}{2u} \right)^{\alpha - 1} - 1} \right\rbrack}{\alpha - 1},\alpha \neq 1,} \\
+{{(1 - u)}\log\left( \frac{u + 1}{2u} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+\setcounter{section}{2}
+\setcounter{subsection}{3}
+\subsection{\texorpdfstring{Symmetrized Alpha-Divergences}{Symmetrized Alpha-Divergences}}
+\label{sec2dot4-entropy-12-01532}
+The basic Alpha-divergence is asymmetric, that is, \(D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} \neq D_{A}^{(\alpha)}{(\mathbf{Q}\,||\,\mathbf{P})}\).
+
+
+Generally, there are two ways to symmetrize divergences: Type-1
+
+\setcounter{equation}{35}
+\begin{equation}
+\label{FD36-entropy-12-01532}
+\fitmath{D_{S1}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\left\lbrack {D_{A}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{A}{(\mathbf{Q}\,||\,\mathbf{P})}} \right\rbrack}
+\end{equation}
+
+ and Type 2
+
+\setcounter{equation}{36}
+\begin{equation}
+\label{FD37-entropy-12-01532}
+\fitmath{D_{S2}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\left\lbrack {D_{A}\left( {{\mathbf{P}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right) + D_{A}\left( {{\mathbf{Q}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right)} \right\rbrack}
+\end{equation}
+
+
+
+
+The symmetric Alpha-divergence (Type-1) can be defined as (we will omit scaling factor \(1/2\) for simplicity)
+
+\setcounter{equation}{37}
+\begin{equation}
+\label{FD38-entropy-12-01532}
+\fitmath{D_{AS1}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{A}^{(\alpha)}{(\mathbf{Q}\,||\,\mathbf{P})} = \int\frac{\left( {p^{\alpha} - q^{\alpha}} \right)\left( {p^{1 - \alpha} - q^{1 - \alpha}} \right)}{\alpha(1 - \alpha)}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+ As special cases, we obtain several well-known symmetric divergences:
+
+
+1. Symmetric Chi-Squared divergence [\hyperlink{B54-entropy-12-01532}{54}]
+
+\setcounter{equation}{38}
+\begin{equation}
+\label{FD39-entropy-12-01532}
+\fitmath{D_{AS1}^{( - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AS1}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}D_{\chi^{2}}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p - q)}^{2}{(p + q)}}{pq}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+2. Symmetrized KL divergence, called also J-divergence corresponding to Jeffreys entropy maximization [\hyperlink{B65-entropy-12-01532}{65},\allowbreak \hyperlink{B66-entropy-12-01532}{66}]
+
+\setcounter{equation}{39}
+\begin{equation}
+\label{FD40-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{AS1}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\alpha\rightarrow 1}D_{AS1}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{J}{(\mathbf{P}\,||\,\mathbf{Q})} = \int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+An alternative wide class of symmetric divergences can be described by the following symmetric Alpha-divergence (Type-2):
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{AS2}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {D_{A}^{(\alpha)}\left( {{\mathbf{P}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right) + D_{A}^{(\alpha)}\left( {{\mathbf{Q}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right)} \\
+ & & = & {\frac{1}{\alpha(\alpha - 1)}\int\left( {{(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha} - {(p + q)}} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\]
+
+
+
+
+The above measure admits the following prominent cases
+
+\begin{enumerate}
+\item Triangular Discrimination [\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B38-entropy-12-01532}{38}]
+
+\setcounter{equation}{40}
+\begin{equation}
+\label{FD42-entropy-12-01532}
+\fitmath{D_{AS2}^{( - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}D_{TD}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p - q)}^{2}}{p + q}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+\item Symmetric Jensen–Shannon divergence [\hyperlink{B62-entropy-12-01532}{62},\allowbreak \hyperlink{B64-entropy-12-01532}{64}]
+
+\setcounter{equation}{41}
+\begin{equation}
+\label{FD43-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{AS2}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{JS}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {p\log\left( \frac{2p}{p + q} \right) + q\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ It is worth mentioning, that the Jensen–Shannon divergence is a symmetrized and smoothed variant of the Kullback–Leibler divergence, i.e., it can be interpreted as the average of the Kullback–Leibler divergences to the average distribution. For the normalized probability densities the Jensen–Shannon divergence is related to the Shannon entropy in the following sense:
+
+\setcounter{equation}{42}
+\begin{equation}
+\label{FD44-entropy-12-01532}
+\fitmath{D_{JS} = H_{S}{({(\mathbf{P} + \mathbf{Q})}/2)} - {(H_{S}{(\mathbf{P})} + H_{S}{(\mathbf{Q})})}/2}
+\end{equation}
+
+ where \(H_{S}{(\mathbf{P})} = - \int p{(\mathbf{x})}\log p{(\mathbf{x})}d\mu{(\mathbf{x})}\)
+
+
+\item Arithmetic-Geometric divergence [\hyperlink{B39-entropy-12-01532}{39}]
+
+\setcounter{equation}{43}
+\begin{equation}
+\label{FD45-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 1}D_{AS2}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+\item Symmetric Chi-square divergence [\hyperlink{B54-entropy-12-01532}{54}]
+
+\setcounter{equation}{44}
+\begin{equation}
+\label{FD46-entropy-12-01532}
+\fitmath{D_{AS2}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{8}D_{\chi^{2}}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{8}\int\frac{{(p - q)}^{2}{(p + q)}}{pq}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\end{enumerate}
+
+
+
+
+
+The above Alpha-divergence is symmetric in its arguments \(\mathbf{P}\) and \(\mathbf{Q}\), and it is well-defined even if \(\mathbf{P}\) and \(\mathbf{Q}\) are not absolutely continuous. For example, for discrete \(D_{AS2}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})}\) is well-defined even if, for some indices \(p_{i}\), it vanishes without vanishing \(q_{i}\) or if \(q_{i}\) vanishes without vanishing \(p_{i}\) [\hyperlink{B54-entropy-12-01532}{54}]. It is also lower- and upper-bounded, for example, the Jensen–Shannon divergence is bounded between 0 and 2 [\hyperlink{B36-entropy-12-01532}{36}].

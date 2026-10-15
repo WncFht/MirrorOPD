@@ -1,0 +1,96 @@
+\setcounter{section}{0}
+\section{\texorpdfstring{引言}{引言}}
+\label{sec1-entropy-12-01532}
+许多用于分类和聚类的机器学习算法采用不同的相异性度量。信息论、凸分析和信息几何在这些散度的构造中起着关键作用[\hyperlink{B1-entropy-12-01532}{1}--\hyperlink{B25-entropy-12-01532}{25}]。
+
+
+最常用的度量包括平方欧氏距离和 Kullback–Leibler 散度。近年来，Csiszár–Morimoto 的 f 散度与 Bregman 散度等广义散度，为机器学习算法提供了其他选择[\hyperlink{B26-entropy-12-01532}{26}--\hyperlink{B34-entropy-12-01532}{34}]。本文讨论 Csiszár–Morimoto 散度与 Bregman 散度中一个稳健的参数化子类：\(\alpha\) 散度和 \(\beta\) 散度。面对离群值和加性噪声，它们可以给出更稳健、精度更高的解。我们还建立它们与一类新的稳健 \(\gamma\) 散度[\hyperlink{B35-entropy-12-01532}{35}]之间的联系，并将后者扩展为所谓的 \(\alpha\)–\(\gamma\) 散度。
+
+
+本文将散度视为相似性或相异性度量。通常，它衡量两个概率分布 \(\mathbf{P}\) 与 \(\mathbf{Q}\) 之间的准距离或有向差异，也可以定义在无约束的非负多维数组和模式上。
+
+
+本文假设 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 是正的有限测度或密度，未必归一化。对于归一化密度，我们明确称其为概率密度。除非另有说明，均假设这些测度是连续的。信息散度度量两条概率曲线之间的距离。本文只讨论由非负信号或时间序列表示的一维概率曲线；推广到二维或更高维变量是直接的。通常，一个密度 \(\mathbf{Q}(x)\) 已知且固定，另一个密度 \(\mathbf{P}(\mathbf{x})\) 通过学习或调整，在某种意义下尽可能接近 \(\mathbf{Q}(\mathbf{x})\)。例如，离散密度 \(\mathbf{Q}\) 对应观测数据，而向量 \(\mathbf{P}\) 对应待估计的数据或期望数据，并满足所假设模型施加的约束。对于非负矩阵分解（Non-negative Matrix Factorization，NMF），\(\mathbf{Q}\) 对应数据矩阵 \(\mathbf{Y}\)，\(\mathbf{P}\) 对应估计矩阵 \(\hat{\mathbf{Y}} = \mathbf{A}\mathbf{X}\)，二者也可以交换[\hyperlink{B30-entropy-12-01532}{30}]。
+
+
+两个密度之间的距离若满足以下条件，就称为度量：
+
+\begin{enumerate}
+\item \(D(\mathbf{P}\,||\,\mathbf{Q}) \geq 0\)，等号成立当且仅当 \(\mathbf{P} = \mathbf{Q}\)，即非负性与正定性；
+
+
+\item \(D(\mathbf{P}\,||\,\mathbf{Q}) = D(\mathbf{Q}\,||\,\mathbf{P})\)，即对称性；
+
+
+\item \(D(\mathbf{P}\,||\,\mathbf{Z}) \leq D(\mathbf{P}\,||\,\mathbf{Q}) + D(\mathbf{Q}\,||\,\mathbf{Z})\)，即次可加性或三角不等式。
+
+\end{enumerate}
+
+
+
+
+
+只满足条件 1 的距离不构成度量，称为非对称散度。
+
+
+在图像分析、模式识别和统计机器学习等应用中，常采用信息论散度来替代平方欧氏距离或 \(l_{p}\) 范数距离[\hyperlink{B28-entropy-12-01532}{28}]。Kullback–Leibler、Hellinger 和 Jensen–Shannon 等信息散度，是估计分布相似性的重要工具，在信息几何中已有长期研究。
+
+
+散度的概念不限于欧氏空间，还可以借助 Radon–Nikodym 导数扩展到抽象空间，例如文献[\hyperlink{B36-entropy-12-01532}{36}]。设 \((\mathbf{X},\mathcal{A},\mu)\) 是一个测度空间，其中 \(\mu\) 是 \((\mathbf{X},\mathcal{A})\) 上的有限测度或 \(\sigma\) 有限测度。设 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 是 \((\mathbf{X},\mathcal{A})\) 上的两个概率测度，且 \(\mathbf{P} < < \mu\)、\(\mathbf{Q} < < \mu\) 关于测度 \(\mu\) 绝对连续，例如取 \(\mu = \mathbf{P} + \mathbf{Q}\)；设 \(p = \frac{d\mathbf{P}}{d\mu}\) 和 \(q = \frac{d\mathbf{Q}}{d\mu}\) 分别为 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 关于 \(\mu\) 的 Radon–Nikodym 导数，即密度。使用这些记号，两个概率分布之间的 Kullback–Leibler（KL）散度可写为
+
+\setcounter{equation}{0}
+\begin{equation}
+\label{FD1-entropy-12-01532}
+\fitmath{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = \int_{\mathbf{X}}p{(\mathbf{x})}\log\left( \frac{p(\mathbf{x})}{q(\mathbf{x})} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+它与 Shannon 熵
+
+\setcounter{equation}{1}
+\begin{equation}
+\label{FD2-entropy-12-01532}
+\fitmath{H_{S}{(\mathbf{P})} = - \int_{\mathbf{X}}p{(\mathbf{x})}\,\log{(p{(\mathbf{x})})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+之间满足
+
+\[
+\fitmath{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = V_{S}{(\mathbf{P},\mathbf{Q})} - H_{S}{(\mathbf{P})}}
+\]
+
+其中
+
+\[
+\fitmath{V_{S}{(\mathbf{P},\mathbf{Q})} = - \int_{\mathbf{X}}p{(\mathbf{x})}\log{(q{(\mathbf{x})})}d\mu{(\mathbf{x})}}
+\]
+
+为 Shannon 交叉熵，前提是相应积分存在。从测度论的角度，若由 \(\mathbf{P}\) 诱导的测度关于由 \(\mathbf{Q}\) 诱导的测度绝对连续，则该积分存在。本文始终假设所涉及的积分存在。
+
+
+利用一族广义对数函数，也称 \(\alpha\) 对数，可以推广 Kullback–Leibler 散度：
+
+\setcounter{equation}{2}
+\begin{equation}
+\label{FD3-entropy-12-01532}
+\fitmath{\log_{\;\alpha}{(x)} = \frac{1}{1 - \alpha}{(x^{1 - \alpha} - 1)}{(\text{当}\;\; x > 0)}}
+\end{equation}
+
+这是关于 x 的幂函数，幂次为 \(1 - \alpha\)；在极限 \(\left. \alpha\rightarrow 1 \right.\) 下，它退化为自然对数。利用幂函数（\hyperref[FD3-entropy-12-01532]{3}），常可构造对离群值更稳健的散度，获得更好或更灵活的性能，例如文献[\hyperlink{B37-entropy-12-01532}{37}]。
+
+
+利用这种扩展，我们推导并回顾 \(\alpha\)、\(\beta\) 和 \(\gamma\) 三个散度族，它们都是 KL 散度的推广。我们还说明它们与 Tsallis 熵和 Rényi 熵的关系，见\hyperref[app1-entropy-12-01532]{附录 A}和\hyperref[app2-entropy-12-01532]{附录 B}。此外，还将说明如何利用幂函数从 Csiszár–Morimoto 的 f 散度导出 \(\alpha\) 散度，以及从 Bregman 散度导出 \(\beta\) 散度。
+
+
+与 Zhang[\hyperlink{B22-entropy-12-01532}{22}--\hyperlink{B24-entropy-12-01532}{24}]以及 Hein 和 Bousquet[\hyperlink{B21-entropy-12-01532}{21}]的工作类似，我们的一个动机是说明广泛的散度类之间的紧密联系，并在同一框架内处理已知散度、中间散度和新散度。不过，本文的相似性度量与文献[\hyperlink{B21-entropy-12-01532}{21}]提出的度量不同，所用方法和结果也与文献[\hyperlink{B22-entropy-12-01532}{22}]有明显区别。
+
+
+已有一些工作尝试统一散度函数，尤其是与 \(\alpha\) 散度有关的函数，包括 Zhu 和 Rohwer[\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}]、Amari 和 Nagaoka[\hyperlink{B3-entropy-12-01532}{3}]、Taneya[\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39}]、Zhang[\hyperlink{B22-entropy-12-01532}{22}]以及 Gorban 和 Judge[\hyperlink{B40-entropy-12-01532}{40}]的研究。Zhang 在文献[\hyperlink{B22-entropy-12-01532}{22}]及其后续工作[\hyperlink{B23-entropy-12-01532}{23},\allowbreak \hyperlink{B24-entropy-12-01532}{24}]中，通过基于凸函数的统一方法，研究了信息几何与各种散度函数之间的深层联系，其中主要涉及 \(\alpha\) 散度。然而，已有工作没有明确讨论 \(\alpha\)、\(\beta\) 和 \(\gamma\) 这三个基本散度类之间的全部联系。本文还回顾并扩展它们的若干基本性质。
+
+
+本文结果覆盖的广义散度函数类包含许多有用的损失函数，例如基于相对熵、广义 Kullback–Leibler 散度或 I 散度、Hellinger 距离、Jensen–Shannon 散度、J 散度、Pearson 与 Neyman 卡方散度、三角判别散度及算术–几何散度的损失函数。我们还说明如何生成新的散度。特别地，我们构造一族新的 \(\alpha\)–\(\gamma\) 散度，以及具有尺度不变性的 Itakura–Saito 型距离；后者属于更广泛的 \(\beta\) 散度类。这些新的尺度不变散度扩展了 \(\beta\) 散度族和 \(\gamma\) 散度族。本文讨论的散度函数具有灵活性：通过设定调节参数，可以生成许多已知且常用的特例。此外，通过自适应调节参数，可以优化学习算法的代价函数，并在噪声与离群值存在时估计模型参数。本文讨论的散度，尤其是 \(\beta\) 散度和 \(\gamma\) 散度，在某些参数取值下对离群值具有稳健性。
+
+
+这些散度族可以为散度的选择乃至新度量的构造提供指导，并利用 Csiszár–Morimoto 散度、Bregman 散度及其基本性质，将不同散度置于同一框架。它们通常定义在未归一化的有限测度上，而不局限于归一化概率。这使我们可以分析不同大小、具有不同权重的模式，例如尺寸不同的图像或长度不同的文档。这类测度在神经计算、模式识别、学习、估计、推断和优化中也很重要。我们已将其中一部分散度作为代价函数，并在需要时加入约束或正则项，导出了用于非负矩阵分解和非负张量分解的乘法更新算法及加性投影梯度算法[\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B31-entropy-12-01532}{31}]。
+
+
+散度与概率分布流形的不变几何性质密切相关[\hyperlink{B5-entropy-12-01532}{5}--\hyperlink{B7-entropy-12-01532}{7}]。

@@ -1,0 +1,361 @@
+\setcounter{section}{3}
+\section{\texorpdfstring{Family of Gamma-Divergences Generated from Beta- and Alpha-Divergences}{Family of Gamma-Divergences Generated from Beta- and Alpha-Divergences}}
+\label{sec4-entropy-12-01532}
+A basic asymmetric Gamma-divergence has been proposed very recently by Fujisawa and Eguchi [\hyperlink{B35-entropy-12-01532}{35}] as a very robust similarity measure with respect to outliers:
+
+\setcounter{equation}{71}
+\begin{equation}
+\label{FD74-entropy-12-01532}
+\fitmath{D_{G}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\gamma(\gamma - 1)}\log\;\left( \frac{\left( {\int p^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)\left( {\int q^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\gamma - 1}}{\left( {\int p{(\mathbf{x})}\; q^{\,\gamma - 1}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\gamma}} \right)}
+\end{equation}
+
+ The Gamma-divergence employs the nonlinear transformation (log) for cumulative patterns and the terms \(p,q\) are not separable. The main motivation for employing the Gamma divergence is that it allows “super” robust estimation of some parameters in presence of outlier. In fact, the authors demonstrated that the bias caused by outliers can become sufficiently small even in the case of very heavy contamination and that some contamination can be naturally and automatically neglected [\hyperlink{B35-entropy-12-01532}{35},\allowbreak \hyperlink{B37-entropy-12-01532}{37}].
+
+
+In this paper, we show that we can formulate the whole family of Gamma-divergences generated directly from Alpha- and also Beta-divergences. In order to obtain a robust Gamma-divergence from an Alpha- or Beta-divergence, we use the following transformations (see also \hyperref[entropy-12-01532-t003]{Table 3}):
+
+\setcounter{equation}{72}
+\begin{equation}
+\label{FD75-entropy-12-01532}
+\fitmath{\left. c_{0}\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})}\rightarrow\log\left( {\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)^{c_{0}} \right.}
+\end{equation}
+
+ where \(c_{0},c_{1}\) and \(c_{2}\) are real constants and \(\gamma = \alpha\).
+
+
+Applying the above transformation to all monomials to the basic Alpha-divergence (\hyperref[FD4-entropy-12-01532]{4}), we obtain a new divergence referred to as here the Alpha-Gamma-divergence:
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{AG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})}} & & = & {\log\left( {\int p^{\gamma}{(\mathbf{x})}q^{1 - \gamma}{(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma(\gamma - 1)}} - \log\left( {\int p(\mathbf{x})d\mu(\mathbf{x})} \right)^{\frac{1}{\gamma - 1}} + \log\left( {\int q(\mathbf{x})d\mu(\mathbf{x})} \right)^{\frac{1}{\gamma}}} \\
+ & & = & {\frac{1}{\gamma(\gamma - 1)}\log\left( \frac{\int p^{\gamma}{(\mathbf{x})}q^{1 - \gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}}{\left( {\int p(\mathbf{x})d\mu(\mathbf{x})} \right)^{\gamma}\left( {\int q(\mathbf{x})d\mu(\mathbf{x})} \right)^{1 - \gamma}} \right)}
+\end{array}}
+\]
+
+
+
+
+The asymmetric Alpha-Gamma-divergence has the following important properties:
+
+\begin{enumerate}
+\item \(D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} \geq 0\). The equality holds if and only if \(\mathbf{P} = c\mathbf{Q}\) for a positive constant c.
+
+
+\item It is scale invariant for any value of \(\gamma\), that is, \(D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AG}^{(\gamma)}(c_{1}{\mathbf{P}\,||\,}c_{2}{\mathbf{Q})}\), for arbitrary positive scaling constants \(c_{1},c_{2}\).
+
+
+\item The Alpha-Gamma divergence is equivalent to the normalized Alpha-Rényi divergence (\hyperref[FD25-entropy-12-01532]{25}), i.e.,
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{AG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})}} & & = & {\frac{1}{\gamma(\gamma - 1)}\log\left( \frac{\int p^{\gamma}{(\mathbf{x})}\, q^{1 - \gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}}{\left( {\int p(\mathbf{x})d\mu(\mathbf{x})} \right)^{\gamma}\left( {\int q(\mathbf{x})d\mu(\mathbf{x})} \right)^{1 - \gamma}} \right)} \\
+ & & = & {\frac{1}{\gamma(\gamma - 1)}\log\left( {\int{\overline{p}}^{\gamma}{(\mathbf{x})}\,{\overline{q}}^{1 - \gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)} \\
+ & & = & {\frac{1}{\gamma - 1}\log\left( {\int\overline{q}{(\mathbf{x})}\,\left( \frac{\overline{p}{(\mathbf{x})}}{\overline{q}{(\mathbf{x})}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}} = D_{AR}^{(\gamma)}(\overline{\mathbf{P}}{||}\overline{\mathbf{Q}})}
+\end{array}}
+\]
+
+ for \(\alpha = \gamma\) and normalized densities \(\overline{p}{{(\mathbf{x})} = p{(\mathbf{x})}/\int(p{(\mathbf{x})}d\mu{(\mathbf{x})}}\) and \(\overline{q}{{(\mathbf{x})} = q{(\mathbf{x})}/\int(q{(\mathbf{x})}d\mu{(\mathbf{x})}}\).
+
+
+\item It can be expressed via generalized weighted mean:
+
+\setcounter{equation}{73}
+\begin{equation}
+\label{FD78-entropy-12-01532}
+\fitmath{D_{AG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})} = \frac{1}{\gamma - 1}\log\left( {{\overline{M}}_{\gamma}\left\{ {\overline{q};\frac{\overline{p}}{\overline{q}}} \right\}} \right)}
+\end{equation}
+
+ where the weighted mean is defined as \({\overline{M}}_{\gamma}\left\{ {\overline{q};\frac{\overline{p}}{\overline{q}}} \right\} = \left( {\int\overline{q}{(\mathbf{x})}\,\left( \frac{\overline{p}{(\mathbf{x})}}{\overline{q}{(\mathbf{x})}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}\).
+
+
+\item As \(\left. \gamma\rightarrow 0 \right.\), the Alpha-Gamma-divergence becomes the Kullback–Leibler divergence:
+
+\setcounter{equation}{74}
+\begin{equation}
+\label{FD79-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 0}D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{KL}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) = \int}\overline{p}{(\mathbf{x})}\,\log\frac{\overline{p}{(\mathbf{x})}}{\overline{q}{(\mathbf{x})}}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+\item For \(\left. \gamma\rightarrow 1 \right.\), the Alpha-Gamma-divergence can be expressed by the reverse Kullback–Leibler divergence:
+
+\setcounter{equation}{75}
+\begin{equation}
+\label{FD80-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 1}D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{KL}(\overline{\mathbf{Q}}{\,||\,}\overline{\mathbf{P}}{) = \int}\overline{q}{(\mathbf{x})}\,\log\frac{\overline{q}{(\mathbf{x})}}{\overline{p}{(\mathbf{x})}}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\end{enumerate}
+
+
+
+
+
+In a similar way, we can generate the whole family of Alpha-Gamma-divergences from the family of Alpha-divergences, which are summarized in \hyperref[entropy-12-01532-t003]{Table 3}.
+
+
+It is interesting to note that using the above transformations (\hyperref[FD75-entropy-12-01532]{73}) with \(\gamma = \beta\), we can generate another family of Gamma divergences, referred to as Beta-Gamma divergences.
+
+
+In particular, using the nonlinear transformations (\hyperref[FD75-entropy-12-01532]{73}) for the basic asymmetric Beta-divergence (\hyperref[FD47-entropy-12-01532]{46}), we obtain the Gamma-divergence (\hyperref[FD74-entropy-12-01532]{72}) [\hyperlink{B35-entropy-12-01532}{35}] referred to as here a Beta-Gamma-divergence (\(D_{G}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})} = D_{BG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})}\))
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {\frac{1}{\gamma(\gamma - 1)}\left\lbrack {\log{(\int p^{\gamma}d\mu{(\mathbf{x})})} + {(\gamma - 1)}\log{(\int q^{\gamma}d\mu{(\mathbf{x})})} - \gamma\log{(\int p\; q^{\gamma - 1}d\mu{(\mathbf{x})})}} \right\rbrack} \\
+ & & = & {\log\;\left( \frac{\left( {\int p\; q^{\,\gamma - 1}d\mu{(\mathbf{x})}} \right)^{\frac{1}{1 - \gamma}}}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma(1 - \gamma)}}\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{- 1}{\gamma}}} \right)} \\
+ & & = & {\frac{1}{1 - \gamma}\log\left( {\int{\widetilde{q}}^{\;\gamma}{(\mathbf{x})}\left( {\,\frac{\widetilde{p}{(\mathbf{x})}}{\widetilde{q}{(\mathbf{x})}}} \right)\; d\mu{(\mathbf{x})}} \right)}
+\end{array}}
+\]
+
+ where
+
+\setcounter{equation}{76}
+\begin{equation}
+\label{FD82-entropy-12-01532}
+\fitmath{\widetilde{p}{(\mathbf{x})} = \frac{p(\mathbf{x})}{\left( {\int p^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}},\widetilde{q}{(\mathbf{x})} = \frac{q(\mathbf{x})}{\left( {\int q^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}}}
+\end{equation}
+
+
+
+
+Analogously, for discrete densities we can express the Beta-Gamma-divergence via generalized power means also known as the power mean or Hölder means as follows
+
+\setcounter{equation}{77}
+\begin{equation}
+\label{FD83-entropy-12-01532}
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = - \log\;\frac{\left( {\sum\limits_{i = 1}^{n}p_{i}\; q_{i}^{\,\gamma - 1}} \right)^{\frac{1}{\gamma - 1}}}{\left( {\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma(\gamma - 1)}}\left( {\sum\limits_{i = 1}^{n}q_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}}}
+\end{equation}
+
+
+
+
+Hence,
+
+\[
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = - \log\;\frac{\left( {\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\; q_{i}^{\,\gamma}} \right)^{\frac{1}{\gamma - 1}}}{\left\lbrack \left( {\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma}} \right\rbrack^{\frac{1}{\gamma - 1}}\left( {\sum\limits_{i = 1}^{n}q_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}} = - \log\left( \frac{\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\; q_{i}^{\,\gamma}}{\left( {\frac{1}{n}\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}\left\lbrack \left( {\frac{1}{n}\sum\limits_{i = 1}^{n}q_{i}^{\gamma}} \right)^{\frac{1}{\gamma}} \right\rbrack^{\gamma - 1}} \right)^{\frac{1}{\gamma - 1}}}
+\]
+
+ and finally
+
+\setcounter{equation}{78}
+\begin{equation}
+\label{FD84-entropy-12-01532}
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{1 - \gamma}\log\,\frac{\frac{1}{n}\;\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\; q_{i}^{\,\gamma}}{M_{\gamma}{\{ p_{i}\}}\,\left\lbrack {M_{\gamma}{\{ q_{i}\}}} \right\rbrack^{\gamma - 1}}}
+\end{equation}
+
+ where the (generalized) power mean of the order-\(\gamma\) is defined as
+
+\setcounter{equation}{79}
+\begin{equation}
+\label{FD85-entropy-12-01532}
+\fitmath{M_{\gamma}{\{ p_{i}\}} = \left( {\frac{1}{n}\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}}
+\end{equation}
+
+ In the special cases, we obtain standard harmonic mean (\(\gamma = - 1)\), geometric mean (\(\gamma = 0\)), arithmetic mean(\(\gamma = 1\)), and squared root mean \(\gamma = 2\) with the following relations:
+
+\setcounter{equation}{80}
+\begin{equation}
+\label{FD86-entropy-12-01532}
+\fitmath{M_{- \infty}{\{ p_{i}\}} \leq M_{- 1}{({\{ p_{i}\}})} \leq M_{0}{\{ p_{i}\}} \leq M_{1}{\{ p_{i}\}} \leq M_{2}{\{ p_{i}\}} \leq M_{\infty}{\{ p_{i}\}},}
+\end{equation}
+
+ with \(M_{0}{\{ p_{i}\}} = \lim_{\gamma\rightarrow 0}M_{\gamma}{\{ p_{i}\}} = \left( {\prod_{i = 1}^{n}p_{i}} \right)^{1/n}\), \(M_{- \infty}{\{ p_{i}\}} = \min_{i}{\{ p_{i}\}}\) and \(M_{\infty}{\{ p_{i}\}} = \max_{i}{\{ p_{i}\}}\).
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{2}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{Family of Alpha-divergences and corresponding robust Alpha-Gamma-divergences; \(\overline{p}{(\mathbf{x})} = p{(\mathbf{x})}/{(\int p{(\mathbf{x})}d\mu{(\mathbf{x})})},\;\;\overline{q}{(\mathbf{x})} = q{(\mathbf{x})}/{(\int q{(\mathbf{x})}d\mu{(\mathbf{x})})}\). For \(\gamma = 0,1\), we obtained a generalized robust KL divergences. Note that Gamma divergences are expressed compactly via generalized power means. (see also \hyperref[entropy-12-01532-t004]{Table 4} for more direct representations).}\label{entropy-12-01532-t003}\\
+\toprule
+Alpha-divergence \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})}} & Robust Alpha-Gamma-divergence \cellmath{D_{AG}^{(\gamma)}{({c\mathbf{P}||c\mathbf{Q}})}} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}q^{1 - \alpha} - \alpha p + {(\alpha - 1)}q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left( {\int\overline{q}\left( \frac{\overline{p}}{\overline{q}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}},} \\
+{\int\overline{q}\log\left( \frac{\overline{q}}{\overline{p}} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int\overline{p}\log\left( \frac{\overline{p}}{\overline{q}} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{1 - \alpha}q^{\alpha} + {(\alpha - 1)}p - \alpha q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {q\log\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left( {\int\overline{p}\left( \frac{\overline{q}}{\overline{p}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}},} \\
+{\int\overline{p}\log\left( \frac{\overline{p}}{\overline{q}} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int\overline{q}\log\left( \frac{\overline{q}}{\overline{p}} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {\left( \frac{p + q}{2} \right)^{\alpha}q^{1 - \alpha} - \frac{\alpha}{2}p - {(1 - \frac{\alpha}{2})}\, q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {q\log\left( \frac{2q}{p + q} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left\lbrack {\left( \frac{\int qd\mu(\mathbf{x})}{\int pd\mu(\mathbf{x})} \right)^{\frac{1}{2}}\left( {\int\overline{q}\left( \frac{p + q}{2q} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}} \right\rbrack} \\
+{\int\left( {(\overline{q}\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int\left( {\frac{\overline{p} + \overline{q}}{2}\log\left( \frac{p + q}{2q} \right)} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int\left\lbrack {\left( \frac{p + q}{2q} \right)^{\alpha - 1} - 1} \right\rbrack{(p - q)}d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\log\left( \frac{\int{(\overline{p}\left( \frac{p + q}{2q} \right)^{\gamma - 1})}d\mu{(\mathbf{x})}}{\int{(\overline{q}\left( \frac{p + q}{2q} \right)^{\gamma - 1})}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma - 1}}} \\
+{\int{(\overline{p} - \overline{q})}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}q^{1 - \alpha} + p^{1 - \alpha}q^{\alpha} - p - q} \right)d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\alpha = 0,1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left\lbrack {\int\overline{q}\left( \frac{p}{q} \right)^{\gamma}d\mu{(\mathbf{x})}\int\overline{p}\left( \frac{q}{p} \right)^{\gamma}d\mu{(\mathbf{x})}} \right\rbrack^{\frac{1}{\gamma}}} \\
+{\int{(\overline{p} - \overline{q})}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\gamma = 0,1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {{(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha} - p - q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {p\log\left( \frac{2p}{p + q} \right) + q\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}{\log\left\lbrack {\int\overline{p}\left( \frac{p + q}{2p} \right)^{\gamma}d\mu{(\mathbf{x})}\,\int\overline{q}\left( \frac{p + q}{2q} \right)^{\gamma}d\mu{(\mathbf{x})}} \right\rbrack^{\frac{1}{\gamma}}}} \\
+{\int\left( {\overline{p}\log\left( \frac{2p}{p + q} \right) + \overline{q}\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int{(\overline{p} + \overline{q})}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\gamma = 1.}
+\end{array} \right.} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{3}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{Basic Alpha- and Beta-divergences and directly generated corresponding Gamma-divergences (see also \hyperref[entropy-12-01532-t003]{Table 3} how the Gamma-divergences can be expressed by power means).}\label{entropy-12-01532-t004}\\
+\toprule
+Divergence \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})}} or \cellmath{D_{B}^{(\beta)}{({\mathbf{P}||\mathbf{Q}})}} & Gamma-divergence \cellmath{D_{AG}^{(\gamma)}{({c\mathbf{P}||c\mathbf{Q}})}} and \cellmath{D_{BG}^{(\gamma)}{({c\mathbf{P}||c\mathbf{Q}})}} \\ \midrule
+\cellmath{\frac{1}{\alpha(1 - \alpha)}\int\left( {\alpha\, p + {(1 - \alpha)}\, q - p^{\alpha}\, q^{1 - \alpha}} \right)d\mu{(\mathbf{x})}} & \cellmath{ - \log\frac{\left( {\int p^{\gamma}\, q^{1 - \gamma}d\mu{(\mathbf{x})}} \right)^{\; 1/(\gamma(1 - \gamma))}}{\left( {\int pd\mu(\mathbf{x})} \right)^{1/(1 - \gamma)}\;\left( {\int qd\mu(\mathbf{x})} \right)^{1/\gamma}}} \\ \midrule
+\cellmath{\frac{1}{\beta(\beta - 1)}\int\left( {p^{\beta} + {(\beta - 1)}\, q^{\beta} - \beta\, p\, q^{\beta - 1}} \right)d\mu{(\mathbf{x})}} & \cellmath{ - \log\frac{\left( {\int p\, q^{\gamma - 1}d\mu{(\mathbf{x})}} \right)^{\; 1/(\gamma - 1)}}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)^{1/(\gamma(\gamma - 1))}\;\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)^{1/\gamma}}} \\ \midrule
+\cellmath{\frac{1}{\alpha(1 - \alpha)}\int\left( {p + q - p^{\alpha}\, q^{1 - \alpha} - p^{1 - \alpha}\, q^{\alpha}} \right)d\mu{(\mathbf{x})}} & \cellmath{\frac{- 1}{\gamma(1 - \gamma)}\log\frac{\left( {\int p^{\gamma}\, q^{1 - \gamma}d\mu{(\mathbf{x})}} \right)\,\left( {\int p^{1 - \gamma}\, q^{\gamma}d\mu{(\mathbf{x})}} \right)}{\int pd\mu(\mathbf{x})\;\int qd\mu(\mathbf{x})}} \\ \midrule
+\cellmath{\frac{1}{\beta - 1}\int\left( {p^{\beta} + q^{\beta} - p\, q^{\beta - 1} - p^{\beta - 1}\, q} \right)d\mu{(\mathbf{x})}} & \cellmath{\frac{- 1}{\gamma - 1}\log\frac{\left( {\int p\, q^{\gamma - 1}d\mu{(\mathbf{x})}} \right)\left( {\,\int p^{\gamma - 1}\, qd\mu{(\mathbf{x})}} \right)}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)}} \\ \midrule
+\cellmath{\frac{\int\left( {\frac{\alpha}{2}\, p + {(1 - \frac{\alpha}{2})}\, q - \left( \frac{p + q}{2} \right)^{\alpha}q^{\alpha - 1}} \right)d\mu{(\mathbf{x})}}{\alpha(1 - \alpha)}} & \cellmath{\frac{- 1}{\gamma(1 - \gamma)}\log\frac{\int\left( \frac{p + q}{2} \right)^{\gamma - 1}q^{\gamma - 1}d\mu{(\mathbf{x})}}{\left( {\int pd\mu(\mathbf{x})} \right)^{\gamma/2}\;\left( {\int qd\mu(\mathbf{x})} \right)^{1 - \gamma/2}}} \\ \midrule
+\cellmath{\frac{1}{1 - \alpha}\int{(p - q)}\left( {1 - \frac{p + q}{2q}} \right)^{\alpha - 1}d\mu{(\mathbf{x})}} & \cellmath{\frac{1}{1 - \gamma}\log\frac{\int pd\mu{(\mathbf{x})}\,\int q\left( \frac{p + q}{2q} \right)^{\gamma - 1}d\mu{(\mathbf{x})}}{\int qd\mu{(\mathbf{x})}\,\int p\left( \frac{p + q}{2q} \right)^{\gamma - 1}d\mu{(\mathbf{x})}}} \\ \midrule
+\cellmath{\frac{\int\left( {p + q - {(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha}} \right)d\mu{(\mathbf{x})}}{\alpha(1 - \alpha)}} & \cellmath{\;\log\left( \frac{\int p^{1 - \gamma}\left( \frac{p + q}{2} \right)^{\,\gamma}d\mu{(\mathbf{x})}\int q^{1 - \gamma}\left( \frac{p + q}{2} \right)^{\,\gamma}d\mu{(\mathbf{x})}}{\int pd\mu(\mathbf{x})\;\int qd\mu(\mathbf{x})} \right)^{\frac{1}{\gamma(\gamma - 1)}}} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+The asymmetric Beta-Gamma-divergence has the following properties [\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B35-entropy-12-01532}{35}]:
+
+\begin{enumerate}
+\item \(D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} \geq 0\). The equality holds if and only if \(\mathbf{P} = c\mathbf{Q}\) for a positive constant c.
+
+
+\item It is scale invariant, that is, \(D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{BG}^{(\gamma)}(c_{1}{\mathbf{P}\,||\,}c_{2}{\mathbf{Q})}\), for arbitrary positive scaling constants \(c_{1},c_{2}\).
+
+
+\item As \(\left. \gamma\rightarrow 1 \right.\), the Gamma-divergence becomes the Kullback–Leibler divergence:
+
+\setcounter{equation}{81}
+\begin{equation}
+\label{FD87-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 1}D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{KL}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) = \int}\overline{p}\,\log\frac{\overline{p}}{\overline{q}}d\mu{(\mathbf{x})}}
+\end{equation}
+
+ where \(\overline{p} = p/\int pd\mu{(\mathbf{x})}\) and \(\overline{q} = q/\int qd\mu{(\mathbf{x})}\).
+
+
+\item For \(\left. \gamma\rightarrow 0 \right.\), the Gamma-divergence can be expressed as follows
+
+\setcounter{equation}{82}
+\begin{equation}
+\label{FD88-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 0}D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\log\frac{q(\mathbf{x})}{p(\mathbf{x})}\, d\mu{(\mathbf{x})} + \log\left( {\int\frac{p(\mathbf{x})}{q(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+ For the discrete Gamma divergence we have the corresponding formula
+
+\setcounter{equation}{83}
+\begin{equation}
+\label{FD89-entropy-12-01532}
+\fitmath{D_{BG}^{(0)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{n}\sum\limits_{i = 1}^{n}\left( {\log\frac{q_{i}}{p_{i}}} \right) + \log\left( {\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}} \right) - \log{(n)} = \log\frac{\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}}{\left( {\prod\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}} \right)^{1/n}}}
+\end{equation}
+
+
+
+\end{enumerate}
+
+
+
+
+
+Similarly to the Alpha and Beta-divergences, we can also define the symmetric Beta-Gamma-divergence as
+
+\[
+\fitmath{D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{BG}^{(\gamma)}{(\mathbf{Q}\,||\,\mathbf{P})} = \frac{1}{1 - \gamma}\;\log\left\lbrack \frac{\left( {\int p^{\gamma - 1}\; q\, d\mu{(\mathbf{x})}} \right)\left( {\int p\; q^{\gamma - 1}\, d\mu{(\mathbf{x})}} \right)}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)} \right\rbrack}
+\]
+
+
+
+
+The symmetric Gamma-divergence has similar properties to the asymmetric Gamma-divergence:
+
+\begin{enumerate}
+\item \(D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} \geq 0\). The equality holds if and only if \(\mathbf{P} = c\mathbf{Q}\) for a positive constant c, in particular, \(p = q,\;\;\forall i\).
+
+
+\item It is scale invariant, that is,
+
+\setcounter{equation}{84}
+\begin{equation}
+\label{FD90-entropy-12-01532}
+\fitmath{D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{BGS}^{(\gamma)}(c_{1}{\mathbf{P}\,||\,}c_{2}{\mathbf{Q})}}
+\end{equation}
+
+ for arbitrary positive scaling constants \(c_{1},c_{2}\).
+
+
+\item For \(\left. \gamma\rightarrow 1 \right.\), it is reduced to a special form of the symmetric Kullback–Leibler divergence (also called the J-divergence)
+
+\setcounter{equation}{85}
+\begin{equation}
+\label{FD91-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 1}D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int{(\overline{p} - \overline{q})}\log\frac{\overline{p}}{\overline{q}}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+ where \(\overline{p} = p/\int pd\mu{(\mathbf{x})}\) and \(\overline{q} = q/\int qd\mu{(\mathbf{x})}\).
+
+
+\item For \(\gamma = 0\), we obtain a simple divergence expressed by weighted arithmetic means
+
+\setcounter{equation}{86}
+\begin{equation}
+\label{FD92-entropy-12-01532}
+\fitmath{D_{BGS}^{(0)}{(\mathbf{P}\,||\,\mathbf{Q})} = \log\left( {\int w\,\frac{p(\mathbf{x})}{q(\mathbf{x})}\, d\mu{(\mathbf{x})}\;\int w\,\frac{q(\mathbf{x})}{p(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+ where weight function \(w > 0\) is such that \(\int wd\mu(\mathbf{x}) = 1\).
+
+For the discrete Beta-Gamma divergence (or simply the Gamma divergence), we obtain divergence
+
+\[
+\fitmath{\begin{array}{clr}
+{D_{BGS}^{(0)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {\log\left( {\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\sum\limits_{i = 1}^{n}\frac{q_{i}}{p_{i}}} \right) - \log{(n)}^{2}} \\
+ & = & {\log\left( {\left( {\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}} \right)\left( {\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{q_{i}}{p_{i}}} \right)} \right)} \\
+ & = & {\log\left( {M_{1}\left\{ \frac{p_{i}}{q_{i}} \right\}\, M_{1}\left\{ \frac{q_{i}}{p_{i}} \right\}} \right)}
+\end{array}}
+\]
+
+ It is interesting to note that for \(\left. n\rightarrow\infty \right.\) the discrete symmetric Gamma-divergence can be expressed by expectation functions \(D_{BGS}^{(1)}{(\mathbf{P}\,||\,\mathbf{Q})} = \log{(E{\{\mathbf{u}\}}\; E{\{\mathbf{u}^{- 1}\}})}\), where \(u_{i} = {\{ p_{i}/q_{i}\}}\) and \(u_{i}^{- 1} = {\{ q_{i}/p_{i}\}}\).
+
+
+\item For \(\gamma = 2\), the asymmetric Gamma-divergences (equal to a symmetric Gamma-divergence) is reduced to Cauchy–Schwarz divergence, introduced by Principe [\hyperlink{B83-entropy-12-01532}{83}]
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{BG}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {D_{BG}^{(2)}{(\mathbf{Q}\,||\,\mathbf{P})} = \frac{1}{2}D_{BGS}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}D_{CS}{(\mathbf{P}\,||\,\mathbf{Q})}} \\
+ & & = & {- \log\frac{\int p(\mathbf{x})\; q(\mathbf{x})\; d\mu(\mathbf{x})}{\left( {\int p^{2}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{1/2}\left( {\int q^{2}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{1/2}}}
+\end{array}}
+\]
+
+
+
+\end{enumerate}
+
+
+
+
+
+It should be noted that the basic asymmetric Beta-Gamma divergence (derived from the Beta-divergence) is exactly equivalent to the Gamma divergence defined in [\hyperlink{B35-entropy-12-01532}{35}], while Alpha-Gamma divergences (derived from the family of Alpha-divergences) have different expressions but they are similar in terms of properties.

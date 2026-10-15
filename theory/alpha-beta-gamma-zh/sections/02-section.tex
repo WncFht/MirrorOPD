@@ -1,0 +1,676 @@
+\setcounter{section}{1}
+\section{\texorpdfstring{\(\alpha\) 散度族}{α 散度族}}
+\label{sec2-entropy-12-01532}
+\(\alpha\) 散度可以从 Csiszár–Morimoto 的 f 散度导出；Amari 最近还说明，通过一些处理，也可以从 Bregman 散度导出它[\hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B6-entropy-12-01532}{6}]，另见\hyperref[app1-entropy-12-01532]{附录 A}。\(\alpha\) 散度由 Chernoff 提出[\hyperlink{B41-entropy-12-01532}{41}]，Amari[\hyperlink{B1-entropy-12-01532}{1},\allowbreak \hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B5-entropy-12-01532}{5},\allowbreak \hyperlink{B6-entropy-12-01532}{6}]和其他研究者对它进行了广泛研究与扩展。有关修改或推广，可参阅 Liese 和 Vajda[\hyperlink{B36-entropy-12-01532}{36}]、Minka[\hyperlink{B42-entropy-12-01532}{42}]、Taneja[\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39},\allowbreak \hyperlink{B43-entropy-12-01532}{43}]、Cressie–Read[\hyperlink{B44-entropy-12-01532}{44}]、Zhu–Rohwer[\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}]以及 Zhang[\hyperlink{B22-entropy-12-01532}{22}--\hyperlink{B25-entropy-12-01532}{25}]的工作。我们研究 \(\alpha\) 散度族的一个动机，是为非负矩阵分解和非负张量分解开发灵活、高效的学习算法，以统一并扩展已有算法，包括期望最大化最大似然算法（Expectation Maximization Maximum Likelihood，EMML）和图像空间重建算法（Image Space Reconstruction Algorithm，ISRA）；见文献[\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B45-entropy-12-01532}{45}]及其中的参考文献。
+
+
+\setcounter{section}{2}
+\setcounter{subsection}{0}
+\subsection{\texorpdfstring{非对称 \(\alpha\) 散度}{非对称 α 散度}}
+\label{sec2dot1-entropy-12-01532}
+基本的非对称 \(\alpha\) 散度可定义为[\hyperlink{B3-entropy-12-01532}{3}]：
+
+\setcounter{equation}{3}
+\begin{equation}
+\label{FD4-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\,\alpha}{(\mathbf{x})}\, q^{\, 1 - \alpha}{(\mathbf{x})} - \alpha\, p{(\mathbf{x})} + {(\alpha - 1)}\, q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+其中 \(p(\mathbf{x})\) 和 \(q(\mathbf{x})\) 不必归一化。
+
+
+\(\alpha\) 散度可通过广义 KL 散度表示为
+
+\setcounter{equation}{4}
+\begin{equation}
+\label{FD5-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\;\mathbf{Q})} = D_{GKL}^{(\alpha)}{(\mathbf{P}\,||\;\mathbf{Q})} = - \frac{1}{\alpha}\int\left( {p\log_{\,\alpha}\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\;\;\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+
+
+
+对于概率质量函数为 \(\mathbf{P} = \lbrack p_{1},p_{2},\ldots,p_{n}\rbrack\) 和 \(\mathbf{Q} = \lbrack q_{1},q_{2},\ldots,q_{n}\rbrack\) 的离散概率测度，离散 \(\alpha\) 散度可以写成可分离形式：
+
+\setcounter{equation}{5}
+\begin{equation}
+\label{FD6-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \sum\limits_{i = 1}^{n}d_{A}^{(\alpha)}(p_{i}{\,||\,}q_{i}{) =}\frac{1}{\alpha(\alpha - 1)}\sum\limits_{i = 1}^{n}\left( {p_{i}^{\alpha}\, q_{i}^{1 - \alpha} - \alpha\, p_{i} + {(\alpha - 1)}\, q_{i}} \right),\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+其中 \(d_{A}^{(\alpha)}(p_{i}{\,||\,}q_{i}{) =}\left( {p_{i}^{\alpha}q_{i}^{1 - \alpha} - \alpha p_{i} + {(\alpha - 1)}q_{i}} \right)/\left( {\alpha(\alpha - 1)} \right).\)。
+
+
+这一 \(\alpha\) 散度形式与文献[\hyperlink{B1-entropy-12-01532}{1}]中的损失函数略有不同，后者只定义在概率分布上，即假设 \(\int p(\mathbf{x})d\mu(\mathbf{x}) = 1\) 且 \(\int q(\mathbf{x})d\mu(\mathbf{x}) = 1\)。Zhu 和 Rohwer 在文献[\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}]中通过加入额外项，将其扩展到正测度；另见 Amari 和 Nagaoka[\hyperlink{B3-entropy-12-01532}{3}]。这些额外项使该定义能够处理未归一化密度，即正测度，其作用与广义 KL 散度或 I 散度中的附加项相同。
+
+
+将 Kullback–Leibler 散度扩展为 \(\alpha\) 散度族，是统一理解广泛散度函数的一步，因为 \(\alpha\) 散度的非负性既可以由 Jensen 不等式解释，也可以由算术–几何平均不等式解释。正如 Jun Zhang 指出的，这一点可以充分利用凸函数不等式，或者更一般地利用他提出的基于凸性的研究方法[\hyperlink{B22-entropy-12-01532}{22}]。
+
+
+对于归一化密度 \(\overline{p}{(\mathbf{x})} = p{(\mathbf{x})}/\int p{(\mathbf{x})}d\mu{(\mathbf{x})}\) 和 \(\overline{q}{(\mathbf{x})} = q{(\mathbf{x})}/\int q{(\mathbf{x})}d\mu{(\mathbf{x})}\)，\(\alpha\) 散度简化为[\hyperlink{B1-entropy-12-01532}{1},\allowbreak \hyperlink{B44-entropy-12-01532}{44}]：
+
+\setcounter{equation}{6}
+\begin{equation}
+\label{FD7-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) =}\frac{1}{\alpha(\alpha - 1)}\left( {\int{\overline{p}}^{\,\alpha}{(\mathbf{x})}\,{\overline{q}}^{\, 1 - \alpha}{(\mathbf{x})}d\mu{(\mathbf{x})} - 1} \right),\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{equation}
+
+它还与 Tsallis 散度及 Tsallis 熵[\hyperlink{B46-entropy-12-01532}{46}]有关，见\hyperref[app1-entropy-12-01532]{附录 A}：
+
+\setcounter{equation}{7}
+\begin{equation}
+\label{FD8-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{P}})} = \frac{1}{1 - \alpha}\left( {\int{\overline{p}}^{\,\alpha}{(\mathbf{x})}\, d\mu{(\mathbf{x})} - 1} \right) = - \int{\overline{p}}^{\,\alpha}{(\mathbf{x})}\log_{\;\alpha}\overline{p}{(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+其中假设右侧积分存在。
+
+
+Tsallis 熵实际上最早由 Havrda 和 Charvat 于 1967 年定义[\hyperlink{B47-entropy-12-01532}{47}]，后来几乎被遗忘；Tsallis 于 1988 年在另一背景下重新提出了它[\hyperlink{B46-entropy-12-01532}{46}]，见\hyperref[app1-entropy-12-01532]{附录 A}。
+
+
+不同作者对参数 \(\alpha\) 的约定并不相同。例如，采用 Amari 的记号 \(\alpha_{A}\)，并令 \(\alpha = (1 - \alpha_{A})/2\)，则 \(\alpha\) 散度具有如下形式[\hyperlink{B1-entropy-12-01532}{1}--\hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11},\allowbreak \hyperlink{B22-entropy-12-01532}{22}--\hyperlink{B25-entropy-12-01532}{25},\allowbreak \hyperlink{B44-entropy-12-01532}{44},\allowbreak \hyperlink{B48-entropy-12-01532}{48},\allowbreak \hyperlink{B49-entropy-12-01532}{49}]：
+
+\setcounter{equation}{8}
+\begin{equation}
+\label{FD9-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{A}^{(\alpha_{A})}{(\underline{P}\,||\, \underline{Q})} = \frac{4}{1 - \alpha_{A}^{2}}\int\left( {\frac{1 - \alpha_{A}}{2}\, p + \frac{1 + \alpha_{A}}{2}\, q - p^{\frac{1 - \alpha_{A}}{2}}q^{\frac{1 + \alpha_{A}}{2}}} \right)d\mu{(\mathbf{x})},\;\;\alpha_{A} \in \mathbb{R} \smallsetminus {\{ \pm 1\}}}
+\end{equation}
+
+
+
+
+当 \(\alpha\) 从 0 变化到 1 时，\(\alpha_{A}\) 从 \(- 1\) 变化到 1。\(\alpha_{A}\) 与 \(- \alpha_{A}\) 之间存在对偶关系，即 \({\widetilde{D}}_{A}^{(\alpha_{A})}{(\mathbf{P}\,||\,\mathbf{Q})} = {\widetilde{D}}_{A}^{( - \alpha_{A})}{(\mathbf{Q}\,||\,\mathbf{P})}\)。
+
+
+当 \(\alpha = 2,0.5, - 1\) 时，由式（\hyperref[FD4-entropy-12-01532]{4}）分别得到熟知的 Pearson 卡方散度、Hellinger 距离和逆 Pearson 卡方散度；最后一种也称 Neyman 卡方距离：
+
+\setcounter{equation}{9}
+\begin{equation}
+\label{FD10-entropy-12-01532}
+\fitmath{\begin{array}{rlr}
+{D_{A}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {D_{P}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p{(\mathbf{x})} - q{(\mathbf{x})})}^{2}}{q(\mathbf{x})}d\mu{(\mathbf{x})}} \\
+{D_{A}^{(1/2)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {2D_{H}{(\mathbf{P}\,||\,\mathbf{Q})} = 2\int{(\sqrt{p(\mathbf{x})} - \sqrt{q(\mathbf{x})})}^{2}d\mu{(\mathbf{x})}} \\
+{D_{A}^{( - 1)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {D_{N}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p{(\mathbf{x})} - q{(\mathbf{x})})}^{2}}{p(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+
+
+
+对于奇异参数值 \(\alpha = 1\) 和 \(\alpha = 0\)，\(\alpha\) 散度（\hyperref[FD4-entropy-12-01532]{4}）必须分别通过 \(\left. \alpha\rightarrow 1 \right.\) 和 \(\left. \alpha\rightarrow 0 \right.\) 的极限来定义。当 \(\left. \alpha\rightarrow 1 \right.\) 时，利用洛必达法则计算极限，得到 Kullback–Leibler 散度：
+
+\setcounter{equation}{10}
+\begin{equation}
+\label{FD11-entropy-12-01532}
+\fitmath{\begin{array}{cl}
+{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})}} & {= \lim\limits_{\alpha\rightarrow 1}D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\alpha\rightarrow 1}\int\frac{p^{\,\alpha}q^{\, 1 - \alpha}\log p - p^{\,\alpha}q^{1 - \alpha}\log q - p + q}{2\alpha - 1}d\mu{(\mathbf{x})}} \\
+ & {= \int\left( {p\;\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+其中约定 \(0/0 = 0,\; 0\log(0) = 0\)，且对于 \(p > 0\)，有 \(p/0 = \infty\)。
+
+
+由不等式 \(p\log p \geq p - 1\) 可知，KL 的 I 散度非负，且仅在 \(\mathbf{P} = \mathbf{Q}\) 时为零。
+
+
+类似地，当 \(\left. \alpha\rightarrow 0 \right.\) 时，得到反向 Kullback–Leibler 散度：
+
+\setcounter{equation}{11}
+\begin{equation}
+\label{FD12-entropy-12-01532}
+\fitmath{D_{KL}{(\mathbf{Q}||\mathbf{P})} = \lim\limits_{\alpha\rightarrow 0}D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {q\log\left( \frac{q}{p} \right) - q + p} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+因此，\(\alpha\) 散度可更明确地写为
+
+\setcounter{equation}{12}
+\begin{equation}
+\label{FD13-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \left\{ \begin{matrix}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {q{(\mathbf{x})}\left\lbrack {\left( \frac{p(\mathbf{x})}{q(\mathbf{x})} \right)^{\alpha} - 1} \right\rbrack - \alpha\,{\lbrack p{(\mathbf{x})} - q{(\mathbf{x})}\rbrack}} \right)d\mu{(\mathbf{x})},\hspace{3.33333pt}\hspace{3.33333pt}\alpha \neq 0,1} \\
+ \\
+{\int\left( {q{(\mathbf{x})}\log\frac{q(\mathbf{x})}{p(\mathbf{x})} + p{(\mathbf{x})} - q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+ \\
+{\int\left( {p{(\mathbf{x})}\log\frac{p(\mathbf{x})}{q(\mathbf{x})} - p{(\mathbf{x})} + q{(\mathbf{x})}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{matrix} \right.}
+\end{equation}
+
+
+
+
+\(\alpha\) 散度平滑地连接 I 散度 \(D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})}\) 与反向 I 散度 \(D_{KL}{(\mathbf{Q}\,||\,\mathbf{P})}\)，并经过 Hellinger 距离[\hyperlink{B50-entropy-12-01532}{50}]。它还平滑地连接 Pearson 卡方散度与 Neyman 卡方散度，并经过这两个 I 散度[\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}]。
+
+
+\(\alpha\) 散度是 Csiszár–Morimoto 的 f 散度[\hyperlink{B17-entropy-12-01532}{17},\allowbreak \hyperlink{B19-entropy-12-01532}{19}]的特例；Ali 和 Silvey 后来也提出了这类散度[\hyperlink{B20-entropy-12-01532}{20}]，Morimoto 则独立地给出了定义[\hyperlink{B51-entropy-12-01532}{51}]。Csiszár–Morimoto 的 f 散度与函数 \(f(u)\) 对应，其中该函数在 \((0,\infty)\) 上为凸函数，并满足 \(f(1) = 0\)：
+
+\setcounter{equation}{13}
+\begin{equation}
+\label{FD14-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}\,||\,\mathbf{Q})} = \int q{(\mathbf{x})}f\left( \frac{p(\mathbf{x})}{q(\mathbf{x})} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+定义 \(0f(0/0) = 0\) 和
+\[
+\fitmath{0f{(a/0)} = \lim_{t\rightarrow 0}tf{(a/t)} = \lim_{u\rightarrow\infty}f{(u)}/u}
+\]
+。取 \(f{(u)} = {(u^{\alpha} - \alpha u + \alpha - 1)}{)/}{(\alpha^{2} - \alpha)}\)，即可得到式（\hyperref[FD4-entropy-12-01532]{4}）。
+
+
+Csiszár–Morimoto 的 f 散度具有以下性质[\hyperlink{B6-entropy-12-01532}{6},\allowbreak \hyperlink{B17-entropy-12-01532}{17},\allowbreak \hyperlink{B18-entropy-12-01532}{18},\allowbreak \hyperlink{B20-entropy-12-01532}{20},\allowbreak \hyperlink{B22-entropy-12-01532}{22},\allowbreak \hyperlink{B36-entropy-12-01532}{36},\allowbreak \hyperlink{B52-entropy-12-01532}{52},\allowbreak \hyperlink{B53-entropy-12-01532}{53}]：
+
+\begin{itemize}
+\item 非负性：Csiszár–Morimoto 的 f 散度始终非负，且仅在概率密度 \(p(\mathbf{x})\) 与 \(q(\mathbf{x})\) 相同时为零。对于归一化密度，这可直接由 Jensen 不等式得到：
+
+\setcounter{equation}{14}
+\begin{equation}
+\label{FD15-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = \int qf\left( \frac{p}{q} \right)d\mu{(\mathbf{x})} \geq f\left( {\int q{(\frac{p}{q})}d\mu{(\mathbf{x})}} \right) = f{(1)} = 0.}
+\end{equation}
+
+
+
+
+\item 广义熵：该散度对应如下形式的广义 f 熵：
+
+\setcounter{equation}{15}
+\begin{equation}
+\label{FD16-entropy-12-01532}
+\fitmath{H_{f}{(\mathbf{P})} = - \int f{(p{(\mathbf{x})})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+当 \(f(p) = p\log(p)\) 时，得到 Shannon 熵这一特例。\(H_{f}\) 为凹函数，而 f 为凸函数。
+
+
+\item 凸性：对于任意 \(0 \leq \lambda \leq 1\)，有
+
+\setcounter{equation}{16}
+\begin{equation}
+\label{FD17-entropy-12-01532}
+\fitmath{D_{f}{(\lambda}\mathbf{P}_{1} + {(1 - \lambda)}\mathbf{P}_{2}{\,||\,\lambda}\mathbf{Q}_{1} + {(1 - \lambda)}\mathbf{Q}_{2}{) \leq \lambda}D_{f}(\mathbf{P}_{1}{||}\mathbf{Q}_{1}{) + {(1 - \lambda)}}D_{f}(\mathbf{P}_{2}{||}\mathbf{Q}_{2}{).}}
+\end{equation}
+
+
+
+
+\item 缩放性质：对于任意正常数 \(c > 0\)，有
+
+\setcounter{equation}{17}
+\begin{equation}
+\label{FD18-entropy-12-01532}
+\fitmath{cD_{f}{(\mathbf{P}||\mathbf{Q})} = D_{cf}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+
+
+
+\item 不变性：f 散度在双射变换下保持不变[\hyperlink{B6-entropy-12-01532}{6},\allowbreak \hyperlink{B20-entropy-12-01532}{20}]。也就是说，当 \(\mathbf{x}\) 通过
+
+\setcounter{equation}{18}
+\begin{equation}
+\label{FD19-entropy-12-01532}
+\fitmath{\mathbf{y} = \mathbf{k}(\mathbf{x})}
+\end{equation}
+
+双射变换为 \(\mathbf{y}\) 时，概率分布 \(\mathbf{P}(\mathbf{x})\) 变为 \(\widetilde{\mathbf{P}}{(\mathbf{y})}\)，但仍有
+
+\setcounter{equation}{19}
+\begin{equation}
+\label{FD20-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = D_{f}(\widetilde{\mathbf{P}}{||}\widetilde{\mathbf{Q}})}
+\end{equation}
+
+此外，对于任意常数 c 以及 \(\widetilde{f}{(u)} = f{(u)} - c{(u - 1)}\)，有
+
+\setcounter{equation}{20}
+\begin{equation}
+\label{FD21-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = D_{\widetilde{f}}{(\mathbf{P}||\mathbf{Q})}}
+\end{equation}
+
+并且
+
+\setcounter{equation}{21}
+\begin{equation}
+\label{FD22-entropy-12-01532}
+\fitmath{D_{f}{(\mathbf{P}||\mathbf{Q})} = D_{f^{*}}{(\mathbf{Q}||\mathbf{P})}}
+\end{equation}
+
+其中 \(f^{*}{(u)} = uf{(1/u)}\) 称为共轭函数。
+
+
+\item 对称性：对于任意 Csiszár–Morimoto 的 f 散度，当 \(f_{sym}{(u)} = f{(u)} + f^{*}{(u)}\) 时，可以构造对称散度。
+
+
+\item 有界性：正测度或正密度上的 Csiszár–Morimoto 的 f 散度具有下列界，前提是相关极限存在且有限[\hyperlink{B28-entropy-12-01532}{28},\allowbreak \hyperlink{B36-entropy-12-01532}{36}]：
+
+\setcounter{equation}{22}
+\begin{equation}
+\label{FD23-entropy-12-01532}
+\fitmath{0 \leq D_{f}{(\mathbf{P}||\mathbf{Q})} \leq \lim\limits_{u\rightarrow 0^{+}}\left\{ {f{(u)} + uf{(\frac{1}{u})}} \right\}}
+\end{equation}
+
+此外，还有[\hyperlink{B54-entropy-12-01532}{54}]：
+
+\setcounter{equation}{23}
+\begin{equation}
+\label{FD24-entropy-12-01532}
+\fitmath{0 \leq D_{f}{(\mathbf{P}||\mathbf{Q})} \leq \int{(p - q)}f'{(\frac{p}{q})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\end{itemize}
+
+
+
+
+
+利用 Csiszár–Morimoto 的 f 散度的基本性质，可以建立 \(\alpha\) 散度的基本性质[\hyperlink{B3-entropy-12-01532}{3},\allowbreak \hyperlink{B6-entropy-12-01532}{6},\allowbreak \hyperlink{B22-entropy-12-01532}{22},\allowbreak \hyperlink{B40-entropy-12-01532}{40},\allowbreak \hyperlink{B42-entropy-12-01532}{42}]。
+
+
+\(\alpha\) 散度（\hyperref[FD4-entropy-12-01532]{4}）具有以下基本性质：
+
+\begin{enumerate}
+\item 凸性：\(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})}\) 关于 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 均为凸函数。
+
+
+\item 严格正性：\(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})} \geq 0\)，且 \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})} = 0\) 当且仅当 \(\mathbf{P} = \mathbf{Q}\)。
+
+
+\item 连续性：\(\alpha\) 散度作为实变量 \(\alpha\) 的函数，在包括奇异参数值在内的整个取值范围上连续。
+
+
+\item 对偶性：\(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})} = D_{A}^{(1 - \alpha)}{(\mathbf{Q}||\mathbf{P})}\)。
+
+
+\item 排他性与包容性[\hyperlink{B42-entropy-12-01532}{42}]：
+
+\begin{itemize}
+\item 当 \(\left. \alpha\rightarrow - \infty \right.\) 时，用于逼近 \(p(\mathbf{x})\) 的 \(q(\mathbf{x})\) 的估计具有排他性，即对所有 \(\mathbf{x}\) 都有 \(q(\mathbf{x}) \leq p(\mathbf{x})\)。对 \(q(\mathbf{x})\) 最小化 \(D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})}\)，将迫使 \(q(\mathbf{x})\) 成为排他性近似，即 \(q(\mathbf{x}\) 的质量位于 \(p(\mathbf{x})\) 之内；详细说明和图示见文献[\hyperlink{B42-entropy-12-01532}{42}]。
+
+
+\item 当 \(\left. \alpha\rightarrow\infty \right.\) 时，用于逼近 \(p(\mathbf{x})\) 的 \(q(\mathbf{x})\) 的估计具有包容性，即对所有 \(\mathbf{x}\) 都有 \(q(\mathbf{x}) \geq p(\mathbf{x})\)。换言之，\(q(\mathbf{x})\) 的质量覆盖 \(p(\mathbf{x})\) 的全部质量。
+
+\end{itemize}
+
+
+
+
+
+\item 强制为零与避免为零的性质[\hyperlink{B42-entropy-12-01532}{42}]。
+
+这里考虑 \(p(\mathbf{x})\) 与 \(q(\mathbf{x})\) 未必相互绝对连续的情形。此时，散度可能发散到无穷大，但仍具有以下两个性质：
+
+\begin{itemize}
+\item 当 \(\alpha \leq 0\) 时，用于逼近 \(p(\mathbf{x})\) 的 \(q(\mathbf{x})\) 的估计具有强制为零的性质，即 \(p(\mathbf{x}) = 0\) 将迫使 \(q(\mathbf{x}) = 0\)。
+
+
+\item 当 \(\alpha \geq 1\) 时，用于逼近 \(p(\mathbf{x})\) 的 \(q(\mathbf{x})\) 的估计具有避免为零的性质，即 \(p(\mathbf{x}) > 0\) 蕴含 \(q(\mathbf{x}) > 0\)。
+
+\end{itemize}
+
+
+
+
+\end{enumerate}
+
+
+
+
+
+\(\alpha\) 散度的一个重要性质是：它关于 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 为凸函数，并在 \(\mathbf{P} = \mathbf{Q}\) 时具有唯一的极小值，例如文献[\hyperlink{B22-entropy-12-01532}{22}]。
+
+
+\setcounter{section}{2}
+\setcounter{subsection}{1}
+\subsection{\texorpdfstring{\(\alpha\)–Rényi 散度}{α–Rényi 散度}}
+\label{sec2dot2-entropy-12-01532}
+\(\alpha\) 散度与 Rényi 散度密切相关。定义 \(\alpha\)–Rényi 散度如下：
+
+\setcounter{equation}{24}
+\begin{equation}
+\label{FD25-entropy-12-01532}
+\fitmath{\begin{array}{ccrl}
+{D_{AR}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {\frac{1}{\alpha(\alpha - 1)}\log\left( {1 + \alpha{(\alpha - 1)}D_{A}^{(\alpha)}{(\mathbf{P}||\mathbf{Q}}} \right)} \\
+ & & = & {\frac{1}{\alpha(\alpha - 1)}\log\left( {\int\left( {p^{\,\alpha}q^{1 - \alpha} - \alpha p + {(\alpha - 1)}\, q} \right)d\mu{(\mathbf{x})} + 1} \right),\;\;\alpha \in \mathbb{R} \smallsetminus {\{ 0,1\}}}
+\end{array}}
+\end{equation}
+
+
+
+
+对于 \(\alpha = 0\) 和 \(\alpha = 1\)，\(\alpha\)–Rényi 散度分别简化为 Kullback–Leibler 散度：
+
+\setcounter{equation}{25}
+\begin{equation}
+\label{FD26-entropy-12-01532}
+\fitmath{\begin{array}{ccrl}
+{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\alpha\rightarrow 1}D_{AR}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {\lim\limits_{\alpha\rightarrow 1}\frac{1}{2\alpha - 1}\frac{\int(p^{\,\alpha}q^{\, 1 - \alpha}{(\log p - \log q)} - p + q)d\mu{(\mathbf{x})}}{\int(p^{\,\alpha}q^{\, 1 - \alpha} - \alpha p - {(\alpha - 1)}q)d\mu{(\mathbf{x})} + 1}} \\
+ & & = & {\int\left( {p\;\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+以及
+
+\setcounter{equation}{26}
+\begin{equation}
+\label{FD27-entropy-12-01532}
+\fitmath{\begin{array}{r}
+{D_{KL}{(\mathbf{Q}||\mathbf{P})} = \lim\limits_{\alpha\rightarrow 0}D_{AR}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {q\log\left( \frac{q}{p} \right) - q + p} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+
+
+
+对于归一化概率密度，定义 \(\alpha\)–Rényi 散度为
+
+\setcounter{equation}{27}
+\begin{equation}
+\label{FD28-entropy-12-01532}
+\fitmath{D_{AR}^{(\alpha)}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) =}\frac{1}{\alpha(\alpha - 1)}\log\left( {\int{\overline{p}}^{\alpha}{\overline{q}}^{1 - \alpha}d\mu{(\mathbf{x})}} \right) = \frac{1}{\alpha - 1}\log\left( {\int\overline{q}\left( \frac{\overline{p}}{\overline{q}} \right)^{\alpha}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\alpha}}}
+\end{equation}
+
+它对应于 Rényi 熵[\hyperlink{B55-entropy-12-01532}{55}--\hyperlink{B57-entropy-12-01532}{57}]，见\hyperref[app2-entropy-12-01532]{附录 B}：
+
+\setcounter{equation}{28}
+\begin{equation}
+\label{FD29-entropy-12-01532}
+\fitmath{H_{R}^{(\alpha)}{(\overline{\mathbf{P}})} = - \frac{1}{\alpha - 1}\log\left( {\int{\overline{p}}^{\alpha}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+
+
+
+这里采用的缩放因子与原始 Rényi 散度中的因子不同[\hyperlink{B56-entropy-12-01532}{56},\allowbreak \hyperlink{B57-entropy-12-01532}{57}]。一般而言，\(\alpha\)–Rényi 散度只对归一化概率密度有意义；否则，对于某些未归一化的正测度，式（\hyperref[FD25-entropy-12-01532]{25}）给出的函数可能取复数值。
+
+
+此外，对任意参数 \(\alpha \in \mathbb{R}\)，\(\alpha\) 散度关于正密度 p 和 q 为凸函数；\(\alpha\)–Rényi 散度（\hyperref[FD28-entropy-12-01532]{28}）则在 \(\alpha \in \lbrack 0,1\rbrack\) 时关于 p、q 联合为凸函数，在 \(\alpha > 1\) 时不具有凸性。凸性意味着，当 p 和 q 固定时，\(D_{AR}^{(\alpha)}\) 随 \(\alpha\) 增大。实际上，Rényi 散度在整个集合 \((0,\infty)\) 上都随 \(\alpha\) 增大[\hyperlink{B58-entropy-12-01532}{58}--\hyperlink{B60-entropy-12-01532}{60}]。
+
+
+\setcounter{section}{2}
+\setcounter{subsection}{2}
+\subsection{\texorpdfstring{扩展的 \(\alpha\) 散度族}{扩展的 α 散度族}}
+\label{sec2dot3-entropy-12-01532}
+非对称 \(\alpha\) 散度有多种扩展方式。例如，可以用 q 与 p 的平均值替代 q：如果 p 和 q 相似，则二者应当都接近其平均值。据此定义修正的 \(\alpha\) 散度为
+
+\setcounter{equation}{29}
+\begin{equation}
+\label{FD30-entropy-12-01532}
+\fitmath{D_{Am1}^{(\alpha)}{(\mathbf{P}\,||\,}\widetilde{\mathbf{Q}}{) =}\frac{1}{\alpha(\alpha - 1)}\int\left( {\widetilde{q}\left\lbrack {\left( \frac{p}{\widetilde{q}} \right)^{\,\alpha} - 1} \right\rbrack - \alpha\;{(p - \widetilde{q})}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+相应的伴随 \(\alpha\) 散度为
+
+\setcounter{equation}{30}
+\begin{equation}
+\label{FD31-entropy-12-01532}
+\fitmath{D_{Am2}^{(\alpha)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{\alpha(\alpha - 1)}\int\left( {p\left\lbrack {\left( \frac{\widetilde{q}}{p} \right)^{\alpha} - 1} \right\rbrack + \alpha\;{(p - \widetilde{q})}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+其中 \(\widetilde{\mathbf{Q}} = {(\mathbf{P} + \mathbf{Q})}/2\) 且 \(\widetilde{q} = {(p + q)}/2\)。
+
+
+对于奇异参数值 \(\alpha = 1\) 和 \(\alpha = 0\)，\(\alpha\) 散度（\hyperref[FD30-entropy-12-01532]{30}）分别为
+
+\[
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{Am1}^{(\alpha)}{(\mathbf{P}\,||}\widetilde{\mathbf{Q}}{) = \int}\left( {\widetilde{q}\;\log\left( \frac{\widetilde{q}}{p} \right) + p - \widetilde{q}} \right)d\mu{(\mathbf{x})} = \int\left( {\frac{p + q}{2}\;\log\left( \frac{p + q}{2p} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})}}
+\]
+
+以及
+
+\[
+\fitmath{\lim\limits_{\alpha\rightarrow 1}D_{Am1}^{(\alpha)}{(\mathbf{P}\,||\,}\widetilde{Q}{) = \int}\left( {p\log\left( \frac{p}{\widetilde{q}} \right) - p + \widetilde{q}} \right)d\mu{(\mathbf{x})} = \int\left( {p\log\left( \frac{2p}{p + q} \right) + \frac{q - p}{2}} \right)d\mu{(\mathbf{x})}}
+\]
+
+下面列出式（\hyperref[FD31-entropy-12-01532]{31}）的几个重要特例。
+
+
+1. 三角判别散度（Triangular Discrimination，TD）[\hyperlink{B61-entropy-12-01532}{61}]：
+
+\setcounter{equation}{31}
+\begin{equation}
+\label{FD32-entropy-12-01532}
+\fitmath{D_{Am2}^{( - 1)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{4}D_{TD}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{4}\int\frac{{(p - q)}^{2}}{p + q}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+2. 相对 Jensen–Shannon 散度[\hyperlink{B62-entropy-12-01532}{62}--\hyperlink{B64-entropy-12-01532}{64}]：
+
+\setcounter{equation}{32}
+\begin{equation}
+\label{FD33-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{Am2}^{(\alpha)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = D_{RJS}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {p\log\left( \frac{2p}{p + q} \right) - p + q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+3. Taneya 提出的相对算术–几何散度[\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39},\allowbreak \hyperlink{B43-entropy-12-01532}{43}]：
+
+\setcounter{equation}{33}
+\begin{equation}
+\label{FD34-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 1}D_{Am2}^{(\alpha)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{2}D_{RAG}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {{(p + q)}\log\left( \frac{p + q}{2p} \right) + p - q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+3. Neyman 卡方散度：
+
+\setcounter{equation}{34}
+\begin{equation}
+\label{FD35-entropy-12-01532}
+\fitmath{D_{Am2}^{(2)}(\widetilde{\mathbf{Q}}{\,||\,\mathbf{P})} = \frac{1}{8}D_{\chi^{2}}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{8}\int\frac{{(p - q)}^{2}}{p}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+非对称 \(\alpha\) 散度可以形式化地表示为 Csiszár–Morimoto 的 f 散度，见\hyperref[entropy-12-01532-t001]{表 1}[\hyperlink{B30-entropy-12-01532}{30}]。
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{0}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{非对称 \(\alpha\) 散度及相应的凸 Csiszár–Morimoto 函数[\protect\hyperlink{B30-entropy-12-01532}{30}]。}\label{entropy-12-01532-t001}\\
+\toprule
+散度 \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})} = \int qf^{(\alpha)}\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}} & Csiszár 函数 \cellmath{f^{(\alpha)}{(u)}, u = p/q} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {q\left\lbrack {\left( \frac{p}{q} \right)^{\alpha} - 1} \right\rbrack - \alpha{(p - q)}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\frac{q}{p} + p - q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\frac{p}{q} - p + q} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{matrix}
+{\frac{u^{\alpha} - 1 - \alpha{(u - 1)}}{\alpha(\alpha - 1)},\alpha \neq 0,1} \\
+ \\
+{u - 1 - \log u,\alpha = 0,} \\
+ \\
+{1 - u + u\log u,\;\alpha = 1.}
+\end{matrix} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p\left\lbrack {\left( \frac{q}{p} \right)^{\alpha} - 1} \right\rbrack + \alpha{(p - q)}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\frac{p}{q} - p + q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\frac{q}{p} + p - q} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{matrix}
+{\frac{u^{1 - \alpha} + {(\alpha - 1)}u - \alpha}{\alpha(\alpha - 1)},\alpha \neq 0,1,} \\
+ \\
+{1 - u + u\log u,\alpha = 0} \\
+ \\
+{u - 1 - \log u,\alpha = 1.}
+\end{matrix} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {q\left( \frac{p + q}{2q} \right)^{\alpha} - q - \alpha\frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\left( \frac{2q}{p + q} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{\left( \frac{u + 1}{2} \right)^{\alpha} - 1 - \alpha\left( \frac{u - 1}{2} \right)}{\alpha(\alpha - 1)},\;\;\alpha \neq 0,1,} \\
+{\frac{u - 1}{2} + \log\left( \frac{2}{u + 1} \right),\;\;\alpha = 0,} \\
+{\frac{1 - u}{2} + \frac{u + 1}{2}\log\left( \frac{u + 1}{2} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p\left( \frac{p + q}{2p} \right)^{\alpha} - p + \alpha\frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\left( \frac{2p}{p + q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2p} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{u\left( \frac{u + 1}{2u} \right)^{\alpha} - u - \alpha\left( \frac{1 - u}{2} \right)}{\alpha(\alpha - 1)},\;\alpha \neq 0,1,} \\
+{\frac{1 - u}{2} - u\log\left( \frac{u + 1}{2u} \right),\;\alpha = 0,} \\
+{\frac{u - 1}{2} + \left( \frac{u + 1}{2} \right)\log\left( \frac{u + 1}{2u} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int{(p - q)}\left\lbrack {\left( \frac{p + q}{2q} \right)^{\alpha - 1} - 1} \right\rbrack d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{{(u - 1)}\left\lbrack {\left( \frac{u + 1}{2} \right)^{\alpha - 1} - 1} \right\rbrack}{\alpha - 1},\alpha \neq 1,} \\
+{{(u - 1)}\log\left( \frac{u + 1}{2} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int{(q - p)}\left\lbrack {\left( \frac{p + q}{2p} \right)^{\alpha - 1} - 1} \right\rbrack d\mu{(\mathbf{x})},} \\
+{\int{(q - p)}\log\left( \frac{p + q}{2p} \right)d\mu{(\mathbf{x})}.}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{{(1 - u)}\left\lbrack {\left( \frac{u + 1}{2u} \right)^{\alpha - 1} - 1} \right\rbrack}{\alpha - 1},\alpha \neq 1,} \\
+{{(1 - u)}\log\left( \frac{u + 1}{2u} \right),\alpha = 1.}
+\end{array} \right.} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+\setcounter{section}{2}
+\setcounter{subsection}{3}
+\subsection{\texorpdfstring{对称化的 \(\alpha\) 散度}{对称化的 α 散度}}
+\label{sec2dot4-entropy-12-01532}
+基本的 \(\alpha\) 散度是非对称的，即 \(D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} \neq D_{A}^{(\alpha)}{(\mathbf{Q}\,||\,\mathbf{P})}\)。
+
+
+通常有两种散度对称化方法。第一类为
+
+\setcounter{equation}{35}
+\begin{equation}
+\label{FD36-entropy-12-01532}
+\fitmath{D_{S1}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\left\lbrack {D_{A}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{A}{(\mathbf{Q}\,||\,\mathbf{P})}} \right\rbrack}
+\end{equation}
+
+第二类为
+
+\setcounter{equation}{36}
+\begin{equation}
+\label{FD37-entropy-12-01532}
+\fitmath{D_{S2}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\left\lbrack {D_{A}\left( {{\mathbf{P}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right) + D_{A}\left( {{\mathbf{Q}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right)} \right\rbrack}
+\end{equation}
+
+
+
+
+第一类对称 \(\alpha\) 散度可定义为下式。为简化表达，省略缩放因子 \(1/2\)：
+
+\setcounter{equation}{37}
+\begin{equation}
+\label{FD38-entropy-12-01532}
+\fitmath{D_{AS1}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{A}^{(\alpha)}{(\mathbf{Q}\,||\,\mathbf{P})} = \int\frac{\left( {p^{\alpha} - q^{\alpha}} \right)\left( {p^{1 - \alpha} - q^{1 - \alpha}} \right)}{\alpha(1 - \alpha)}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+作为特例，可以得到几个已知的对称散度。
+
+
+1. 对称卡方散度[\hyperlink{B54-entropy-12-01532}{54}]：
+
+\setcounter{equation}{38}
+\begin{equation}
+\label{FD39-entropy-12-01532}
+\fitmath{D_{AS1}^{( - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AS1}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}D_{\chi^{2}}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p - q)}^{2}{(p + q)}}{pq}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+2. 对称化的 KL 散度，也称 J 散度，对应于 Jeffreys 熵最大化[\hyperlink{B65-entropy-12-01532}{65},\allowbreak \hyperlink{B66-entropy-12-01532}{66}]：
+
+\setcounter{equation}{39}
+\begin{equation}
+\label{FD40-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{AS1}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \lim\limits_{\alpha\rightarrow 1}D_{AS1}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{J}{(\mathbf{P}\,||\,\mathbf{Q})} = \int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+另一类广泛的对称散度，可以由第二类对称 \(\alpha\) 散度表示：
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{AS2}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {D_{A}^{(\alpha)}\left( {{\mathbf{P}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right) + D_{A}^{(\alpha)}\left( {{\mathbf{Q}\,||\,}\frac{\mathbf{P} + \mathbf{Q}}{2}} \right)} \\
+ & & = & {\frac{1}{\alpha(\alpha - 1)}\int\left( {{(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha} - {(p + q)}} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\]
+
+
+
+
+上述度量包括以下重要特例：
+
+\begin{enumerate}
+\item 三角判别散度[\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B38-entropy-12-01532}{38}]：
+
+\setcounter{equation}{40}
+\begin{equation}
+\label{FD42-entropy-12-01532}
+\fitmath{D_{AS2}^{( - 1)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}D_{TD}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}\int\frac{{(p - q)}^{2}}{p + q}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+\item 对称 Jensen–Shannon 散度[\hyperlink{B62-entropy-12-01532}{62},\allowbreak \hyperlink{B64-entropy-12-01532}{64}]：
+
+\setcounter{equation}{41}
+\begin{equation}
+\label{FD43-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 0}D_{AS2}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{JS}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\left( {p\log\left( \frac{2p}{p + q} \right) + q\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+Jensen–Shannon 散度是 Kullback–Leibler 散度经过对称化和平滑化得到的变体，可以解释为两个分布分别到其平均分布的 KL 散度的平均。对于归一化概率密度，Jensen–Shannon 散度与 Shannon 熵具有以下关系：
+
+\setcounter{equation}{42}
+\begin{equation}
+\label{FD44-entropy-12-01532}
+\fitmath{D_{JS} = H_{S}{({(\mathbf{P} + \mathbf{Q})}/2)} - {(H_{S}{(\mathbf{P})} + H_{S}{(\mathbf{Q})})}/2}
+\end{equation}
+
+其中 \(H_{S}{(\mathbf{P})} = - \int p{(\mathbf{x})}\log p{(\mathbf{x})}d\mu{(\mathbf{x})}\)。
+
+
+\item 算术–几何散度[\hyperlink{B39-entropy-12-01532}{39}]：
+
+\setcounter{equation}{43}
+\begin{equation}
+\label{FD45-entropy-12-01532}
+\fitmath{\lim\limits_{\alpha\rightarrow 1}D_{AS2}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+\item 对称卡方散度[\hyperlink{B54-entropy-12-01532}{54}]：
+
+\setcounter{equation}{44}
+\begin{equation}
+\label{FD46-entropy-12-01532}
+\fitmath{D_{AS2}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{8}D_{\chi^{2}}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{8}\int\frac{{(p - q)}^{2}{(p + q)}}{pq}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\end{enumerate}
+
+
+
+
+
+上述 \(\alpha\) 散度关于参数 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 对称；即使 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 不相互绝对连续，它也具有良好定义。例如，在离散情形中，即使某些指标 \(p_{i}\) 上，一个分量为零而 \(q_{i}\) 不为零，或者 \(q_{i}\) 为零而 \(p_{i}\) 不为零，\(D_{AS2}^{(\alpha)}{(\mathbf{P}||\mathbf{Q})}\) 仍有良好定义[\hyperlink{B54-entropy-12-01532}{54}]。它还有下界和上界；例如，Jensen–Shannon 散度的取值位于 0 与 2 之间[\hyperlink{B36-entropy-12-01532}{36}]。

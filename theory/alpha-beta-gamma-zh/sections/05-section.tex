@@ -1,0 +1,100 @@
+\setcounter{section}{4}
+\section{\texorpdfstring{非对称散度之间的关系及其统一表示}{非对称散度之间的关系及其统一表示}}
+\label{sec5-entropy-12-01532}
+本文讨论的广义散度之间的基本联系与类比汇总于\hyperref[entropy-12-01532-t005]{表 5}。
+
+
+\(\alpha\)、\(\beta\) 和 \(\gamma\) 散度的基本区别在于缩放性质：
+
+\setcounter{equation}{87}
+\begin{equation}
+\label{FD95-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(c\,\mathbf{P}\,||\, c\,\mathbf{Q})} = c\, D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}}
+\end{equation}
+
+
+
+\setcounter{equation}{88}
+\begin{equation}
+\label{FD96-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(c\,\mathbf{P}\,||\, c\,\mathbf{Q})} = c^{\;\beta}\, D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})}}
+\end{equation}
+
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{4}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{基本非对称散度及其相互关系。通过变换 \(\left. p\rightarrow p^{\beta}, q\rightarrow q^{\beta}\text{且}\alpha = \beta^{- 1} \right.\)，可由 \(\alpha\) 散度得到 \(\beta\) 散度；通过对偶变换 \(\left. p\rightarrow p^{\alpha}, q\rightarrow q^{\alpha}\text{且}\beta = \alpha^{- 1} \right.\)，可由 \(\beta\) 散度得到 \(\alpha\) 散度。通过变换 \(\left. c_{0}\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})}\rightarrow c_{0}\,\log\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})} \right.\)，还可以由 \(\alpha\) 散度和 \(\beta\) 散度生成 \(\gamma\) 散度。此外，通过变换 \(\left. p\rightarrow p^{\gamma_{new}}, q\rightarrow q^{\gamma_{new}}\text{且}\gamma = \gamma_{new}^{- 1} \right.\)，可由 \(\alpha\)–\(\gamma\) 散度生成 \(\beta\)–\(\gamma\) 散度。}\label{entropy-12-01532-t005}\\
+\toprule
+散度名称 & 公式 \\ \midrule
+\cellmath{\alpha} 散度 & \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\int(p^{\alpha}\; q^{1 - \alpha} - \alpha\; p + {(\alpha - 1)}\; q)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)}} \\ \midrule
+\cellmath{\beta} 散度 & \cellmath{D_{B}^{(\beta)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\int(p^{\beta} + {(\beta - 1)}\; q^{\beta} - \beta\; p\; q^{\beta - 1})d\mu{(\mathbf{x})}}{\beta(\beta - 1)}} \\ \midrule
+\cellmath{\gamma} 散度 & \cellmath{D_{AG}^{(\gamma)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\log\;{(\int p^{\gamma}\; q^{1 - \gamma}d\mu{(\mathbf{x})})} - \gamma\log\;{(\int pd\mu{(\mathbf{x})})} + {(\gamma - 1)}\log\;{(\int qd\mu{(\mathbf{x})})}}{\gamma(\gamma - 1)}} \\ \midrule
+ & \cellmath{ = \frac{1}{\gamma - 1}\log\left( {\int\overline{q}\,\left( \frac{\overline{p}}{\overline{q}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}} \\ \midrule
+ & \cellmath{D_{BG}^{(\gamma)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\log\;{(\int p^{\gamma}d\mu{(\mathbf{x})})} + {(\gamma - 1)}\log\;{(\int q^{\gamma}d\mu{(\mathbf{x})})} - \gamma\log\;{(\int p\; q^{\gamma - 1}d\mu{(\mathbf{x})})}}{\gamma(\gamma - 1)}} \\ \midrule
+ & \cellmath{ = \frac{1}{1 - \gamma}\log\left( {\int{\widetilde{q}}^{\;\gamma}\,\left( \frac{\widetilde{p}}{\widetilde{q}} \right)^{}d\mu{(\mathbf{x})}} \right)} )) \\ \midrule
+\cellmath{\alpha}–Rényi 散度 & \cellmath{D_{AR}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\log(\int{(p^{\,\alpha}q^{\, 1 - \alpha} - \alpha p + {(\alpha - 1)}\, q)}d\mu{(\mathbf{x})} + 1)}{\alpha(\alpha - 1)}} \\ \midrule
+Bregman 散度 & \cellmath{D_{\Phi}{({\mathbf{P}||\mathbf{Q}})} = \int\left( {\Phi{(p)} - \Phi{(q)} - \frac{\delta\Phi}{\delta q}{(p - q)}} \right)d\mu{(\mathbf{x})}}，见式（\hyperref[FD58-entropy-12-01532]{57}）。 \\ \midrule
+Csiszár–Morimoto 散度 & \cellmath{D_{f}{({\mathbf{P}||\mathbf{Q}})} = \int qf\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}}，见式（\hyperref[FD58-entropy-12-01532]{57}），其中 \cellmath{f{(u)} = \Phi{(t)}_{|t = u}}。 \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+
+
+
+\setcounter{equation}{89}
+\begin{equation}
+\label{FD97-entropy-12-01532}
+\fitmath{D_{G}^{(\gamma)}{(c\,\mathbf{P}\,||\, c\,\mathbf{Q})} = D_{G}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})}}
+\end{equation}
+
+其中 \(c > 0\) 可任意取值。
+
+
+所有 \(\alpha\) 散度的值都与缩放因子成正比，而且这种缩放关系与参数 \(\alpha\) 无关；所有 \(\beta\) 散度的缩放因子，则以指数形式依赖参数 \(\beta\)。\(\beta\) 散度只有在 \(\beta = 0\)，即 Itakura–Saito 距离这一特例下，才对缩放因子保持不变；\(\gamma\) 散度则对任意参数 \(\gamma\) 都具有尺度不变性。
+
+
+根据前面各节的分析与讨论，广泛的非对称散度可以用下列广义函数描述：
+
+\setcounter{equation}{90}
+\begin{equation}
+\label{FD98-entropy-12-01532}
+\fitmath{D_{AC}^{(\alpha,\beta,r)}{(\mathbf{P}||\mathbf{Q})} = \frac{1}{\alpha(\beta - 1)\lambda\, r}\left\lbrack {\left( {{\widetilde{D}}_{AC}^{(\alpha,\beta)} + 1} \right)^{r} - 1} \right\rbrack}
+\end{equation}
+
+其中 \(r > 0\)，并且
+
+\setcounter{equation}{91}
+\begin{equation}
+\label{FD99-entropy-12-01532}
+\fitmath{\begin{array}{rcl}
+{{\widetilde{D}}_{AC}^{(\alpha,\beta)}{(\mathbf{P} \parallel \mathbf{Q})}} & = & {\int\left( {\alpha p^{\lambda} + {(\beta - 1)}q^{\lambda} - \lambda p^{\alpha}q^{\beta - 1}} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+这里 \(\alpha \neq 0,\;\;\beta \neq 1\) 且 \(\lambda = \alpha + \beta - 1 \neq 0\)。
+
+
+这样定义的函数与广义对数（\hyperref[FD3-entropy-12-01532]{3}）具有类似结构。只有在参数满足 \({\widetilde{D}}_{AC}^{(\alpha,\beta)}{(\mathbf{P} \parallel \mathbf{Q})} \geq 0\)，且函数仅在 \(\mathbf{P} = \mathbf{Q}\) 时为零的条件下，上述函数才构成散度。
+
+
+在若干特例中，得到以下散度：
+
+\begin{itemize}
+\item 当 \(r = \lambda = 1\) 且 \(\alpha + \beta = 2\) 时，得到 \(\alpha\) 散度（\hyperref[FD4-entropy-12-01532]{4}）。
+
+
+\item 当 \(r = 1\) 且 \(\alpha = 1\)，即 \(\;(\beta = \lambda)\) 时，得到 \(\beta\) 散度（\hyperref[FD47-entropy-12-01532]{46}）。
+
+
+\item 当 \(\left. r\rightarrow 0 \right.\) 且 \(\alpha + \beta = 2\)，即 \(\;(\lambda = 1)\) 时，得到 \(\alpha\)–Rényi 散度（\hyperref[FD25-entropy-12-01532]{25}）；对于归一化概率密度 \(\overline{p} = p/{(\int pd\mu{(\mathbf{x})})}\) 和 \(\overline{q} = q/{(\int qd\mu{(\mathbf{x})})}\)，它退化为 \(\alpha\)–\(\gamma\) 散度。
+
+
+\item 当 \(\left. r\rightarrow 0 \right.\) 且 \(\alpha = 1\)，即 \(\;(\beta = \lambda = \gamma\)，并采用归一化密度 \(\widetilde{p} = p/{(\int p^{\gamma}d\mu{(\mathbf{x})})}^{1/\gamma}\) 和 \(\widetilde{q} = q/{(\int q^{\,\gamma}d\mu{(\mathbf{x})})}^{1/\gamma}\) 时，得到 Fujisawa 和 Eguchi 最近提出的 \(\gamma\) 散度（\hyperref[FD74-entropy-12-01532]{72}）[\hyperlink{B35-entropy-12-01532}{35}]，本文称其为 \(\beta\)–\(\gamma\) 散度。
+
+\end{itemize}
+
+
+
+
+
+函数（\hyperref[FD98-entropy-12-01532]{91}）还具有许多一般性质，这些性质超出了本文的讨论范围。

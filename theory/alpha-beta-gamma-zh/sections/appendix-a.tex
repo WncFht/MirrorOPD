@@ -1,0 +1,114 @@
+\section{\texorpdfstring{从 Tsallis \(\alpha\) 熵导出的散度}{从 Tsallis α 熵导出的散度}}\label{app1-entropy-12-01532}
+本附录说明 Tsallis 熵和 Rényi 熵与 \(\alpha\) 散度、\(\beta\) 散度及 \(\gamma\) 散度之间的联系。为简化讨论，先假设 \(\int\overline{p}{(\mathbf{x})}d\mu{(\mathbf{x})} = 1\) 且 \(\int\overline{q}{(\mathbf{x})}d\mu{(\mathbf{x})} = 1\)，这些约束也可以放宽。
+
+
+利用幂函数 \(h_{\alpha}{(\overline{\mathbf{p}})} = \int{\overline{p}}^{\alpha}d\mu{(\mathbf{x})}\)，Tsallis 熵定义为
+
+\setcounter{equation}{99}
+\begin{equation}
+\label{FD126-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{p}})} = \frac{1}{1 - \alpha}\left\{ {h_{\alpha}{(\overline{\mathbf{p}})} - 1} \right\}}
+\end{equation}
+
+Rényi 熵则可写为
+
+\setcounter{equation}{100}
+\begin{equation}
+\label{FD127-entropy-12-01532}
+\fitmath{H_{R}^{(\alpha)}{(\overline{\mathbf{p}})} = \frac{1}{1 - \alpha}\log\left\{ {h_{\alpha}{(\overline{\mathbf{p}})}} \right\} = \frac{1}{1 - \alpha}\log\left( {\int{\overline{p}}^{\alpha}{(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+
+
+
+Tsallis 熵与 \(\alpha\) 散度和 \(\beta\) 散度相对应，而 Rényi 熵与 \(\gamma\) 散度相关。
+
+
+Rényi 熵和 Tsallis 熵是标准 Boltzmann–Gibbs 熵，即 Shannon 信息熵，的两种不同推广。在 \(\left. \alpha\rightarrow 1 \right.\) 的极限下，有 \(p^{\alpha - 1} = \exp{({(\alpha - 1)}\log p)} \approx 1 + {(\alpha - 1)}\log p\)，二者均退化为 Shannon 熵：
+
+\setcounter{equation}{101}
+\begin{equation}
+\label{FD128-entropy-12-01532}
+\fitmath{H_{S}{(\overline{\mathbf{p}})} = - \int\overline{p}{(\mathbf{x})}\log{(\overline{p}{(\mathbf{x})})}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+Tsallis 熵还可以视为 Shannon 熵的 \(\alpha\) 形变，因为
+
+\setcounter{equation}{102}
+\begin{equation}
+\label{FD129-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{p}})} = - \int{\overline{p}}^{\alpha}{(\mathbf{x})}\log_{\,\alpha}\,{(\overline{p}{(\mathbf{x})})}\, d\mu{(\mathbf{x})} = \frac{1}{1 - \alpha}\left( {\int{\overline{p}}^{\,\alpha}{(\mathbf{x})}d\mu{(\mathbf{x})} - 1} \right)}
+\end{equation}
+
+其中使用的广义对数函数定义为
+
+\setcounter{equation}{103}
+\begin{equation}
+\label{FD130-entropy-12-01532}
+\fitmath{\log_{\,\alpha}x = \frac{1}{1 - \alpha}\left( {x^{1 - \alpha} - 1} \right)}
+\end{equation}
+
+
+
+
+类似地，Tsallis 相对熵或 Tsallis 散度定义为
+
+\setcounter{equation}{104}
+\begin{equation}
+\label{FD131-entropy-12-01532}
+\fitmath{\begin{array}{rcl}
+{D_{T}^{(\alpha)}\left( {\overline{\mathbf{p}} \parallel \overline{\mathbf{q}}} \right)} & = & {- \int\overline{p}\log_{\,\alpha}\left( \frac{\overline{q}}{\overline{p}} \right)d\mu{(\mathbf{x})} = \frac{1}{1 - \alpha}\left( {1 - \int{\overline{p}}^{\alpha}{\overline{q}}^{1 - \alpha}d\mu{(\mathbf{x})}} \right)}
+\end{array}}
+\end{equation}
+
+
+
+
+这是 \(\alpha\) 散度经过重新缩放后的形式：
+
+\setcounter{equation}{105}
+\begin{equation}
+\label{FD132-entropy-12-01532}
+\fitmath{D_{T}^{(\alpha)}{(\overline{\mathbf{p}} \parallel \overline{\mathbf{q}})} = \alpha D_{A}^{(\alpha)}\left( {\overline{\mathbf{p}} \parallel \overline{\mathbf{q}}} \right)}
+\end{equation}
+
+\(\alpha\) 散度更为一般，因为它对任意正数组 \(\mathbf{P}\) 和 \(\mathbf{Q}\) 都有定义，而且允许 \(\alpha\) 取任意值，包括奇异值 \(\alpha = 0\) 和 \(\alpha = 1\)。
+
+
+由于 Tsallis 的 \(\alpha\) 散度是 f 散度，可以将其扩展到相应的一般情形。\hyperref[app2-entropy-12-01532]{附录 B}给出了这种扩展，其中 \(\log_{\,\alpha}{(x)}\) 被另一个幂函数替代。
+
+
+导出散度的另一种方法是使用凸生成函数。Zhang 对此作了深入研究[\hyperlink{B22-entropy-12-01532}{22}]。
+
+
+由于
+
+\setcounter{equation}{106}
+\begin{equation}
+\label{FD133-entropy-12-01532}
+\fitmath{\Phi_{\alpha}{(\overline{\mathbf{p}})} = - h_{\alpha}{(\overline{\mathbf{p}})}}
+\end{equation}
+
+为凸函数，可以导出与 Tsallis 熵对应的 Bregman 散度：
+
+\setcounter{equation}{107}
+\begin{equation}
+\label{FD134-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{T}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})} = \int\left\{ {- {\overline{p}}^{\alpha} + {\overline{q}}^{\alpha} + \alpha{\overline{p}}^{\alpha - 1}\left( {\overline{p} - \overline{q}} \right)} \right\} d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+这是在 \(\alpha = \beta\) 条件下，\(\beta\) 散度经过重新缩放和简化后的形式：
+
+\setcounter{equation}{108}
+\begin{equation}
+\label{FD135-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{T}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})} = \alpha{(1 - \alpha)}D_{B}^{(\beta)}\left( {\overline{\mathbf{p}} \parallel \overline{\mathbf{q}}} \right)}
+\end{equation}
+
+
+
+
+\(\beta\) 散度也比 Tsallis 散度更为一般，因为它定义在任意正数组上，并允许 \(\beta\) 取任意值，包括奇异值 \(\beta = 0\) 和 \(\beta = 1\)。要得到完整的 \(\beta\) 散度取值范围，需要扩展 \(h_{\alpha}{(\mathbf{p})}\) 的定义。

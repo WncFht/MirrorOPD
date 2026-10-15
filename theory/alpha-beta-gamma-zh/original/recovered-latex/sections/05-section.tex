@@ -1,0 +1,100 @@
+\setcounter{section}{4}
+\section{\texorpdfstring{Relationships for Asymmetric Divergences and their Unified Representation}{Relationships for Asymmetric Divergences and their Unified Representation}}
+\label{sec5-entropy-12-01532}
+The fundamental relationships and analogies for the generalized divergences discussed in this paper are summarized in \hyperref[entropy-12-01532-t005]{Table 5}.
+
+
+The basic difference among Alpha- Beta and Gamma divergences is their scaling properties
+
+\setcounter{equation}{87}
+\begin{equation}
+\label{FD95-entropy-12-01532}
+\fitmath{D_{A}^{(\alpha)}{(c\,\mathbf{P}\,||\, c\,\mathbf{Q})} = c\, D_{A}^{(\alpha)}{(\mathbf{P}\,||\,\mathbf{Q})}}
+\end{equation}
+
+
+
+\setcounter{equation}{88}
+\begin{equation}
+\label{FD96-entropy-12-01532}
+\fitmath{D_{B}^{(\beta)}{(c\,\mathbf{P}\,||\, c\,\mathbf{Q})} = c^{\;\beta}\, D_{B}^{(\beta)}{(\mathbf{P}\,||\,\mathbf{Q})}}
+\end{equation}
+
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{4}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{Fundamental asymmetric divergences and their relationships. We can obtain the Beta-divergence from the Alpha-divergence via transformations \(\left. p\rightarrow p^{\beta}, q\rightarrow q^{\beta}\text{and}\alpha = \beta^{- 1} \right.\) and the Alpha-divergence from the Beta-divergence via dual transformations: \(\left. p\rightarrow p^{\alpha}, q\rightarrow q^{\alpha}\text{and}\beta = \alpha^{- 1} \right.\). Furthermore, we can generate the Gamma-divergences from the Alpha- and Beta- divergences via transformations \(\left. c_{0}\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})}\rightarrow c_{0}\,\log\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})} \right.\). Moreover, we can generate Beta-Gamma divergences from the Alpha-Gamma divergence via transformations: \(\left. p\rightarrow p^{\gamma_{new}}, q\rightarrow q^{\gamma_{new}}\text{and}\gamma = \gamma_{new}^{- 1} \right.\).}\label{entropy-12-01532-t005}\\
+\toprule
+Divergence name & Formula \\ \midrule
+Alpha & \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\int(p^{\alpha}\; q^{1 - \alpha} - \alpha\; p + {(\alpha - 1)}\; q)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)}} \\ \midrule
+Beta & \cellmath{D_{B}^{(\beta)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\int(p^{\beta} + {(\beta - 1)}\; q^{\beta} - \beta\; p\; q^{\beta - 1})d\mu{(\mathbf{x})}}{\beta(\beta - 1)}} \\ \midrule
+Gamma & \cellmath{D_{AG}^{(\gamma)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\log\;{(\int p^{\gamma}\; q^{1 - \gamma}d\mu{(\mathbf{x})})} - \gamma\log\;{(\int pd\mu{(\mathbf{x})})} + {(\gamma - 1)}\log\;{(\int qd\mu{(\mathbf{x})})}}{\gamma(\gamma - 1)}} \\ \midrule
+ & \cellmath{ = \frac{1}{\gamma - 1}\log\left( {\int\overline{q}\,\left( \frac{\overline{p}}{\overline{q}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}} \\ \midrule
+ & \cellmath{D_{BG}^{(\gamma)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\log\;{(\int p^{\gamma}d\mu{(\mathbf{x})})} + {(\gamma - 1)}\log\;{(\int q^{\gamma}d\mu{(\mathbf{x})})} - \gamma\log\;{(\int p\; q^{\gamma - 1}d\mu{(\mathbf{x})})}}{\gamma(\gamma - 1)}} \\ \midrule
+ & \cellmath{ = \frac{1}{1 - \gamma}\log\left( {\int{\widetilde{q}}^{\;\gamma}\,\left( \frac{\widetilde{p}}{\widetilde{q}} \right)^{}d\mu{(\mathbf{x})}} \right)} )) \\ \midrule
+Alpha-Rényi & \cellmath{D_{AR}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})} = \frac{\log(\int{(p^{\,\alpha}q^{\, 1 - \alpha} - \alpha p + {(\alpha - 1)}\, q)}d\mu{(\mathbf{x})} + 1)}{\alpha(\alpha - 1)}} \\ \midrule
+Bregman & \cellmath{D_{\Phi}{({\mathbf{P}||\mathbf{Q}})} = \int\left( {\Phi{(p)} - \Phi{(q)} - \frac{\delta\Phi}{\delta q}{(p - q)}} \right)d\mu{(\mathbf{x})}}, (see Eqation(\hyperref[FD58-entropy-12-01532]{57})) \\ \midrule
+Csiszár-Morimoto & \cellmath{D_{f}{({\mathbf{P}||\mathbf{Q}})} = \int qf\left( \frac{p}{q} \right)d\mu{(\mathbf{x})}}, (see Equation (\hyperref[FD58-entropy-12-01532]{57})) for \cellmath{f{(u)} = \Phi{(t)}_{|t = u}}) \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+
+
+
+\setcounter{equation}{89}
+\begin{equation}
+\label{FD97-entropy-12-01532}
+\fitmath{D_{G}^{(\gamma)}{(c\,\mathbf{P}\,||\, c\,\mathbf{Q})} = D_{G}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})}}
+\end{equation}
+
+ for any \(c > 0\).
+
+
+Note that the values of all Alpha-divergences are proportional to a scaling factor and this scaling is independent of the parameter \(\alpha\), while for all Beta-divergences this scaling factor is dependent on the value of the parameter \(\beta\) exponentially. Only in a special case for \(\beta = 0\) (Itakura–Saito distance), the Beta-divergences are invariant to a scaling factor, while the Gamma-divergences is invariant to a scaling factor for any value of the parameter \(\gamma\).
+
+
+On the basis of our analysis and discussion in the previous sections, we come to conclusion that the wide class of asymmetric divergences can be described by the following generalized function:
+
+\setcounter{equation}{90}
+\begin{equation}
+\label{FD98-entropy-12-01532}
+\fitmath{D_{AC}^{(\alpha,\beta,r)}{(\mathbf{P}||\mathbf{Q})} = \frac{1}{\alpha(\beta - 1)\lambda\, r}\left\lbrack {\left( {{\widetilde{D}}_{AC}^{(\alpha,\beta)} + 1} \right)^{r} - 1} \right\rbrack}
+\end{equation}
+
+ where \(r > 0\) and
+
+\setcounter{equation}{91}
+\begin{equation}
+\label{FD99-entropy-12-01532}
+\fitmath{\begin{array}{rcl}
+{{\widetilde{D}}_{AC}^{(\alpha,\beta)}{(\mathbf{P} \parallel \mathbf{Q})}} & = & {\int\left( {\alpha p^{\lambda} + {(\beta - 1)}q^{\lambda} - \lambda p^{\alpha}q^{\beta - 1}} \right)d\mu{(\mathbf{x})}}
+\end{array}}
+\end{equation}
+
+ with \(\alpha \neq 0,\;\;\beta \neq 1\) and \(\lambda = \alpha + \beta - 1 \neq 0\).
+
+
+Note that such defined function has similar structure to generalized logarithm (\hyperref[FD3-entropy-12-01532]{3}). Moreover, it should be noted that the above function is a divergence only for such set of parameters for which \({\widetilde{D}}_{AC}^{(\alpha,\beta)}{(\mathbf{P} \parallel \mathbf{Q})} \geq 0\) and equals zero if and only if \(\mathbf{P} = \mathbf{Q}\).
+
+
+In the special cases, we obtain the following divergences:
+
+\begin{itemize}
+\item For \(r = \lambda = 1\) and \(\alpha + \beta = 2\), we obtain the Alpha-divergence (\hyperref[FD4-entropy-12-01532]{4})
+
+
+\item For \(r = 1\) and \(\alpha = 1\) \(\;(\beta = \lambda)\), we obtain the Beta-divergence (\hyperref[FD47-entropy-12-01532]{46})
+
+
+\item For \(\left. r\rightarrow 0 \right.\) and \(\alpha + \beta = 2\) \(\;(\lambda = 1)\), we obtain the Alpha-Rényi divergence (\hyperref[FD25-entropy-12-01532]{25}), which for normalized probabilities densities: \(\overline{p} = p/{(\int pd\mu{(\mathbf{x})})}\) and \(\overline{q} = q/{(\int qd\mu{(\mathbf{x})})}\) reduces to the Alpha-Gamma divergence.
+
+
+\item And finally, for \(\left. r\rightarrow 0 \right.\) and \(\alpha = 1\) \(\;(\beta = \lambda = \gamma\)) and the normalized densities: \(\widetilde{p} = p/{(\int p^{\gamma}d\mu{(\mathbf{x})})}^{1/\gamma}\) and \(\widetilde{q} = q/{(\int q^{\,\gamma}d\mu{(\mathbf{x})})}^{1/\gamma}\), we obtain the Gamma divergence (referred in this paper as the Beta-Gamma divergence) (\hyperref[FD74-entropy-12-01532]{72}), proposed recently by Fujisawa and Eguchi [\hyperlink{B35-entropy-12-01532}{35}].
+
+\end{itemize}
+
+
+
+
+
+The function (\hyperref[FD98-entropy-12-01532]{91}) has many interesting general properties. However, this is out of the scope of this paper.

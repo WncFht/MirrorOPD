@@ -1,0 +1,41 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\errorcontextlines=40
+\usepackage[margin=23mm]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm,graphicx,adjustbox,booktabs,longtable,pdflscape,xurl,xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=blue]{hyperref}
+\setlength{\LTcapwidth}{\textwidth}
+\newcommand{\fitmath}[1]{\mbox{\begin{adjustbox}{max width=.94\linewidth}$\displaystyle #1$\end{adjustbox}}}
+\newcommand{\cellmath}[1]{\mbox{\begin{adjustbox}{max width=\linewidth}$\displaystyle #1$\end{adjustbox}}}
+\setlength{\emergencystretch}{3em}
+\setcounter{secnumdepth}{2}
+\pagestyle{plain}
+\renewcommand{\refname}{References}
+\renewcommand{\abstractname}{Abstract}
+
+\title{Families of Alpha- Beta- and Gamma-Divergences:\\Flexible and Robust Measures of Similarities}
+\author{Andrzej Cichocki \and Shun-ichi Amari}
+\date{Entropy 2010, 12, 1532--1568}
+\begin{document}
+\maketitle
+{\small\noindent 1. Riken Brain Science Institute, Laboratory for Advanced Brain Signal Processing, Wako-shi, Japan.\\2. Systems Research Institute, Polish Academy of Science, Poland.\\3. Riken Brain Science Institute, Laboratory for Mathematical Neuroscience, Wako-shi, Japan.\\Andrzej Cichocki: affiliations 1 and 2, corresponding author; Shun-ichi Amari: affiliation 3.\\E-mail: a.cichocki@riken.jp; Tel.: +81-48467-9668; Fax: +81-48467-9686.\\Received: 26 April 2010; Accepted: 1 June 2010; Published: 14 June 2010.\par}
+\begin{quote}\small LaTeX recovered from the publisher's XML; this is not the authors' original TeX submission. Original: \href{https://doi.org/10.3390/e12061532}{doi:10.3390/e12061532}. Copyright 2010 the authors; \href{https://creativecommons.org/licenses/by/3.0/}{CC BY 3.0}.\end{quote}
+\begin{abstract}
+In this paper, we extend and overview wide families of Alpha-, Beta- and Gamma-divergences and discuss their fundamental properties. In literature usually only one single asymmetric (Alpha, Beta or Gamma) divergence is considered. We show in this paper that there exist families of such divergences with the same consistent properties. Moreover, we establish links and correspondences among these divergences by applying suitable nonlinear transformations. For example, we can generate the Beta-divergences directly from Alpha-divergences and vice versa. Furthermore, we show that a new wide class of Gamma-divergences can be generated not only from the family of Beta-divergences but also from a family of Alpha-divergences. The paper bridges these divergences and shows also their links to Tsallis and Rényi entropies. Most of these divergences have a natural information theoretic interpretation.
+\end{abstract}
+\noindent Keywords: Similarity measures; generalized divergences; extended Itakura--Saito like divergences; Csiszár--Morimoto and Bregman divergences; Tsallis and Rényi entropies
+\tableofcontents
+\clearpage
+\input{sections/01-section}
+\input{sections/02-section}
+\input{sections/03-section}
+\input{sections/04-section}
+\input{sections/05-section}
+\input{sections/06-section}
+\appendix
+\input{sections/appendix-a}
+\input{sections/appendix-b}
+\input{sections/appendix-c}
+\input{references}
+\bigskip\noindent\small Copyright 2010 by the authors; licensee MDPI, Basel, Switzerland. Distributed under the terms of the Creative Commons Attribution 3.0 license.
+\end{document}

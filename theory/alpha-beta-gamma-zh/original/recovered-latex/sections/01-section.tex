@@ -1,0 +1,96 @@
+\setcounter{section}{0}
+\section{\texorpdfstring{Introduction}{Introduction}}
+\label{sec1-entropy-12-01532}
+Many machine learning algorithms for classification and clustering employ a variety of dissimilarity measures. Information theory, convex analysis, and information geometry play key roles in the formulation of such divergences [\hyperlink{B1-entropy-12-01532}{1}--\hyperlink{B25-entropy-12-01532}{25}].
+
+
+The most popular and often used are: Squared Euclidean distance and Kullback–Leibler divergence. Recently, alternative generalized divergences such as the Csiszár–Morimoto f-divergence and Bregman divergence become attractive alternatives for advanced machine learning algorithms [\hyperlink{B26-entropy-12-01532}{26}--\hyperlink{B34-entropy-12-01532}{34}]. In this paper, we discuss a robust parameterized subclass of the Csiszár–Morimoto and the Bregman divergences: Alpha- and Beta-divergences that may provide more robust solutions with respect to outliers and additive noise and improved accuracy. Moreover, we provide links to new-class of robust Gamma-divergences [\hyperlink{B35-entropy-12-01532}{35}] and extend this class to so called Alpha-Gamma divergences.
+
+
+Divergences are considered here as (dis)similarity measures. Generally speaking, they measure a quasi-distance or directed difference between two probability distributions \(\mathbf{P}\) and \(\mathbf{Q}\), which can also be expressed for unconstrained nonnegative multi-way arrays and patterns.
+
+
+In this paper we assume that \(\mathbf{P}\) and \(\mathbf{Q}\) are positive measures (densities) not necessary normalized, but should be finite measures. In the special case of normalized densities, we explicitly refer to these as probability densities. If we do not mention explicitly we assume that these measures are continuous. An information divergence is a measure of distance between two probability curves. In this paper, we discuss only one-dimensional probability curves (represented by nonnegative signals or time series). Generalization to two or multidimensional dimensional variables is straightforward. One density \(\mathbf{Q}(x)\) is usually known and fixed and another one \(\mathbf{P}(\mathbf{x})\) is learned or adjusted to achieve a best in some sense similarity to the \(\mathbf{Q}(\mathbf{x})\). For example, a discrete density \(\mathbf{Q}\) corresponds to the observed data and the vector \(\mathbf{P}\) to be estimated, or expected data which are subject to constraints imposed on the assumed models. For the Non-negative Matrix Factorization (NMF) problem \(\mathbf{Q}\) corresponds to the data matrix \(\mathbf{Y}\) and \(\mathbf{P}\) corresponds to estimated matrix \(\hat{\mathbf{Y}} = \mathbf{A}\mathbf{X}\) (or vice versa) [\hyperlink{B30-entropy-12-01532}{30}].
+
+
+The distance between two densities is called a metric if the following conditions hold:
+
+\begin{enumerate}
+\item \(D(\mathbf{P}\,||\,\mathbf{Q}) \geq 0\) with equality if and only if \(\mathbf{P} = \mathbf{Q}\) (nonnegativity and positive definiteness),
+
+
+\item \(D(\mathbf{P}\,||\,\mathbf{Q}) = D(\mathbf{Q}\,||\,\mathbf{P})\) (symmetry),
+
+
+\item \(D(\mathbf{P}\,||\,\mathbf{Z}) \leq D(\mathbf{P}\,||\,\mathbf{Q}) + D(\mathbf{Q}\,||\,\mathbf{Z})\) (subaddivity/triangle inequality).
+
+\end{enumerate}
+
+
+
+
+
+Distances which only satisfies Condition 1 are not a metric and are referred to as (asymmetric) divergences.
+
+
+In many applications, such as image analysis, pattern recognition and statistical machine learning we use the information-theoretic divergences rather than Euclidean squared or \(l_{p}\)-norm distances [\hyperlink{B28-entropy-12-01532}{28}]. Several information divergences such as Kullback–Leibler, Hellinger and Jensen–Shannon divergences are central to estimate similarity between distributions and have long history in information geometry.
+
+
+The concept of a divergence is not restricted to Euclidean spaces but can be extended to abstract spaces with the help of Radon–Nikodym derivative (see for example [\hyperlink{B36-entropy-12-01532}{36}]). Let \((\mathbf{X},\mathcal{A},\mu)\) be a measure space, where \(\mu\) is a finite or a \(\sigma\)-finite measure on \((\mathbf{X},\mathcal{A})\) and let assume that \(\mathbf{P}\) and \(\mathbf{Q}\) are two (probability) measures on \((\mathbf{X},\mathcal{A})\) such that \(\mathbf{P} < < \mu\), \(\mathbf{Q} < < \mu\) are absolutely continuous with respect to a measure \(\mu\), e.g., \(\mu = \mathbf{P} + \mathbf{Q}\) and that \(p = \frac{d\mathbf{P}}{d\mu}\) and \(q = \frac{d\mathbf{Q}}{d\mu}\) the (densities) Radon–Nikodym derivative of \(\mathbf{P}\) and \(\mathbf{Q}\) with respect to \(\mu\). Using such notations the fundamental Kullback–Leibler (KL) divergence between two probabilities distributions can be written as
+
+\setcounter{equation}{0}
+\begin{equation}
+\label{FD1-entropy-12-01532}
+\fitmath{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = \int_{\mathbf{X}}p{(\mathbf{x})}\log\left( \frac{p(\mathbf{x})}{q(\mathbf{x})} \right)d\mu{(\mathbf{x})}}
+\end{equation}
+
+ which is related to the Shannon entropy
+
+\setcounter{equation}{1}
+\begin{equation}
+\label{FD2-entropy-12-01532}
+\fitmath{H_{S}{(\mathbf{P})} = - \int_{\mathbf{X}}p{(\mathbf{x})}\,\log{(p{(\mathbf{x})})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+ via
+
+\[
+\fitmath{D_{KL}{(\mathbf{P}\,||\,\mathbf{Q})} = V_{S}{(\mathbf{P},\mathbf{Q})} - H_{S}{(\mathbf{P})}}
+\]
+
+ where
+
+\[
+\fitmath{V_{S}{(\mathbf{P},\mathbf{Q})} = - \int_{\mathbf{X}}p{(\mathbf{x})}\log{(q{(\mathbf{x})})}d\mu{(\mathbf{x})}}
+\]
+
+ is the Shannon’s cross entropy, provided that integrals exist. (In measure theoretic terms, the integral exists if the measure induced by \(\mathbf{P}\) is absolutely continuous with respect to that induced by \(\mathbf{Q}\)). Here and in the whole paper we assume that all integrals exist.
+
+
+The Kullback–Leibler divergence has been generalized by using a family of functions called generalized logarithm functions or \(\alpha\)-logarithm
+
+\setcounter{equation}{2}
+\begin{equation}
+\label{FD3-entropy-12-01532}
+\fitmath{\log_{\;\alpha}{(x)} = \frac{1}{1 - \alpha}{(x^{1 - \alpha} - 1)}{(\text{for}\;\; x > 0)}}
+\end{equation}
+
+ which is a power function of x with power \(1 - \alpha\), and is the natural logarithm function in the limit \(\left. \alpha\rightarrow 1 \right.\). Often, the power function (\hyperref[FD3-entropy-12-01532]{3}) allows to generate more robust divergences in respect to outliers and consequently better or more flexible performance (see, for example, [\hyperlink{B37-entropy-12-01532}{37}]).
+
+
+By using this type of extension, we derive and review three series of divergences, the Alpha, Beta- and Gamma- divergences all of which are generalizations of the KL-divergence. Moreover, we show its relation to the Tsallis entropy and the Rényi entropy (see \hyperref[app1-entropy-12-01532]{Appendix A} and \hyperref[app2-entropy-12-01532]{Appendix B}). It will be also shown how the Alpha-divergences are derived from the Csiszár–Morimoto f-divergence and the Beta-divergence form the Bregman divergence by using the power functions.
+
+
+Similarly to work of Zhang [\hyperlink{B22-entropy-12-01532}{22}--\hyperlink{B24-entropy-12-01532}{24}] and Hein and Bousquet [\hyperlink{B21-entropy-12-01532}{21}] one of our motivations is to show the close links and relations among wide class of divergences and provide an elegant way to handle the known divergences and intermediate and new one in the same framework. However, our similarity measures are different from these proposed in [\hyperlink{B21-entropy-12-01532}{21}] and our approach and results are quite different to these presented in [\hyperlink{B22-entropy-12-01532}{22}].
+
+
+It should be mentioned that there has been previous attempts of unifying divergence functions, (especially related to Alpha-divergence) starting from the work by Zhu and Rohwer [\hyperlink{B10-entropy-12-01532}{10},\allowbreak \hyperlink{B11-entropy-12-01532}{11}], Amari and Nagaoka [\hyperlink{B3-entropy-12-01532}{3}], Taneya [\hyperlink{B38-entropy-12-01532}{38},\allowbreak \hyperlink{B39-entropy-12-01532}{39}], Zhang ([\hyperlink{B22-entropy-12-01532}{22}] and Gorban and Judge [\hyperlink{B40-entropy-12-01532}{40}]. In particular, Zhang in ([\hyperlink{B22-entropy-12-01532}{22}], and in subsequent works [\hyperlink{B23-entropy-12-01532}{23},\allowbreak \hyperlink{B24-entropy-12-01532}{24}] investigated the deep link between information geometry and various divergence functions mostly related to Alpha-divergence through a unified approach based on convex functions. However, the previous works have not considered explicitly links and relationships among ALL three fundamental classes (Alpha-, Beta, Gamma-) divergences. Moreover, some their basic properties are reviewed and extended.
+
+
+The scope of the results presented in this paper is vast since the class of generalized (flexible) divergence functions include a large number of useful loss functions containing those based on the relative entropies, generalized Kullback–Leibler or I-divergence, Hellinger distance, Jensen–Shannon divergence, J-divergence, Pearson and Neyman Chi-square divergences, Triangular Discrimination and Arithmetic-Geometric divergence. Moreover, we show that some new divergences can be generated. Especially, we generate a new family of Alpha-Gamma divergences and Itakura–Saito like distances with the invariant scaling property which belongs to a wider class of Beta-divergences. Generally, these new scale-invariant divergences provide extension of the families of Beta- and Gamma- divergences. The discussed in this paper divergence functions are flexible because they allow us to generate a large number of well known and often used particular divergences (for specific values of tuning parameters). Moreover, by adjusting adaptive tuning parameters, we can optimize cost functions for learning algorithms and estimate desired parameters of a model in presence of noise and outliers. In other words, the discussed in this paper divergences, especially Beta- and Gama- divergences are robust in respect to outliers for some values of tuning parameters.
+
+
+One of important features of the considered family of divergences is that they can give some guidance for the selection and even development of new divergence measures if necessary and allows to unify these divergences under the same framework using the Csiszár-Morimoto and Bregamn divergences and their fundamental properties. Moreover, these families of divergences are generally defined on unnormalized finite measures (not necessary normalized probabilities). This allows us to analyze patterns of different size to be weighted differently, e.g., images with different sizes or documents of different length. Such measures play also an important role in the areas of neural computation, pattern recognition, learning, estimation, inference, and optimization. We have already successfully applied a subset of such divergences as cost functions (possibly with additional constraints and regularization terms) to derive novel multiplicative and additive projected gradient algorithms for nonnegative matrix and tensor factorizations [\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B31-entropy-12-01532}{31}].
+
+
+The divergences are closely related to the invariant geometrical properties of the manifold of probability distributions [\hyperlink{B5-entropy-12-01532}{5}--\hyperlink{B7-entropy-12-01532}{7}].

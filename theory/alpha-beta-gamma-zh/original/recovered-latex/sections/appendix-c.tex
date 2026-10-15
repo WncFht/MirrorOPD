@@ -1,0 +1,124 @@
+\section{\texorpdfstring{Tsallis and Rényi Entropies}{Tsallis and Rényi Entropies}}\label{app3-entropy-12-01532}
+It is worth mentioning that the Rényi and Tsallis \(\alpha\)-entropies are monotonically related through
+
+\setcounter{equation}{115}
+\begin{equation}
+\label{FD113-entropy-12-01532}
+\fitmath{H_{R}^{(\alpha)}{(\overline{\mathbf{p}})} = \frac{1}{1 - \alpha}\log\left( {1 + {(1 - \alpha)}H_{T}^{(\alpha)}{(\overline{\mathbf{p}})}} \right)}
+\end{equation}
+
+ or using the \(\alpha\)-logarithm
+
+\setcounter{equation}{116}
+\begin{equation}
+\label{FD114-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{p}})} = \log_{\,\alpha}e^{\; H_{R}^{(\alpha)}{(\overline{\mathbf{p}})}}}
+\end{equation}
+
+ \(\Psi_{R}^{(\alpha)} = - H_{R}^{(\alpha)}\) is convex function of \(\overline{\mathbf{p}}\), and hence we have a corresponding divergence.
+
+
+The Bregman divergence can be defined in a more general form as shown below.
+
+
+If \(\left. \Phi{(\overline{\mathbf{p}})}:\;\mathbb{R}^{n}\rightarrow\mathbb{R} \right.\) is a strictly convex and \(C^{1}\) (i.e., first-order differentiable) function, the corresponding Bregman distance (divergence) for discrete positive measures is defined by
+
+\setcounter{equation}{117}
+\begin{equation}
+\label{FD115-entropy-12-01532}
+\fitmath{D_{\Phi}(\overline{\mathbf{p}}{\,||\,}\overline{\mathbf{q}}{) = \Phi}{(\overline{\mathbf{p}})} - \Phi{(\overline{\mathbf{q}})} - {(\overline{\mathbf{p}} - \overline{\mathbf{q}})}^{T}\nabla\Phi{(\overline{\mathbf{q}})}}
+\end{equation}
+
+ where \(\nabla\Phi(\overline{\mathbf{q}})\) represents the gradient of \(\Phi\) evaluated at \(\overline{\mathbf{q}}\).
+
+
+The Bregman divergence derived from the Rényi entropy for discrete probability densities is given by
+
+\setcounter{equation}{118}
+\begin{equation}
+\label{FD116-entropy-12-01532}
+\fitmath{D_{R}^{(\alpha)}(\overline{\mathbf{p}}{\,||\,}\overline{\mathbf{q}}{) =}\frac{1}{1 - \alpha}\log\frac{h_{\alpha}{(\overline{\mathbf{q}})}}{h_{\alpha}{(\mathbf{p})}} - \frac{\alpha}{1 - \alpha}\frac{1}{h_{\alpha}{(\overline{\mathbf{q}})}}{(1 - \sum\limits_{i}{\overline{p}}_{i}\,{\overline{q}}_{i}^{\alpha - 1})}}
+\end{equation}
+
+ The Tsallis entropy is closely related to the \(\alpha\)-exponential family of probability distributions. A family \(S = \left\{ {\overline{p}{(\mathbf{x},\mathbf{\theta})}} \right\}\), parameterized by a vector parameter \(\mathbf{\theta}\), of probability distributions is called a \(\alpha\)-exponential family, when it is written as
+
+\setcounter{equation}{119}
+\begin{equation}
+\label{FD117-entropy-12-01532}
+\fitmath{\log_{\,\alpha}\overline{p}{(\mathbf{x},\mathbf{\theta})} = \sum\limits_{i}\theta_{i}x_{i} - \Psi{(\mathbf{\theta})}}
+\end{equation}
+
+ where \(\Psi(\mathbf{\theta})\) is a convex function. This is the same as the \(\alpha\)-family defined in [\hyperlink{B6-entropy-12-01532}{6}]. The set \(S = \left\{ \mathbf{p} \right\}\) of discrete probability distributions is a \(\alpha\)-exponential family for any \(\alpha\). To show this, we introduce random variables \(\mathbf{x} = (x)\),
+
+\setcounter{equation}{120}
+\begin{equation}
+\label{FD118-entropy-12-01532}
+\fitmath{x_{i} = \delta_{i}}
+\end{equation}
+
+ which is 1 when the outcome is i of which probability is \(\overline{p}\).
+
+
+Then, the probability is written as
+
+\setcounter{equation}{121}
+\begin{equation}
+\label{FD119-entropy-12-01532}
+\fitmath{\log_{\,\alpha}\overline{p}{(\mathbf{x},\mathbf{\theta})} = \sum\limits_{i}\theta_{i}\delta_{i} - \Psi{(\mathbf{\theta})}}
+\end{equation}
+
+ where
+
+\setcounter{equation}{122}
+\begin{equation}
+\label{FD120-entropy-12-01532}
+\fitmath{\theta_{i} = \log_{\,\alpha}{\overline{p}}_{i}}
+\end{equation}
+
+ Since \(\sum{\overline{p}}_{i} = 1\) holds, or
+
+\setcounter{equation}{123}
+\begin{equation}
+\label{FD121-entropy-12-01532}
+\fitmath{\sum\delta_{i} = 1}
+\end{equation}
+
+ and hence free variables of \(\mathbf{\theta}\) are \(n - 1\), say \(\left( {\theta_{1},\cdots,\theta_{n - 1}} \right)\). In this case \(\theta_{n}\) is a function of the other variables, and we get
+
+\setcounter{equation}{124}
+\begin{equation}
+\label{FD122-entropy-12-01532}
+\fitmath{\Psi{(\mathbf{\theta})} = - \log_{\,\alpha}\theta_{n}}
+\end{equation}
+
+
+
+
+We can derive a divergence from this convex function \(\Psi(\mathbf{\theta})\). However, it is more intuitive to use the dual of \(\Psi(\mathbf{\theta})\), which is given by
+
+\setcounter{equation}{125}
+\begin{equation}
+\label{FD123-entropy-12-01532}
+\fitmath{\varphi{(\mathbf{\eta})} = \frac{1}{1 - \alpha}\left( {\frac{1}{h_{\alpha}{(\overline{\mathbf{p}})}} - 1} \right)}
+\end{equation}
+
+ where \(\mathbf{\eta}\) is the dual variable of \(\mathbf{\theta}\) by the Legendre transformation
+
+\setcounter{equation}{126}
+\begin{equation}
+\label{FD124-entropy-12-01532}
+\fitmath{\mathbf{\eta} = \nabla_{\mathbf{\theta}}\Psi{(\mathbf{\theta})}}
+\end{equation}
+
+
+
+
+The derived divergence is
+
+\setcounter{equation}{127}
+\begin{equation}
+\label{FD125-entropy-12-01532}
+\fitmath{D_{\exp}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})} = \frac{1}{h_{\alpha}{(\overline{\mathbf{p}})}}D_{T}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})}}
+\end{equation}
+
+ This is a conformal transformation of the Alpha-divergence [\hyperlink{B7-entropy-12-01532}{7}]. A conformal transformation, also called a conformal map or angle-preserving transformation is a transformation that preserves local angles of intersection of any two lines or curves.

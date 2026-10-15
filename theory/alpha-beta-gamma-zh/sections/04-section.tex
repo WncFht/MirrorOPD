@@ -1,0 +1,361 @@
+\setcounter{section}{3}
+\section{\texorpdfstring{从 \(\beta\) 散度和 \(\alpha\) 散度生成的 \(\gamma\) 散度族}{从 β 散度和 α 散度生成的 γ 散度族}}
+\label{sec4-entropy-12-01532}
+Fujisawa 和 Eguchi 最近提出了基本的非对称 \(\gamma\) 散度[\hyperlink{B35-entropy-12-01532}{35}]，作为对离群值高度稳健的相似性度量：
+
+\setcounter{equation}{71}
+\begin{equation}
+\label{FD74-entropy-12-01532}
+\fitmath{D_{G}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{\gamma(\gamma - 1)}\log\;\left( \frac{\left( {\int p^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)\left( {\int q^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\gamma - 1}}{\left( {\int p{(\mathbf{x})}\; q^{\,\gamma - 1}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\gamma}} \right)}
+\end{equation}
+
+\(\gamma\) 散度对累积模式施加非线性对数变换，其中各项 \(p,q\) 不可分离。使用 \(\gamma\) 散度的主要动机，是在离群值存在时，对某些参数进行高度稳健的估计。作者说明，即使污染十分严重，离群值引起的偏差也可以变得足够小，而且某些污染可以自然、自动地被忽略[\hyperlink{B35-entropy-12-01532}{35},\allowbreak \hyperlink{B37-entropy-12-01532}{37}]。
+
+
+本文说明，既可以从 \(\alpha\) 散度，也可以从 \(\beta\) 散度，直接构造完整的 \(\gamma\) 散度族。要从 \(\alpha\) 散度或 \(\beta\) 散度得到稳健的 \(\gamma\) 散度，使用以下变换，另见\hyperref[entropy-12-01532-t003]{表 3}：
+
+\setcounter{equation}{72}
+\begin{equation}
+\label{FD75-entropy-12-01532}
+\fitmath{\left. c_{0}\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})}\rightarrow\log\left( {\int p^{\, c_{1}}{(\mathbf{x})}\, q^{\, c_{2}}{(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)^{c_{0}} \right.}
+\end{equation}
+
+其中 \(c_{0},c_{1}\) 和 \(c_{2}\) 为实常数，且 \(\gamma = \alpha\)。
+
+
+对基本 \(\alpha\) 散度（\hyperref[FD4-entropy-12-01532]{4}）中的所有单项式施加上述变换，得到一个新的散度，本文称为 \(\alpha\)–\(\gamma\) 散度：
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{AG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})}} & & = & {\log\left( {\int p^{\gamma}{(\mathbf{x})}q^{1 - \gamma}{(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma(\gamma - 1)}} - \log\left( {\int p(\mathbf{x})d\mu(\mathbf{x})} \right)^{\frac{1}{\gamma - 1}} + \log\left( {\int q(\mathbf{x})d\mu(\mathbf{x})} \right)^{\frac{1}{\gamma}}} \\
+ & & = & {\frac{1}{\gamma(\gamma - 1)}\log\left( \frac{\int p^{\gamma}{(\mathbf{x})}q^{1 - \gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}}{\left( {\int p(\mathbf{x})d\mu(\mathbf{x})} \right)^{\gamma}\left( {\int q(\mathbf{x})d\mu(\mathbf{x})} \right)^{1 - \gamma}} \right)}
+\end{array}}
+\]
+
+
+
+
+非对称 \(\alpha\)–\(\gamma\) 散度具有以下重要性质：
+
+\begin{enumerate}
+\item \(D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} \geq 0\)。等号成立当且仅当存在正常数 c，使 \(\mathbf{P} = c\mathbf{Q}\)。
+
+
+\item 对任意 \(\gamma\)，它都具有尺度不变性：对于任意正的缩放常数 \(c_{1},c_{2}\)，有 \(D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{AG}^{(\gamma)}(c_{1}{\mathbf{P}\,||\,}c_{2}{\mathbf{Q})}\)。
+
+
+\item \(\alpha\)–\(\gamma\) 散度等价于归一化的 \(\alpha\)–Rényi 散度（\hyperref[FD25-entropy-12-01532]{25}），即
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{AG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})}} & & = & {\frac{1}{\gamma(\gamma - 1)}\log\left( \frac{\int p^{\gamma}{(\mathbf{x})}\, q^{1 - \gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}}{\left( {\int p(\mathbf{x})d\mu(\mathbf{x})} \right)^{\gamma}\left( {\int q(\mathbf{x})d\mu(\mathbf{x})} \right)^{1 - \gamma}} \right)} \\
+ & & = & {\frac{1}{\gamma(\gamma - 1)}\log\left( {\int{\overline{p}}^{\gamma}{(\mathbf{x})}\,{\overline{q}}^{1 - \gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)} \\
+ & & = & {\frac{1}{\gamma - 1}\log\left( {\int\overline{q}{(\mathbf{x})}\,\left( \frac{\overline{p}{(\mathbf{x})}}{\overline{q}{(\mathbf{x})}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}} = D_{AR}^{(\gamma)}(\overline{\mathbf{P}}{||}\overline{\mathbf{Q}})}
+\end{array}}
+\]
+
+其中 \(\alpha = \gamma\)，归一化密度为 \(\overline{p}{{(\mathbf{x})} = p{(\mathbf{x})}/\int(p{(\mathbf{x})}d\mu{(\mathbf{x})}}\) 和 \(\overline{q}{{(\mathbf{x})} = q{(\mathbf{x})}/\int(q{(\mathbf{x})}d\mu{(\mathbf{x})}}\)。
+
+
+\item 它可以表示为广义加权平均：
+
+\setcounter{equation}{73}
+\begin{equation}
+\label{FD78-entropy-12-01532}
+\fitmath{D_{AG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})} = \frac{1}{\gamma - 1}\log\left( {{\overline{M}}_{\gamma}\left\{ {\overline{q};\frac{\overline{p}}{\overline{q}}} \right\}} \right)}
+\end{equation}
+
+其中加权平均定义为 \({\overline{M}}_{\gamma}\left\{ {\overline{q};\frac{\overline{p}}{\overline{q}}} \right\} = \left( {\int\overline{q}{(\mathbf{x})}\,\left( \frac{\overline{p}{(\mathbf{x})}}{\overline{q}{(\mathbf{x})}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}\)。
+
+
+\item 当 \(\left. \gamma\rightarrow 0 \right.\) 时，\(\alpha\)–\(\gamma\) 散度变为 Kullback–Leibler 散度：
+
+\setcounter{equation}{74}
+\begin{equation}
+\label{FD79-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 0}D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{KL}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) = \int}\overline{p}{(\mathbf{x})}\,\log\frac{\overline{p}{(\mathbf{x})}}{\overline{q}{(\mathbf{x})}}d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+\item 对于 \(\left. \gamma\rightarrow 1 \right.\)，\(\alpha\)–\(\gamma\) 散度可以通过反向 Kullback–Leibler 散度表示：
+
+\setcounter{equation}{75}
+\begin{equation}
+\label{FD80-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 1}D_{AG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{KL}(\overline{\mathbf{Q}}{\,||\,}\overline{\mathbf{P}}{) = \int}\overline{q}{(\mathbf{x})}\,\log\frac{\overline{q}{(\mathbf{x})}}{\overline{p}{(\mathbf{x})}}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+\end{enumerate}
+
+
+
+
+
+类似地，可以从 \(\alpha\) 散度族生成整个 \(\alpha\)–\(\gamma\) 散度族，结果汇总于\hyperref[entropy-12-01532-t003]{表 3}。
+
+
+在变换（\hyperref[FD75-entropy-12-01532]{73}）中取 \(\gamma = \beta\)，还可以生成另一族 \(\gamma\) 散度，本文称为 \(\beta\)–\(\gamma\) 散度。
+
+
+具体地，对基本的非对称 \(\beta\) 散度（\hyperref[FD47-entropy-12-01532]{46}）采用非线性变换（\hyperref[FD75-entropy-12-01532]{73}），得到 \(\gamma\) 散度（\hyperref[FD74-entropy-12-01532]{72}）[\hyperlink{B35-entropy-12-01532}{35}]。本文将其记为 \(\beta\)–\(\gamma\) 散度（\(D_{G}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})} = D_{BG}^{(\gamma)}{(\mathbf{P}||\mathbf{Q})}\)）：
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {\frac{1}{\gamma(\gamma - 1)}\left\lbrack {\log{(\int p^{\gamma}d\mu{(\mathbf{x})})} + {(\gamma - 1)}\log{(\int q^{\gamma}d\mu{(\mathbf{x})})} - \gamma\log{(\int p\; q^{\gamma - 1}d\mu{(\mathbf{x})})}} \right\rbrack} \\
+ & & = & {\log\;\left( \frac{\left( {\int p\; q^{\,\gamma - 1}d\mu{(\mathbf{x})}} \right)^{\frac{1}{1 - \gamma}}}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma(1 - \gamma)}}\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{- 1}{\gamma}}} \right)} \\
+ & & = & {\frac{1}{1 - \gamma}\log\left( {\int{\widetilde{q}}^{\;\gamma}{(\mathbf{x})}\left( {\,\frac{\widetilde{p}{(\mathbf{x})}}{\widetilde{q}{(\mathbf{x})}}} \right)\; d\mu{(\mathbf{x})}} \right)}
+\end{array}}
+\]
+
+其中
+
+\setcounter{equation}{76}
+\begin{equation}
+\label{FD82-entropy-12-01532}
+\fitmath{\widetilde{p}{(\mathbf{x})} = \frac{p(\mathbf{x})}{\left( {\int p^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}},\widetilde{q}{(\mathbf{x})} = \frac{q(\mathbf{x})}{\left( {\int q^{\gamma}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}}}
+\end{equation}
+
+
+
+
+类似地，对于离散密度，\(\beta\)–\(\gamma\) 散度也可以通过广义幂平均，又称幂平均或 Hölder 平均，表示为
+
+\setcounter{equation}{77}
+\begin{equation}
+\label{FD83-entropy-12-01532}
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = - \log\;\frac{\left( {\sum\limits_{i = 1}^{n}p_{i}\; q_{i}^{\,\gamma - 1}} \right)^{\frac{1}{\gamma - 1}}}{\left( {\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma(\gamma - 1)}}\left( {\sum\limits_{i = 1}^{n}q_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}}}
+\end{equation}
+
+
+
+
+因此有
+
+\[
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = - \log\;\frac{\left( {\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\; q_{i}^{\,\gamma}} \right)^{\frac{1}{\gamma - 1}}}{\left\lbrack \left( {\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma}} \right\rbrack^{\frac{1}{\gamma - 1}}\left( {\sum\limits_{i = 1}^{n}q_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}} = - \log\left( \frac{\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\; q_{i}^{\,\gamma}}{\left( {\frac{1}{n}\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}\left\lbrack \left( {\frac{1}{n}\sum\limits_{i = 1}^{n}q_{i}^{\gamma}} \right)^{\frac{1}{\gamma}} \right\rbrack^{\gamma - 1}} \right)^{\frac{1}{\gamma - 1}}}
+\]
+
+最终得到
+
+\setcounter{equation}{78}
+\begin{equation}
+\label{FD84-entropy-12-01532}
+\fitmath{D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{1 - \gamma}\log\,\frac{\frac{1}{n}\;\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\; q_{i}^{\,\gamma}}{M_{\gamma}{\{ p_{i}\}}\,\left\lbrack {M_{\gamma}{\{ q_{i}\}}} \right\rbrack^{\gamma - 1}}}
+\end{equation}
+
+其中 \(\gamma\) 阶广义幂平均定义为
+
+\setcounter{equation}{79}
+\begin{equation}
+\label{FD85-entropy-12-01532}
+\fitmath{M_{\gamma}{\{ p_{i}\}} = \left( {\frac{1}{n}\sum\limits_{i = 1}^{n}p_{i}^{\gamma}} \right)^{\frac{1}{\gamma}}}
+\end{equation}
+
+它的特例包括通常的调和平均（\(\gamma = - 1)\)）、几何平均（\(\gamma = 0\)）、算术平均（\(\gamma = 1\)）和均方根 \(\gamma = 2\)，并满足以下关系：
+
+\setcounter{equation}{80}
+\begin{equation}
+\label{FD86-entropy-12-01532}
+\fitmath{M_{- \infty}{\{ p_{i}\}} \leq M_{- 1}{({\{ p_{i}\}})} \leq M_{0}{\{ p_{i}\}} \leq M_{1}{\{ p_{i}\}} \leq M_{2}{\{ p_{i}\}} \leq M_{\infty}{\{ p_{i}\}},}
+\end{equation}
+
+其中 \(M_{0}{\{ p_{i}\}} = \lim_{\gamma\rightarrow 0}M_{\gamma}{\{ p_{i}\}} = \left( {\prod_{i = 1}^{n}p_{i}} \right)^{1/n}\)、\(M_{- \infty}{\{ p_{i}\}} = \min_{i}{\{ p_{i}\}}\) 且 \(M_{\infty}{\{ p_{i}\}} = \max_{i}{\{ p_{i}\}}\)。
+
+
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{2}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{\(\alpha\) 散度族及其对应的稳健 \(\alpha\)–\(\gamma\) 散度；\(\overline{p}{(\mathbf{x})} = p{(\mathbf{x})}/{(\int p{(\mathbf{x})}d\mu{(\mathbf{x})})},\;\;\overline{q}{(\mathbf{x})} = q{(\mathbf{x})}/{(\int q{(\mathbf{x})}d\mu{(\mathbf{x})})}\)。当 \(\gamma = 0,1\) 时，得到广义的稳健 KL 散度。\(\gamma\) 散度可以通过广义幂平均紧凑地表示；更直接的表示见\hyperref[entropy-12-01532-t004]{表 4}。}\label{entropy-12-01532-t003}\\
+\toprule
+\cellmath{\alpha} 散度 \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})}} & 稳健的 \cellmath{\alpha}–\cellmath{\gamma} 散度 \cellmath{D_{AG}^{(\gamma)}{({c\mathbf{P}||c\mathbf{Q}})}} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}q^{1 - \alpha} - \alpha p + {(\alpha - 1)}q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {q\log\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left( {\int\overline{q}\left( \frac{\overline{p}}{\overline{q}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}},} \\
+{\int\overline{q}\log\left( \frac{\overline{q}}{\overline{p}} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int\overline{p}\log\left( \frac{\overline{p}}{\overline{q}} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{1 - \alpha}q^{\alpha} + {(\alpha - 1)}p - \alpha q} \right)d\mu{(\mathbf{x})},} \\
+{\int\left( {p\log\left( \frac{p}{q} \right) - p + q} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {q\log\left( \frac{q}{p} \right) + p - q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left( {\int\overline{p}\left( \frac{\overline{q}}{\overline{p}} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}},} \\
+{\int\overline{p}\log\left( \frac{\overline{p}}{\overline{q}} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int\overline{q}\log\left( \frac{\overline{q}}{\overline{p}} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {\left( \frac{p + q}{2} \right)^{\alpha}q^{1 - \alpha} - \frac{\alpha}{2}p - {(1 - \frac{\alpha}{2})}\, q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {q\log\left( \frac{2q}{p + q} \right) + \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int\left( {\frac{p + q}{2}\log\left( \frac{p + q}{2q} \right) - \frac{p - q}{2}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left\lbrack {\left( \frac{\int qd\mu(\mathbf{x})}{\int pd\mu(\mathbf{x})} \right)^{\frac{1}{2}}\left( {\int\overline{q}\left( \frac{p + q}{2q} \right)^{\gamma}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma}}} \right\rbrack} \\
+{\int\left( {(\overline{q}\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int\left( {\frac{\overline{p} + \overline{q}}{2}\log\left( \frac{p + q}{2q} \right)} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha - 1}\int\left\lbrack {\left( \frac{p + q}{2q} \right)^{\alpha - 1} - 1} \right\rbrack{(p - q)}d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\log\left( \frac{\int{(\overline{p}\left( \frac{p + q}{2q} \right)^{\gamma - 1})}d\mu{(\mathbf{x})}}{\int{(\overline{q}\left( \frac{p + q}{2q} \right)^{\gamma - 1})}d\mu{(\mathbf{x})}} \right)^{\frac{1}{\gamma - 1}}} \\
+{\int{(\overline{p} - \overline{q})}\log\left( \frac{p + q}{2q} \right)d\mu{(\mathbf{x})},\gamma = 1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\alpha(\alpha - 1)}\int\left( {p^{\alpha}q^{1 - \alpha} + p^{1 - \alpha}q^{\alpha} - p - q} \right)d\mu{(\mathbf{x})},} \\
+{\int{(p - q)}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\alpha = 0,1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}\log\left\lbrack {\int\overline{q}\left( \frac{p}{q} \right)^{\gamma}d\mu{(\mathbf{x})}\int\overline{p}\left( \frac{q}{p} \right)^{\gamma}d\mu{(\mathbf{x})}} \right\rbrack^{\frac{1}{\gamma}}} \\
+{\int{(\overline{p} - \overline{q})}\log\left( \frac{p}{q} \right)d\mu{(\mathbf{x})},\gamma = 0,1}
+\end{array} \right.} \\ \midrule
+\cellmath{\left\{ \begin{array}{l}
+{\frac{\int\left( {{(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha} - p - q} \right)d\mu{(\mathbf{x})}}{\alpha(\alpha - 1)},} \\
+{\int\left( {p\log\left( \frac{2p}{p + q} \right) + q\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\alpha = 0} \\
+{\int{(p + q)}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\alpha = 1}
+\end{array} \right.} & \cellmath{\left\{ \begin{array}{l}
+{\frac{1}{\gamma - 1}{\log\left\lbrack {\int\overline{p}\left( \frac{p + q}{2p} \right)^{\gamma}d\mu{(\mathbf{x})}\,\int\overline{q}\left( \frac{p + q}{2q} \right)^{\gamma}d\mu{(\mathbf{x})}} \right\rbrack^{\frac{1}{\gamma}}}} \\
+{\int\left( {\overline{p}\log\left( \frac{2p}{p + q} \right) + \overline{q}\log\left( \frac{2q}{p + q} \right)} \right)d\mu{(\mathbf{x})},\gamma = 0} \\
+{\int{(\overline{p} + \overline{q})}\log\left( \frac{p + q}{2\sqrt{pq}} \right)d\mu{(\mathbf{x})},\gamma = 1.}
+\end{array} \right.} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+\clearpage\begin{landscape}\small\setlength{\LTcapwidth}{\linewidth}
+\setcounter{table}{3}
+\begin{longtable}{@{}p{0.48\linewidth}p{0.48\linewidth}@{}}
+\caption[]{基本的 \(\alpha\) 散度、\(\beta\) 散度，以及由它们直接生成的对应 \(\gamma\) 散度。\(\gamma\) 散度的幂平均表示另见\hyperref[entropy-12-01532-t003]{表 3}。}\label{entropy-12-01532-t004}\\
+\toprule
+散度 \cellmath{D_{A}^{(\alpha)}{({\mathbf{P}||\mathbf{Q}})}} 或 \cellmath{D_{B}^{(\beta)}{({\mathbf{P}||\mathbf{Q}})}} & \cellmath{\gamma} 散度 \cellmath{D_{AG}^{(\gamma)}{({c\mathbf{P}||c\mathbf{Q}})}} 和 \cellmath{D_{BG}^{(\gamma)}{({c\mathbf{P}||c\mathbf{Q}})}} \\ \midrule
+\cellmath{\frac{1}{\alpha(1 - \alpha)}\int\left( {\alpha\, p + {(1 - \alpha)}\, q - p^{\alpha}\, q^{1 - \alpha}} \right)d\mu{(\mathbf{x})}} & \cellmath{ - \log\frac{\left( {\int p^{\gamma}\, q^{1 - \gamma}d\mu{(\mathbf{x})}} \right)^{\; 1/(\gamma(1 - \gamma))}}{\left( {\int pd\mu(\mathbf{x})} \right)^{1/(1 - \gamma)}\;\left( {\int qd\mu(\mathbf{x})} \right)^{1/\gamma}}} \\ \midrule
+\cellmath{\frac{1}{\beta(\beta - 1)}\int\left( {p^{\beta} + {(\beta - 1)}\, q^{\beta} - \beta\, p\, q^{\beta - 1}} \right)d\mu{(\mathbf{x})}} & \cellmath{ - \log\frac{\left( {\int p\, q^{\gamma - 1}d\mu{(\mathbf{x})}} \right)^{\; 1/(\gamma - 1)}}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)^{1/(\gamma(\gamma - 1))}\;\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)^{1/\gamma}}} \\ \midrule
+\cellmath{\frac{1}{\alpha(1 - \alpha)}\int\left( {p + q - p^{\alpha}\, q^{1 - \alpha} - p^{1 - \alpha}\, q^{\alpha}} \right)d\mu{(\mathbf{x})}} & \cellmath{\frac{- 1}{\gamma(1 - \gamma)}\log\frac{\left( {\int p^{\gamma}\, q^{1 - \gamma}d\mu{(\mathbf{x})}} \right)\,\left( {\int p^{1 - \gamma}\, q^{\gamma}d\mu{(\mathbf{x})}} \right)}{\int pd\mu(\mathbf{x})\;\int qd\mu(\mathbf{x})}} \\ \midrule
+\cellmath{\frac{1}{\beta - 1}\int\left( {p^{\beta} + q^{\beta} - p\, q^{\beta - 1} - p^{\beta - 1}\, q} \right)d\mu{(\mathbf{x})}} & \cellmath{\frac{- 1}{\gamma - 1}\log\frac{\left( {\int p\, q^{\gamma - 1}d\mu{(\mathbf{x})}} \right)\left( {\,\int p^{\gamma - 1}\, qd\mu{(\mathbf{x})}} \right)}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)}} \\ \midrule
+\cellmath{\frac{\int\left( {\frac{\alpha}{2}\, p + {(1 - \frac{\alpha}{2})}\, q - \left( \frac{p + q}{2} \right)^{\alpha}q^{\alpha - 1}} \right)d\mu{(\mathbf{x})}}{\alpha(1 - \alpha)}} & \cellmath{\frac{- 1}{\gamma(1 - \gamma)}\log\frac{\int\left( \frac{p + q}{2} \right)^{\gamma - 1}q^{\gamma - 1}d\mu{(\mathbf{x})}}{\left( {\int pd\mu(\mathbf{x})} \right)^{\gamma/2}\;\left( {\int qd\mu(\mathbf{x})} \right)^{1 - \gamma/2}}} \\ \midrule
+\cellmath{\frac{1}{1 - \alpha}\int{(p - q)}\left( {1 - \frac{p + q}{2q}} \right)^{\alpha - 1}d\mu{(\mathbf{x})}} & \cellmath{\frac{1}{1 - \gamma}\log\frac{\int pd\mu{(\mathbf{x})}\,\int q\left( \frac{p + q}{2q} \right)^{\gamma - 1}d\mu{(\mathbf{x})}}{\int qd\mu{(\mathbf{x})}\,\int p\left( \frac{p + q}{2q} \right)^{\gamma - 1}d\mu{(\mathbf{x})}}} \\ \midrule
+\cellmath{\frac{\int\left( {p + q - {(p^{1 - \alpha} + q^{1 - \alpha})}\left( \frac{p + q}{2} \right)^{\alpha}} \right)d\mu{(\mathbf{x})}}{\alpha(1 - \alpha)}} & \cellmath{\;\log\left( \frac{\int p^{1 - \gamma}\left( \frac{p + q}{2} \right)^{\,\gamma}d\mu{(\mathbf{x})}\int q^{1 - \gamma}\left( \frac{p + q}{2} \right)^{\,\gamma}d\mu{(\mathbf{x})}}{\int pd\mu(\mathbf{x})\;\int qd\mu(\mathbf{x})} \right)^{\frac{1}{\gamma(\gamma - 1)}}} \\ \midrule
+\bottomrule\end{longtable}\end{landscape}\clearpage
+非对称 \(\beta\)–\(\gamma\) 散度具有以下性质[\hyperlink{B30-entropy-12-01532}{30},\allowbreak \hyperlink{B35-entropy-12-01532}{35}]：
+
+\begin{enumerate}
+\item \(D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} \geq 0\)。等号成立当且仅当存在正常数 c，使 \(\mathbf{P} = c\mathbf{Q}\)。
+
+
+\item 它具有尺度不变性，即对于任意正的缩放常数 \(c_{1},c_{2}\)，有 \(D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{BG}^{(\gamma)}(c_{1}{\mathbf{P}\,||\,}c_{2}{\mathbf{Q})}\)。
+
+
+\item 当 \(\left. \gamma\rightarrow 1 \right.\) 时，\(\gamma\) 散度变为 Kullback–Leibler 散度：
+
+\setcounter{equation}{81}
+\begin{equation}
+\label{FD87-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 1}D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{KL}(\overline{\mathbf{P}}{\,||\,}\overline{\mathbf{Q}}{) = \int}\overline{p}\,\log\frac{\overline{p}}{\overline{q}}d\mu{(\mathbf{x})}}
+\end{equation}
+
+其中 \(\overline{p} = p/\int pd\mu{(\mathbf{x})}\) 且 \(\overline{q} = q/\int qd\mu{(\mathbf{x})}\)。
+
+
+\item 当 \(\left. \gamma\rightarrow 0 \right.\) 时，\(\gamma\) 散度可以表示为
+
+\setcounter{equation}{82}
+\begin{equation}
+\label{FD88-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 0}D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int\log\frac{q(\mathbf{x})}{p(\mathbf{x})}\, d\mu{(\mathbf{x})} + \log\left( {\int\frac{p(\mathbf{x})}{q(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+对于离散 \(\gamma\) 散度，相应公式为
+
+\setcounter{equation}{83}
+\begin{equation}
+\label{FD89-entropy-12-01532}
+\fitmath{D_{BG}^{(0)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{n}\sum\limits_{i = 1}^{n}\left( {\log\frac{q_{i}}{p_{i}}} \right) + \log\left( {\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}} \right) - \log{(n)} = \log\frac{\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}}{\left( {\prod\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}} \right)^{1/n}}}
+\end{equation}
+
+
+
+\end{enumerate}
+
+
+
+
+
+与 \(\alpha\) 散度和 \(\beta\) 散度类似，也可以定义对称 \(\beta\)–\(\gamma\) 散度：
+
+\[
+\fitmath{D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{BG}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} + D_{BG}^{(\gamma)}{(\mathbf{Q}\,||\,\mathbf{P})} = \frac{1}{1 - \gamma}\;\log\left\lbrack \frac{\left( {\int p^{\gamma - 1}\; q\, d\mu{(\mathbf{x})}} \right)\left( {\int p\; q^{\gamma - 1}\, d\mu{(\mathbf{x})}} \right)}{\left( {\int p^{\gamma}d\mu{(\mathbf{x})}} \right)\left( {\int q^{\gamma}d\mu{(\mathbf{x})}} \right)} \right\rbrack}
+\]
+
+
+
+
+对称 \(\gamma\) 散度具有与非对称 \(\gamma\) 散度类似的性质：
+
+\begin{enumerate}
+\item \(D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} \geq 0\)。等号成立当且仅当存在正常数 c，使 \(\mathbf{P} = c\mathbf{Q}\)；特别地，有 \(p = q,\;\;\forall i\)。
+
+
+\item 它具有尺度不变性，即
+
+\setcounter{equation}{84}
+\begin{equation}
+\label{FD90-entropy-12-01532}
+\fitmath{D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = D_{BGS}^{(\gamma)}(c_{1}{\mathbf{P}\,||\,}c_{2}{\mathbf{Q})}}
+\end{equation}
+
+其中 \(c_{1},c_{2}\) 为任意正的缩放常数。
+
+
+\item 当 \(\left. \gamma\rightarrow 1 \right.\) 时，它退化为对称 Kullback–Leibler 散度的一种特殊形式，也称 J 散度：
+
+\setcounter{equation}{85}
+\begin{equation}
+\label{FD91-entropy-12-01532}
+\fitmath{\lim\limits_{\gamma\rightarrow 1}D_{BGS}^{(\gamma)}{(\mathbf{P}\,||\,\mathbf{Q})} = \int{(\overline{p} - \overline{q})}\log\frac{\overline{p}}{\overline{q}}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+其中 \(\overline{p} = p/\int pd\mu{(\mathbf{x})}\) 且 \(\overline{q} = q/\int qd\mu{(\mathbf{x})}\)。
+
+
+\item 当 \(\gamma = 0\) 时，得到一个可由加权算术平均表示的简单散度：
+
+\setcounter{equation}{86}
+\begin{equation}
+\label{FD92-entropy-12-01532}
+\fitmath{D_{BGS}^{(0)}{(\mathbf{P}\,||\,\mathbf{Q})} = \log\left( {\int w\,\frac{p(\mathbf{x})}{q(\mathbf{x})}\, d\mu{(\mathbf{x})}\;\int w\,\frac{q(\mathbf{x})}{p(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+其中权重函数 \(w > 0\) 满足 \(\int wd\mu(\mathbf{x}) = 1\)。
+
+对于离散 \(\beta\)–\(\gamma\) 散度，简称 \(\gamma\) 散度，得到
+
+\[
+\fitmath{\begin{array}{clr}
+{D_{BGS}^{(0)}{(\mathbf{P}\,||\,\mathbf{Q})}} & = & {\log\left( {\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}\sum\limits_{i = 1}^{n}\frac{q_{i}}{p_{i}}} \right) - \log{(n)}^{2}} \\
+ & = & {\log\left( {\left( {\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{p_{i}}{q_{i}}} \right)\left( {\frac{1}{n}\sum\limits_{i = 1}^{n}\frac{q_{i}}{p_{i}}} \right)} \right)} \\
+ & = & {\log\left( {M_{1}\left\{ \frac{p_{i}}{q_{i}} \right\}\, M_{1}\left\{ \frac{q_{i}}{p_{i}} \right\}} \right)}
+\end{array}}
+\]
+
+当 \(\left. n\rightarrow\infty \right.\) 时，离散的对称 \(\gamma\) 散度可用期望表示为 \(D_{BGS}^{(1)}{(\mathbf{P}\,||\,\mathbf{Q})} = \log{(E{\{\mathbf{u}\}}\; E{\{\mathbf{u}^{- 1}\}})}\)，其中 \(u_{i} = {\{ p_{i}/q_{i}\}}\) 且 \(u_{i}^{- 1} = {\{ q_{i}/p_{i}\}}\)。
+
+
+\item 当 \(\gamma = 2\) 时，非对称 \(\gamma\) 散度与对称 \(\gamma\) 散度相等，退化为 Principe 提出的 Cauchy–Schwarz 散度[\hyperlink{B83-entropy-12-01532}{83}]：
+
+\[
+\fitmath{\begin{array}{ccrl}
+{D_{BG}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})}} & & = & {D_{BG}^{(2)}{(\mathbf{Q}\,||\,\mathbf{P})} = \frac{1}{2}D_{BGS}^{(2)}{(\mathbf{P}\,||\,\mathbf{Q})} = \frac{1}{2}D_{CS}{(\mathbf{P}\,||\,\mathbf{Q})}} \\
+ & & = & {- \log\frac{\int p(\mathbf{x})\; q(\mathbf{x})\; d\mu(\mathbf{x})}{\left( {\int p^{2}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{1/2}\left( {\int q^{2}{(\mathbf{x})}d\mu{(\mathbf{x})}} \right)^{1/2}}}
+\end{array}}
+\]
+
+
+
+\end{enumerate}
+
+
+
+
+
+由 \(\beta\) 散度导出的基本非对称 \(\beta\)–\(\gamma\) 散度，与文献[\hyperlink{B35-entropy-12-01532}{35}]定义的 \(\gamma\) 散度完全等价；由 \(\alpha\) 散度族导出的 \(\alpha\)–\(\gamma\) 散度具有不同的表达式，但性质相似。

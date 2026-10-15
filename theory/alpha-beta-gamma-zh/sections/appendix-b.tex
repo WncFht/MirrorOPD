@@ -1,0 +1,63 @@
+\section{\texorpdfstring{熵与散度}{熵与散度}}\label{app2-entropy-12-01532}
+熵 \(H(\overline{\mathbf{p}})\) 在均匀分布处取得最大值。因此，给定一个散度函数，可以定义熵 \(H(\overline{\mathbf{p}})\) 为
+
+\setcounter{equation}{109}
+\begin{equation}
+\label{FD107-entropy-12-01532}
+\fitmath{H{(\overline{\mathbf{p}})}{= D(}\overline{\mathbf{p}}{\,||\, 1)} + c}
+\end{equation}
+
+其中 c 为某个常数，\(\overline{p}\) 为归一化概率测度。
+
+
+在许多情形中，\(\Psi{(\overline{\mathbf{p}})}{= - D(}\overline{\mathbf{p}}{\,||\, 1)}\) 是 \(\overline{p}\) 的凸函数。例如，由 KL 散度可得
+
+\setcounter{equation}{110}
+\begin{equation}
+\label{FD108-entropy-12-01532}
+\fitmath{H_{KL}{(\overline{\mathbf{p}})} = - \int\overline{p}{(\mathbf{x})}\log\overline{p}{(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+忽略一个常数后，这就是 Shannon 熵。
+
+
+定义概率的幂函数为
+
+\setcounter{equation}{111}
+\begin{equation}
+\label{FD109-entropy-12-01532}
+\fitmath{h_{\alpha}{(\overline{\mathbf{p}})} = \int{\overline{p}}^{\alpha}{(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+其中 \(0 < \alpha < 1\)。
+
+
+由 \(\alpha\) 散度 \(D_{A}^{(\alpha)}\) 和 \(\beta\) 散度 \(D_{B}^{(\beta)}\)，得到相应的熵
+
+\setcounter{equation}{112}
+\begin{equation}
+\label{FD110-entropy-12-01532}
+\fitmath{H{(\overline{\mathbf{p}})} = c\, h_{\alpha}{(\overline{\mathbf{p}})} + d}
+\end{equation}
+
+其中 c 和 d 为常数，且 \(\alpha = \beta\)。
+
+
+类似地，由 \(\gamma\) 散度 \(D_{G}^{(\gamma)}\) 得到
+
+\setcounter{equation}{113}
+\begin{equation}
+\label{FD111-entropy-12-01532}
+\fitmath{H{(\overline{\mathbf{p}})} = c\,\log{(h_{\alpha}{(\overline{\mathbf{p}})})} + d}
+\end{equation}
+
+其中 \(\alpha = \gamma\)。
+
+
+不同的散度函数可以生成相似的熵函数族。反过来，从熵函数生成散度也有多种方法。一种典型方法，是利用凸生成函数 \(\Phi{(\overline{p})} = - H{(\overline{p})}\) 导出 Bregman 散度：
+
+\setcounter{equation}{114}
+\begin{equation}
+\label{FD112-entropy-12-01532}
+\fitmath{D_{\Phi}(\overline{\mathbf{p}}{\,||\,}\overline{\mathbf{q}}{) = \int}\left( {\Phi{(\overline{p})} - \Phi{(\overline{q})} - \frac{\delta\Phi(\overline{q})}{\delta\overline{q}}{(\overline{p} - \overline{q})}} \right)\, d\mu{(\mathbf{x})}}
+\end{equation}

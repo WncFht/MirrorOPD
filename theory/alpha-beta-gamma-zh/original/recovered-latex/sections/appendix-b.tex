@@ -1,0 +1,63 @@
+\section{\texorpdfstring{Entropies and Divergences}{Entropies and Divergences}}\label{app2-entropy-12-01532}
+An entropy \(H(\overline{\mathbf{p}})\) is maximized at the uniform distribution. Therefore, when a divergence function is given, we can define an entropy \(H(\overline{\mathbf{p}})\) by
+
+\setcounter{equation}{109}
+\begin{equation}
+\label{FD107-entropy-12-01532}
+\fitmath{H{(\overline{\mathbf{p}})}{= D(}\overline{\mathbf{p}}{\,||\, 1)} + c}
+\end{equation}
+
+ for some constant c and normalized probability measure \(\overline{p}\).
+
+
+In many cases, \(\Psi{(\overline{\mathbf{p}})}{= - D(}\overline{\mathbf{p}}{\,||\, 1)}\) is a convex function of \(\overline{p}\). For example, from the KL-divergence, we have
+
+\setcounter{equation}{110}
+\begin{equation}
+\label{FD108-entropy-12-01532}
+\fitmath{H_{KL}{(\overline{\mathbf{p}})} = - \int\overline{p}{(\mathbf{x})}\log\overline{p}{(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+ which is the Shannon entropy (neglecting a constant).
+
+
+We define a power function of probabilities by
+
+\setcounter{equation}{111}
+\begin{equation}
+\label{FD109-entropy-12-01532}
+\fitmath{h_{\alpha}{(\overline{\mathbf{p}})} = \int{\overline{p}}^{\alpha}{(\mathbf{x})}d\mu{(\mathbf{x})}}
+\end{equation}
+
+ where \(0 < \alpha < 1\).
+
+
+From the Alpha-divergence \(D_{A}^{(\alpha)}\) and Beta-divergence \(D_{B}^{(\beta)}\) we have the entropies
+
+\setcounter{equation}{112}
+\begin{equation}
+\label{FD110-entropy-12-01532}
+\fitmath{H{(\overline{\mathbf{p}})} = c\, h_{\alpha}{(\overline{\mathbf{p}})} + d}
+\end{equation}
+
+ where c and d are constants and \(\alpha = \beta\).
+
+
+Similarly, from the Gamma-divergence \(D_{G}^{(\gamma)}\), we have
+
+\setcounter{equation}{113}
+\begin{equation}
+\label{FD111-entropy-12-01532}
+\fitmath{H{(\overline{\mathbf{p}})} = c\,\log{(h_{\alpha}{(\overline{\mathbf{p}})})} + d}
+\end{equation}
+
+ with \(\alpha = \gamma\).
+
+
+This implies that various divergence functions can generate a similar family of entropy functions. On the other hand, there are a number of ways to generate divergences from entropy functions. A typical way is to use the Bregman divergence derived from a convex generating function \(\Phi{(\overline{p})} = - H{(\overline{p})}\),
+
+\setcounter{equation}{114}
+\begin{equation}
+\label{FD112-entropy-12-01532}
+\fitmath{D_{\Phi}(\overline{\mathbf{p}}{\,||\,}\overline{\mathbf{q}}{) = \int}\left( {\Phi{(\overline{p})} - \Phi{(\overline{q})} - \frac{\delta\Phi(\overline{q})}{\delta\overline{q}}{(\overline{p} - \overline{q})}} \right)\, d\mu{(\mathbf{x})}}
+\end{equation}

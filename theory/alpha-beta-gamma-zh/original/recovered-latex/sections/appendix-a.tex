@@ -1,0 +1,114 @@
+\section{\texorpdfstring{Divergences Derived from Tsallis \(\alpha\)-entropy}{Divergences Derived from Tsallis α-entropy}}\label{app1-entropy-12-01532}
+In this appendix, we presents links between the Tsallis and the Rényi entropies and Alpha- Beta-divergences and Gamma-divergences. For simplicity of our considerations, we assume first that \(\int\overline{p}{(\mathbf{x})}d\mu{(\mathbf{x})} = 1\) and \(\int\overline{q}{(\mathbf{x})}d\mu{(\mathbf{x})} = 1\), but these constraints can be relaxed.
+
+
+The Tsallis entropy is defined by using the power function \(h_{\alpha}{(\overline{\mathbf{p}})} = \int{\overline{p}}^{\alpha}d\mu{(\mathbf{x})}\),
+
+\setcounter{equation}{99}
+\begin{equation}
+\label{FD126-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{p}})} = \frac{1}{1 - \alpha}\left\{ {h_{\alpha}{(\overline{\mathbf{p}})} - 1} \right\}}
+\end{equation}
+
+ The Rényi entropy is also written as
+
+\setcounter{equation}{100}
+\begin{equation}
+\label{FD127-entropy-12-01532}
+\fitmath{H_{R}^{(\alpha)}{(\overline{\mathbf{p}})} = \frac{1}{1 - \alpha}\log\left\{ {h_{\alpha}{(\overline{\mathbf{p}})}} \right\} = \frac{1}{1 - \alpha}\log\left( {\int{\overline{p}}^{\alpha}{(\mathbf{x})}\, d\mu{(\mathbf{x})}} \right)}
+\end{equation}
+
+
+
+
+It is shown that the Tsallis entropy is related (corresponds) to the Alpha- and Beta-divergences, while the Rényi entropy is related to the Gamma-divergences.
+
+
+The Rényi and Tsallis entropy measures are two different generalization of the standard Boltzman-Gibbs entropy (or Shannon’s information). In the limit as \(\left. \alpha\rightarrow 1 \right.\) we have \(p^{\alpha - 1} = \exp{({(\alpha - 1)}\log p)} \approx 1 + {(\alpha - 1)}\log p\), hence they reduce to the Shannon entropy:
+
+\setcounter{equation}{101}
+\begin{equation}
+\label{FD128-entropy-12-01532}
+\fitmath{H_{S}{(\overline{\mathbf{p}})} = - \int\overline{p}{(\mathbf{x})}\log{(\overline{p}{(\mathbf{x})})}\, d\mu{(\mathbf{x})}}
+\end{equation}
+
+ The Tsallis entropy can also be considered as an \(\alpha\)-deformation of the Shannon’s entropy by noting that
+
+\setcounter{equation}{102}
+\begin{equation}
+\label{FD129-entropy-12-01532}
+\fitmath{H_{T}^{(\alpha)}{(\overline{\mathbf{p}})} = - \int{\overline{p}}^{\alpha}{(\mathbf{x})}\log_{\,\alpha}\,{(\overline{p}{(\mathbf{x})})}\, d\mu{(\mathbf{x})} = \frac{1}{1 - \alpha}\left( {\int{\overline{p}}^{\,\alpha}{(\mathbf{x})}d\mu{(\mathbf{x})} - 1} \right)}
+\end{equation}
+
+ and by using the generalized logarithm function defined by
+
+\setcounter{equation}{103}
+\begin{equation}
+\label{FD130-entropy-12-01532}
+\fitmath{\log_{\,\alpha}x = \frac{1}{1 - \alpha}\left( {x^{1 - \alpha} - 1} \right)}
+\end{equation}
+
+
+
+
+The Tsallis relative entropy or the Tsallis divergence is defined similarly by
+
+\setcounter{equation}{104}
+\begin{equation}
+\label{FD131-entropy-12-01532}
+\fitmath{\begin{array}{rcl}
+{D_{T}^{(\alpha)}\left( {\overline{\mathbf{p}} \parallel \overline{\mathbf{q}}} \right)} & = & {- \int\overline{p}\log_{\,\alpha}\left( \frac{\overline{q}}{\overline{p}} \right)d\mu{(\mathbf{x})} = \frac{1}{1 - \alpha}\left( {1 - \int{\overline{p}}^{\alpha}{\overline{q}}^{1 - \alpha}d\mu{(\mathbf{x})}} \right)}
+\end{array}}
+\end{equation}
+
+
+
+
+This is a rescaled version of the Alpha-divergence,
+
+\setcounter{equation}{105}
+\begin{equation}
+\label{FD132-entropy-12-01532}
+\fitmath{D_{T}^{(\alpha)}{(\overline{\mathbf{p}} \parallel \overline{\mathbf{q}})} = \alpha D_{A}^{(\alpha)}\left( {\overline{\mathbf{p}} \parallel \overline{\mathbf{q}}} \right)}
+\end{equation}
+
+ It should be noted that the Alpha-divergence is more general since it is defined for any positive arrays \(\mathbf{P}\) and \(\mathbf{Q}\) and also for any values of \(\alpha\) including singular values of \(\alpha = 0\) and \(\alpha = 1\).
+
+
+Since the Tsallis Alpha-divergence is an f-divergence, it is possible to extend it to the applicable general cases. This is given in \hyperref[app2-entropy-12-01532]{Appendix B}, where \(\log_{\,\alpha}{(x)}\) is replaced by another power function.
+
+
+Another way of deriving a divergence is to use the convex generating functions. This has been deeply investigated by Zhang [\hyperlink{B22-entropy-12-01532}{22}].
+
+
+Since
+
+\setcounter{equation}{106}
+\begin{equation}
+\label{FD133-entropy-12-01532}
+\fitmath{\Phi_{\alpha}{(\overline{\mathbf{p}})} = - h_{\alpha}{(\overline{\mathbf{p}})}}
+\end{equation}
+
+ is a convex function, we derive a Bregman divergence associated with the Tsallis entropy,
+
+\setcounter{equation}{107}
+\begin{equation}
+\label{FD134-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{T}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})} = \int\left\{ {- {\overline{p}}^{\alpha} + {\overline{q}}^{\alpha} + \alpha{\overline{p}}^{\alpha - 1}\left( {\overline{p} - \overline{q}} \right)} \right\} d\mu{(\mathbf{x})}}
+\end{equation}
+
+
+
+
+This is a rescaled and simplified version of the Beta-divergence with \(\alpha = \beta\),
+
+\setcounter{equation}{108}
+\begin{equation}
+\label{FD135-entropy-12-01532}
+\fitmath{{\widetilde{D}}_{T}^{(\alpha)}{(\overline{\mathbf{p}}\, \parallel \,\overline{\mathbf{q}})} = \alpha{(1 - \alpha)}D_{B}^{(\beta)}\left( {\overline{\mathbf{p}} \parallel \overline{\mathbf{q}}} \right)}
+\end{equation}
+
+
+
+
+Again, note that the Beta-divergence is more general than the Tsallis divergence, since it is defined for any positive arrays and any \(\beta\) including singular values of \(\beta = 0\) and \(\beta = 1\). We need to extend the definition of \(h_{\alpha}{(\mathbf{p})}\) to obtain the whole range of the Beta-divergences.
