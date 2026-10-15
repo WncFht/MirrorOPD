@@ -1,0 +1,40 @@
+{
+  "schema_version": 2,
+  "passed": true,
+  "run_id": "native-smoke-04",
+  "source_id": "sha256:9e82a4c1075e4196d39335835d59ac03d5c9c9d5217b33ae8ab7aaf9c14145d0",
+  "config_id": "sha256:755129701f43d926b8dfa9798fcaee46295219594733384b595bdb89ab5ae334",
+  "algorithm": "on_policy",
+  "loss_kind": "score_surrogate",
+  "outer_steps": 2,
+  "optimizer_updates": 2,
+  "evaluations": [
+    {
+      "model_version": 2,
+      "metrics": {
+        "evaluation/generated_examples": 8,
+        "evaluation/unique_questions": 4,
+        "evaluation/samples_per_question": 2,
+        "evaluation/MATH-500/mean@2": 0.0,
+        "evaluation/MATH-500/pass@2": 0.0,
+        "evaluation/MATH-500/response_tokens/mean": 128.0,
+        "evaluation/MATH-500/budget_exhausted_fraction": 1.0,
+        "evaluation/MATH-500/eos_fraction": 0.0
+      }
+    }
+  ],
+  "expected_questions": 4,
+  "protocol": {
+    "samples_per_question": 2,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": -1,
+    "prompt_tokens": 4096,
+    "response_tokens": 128,
+    "max_context_tokens": 4224,
+    "seed": 42,
+    "scorer_id": "sha256:1d74a8af65daa975efdf786607877a1098e989e992a2181ad7a9f3d7c55e3d0c",
+    "score_kind": "binary",
+    "schema_version": 2
+  }
+}

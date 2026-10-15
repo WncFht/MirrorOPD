@@ -1,0 +1,8 @@
+{
+  "wheel": "runs/refactor-20261015/dist/mirroropd-0.2.0-py3-none-any.whl",
+  "sha256": "8c6616c959852ce9641e2ce8a27633e0e4da1c15e4f14f2b8256e7ba21b93a25",
+  "profile_plan_passed": true,
+  "legacy_modules_absent": true,
+  "bundled_runtime_files_present": true,
+  "outside_repository_cwd": true
+}

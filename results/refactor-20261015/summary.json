@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "version": "0.2.0",
+  "scope": "Implementation validation; not algorithm ranking or a full research suite",
+  "runs": [
+    {
+      "path": "runs/refactor-20261015/native-smoke-04",
+      "verification": "native-smoke-04-verification.json",
+      "algorithm": "on_policy",
+      "optimizer_updates": 2,
+      "source_id": "sha256:9e82a4c1075e4196d39335835d59ac03d5c9c9d5217b33ae8ab7aaf9c14145d0",
+      "config_id": "sha256:755129701f43d926b8dfa9798fcaee46295219594733384b595bdb89ab5ae334"
+    },
+    {
+      "path": "runs/refactor-20261015/native-mirror-matrix/mdpo",
+      "verification": "mdpo-verification.json",
+      "algorithm": "mdpo",
+      "optimizer_updates": 4,
+      "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+      "config_id": "sha256:79456a43ff1eaf2b10f6f7004a27e7bf0c1fa772984e9aa8ce47af09f2e2bbe8"
+    },
+    {
+      "path": "runs/refactor-20261015/native-mirror-matrix/bpo",
+      "verification": "bpo-verification.json",
+      "algorithm": "bpo",
+      "optimizer_updates": 4,
+      "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+      "config_id": "sha256:4ff53966047ac9882e6433f588737cf97191e71a2fa67568640fed584c98d347"
+    },
+    {
+      "path": "runs/refactor-20261015/extended-validation-02/00-tiny-bpo-full",
+      "verification": "00-tiny-bpo-full-verification.json",
+      "algorithm": "bpo",
+      "optimizer_updates": 4,
+      "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+      "config_id": "sha256:f3632708b35d4e9373c55f9ddf672662c1eee6953fed62716bab2b2940060664"
+    },
+    {
+      "path": "runs/refactor-20261015/extended-validation-02/01-tiny-mdpo-full",
+      "verification": "01-tiny-mdpo-full-verification.json",
+      "algorithm": "mdpo",
+      "optimizer_updates": 4,
+      "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+      "config_id": "sha256:ffdb3e82bd06e0b2244169ab96b31f97aa63a62d37bbc41772fdc5036ee9b869"
+    },
+    {
+      "path": "runs/refactor-20261015/extended-validation-02/02-tiny-on_policy-full",
+      "verification": "02-tiny-on_policy-full-verification.json",
+      "algorithm": "on_policy",
+      "optimizer_updates": 2,
+      "source_id": "sha256:90b79b5393dedcc9aedd95bad0fb94d2876b708776ae99521e17e38eee5952b8",
+      "config_id": "sha256:344863a00a036685dc2d3bf44f0c50248d092f88a91dff09ff273ca62f0c8526"
+    },
+    {
+      "path": "runs/refactor-20261015/extended-validation-02/03-math-four-gpu",
+      "verification": "03-math-four-gpu-verification.json",
+      "algorithm": "on_policy",
+      "optimizer_updates": 2,
+      "source_id": "sha256:1f5b14ea6cf23f21a864d9d6b1deba032436afc8f9e94a555bd6653655f179fa",
+      "config_id": "sha256:02ec61ff2327ce5b3902dd58b40eeccf91675aa31584d0d452a7d6d1181fc5ca"
+    }
+  ],
+  "native_global_token_counts_match_rollouts": true,
+  "tests": {
+    "passed": 244,
+    "log": "runs/refactor-20261015/final-tests.log"
+  },
+  "benchmark_input_sha256": "aba3013407ba6edb7112cffc800f9090dabf3ab643ae1aa5da390161466fab29"
+}
