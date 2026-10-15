@@ -81,6 +81,34 @@ def test_tracking_uses_exact_worker_events_and_independent_axes(tmp_path, monkey
     assert environment_writer("driver").run_id == "other"
 
 
+def test_native_timing_counts_and_durations_keep_units(tmp_path, monkeypatch):
+    atomic_json(tmp_path / "job.json", job().to_dict())
+    monkeypatch.setenv("MIRROR_JOB_PATH", str(tmp_path / "job.json"))
+    monkeypatch.setenv("MIRROR_EVENT_DIR", str(tmp_path / "events"))
+    monkeypatch.setenv("MIRROR_RUN_ID", "units")
+    sdk = SDK()
+    tracker = RunTracker({}, sdk)
+    tracker.log(
+        {
+            "timing_s/agent_loop/slowest/prompt_length": 2048,
+            "timing_s/agent_loop/slowest/response_length": 7168,
+            "timing_s/agent_loop/num_preempted/mean": -1,
+            "timing_s/agent_loop/slowest/num_preempted": 3,
+            "timing_s/agent_loop/tool_calls/mean": 0.25,
+            "timing_s/gen": 1.5,
+        },
+        1,
+    )
+    values = sdk.history[-1][1]
+    assert values["resources/agent_loop/slowest/prompt_tokens"] == 2048
+    assert values["resources/agent_loop/slowest/response_tokens"] == 7168
+    assert values["resources/agent_loop/slowest/num_preempted"] == 3
+    assert not any("num_preempted/mean" in key for key in values)
+    assert values["timing/agent_loop/tool_calls/mean_seconds"] == 0.25
+    assert values["timing/gen_seconds"] == 1.5
+    assert not any("length_seconds" in key or "num_preempted_seconds" in key for key in values)
+
+
 def completed_run(tmp_path):
     spec = job()
     atomic_json(tmp_path / "job.json", spec.to_dict())

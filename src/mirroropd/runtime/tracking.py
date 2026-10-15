@@ -97,7 +97,19 @@ class RunTracker:
                 "actor/distillation/loss",
             }:
                 continue
-            if key.startswith("timing_s/"):
+            if key.startswith("timing_s/agent_loop/") and (
+                "/num_preempted/" in key or key.endswith("/num_preempted")
+            ):
+                # Native -1 means unavailable, rather than a negative count.
+                if value >= 0:
+                    values["resources/" + key.removeprefix("timing_s/")] = value
+            elif key in {
+                "timing_s/agent_loop/slowest/prompt_length",
+                "timing_s/agent_loop/slowest/response_length",
+            }:
+                name = key.removeprefix("timing_s/").removesuffix("_length")
+                values["resources/" + name + "_tokens"] = value
+            elif key.startswith("timing_s/"):
                 values["timing/" + key.removeprefix("timing_s/") + "_seconds"] = value
             elif key.startswith("perf/"):
                 values["resources/" + key.removeprefix("perf/")] = value
