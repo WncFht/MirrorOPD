@@ -1,0 +1,894 @@
+{
+  "schema_version": 2,
+  "stage": "interim",
+  "generated_at_utc": "2026-10-15T09:31:55.835233+00:00",
+  "algorithm": "on_policy",
+  "model_versions": [
+    0,
+    5
+  ],
+  "samples_per_question": 16,
+  "estimator": "mean_question[1 - C(n-c,k)/C(n,k)]; n=16, c=correct responses; C(n-c,k)=0 when k>n-c",
+  "interpretation": "Average over all size-k subsets of the 16 saved responses; not first-k ordering, not greedy accuracy",
+  "source_id": "sha256:5fb1d9b83b23c6f46d592a10cdd0623ca9be876130cd53a777b9a9f7e1e5a63a",
+  "source_artifacts": [
+    {
+      "model_version": 0,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/0.jsonl",
+      "sha256": "1fdd34e5a848638a709627d87eaa36eb8104dcf4d9215c0b3bb97672e480eee3",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 5,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/5.jsonl",
+      "sha256": "0d6020704cb69dd13bc1c6059d7e314232b375d8515ec9570072249069c670b0",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    }
+  ],
+  "records": [
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 1,
+      "pass_at_k": 0.8335
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 2,
+      "pass_at_k": 0.8890833333333333
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 3,
+      "pass_at_k": 0.9094607142857143
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 4,
+      "pass_at_k": 0.9205945054945055
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 5,
+      "pass_at_k": 0.9279033882783884
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 6,
+      "pass_at_k": 0.9331798201798202
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 7,
+      "pass_at_k": 0.9372031468531469
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 8,
+      "pass_at_k": 0.9403947163947164
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 9,
+      "pass_at_k": 0.9430125874125874
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 10,
+      "pass_at_k": 0.9452222777222776
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 11,
+      "pass_at_k": 0.9471309523809525
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 12,
+      "pass_at_k": 0.9488087912087912
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 13,
+      "pass_at_k": 0.9503035714285715
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 14,
+      "pass_at_k": 0.95165
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 15,
+      "pass_at_k": 0.952875
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 16,
+      "pass_at_k": 0.954
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 1,
+      "pass_at_k": 0.6984375
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 2,
+      "pass_at_k": 0.8066666666666666
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 3,
+      "pass_at_k": 0.8570982142857144
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 4,
+      "pass_at_k": 0.8860576923076924
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 5,
+      "pass_at_k": 0.9042124542124542
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 6,
+      "pass_at_k": 0.9166645854145854
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 7,
+      "pass_at_k": 0.9259965034965034
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 8,
+      "pass_at_k": 0.9335334110334111
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 9,
+      "pass_at_k": 0.9399803321678322
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 10,
+      "pass_at_k": 0.9457355144855144
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 11,
+      "pass_at_k": 0.9510416666666666
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 12,
+      "pass_at_k": 0.9560576923076922
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 13,
+      "pass_at_k": 0.9608928571428571
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 14,
+      "pass_at_k": 0.965625
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 15,
+      "pass_at_k": 0.9703125
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 16,
+      "pass_at_k": 0.975
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 1,
+      "pass_at_k": 0.23333333333333334
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 2,
+      "pass_at_k": 0.3005555555555555
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 3,
+      "pass_at_k": 0.33041666666666664
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 4,
+      "pass_at_k": 0.34974358974358977
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 5,
+      "pass_at_k": 0.3650030525030525
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 6,
+      "pass_at_k": 0.37817599067599067
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 7,
+      "pass_at_k": 0.3900437062937063
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 8,
+      "pass_at_k": 0.400991970991971
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 9,
+      "pass_at_k": 0.4112208624708625
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 10,
+      "pass_at_k": 0.4208291708291708
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 11,
+      "pass_at_k": 0.42986111111111114
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 12,
+      "pass_at_k": 0.43833333333333335
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 13,
+      "pass_at_k": 0.44625
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 14,
+      "pass_at_k": 0.45361111111111113
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 15,
+      "pass_at_k": 0.46041666666666664
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 0,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 16,
+      "pass_at_k": 0.4666666666666667
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 1,
+      "pass_at_k": 0.832375
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 2,
+      "pass_at_k": 0.8912833333333333
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 3,
+      "pass_at_k": 0.9125285714285715
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 4,
+      "pass_at_k": 0.9238747252747253
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 5,
+      "pass_at_k": 0.9311076007326008
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 6,
+      "pass_at_k": 0.9362152847152847
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 7,
+      "pass_at_k": 0.9400847902097902
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 8,
+      "pass_at_k": 0.9431825951825952
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 9,
+      "pass_at_k": 0.9457772727272727
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 10,
+      "pass_at_k": 0.9480307192807192
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 11,
+      "pass_at_k": 0.9500430402930403
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 12,
+      "pass_at_k": 0.9518769230769231
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 13,
+      "pass_at_k": 0.9535714285714285
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 14,
+      "pass_at_k": 0.9551499999999999
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 15,
+      "pass_at_k": 0.956625
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "MATH-500",
+      "questions": 500,
+      "samples_per_question": 16,
+      "k": 16,
+      "pass_at_k": 0.958
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 1,
+      "pass_at_k": 0.696875
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 2,
+      "pass_at_k": 0.8016666666666665
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 3,
+      "pass_at_k": 0.8517410714285715
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 4,
+      "pass_at_k": 0.8832005494505495
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 5,
+      "pass_at_k": 0.9045959249084248
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 6,
+      "pass_at_k": 0.9194867632367633
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 7,
+      "pass_at_k": 0.9298557692307693
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 8,
+      "pass_at_k": 0.937004662004662
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 9,
+      "pass_at_k": 0.9418553321678322
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 10,
+      "pass_at_k": 0.945083041958042
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 11,
+      "pass_at_k": 0.9471840659340659
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 12,
+      "pass_at_k": 0.9485164835164834
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 13,
+      "pass_at_k": 0.9493303571428571
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 14,
+      "pass_at_k": 0.9497916666666667
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 15,
+      "pass_at_k": 0.95
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AMC23",
+      "questions": 40,
+      "samples_per_question": 16,
+      "k": 16,
+      "pass_at_k": 0.95
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 1,
+      "pass_at_k": 0.22291666666666668
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 2,
+      "pass_at_k": 0.2852777777777778
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 3,
+      "pass_at_k": 0.3185119047619048
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 4,
+      "pass_at_k": 0.34214285714285714
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 5,
+      "pass_at_k": 0.3615995115995116
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 6,
+      "pass_at_k": 0.37892940392940394
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 7,
+      "pass_at_k": 0.39495337995338
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 8,
+      "pass_at_k": 0.40999481999481996
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 9,
+      "pass_at_k": 0.42416666666666664
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 10,
+      "pass_at_k": 0.4375
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 11,
+      "pass_at_k": 0.45
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 12,
+      "pass_at_k": 0.46166666666666667
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 13,
+      "pass_at_k": 0.47250000000000003
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 14,
+      "pass_at_k": 0.4825
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 15,
+      "pass_at_k": 0.49166666666666664
+    },
+    {
+      "algorithm": "on_policy",
+      "model_version": 5,
+      "data_source": "AIME25",
+      "questions": 30,
+      "samples_per_question": 16,
+      "k": 16,
+      "pass_at_k": 0.5
+    }
+  ]
+}
