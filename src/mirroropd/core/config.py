@@ -127,10 +127,13 @@ class CacheContext:
     signal: Signal
     estimator: Estimator
     schema_version: int = API_VERSION
+    action_only: bool = False
 
     def __post_init__(self):
         if self.schema_version != API_VERSION:
             raise ValueError(f"Cache schema must be {API_VERSION}")
+        if type(self.action_only) is not bool:
+            raise TypeError("Cache action_only must be boolean")
         if not isinstance(self.anchor_version, int) or self.anchor_version < 0:
             raise ValueError("anchor_version must be a nonnegative integer")
         if not self.teacher_id or not self.tokenizer_id:
@@ -145,6 +148,12 @@ class CacheContext:
             raise ValueError("Objective does not match the frozen cache signal/estimator")
         if anchor_version is not None and anchor_version != self.anchor_version:
             raise ValueError("Stale anchor version")
+        if self.action_only and not (
+            objective.algorithm == "mdpo"
+            and objective.estimator.integration == "sampled"
+            and objective.diagnostics == "none"
+        ):
+            raise ValueError("Action-only cache cannot supply this objective's required statistics")
 
     def to_dict(self):
         return asdict(self)

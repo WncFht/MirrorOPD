@@ -19,6 +19,7 @@ ANCHOR_FIELDS = (
 )
 TEACHER_FIELDS = ("teacher_action", "reward_center", "teacher_ids", "target_full")
 WIRE_PREFIX = "mirror_cache_"
+FULL_FIELDS = ("anchor_full", "target_full")
 
 
 def scatter_valid(value, valid, trailing=()):
@@ -32,9 +33,9 @@ class AnchorCache:
     context: CacheContext
     valid: torch.Tensor
     actions: torch.Tensor
-    head_ids: torch.Tensor
-    anchor_head: torch.Tensor
-    anchor_tail: torch.Tensor
+    head_ids: torch.Tensor | None
+    anchor_head: torch.Tensor | None
+    anchor_tail: torch.Tensor | None
     anchor_action: torch.Tensor
     anchor_full: torch.Tensor | None = None
 
@@ -42,7 +43,17 @@ class AnchorCache:
         shape = self.valid.shape
         if self.valid.dtype != torch.bool or self.actions.dtype != torch.long:
             raise TypeError("Cache valid/actions must be bool/int64 tensors")
-        if self.head_ids.dtype != torch.long:
+        if self.context.action_only:
+            if any(
+                value is not None
+                for value in (self.head_ids, self.anchor_head, self.anchor_tail, self.anchor_full)
+            ):
+                raise ValueError("Action-only cache cannot retain unused distribution fields")
+            if self.anchor_action.shape != shape or self.actions.shape != shape:
+                raise ValueError("Action-only cache fields do not align with prefixes")
+            self._validate_tensors()
+            return
+        if self.head_ids is None or self.head_ids.dtype != torch.long:
             raise TypeError("Cache head_ids must be int64")
         for name in ("actions", "anchor_tail", "anchor_action"):
             if getattr(self, name).shape != shape:
@@ -53,7 +64,7 @@ class AnchorCache:
         full = self.context.estimator.center == "full"
         if full != (self.anchor_full is not None):
             raise ValueError("Cache full anchor does not match estimator")
-        if full and self.anchor_full.shape != (*shape, self.context.vocab_size):
+        if full and self.anchor_full.shape != (int(self.valid.sum()), self.context.vocab_size):
             raise ValueError("Full anchor vocabulary does not match context")
         self._validate_tensors()
 
@@ -83,6 +94,8 @@ class AnchorCache:
         values = {
             name: data[WIRE_PREFIX + name] for name in ANCHOR_FIELDS if WIRE_PREFIX + name in data
         }
+        if context.action_only:
+            values.update(head_ids=None, anchor_head=None, anchor_tail=None)
         return cls(context=context, **values)
 
 
@@ -95,7 +108,13 @@ class FrozenCache(AnchorCache):
 
     def __post_init__(self):
         super(FrozenCache, self).__post_init__()
-        for name in ("teacher_action", "reward_center"):
+        if self.context.action_only and any(
+            value is not None for value in (self.reward_center, self.teacher_ids, self.target_full)
+        ):
+            raise ValueError("Action-only teacher cache cannot retain unused statistics")
+        for name in (
+            ("teacher_action",) if self.context.action_only else ("teacher_action", "reward_center")
+        ):
             value = getattr(self, name)
             if value is None or value.shape != self.valid.shape:
                 raise ValueError(f"Frozen cache requires aligned {name}")
@@ -114,7 +133,21 @@ class FrozenCache(AnchorCache):
             for name in (*ANCHOR_FIELDS, *TEACHER_FIELDS)
             if WIRE_PREFIX + name in data
         }
+        if context.action_only:
+            values.update(head_ids=None, anchor_head=None, anchor_tail=None)
         return cls(context=context, **values)
+
+
+def select_valid(cache, start, stop):
+    """Slice frozen evidence in predictor order; never materialize padded vocab axes."""
+    from dataclasses import replace
+
+    selected = {}
+    for name, value in cache.tensors().items():
+        selected[name] = (
+            value[start:stop] if name in FULL_FIELDS else value[cache.valid][start:stop]
+        )
+    return replace(cache, **selected)
 
 
 @torch.no_grad()
@@ -127,17 +160,21 @@ def build_anchor(logits, actions, valid, context):
         raise ValueError("Anchor action is outside the legal vocabulary")
     distribution = Distribution.from_logits(logits[valid].detach())
     estimator = context.estimator
-    ids = distribution.logits.topk(estimator.topj, -1).indices
+    ids = None if context.action_only else distribution.logits.topk(estimator.topj, -1).indices
     return AnchorCache(
         context=context,
         valid=valid.detach().clone(),
         actions=actions.detach().clone(),
-        head_ids=scatter_valid(ids, valid, (estimator.topj,)),
-        anchor_head=scatter_valid(distribution.selected(ids), valid, (estimator.topj,)),
-        anchor_tail=scatter_valid(distribution.tail(ids, estimator.chunk_size), valid),
+        head_ids=scatter_valid(ids, valid, (estimator.topj,)) if ids is not None else None,
+        anchor_head=scatter_valid(distribution.selected(ids), valid, (estimator.topj,))
+        if ids is not None
+        else None,
+        anchor_tail=scatter_valid(distribution.tail(ids, estimator.chunk_size), valid)
+        if ids is not None
+        else None,
         anchor_action=scatter_valid(distribution.action(actions[valid]), valid),
-        anchor_full=scatter_valid(distribution.full(), valid, (context.vocab_size,))
-        if estimator.center == "full"
+        anchor_full=distribution.full()
+        if estimator.center == "full" and not context.action_only
         else None,
     )
 
@@ -148,6 +185,17 @@ def score_teacher(logits, anchor, *, diagnostics="full"):
     if logits.shape != (*valid.shape, context.vocab_size):
         raise ValueError("Teacher logits do not match the frozen anchor context")
     distribution = Distribution.from_logits(logits[valid].detach())
+    if context.action_only:
+        if diagnostics != "none":
+            raise ValueError("Action-only teacher scoring requires diagnostics=none")
+        return FrozenCache(
+            context=context,
+            **anchor.tensors(),
+            head_ids=None,
+            anchor_head=None,
+            anchor_tail=None,
+            teacher_action=scatter_valid(distribution.action(anchor.actions[valid]), valid),
+        )
     ids = anchor.head_ids[valid]
     qhead, qtail = anchor.anchor_head[valid], anchor.anchor_tail[valid]
     center = -(qhead.exp() * power_reward(distribution.selected(ids) - qhead, context.signal)).sum(
@@ -160,14 +208,12 @@ def score_teacher(logits, anchor, *, diagnostics="full"):
     )
     target = None
     if context.estimator.center == "full":
-        qlog = anchor.anchor_full[valid]
+        qlog = anchor.anchor_full
         reward = power_reward(distribution.full() - qlog, context.signal)
         center = -(qlog.exp() * reward).sum(-1)
         if context.estimator.integration == "full":
             raw = qlog + context.signal.eta * reward
-            target = scatter_valid(
-                raw - raw.logsumexp(-1, keepdim=True), valid, (context.vocab_size,)
-            )
+            target = raw - raw.logsumexp(-1, keepdim=True)
     values = anchor.tensors()
     return FrozenCache(
         context=context,

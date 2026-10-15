@@ -11,8 +11,9 @@ from mirroropd.core.vocabulary import align_logits, validate_tokenizers
 from mirroropd.integrations.verl.adapter import (
     cache_outputs,
     loss_outputs,
+    nested_cache_output,
     prediction_fields,
-    restore_predictions,
+    restore_cache_output,
     unpad_cache_fields,
 )
 
@@ -48,7 +49,13 @@ def test_padded_and_ragged_adapters_preserve_last_budget_action_and_gradients(
         flat_q, prediction, "anchor", context, diagnostics="full", sequence_parallel_size=1
     )
     padded = initial | {
-        key: restore_predictions(value, attention.shape, indices) for key, value in anchor.items()
+        key: restore_cache_output(
+            key,
+            nested_cache_output(key, value, prediction["mirror_cache_valid"], offsets),
+            attention.shape,
+            indices,
+        )
+        for key, value in anchor.items()
     }
     teacher_input = unpad_cache_fields(padded, indices, offsets)
     completed = cache_outputs(
@@ -61,7 +68,12 @@ def test_padded_and_ragged_adapters_preserve_last_budget_action_and_gradients(
     )
     padded.update(
         {
-            key: restore_predictions(value, attention.shape, indices)
+            key: restore_cache_output(
+                key,
+                nested_cache_output(key, value, teacher_input["mirror_cache_valid"], offsets),
+                attention.shape,
+                indices,
+            )
             for key, value in completed.items()
         }
     )

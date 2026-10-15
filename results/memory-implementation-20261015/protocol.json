@@ -1,0 +1,36 @@
+{
+  "status": "CPU completed; GPU pending resource release",
+  "benchmark_sha256": "de54cc262a2bf05c082eff711eec9eb3db8a91d1e75f71d56a45dd3e16ed2a11",
+  "scope": "synthetic LM-head projection and objective forward/backward only; no backbone, RPC, optimizer, KV or accuracy evaluation",
+  "cpu": {
+    "threads": 1,
+    "seed": 522,
+    "prefixes": 128,
+    "vocab": 4096,
+    "width": 64,
+    "dtype": "float32",
+    "warmup": 2,
+    "iterations": 5,
+    "token_chunk": 16,
+    "vocab_chunk": 1024,
+    "acceptance": {
+      "coordinate_atol": 2e-06,
+      "coordinate_rtol": 0.0002,
+      "relative_l2": 0.0002
+    },
+    "evidence_contract": "same nonminimal cache for baseline and chunked to isolate execution; action-only runtime cache pruning is tested separately",
+    "saved_unique_storage_bytes": "unique storage pointers seen by saved_tensors_hooks in one forward/backward, includes parameter/cache storages seen by hooks; not live peak or GPU allocated"
+  },
+  "backend": {
+    "base": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+    "patch_sha256": "61cf2a7e0e2633240ba34ec52dc888739188e0e213cb4d8b53b2c0f22adc4635",
+    "clean_replay": "passed"
+  },
+  "baseline_archive": {
+    "path": "data/memory-implementation-20261015/baseline-source.tar.gz",
+    "sha256": "bad46b3372e0f31748450c268279b8a4449b765be91006296f1ed98c6a5011d8",
+    "head": "e19c7f71ce47f45bf0ac4922bab4e2748c52629e",
+    "identity": "archive file bytes and per-file hashes, rather than head alone"
+  },
+  "benchmark_change_after_cpu_run": "Only optional borrowed-slot CLI plumbing; CPU workload unchanged"
+}

@@ -7,6 +7,7 @@ from mirroropd.core.vocabulary import validate_tokenizers
 from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.data import evaluation_questions, prepare_data, read_frame
 from mirroropd.runtime.evaluation import Protocol
+from mirroropd.runtime.memory import check_cache_capacity
 from mirroropd.runtime.provenance import FingerprintCache, model_artifact
 from mirroropd.scoring import load_scorer, scorer_identity
 
@@ -68,6 +69,19 @@ def prepare_inputs(job, directory, *, fingerprint_cache):
         raise ValueError("Shared vocabulary IDs must form the dense legal output prefix")
     if job.objective.estimator.topj > vocab_size:
         raise ValueError("Configured topj exceeds the shared vocabulary")
+    memory_plan = check_cache_capacity(
+        job.objective,
+        job.memory,
+        prefixes=(
+            job.training.batch_size
+            * job.training.responses_per_prompt
+            * job.training.response_tokens
+        ),
+        vocab_size=vocab_size,
+        sequence_slots=job.training.batch_size
+        * job.training.responses_per_prompt
+        * (job.training.prompt_tokens + job.training.response_tokens),
+    )
     for role, model in models.items():
         config = AutoConfig.from_pretrained(
             model["path"], local_files_only=True, trust_remote_code=job.models.trust_remote_code
@@ -117,6 +131,7 @@ def prepare_inputs(job, directory, *, fingerprint_cache):
         "models": models,
         "vocabulary_id": vocabulary_id,
         "vocab_size": vocab_size,
+        "memory_plan": memory_plan,
         "dataset": dataset,
         "prompt_lengths": lengths,
         "scorer_id": scorer_id,

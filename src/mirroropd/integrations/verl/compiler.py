@@ -56,7 +56,9 @@ def backend_values(job, evidence, run_dir, source_root, environment):
     reference = micro | {
         "fsdp_config": {
             "model_dtype": precision.teacher,
-            "param_offload": training.parameter_offload,
+            "param_offload": training.parameter_offload
+            if job.memory.teacher_parameter_offload is None
+            else job.memory.teacher_parameter_offload,
             "use_torch_compile": False,
             "mixed_precision": mixed,
         }
@@ -110,6 +112,7 @@ def backend_values(job, evidence, run_dir, source_root, environment):
         "tokenizer_id": evidence["vocabulary_id"],
         "vocab_size": evidence["vocab_size"],
         "objective": job.objective.to_dict(),
+        "memory": asdict(job.memory),
     }
     distillation = {
         "enabled": True,
