@@ -43,6 +43,20 @@ L_{\rm BPO}(q)\simeq0.062277,\quad L_{\rm BPO}(p)\simeq0.000240,
 \end{equation}
 稀有动作的对数误差在 $q$ 下权重很小，却可以改变归一化后的学生质量。因此需要区分 loss 下降与目标教师拟合证书。
 
+\section{有限内层的局部谱与外层同步}
+固定前缀测度，并假设学生在参数 $\theta_\star$ 实现教师。令 $F_\star$ 为该点的参数 Fisher 矩阵，$t_{\rm in}$ 为每轮普通梯度流时长。BPO 和 MDPO 在教师附近具有共同的一阶外层算子
+\begin{equation}
+e_{k+1}=\left[(1-\eta)I+\eta e^{-t_{\rm in}F_\star/\eta}\right]e_k+O(\|e_k\|^2),
+\qquad e_k=\theta_k-\theta_\star.
+\end{equation}
+正特征方向 $\lambda_i$ 的系数为 $r_i=1-\eta+\eta e^{-\lambda_i t_{\rm in}/\eta}$。慢方向近似为 $1-\lambda_i t_{\rm in}$，充分拟合的方向趋于 $1-\eta$。在固定线性模型中，教师 KL 二次项是各 $r_i^{2k}$ 的加权和，快方向先消失，造成相对下降率降低；这不表示最慢正特征值本身随时间减小。
+
+若每轮执行 $N$ 步学习率为 $\alpha_{\rm opt}$ 的普通梯度下降，则
+\begin{equation}
+r_i^{(N)}=1-\eta+\eta(1-\alpha_{\rm opt}\lambda_i/\eta)^N.
+\end{equation}
+单步时恰为 $1-\alpha_{\rm opt}\lambda_i$。这些一阶系数不含 $\kappa$，故平方根的方差优势不能直接改写为更好的局部谱条件数。证明、零特征方向的限制、外推稳定区间和时变网络核的修正见\appref{sec:joint-spectrum}、\appref{sec:spectral-dynamics}。它们不是一般 Adam 轨迹的精确表达式。
+
 \section{有效保证的条件}
 从 $q$ 出发，使用精确锚点 Fisher 预条件的 BPO 产生理想路径
 \begin{equation}

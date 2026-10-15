@@ -1,0 +1,112 @@
+\section{固定目标的谱解与时变参数几何}
+\label{sec:spectral-dynamics}
+本节以普通梯度流明确优化器语义。用 $t$ 表示内层连续时间、$t_{\rm in}>0$ 表示每轮运行时长，避免与固定教师目标的独立镜像步长 $\tau$ 混用。教师、锚点和前缀测度在一轮内冻结。
+
+\begin{proposition}[BPO 的精确谱解与单轮输出]
+\label{prop:bpo-spectral-map}
+固定一个前缀的正分布 $q,m$ 和 $\eta>0$。设 $m\propto qe^f$，使用自由 logits、完整动作期望和梯度流 $\dot z=-\nabla_zL_{\rm BPO}$，从 $z(0)=\log q$ 出发。令 $Q_q=\diag(q)-qq^\top$，其非零特征对为 $(\mu_i,v_i)$。则
+\begin{align}
+L_{\rm BPO}(t)&=\frac1{2\eta}\sum_i\mu_i(v_i^\top f)^2e^{-2\mu_it/\eta},\\
+p(t_{\rm in})&=\operatorname{softmax}\!\left(\log q+[I-e^{-t_{\rm in}Q_q/\eta}]f\right).
+\end{align}
+若 $q\ne m$，以各损失项的占比为 $w_i(t)$，相对下降率满足
+\begin{equation}
+R=-\frac d{dt}\log L_{\rm BPO}=\frac2\eta\E_w\mu,
+\qquad \dot R=-\frac4{\eta^2}\Var_w\mu\le0.
+\end{equation}
+\end{proposition}
+\begin{proof}
+令 $h=z-\log m$。二次结构给 $\dot h=-Q_qh/\eta$，因此 $v_i^\top h(t)=e^{-\mu_it/\eta}v_i^\top h(0)$。初始残差为 $h(0)=-f+\log Z\,\mathbf1$；非零特征向量与 $\mathbf1$ 正交，故其系数为 $-v_i^\top f$。代入 $L=h^\top Q_qh/(2\eta)$ 得第一式。矩阵指数解写成 $z(t_{\rm in})=\log m+e^{-t_{\rm in}Q_q/\eta}(\log q-\log m)$；使用 $e^{-t_{\rm in}Q_q/\eta}\mathbf1=\mathbf1$ 即得输出式。
+
+各谱项满足 $\dot E_i=-2\mu_iE_i/\eta$，所以 $\dot w_i=-2w_i(\mu_i-\E_w\mu)/\eta$。对 $R=2\E_w\mu/\eta$ 求导得到方差式。固定 $q,\eta$ 时，形状 $\kappa$ 只经 $f$ 改变初始谱权重；它不改变 $Q_q/\eta$ 的条件数。该指数式精确描述 BPO 拟合损失，不把它等同于到原教师的 KL。
+\end{proof}
+
+\begin{proposition}[共享参数下相对下降率的几何修正]
+\label{prop:time-varying-kernel}
+固定有限前缀及权重 $d_s>0$，将 logits 堆叠为 $z_\theta$。设模型足够光滑，令
+\begin{equation}
+W=\operatorname{blockdiag}(d_sQ_{q_s}),\quad
+b=W^{1/2}(z_\theta-\log m),\quad
+B_\theta=\partial z_\theta/\partial\theta,\quad
+K=W^{1/2}B_\theta B_\theta^\top W^{1/2}.
+\end{equation}
+沿普通参数梯度流，有 $\dot b=-Kb/\eta$。在 $b\ne0$ 时，$L=\|b\|^2/(2\eta)$ 的相对下降率为
+\begin{align}
+R&=\frac2\eta\frac{b^\top Kb}{b^\top b},\\
+\dot R&=-\frac4{\eta^2}\left[\frac{b^\top K^2b}{b^\top b}
+-\left(\frac{b^\top Kb}{b^\top b}\right)^2\right]
++\frac2\eta\frac{b^\top\dot Kb}{b^\top b}.
+\end{align}
+\end{proposition}
+\begin{proof}
+链式法则给 $\nabla_\theta L=B_\theta^\top W^{1/2}b/\eta$，再对 $b$ 求时间导数得到所述流。设 $n=b^\top b$、$h=b^\top Kb$，则 $\dot n=-2h/\eta$，$\dot h=-2b^\top K^2b/\eta+b^\top\dot Kb$。对 $h/n$ 用商法则，即得结果。方括号是 $K$ 的谱在当前残差权重下的方差，非负；$\dot K$ 项没有固定符号。因此固定核的谱耗散不能推出一般神经网络的相对下降率始终下降。这里冻结了 $W,m$；跨轮改变锚点或前缀测度时必须重新定义它们。
+\end{proof}
+
+\section{有限内层与外层同步的联合线性化}
+\label{sec:joint-spectrum}
+\begin{theorem}[BPO 与 MDPO 的共同局部外层算子]
+\label{thm:joint-spectrum}
+固定有限前缀测度 $d$、正教师 $T_s$、$\kappa\in[0,1]$ 与 $\eta>0$。若 $\eta>1$ 且 $\kappa>0$，只在附录~\ref{sec:positive-extrapolation} 的正性区域内构造目标。假设光滑模型在 $\theta_\star$ 实现全部 $T_s$。令
+\begin{equation}
+e_k=\theta_k-\theta_\star,\quad
+B_s=\left.\frac{\partial z_\theta(s)}{\partial\theta}\right|_{\theta_\star},\quad
+F_\star=\sum_s d_sB_s^\top Q_{T_s}B_s.
+\end{equation}
+每轮在 $q_k=p_{\theta_k}$ 冻结目标，从 $\theta_k$ 开始，以 BPO 或 MDPO 普通梯度流运行固定时间 $t_{\rm in}$，再同步锚点，则
+\begin{equation}
+e_{k+1}=\left[(1-\eta)I+\eta e^{-t_{\rm in}F_\star/\eta}\right]e_k+O(\|e_k\|^2).
+\label{eq:joint-flow-map}
+\end{equation}
+若改为固定学习率 $\alpha_{\rm opt}$ 的 $N$ 步普通梯度下降，一阶算子为
+\begin{equation}
+(1-\eta)I+\eta(I-\alpha_{\rm opt}F_\star/\eta)^N.
+\label{eq:joint-discrete-map}
+\end{equation}
+以上余项针对固定 $t_{\rm in}$ 或固定 $N$ 的一轮更新；不声称全局网络轨迹是固定矩阵指数。
+\end{theorem}
+\begin{proof}
+写内层参数为 $\theta_\star+u$。目标在教师处的导数是 $(1-\eta)I$，所以模去每个前缀的公共 logit 常数后，
+\begin{equation}
+\log m_s=\log T_s+(1-\eta)B_se_k+\text{公共常数}+O(\|e_k\|^2).
+\end{equation}
+BPO 的冻结度量 $Q_{q_s}$ 等于 $Q_{T_s}+O(\|e_k\|)$；乘以二阶残差时，度量修正只贡献三阶。MDPO 的 KL 在 $p=m=T_s$ 处具有相同的 logit 二次型 $Q_{T_s}$。因此去掉与 $u$ 无关的常数后，两者具有共同二次模型
+\begin{equation}
+L_k^{(2)}(u)=\frac1{2\eta}[u-(1-\eta)e_k]^\top F_\star[u-(1-\eta)e_k].
+\end{equation}
+对固定局部模型，$v=u-(1-\eta)e_k$ 满足 $\dot v=-F_\star v/\eta$、$v(0)=\eta e_k$，故 $u(t_{\rm in})=(1-\eta)e_k+\eta e^{-t_{\rm in}F_\star/\eta}e_k$。光滑向量场的二阶余项在固定有限时间内仍为 $O(\|e_k\|^2)$。离散情形逐步应用 $v_{j+1}=(I-\alpha_{\rm opt}F_\star/\eta)v_j$，固定 $N$ 后得到第二个算子。
+\end{proof}
+
+\begin{corollary}[模式速率、内层预算与外推稳定性]
+\label{cor:joint-stability}
+在定理~\ref{thm:joint-spectrum} 的固定线性模型中，设 $F_\star$ 的正特征值为 $\lambda_i$，参数误差系数为 $c_{k,i}$。则
+\begin{equation}
+c_{k+1,i}=r_ic_{k,i},\qquad
+r_i=1-\eta+\eta e^{-\lambda_i t_{\rm in}/\eta}.
+\end{equation}
+教师双向条件 KL 的共同二次项为
+\begin{equation}
+E_k=\frac12\sum_i\lambda_ic_{0,i}^2r_i^{2k}.
+\end{equation}
+对有限 $t_{\rm in}>0$，$0<\eta\le2$ 时全部正谱模式满足 $|r_i|<1$；$\eta>2$ 时其同时稳定的充要条件为
+\begin{equation}
+t_{\rm in}<\frac{\eta}{\lambda_{\max}}\log\frac{\eta}{\eta-2}.
+\end{equation}
+零特征方向在该线性模型中保持不变，不由上述结论保证参数收敛。
+\end{corollary}
+\begin{proof}
+对联合算子作谱分解即得模式系数。双向 KL 在可实现教师处的参数 Hessian 都是 $F_\star$，故二次误差按所述公式传播。有限 $t_{\rm in}$ 给 $1-\eta<r_i<1$，于是 $\eta\le2$ 时稳定。$\eta>2$ 时还须 $r_i>-1$，等价于 $e^{-\lambda_i t_{\rm in}/\eta}>1-2/\eta$；对全部模式取最严格的 $\lambda_{\max}$ 即得条件。
+
+慢模式 $\lambda_i t_{\rm in}/\eta\ll1$ 有 $r_i=1-\lambda_i t_{\rm in}+O((\lambda_i t_{\rm in})^2/\eta)$；充分拟合模式有 $r_i\to1-\eta$。离散内层的模式系数为 $1-\eta+\eta(1-\alpha_{\rm opt}\lambda_i/\eta)^N$，须直接检查其绝对值是否小于一。$N=1$ 时恰为 $1-\alpha_{\rm opt}\lambda_i$，与形状和镜像强度无关。内层自身的稳定条件 $0<\alpha_{\rm opt}\lambda_i/\eta<2$ 与外层稳定条件是不同的检查。
+\end{proof}
+
+\begin{proposition}[有限内层后的谱耗散]
+\label{prop:outer-spectral-dissipation}
+取 $0<\eta<1$、有限 $t_{\rm in}>0$ 的固定联合线性模型，令 $a_i=-\log r_i>0$。将轮数连续延拓为 $x$，定义 $E(x)=\frac12\sum_i\lambda_ic_{0,i}^2e^{-2a_ix}$。若 $E>0$，则
+\begin{equation}
+-\frac d{dx}\log E=2\E_w a,\qquad
+\frac d{dx}\left[-\frac d{dx}\log E\right]=-4\Var_w a\le0.
+\end{equation}
+\end{proposition}
+\begin{proof}
+令 $w_i$ 为各指数项在 $E$ 中的占比；逐项求导给 $\dot w_i=-2w_i(a_i-\E_wa)$，再求加权均值的导数得到结果。非零残差所占据的最慢模式最终主导，有限正谱下其速率仍为正常数。充分拟合极限中所有正谱模式的 $r_i$ 都趋于 $1-\eta$，谱方差趋零。该延拓用于解释离散轮次的固定模型，不把时变网络或 Adam 更新替换为这个模型。
+\end{proof}

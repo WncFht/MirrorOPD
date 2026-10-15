@@ -71,3 +71,30 @@ m_{\kappa,\eta}(T+\delta,T)
 \nabla_z^2L_{\rm BPO}=\eta^{-1}[\diag(q)-qq^\top],
 \end{equation}
 其中不含 $\kappa$。形状改变目标和初始残差，不能由此宣称改善该二次问题的条件数。
+
+\section{共同收敛界与形状比较}
+对同一正教师、$0\le\kappa\le1$ 和 $0<\eta<1$，精确目标共享
+\begin{equation}
+\KL(T\Vert m_{\kappa,\eta})\le(1-\eta)\KL(T\Vert q).
+\label{eq:forward-kl-main}
+\end{equation}
+证明使用未归一化坐标 $q_a^{1-\eta}T_a^\eta\le h_a\le(1-\eta)q_a+\eta T_a$ 及 $Z\le1$。因此精确外层有全局几何上界；教师附近的双向 KL 比例则共同趋于 $(1-\eta)^2$。完整证明、双锚点扰动界及反例见\appref{sec:shape-comparison}。
+
+\begin{center}
+\begin{tabular}{lp{36mm}p{39mm}p{36mm}}
+\toprule
+形状 & 精确更新的坐标 & 教师概率覆盖 & 小步标准化方差\\
+\midrule
+$0$ & log-odds 线性插值 & 无统一正覆盖系数 & 无统一有限上界\\
+$1/2$ & 平方根球面插值 & 至少 $\eta^2T_a$ & 最坏极限为 $4$\\
+$1$ & 概率线性插值 & 至少 $\eta T_a$ & 最坏值按 $1/\eta$ 增长\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+算术端点对所有凸生成散度具有 $(1-\eta)$ 的乘法收缩，平方根的主要优势是小步矩控制及相应的误差相关界。固定 $\eta$ 的更新后教师 KL 可以由不同端点取得最小值，因此不存在逐实例的统一形状排序。固定强度、固定 Fisher 移动速度和固定参数更新预算是三种不同的比较口径。
+
+\section{外推的适用范围}
+$\eta>1$ 把插值改为外推。几何端点对任意正 $\eta$ 保持正性；正形状要求 $(T_a/q_a)^\kappa>1-1/\eta$ 对全部动作成立。对固定正教师，算术外推在 $\eta=2$ 形成合法两周期；平方根在同一强度下，只要第一步严格为正，精确迭代仍收敛，双向 KL 渐近为 $1/n$。更一般的 $0<\kappa<1$ 在教师附近有 $[4\kappa(1-\kappa)n]^{-1}$ 的边界 KL 率。
+
+这些结论不改变正文的默认插值范围，也不把精确边界收敛解释为采样训练的最佳强度。平方根在 $1<\eta<2$ 的输出扰动稳态界含 $1/(2-\eta)$，接近边界时会变差。正性、角度递推、两周期和完整高阶证明见\appref{sec:positive-extrapolation}。

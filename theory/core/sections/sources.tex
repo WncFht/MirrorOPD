@@ -28,4 +28,6 @@
 
 \input{sections/verification}
 
+联合内外层谱、共同正向 KL 收缩、双锚点 Hellinger 恒等式和正形状外推在附录 C、D、G 中直接从本文定义推导，不将这些扩展误记为历史来源的原有命题。\path{tests/reference/test_core_dynamics.py} 独立核对共享参数更新的 Jacobian、有限内层谱、外推正性、三阶边界率、非零两周期及统一比较反例。数值核验只检查有限实例，定理条件与证明以正文和附录为准。
+
 在仓库根执行 \texttt{make book} 或 \texttt{make theory-core} 构建完整稿和正文阅读版；在本目录执行 \texttt{make} 等价。构建使用本目录的 \path{elegantbook.cls}、XeLaTeX、latexmk 与 Biber。模板保留原许可头，删除旧目录不影响构建。正文阅读版由同一主源通过条件装配生成，附录引用保留完整稿的编号。

@@ -1,34 +1,59 @@
 {
   "date": "2026-10-15",
-  "scope": "CPU finite-simplex mathematical audits; no model training",
+  "scope": "CPU finite-simplex mathematical audits, including joint inner/outer spectra and positive-shape extrapolation; no model training",
   "commands": [
     {
-      "command": "make test",
-      "result": "341 passed, including 64 core mathematics cases and 7 book-audit cases",
-      "elapsed_seconds": 35.6
+      "command": "../envs/opd/bin/python -m pytest -q tests/reference/test_core_monograph.py tests/reference/test_core_extensions.py tests/reference/test_core_dynamics.py tests/maintenance/test_book_source_audit.py",
+      "result": "130 passed, including 59 new dynamics cases",
+      "elapsed_seconds": 9.49
     },
     {
       "command": "make book",
-      "result": "passed after deleting all four superseded directories; local ElegantBook class used"
+      "result": "passed; full and core-only PDFs rebuilt from current sources"
     },
     {
       "command": "python scripts/book_source_audit.py",
-      "result": "passed; 23 assembled sources, 110 labels, 173 appendix statements followed by proofs"
+      "result": {
+        "entry": "2026-10-15-MirrorOPD核心推导.tex",
+        "assembled_files": 26,
+        "labels": 141,
+        "appendix_statements_with_proofs": 191,
+        "missing_references": []
+      }
+    },
+    {
+      "command": "PYTHONPATH=\"$PWD/src:$PWD\" make test PYTHON=../envs/opd/bin/python",
+      "result": "512 passed, 6 failed outside the theory tests",
+      "elapsed_seconds": 63.87,
+      "failures": [
+        "tests/integrations/test_experiment_config.py: Job.memory attribute (2 cases)",
+        "tests/integrations/test_projection.py: jagged DataProto conversion (1 case)",
+        "tests/runtime/test_offline_tracking.py: Job.memory attribute (3 cases)"
+      ],
+      "workspace_context": "Concurrent production edits were present; this theory change does not alter these modules."
     },
     {
       "command": "make check",
-      "result": "passed; source/PDF builds serialized before pre-commit checks"
+      "result": "documentation, formatting and Markdown checks passed; stopped at repository Ruff errors in concurrently edited production and memory-test files"
+    },
+    {
+      "command": "ruff check tests/reference/test_core_dynamics.py; ruff format --check tests/reference/test_core_dynamics.py; git diff --check -- theory/core tests/reference/test_core_dynamics.py",
+      "result": "passed"
     }
   ],
   "environment": {
-    "python": "3.10.19",
-    "torch": "2.6.0+cu124"
+    "python": "3.12.15",
+    "torch": "2.7.1+cu126",
+    "executable": "../envs/opd/bin/python"
   },
   "new_test_dimensions": [
     2,
     3,
+    4,
+    5,
     6,
-    7
+    7,
+    11
   ],
   "quadrature_order": 96,
   "new_audits": [
@@ -53,7 +78,19 @@
     "Frozen center bias",
     "Biased geometric fixed point and stale target",
     "Equal-rate noise convolution and Mean noise floor",
-    "Fixed-preconditioner momentum stability"
+    "Fixed-preconditioner momentum stability",
+    "All-shape forward-KL multiplicative contraction",
+    "Two-anchor Hellinger identity and interpolation/extrapolation bounds",
+    "Positive extrapolation domain threshold",
+    "Square-root angle recurrence and positivity invariance",
+    "General eta=2 two-step cubic coefficient",
+    "Square-root 1/n KL boundary rate and arithmetic two-cycle",
+    "Positive square-root nonzero two-cycle above eta=2",
+    "Shared-parameter outer Jacobian for BPO and MDPO",
+    "Exact BPO flow and spectral dissipation",
+    "Finite-inner extrapolation stability threshold",
+    "Nonlinear-network time-varying-kernel rate derivative",
+    "Opposite shape rankings under the same teacher KL"
   ],
   "proof_status": "Numerical checks are finite-instance checks, not a replacement for analytical proofs.",
   "source_sha256": {
@@ -61,26 +98,29 @@
     "2026-10-15-MirrorOPD核心推导.tex": "23c35d2eaf34d4729b130e72b7b45002a8b8bd2f53debc073ebec019cf2987a9",
     "appendices/a_measure.tex": "359ccea0eb9169e830f7f07a93a807dd0971656a919d6b8a46363042024de680",
     "appendices/b_objective.tex": "ee9fe3fa86745eede569ad6a52c48b3cf5f2f09319d165fad6befafc01074a2d",
-    "appendices/c_inner.tex": "4d9a2293d14f3198172c6663eff6c6ed6b8c237ea3b7e3b65650ed3b05d97da4",
+    "appendices/c_inner.tex": "b6e4bc162c823446d20b2d9e43fdb5f1f16107f56235e8f790bcb8da068ff299",
     "appendices/c_inner_extensions.tex": "eaac70489e93c124e41474d1cf11a87e0f5015fc334145148b1a8959b12cefe2",
-    "appendices/d_shape.tex": "131aefaa174d420e4e608e97c2ff09353af41b6f542586deb656580583ed3bdc",
+    "appendices/c_spectral_dynamics.tex": "edb7b21b2f536297b92903a4d4916f32fbbaa2ee117ddad7010828b1aea13b50",
+    "appendices/d_shape.tex": "43f14531c82c57fa3ad3d2e59db06802f345e70f63ce9d73544053817839aabf",
+    "appendices/d_shape_comparison.tex": "65bce4930d3d048182cc028640407cbe8da791fa9f076e3392c9ab622e0f137f",
     "appendices/d_shape_extensions.tex": "6bf706fd361b2aca0208a9e05650daae39b3634f16c32b0138a990275f905405",
     "appendices/e_estimation.tex": "53b7418f0a97eb34b48ab0f7c711ffcd4be812fdb55149d89c27d30dd4f2b1a0",
     "appendices/e_estimation_extensions.tex": "3866d2b040b2854028e603e4b230878e51b813a8a311f25430dd0af13a344c39",
     "appendices/f_centers.tex": "af7a26184a36613df3e1657cc27067e9e15668e78ef197d0f233eeb57adfc7f0",
     "appendices/f_centers_extensions.tex": "7f05d01a0819357c04935474b0f3c9f99a0f311837d53cde6d3b4da482bf1d7a",
-    "appendices/g_dynamics.tex": "9993c429c2e03d142669df49366711bde4edfacc3f0c709d3148ae9f529b2d17",
+    "appendices/g_dynamics.tex": "7d25bf16342f463db0b6b8a6fcada068e9434e1630a1f75037a10755e641a4a6",
     "appendices/g_dynamics_extensions.tex": "9e87d710e0887eb47119a21c73f4c0b5842a6000a5753356c1e85466ba567b6d",
+    "appendices/g_extrapolation.tex": "45a284f5932e2bbabd8c3196fa69170f9a5a7523cce6840e55491d87f3f89b50",
     "appendices/h_topd.tex": "2e3d54eaa681c224fca54e32690630e82bede7400d2c57f4611964b7b79420c5",
     "sections/01_mirror.tex": "ffd09da24a2efbaf7dfbf55e345e5a20ec9f5a1944a54bb87da13d69e3d09cce",
     "sections/02_target.tex": "c923ad2c45de19c5ea245287e01c7154072ffebf154e0bca1963abbaec49f5d4",
     "sections/03_objective.tex": "4208c953a9d3cd694638e25f511a00baf06c710b9a4e1e20919d45a4a8cd4bc9",
     "sections/04_inner.tex": "cc4b6af4b894e537126e8b7caf2b1d941ee9e501957b8bd36298e8de8995adba",
-    "sections/05_parameters.tex": "22fed556fe9b109651d8ffe0759f939a4822550fdc150eae3e4847862c0fdc83",
-    "sections/06_finite.tex": "96f681336af09a0995ef74fc122fdfb92cd2ef5401512c328f7ebbc47fc94d84",
-    "sections/reading.tex": "11e3463d7e42d7dcccb44cdc0a20f7891aa6e539248a068f1cc1a6e92f40ca6b",
-    "sections/sources.tex": "55d6373bcc434de84e181f4829d71fa2da2f8ba42c213862fc8c085f5536da2f",
-    "sections/verification.tex": "03401a739ab23336c3aac96c41752332d2bccdfe369b68c34224b8f30d41e380",
+    "sections/05_parameters.tex": "84f8a4a70b66c490f388ce88eae9430702fd63f1bbe47cbf50c0d71543537d7b",
+    "sections/06_finite.tex": "e6b14eaa8bbf69ae3d7bba5ee57cb32ab5c57e64a67cf1b35f40c54f983bf477",
+    "sections/reading.tex": "4e661f7a28a565ca65d774479c9d60af4c9a9a872c910c38b45c4d3bc228badb",
+    "sections/sources.tex": "e3025f77d4227adec304ac26050e86a3f20b6bad89224e87a9c5af546959aa03",
+    "sections/verification.tex": "16915fcb37ddb7ca138cad24eadbc68c8bfc5a6a8fe715207b50aac85207f850",
     "references.bib": "f3acc85bbb4744823527bc762eb880774f1aa881896bb364b6dd823b8d4c077d"
   },
   "template": {
@@ -89,21 +129,23 @@
   },
   "pdfs": {
     "2026-10-15-MirrorOPD核心推导-正文.pdf": {
-      "pages": 14,
-      "sha256": "7605fa97452fd469435deb84108cc63e3da644eb37f7a7ec48db2a836ca8c125"
+      "pages": 15,
+      "sha256": "20fd15dab9bfcda4836fe86bb01275def2501e06b01c4fceeeeec2dfa206351d"
     },
     "2026-10-15-MirrorOPD核心推导.pdf": {
-      "pages": 77,
-      "sha256": "5fd466b867b76dea9e6927dd116b9ad663dbebfbfbf06c5ea157a4cbc668c6ef"
+      "pages": 85,
+      "sha256": "57e59825bab198d8cad49c2b2fb28fd2d55e0182e1fc8491bb1d4cd9f374ee36"
     }
   },
-  "build_status": "Both ElegantBook PDFs built; no LaTeX warnings, undefined references, underfull or overfull boxes.",
+  "build_status": "Both ElegantBook PDFs rebuilt; no LaTeX warnings, undefined references, underfull or overfull boxes.",
   "appendix_statements_with_proofs": {
     "a_measure": 11,
     "b_objective": 13,
     "c_inner": 22,
     "c_inner_extensions": 12,
+    "c_spectral_dynamics": 5,
     "d_shape": 15,
+    "d_shape_comparison": 5,
     "d_shape_extensions": 5,
     "e_estimation": 25,
     "e_estimation_extensions": 6,
@@ -111,15 +153,17 @@
     "f_centers_extensions": 4,
     "g_dynamics": 26,
     "g_dynamics_extensions": 7,
+    "g_extrapolation": 8,
     "h_topd": 8
   },
   "narrative": "Mirror Descent subproblem -> frozen f and centered advantage -> explicit weighted teacher m -> reconstructed teacher objective J -> inner fitting",
   "test_source_sha256": {
     "tests/reference/test_core_monograph.py": "1b40dee9174579fcc8f194ac6991b2dfb2689cb29e5d19d45bf1e43599f79468",
     "tests/reference/test_core_extensions.py": "30c2620fbfe2530282be19772825d4eecf8b4cfaf2cf504c88cb77b3b04d5095",
-    "tests/maintenance/test_book_source_audit.py": "090762a730f920e802df6ad9c17a032612e84af80a27544c461885859dc9266b"
+    "tests/maintenance/test_book_source_audit.py": "090762a730f920e802df6ad9c17a032612e84af80a27544c461885859dc9266b",
+    "tests/reference/test_core_dynamics.py": "fb2c70bcdfc1166c6dcae798516707cc3d59d1c4f7089cb8d93abb8674aa2796"
   },
   "provenance_baseline": "8b1e1af7ab8eabece683c6800d7c84a81c93be29",
-  "content_check": "No excluded historical model names in authored TeX, bibliography, provenance tables or extracted PDF text.",
-  "visual_review": "Rendered PDF pages 42 and 52 checked for statement/proof layout and equation clipping."
+  "content_check": "New authored sections preserve the fixed-prefix and optimizer assumptions and contain no historical model experiments.",
+  "visual_review": "Rendered full-PDF pages 14, 38 and 78 reviewed for tables, statement/proof layout and equation clipping."
 }

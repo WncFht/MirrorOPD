@@ -1,0 +1,108 @@
+\section{共同评价指标下的收敛与稳定性}
+\label{sec:shape-comparison}
+本节固定有限正分布、同一教师及 $0<\eta<1$，比较精确目标映射。相同 $\eta$ 固定插值强度，不保证不同形状移动相同距离；若比较单位 Fisher 速度的瞬时下降，应使用命题~\ref{prop:fisher-shape}。这里的结论也不直接给出共享参数训练的用时排序。
+
+\begin{theorem}[所有形状的正向 KL 乘法收缩]
+\label{thm:forward-kl-contraction}
+对 $0\le\kappa\le1$，记幂均值的未归一化坐标为 $h$、$Z=\sum_a h_a$。精确目标满足
+\begin{equation}
+\KL(T\Vert m_{\kappa,\eta})
+\le(1-\eta)\KL(T\Vert q)+\log Z
+\le(1-\eta)\KL(T\Vert q).
+\end{equation}
+因而固定教师、固定 $\eta$ 的精确迭代有 $\KL(T\Vert q_n)\le(1-\eta)^n\KL(T\Vert q_0)$。几何端点的第一步不等式取等。
+\end{theorem}
+\begin{proof}
+设 $b=1-\eta$。对 $\kappa>0$，加权算术--几何均值不等式给 $bq_a^\kappa+\eta T_a^\kappa\ge q_a^{b\kappa}T_a^{\eta\kappa}$，所以 $h_a\ge q_a^bT_a^\eta$。幂均值不等式还给 $h_a\le bq_a+\eta T_a$，故 $Z\le1$。几何端点直接使用 $h_a=q_a^bT_a^\eta$，并由加权算术--几何均值不等式得到同一上界。于是
+\begin{equation}
+\log m_a\ge b\log q_a+\eta\log T_a-\log Z.
+\end{equation}
+两边从 $\log T_a$ 中减去、乘 $T_a$ 后求和，即得第一式；$\log Z\le0$ 给第二式。逐轮递推完成证明。这个共同的正向 KL 因子，不意味着所有形状对每个凸生成散度都有相同因子；算术端点的全散度乘法收缩是更强结论。
+\end{proof}
+
+\begin{lemma}[平方根目标的双锚点恒等式]
+\label{lem:root-two-anchor}
+固定正教师 $T$，设 $\eta>0$，两个锚点 $q,\widetilde q$ 的平方根未归一化向量均逐坐标为正。令 $b=1-\eta$、$w(q)=b\sqrt q+\eta\sqrt T$、$Z(q)=\|w(q)\|_2^2$，记 $M(q)=m_{1/2,\eta}(q,T)$。则
+\begin{equation}
+H^2(M(q),M(\widetilde q))
+=\frac{b^2H^2(q,\widetilde q)
+-[\sqrt{Z(q)}-\sqrt{Z(\widetilde q)}]^2}
+{\sqrt{Z(q)Z(\widetilde q)}}.
+\label{eq:root-two-anchor}
+\end{equation}
+\end{lemma}
+\begin{proof}
+正性保证 $\sqrt{M(q)}=w(q)/\|w(q)\|$。对两个非零向量 $w,x$，展开内积得到
+\begin{equation}
+\|w-x\|^2=(\|w\|-\|x\|)^2
++\|w\|\|x\|\left\|\frac{w}{\|w\|}-\frac{x}{\|x\|}\right\|^2.
+\end{equation}
+代入 $x=w(\widetilde q)$，使用 $w(q)-w(\widetilde q)=b(\sqrt q-\sqrt{\widetilde q})$，移项即得恒等式。平方根正性是该解释的条件，不能用负坐标平方后得到的另一映射代替。
+\end{proof}
+
+\begin{proposition}[插值区间的扰动收缩比较]
+\label{prop:interpolation-stability}
+固定 $0<\eta<1$、$b=1-\eta$。三种形状满足
+\begin{align}
+d_H(M_0(q),M_0(\widetilde q))&=b\,d_H(q,\widetilde q),\\
+H(M_{1/2}(q),M_{1/2}(\widetilde q))&\le\frac b{\sqrt{b^2+\eta^2}}H(q,\widetilde q),\\
+\TV(M_1(q),M_1(\widetilde q))&=b\,\TV(q,\widetilde q),\\
+H(M_1(q),M_1(\widetilde q))&\le\sqrt b\,H(q,\widetilde q).
+\end{align}
+平方根的上述 Hellinger 上界常数不大于算术上界常数，当且仅当 $\eta\ge1/2$。
+\end{proposition}
+\begin{proof}
+几何目标的 log-ratio 差为 $b\log(q/\widetilde q)$ 加公共常数，取跨度得到第一式。平方根目标的 $Z(q)=b^2+\eta^2+2b\eta\sum_a\sqrt{q_aT_a}\ge b^2+\eta^2$；在式~\eqref{eq:root-two-anchor} 中丢弃被减去的平方项并开方得到第二式。算术目标差精确等于 $b(q-\widetilde q)$，故 TV 等式成立。
+
+对每个坐标，Cauchy--Schwarz 给
+\begin{equation}
+\sqrt{(bq_a+\eta T_a)(b\widetilde q_a+\eta T_a)}
+\ge b\sqrt{q_a\widetilde q_a}+\eta T_a.
+\end{equation}
+求和并用 $H^2=2-2\sum\sqrt{pq}$ 得最后一式。比较两正上界常数并平方，$b^2/(b^2+\eta^2)\le b$ 等价于 $b\le b^2+\eta^2$，即 $\eta\ge1/2$。这里只比较已证明的统一界，不推断任意具体锚点对有相同排序。
+\end{proof}
+
+\begin{proposition}[平方根插值的角度递推]
+\label{prop:root-interpolation-angle}
+固定 $0<\eta<1$，令 $\theta=\arccos\sum_a\sqrt{q_aT_a}\in[0,\pi/2)$。目标的夹角满足
+\begin{equation}
+\theta^+=\arctan\frac{(1-\eta)\sin\theta}{\eta+(1-\eta)\cos\theta}.
+\end{equation}
+在 $\eta=1/2$ 时，$\theta^+=\theta/2$，因而 $H^2(q_n,T)=4\sin^2(\theta_0/2^{n+1})$。
+\end{proposition}
+\begin{proof}
+当 $q\ne T$，写 $\sqrt q=\sqrt T\cos\theta+w\sin\theta$，其中 $w$ 为与 $\sqrt T$ 正交的单位向量。未归一化目标的两个正交系数分别为 $\eta+(1-\eta)\cos\theta$ 和 $(1-\eta)\sin\theta$。前者为正，二者之比即夹角正切。$\eta=1/2$ 时用 $\sin\theta/(1+\cos\theta)=\tan(\theta/2)$ 得精确二分；迭代后使用 $H^2=4\sin^2(\theta/2)$。$q=T$ 时连续延拓给零角度。
+\end{proof}
+
+\section{形状优劣依赖比较准则}
+\label{sec:shape-criteria-summary}
+三个端点分别在 log-ratio、平方根和概率坐标中插值。它们共享定理~\ref{thm:forward-kl-contraction} 的正向 KL 全局界与局部 $(1-\eta)^2$ 的 KL 比例，但只在算术端点直接得到所有凸生成散度的同因子收缩。教师覆盖系数分别为：几何端点无统一正下界，平方根至少 $\eta^2T_a$，算术至少 $\eta T_a$。
+
+监督信号采用相同标准化 $A=f/\eta$。其小步极限依次为 $\log\rho$、$2(\sqrt\rho-1)$、$\rho-1$。平方根方差为 $4(1-c^2)\le4$，其中 $c=\sum\sqrt{qT}$；算术方差为 $\chi^2(T\Vert q)$，几何对数方差也无统一有限上界。固定正 $\eta<1$ 的算术信号仍有有限统一界，不能与其最坏方差在 $\eta\downarrow0$ 时发散混淆。这些矩结论及最优形状的不同准则已经在本附录证明；它们约束采样信号，不直接给出实际优化时间排序。
+
+\begin{proposition}[共同 KL 指标不存在固定端点排序]
+\label{prop:shape-order-counterexample}
+在 $\eta=1/2$ 下，存在正二动作分布使三种形状的更新后逆向 KL 按 $1,1/2,0$ 从小到大排列，也存在按 $0,1/2,1$ 排列的分布。因此平方根不能在这个共同指标下逐实例支配另外两个端点。
+\end{proposition}
+\begin{proof}
+给定 $q=(x,1-x)$、$T=(t,1-t)$，记目标第一坐标为 $p_\kappa$。三式分别为
+\begin{align}
+p_0&=\frac{\sqrt{xt}}{\sqrt{xt}+\sqrt{(1-x)(1-t)}},\\
+p_{1/2}&=\frac{(\sqrt x+\sqrt t)^2}
+{2+2[\sqrt{xt}+\sqrt{(1-x)(1-t)}]},\qquad p_1=\frac{x+t}{2}.
+\end{align}
+第一组 $x=1/20,t=1/5$ 代入后有 $0.10290<p_0<0.10291$、$0.11411<p_{1/2}<0.11412$、$p_1=0.125<t$。第二组 $x=3/5,t=19/20$ 有 $p_1=0.775$、$0.80678<p_{1/2}<0.80679$、$0.84223<p_0<0.84224<t$；这些有理数夹界由对正根式两边平方即可核对。二元 KL 对 $p$ 的导数是 $\log[p(1-t)/(t(1-p))]$，在 $p<t$ 时严格为负，故两组概率次序给出相反的严格 KL 排序。代入二元 KL 后的近似值如下。
+\begin{center}
+\begin{tabular}{ccrrr}
+\toprule
+$x$ & $t$ & $\kappa=0$ & $\kappa=1/2$ & $\kappa=1$\\
+\midrule
+$0.05$ & $0.2$ & $0.034382$ & $0.026311$ & $0.019660$\\
+$0.6$ & $0.95$ & $0.079878$ & $0.129358$ & $0.180628$\\
+\bottomrule
+\end{tabular}
+\end{center}
+两个严格反向排序否定固定排序；相同 $\eta$ 并没有使各形状移动相同距离，故该例不替代单位 Fisher 速度的命题~\ref{prop:fisher-shape}。
+\end{proof}
+
+在可实现教师附近，有限 BPO、MDPO 的共同参数谱由定理~\ref{thm:joint-spectrum} 描述。平方根的采样矩控制不能改写为改善了固定参数 Fisher 矩阵的最小特征值。选择形状时须分别说明评价散度、动作积分方式、内层预算和优化器；这些条件不同，最优性判断也不同。

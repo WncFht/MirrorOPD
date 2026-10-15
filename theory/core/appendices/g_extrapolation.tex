@@ -1,0 +1,173 @@
+\section{正形状的外推定义域与语义}
+\label{sec:positive-extrapolation}
+本节将精确目标公式延拓到 $\eta>1$；正文的默认插值范围仍为 $0<\eta<1$。这里讨论数学映射，不改变生产配置允许的参数范围。外推目标由冻结锚点构造，实际学生是否越过教师还取决于内层拟合程度。
+
+\begin{proposition}[幂均值外推的正性条件]
+\label{prop:extrapolation-domain}
+固定有限正分布 $q,T$、$0<\kappa\le1$ 和 $\eta>1$。原对数信号保持有限实数、幂均值保持原正分支，当且仅当
+\begin{equation}
+(T_a/q_a)^\kappa>1-1/\eta\quad\text{对所有 }a.
+\end{equation}
+若 $q\ne T$，令 $\rho_{\min}=\min_aT_a/q_a<1$，则等价范围为
+\begin{equation}
+1<\eta<\eta_{\max}:=\frac1{1-\rho_{\min}^{\kappa}}.
+\end{equation}
+$q=T$ 时任意正 $\eta$ 均保持教师；几何端点 $\kappa=0$ 对任意正 $\eta$ 都有定义。
+\end{proposition}
+\begin{proof}
+信号的对数自变量为 $1-\eta+\eta(T_a/q_a)^\kappa$，严格为正恰好给出条件。乘 $q_a^\kappa$ 得外推向量 $(1-\eta)q_a^\kappa+\eta T_a^\kappa$ 的正性。$q\ne T$ 且两者归一化，至少一个坐标 $q_a>T_a$，所以 $\rho_{\min}<1$；解最严格的不等式得上界。几何公式 $m\propto q^{1-\eta}T^\eta$ 始终为正。即使 $1/\kappa$ 是偶整数，也不能将负的幂坐标平方后称作原目标，因为原对数信号已无定义。
+\end{proof}
+
+外推在幂坐标中将 $q^\kappa$ 越过 $T^\kappa$，再归一化。几何端点的 log-odds 误差精确乘以 $1-\eta$。其 MDPO 目标的等价形式为
+\begin{equation}
+L_{\rm MDPO}(p)=\KL(p\Vert T)+(\eta^{-1}-1)\KL(p\Vert q)
+=\eta^{-1}\KL(p\Vert q)-\E_p\log(T/q).
+\end{equation}
+第一个形式在 $\eta>1$ 时包含负的锚点 KL 系数；第二个形式说明原镜像正则仍为正，只是相对于冻结纠正信号减弱。信号在学生到达 $T$ 后也不刷新，故充分拟合可越过教师。固定锚点的 $\eta\to\infty$ 极限和最高密度比支持集已在附录~\ref{app:inner} 证明。正形状还会随 $\eta$ 改变信号，不能只把它视作同一目标上的更大步长。
+
+若只想独立调整镜像步长，可固定合法的 $0<\eta_0<1$，保留 $A_{\kappa,\eta_0}$，另取 $\tau>0$：
+\begin{equation}
+p^+\propto q\exp[\tau A_{\kappa,\eta_0}(T/q)]
+\propto q^{1-\tau/\eta_0}m_{\kappa,\eta_0}^{\tau/\eta_0}.
+\end{equation}
+该分布对有限 $\tau$ 保持正性；它与直接把幂均值权重改成 $\eta>1$ 是不同的映射，正性也不自动保证收敛。
+
+\begin{proposition}[算术外推的完整分类]
+\label{prop:arithmetic-extrapolation}
+设 $\kappa=1$、$\eta>1$，精确更新为 $q^+=T-(\eta-1)(q-T)$，其正性条件为 $q_a<\eta T_a/(\eta-1)$。在迭代保持正性期间，
+\begin{equation}
+q_n=T+(1-\eta)^n(q_0-T).
+\end{equation}
+$1<\eta<2$ 时，若第一步为正，全部后续为正并交替收敛；$\eta=2$ 时，非教师初值与其合法第一步构成两周期；$\eta>2$ 时，任何非教师初值最终离开正单纯形。
+\end{proposition}
+\begin{proof}
+目标的归一化常数为一，直接移项得到线性误差递推和正性条件。令 $a=\eta-1$。当 $a<1$，系数 $(-a)^n$ 始终位于 $[-a,1]$，所以所有迭代点位于正的 $q_0,q_1$ 之间。$a=1$ 时两步回到初值。$a>1$ 时，非零概率差 $q_0-T$ 同时含正负坐标；偶数轮的负差坐标最终使相应概率非正。
+\end{proof}
+
+\section{平方根外推的全局角度动力学}
+\label{sec:root-extrapolation}
+\begin{theorem}[平方根外推的角度映射与收敛]
+\label{thm:root-extrapolation}
+固定正教师、$\kappa=1/2$、$\eta>1$，令 $a=\eta-1$。合法外推的条件为 $q_j<(\eta/a)^2T_j$。设 $\theta=\arccos\sum_j\sqrt{q_jT_j}$，则目标在教师另一侧，夹角大小为
+\begin{equation}
+g_\eta(\theta)=\arctan\frac{a\sin\theta}{\eta-a\cos\theta},\qquad
+Z=1+2\eta a(1-\cos\theta).
+\label{eq:root-extrapolation-angle}
+\end{equation}
+若 $1<\eta\le2$ 且第一步严格为正，则全部后续严格为正并收敛到 $T$。$1<\eta<2$ 的局部 KL 比例为 $(\eta-1)^2$；$\eta=2$ 且 $q_0\ne T$ 时，双向 KL 均满足
+\begin{equation}
+\KL(q_n\Vert T)\sim\KL(T\Vert q_n)\sim n^{-1}.
+\label{eq:root-boundary-rate}
+\end{equation}
+\end{theorem}
+\begin{proof}
+令 $u=\sqrt q$、$v=\sqrt T$，写 $u=v\cos\theta+w\sin\theta$，其中 $w\perp v$、$\|w\|=1$。未归一化向量为
+\begin{equation}
+\eta v-au=(\eta-a\cos\theta)v-a\sin\theta\,w.
+\end{equation}
+教师方向的系数为 $1+a(1-\cos\theta)>0$，切向系数反号，由此得到夹角与 $Z$。对 $\theta>0$，$g_\eta(\theta)<\theta$ 等价于 $2a\cos\theta<\eta$；$1<\eta<2$ 时由 $2a<\eta$ 成立，$\eta=2$ 时由 $\cos\theta<1$ 成立。
+
+取初始平面中的有向夹角 $\phi_0=\theta_0$，第一步为 $\phi_1=-g_\eta(\theta_0)$。后续符号交替、绝对值递减，所以全部向量位于 $u_0,u_1$ 之间的短球面弧段。两个端点严格为正，该弧段是二者正线性组合的归一化，故全部后续仍为正。夹角的极限 $\ell$ 满足 $\ell=g_\eta(\ell)$；上述严格不等式迫使 $\ell=0$。展开得
+\begin{equation}
+g_\eta(\theta)=a\theta-\frac{a\eta(2\eta-1)}6\theta^3+O(\theta^5).
+\end{equation}
+因此 $\eta<2$ 时有相应局部几何率。$\eta=2$ 时令 $x_n=\theta_n^2$，则 $x_{n+1}=x_n-2x_n^2+O(x_n^3)$，所以 $x_{n+1}^{-1}-x_n^{-1}=2+O(x_n)$。由于 $x_n\to0$，累加并除以 $n$ 得 $x_n\sim1/(2n)$。
+
+固定平面内 $\sqrt{q_n}=v\cos\theta_n\pm w\sin\theta_n$，故 $q_{n,j}-T_j=\pm2v_jw_j\theta_n+O(\theta_n^2)$。正教师处双向 KL 的二次项同为 $\frac12\sum_j(q_{n,j}-T_j)^2/T_j=2\theta_n^2+O(\theta_n^3)$，从而得到式~\eqref{eq:root-boundary-rate}。
+\end{proof}
+
+\begin{proposition}[外推时的 Hellinger 扰动控制]
+\label{prop:root-extrapolation-perturbation}
+固定 $\eta>1$ 与教师。对任意两个合法平方根锚点，由 $Z(q)=1+\eta(\eta-1)H^2(q,T)\ge1$，有
+\begin{align}
+H(M(q),M(\widetilde q))&\le(\eta-1)H(q,\widetilde q),\\
+H(M(q),T)&\le\frac{\eta-1}{Z(q)^{1/4}}H(q,T).
+\end{align}
+若 $1<\eta<2$，实际输出满足 $H(q_{n+1},M(q_n))\le\epsilon_n$，且各轮目标合法，则
+\begin{equation}
+H(q_n,T)\le(\eta-1)^nH(q_0,T)
++\sum_{j<n}(\eta-1)^{n-1-j}\epsilon_j.
+\end{equation}
+若 $\limsup\epsilon_n\le\epsilon_\infty$，稳态上界为 $\epsilon_\infty/(2-\eta)$。
+\end{proposition}
+\begin{proof}
+在引理~\ref{lem:root-two-anchor} 中使用 $Z\ge1$ 并丢弃非负平方项，得到第一式；令 $\widetilde q=T$、$Z(T)=1$ 给第二式。实际输出用三角不等式得到 $D_{n+1}\le(\eta-1)D_n+\epsilon_n$，递推并对尾部几何级数求和给出稳态界。该界在 $\eta\uparrow2$ 时变差，故精确边界收敛不意味着同等的有噪声鲁棒性。
+\end{proof}
+
+\begin{proposition}[算术外推缺少相同的统一 Hellinger 界]
+\label{prop:arithmetic-hellinger-instability}
+在二动作情形，$q=(x,1-x)$、$T=(t,1-t)$，算术外推第一坐标为 $m=\eta t-(\eta-1)x$。合法内部点处，微小锚点扰动的 Hellinger 放大系数为
+\begin{equation}
+(\eta-1)\sqrt{\frac{x(1-x)}{m(1-m)}}.
+\end{equation}
+该系数在合法区域内无统一有限上界；这不影响算术映射在 TV 下的精确 $(\eta-1)$ 比例。
+\end{proposition}
+\begin{proof}
+平方根坐标的微分长度为 $|dx|/[2\sqrt{x(1-x)}]$，输出微分满足 $dm=-(\eta-1)dx$，两者相除即得系数。取 $\eta=1.5,t=0.2,x=0.6-\varepsilon$，则 $m=\varepsilon/2$；输入保持内部，输出趋于零，因此系数按 $\varepsilon^{-1/2}$ 发散。TV 则直接对线性概率差取绝对值。平方根概率映射的稳定也不保证对数信号在正性边界附近有统一方差界。
+\end{proof}
+
+\begin{proposition}[平方根外推的非零两周期]
+\label{prop:root-extrapolation-cycle}
+设 $\eta>2$，令 $c_\star=\eta/[2(\eta-1)]\in(1/2,1)$，$s_\star=\sqrt{1-c_\star^2}$。取 $v=\sqrt T$ 及 $w\perp v$、$\|w\|=1$。若 $u_\pm=c_\star v\pm s_\star w$ 都严格为正，则 $u_+^2,u_-^2$ 构成平方根更新的非零两周期。该周期在固定平面内的角度幅度是局部吸引的。
+\end{proposition}
+\begin{proof}
+令 $a=\eta-1$。因为 $\eta-ac_\star=ac_\star$，有 $\eta v-au_+=au_-$，归一化后得到 $u_-$；另一方向同理。等价地，$g_\eta(\theta_\star)=\theta_\star$ 的非零解满足 $\cos\theta_\star=c_\star$。求导得
+\begin{equation}
+g_\eta'(\theta)=\frac{a(\eta\cos\theta-a)}{\eta^2+a^2-2\eta a\cos\theta},\quad
+g_\eta'(\theta_\star)=2c_\star^2-1\in(-1/2,1).
+\end{equation}
+因此固定平面内的幅度扰动局部收缩；不同平面可对应不同周期，不声称整个高维空间存在同一个孤立吸引周期。例如 $T=(1/2,1/2)$、$\eta=11/5$ 时，第一坐标为 $1/2\pm11\sqrt{23}/144$ 的两个正分布构成周期，约为 $0.866348$ 与 $0.133652$。教师处的线性系数 $1-\eta$ 模大于一，故该非零周期不代表收敛到教师。
+\end{proof}
+
+\section{一般形状的局部展开与边界强度}
+\label{sec:general-boundary-rate}
+\begin{proposition}[教师中心对数坐标的二阶目标]
+\label{prop:log-target-expansion}
+固定正教师、$\kappa\in[0,1]$、有限 $\eta>0$，在教师附近取合法正目标。令 $y=C_T\log(q/T)$，则
+\begin{equation}
+C_T\log(m/T)=(1-\eta)y+
+\frac{\kappa\eta(1-\eta)}2C_T(y^2)+O(\|y\|^3).
+\end{equation}
+几何端点的线性关系全局精确；其余形状的差别从二阶开始。
+\end{proposition}
+\begin{proof}
+在 $r=0$ 处，信号满足 $f(0)=0$、$f'(0)=\eta$、$f''(0)=\kappa\eta(1-\eta)$，其中 $\kappa=0$ 直接使用 $f=\eta r$。写 $\ell=\log(q/T)=y-\log\E_Te^y$，则 $\ell=y-\E_Ty^2/2+O(\|y\|^3)$。将 Taylor 展开代入 $C_T\log(m/T)=C_T[\ell+f(-\ell)]$，并用 $C_T\ell=y$、$C_T\ell^2=C_Ty^2+O(\|y\|^3)$ 得式。有限正教师确保这些展开在足够小的统一邻域内成立。
+\end{proof}
+
+\begin{theorem}[幂均值在 $\eta=2$ 的两步展开]
+\label{thm:power-boundary-rate}
+固定有限正教师与 $0<\kappa<1$，取 $\eta=2$。在足够小的教师邻域内，精确幂均值迭代合法且收敛。令 $y=C_T\log(q/T)$、$E=\E_Ty^2/2$，则
+\begin{align}
+y_{n+2}&=y_n-2\kappa(1-\kappa)\E_Ty_n^2\,y_n+O(\|y_n\|^4),\\
+E_{n+2}&=E_n-8\kappa(1-\kappa)E_n^2+O(E_n^{5/2}).
+\end{align}
+对充分接近教师的非教师初值，双向 KL 满足
+\begin{equation}
+\KL(q_n\Vert T)\sim\KL(T\Vert q_n)
+\sim\frac1{4\kappa(1-\kappa)n}.
+\end{equation}
+\end{theorem}
+\begin{proof}
+正性条件在 $q=T$ 严格成立，故其邻域内映射光滑。记 $\mu_2=\E_Ty^2$、$\ell=\log(q/T)=y-\log\E_Te^y$。$\E_Ty=0$ 给 $\ell=y-\mu_2/2+O(\|y\|^3)$。信号展开为
+\begin{equation}
+f_{\kappa,2}(r)=2r-\kappa r^2+\kappa^2r^3+O(r^4).
+\end{equation}
+于是中心化后的单步映射为
+\begin{equation}
+F(y)=C_T[\ell+f_{\kappa,2}(-\ell)]
+=-y-\kappa C_T(y^2)+\kappa\mu_2y-\kappa^2C_T(y^3)+O(\|y\|^4).
+\end{equation}
+设 $B(x,y)=-\kappa C_T(xy)$，$C(y)=\kappa\mu_2y-\kappa^2C_T(y^3)$，则 $F(y)=-y+B(y,y)+C(y)+O(\|y\|^4)$。复合后各二次项抵消，得到
+\begin{equation}
+F(F(y))=y-2C(y)-2B(y,B(y,y))+O(\|y\|^4).
+\end{equation}
+直接计算 $B(y,B(y,y))=\kappa^2[C_T(y^3)-\mu_2y]$，即得两步三阶项。取教师加权平方范数，三阶位移与 $y$ 的交叉项为 $-4\kappa(1-\kappa)\mu_2^2$；除以二并使用 $\mu_2=2E$，得到能量递推。
+
+有限正教师使 $\|y\|$ 与 $\sqrt E$ 等价。取足够小邻域，$O(E^{5/2})$ 小于 $4\kappa(1-\kappa)E^2$，两步能量严格下降并保持该邻域；一阶映射的连续性保证中间奇数步也位于合法区域。若偶数能量极限为正，递推会产生固定正下降量，矛盾，因此趋零。映射在零处导数为 $-I$，局部可逆，非教师初值不会在有限步精确到零。故
+\begin{equation}
+E_{n+2}^{-1}-E_n^{-1}=8\kappa(1-\kappa)+O(\sqrt{E_n}).
+\end{equation}
+沿偶数子列求和并取平均，得到 $E_{2j}\sim[8\kappa(1-\kappa)j]^{-1}$。单步 $E_{n+1}=E_n+O(E_n^{3/2})$ 给奇偶子列渐近等价。双向 KL 均为 $E+O(E^{3/2})$，从而得到结论。端点 $\kappa=0,1$ 的三阶系数为零，其精确两周期分别由几何和算术闭式给出。
+\end{proof}
+
+这些边界结果针对精确目标更新。有限内层的正谱系数是 $1-\eta+\eta e^{-\lambda_i t_{\rm in}/\eta}$；在 $\eta=2$、有限 $t_{\rm in}$ 时模严格小于一，因此可能具有线性收缩。将 $t_{\rm in}\to\infty$ 与将误差趋零的分析混合，会掩盖内层不充分拟合提供的阻尼。对应条件和离散版本见定理~\ref{thm:joint-spectrum}。
