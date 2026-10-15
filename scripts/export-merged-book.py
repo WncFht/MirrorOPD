@@ -57,8 +57,8 @@ Gibbs 解为教师 $t$。该例直接区分 Mean 的 Lambert-$W$ 投影与 Gibbs
     anchor = "实际样本只需估计冻结的 reward center。"
     assert current.count(anchor) == 1
     current = current.replace(anchor, mapping + anchor, 1)
-    old_sentence = r"\path{tests/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和有限样本尺度修正；它与 toy 实验分别检验推导正确性和有限步优化行为。"
-    new_sentence = r"\path{tests/test_mean_bpo.py} 的旧版修订核验记录覆盖 48 组随机问题：词表维数为 2、4、8，镜像系数为 0.1、0.5、1、2。核验对象包括解析梯度、逐坐标有限差分、Mean/BPO 损失及梯度恒等式、Mean 归一化与 KKT 条件、最优点驻点、Part/BPO 的 Gibbs 零损失、初始化方向尺度、恒定信号、完整枚举的有限样本修正与 off-behavior 双样本权重。该记录与 toy 实验分别检验推导正确性和有限步优化行为；这里保留历史配置，不将其写成合并时重新运行的测试。"
+    old_sentence = r"\path{tests/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和完整词表内层几何；它与 toy 实验分别检验推导正确性和有限步优化行为。"
+    new_sentence = r"\path{tests/test_mean_bpo.py} 的旧版修订核验记录覆盖 48 组随机问题：词表维数为 2、4、8，镜像系数为 0.1、0.5、1、2。核验对象包括解析梯度、逐坐标有限差分、Mean/BPO 损失及梯度恒等式、Mean 归一化与 KKT 条件、最优点驻点、Part/BPO 的 Gibbs 零损失、初始化方向尺度、恒定信号及完整词表内层几何。该记录与 toy 实验分别检验推导正确性和有限步优化行为；这里保留历史配置，不将其写成合并时重新运行的测试。"
     assert current.count(old_sentence) == 1
     current = current.replace(
         old_sentence,

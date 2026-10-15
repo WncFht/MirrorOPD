@@ -133,7 +133,13 @@ def main():
         assert data["compute_loss"] is False
         assert data["temperature"] == 0.7
         output = ns["compute_mirror_cache_from_logits"](
-            logits[stage], data, stage, data.get("mirror_cache_topk")
+            logits[stage],
+            data,
+            stage,
+            data.get("mirror_cache_topk"),
+            center_mode=data.get("mirror_center_mode", "topj_tail"),
+            kappa=data.get("mirror_kappa", 0.0),
+            eta=data.get("mirror_eta", 0.1),
         )
         offsets = data["input_ids"].offsets()
         output = {
@@ -168,6 +174,16 @@ def main():
     assert batch.batch["mirror_anchor_ids"].shape == (*ids.shape, 3)
     assert batch.batch["mirror_valid"].sum().item() == mask.sum().item()
     assert "teacher_ids" not in batch.batch
+    trainer.distillation_config.distillation_loss.mirror_center_mode = "full_vocab"
+    trainer.distillation_config.distillation_loss.mirror_kappa = 0.5
+    trainer.distillation_config.distillation_loss.mirror_eta = 0.3
+    anchor, _ = old(trainer, batch)
+    batch.batch.update(anchor.batch)
+    completed = teacher(trainer, batch)
+    assert batch.batch["mirror_full_anchor_log_probs"].shape == (*ids.shape, 16)
+    assert completed.batch["mirror_full_teacher_log_probs"].shape == (*ids.shape, 16)
+    assert completed.batch["mirror_signal_kappa"][batch.batch["mirror_valid"]].eq(0.5).all()
+    assert completed.batch["mirror_signal_eta"][batch.batch["mirror_valid"]].eq(0.3).all()
     print(
         "PASS upstream trainer routing: actor anchor -> frozen teacher, full prediction positions, temperature metadata"
     )

@@ -23,7 +23,8 @@ esac
 task_python=${PYTHON_BIN:-"$task_root/.venv/bin/python"}
 mkdir -p "$task_root/data" "$task_root/logs" "$task_root/scratch"
 export MIRROR_INNER_METRICS_PATH="${MIRROR_INNER_METRICS_PATH:-$task_root/logs/$mode-inner-$(date +%Y%m%d-%H%M%S).jsonl}"
-export TMPDIR="${MIRROR_TMPDIR:-$task_root/scratch}"
+# vLLM's Unix sockets need a short disk-backed temporary directory too.
+export TMPDIR="${MIRROR_TMPDIR:-$HOME/.cache/mopd-tmp}"
 mkdir -p "$TMPDIR"
 # Ray creates long session/socket names; keep the disk-backed prefix short.
 export RAY_TMPDIR="${MIRROR_RAY_TMPDIR:-$HOME/.cache/mopd-ray}"

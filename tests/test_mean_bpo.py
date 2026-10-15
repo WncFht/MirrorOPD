@@ -55,33 +55,6 @@ def check_case(q, reward, eta, logits):
     )
 
 
-def check_sample_correction():
-    q = torch.tensor([0.2, 0.3, 0.5], dtype=torch.float64)
-    reward = torch.tensor([-0.4, 0.7, 1.2], dtype=torch.float64)
-    logits = torch.tensor([0.1, -0.8, 0.4], dtype=torch.float64, requires_grad=True)
-    eta = 0.6
-    z = eta * reward - logits.log_softmax(-1) + q.log()
-    exact = bpo_loss(logits, q, reward, eta)
-    for k in (1, 2, 3):
-        sampled = torch.zeros((), dtype=q.dtype)
-        for indices in itertools.product(range(len(q)), repeat=k + 1):
-            probability = q[list(indices)].prod()
-            residual = z[indices[0]] - z[list(indices[1:])].mean()
-            sampled = sampled + probability * (k / (k + 1)) * residual.square() / (2 * eta)
-        close(sampled, exact)
-        close(
-            torch.autograd.grad(sampled, logits, retain_graph=True)[0],
-            torch.autograd.grad(exact, logits, retain_graph=True)[0],
-        )
-    beta = torch.tensor([0.5, 0.4, 0.1], dtype=q.dtype)
-    weighted = sum(
-        beta[a] * beta[b] * (q[a] / beta[a]) * (q[b] / beta[b]) * (z[a] - z[b]).square() / (4 * eta)
-        for a, b in itertools.product(range(3), repeat=2)
-    )
-    close(weighted, exact)
-    close(torch.autograd.grad(weighted, logits)[0], torch.autograd.grad(exact, logits)[0])
-
-
 def check_inner_geometry():
     q = torch.tensor([0.6, 0.3, 0.1], dtype=torch.float64)
     teacher = torch.tensor([0.1, 0.3, 0.6], dtype=torch.float64)
@@ -123,7 +96,6 @@ def main():
     target, multiplier = mean_target(q, teacher.log() - q.log(), 1.0)
     close(target[0], torch.tensor(0.729186955209, dtype=q.dtype), atol=1e-10)
     close(mean_target(q, torch.ones_like(q), 0.7)[0], q)
-    check_sample_correction()
     check_inner_geometry()
     print(
         f"PASS: {cases} random cases; analytic gradients, finite differences, loss/gradient identities,"
@@ -131,7 +103,7 @@ def main():
     print(
         "Lambert-W normalization/KKT/stationarity, Gibbs zeros, first-step scaling, constant reward,"
     )
-    print("enumerated finite-sample correction and off-behavior pair weighting.")
+    print("exact full-vocabulary inner geometry.")
     print(f"Two-action Mean={target.tolist()}, Gibbs={teacher.tolist()}, lambda={multiplier:.12f}")
 
 

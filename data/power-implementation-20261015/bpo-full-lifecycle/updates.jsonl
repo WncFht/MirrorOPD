@@ -1,0 +1,4 @@
+{"update": 1, "grad_norm": 3.956643581390381, "seconds_elapsed": 0.9707780508324504, "peak_allocated_gib": 7.899474620819092, "proxy": 0.02064456563675776, "diagnostic_positions": 32.0}
+{"update": 2, "grad_norm": 3.2950940132141113, "seconds_elapsed": 2.0735161881893873, "peak_allocated_gib": 11.212798595428467, "proxy": 0.017218869412317872, "diagnostic_positions": 32.0}
+{"update": 3, "grad_norm": 3.7099545001983643, "seconds_elapsed": 3.858050105161965, "peak_allocated_gib": 11.214251518249512, "proxy": 0.018965788069181144, "diagnostic_positions": 32.0}
+{"update": 4, "grad_norm": 3.740227699279785, "seconds_elapsed": 4.959986994042993, "peak_allocated_gib": 11.214354991912842, "proxy": 0.01950773090356961, "diagnostic_positions": 32.0}

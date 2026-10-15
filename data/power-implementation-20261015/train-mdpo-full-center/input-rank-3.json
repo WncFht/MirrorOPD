@@ -1,0 +1,33 @@
+{
+  "rank": 3,
+  "cache": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/data/oneshot-effective-time-20261012/seed-42/rank-3.pt",
+  "cache_sha256": "70edd49d83d10361c71da08086e64ff499c12e48e57e742919ec969d36b5e336",
+  "responses": 4,
+  "vocabulary": 151665,
+  "train_prefixes": 64,
+  "heldout_prefixes": 64,
+  "response_lengths": [
+    7168,
+    5715,
+    6915,
+    7168
+  ],
+  "config": {
+    "seed": 42,
+    "kappa": 0.5,
+    "eta": 0.3,
+    "lr": 1e-06,
+    "topj": 16,
+    "method": "mdpo",
+    "center_mode": "full_vocab",
+    "action_mode": "sampled",
+    "responses_per_rank": 4,
+    "train_prefixes": 16,
+    "heldout_prefixes": 16,
+    "updates": 20,
+    "measure_every": 5,
+    "retry_on_gpu_conflict": false,
+    "deterministic": true,
+    "id": "train-mdpo-full-center"
+  }
+}

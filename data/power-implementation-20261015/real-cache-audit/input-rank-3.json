@@ -1,0 +1,43 @@
+{
+  "rank": 3,
+  "cache": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/data/oneshot-effective-time-20261012/seed-42/rank-3.pt",
+  "responses": 16,
+  "vocabulary": 151665,
+  "train_prefixes": 64,
+  "heldout_prefixes": 64,
+  "response_lengths": [
+    7168,
+    5715,
+    6915,
+    7168,
+    7168,
+    7168,
+    7128,
+    7168,
+    7168,
+    4947,
+    3750,
+    4475,
+    7168,
+    3735,
+    7168,
+    7168
+  ],
+  "config": {
+    "seed": 42,
+    "kappa": 0.5,
+    "eta": 0.3,
+    "lr": 1e-06,
+    "topj": 16,
+    "method": "bpo",
+    "center_mode": "topj_tail",
+    "action_mode": "sampled",
+    "responses_per_rank": 16,
+    "train_prefixes": 4,
+    "heldout_prefixes": 4,
+    "updates": 20,
+    "measure_every": 5,
+    "retry_on_gpu_conflict": false,
+    "id": "real-cache-audit"
+  }
+}

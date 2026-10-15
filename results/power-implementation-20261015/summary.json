@@ -1,0 +1,2291 @@
+{
+  "date": "2026-10-15",
+  "kappa": 0.5,
+  "eta": 0.3,
+  "physical_gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "audit": [
+    {
+      "method": "bpo",
+      "topj": 0,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 4.440892098500626e-16,
+      "teacher_center_mae": 0.0654351542717652,
+      "student_center_mae": 0.005961171441051132,
+      "score_coefficient_mae": 0.05038579761714397,
+      "compact_cache_bytes_per_prefix": 65.0,
+      "full_cache_bytes_per_prefix": 2426705.0
+    },
+    {
+      "method": "bpo",
+      "topj": 16,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 4.440892098500626e-16,
+      "teacher_center_mae": 0.0034879771555123146,
+      "student_center_mae": 0.00030675601035514615,
+      "score_coefficient_mae": 0.0024655792877498525,
+      "compact_cache_bytes_per_prefix": 577.0,
+      "full_cache_bytes_per_prefix": 2427217.0
+    },
+    {
+      "method": "bpo",
+      "topj": 64,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 4.440892098500626e-16,
+      "teacher_center_mae": 0.0008599746801214558,
+      "student_center_mae": 7.82750202978157e-05,
+      "score_coefficient_mae": 0.0005991673489522106,
+      "compact_cache_bytes_per_prefix": 2113.0,
+      "full_cache_bytes_per_prefix": 2428753.0
+    },
+    {
+      "method": "bpo",
+      "topj": 256,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 4.440892098500626e-16,
+      "teacher_center_mae": 0.00018218651090250404,
+      "student_center_mae": 2.4472413620531792e-05,
+      "score_coefficient_mae": 0.00010336465478836546,
+      "compact_cache_bytes_per_prefix": 8257.0,
+      "full_cache_bytes_per_prefix": 2434897.0
+    },
+    {
+      "method": "bpo",
+      "topj": 151665,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 4.440892098500626e-16,
+      "teacher_center_mae": 2.0515415010456177e-17,
+      "student_center_mae": 5.83781899135585e-18,
+      "score_coefficient_mae": 3.577429011631695e-17,
+      "compact_cache_bytes_per_prefix": 4853345.0,
+      "full_cache_bytes_per_prefix": 7279985.0
+    },
+    {
+      "method": "mdpo",
+      "topj": 0,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 8.68749516769185e-15,
+      "teacher_center_mae": 0.0654351542717652,
+      "student_center_mae": 0.005961171441051132,
+      "score_coefficient_mae": 0.0,
+      "compact_cache_bytes_per_prefix": 65.0,
+      "full_cache_bytes_per_prefix": 2426705.0
+    },
+    {
+      "method": "mdpo",
+      "topj": 16,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 8.68749516769185e-15,
+      "teacher_center_mae": 0.0034879771555123146,
+      "student_center_mae": 0.00030675601035514615,
+      "score_coefficient_mae": 0.0,
+      "compact_cache_bytes_per_prefix": 577.0,
+      "full_cache_bytes_per_prefix": 2427217.0
+    },
+    {
+      "method": "mdpo",
+      "topj": 64,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 8.68749516769185e-15,
+      "teacher_center_mae": 0.0008599746801214558,
+      "student_center_mae": 7.82750202978157e-05,
+      "score_coefficient_mae": 0.0,
+      "compact_cache_bytes_per_prefix": 2113.0,
+      "full_cache_bytes_per_prefix": 2428753.0
+    },
+    {
+      "method": "mdpo",
+      "topj": 256,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 8.68749516769185e-15,
+      "teacher_center_mae": 0.00018218651090250404,
+      "student_center_mae": 2.4472413620531792e-05,
+      "score_coefficient_mae": 0.0,
+      "compact_cache_bytes_per_prefix": 8257.0,
+      "full_cache_bytes_per_prefix": 2434897.0
+    },
+    {
+      "method": "mdpo",
+      "topj": 151665,
+      "prefixes": 256,
+      "responses": 64,
+      "full_gradient_max_error": 8.68749516769185e-15,
+      "teacher_center_mae": 2.0515415010456177e-17,
+      "student_center_mae": 5.83781899135585e-18,
+      "score_coefficient_mae": 0.0,
+      "compact_cache_bytes_per_prefix": 4853345.0,
+      "full_cache_bytes_per_prefix": 7279985.0
+    }
+  ],
+  "training": [
+    {
+      "id": "bpo-full-lifecycle",
+      "updates": 4,
+      "seconds": 32.104034502990544,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.396962576891588e-08,
+        "heldout/loss": 0.016743112508972816,
+        "heldout/target_reverse_kl": 0.005420216880534552,
+        "heldout/teacher_reverse_kl": 0.06369590432933567,
+        "train/anchor_student_kl": 8.352402770079262e-08,
+        "train/loss": 0.0206445548733792,
+        "train/target_reverse_kl": 0.006748049291136159,
+        "train/teacher_reverse_kl": 0.07797095909423424,
+        "diagnostic_positions": 32.0
+      },
+      "final": {
+        "update": 4,
+        "heldout/anchor_student_kl": 0.00030551882505355706,
+        "heldout/loss": 0.018990243237774408,
+        "heldout/target_reverse_kl": 0.0060858490660342275,
+        "heldout/teacher_reverse_kl": 0.06468443932154037,
+        "train/anchor_student_kl": 0.0006155352353019936,
+        "train/loss": 0.014182439691692776,
+        "train/target_reverse_kl": 0.0047005533206070154,
+        "train/teacher_reverse_kl": 0.06446638883223503,
+        "diagnostic_positions": 32.0
+      },
+      "peak_allocated_gib": 11.214354991912842,
+      "gradient_checks": [],
+      "anchor_refresh": [
+        {
+          "update": 2,
+          "scope": "Fixed-prefix anchor refresh; no new response generation",
+          "heldout/anchor_student_kl": 1.59133433112873e-07,
+          "heldout/loss": 0.016605890942735638,
+          "heldout/target_reverse_kl": 0.005373104354749102,
+          "heldout/teacher_reverse_kl": 0.06310058085448934,
+          "train/anchor_student_kl": 1.9063482478521247e-07,
+          "train/loss": 0.01896578194213683,
+          "train/target_reverse_kl": 0.006159508532636205,
+          "train/teacher_reverse_kl": 0.07096780514209751,
+          "diagnostic_positions": 32.0
+        }
+      ],
+      "checkpoint_roundtrip": [
+        {
+          "update": 4,
+          "diagnostic_max_error": 0.0,
+          "same_topology": true,
+          "continuation_parameter_max_error": 0.0,
+          "extra_verification_updates": 2
+        }
+      ]
+    },
+    {
+      "id": "bpo-parameter-gradient",
+      "updates": 2,
+      "seconds": 3.7466478012502193,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.0183972053596157e-08,
+        "heldout/loss": 0.025719931126841792,
+        "heldout/target_reverse_kl": 0.008238143948268826,
+        "heldout/teacher_reverse_kl": 0.09983521020744426,
+        "train/anchor_student_kl": 6.487080662790633e-08,
+        "train/loss": 0.018693833646402834,
+        "train/target_reverse_kl": 0.00608413310836808,
+        "train/teacher_reverse_kl": 0.07083342843145635,
+        "diagnostic_positions": 64.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.0005261559367055502,
+        "heldout/loss": 0.027019841967725167,
+        "heldout/target_reverse_kl": 0.008627047903266285,
+        "heldout/teacher_reverse_kl": 0.10014305846172192,
+        "train/anchor_student_kl": 0.0004455226280015966,
+        "train/loss": 0.016042061613849152,
+        "train/target_reverse_kl": 0.005273207626118508,
+        "train/teacher_reverse_kl": 0.06711039317151635,
+        "diagnostic_positions": 64.0
+      },
+      "peak_allocated_gib": 11.258769512176514,
+      "gradient_checks": [
+        {
+          "stage": "initial",
+          "relative_l2_error": 0.004590938906247354,
+          "cosine": 0.9999894619691434,
+          "max_absolute_error": 0.0006866455078125,
+          "production_norm": 3.155176547873414,
+          "reference_norm": 3.155122280939917,
+          "scope": "All FSDP parameter shards, BF16 forward and backward, FP32 master/reduction"
+        },
+        {
+          "stage": "after_updates",
+          "relative_l2_error": 0.004397274502439294,
+          "cosine": 0.9999903328916097,
+          "max_absolute_error": 0.00039124488830566406,
+          "production_norm": 2.714306464888699,
+          "reference_norm": 2.7144510172932668,
+          "scope": "All FSDP parameter shards, BF16 forward and backward, FP32 master/reduction"
+        }
+      ],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "bpo-parameter-gradient-fp32",
+      "updates": 1,
+      "seconds": 27.30780676752329,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 1.9318528580999944e-07,
+        "heldout/loss": 0.025795327334256324,
+        "heldout/target_reverse_kl": 0.008270318474241808,
+        "heldout/teacher_reverse_kl": 0.10021937381003417,
+        "train/anchor_student_kl": 1.865682133429132e-07,
+        "train/loss": 0.01822702537209658,
+        "train/target_reverse_kl": 0.005922693584516182,
+        "train/teacher_reverse_kl": 0.06881365776911477,
+        "diagnostic_positions": 64.0
+      },
+      "final": {
+        "update": 1,
+        "heldout/anchor_student_kl": 3.535968215911617e-05,
+        "heldout/loss": 0.023984532911221386,
+        "heldout/target_reverse_kl": 0.007727057962283282,
+        "heldout/teacher_reverse_kl": 0.09803743352265841,
+        "train/anchor_student_kl": 0.004534961570489434,
+        "train/loss": 0.010342137093337206,
+        "train/target_reverse_kl": 0.003431064784917688,
+        "train/teacher_reverse_kl": 0.04917715635498132,
+        "diagnostic_positions": 64.0
+      },
+      "peak_allocated_gib": 21.031081199645996,
+      "gradient_checks": [
+        {
+          "stage": "initial",
+          "relative_l2_error": 1.1236677037176554e-06,
+          "cosine": 0.9999999999993902,
+          "max_absolute_error": 4.4621992856264114e-07,
+          "production_norm": 3.0847231079842246,
+          "reference_norm": 3.0847224715239254,
+          "scope": "All FSDP parameter shards, configured forward precision, FP32 master/reduction",
+          "precision": "fp32"
+        },
+        {
+          "stage": "after_updates",
+          "relative_l2_error": 1.7091516088266507e-06,
+          "cosine": 0.9999999999985398,
+          "max_absolute_error": 5.657784640789032e-07,
+          "production_norm": 2.416956069288887,
+          "reference_norm": 2.416956009181142,
+          "scope": "All FSDP parameter shards, configured forward precision, FP32 master/reduction",
+          "precision": "fp32"
+        }
+      ],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "canary-bpo-full-actions",
+      "updates": 2,
+      "seconds": 1.4521093759685755,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": -9.17813200789266e-09,
+        "heldout/loss": 0.00849778275890539,
+        "heldout/target_reverse_kl": 0.003051459808253794,
+        "heldout/teacher_reverse_kl": 0.03315175023989478,
+        "train/anchor_student_kl": 6.745312004306347e-08,
+        "train/loss": 0.016000763054080512,
+        "train/target_reverse_kl": 0.005456908406634146,
+        "train/teacher_reverse_kl": 0.06302839782979278,
+        "diagnostic_positions": 16.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 7.673777148907421e-05,
+        "heldout/loss": 0.008504557480619743,
+        "heldout/target_reverse_kl": 0.0030545053597029505,
+        "heldout/teacher_reverse_kl": 0.03295050463277469,
+        "train/anchor_student_kl": 0.0005246842119256864,
+        "train/loss": 0.010474712208422745,
+        "train/target_reverse_kl": 0.0037087886844788475,
+        "train/teacher_reverse_kl": 0.056196309375062016,
+        "diagnostic_positions": 16.0
+      },
+      "peak_allocated_gib": 9.321822166442871,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "canary-bpo-full-center",
+      "updates": 2,
+      "seconds": 1.4381374660879374,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": -9.17813200789266e-09,
+        "heldout/loss": 0.00849778275890539,
+        "heldout/target_reverse_kl": 0.003051459808253794,
+        "heldout/teacher_reverse_kl": 0.03315175023989478,
+        "train/anchor_student_kl": 6.745312004306347e-08,
+        "train/loss": 0.016000763054080512,
+        "train/target_reverse_kl": 0.005456908406634146,
+        "train/teacher_reverse_kl": 0.06302839782979278,
+        "diagnostic_positions": 16.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.0001893416682584732,
+        "heldout/loss": 0.008805548720608144,
+        "heldout/target_reverse_kl": 0.0031349197750857273,
+        "heldout/teacher_reverse_kl": 0.032966162210859275,
+        "train/anchor_student_kl": 0.00033613459774091225,
+        "train/loss": 0.014379424225751558,
+        "train/target_reverse_kl": 0.004987466377364023,
+        "train/teacher_reverse_kl": 0.06041611783021075,
+        "diagnostic_positions": 16.0
+      },
+      "peak_allocated_gib": 9.321822166442871,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "canary-bpo-topj16",
+      "updates": 2,
+      "seconds": 1.4970947932451963,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": -9.17813200789266e-09,
+        "heldout/loss": 0.008497782758905392,
+        "heldout/teacher_reverse_kl": 0.03315175023989478,
+        "train/anchor_student_kl": 6.745312004306349e-08,
+        "train/loss": 0.016000763054080512,
+        "train/teacher_reverse_kl": 0.06302839782979278,
+        "diagnostic_positions": 16.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.00011015305041394369,
+        "heldout/loss": 0.00901132407993233,
+        "heldout/teacher_reverse_kl": 0.03336693738086906,
+        "train/anchor_student_kl": 0.0002316066496380711,
+        "train/loss": 0.013193243049150098,
+        "train/teacher_reverse_kl": 0.05948773289395571,
+        "diagnostic_positions": 16.0
+      },
+      "peak_allocated_gib": 9.310976028442383,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "canary-mdpo-full-actions",
+      "updates": 2,
+      "seconds": 1.4374678917229176,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": -9.17813200789266e-09,
+        "heldout/loss": 0.023326162281676516,
+        "heldout/target_reverse_kl": 0.003051459808253794,
+        "heldout/teacher_reverse_kl": 0.03315175023989478,
+        "train/anchor_student_kl": 6.745312004306347e-08,
+        "train/loss": 0.04124484621453496,
+        "train/target_reverse_kl": 0.005456908406634146,
+        "train/teacher_reverse_kl": 0.06302839782979278,
+        "diagnostic_positions": 16.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.00017680303655782367,
+        "heldout/loss": 0.023180695811992516,
+        "heldout/target_reverse_kl": 0.0030078198673485776,
+        "heldout/teacher_reverse_kl": 0.032636773114692166,
+        "train/anchor_student_kl": 0.0005666668273390002,
+        "train/loss": 0.03647477505999773,
+        "train/target_reverse_kl": 0.00402588706027298,
+        "train/teacher_reverse_kl": 0.05663849380696441,
+        "diagnostic_positions": 16.0
+      },
+      "peak_allocated_gib": 9.321809768676758,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "canary-mdpo-full-center",
+      "updates": 2,
+      "seconds": 1.583928156644106,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": -9.17813200789266e-09,
+        "heldout/loss": 0.023326162281676516,
+        "heldout/target_reverse_kl": 0.003051459808253794,
+        "heldout/teacher_reverse_kl": 0.03315175023989478,
+        "train/anchor_student_kl": 6.745312004306347e-08,
+        "train/loss": 0.04124484621453496,
+        "train/target_reverse_kl": 0.005456908406634146,
+        "train/teacher_reverse_kl": 0.06302839782979278,
+        "diagnostic_positions": 16.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.00014627661814615458,
+        "heldout/loss": 0.023504098200668275,
+        "heldout/target_reverse_kl": 0.003104840583951303,
+        "heldout/teacher_reverse_kl": 0.03296347118780559,
+        "train/anchor_student_kl": 0.0005408149130096578,
+        "train/loss": 0.036797302746654915,
+        "train/target_reverse_kl": 0.004122645366270125,
+        "train/teacher_reverse_kl": 0.05723108216621495,
+        "diagnostic_positions": 16.0
+      },
+      "peak_allocated_gib": 9.321822166442871,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "canary-mdpo-topj16",
+      "updates": 2,
+      "seconds": 1.4429809181019664,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": -9.17813200789266e-09,
+        "heldout/loss": 0.023326162281676516,
+        "heldout/target_reverse_kl": 0.003051459808253794,
+        "heldout/teacher_reverse_kl": 0.03315175023989478,
+        "train/anchor_student_kl": 6.745312004306347e-08,
+        "train/loss": 0.04124484621453496,
+        "train/target_reverse_kl": 0.005456908406634146,
+        "train/teacher_reverse_kl": 0.06302839782979278,
+        "diagnostic_positions": 16.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.00010439511208922816,
+        "heldout/loss": 0.02353725065535008,
+        "heldout/target_reverse_kl": 0.0031147863203558465,
+        "heldout/teacher_reverse_kl": 0.033085877453470317,
+        "train/anchor_student_kl": 0.0008554560131270763,
+        "train/loss": 0.03987796059549603,
+        "train/target_reverse_kl": 0.005046842720922473,
+        "train/teacher_reverse_kl": 0.05928752300882478,
+        "diagnostic_positions": 16.0
+      },
+      "peak_allocated_gib": 9.310976028442383,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "mdpo-parameter-gradient",
+      "updates": 2,
+      "seconds": 4.573912939988077,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.0183972053596157e-08,
+        "heldout/loss": 0.061026575744107685,
+        "heldout/target_reverse_kl": 0.008238143948268826,
+        "heldout/teacher_reverse_kl": 0.09983521020744426,
+        "train/anchor_student_kl": 6.487080662790633e-08,
+        "train/loss": 0.0452894336797661,
+        "train/target_reverse_kl": 0.00608413310836808,
+        "train/teacher_reverse_kl": 0.07083342843145635,
+        "diagnostic_positions": 64.0
+      },
+      "final": {
+        "update": 2,
+        "heldout/anchor_student_kl": 0.0004613375046233051,
+        "heldout/loss": 0.06303804939396214,
+        "heldout/target_reverse_kl": 0.008841586043225168,
+        "heldout/teacher_reverse_kl": 0.10110222135830539,
+        "train/anchor_student_kl": 0.0005442083788326799,
+        "train/loss": 0.04239236901813657,
+        "train/target_reverse_kl": 0.0052150137098792146,
+        "train/teacher_reverse_kl": 0.06637027140082227,
+        "diagnostic_positions": 64.0
+      },
+      "peak_allocated_gib": 11.259405612945557,
+      "gradient_checks": [
+        {
+          "stage": "initial",
+          "relative_l2_error": 0.004696691816206183,
+          "cosine": 0.9999889705148133,
+          "max_absolute_error": 0.0008106231689453125,
+          "production_norm": 3.1551251466122374,
+          "reference_norm": 3.1551344514811572,
+          "scope": "All FSDP parameter shards, BF16 forward and backward, FP32 master/reduction"
+        },
+        {
+          "stage": "after_updates",
+          "relative_l2_error": 0.004628882527969666,
+          "cosine": 0.9999892874644658,
+          "max_absolute_error": 0.0007003545761108398,
+          "production_norm": 2.616657308676369,
+          "reference_norm": 2.6165807689942877,
+          "scope": "All FSDP parameter shards, BF16 forward and backward, FP32 master/reduction"
+        }
+      ],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "mdpo-parameter-gradient-fp32",
+      "updates": 1,
+      "seconds": 27.263559056445956,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 1.9318528580999944e-07,
+        "heldout/loss": 0.06128637651026124,
+        "heldout/target_reverse_kl": 0.008270318474241808,
+        "heldout/teacher_reverse_kl": 0.10021937381003417,
+        "train/anchor_student_kl": 1.865682133429132e-07,
+        "train/loss": 0.04405724825898091,
+        "train/target_reverse_kl": 0.005922693584516182,
+        "train/teacher_reverse_kl": 0.06881365776911477,
+        "diagnostic_positions": 64.0
+      },
+      "final": {
+        "update": 1,
+        "heldout/anchor_student_kl": 3.535996742741114e-05,
+        "heldout/loss": 0.05947564776849705,
+        "heldout/target_reverse_kl": 0.007727099851712561,
+        "heldout/teacher_reverse_kl": 0.09803753096820898,
+        "train/anchor_student_kl": 0.004535022179195899,
+        "train/loss": 0.03575188930718173,
+        "train/target_reverse_kl": 0.003431085898976423,
+        "train/teacher_reverse_kl": 0.049177085251180835,
+        "diagnostic_positions": 64.0
+      },
+      "peak_allocated_gib": 21.02656078338623,
+      "gradient_checks": [
+        {
+          "stage": "initial",
+          "relative_l2_error": 2.225409174656473e-06,
+          "cosine": 0.9999999999976131,
+          "max_absolute_error": 1.989305019378662e-06,
+          "production_norm": 3.084722437752598,
+          "reference_norm": 3.084721133272396,
+          "scope": "All FSDP parameter shards, configured forward precision, FP32 master/reduction",
+          "precision": "fp32"
+        },
+        {
+          "stage": "after_updates",
+          "relative_l2_error": 2.567882362134564e-06,
+          "cosine": 0.9999999999967036,
+          "max_absolute_error": 1.1175870895385742e-06,
+          "production_norm": 2.3716310483869156,
+          "reference_norm": 2.371631105874711,
+          "scope": "All FSDP parameter shards, configured forward precision, FP32 master/reduction",
+          "precision": "fp32"
+        }
+      ],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "train-bpo-full-actions",
+      "updates": 20,
+      "seconds": 33.21108954772353,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.7416048006447073e-08,
+        "heldout/loss": 0.025832239253204173,
+        "heldout/target_reverse_kl": 0.0081362528094777,
+        "heldout/teacher_reverse_kl": 0.10717519075363836,
+        "train/anchor_student_kl": 2.5058726474027485e-08,
+        "train/loss": 0.02201729508562223,
+        "train/target_reverse_kl": 0.007102658794933017,
+        "train/teacher_reverse_kl": 0.08454432574633847,
+        "diagnostic_positions": 256.0
+      },
+      "final": {
+        "update": 20,
+        "heldout/anchor_student_kl": 0.0016027086199855395,
+        "heldout/loss": 0.018279288647622606,
+        "heldout/target_reverse_kl": 0.005865000372195235,
+        "heldout/teacher_reverse_kl": 0.09372634023563015,
+        "train/anchor_student_kl": 0.008639987708796575,
+        "train/loss": 0.007174297561835628,
+        "train/target_reverse_kl": 0.0023389970016079783,
+        "train/teacher_reverse_kl": 0.04573579096259542,
+        "diagnostic_positions": 256.0
+      },
+      "peak_allocated_gib": 11.787368297576904,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "train-bpo-full-center",
+      "updates": 20,
+      "seconds": 32.904154191724956,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.7416048006447073e-08,
+        "heldout/loss": 0.025832239253204173,
+        "heldout/target_reverse_kl": 0.0081362528094777,
+        "heldout/teacher_reverse_kl": 0.10717519075363836,
+        "train/anchor_student_kl": 2.5058726474027485e-08,
+        "train/loss": 0.02201729508562223,
+        "train/target_reverse_kl": 0.007102658794933017,
+        "train/teacher_reverse_kl": 0.08454432574633847,
+        "diagnostic_positions": 256.0
+      },
+      "final": {
+        "update": 20,
+        "heldout/anchor_student_kl": 0.0006177346741168162,
+        "heldout/loss": 0.02439777899029386,
+        "heldout/target_reverse_kl": 0.00771062741104246,
+        "heldout/teacher_reverse_kl": 0.10364089120698738,
+        "train/anchor_student_kl": 0.003383710702695597,
+        "train/loss": 0.01686778648566027,
+        "train/target_reverse_kl": 0.005527998686747041,
+        "train/teacher_reverse_kl": 0.0701622500334137,
+        "diagnostic_positions": 256.0
+      },
+      "peak_allocated_gib": 11.787368297576904,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "train-bpo-topj16",
+      "updates": 20,
+      "seconds": 32.806926970370114,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.7416048006447073e-08,
+        "heldout/loss": 0.025832239253204173,
+        "heldout/target_reverse_kl": 0.0081362528094777,
+        "heldout/teacher_reverse_kl": 0.10717519075363836,
+        "train/anchor_student_kl": 2.5058726474027485e-08,
+        "train/loss": 0.02201729508562223,
+        "train/target_reverse_kl": 0.007102658794933017,
+        "train/teacher_reverse_kl": 0.08454432574633847,
+        "diagnostic_positions": 256.0
+      },
+      "final": {
+        "update": 20,
+        "heldout/anchor_student_kl": 0.0006281288433979493,
+        "heldout/loss": 0.024285340237453955,
+        "heldout/target_reverse_kl": 0.007671243893602655,
+        "heldout/teacher_reverse_kl": 0.10338270232575983,
+        "train/anchor_student_kl": 0.0035049787084765996,
+        "train/loss": 0.016670813130508288,
+        "train/target_reverse_kl": 0.00548688287854207,
+        "train/teacher_reverse_kl": 0.06971892250702,
+        "diagnostic_positions": 256.0
+      },
+      "peak_allocated_gib": 11.641588687896729,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "train-mdpo-full-actions",
+      "updates": 20,
+      "seconds": 33.21148760523647,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.7416048006447073e-08,
+        "heldout/loss": 0.06017751118847347,
+        "heldout/target_reverse_kl": 0.0081362528094777,
+        "heldout/teacher_reverse_kl": 0.10717519075363836,
+        "train/anchor_student_kl": 2.5058726474027485e-08,
+        "train/loss": 0.05274054373812048,
+        "train/target_reverse_kl": 0.007102658794933017,
+        "train/teacher_reverse_kl": 0.08454432574633847,
+        "diagnostic_positions": 256.0
+      },
+      "final": {
+        "update": 20,
+        "heldout/anchor_student_kl": 0.0014866738016660302,
+        "heldout/loss": 0.052060311063547304,
+        "heldout/target_reverse_kl": 0.005701092771999846,
+        "heldout/teacher_reverse_kl": 0.09334447043197203,
+        "train/anchor_student_kl": 0.009450269416553116,
+        "train/loss": 0.03712332339825834,
+        "train/target_reverse_kl": 0.0024174926929743665,
+        "train/teacher_reverse_kl": 0.043977019971374084,
+        "diagnostic_positions": 256.0
+      },
+      "peak_allocated_gib": 11.78764295578003,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "train-mdpo-full-center",
+      "updates": 20,
+      "seconds": 33.089313437230885,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.7416048006447073e-08,
+        "heldout/loss": 0.06017751118847347,
+        "heldout/target_reverse_kl": 0.0081362528094777,
+        "heldout/teacher_reverse_kl": 0.10717519075363836,
+        "train/anchor_student_kl": 2.5058726474027485e-08,
+        "train/loss": 0.05274054373812048,
+        "train/target_reverse_kl": 0.007102658794933017,
+        "train/teacher_reverse_kl": 0.08454432574633847,
+        "diagnostic_positions": 256.0
+      },
+      "final": {
+        "update": 20,
+        "heldout/anchor_student_kl": 0.0006822638891010879,
+        "heldout/loss": 0.058279935532021244,
+        "heldout/target_reverse_kl": 0.007566980112542028,
+        "heldout/teacher_reverse_kl": 0.10277485604702039,
+        "train/anchor_student_kl": 0.0034390943945704945,
+        "train/loss": 0.047386716384762544,
+        "train/target_reverse_kl": 0.005496510588925642,
+        "train/teacher_reverse_kl": 0.07035737587098946,
+        "diagnostic_positions": 256.0
+      },
+      "peak_allocated_gib": 11.787130355834961,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    },
+    {
+      "id": "train-mdpo-topj16",
+      "updates": 20,
+      "seconds": 32.82324782013893,
+      "initial": {
+        "update": 0,
+        "heldout/anchor_student_kl": 2.7416048006447073e-08,
+        "heldout/loss": 0.06017751118847347,
+        "heldout/target_reverse_kl": 0.0081362528094777,
+        "heldout/teacher_reverse_kl": 0.10717519075363836,
+        "train/anchor_student_kl": 2.5058726474027485e-08,
+        "train/loss": 0.05274054373812048,
+        "train/target_reverse_kl": 0.007102658794933017,
+        "train/teacher_reverse_kl": 0.08454432574633847,
+        "diagnostic_positions": 256.0
+      },
+      "final": {
+        "update": 20,
+        "heldout/anchor_student_kl": 0.0006822638891010879,
+        "heldout/loss": 0.058279935532021244,
+        "heldout/target_reverse_kl": 0.007566980112542028,
+        "heldout/teacher_reverse_kl": 0.10277485604702039,
+        "train/anchor_student_kl": 0.0034390943945704945,
+        "train/loss": 0.047386716384762544,
+        "train/target_reverse_kl": 0.005496510588925642,
+        "train/teacher_reverse_kl": 0.07035737587098946,
+        "diagnostic_positions": 256.0
+      },
+      "peak_allocated_gib": 11.641588687896729,
+      "gradient_checks": [],
+      "anchor_refresh": [],
+      "checkpoint_roundtrip": []
+    }
+  ],
+  "provenance": [
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/anchor-refresh.jsonl",
+      "sha256": "bcd66c18275ec8afc5cfc80b07d9706392a983ef8c403d06732972188080a45f"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/checkpoint-roundtrip.jsonl",
+      "sha256": "578d7b01da71d5265ff5260844b040fbf6bb12185643c64bde9f6ab947f29402"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/completion.jsonl",
+      "sha256": "5834e7cc37a96282d6c08fc9922d0412f029a0168efe7e70a2a522c28fa9bec5"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/input-rank-0.json",
+      "sha256": "53177f09459c724edbb946d64ed04883292fe8a87129880826083ead1c7675b3"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/input-rank-1.json",
+      "sha256": "d1e8404e5128ddbac24daacf7599aea36bcde4d5bab2172f5c7c8131d5d809a5"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/input-rank-2.json",
+      "sha256": "12fa3ad1324d1cd70659666b020f1c603671d31ae760812096a90fadd6715d77"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/input-rank-3.json",
+      "sha256": "071b2e9ccad55eb13d3a939cf485d0f00e262733fd854fdfdd263258560afa90"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/measurements.jsonl",
+      "sha256": "f2dba879c68593f88411b8f9c56df1ea2398c402a623f7f9708cf026ec282201"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/model-info.json",
+      "sha256": "32702674c0b028a403ce4cc27eed62f33c39d52b1276b2646464daa78fbe3b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/updates.jsonl",
+      "sha256": "f564fdb42460d329e60d387c4fb7a0175615988e73c83f9df0ad0cc2cee25c2b"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/worker-source-rank-0.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/worker-source-rank-1.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/worker-source-rank-2.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/worker-source-rank-3.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/config.json",
+      "sha256": "60dcd9a1fb5a8d21506bdc439a53ed2162e8cb2f42a2828a4e9256e85b4ca95a"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/source-sha256.json",
+      "sha256": "17d95181d980798dcbc395c1922fd03d3a4e60e58a4a2e40749d7084fa86f878"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/gpu-owner-rank-0.json",
+      "sha256": "d5636e247ad2053482290f842e7c1bd356f44fd674798d5975ebfa0a30268424"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/gpu-owner-rank-1.json",
+      "sha256": "cfa788bbe4b657556259e625bf465bbf55c3d283d73ee540698f16d6cf207708"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/gpu-owner-rank-2.json",
+      "sha256": "631b59cb36feaebaa83828a44d7c62426b97d8db8ff200fac37e4f78f3d676eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/gpu-owner-rank-3.json",
+      "sha256": "79e4480a6a5da829d724e1f4a98962e4ca67b178267205b30e5d5b22a638a4af"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-full-lifecycle/source.tar.gz",
+      "sha256": "9e5d5513b9d2ac7053ecac268c77abe50e6c3912c6e40d18cfc9f67b05e07b8e"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/completion.jsonl",
+      "sha256": "b36ac41e6667dc1207a6bd0c6f9e72977bdf78926f38e4063afcf0951ccb6926"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/input-rank-0.json",
+      "sha256": "fb5e8cedc138e6f8f444ad3534e704ca0dfe6af6bee5f331f326824f01dbfd60"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/input-rank-1.json",
+      "sha256": "73058ef1498712e3cdf341d48b5b11826b5acfd2c6c9faaf1ebe9b062d64f9b2"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/input-rank-2.json",
+      "sha256": "59cb946f858e469fa3064d76690e51f44b7cb71057e32ce589e36c6a0b6ff717"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/input-rank-3.json",
+      "sha256": "7d74dddae92efaaa8ddba842aefeb7530175f3216350eb90d05aece553e17045"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/measurements.jsonl",
+      "sha256": "93b85e0a868c7a8de60508db871af756ea5b744e490db8c3514aba3160e7de31"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/parameter-gradient-check.jsonl",
+      "sha256": "a22c98e048c80d762c0e27fb0c333988549b02ad9cbda7052f652dabd9b1aafc"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/updates.jsonl",
+      "sha256": "a13153fff5340935e8f8860bf0051355d7fddea1919d2cd10bc6839920125eb7"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/worker-source-rank-0.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/worker-source-rank-1.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/worker-source-rank-2.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/worker-source-rank-3.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/config.json",
+      "sha256": "d5824e5c9846e0fa0d04f1f0c841edc1e0af13c655a46cee3083470e59e7f20a"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/source-sha256.json",
+      "sha256": "623e6e8384ef82f2f1a703e01778585cf062c7a2a10242f962a53174470787eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/gpu-owner-rank-0.json",
+      "sha256": "0c00e189d461fb7da00452ec7279a9cb8c7372c01fac12ce8442a0f86c2854da"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/gpu-owner-rank-1.json",
+      "sha256": "120715286c9023dd915a00814de7c46399256fb444e27069ba9b8d6dcd0858d0"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/gpu-owner-rank-2.json",
+      "sha256": "327fcbadd378d8b5559e8eaa9584e730bf6d7287e2e5aceca5f947d65d9a4434"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/gpu-owner-rank-3.json",
+      "sha256": "0b8849c527a7a9dda507c7f0319670494365097db482b6e65c3b1e3b6cbc7858"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient/source.tar.gz",
+      "sha256": "540220500f7accb8c3bc8f05f10351e79fb000e8aff76d29e7d2a171b0816f25"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/completion.jsonl",
+      "sha256": "0d92ba7df1e472d9f2b447fd7dc908c316fa058f1c49806da564b078037ef698"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/input-rank-0.json",
+      "sha256": "464d3092db60115a314121d6e464549862a3faa583ed317d063f2b32dc4fbfbc"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/input-rank-1.json",
+      "sha256": "a6a121a8bdda8103c278dd13f603055f8318f3c7dcd76acce73f4de9b94dbd55"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/input-rank-2.json",
+      "sha256": "826412f0e266130f8ee6149dabf7c846e717c7dded51903b3f3bbf8bc13effb2"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/input-rank-3.json",
+      "sha256": "4f4593bf82caf3a873ac603ffec0d955d6e4255c0fb295c3e858baf63815ff51"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/measurements.jsonl",
+      "sha256": "5df796fef6a90ce399e55542f5471ab293fdb753b07cfc641dd8482e7f56539c"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/model-info.json",
+      "sha256": "87a011b15beb4e837598cf33adac46307ea9a01d9a9bdb70d1e3980d2163166c"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/parameter-gradient-check.jsonl",
+      "sha256": "e80bc8aa19c2ec8ceb66c45dd940e3dc382df70ab21a54790d6e2e5728d5cae4"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/updates.jsonl",
+      "sha256": "953bd9ae3498ad78312163196c14b296b116b30c116ca9955d2482de98213143"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/worker-source-rank-0.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/worker-source-rank-1.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/worker-source-rank-2.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/worker-source-rank-3.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/config.json",
+      "sha256": "d5824e5c9846e0fa0d04f1f0c841edc1e0af13c655a46cee3083470e59e7f20a"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/source-sha256.json",
+      "sha256": "623e6e8384ef82f2f1a703e01778585cf062c7a2a10242f962a53174470787eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/gpu-owner-rank-0.json",
+      "sha256": "0c00e189d461fb7da00452ec7279a9cb8c7372c01fac12ce8442a0f86c2854da"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/gpu-owner-rank-1.json",
+      "sha256": "120715286c9023dd915a00814de7c46399256fb444e27069ba9b8d6dcd0858d0"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/gpu-owner-rank-2.json",
+      "sha256": "327fcbadd378d8b5559e8eaa9584e730bf6d7287e2e5aceca5f947d65d9a4434"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/gpu-owner-rank-3.json",
+      "sha256": "0b8849c527a7a9dda507c7f0319670494365097db482b6e65c3b1e3b6cbc7858"
+    },
+    {
+      "path": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/source.tar.gz",
+      "sha256": "540220500f7accb8c3bc8f05f10351e79fb000e8aff76d29e7d2a171b0816f25"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/completion.jsonl",
+      "sha256": "1f1c341273f94ceaf03910ed7acbf31ea9b3f133bc6212d2975d0923416ea04a"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/input-rank-0.json",
+      "sha256": "3b1466e183d9a078ce56043e6062675085b895b34bc8fe105441fe83fcea0154"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/input-rank-1.json",
+      "sha256": "2c18cf776f1def0a689ccc569f7c6d06fab7842cd379b29ba23df37e8e552a33"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/input-rank-2.json",
+      "sha256": "9b9ebda03ebb6051585e3d91f973e4f3332e008f92e98532c4a47d2cd5130b4e"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/input-rank-3.json",
+      "sha256": "480f173f28cfc990a0b052c29b40919c6737d8fcf69d6d68efa8c5f3e5d9be98"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/measurements.jsonl",
+      "sha256": "e83ead9648b50d8dcced0ecb5f8d6de5943f4e204cd723ca5ad543a2cd72e769"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/updates.jsonl",
+      "sha256": "108fd42dec88030263145be95acd80d091e07ddd972edd8f3ffad62f697da1cd"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/worker-source-rank-0.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/worker-source-rank-1.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/worker-source-rank-2.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/worker-source-rank-3.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/config.json",
+      "sha256": "cf6b546cd7526abde445272fcfa1b50f6256a86ed22ea0ced57e0f9432be629a"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/source-sha256.json",
+      "sha256": "cc1be002e217f9253574896a330026e4d0f67c8ccb1f78e65b53a700a5d29b8d"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/gpu-owner-rank-0.json",
+      "sha256": "35986f9cabaf1e98928f809c57ee514b9b24d16c149e5b5a4cbd45e4d870c383"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/gpu-owner-rank-1.json",
+      "sha256": "3d7b662c4226df7c370b98a7dd0707f70c244516ad2e1e4128de7592962d5590"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/gpu-owner-rank-2.json",
+      "sha256": "edc052863d119e412df63a656f2427ab5207893defc410beea8905d9e2b3125f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/gpu-owner-rank-3.json",
+      "sha256": "d9eecba49bac492200462d2530afc2f0f67cb4e4b09e5b5efcbcb9a5adc8faad"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-actions/source.tar.gz",
+      "sha256": "a3823fde1da71b83e90f4021293ee8ff065edfb932ca3148b95a6bcf72ed193c"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/completion.jsonl",
+      "sha256": "b29fd0ca4086383d81ffd25d1c7b5bbec46216d214e6d5c2b763761829a0bf0f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/input-rank-0.json",
+      "sha256": "46dd20f7f7cfd8d27b0688fd298fc1d62785ef4d86f913536dab69843327f494"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/input-rank-1.json",
+      "sha256": "71c51925c323bd348660554d152e26d78f56094c77ebbbfe6c562f1c71a32487"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/input-rank-2.json",
+      "sha256": "08bb280953926c71b9bbd64b2d0d68aa6c5d359f5cd9e36ee2de85e1f683cd29"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/input-rank-3.json",
+      "sha256": "0693e1f8760a22ccad3dce407d72f5880cfb5f30119f896ba3496042483f7329"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/measurements.jsonl",
+      "sha256": "d74a64d69a9eb42f99311c0b3d3a8811de2347518cb1d25d337de477f998db31"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/updates.jsonl",
+      "sha256": "1b483d0181e423faf81a04c56da6dad0c95f18adebee6fdac0e9f6121ab4110b"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/worker-source-rank-0.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/worker-source-rank-1.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/worker-source-rank-2.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/worker-source-rank-3.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/config.json",
+      "sha256": "1b37e0309100a0ee28b507bf21cd0d376f0ced49cb4f75695cd0d355737fbcb6"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/source-sha256.json",
+      "sha256": "cc1be002e217f9253574896a330026e4d0f67c8ccb1f78e65b53a700a5d29b8d"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/gpu-owner-rank-0.json",
+      "sha256": "4fd2d74a0bb3f0ca67cf4f4b6e2561f18bdd8bfedb4be5d69e578ee4f10e6a55"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/gpu-owner-rank-1.json",
+      "sha256": "38485d1bc25ee377c9f3131b2b59036b5ec7d40773017e4ebfa4c6906d62309c"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/gpu-owner-rank-2.json",
+      "sha256": "8140cbbcd89de61cb70eb08814e0fee129427b09490924bdc058313963fba7ad"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/gpu-owner-rank-3.json",
+      "sha256": "f8d9f3233441f6f4a399b6aaf798bb498659fd832a4e622b3cbc5ca0a7495724"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-full-center/source.tar.gz",
+      "sha256": "a3823fde1da71b83e90f4021293ee8ff065edfb932ca3148b95a6bcf72ed193c"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/completion.jsonl",
+      "sha256": "6761ec6c6c48befb0400bd7e1461b65acaf2415db9d82c23953fe296d11d5294"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/input-rank-0.json",
+      "sha256": "900e98410856c5309e8a797cb6de7cb1254dd45e93371e81008f60eaa56de8a7"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/input-rank-1.json",
+      "sha256": "f8d389e24ecf25ec8954f1667023c884ab9d5d87dfd50397e669d9384458269e"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/input-rank-2.json",
+      "sha256": "2a8ace4bf76cce766c1d5a7c094c794897586122748aec13ad2350f621e5b817"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/input-rank-3.json",
+      "sha256": "cc1975eaeb1d571e32ac1da728555d338279f1b958d33a1de9555396697bc3af"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/measurements.jsonl",
+      "sha256": "a2b399618ebbe1d22e61d116cb40ab776371ee0c3bf991e69851cc78e51eb74f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/updates.jsonl",
+      "sha256": "70437a408b370705bb933c5610cdd190997ff60af50c5a43387cee0e39f19a88"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/worker-source-rank-0.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/worker-source-rank-1.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/worker-source-rank-2.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/worker-source-rank-3.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/config.json",
+      "sha256": "ca0607ef6652e1ee2f24ecb4e3eb9a80f70fc500c79ad5e353b8b10115aadf8f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/source-sha256.json",
+      "sha256": "3752724fb94f83d48b1dff93d31d5519aefa1565e6bf6c928cddcf8820980f0c"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/gpu-owner-rank-0.json",
+      "sha256": "9bb612269d22c54dc4cd213f0655cfc592ac85c3ab10c8a5b2cb4a5dcb187d63"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/gpu-owner-rank-1.json",
+      "sha256": "5484754fd0af40c5d216b3f415803bf8f257448fe507e124ce65d84b913b2296"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/gpu-owner-rank-2.json",
+      "sha256": "f296c53a225def6ec0be029135fd221f6051b8efd2ccf0286d22e9c5e14887e1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/gpu-owner-rank-3.json",
+      "sha256": "159daa6151fbb8afc8611d314a0b21c4b8f0c549b7b78bd1f554ed022905c995"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-bpo-topj16/source.tar.gz",
+      "sha256": "d0bd43f49f37d08cc03a299455d9108898203d4930dd2848865b311b575db701"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/completion.jsonl",
+      "sha256": "8cfb30ca4c49c35fb903e14ec49ac09ce984a2d33d68ffea0f4d9c3f9ff90413"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/input-rank-0.json",
+      "sha256": "55c369e76160364c7d6c30a40cbbf48d7658773838bf90c15a91485ce584d18c"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/input-rank-1.json",
+      "sha256": "8ed4a81411bf5979c38c5e8121157c60b8cf97fe11cd03788556ebfa8a90f254"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/input-rank-2.json",
+      "sha256": "4c5f30dec97ced30146ed1ec8389059b058e9732d707f0cb30df5b2e56fb9d87"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/input-rank-3.json",
+      "sha256": "55f82eeefb53d9bea5a81d28bbf5c6a8a3404ef0759a6cee9f504a48f87df518"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/measurements.jsonl",
+      "sha256": "e7c5d29d9ece986536a79d1bac0de7e93ccc3577e9fcf4e44d3cb2a272d6e66f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/updates.jsonl",
+      "sha256": "db4940c8a9ab108b7c12e2fba56d5db28691a7cdee7f64636daf54cf995fdc20"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/worker-source-rank-0.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/worker-source-rank-1.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/worker-source-rank-2.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/worker-source-rank-3.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/config.json",
+      "sha256": "8d38573628a4d50ef8f88cbc71baae7c5060b53b5f57dbe72f86888a30750645"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/source-sha256.json",
+      "sha256": "d2aa15a117c4078fd6a80e35a1fff5ba59047c6325acd2dafb4c2a3c28e94bbe"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/gpu-owner-rank-0.json",
+      "sha256": "653b28100c94100a6b9333ae6e2e7b33207416e2441a391e2f7e15681d17d235"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/gpu-owner-rank-1.json",
+      "sha256": "88cdcdd48810f29e48347894f0003ee415cb548546c87bd0e38073bf5af4ebb1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/gpu-owner-rank-2.json",
+      "sha256": "b245958a33b684c96dc3df827e5c6bdd8f06e2c24c2c107bd4c65d8b2be3f220"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/gpu-owner-rank-3.json",
+      "sha256": "15305bf688a997708a57d350261faba76188d3fe17e4b4e9cc36aaa512b7c7c3"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-actions/source.tar.gz",
+      "sha256": "80259d1177123ce995515200ab9b5997cde08b178996f0b50bb0440245ba672f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/completion.jsonl",
+      "sha256": "50a91b2e2044c4b69eb362ea595d6e4de2ad8e5a6d44404aa401769c13703992"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/input-rank-0.json",
+      "sha256": "e03001447c3b83536960fc0b40da3adc6776609a0101e876daa63c1d8376dec4"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/input-rank-1.json",
+      "sha256": "cd4352a72a70216c2b9c5aaf0bc606450329dab95d0addf77f345bffab0870c7"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/input-rank-2.json",
+      "sha256": "e0579fb42b02a91029ed3091e9211eb2d0e6948ccc1d075314a82f3cca806990"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/input-rank-3.json",
+      "sha256": "3c646b14a4d57388848074a95466a89d33c34d0922d42322ecb1f5cf56e0fb2e"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/measurements.jsonl",
+      "sha256": "56e9344be4c9332d7cc9d218930f9e107e2fc21f566a71cc6178db5a15f62ccf"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/updates.jsonl",
+      "sha256": "ba388a80f7dcfef3167ca367a18ba0c44bbbc3fba0923b2e118eb633f8c613e6"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/worker-source-rank-0.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/worker-source-rank-1.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/worker-source-rank-2.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/worker-source-rank-3.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/config.json",
+      "sha256": "30cb238617a84885cd9562bb90793bfecf94504b72c562f17b40ac7b329ef9e3"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/source-sha256.json",
+      "sha256": "cc1be002e217f9253574896a330026e4d0f67c8ccb1f78e65b53a700a5d29b8d"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/gpu-owner-rank-0.json",
+      "sha256": "6b7bbad604a6dae27587b29b0d93e06b6d02f4c3255997f05b52472816418db5"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/gpu-owner-rank-1.json",
+      "sha256": "592befd52030aabf5854809175a002fbabf968ef9e9344fb484258d4031a8d27"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/gpu-owner-rank-2.json",
+      "sha256": "c09d8f189c40f963ede5e4b6a914a19f9fb76985f20893b31a5954e694bc1ab9"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/gpu-owner-rank-3.json",
+      "sha256": "d37020b3a898b01a107c34c29cb7ce6c1751fd3ff60ad438071243552028ac66"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-full-center/source.tar.gz",
+      "sha256": "a3823fde1da71b83e90f4021293ee8ff065edfb932ca3148b95a6bcf72ed193c"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/completion.jsonl",
+      "sha256": "9b7d3ff71079699e518e5157b182db279e70cc3f3e8adcab0a6ab197cedb676d"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/input-rank-0.json",
+      "sha256": "c3b6145da0b146cf970b1846bf215b70693b42215eb65af57080482a36ec1d87"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/input-rank-1.json",
+      "sha256": "52c9f5ab2b1b346a05aa48729a481d98372958eb4d56dd9b83dd20b77e9fa302"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/input-rank-2.json",
+      "sha256": "9e7e2d30870b8f3e7600d31bea85532ce3ea5392e073460d2444315bf2fdc241"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/input-rank-3.json",
+      "sha256": "5558027446fcd6213cde3dedd7afe040b3d000223108317664daa6a64915733b"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/measurements.jsonl",
+      "sha256": "4f767b40c8e38d1ea048ab23c6c74a55beb5239db2d83cb302b79e93abea2ff0"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/updates.jsonl",
+      "sha256": "a92121919f6b15497de23566f1186b544fd316fe73d2ca7c6b59f8e8d4d7f9bb"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/worker-source-rank-0.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/worker-source-rank-1.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/worker-source-rank-2.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/worker-source-rank-3.json",
+      "sha256": "9fd5ac3aae00b1cfb60107ab60ed22b8d3fd5a2d9ada340e093d0c96a0d8fbe1"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/config.json",
+      "sha256": "53b7d575bf30eb7df988316623773577421b313f9c6da51ac5ce254737cc8e49"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/source-sha256.json",
+      "sha256": "cc1be002e217f9253574896a330026e4d0f67c8ccb1f78e65b53a700a5d29b8d"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/gpu-owner-rank-0.json",
+      "sha256": "2a18cd331bb64babac7c045a18855ae5f5b32fdf8ba821d4ce491b4de92c6bd0"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/gpu-owner-rank-1.json",
+      "sha256": "bb5ef1748b58bb04621ca44eb87fee45e0872e03b2b88e970916bd11d256e436"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/gpu-owner-rank-2.json",
+      "sha256": "a924b30e2c10b8156d6a11112be2247d05f1936c33cd2e7515bc5cf0c0a615f7"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/gpu-owner-rank-3.json",
+      "sha256": "50f2203bb31cfe5f2f27f3b06383bd96dc4c63e551a5df90c8142cf3fc499d17"
+    },
+    {
+      "path": "data/power-implementation-20261015/canary-mdpo-topj16/source.tar.gz",
+      "sha256": "a3823fde1da71b83e90f4021293ee8ff065edfb932ca3148b95a6bcf72ed193c"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/completion.jsonl",
+      "sha256": "087aa99f10c6a5ffa70ac74c555daa0824f61453f08ca272f81299c8481d85e2"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/input-rank-0.json",
+      "sha256": "9904a3c9b5ce8951311bad6e53100fb316c1723e695bcf9f041327b13bd84a53"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/input-rank-1.json",
+      "sha256": "290a179c7d662b2b01d72c81a62bfed6a278f955ddfd1dfb8664e9408638b743"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/input-rank-2.json",
+      "sha256": "3c73c32c57b3847deba7c8c06ef4dc3d01cb1497d73f909a799fa94439b3ca57"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/input-rank-3.json",
+      "sha256": "ffef126d8faec42beafd4b639ea101d8e4eb54e079e20c905b24ea5e64f0fd65"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/measurements.jsonl",
+      "sha256": "0de1e77e7fc1d10e19700145aec8d506103fe6c5154cd7fc3c38d36fd0d2e6f0"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/parameter-gradient-check.jsonl",
+      "sha256": "243b20c3fb696e7f95d6e1523dd4a217917d7e581610f3c5fecbff17bb7512f8"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/updates.jsonl",
+      "sha256": "a478b12fa3f89b29779fdbe8c8fdcb9d2e1644d60cb333b77b1540e1af083095"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/worker-source-rank-0.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/worker-source-rank-1.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/worker-source-rank-2.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/worker-source-rank-3.json",
+      "sha256": "679efb6b69fe5d75b3d84aa8723f4816041d76aeadddb1b3cd8e98dab68e9337"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/config.json",
+      "sha256": "8988504a5102f2a21f7b604f57c3d917052fe9074120d0f4b18268d21a441cf6"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/source-sha256.json",
+      "sha256": "623e6e8384ef82f2f1a703e01778585cf062c7a2a10242f962a53174470787eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/gpu-owner-rank-0.json",
+      "sha256": "153d373c542ef2af8b55744b2913fdb06612b7398bb26fca079f832d4ee78c58"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/gpu-owner-rank-1.json",
+      "sha256": "fc9bc7ebe6301708e30b144325585ff2e305f68c0e4876a4e437e83a42e0adcf"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/gpu-owner-rank-2.json",
+      "sha256": "43ea68332a4444903df6b8555ffa75bc22deb157ef9730b950dc8d992fc6dc2f"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/gpu-owner-rank-3.json",
+      "sha256": "7ec0112a4147d11f1fe5cd644446b339fac957528a79ac3a0e9e14f41fbd0c99"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient/source.tar.gz",
+      "sha256": "540220500f7accb8c3bc8f05f10351e79fb000e8aff76d29e7d2a171b0816f25"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/completion.jsonl",
+      "sha256": "77e8bde845db3cbd5903cf256d9c25aff2f6417cb04907bdb3b850983cb6482a"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/input-rank-0.json",
+      "sha256": "e4b8c9a1eb76adb864beb3defc3b113a92ba6bc981dc959b54cad76a541c66c6"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/input-rank-1.json",
+      "sha256": "8e164f2f194e2476e25c81399b424246b37c15162d625cc97232022f4b4a5a56"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/input-rank-2.json",
+      "sha256": "a11a961908b73443d61adf6818b6c4aa8e8b7efb96fcebe6a17bfc77b539beed"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/input-rank-3.json",
+      "sha256": "d4a74bae003faa69f6a51e199fedcfd8e80b77b1d98bd75a9a89382b7c5d80a0"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/measurements.jsonl",
+      "sha256": "2ee6bd8b34d495a230406f60736e106b7ced31a970eea355150d7ef6cba6294a"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/model-info.json",
+      "sha256": "87a011b15beb4e837598cf33adac46307ea9a01d9a9bdb70d1e3980d2163166c"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/parameter-gradient-check.jsonl",
+      "sha256": "500b72ee90a115b7498266e90930c05abc25af5f1d6f3c5f71a1ad9af9fcbbe9"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/updates.jsonl",
+      "sha256": "09e2190a054853eaa79e4e115a36accd72ebe68f94c248a8780f71b425e461c9"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/worker-source-rank-0.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/worker-source-rank-1.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/worker-source-rank-2.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/worker-source-rank-3.json",
+      "sha256": "571d15ca6a0d4864efbd6164fb53bf7046d467e4da73e607823bba4392645a69"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/config.json",
+      "sha256": "8988504a5102f2a21f7b604f57c3d917052fe9074120d0f4b18268d21a441cf6"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/source-sha256.json",
+      "sha256": "623e6e8384ef82f2f1a703e01778585cf062c7a2a10242f962a53174470787eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/gpu-owner-rank-0.json",
+      "sha256": "153d373c542ef2af8b55744b2913fdb06612b7398bb26fca079f832d4ee78c58"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/gpu-owner-rank-1.json",
+      "sha256": "fc9bc7ebe6301708e30b144325585ff2e305f68c0e4876a4e437e83a42e0adcf"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/gpu-owner-rank-2.json",
+      "sha256": "43ea68332a4444903df6b8555ffa75bc22deb157ef9730b950dc8d992fc6dc2f"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/gpu-owner-rank-3.json",
+      "sha256": "7ec0112a4147d11f1fe5cd644446b339fac957528a79ac3a0e9e14f41fbd0c99"
+    },
+    {
+      "path": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/source.tar.gz",
+      "sha256": "540220500f7accb8c3bc8f05f10351e79fb000e8aff76d29e7d2a171b0816f25"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/audit-rank-0.json",
+      "sha256": "3242bb14be319cf4365187cbb5a355b931f7a6731719a39f8e96e017a3bc80dc"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/audit-rank-1.json",
+      "sha256": "256db1cfbb2dbfd9360e1f6d7a4f10565c49a54d79e3276a021b11c126560a97"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/audit-rank-2.json",
+      "sha256": "3d8f74c191a6fcbbfafaaf84635eb828d2aebc7a813814aafd76d41ffa943a8a"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/audit-rank-3.json",
+      "sha256": "904e49c24ba4d59075ce4b3d374e0271ad148e3713cde67abc578011272b176a"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/completion.jsonl",
+      "sha256": "99599c9e226f67b9a57fc7a7c6e2860c95dbeb8b8945de3beb59c767d2c07de0"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/input-rank-0.json",
+      "sha256": "e43a45cca724f99ab13bd1fa19d088361ebe3d50c1ac6c0d32467980bb409fdc"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/input-rank-1.json",
+      "sha256": "d99e1e75c192c1a235c99bef9276f7a09b87b1e7544dc2db0c3a06d5588d90eb"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/input-rank-2.json",
+      "sha256": "182b55b38d51c2ca0b00a8539e007de41bf83e664831323c63e97c4760e8f2f6"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/input-rank-3.json",
+      "sha256": "3597603c697a92fa941eb29ee04a1aecd0d94c8f4073a86a82fea4612d7cc9d4"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/worker-source-rank-0.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/worker-source-rank-1.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/worker-source-rank-2.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/worker-source-rank-3.json",
+      "sha256": "e40b7aa945cbf88976072348cbd1503856fff615a1a97b7a00ef38080958c710"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/config.json",
+      "sha256": "d3873b9282e4b9fd0f2e24e286e9ceb8f108c9ff647c5a09743c3b716cd751af"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/source-sha256.json",
+      "sha256": "3752724fb94f83d48b1dff93d31d5519aefa1565e6bf6c928cddcf8820980f0c"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/gpu-owner-rank-0.json",
+      "sha256": "810478a25ec4d5e2f0fb36b698ad6de6d6000e407f117744038957209868c8d4"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/gpu-owner-rank-1.json",
+      "sha256": "3e66372edd8bd33db317bd27f923f2610e5be4c9f37eae7237a6465e0a48a349"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/gpu-owner-rank-2.json",
+      "sha256": "e0c052c5d0622b318f664f282511f298e60fbb86df7fa30a69f2f9a34c81e731"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/gpu-owner-rank-3.json",
+      "sha256": "61ef3536f29b2cf039a07cbbc3a2f99db1f36cb1dc9321d6cf88e945473018e2"
+    },
+    {
+      "path": "data/power-implementation-20261015/real-cache-audit/source.tar.gz",
+      "sha256": "d0bd43f49f37d08cc03a299455d9108898203d4930dd2848865b311b575db701"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/completion.jsonl",
+      "sha256": "3b3875c9291d3eed47a79d4b3caab62114bbbd4420d51874fb2acfb93373e20e"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/input-rank-0.json",
+      "sha256": "cde59d013cf447e8e2828d75af55dce4835cce8a02fbac1de6ac55ce476b4ba4"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/input-rank-1.json",
+      "sha256": "a83b9c3a95cd95c8fa0a98280d55ea7fe48d1547041a6ca1a531fd77b9d8c63f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/input-rank-2.json",
+      "sha256": "ac597475f3f1cd48ecde28ee949700b09cb248b7676791b96e1edb41b79b670b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/input-rank-3.json",
+      "sha256": "d11a7f2eca858290b4a0d3d8bc819f2fc15243d0e87343ce9e93febd0c3baf46"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/measurements.jsonl",
+      "sha256": "f46d6628211a3b6173c394afd9147e82bb96b2edb29a0bdd0e21bd40f61369f9"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/model-info.json",
+      "sha256": "32702674c0b028a403ce4cc27eed62f33c39d52b1276b2646464daa78fbe3b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/updates.jsonl",
+      "sha256": "1951d783d9e74e992cdc23b97bce0cea2acbcd91df5d42065f5205ec18ea36ad"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/worker-source-rank-0.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/worker-source-rank-1.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/worker-source-rank-2.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/worker-source-rank-3.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/config.json",
+      "sha256": "01110dd1aefab68875be96bbdf01bae55922afda1585787a2e44c3b00d5aeb68"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/source-sha256.json",
+      "sha256": "320b70e39f476e497afc2be2f4242ba13444f2faa8ddc64228e19df4341c8946"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/gpu-owner-rank-0.json",
+      "sha256": "7ff655158b544cc22f03f8b698fa8e52e64ed0d1fb08466a609375c24d39b6ab"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/gpu-owner-rank-1.json",
+      "sha256": "6ce4ba03c315e577dcd106ef02f06f1544708060eab811a5d4bad95433bf7491"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/gpu-owner-rank-2.json",
+      "sha256": "db9f710a2b707c1ab167cb55a30512cf904d03188a7fb00ca66da15a72884504"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/gpu-owner-rank-3.json",
+      "sha256": "722d45b4f21cd27e0e24d29e4345dd751d364855cc9588983d05c5b15f94b5bd"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-actions/source.tar.gz",
+      "sha256": "308f91866411e31fb9bae8760654cbacb74fc12b4ef3793b5b09e6cfb833cee7"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/completion.jsonl",
+      "sha256": "caca41fc6de2d3bf722b1fea2c797041bae8655c38f5550fdee44fd0f62b286a"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/input-rank-0.json",
+      "sha256": "11378699ea31b0360dff4d245ef77aa88ba2b2cea2c6d87623f7500860978250"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/input-rank-1.json",
+      "sha256": "aa702f151e0d921c173155d6b7d7325aaec5ccbfd5bab7369c6f3b9513175cd6"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/input-rank-2.json",
+      "sha256": "21261fe48bdcc51b73b88166521f2e860659c6ef04c3fc642f9336869036cf85"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/input-rank-3.json",
+      "sha256": "da8572682a1063fe63d667357edd715ef445c564cd2a46a5bac77c2914be1469"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/measurements.jsonl",
+      "sha256": "07184a8230dd694fe53573715f9885b7104caf4393116e02e417266f0e328203"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/model-info.json",
+      "sha256": "32702674c0b028a403ce4cc27eed62f33c39d52b1276b2646464daa78fbe3b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/updates.jsonl",
+      "sha256": "4360a1b22c1dfab168098558ba08f9bd493ae1261fbfd684d6ee03568953b279"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/worker-source-rank-0.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/worker-source-rank-1.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/worker-source-rank-2.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/worker-source-rank-3.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/config.json",
+      "sha256": "209f7fd321dba15fd41ac741c9bb662d07ea36e02c399a6444cbce26bd11eca0"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/source-sha256.json",
+      "sha256": "45627a415129b455db302838bef26499e0103f2ac4859f0aa8c71a6e0cd25149"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/gpu-owner-rank-0.json",
+      "sha256": "45d78666340f25641dbfce9538b9c221a7074bb403c712810afea3dcfa3a5582"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/gpu-owner-rank-1.json",
+      "sha256": "7a6ff2353b6abdb52dfe645d32de353a9ed83b56aace567bda2ef5480a293a0f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/gpu-owner-rank-2.json",
+      "sha256": "379dc61b734b56f52bd231554e74d141da57763c1057107ea7d451a0928cb4df"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/gpu-owner-rank-3.json",
+      "sha256": "90a8ec85df775fef7795c17bd23a5e3168ff4bd5b417ab4f08db9d8d99bfd2da"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-full-center/source.tar.gz",
+      "sha256": "bc660723ba944662e79f0e8931696019ed1bfa2fa6eda7b3239599a6050f9a64"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/completion.jsonl",
+      "sha256": "ad49decdd19250a200b2610ce4016b7bffc1a71d5044fe623406814e31009d1e"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/input-rank-0.json",
+      "sha256": "35dbc2863eb330d912c96840cdaf047e0f20778238ff860e4cffe16c7cf56b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/input-rank-1.json",
+      "sha256": "e8d65a5ff5725ade8f4785a12dbf51bdcd45f97eeb8fea6dfdf2ef4c1c97c5bc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/input-rank-2.json",
+      "sha256": "92dfbc05b521f6faae628a1c3c6797297ae219516c76dc9fd67277b4ff853ad6"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/input-rank-3.json",
+      "sha256": "6b92cd57cb5f5d6292268c013c7fd36ef887b9dd1b3265712eeda54acc7e1d21"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/measurements.jsonl",
+      "sha256": "24bad61741ea00b8f2fba219f403c81c344465056f7539d4fe2d1de4eefb1403"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/updates.jsonl",
+      "sha256": "799c8b10c46e2bc42cdca8821d23d672bad74362827804612dfc0835871f93d5"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/worker-source-rank-0.json",
+      "sha256": "667e2be1aee535f4859d84859ba9450269b975d4b469d0ffb229cd151179fedc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/worker-source-rank-1.json",
+      "sha256": "667e2be1aee535f4859d84859ba9450269b975d4b469d0ffb229cd151179fedc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/worker-source-rank-2.json",
+      "sha256": "667e2be1aee535f4859d84859ba9450269b975d4b469d0ffb229cd151179fedc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/worker-source-rank-3.json",
+      "sha256": "667e2be1aee535f4859d84859ba9450269b975d4b469d0ffb229cd151179fedc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/config.json",
+      "sha256": "3fa714482be7d2c0cad04b17cd923e2670f106bdf86c285f02b82d0f7b762603"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/source-sha256.json",
+      "sha256": "f14119e81a09197ab556b786ac9b7fbc5b6a86abf2a7bbd22d76dda4ff3ca594"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/gpu-owner-rank-0.json",
+      "sha256": "8deb6dce9aaaa5c8a9645344473944ed6022ba51285b235c3615a0dce7b07964"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/gpu-owner-rank-1.json",
+      "sha256": "62e4ccc8a9686ceaf377587c17a37be31759361df8c3616b912a0a57ed739f73"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/gpu-owner-rank-2.json",
+      "sha256": "e1fe911b9b35eabf3e5b1124d4c169fa8c7449efdb29720a9121274e4faa6b24"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/gpu-owner-rank-3.json",
+      "sha256": "54a0b2d780ac925f2f4e3d3ccb5df1e08b442f3dfdd6088dee595956d8df848c"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-bpo-topj16/source.tar.gz",
+      "sha256": "c92912f7df15f11026944c8bb157509662139aaba69660d52df0c6c1302f8bcb"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/completion.jsonl",
+      "sha256": "893bf9c1a77d003c49b9c2e43c1961e982522280e8426a602cc61e2476dd9575"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/input-rank-0.json",
+      "sha256": "b96c998274e6d142ae563cd58fd8147e541b08c7345dd60f4dd867cf671c8acc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/input-rank-1.json",
+      "sha256": "d320b6f7843f441540de8e3ddbb38fe5d1c548bb5568815ee6977a41a7b19c88"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/input-rank-2.json",
+      "sha256": "0e901dcf9a3375b98331e6e040d1aca3cd558842525afd4e4b785874e453cbe6"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/input-rank-3.json",
+      "sha256": "a358f5c471f2f87f7f4423f4091ed6abe68a7a750ce112f4b86de8fe88b2a2b7"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/measurements.jsonl",
+      "sha256": "20d915b4edba52cc4b41b9d6354e791d10cdf76b6d8857e5d0df4513aaf30482"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/model-info.json",
+      "sha256": "32702674c0b028a403ce4cc27eed62f33c39d52b1276b2646464daa78fbe3b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/updates.jsonl",
+      "sha256": "7519afc9f4ff31f238c2971f4a8f68d2a01275b6f5d5c4a39eb015847dc6ee67"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/worker-source-rank-0.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/worker-source-rank-1.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/worker-source-rank-2.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/worker-source-rank-3.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/config.json",
+      "sha256": "f875dc5e6f2e269b6062ef1a0da5bc7231c9d777b6c24121d0cddb47a2a597a2"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/source-sha256.json",
+      "sha256": "17d95181d980798dcbc395c1922fd03d3a4e60e58a4a2e40749d7084fa86f878"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/gpu-owner-rank-0.json",
+      "sha256": "18773e55e483f12bf285597f01cf2b52b04dc5615c0e4bcf9ee644bb78cffb6d"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/gpu-owner-rank-1.json",
+      "sha256": "8f86bac431134f6a7b15c1331b71f4c2fb9d4c4c806b3ebc52b7b1df2ee5fb68"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/gpu-owner-rank-2.json",
+      "sha256": "2b79a1412ae24807a598c58cb3cd6d0d842a1b7c2bec42ac00ef6f55003bf674"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/gpu-owner-rank-3.json",
+      "sha256": "21c9962918d0d03bd4ac209070141b0d016abcd0265e4e435a3f577b8d0d9333"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-actions/source.tar.gz",
+      "sha256": "9e5d5513b9d2ac7053ecac268c77abe50e6c3912c6e40d18cfc9f67b05e07b8e"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/completion.jsonl",
+      "sha256": "9f14e69e3e191b7cf42d1cb97f26bdfe80de04802f9a04e1fa82182523163edf"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/input-rank-0.json",
+      "sha256": "7b1b8a962020fcae0237f7815a117229845f2dae144c7c868eb16fbfe1eadc7b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/input-rank-1.json",
+      "sha256": "a8b7e8214f016d01d7f67f8fdac42e3e65aba986c862d14be15f6eb80b6bc6b0"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/input-rank-2.json",
+      "sha256": "5fdac22a4ac9c1a82c14e93a9343939ae965e3caa2f4c395de236f38cf8a8601"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/input-rank-3.json",
+      "sha256": "af3d88734edaff45555ea726a45af7f260a9f3146491b7d616ef11c6085d78a8"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/measurements.jsonl",
+      "sha256": "053dc42b94758ce011409c3f86e4590ad17fbc144908b12a393b34071210af24"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/model-info.json",
+      "sha256": "32702674c0b028a403ce4cc27eed62f33c39d52b1276b2646464daa78fbe3b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/updates.jsonl",
+      "sha256": "9f95683d7cbd0c5e3ed58d17916c0eada42bde71ec50b9fb9a6a2b5f9770fecf"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/worker-source-rank-0.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/worker-source-rank-1.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/worker-source-rank-2.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/worker-source-rank-3.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/config.json",
+      "sha256": "1b2383c9785eaf942dceaba3dde9f07e47b92ea87313895444db29722dda0040"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/source-sha256.json",
+      "sha256": "9e9a8240fc3a3b6d950e0abc0901393f0afaffa0c358179cf2190b059596b7d8"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/gpu-owner-rank-0.json",
+      "sha256": "336b8a6c0b37564a13d7677bc0b252810735bc5ca15abe6162f2caa43cbdabcb"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/gpu-owner-rank-1.json",
+      "sha256": "63643deb34dea89986909890f65e286e9c5a73a4c3a844e13979519a35f88eae"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/gpu-owner-rank-2.json",
+      "sha256": "a729171998558b79af6990ceead9ea49616c3e570f824cb5d3fdf170a16864ea"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/gpu-owner-rank-3.json",
+      "sha256": "748ac4c14168a8a9b017c75275d70c756c9d523347ecae63c5f995499e9a393f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-full-center/source.tar.gz",
+      "sha256": "11c4c8a2807ce6c41e5a1f3541712f98ead4ceddd636c978244cfb6553c43bcc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/completion.jsonl",
+      "sha256": "86445a08eb4c52a3463fdc060b9fcd84152abd509acc32b2f19c19eca88d2ab2"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/input-rank-0.json",
+      "sha256": "cee51fc3b61b07153337a84df115671f0fdbfb17f552f33b6b040409b7b115ed"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/input-rank-1.json",
+      "sha256": "7f1bf9a015caea636e56b28efa1969ba9e9d6e73f0b8cdc47b5645ab4bf295cc"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/input-rank-2.json",
+      "sha256": "c5afbf5347cd9dc279aee9dfe66aeb15af022f5069f02d2e9452a26339bbd324"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/input-rank-3.json",
+      "sha256": "00a33267e8a90a47c9a479ce665e4c670e97c8324ed29cd0f030a11eb7dc1cf6"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/measurements.jsonl",
+      "sha256": "053dc42b94758ce011409c3f86e4590ad17fbc144908b12a393b34071210af24"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/model-info.json",
+      "sha256": "32702674c0b028a403ce4cc27eed62f33c39d52b1276b2646464daa78fbe3b14"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/updates.jsonl",
+      "sha256": "a45bec53f734248a6bae1232bed07e6668710faf1791a0f197a9fd51de70e70c"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/worker-source-rank-0.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/worker-source-rank-1.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/worker-source-rank-2.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/worker-source-rank-3.json",
+      "sha256": "f8da7dbaf63b882ec582f908900ff643eadf24a2c859eb9c9516d745ffd0fa6b"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/config.json",
+      "sha256": "77677b6be11d9d868947d720b36f5cbcd0d30bceacc9a70d6e226bb99b240251"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/source-sha256.json",
+      "sha256": "320b70e39f476e497afc2be2f4242ba13444f2faa8ddc64228e19df4341c8946"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/exit.json",
+      "sha256": "e717fca86f80f9c0541001ae54b4df07c728eda425b79ce89f58bb227232cf4f"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/gpu-owner-rank-0.json",
+      "sha256": "c66c4c4ae765d305433fe99b219b27a2fc0cf03cfa2bd1f337c99dfa6a287583"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/gpu-owner-rank-1.json",
+      "sha256": "dea771950f33d62beadaa0c347d2c513263be68860ac8723f8946d9bf65f88a4"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/gpu-owner-rank-2.json",
+      "sha256": "d7939533b2d0ca21111739f491a5aa0f5d87e68f3ea7ccb34f63c373ab4be378"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/gpu-owner-rank-3.json",
+      "sha256": "1e73c1232fbf00ea6385a1026c2ae77ca00aab760a8e58881ebcbd5f1e7a2ebf"
+    },
+    {
+      "path": "data/power-implementation-20261015/train-mdpo-topj16/source.tar.gz",
+      "sha256": "308f91866411e31fb9bae8760654cbacb74fc12b4ef3793b5b09e6cfb833cee7"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/backend.patch",
+      "sha256": "4a1a9cbbfa1ecb653a3d1c177fe1cd8200e98a0f94af5906a4bb534079847c83"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/command.json",
+      "sha256": "441a52735d9a4bdbf2f426718e829b011a530657138571a75e1beb88a69bc981"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/completion.jsonl",
+      "sha256": "13b142010fff900e8cc3eed8b37efb5adb29de2c501d41697985b3b1b4896802"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/exit.json",
+      "sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/host-memory.jsonl",
+      "sha256": "a58a4fcf60fb3fb3cf6f943026992f6421961d07357f5854af61d12c2d5914af"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/inner.jsonl",
+      "sha256": "3d46c35d9325f7d98b67c2c09b152028ef229a0be11d106c6ba8ce9ab4fe36e3"
+    },
+    {
+      "path": "data/power-implementation-20261015/verl-bpo-full_vocab/source.tar.gz",
+      "sha256": "732b732ab19dc6b046423f37bc649885edfe5fd3a19b8e2a1d8ab975af980ce9"
+    }
+  ],
+  "scope": "Fixed-parameter correctness and estimator comparison; single t22 prompt; no task-score or optimal-hyperparameter claim",
+  "cpu_gradients": [
+    {
+      "method": "bpo",
+      "production": [
+        -0.6487993206272612,
+        -0.1290986071726241,
+        0.7778979277998853
+      ],
+      "reference": [
+        -0.6487993206272613,
+        -0.12909860717262428,
+        0.7778979277998855
+      ],
+      "max_absolute_error": 2.220446049250313e-16,
+      "kappa": 0.5,
+      "eta": 0.3
+    },
+    {
+      "method": "mdpo",
+      "production": [
+        -0.45083770410331675,
+        -0.2374233474749099,
+        0.6882610515782264
+      ],
+      "reference": [
+        -0.45083770410331675,
+        -0.23742334747491,
+        0.6882610515782269
+      ],
+      "max_absolute_error": 5.551115123125783e-16,
+      "kappa": 0.5,
+      "eta": 0.3
+    }
+  ]
+}

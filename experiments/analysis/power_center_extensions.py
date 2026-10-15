@@ -1,4 +1,4 @@
-"""Bounded tail centers, covariance BPO and exact conditional LLM-cache audits."""
+"""Bounded head-tail teacher-center estimates and conditional LLM-cache audits."""
 
 import csv
 import gc
@@ -6,7 +6,6 @@ import gzip
 import hashlib
 import io
 import json
-from itertools import product
 from pathlib import Path
 
 import matplotlib
@@ -70,32 +69,6 @@ def tail_estimator(q, teacher, kappa, eta, head):
     }
 
 
-def logit_u_variance(q, h, eta, count):
-    residual = (h - q @ h) / eta
-    scalar = float(q @ residual**2)
-    mean2 = float(np.sum((q * residual) ** 2))
-    oracle = float(q @ (residual**2 * (1 - 2 * q + q @ q))) - mean2
-    pair = scalar - mean2
-    return {
-        "oracle_one": oracle,
-        "pair": pair,
-        "u": ((count - 2) * oracle + 2 * pair) / (count * (count - 1)),
-        "oracle_average": oracle / count,
-        "second_moment_pair": scalar,
-    }
-
-
-def mixture_logit_variance(q, teacher, h, eta, count):
-    residual = (h - q @ h) / eta
-    proposal = (q + teacher) / 2
-    measure = q * q / proposal
-    s0, s1, s2 = measure.sum(), measure @ residual, measure @ residual**2
-    mean2 = float(np.sum((q * residual) ** 2))
-    pair = float(s0 * s2 - s1 * s1 - mean2)
-    first = float((1 + q @ q) * s2 - 2 * s1 * np.sum(q * q * residual) + mean2 * s0 - 4 * mean2)
-    return ((count - 2) * first + 2 * pair) / (count * (count - 1))
-
-
 def checks():
     rng = np.random.default_rng(20261014)
     max_error = 0.0
@@ -113,54 +86,7 @@ def checks():
             assert r["raw_tail_variance"] <= old_raw + 1e-10
             max_error = max(max_error, r["mean_error"])
             old_width, old_raw = r["width"], r["raw_tail_variance"]
-    q = np.array([0.2, 0.3, 0.5])
-    h = np.array([-1.0, 0.3, 1.7])
-    eta = 0.3
-    psi = np.eye(3) - np.array([0.25, 0.25, 0.5])[None, :]
-    centered_psi = psi - q @ psi
-    r = (h - q @ h) / eta
-    mean = (q * r) @ psi
-    oracle = float(q @ np.sum((r[:, None] * centered_psi - mean) ** 2, axis=1))
-    pair_second = 0.0
-    for x, y in product(range(3), repeat=2):
-        g = (h[x] - h[y]) * (psi[x] - psi[y]) / (2 * eta)
-        pair_second += q[x] * q[y] * np.sum((g - mean) ** 2)
-    errors = []
-    for count in (2, 3, 4):
-        var = 0.0
-        for outcome in product(range(3), repeat=count):
-            ids = np.array(outcome)
-            values = h[ids]
-            scores = psi[ids]
-            g = ((values - values.mean())[:, None] * scores).sum(0) / (eta * (count - 1))
-            var += q[ids].prod() * np.sum((g - mean) ** 2)
-        predicted = ((count - 2) * oracle + 2 * pair_second) / (count * (count - 1))
-        errors.append(abs(var - predicted))
-        assert errors[-1] < 1e-11
-        assert predicted >= oracle / count - 1e-11
-    mixture_errors = []
-    teacher = np.array([0.5, 0.2, 0.3])
-    proposal = (q + teacher) / 2
-    true_gradient = q * (h - q @ h) / eta
-    for count in (2, 3, 4):
-        measured = 0.0
-        for outcome in product(range(3), repeat=count):
-            ids = np.array(outcome)
-            w = q[ids] / proposal[ids]
-            difference = h[ids, None] - h[None, ids]
-            coefficients = w * (difference * w[None, :]).sum(-1) / (eta * count * (count - 1))
-            gradient = np.zeros(3)
-            np.add.at(gradient, ids, coefficients)
-            measured += proposal[ids].prod() * np.sum((gradient - true_gradient) ** 2)
-        error = abs(measured - mixture_logit_variance(q, teacher, h, eta, count))
-        mixture_errors.append(error)
-        assert error < 1e-10
-    return {
-        "mixture_covariance_identity_max_error": max(mixture_errors),
-        "tail_cases": 600,
-        "tail_mean_max_error": max_error,
-        "covariance_trace_identity_max_error": max(errors),
-    }
+    return {"tail_cases": 600, "tail_mean_max_error": max_error}
 
 
 def save(fig, output, name):
@@ -174,47 +100,6 @@ def save(fig, output, name):
 
 
 def figures(output):
-    q = np.array([0.7, 0.2, 0.1])
-    t = np.array([0.1, 0.2, 0.7])
-    eta = 0.3
-    _a, _k, b, _ = signals(q, t, 0.5, eta)
-    m = moments(q, t, 0.5, eta)
-    beta = np.linspace(0, 1, 101)
-    covariance_trace = 1 - q @ q
-    curves = np.array([logit_u_variance(q, -(1 - p) * eta * b, eta, 4)["u"] for p in beta])
-    floor = m["mixture_center_estimator_variance"] * covariance_trace / 4
-    oracle = np.array(
-        [logit_u_variance(q, -(1 - p) * eta * b, eta, 4)["oracle_average"] for p in beta]
-    )
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), layout="constrained")
-    axes[0].semilogy(beta, oracle + floor, label="Cached K: 1 center draw, 4 gradient actions")
-    axes[0].semilogy(beta, np.maximum(curves, 1e-12), label="BPO sample variance U4: no K")
-    axes[0].semilogy(beta, np.maximum(oracle, 1e-12), label="Oracle two centers: 4 actions")
-    axes[0].set(
-        xlabel="Ideal target progress beta",
-        ylabel="Exact logit gradient covariance trace",
-        title="Fixed center errors leave a sampling noise floor",
-    )
-    counts = np.arange(2, 17)
-    axes[1].plot(
-        counts,
-        [logit_u_variance(q, -eta * b, eta, int(n))["u"] for n in counts],
-        label="BPO U statistic",
-    )
-    axes[1].plot(
-        counts,
-        [logit_u_variance(q, -eta * b, eta, int(n))["oracle_average"] for n in counts],
-        label="Known exact centers",
-    )
-    axes[1].set(
-        xlabel="Auxiliary actions per prefix",
-        ylabel="Exact covariance trace",
-        title="Removing centers adds variance at equal action budget",
-    )
-    for ax in axes:
-        ax.legend(fontsize=8)
-        ax.grid(alpha=0.2)
-    save(fig, output, "center-noise-and-sample-variance")
     q = np.array([0.99, 0.01])
     t = np.array([0.5, 0.5])
     _a, k, _b, phi = signals(q, t, 0.5, 0.3)
@@ -237,7 +122,6 @@ def figures(output):
 
 def cached(repo, output):
     rows = []
-    mixture_rows = []
     rng = np.random.default_rng(20261014)
     for rank in range(4):
         artifact = torch.load(
@@ -254,17 +138,6 @@ def cached(repo, output):
                 tl -= tl.logsumexp(-1)
                 q, t = ql.exp().numpy(), tl.exp().numpy()
                 parent = moments(q, t, 0.5, 0.3)
-                teacher_signal = signals(q, t, 0.5, 0.3)[0]
-                mixture_rows.append(
-                    {
-                        "response": rank * 16 + index,
-                        "q_u4": logit_u_variance(q, -0.3 * teacher_signal, 0.3, 4)["u"],
-                        "distinct_u2": (1 - float(q @ q) / 2) * parent["advantage_variance"]
-                        - 1.5 * parent["mean_logit_gradient_squared"],
-                        "mixture_u4": mixture_logit_variance(q, t, -0.3 * teacher_signal, 0.3, 4),
-                        "mixture_u2": mixture_logit_variance(q, t, -0.3 * teacher_signal, 0.3, 2),
-                    }
-                )
                 order = np.argsort(-q)
                 previous_raw = parent["mixture_center_estimator_variance"]
                 previous_width = -np.log1p(-0.3) / (0.5 * 0.3)
@@ -357,63 +230,15 @@ def cached(repo, output):
         ax.set(xlabel="Head size", xscale="log")
         ax.grid(alpha=0.2)
     save(fig, output, "cached-head-tail-estimation")
-    u_stats = {}
-    with gzip.open(repo / "data/power-center-20261014/prefix-audit.csv.gz", "rt") as stream:
-        for row in csv.DictReader(stream):
-            key = f"k{row['kappa']}-eta{row['eta']}"
-            entry = u_stats.setdefault(key, [])
-            scalar = float(row["advantage_variance"])
-            g2 = float(row["mean_logit_gradient_squared"])
-            vc = float(row["mean_centered_logit_gradient_variance"])
-            vp = scalar - g2
-            entry.append([vc / 4, (2 * vc + 2 * vp) / 12, scalar - g2])
-    pair_values = [
-        float(np.mean([r["distinct_u2"] for r in mixture_rows])),
-        float(np.mean([r["mixture_u2"] for r in mixture_rows])),
-        float(np.mean([r["q_u4"] for r in mixture_rows])),
-        float(np.mean([r["mixture_u4"] for r in mixture_rows])),
-    ]
-    fig, ax = plt.subplots(figsize=(9, 4), layout="constrained")
-    ax.bar(
-        ["q distinct pair (2)", "q/T mixture pair (2)", "q U4 (4)", "q/T mixture U4 (4)"],
-        pair_values,
-        color=["#3979ae", "#289b78", "#3979ae", "#289b78"],
-    )
-    ax.set(
-        ylabel="Mean exact logit covariance trace",
-        title="128 cached prefixes; counts show action budget; k=0.5, eta=0.3",
-    )
-    ax.tick_params(axis="x", labelsize=9)
-    save(fig, output, "pair-proposal-variance")
-    u_summary = {
-        key: {
-            "oracle_4_action_variance": float(np.mean(a, axis=0)[0]),
-            "u4_variance": float(np.mean(a, axis=0)[1]),
-            "u2_variance": float(np.mean(a, axis=0)[2]),
-            "u4_over_oracle4_ratio": float(
-                np.mean(a, axis=0)[1] / max(np.mean(a, axis=0)[0], 1e-30)
-            ),
-        }
-        for key, a in u_stats.items()
-    }
     return {
         "bootstrap": "3000 response-cluster draws; same 64 responses, two fixed prefixes each; single-prompt scope",
-        "mixture_bpo": {
-            "proposal": "(q+T)/2",
-            "mean_u4_variance": float(np.mean([r["mixture_u4"] for r in mixture_rows])),
-            "mean_q_u4_variance": float(np.mean([r["q_u4"] for r in mixture_rows])),
-            "mean_distinct_u2_variance": float(np.mean([r["distinct_u2"] for r in mixture_rows])),
-            "mean_u2_variance": float(np.mean([r["mixture_u2"] for r in mixture_rows])),
-            "scope": "Same real q/T and logits metric; pairwise frozen q/proposal importance weights, no sample-weight normalization",
-        },
         "prefixes": 128,
         "responses": 64,
         "native_anchor": "cached BF16; probabilities renormalized in FP64",
         "kappa": 0.5,
         "eta": 0.3,
         "heads": stats,
-        "u_statistics_on_existing_20_cells": u_summary,
-        "scope": "Exact scalar/logit conditional moments of actual q/T; ideal p-beta curves are analytic policies, not neural training histories",
+        "scope": "Exact scalar center conditional moments of actual q/T; no new model training",
     }
 
 
@@ -422,7 +247,7 @@ def main():
     repo = Path(__file__).resolve().parents[2]
     output = repo / "results/power-center-extensions"
     output.mkdir(exist_ok=True)
-    summary = {"date": "2026-10-14", "checks": checks()}
+    summary = {"date": "2026-10-15", "checks": checks()}
     figures(output)
     summary["cached"] = cached(repo, output)
     (output / "summary.json").write_text(json.dumps(summary, indent=2, allow_nan=False) + "\n")

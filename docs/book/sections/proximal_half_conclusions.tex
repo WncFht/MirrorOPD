@@ -132,4 +132,4 @@ $u,v$ 在正单位球面上。归一化的正线性组合位于两者张成的�
  \label{fig:power-kappa-criteria}
 \end{figure}
 
-学生和教师的加权分布还可以用作辅助 action 提案，例如 $\mu_\zeta=(1-\zeta)q+\zeta T$。这与平方根监督 target 是两个选择：前者通过重要性校正估计原 $q$ 加权 BPO 损失，后者改变要拟合的目标。提案混合能控制重要性比率并在一些稀有 action 输入上改善相对方差，但没有每个输入都降低方差的保证。第~\ref{sec:power-estimators}~节给出无偏性、反例和排除重复 action 后的协方差半正定改进。
+当前实现比较 Top-J 加尾部中心与完整词表求和。前者保留冻结锚点的原始 head 质量，将尾部合并；后者提供精确条件中心及梯度参照。两种中心在 $J=|\mathcal V|$ 时必须一致；有限 head 的误差和作用于 BPO 的梯度偏差见第~\ref{sec:power-estimators}~节。

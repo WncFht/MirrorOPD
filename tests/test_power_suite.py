@@ -17,8 +17,8 @@ def test_power_plan_separates_target_fit_and_sampling_choices():
     assert all(c["updates"] == 300 and c["batch_size"] == 64 and c["seed"] == 42 for c in plan)
     assert sum(c["updates"] for c in plan) == 18900
     canaries = canary_plan(plan)
-    assert len(canaries) == 9
-    assert sum(c["updates"] for c in canaries) == 18
+    assert len(canaries) == 5
+    assert sum(c["updates"] for c in canaries) == 10
     assert {c["kappa"] for c in canaries[:3]} == {0, 0.5, 1}
     assert all(c["batch_size"] == 64 and c["gradient_probe_draws"] == 8 for c in canaries)
     assert all(c["sampler"] == "anchor" for c in plan if c["fit"] == "bpo")

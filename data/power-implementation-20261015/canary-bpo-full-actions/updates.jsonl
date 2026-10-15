@@ -1,0 +1,2 @@
+{"update": 1, "grad_norm": 4.670961856842041, "seconds_elapsed": 0.49851167667657137, "peak_allocated_gib": 7.583045959472656, "proxy": 0.01600077177863568, "diagnostic_positions": 16.0}
+{"update": 2, "grad_norm": 3.9747443199157715, "seconds_elapsed": 1.080090214498341, "peak_allocated_gib": 9.321822166442871, "proxy": 0.012536190217360854, "diagnostic_positions": 16.0}

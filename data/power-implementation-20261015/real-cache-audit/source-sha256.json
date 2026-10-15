@@ -1,0 +1,112 @@
+{
+  "files": [
+    {
+      "path": "experiments/rollout/oneshot_batch.py",
+      "sha256": "8c9e9d5cce2463c17d94b744b86bd597338523ae48c5cec0b27b3fab568495aa"
+    },
+    {
+      "path": "experiments/scoring/oneshot_math_evaluate.py",
+      "sha256": "cee6a21ef5720be466562a03aed9c1e296099f30b5f1b150612e67f83e0f5a2e"
+    },
+    {
+      "path": "src/mirroropd/__init__.py",
+      "sha256": "6f5935592c34e48483e099a54fd0fff6b8bb9e860bf4cf0b07bad69780340db3"
+    },
+    {
+      "path": "src/mirroropd/integrations/__init__.py",
+      "sha256": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/__init__.py",
+      "sha256": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/fsdp.py",
+      "sha256": "dc621b8a031e504f19e3742d730ea9633d9ff059a8969569c47b4c263bf702c6"
+    },
+    {
+      "path": "src/mirroropd/opd_categorical.py",
+      "sha256": "618cde179e86e4df43025408cb6c66c77e270e960c4b1d833574204237f05cd2"
+    },
+    {
+      "path": "src/mirroropd/opd_lm.py",
+      "sha256": "c1c1384f7309a8f2ef8316c88ef6e507f5751cce2ac0257ae219cc6f38efdb50"
+    },
+    {
+      "path": "src/mirroropd/opd_pg.py",
+      "sha256": "fb0a1f3dfb722349a2da07ee08733069be4fe8afc0e07d1f3e41e2a7de1c1cb2"
+    },
+    {
+      "path": "src/mirroropd/proximal.py",
+      "sha256": "c063af23852743af079e5fb8b93c749bfd7cf65de12b41b4b44ff7d18709f033"
+    },
+    {
+      "path": "src/mirroropd/token_inner.py",
+      "sha256": "5deb1b44f71309b3f16ce41ed2919d5b3606a50ba98f4161bdabdd46f2abb981"
+    },
+    {
+      "path": "src/mirroropd/training/__init__.py",
+      "sha256": "bd253c8d30ead9acaecef90f17198943480e09df2bb5269be3d41d2ac94af878"
+    },
+    {
+      "path": "src/mirroropd/training/cache.py",
+      "sha256": "85babd5972f826041a0552bbd1b91f2b858fcd796515688aee47b1ac1e3d2b09"
+    },
+    {
+      "path": "src/mirroropd/training/configuration.py",
+      "sha256": "433cbc913dbdbca09185911c7b3d6160e6d44d9748191f15bf44cfe6ab371d96"
+    },
+    {
+      "path": "src/mirroropd/training/evaluation.py",
+      "sha256": "00496a1678d621f9bc85676a2ae90f848d03dee2a4b5d7662f3a778427efd731"
+    },
+    {
+      "path": "src/mirroropd/training/gsm8k.py",
+      "sha256": "9aa248beca13963b42619ac2b8baa0d5d8381c8bd698646040950d758ed6d29f"
+    },
+    {
+      "path": "src/mirroropd/training/host_memory.py",
+      "sha256": "e0eb5c5062039ec7205882ee5da86af7fe06bd23e93a859bb4965638eb1cfd62"
+    },
+    {
+      "path": "src/mirroropd/training/losses.py",
+      "sha256": "6aae0d21874273cfa72c1988035edb04f257cd3122f9055035343cf2feffc922"
+    },
+    {
+      "path": "src/mirroropd/training/metrics.py",
+      "sha256": "541e9114e6c3d7af161c2a388a3235f8750ba4f043fc7797d10a8ea3a3ea4c4f"
+    },
+    {
+      "path": "src/mirroropd/training/scalar_schedule.py",
+      "sha256": "d7fc869e68b6b84db77d3e3e84d4fe2d7c0778db35292ed95f33162650701d14"
+    },
+    {
+      "path": "src/mirroropd/training/support.py",
+      "sha256": "bd9cadb588fb327ca1f2b2c5028e23c7529fb046d6dc8d071b58bff66b71d48f"
+    },
+    {
+      "path": "src/mirroropd/training/tokenization.py",
+      "sha256": "af42ad7b8e3a45551408fbf73413183c953fff19faf02d9f1c8d9e00bed1712c"
+    },
+    {
+      "path": "src/mirroropd/training/tracking.py",
+      "sha256": "a52fc74aa6a7924af1aa5bf52d01612d8b00a4617ca0180956a7c2d0843fc34f"
+    },
+    {
+      "path": "training/gpu_exclusive.py",
+      "sha256": "8cdd009f7dd5ac09697421985a1166856c8ace578dcfcfe72831cfb03bfd0317"
+    },
+    {
+      "path": "training/oneshot_evaluation_job.py",
+      "sha256": "c3553a8bb6e67e22619030acc42b26da788ea6e222de10a4382b806b64a3ff57"
+    },
+    {
+      "path": "training/oneshot_worker.py",
+      "sha256": "cb348754395a27a8c325dc8ee5c5ec7ed95fe584f423e79b52e4ab13574bf38e"
+    },
+    {
+      "path": "training/power_implementation_worker.py",
+      "sha256": "781682c40e3d4dcff81c54c31f2248a13f097e4096e826c29b7cc78688838b5f"
+    }
+  ]
+}

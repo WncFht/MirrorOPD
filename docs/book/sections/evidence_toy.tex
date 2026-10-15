@@ -103,7 +103,7 @@ $\eta$ 同时影响 Gibbs target、Mean 的 Lambert-$W$ target 以及各损失�
 
 这些检查完成前不运行大型模型 sweep。当前仓库中的 toy 输出由 \path{toy_token_inner.py}（从仓库根用 \path{PYTHONPATH=src uv run --with torch python} 运行）生成，结果保存在\path{results/toy/toy_token_inner.csv}。独立的 \path{tests/test_kl_estimators.py} 使用 200,000 个 token 样本检查 K4 的 value 与 autograd gradient；旧书记录的绝对 value 误差为 $5.6\times10^{-5}$，gradient 的 $\ell_2$ 误差为 $1.5\times10^{-3}$。
 
-\path{tests/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和有限样本尺度修正；它与 toy 实验分别检验推导正确性和有限步优化行为。
+\path{tests/test_mean_bpo.py} 进一步核对 Mean 与 BPO 的解析梯度、有限差分、最优点和完整词表内层几何；它与 toy 实验分别检验推导正确性和有限步优化行为。
 
 \section{真实语言模型上的四种 \texorpdfstring{Top-$J$}{Top-J} 对照}
 

@@ -23,6 +23,7 @@ def metric_name(key: str, scope: str) -> str:  # noqa: PLR0911
         "grad_was_clipped": "03_optimization",
         "score_coefficient": "03_optimization",
         "token_advantage": "03_optimization",
+        "full_loss": "03_optimization",
         "action_nll": "03_optimization",
         "support_overlap": "06_support_mass",
         "student_center": "04_kl_centers",

@@ -43,6 +43,19 @@ make check
 
 固定监督下的全局标量学习率分析、精确 BPO 推导和 GPU 0–3 验证见 [固定监督蒸馏与 BPO 优化实验总报告](docs/experiments/2026-10-15-固定监督蒸馏动力学与BPO优化实验报告.md)。报告区分完整目标与 sampled/Top-k 更新场，并同时记录 backward、forward、耗时和后期反弹。
 
+幂均值生产实现和固定 κ、η 的正确性对照见[实现与估计器报告](docs/experiments/2026-10-15-幂均值镜像蒸馏实现与估计器对照.md)。BPO、MDPO 可配置 `distillation.distillation_loss.mirror_kappa`；`mirror_center_mode=topj_tail` 使用原始 head 质量加合并尾部，`full_vocab` 保留完整锚点与教师分布。`mirror_action_mode=sampled` 使用记录动作，`full_vocab` 直接微分完整条件损失并要求完整缓存。默认 κ=0、Top-J＋tail、sampled，保留原调用行为。完整动作模式记录 `mirror/full_loss`，不生成采样 score 或重要性比率指标。
+
+例如在原训练命令后增加以下 Hydra 参数，可固定平方根目标并启用完整动作求和；这里的参数用于实现验证，不代表已选出的最佳值：
+
+```bash
+distillation.distillation_loss.mirror_kappa=0.5 \
+distillation.distillation_loss.mirror_eta=0.3 \
+distillation.distillation_loss.mirror_center_mode=full_vocab \
+distillation.distillation_loss.mirror_action_mode=full_vocab
+```
+
+固定监督四卡验证入口为 `PYTHONPATH=.:src python -m training.power_implementation_suite --phase audit`，随后依次运行 `canary`、`gradient`、`train`、`lifecycle`。模型、冻结轨迹、前缀切分及结果范围见报告；BPO 二样本恒等式及相关训练入口已退出当前实现。
+
 当前数学实验使用 DeepSeek-R1-Distill-Qwen-1.5B 学生和 JustRL-DeepSeek-1.5B 教师，在四张 H800 上比较 OPD、MDPO、BPO。设置、日志审计和图表见[数学三算法主报告](docs/experiments/2026-10-12-数学三算法日志审计与学习效率比较.md)，字段、事件轴和公式见[统一指标规范](docs/operations/2026-10-12-蒸馏统一日志与评测指标规范.md)。
 
 代码分层、实际 GPU 环境清单、模型与数据要求、可移植 canary 和正式启动命令见[代码架构与跨机器复现](docs/operations/2026-10-12-代码架构与跨机器复现.md)。新默认数学评测已改为每题 16 次采样和独立长预算；旧正式比较采用单次 greedy。新默认配置尚未完成 GPU canary。`make bootstrap` 不安装 GPU 训练栈，数学模型和 parquet 需要单独准备。

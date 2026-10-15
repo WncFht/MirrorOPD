@@ -20,7 +20,6 @@ from experiments.rollout.oneshot_batch import model_path, one_prompt
 from mirroropd.proximal import (
     power_log_target,
     renyi_inner_bound,
-    sample_variance_bpo_loss,
     sampled_target_loss,
     target_divergence,
 )
@@ -196,67 +195,22 @@ def backward_once(model, sequences, config, count, update):
                 sampler = config.get("sampler", "anchor")
                 if sampler == "student":
                     proposal = logits.float().log_softmax(-1).detach()
-                elif sampler == "anchor_teacher_mixture":
-                    mix = config["proposal_teacher_weight"]
-                    if not 0 < mix < 1:
-                        raise ValueError("The frozen proposal mixture must retain anchor mass")
-                    proposal = torch.logaddexp(
-                        sequence["qlog"] + math.log1p(-mix), sequence["tlog"] + math.log(mix)
-                    )
-                else:
+                elif sampler == "anchor":
                     proposal = sequence["qlog"]
-                if sampler == "anchor_distinct_pair":
-                    if config["sample_count"] != 2:
-                        raise ValueError("The distinct pair uses exactly two auxiliary actions")
-                    probabilities = sequence["qlog"].exp()
-                    first = torch.multinomial(
-                        probabilities, 1, replacement=True, generator=generator
-                    )
-                    second_probabilities = probabilities.clone().scatter(-1, first, 0.0)
-                    tail_mass = second_probabilities.sum(-1) / probabilities.sum(-1)
-                    if bool((tail_mass <= 0).any()):
-                        raise ValueError("Distinct-pair sampling needs two positive anchor actions")
-                    second = torch.multinomial(
-                        second_probabilities, 1, replacement=True, generator=generator
-                    )
-                    actions = torch.cat((first, second), -1)
-                    action_weights = torch.stack((torch.ones_like(tail_mass), tail_mass), -1)
                 else:
-                    actions = torch.multinomial(
-                        proposal.exp(),
-                        config["sample_count"],
-                        replacement=True,
-                        generator=generator,
-                    )
-                    action_weights = (
-                        (sequence["qlog"].gather(-1, actions) - proposal.gather(-1, actions)).exp()
-                        if sampler == "anchor_teacher_mixture"
-                        else None
-                    )
-                if config.get("gradient_estimator") == "sample_variance":
-                    if config["fit"] != "bpo" or sampler not in (
-                        "anchor",
-                        "anchor_teacher_mixture",
-                        "anchor_distinct_pair",
-                    ):
-                        raise ValueError("BPO sample variance requires a frozen proposal")
-                    fields = sample_variance_bpo_loss(
-                        logits,
-                        sequence["mlog"],
-                        actions,
-                        config["strength"],
-                        importance_weights=action_weights,
-                    )
-                else:
-                    fields = sampled_target_loss(
-                        logits,
-                        proposal,
-                        sequence["mlog"],
-                        actions,
-                        config.get("fit_kappa", config["kappa"]),
-                        config["strength"],
-                        config["fit"],
-                    )
+                    raise ValueError("Supported action samplers are anchor and student")
+                actions = torch.multinomial(
+                    proposal.exp(), config["sample_count"], replacement=True, generator=generator
+                )
+                fields = sampled_target_loss(
+                    logits,
+                    proposal,
+                    sequence["mlog"],
+                    actions,
+                    config.get("fit_kappa", config["kappa"]),
+                    config["strength"],
+                    config["fit"],
+                )
                 loss = fields["loss"]
                 coefficient, ratio = (
                     fields["coefficient"].detach().double(),
@@ -466,9 +420,7 @@ def train(args, config, rank):
                 "action_expectation": "fresh_auxiliary_mc"
                 if config["sample_count"]
                 else "exact_full_vocabulary",
-                "objective_kind": "unbiased_sample_variance_loss"
-                if config.get("gradient_estimator") == "sample_variance" and config["sample_count"]
-                else "score_surrogate"
+                "objective_kind": "score_surrogate"
                 if config["sample_count"]
                 else "exact_normalized_loss",
                 "seconds_elapsed": time.monotonic() - begin,

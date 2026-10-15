@@ -33,36 +33,7 @@ $-\bar\psi_{k,n}$ 项吸收到同一个 score expectation 中。OPD 代入后，
 式中两个 KL 均条件于同一个 $s$，且都停止梯度；前者是 student center，后者是
 OPD reward center。生产实现的 ``bpo`` 系数正是式~\eqref{eq:ch2-bpo-opd-pg} 的
 括号部分。
-centered score 来自 student center 的导数。令 $h(s,a)=U_{k,n}(s,a)-\eta f(s,a)$，用一个主 action $a_i$ 和 $m$ 个独立辅助 actions $b_{i\ell}$ 估计 center，则
-\begin{equation*}
-\mathbb E\left[\left(h(s,a_i)-\frac1m\sum_{\ell=1}^m h(s,b_{i\ell})\right)^2\right]
-=\left(1+\frac1m\right)\operatorname{Var}_{ q_k}(z\mid s).
-\end{equation*}
-因此 sampled 平方损失需乘 $m/(m+1)$，其 autograd 梯度才无偏。若同 prefix 共有 $m\ge2$ 个 actions，leave-one-out center 使用其余 $m-1$ 个样本，对应系数为 $(m-1)/m$。独立性本身不能消除 residual 与 center 导数乘积中的协方差。
-
-\begin{algorithm}[ht]
-\caption{BPO inner update\\{\small\textit{Semantics: 固定 anchor 下对正向中心化残差求平方损失}}}
-\begin{algorithmic}[1]
-\Require frozen $ q_k$, signal $f$, histories $\{s_i\}_{i=1}^{B}$, auxiliary count $m\ge1$, $\eta$, step size $\alpha_{k,n}$
-\Ensure updated parameters $\theta_{k,n+1}$
-\For{each history $s_i$}
-    \State sample $a_i\sim q_k(\cdot\mid s_i)$ and $b_{i1},\ldots,b_{im}\sim q_k(\cdot\mid s_i)$ independently
-    \State $h_i\gets U_{k,n}(s_i,a_i)-\eta f(s_i,a_i)$
-    \State $\bar h_i\gets m^{-1}\sum_{\ell=1}^{m}[U_{k,n}(s_i,b_{i\ell})-\eta f(s_i,b_{i\ell})]$
-    \State $\widehat R_i^{\mathrm{BPO}}\gets h_i-\bar h_i$, $\ell_i\gets\frac{m}{m+1}\frac{(\widehat R_i^{\mathrm{BPO}})^2}{2\eta}$
-\EndFor
-\State $g_{k,n}\gets\nabla_\theta(B^{-1}\sum_i\ell_i)$
-\State $\theta_{k,n+1}\gets\theta_{k,n}-\alpha_{k,n}g_{k,n}$
-\State \Return $\theta_{k,n+1}$
-\end{algorithmic}
-\end{algorithm}
-
-若从行为测度 $\beta$ 采样，不能先把 $z$ 乘以 importance weight 再平方；这会把二阶矩的权重变成平方。可用两个独立样本 $a,b\sim\beta(\cdot\mid s)$，令 $w(v)=\operatorname{sg}( q_k(v\mid s)/\beta(v\mid s))$，使用
-\begin{equation*}
-\widehat{\mathcal L}_{\mathrm{BPO}}(s)
-=\frac{w(a)w(b)}{4\eta}[z(a)-z(b)]^2.
-\end{equation*}
-因为 $\mathbb E_{a,b\sim q_k}[(z(a)-z(b))^2]=2\operatorname{Var}_{ q_k}(z)$，上述估计器的期望恰为原始 BPO 损失，且固定权重下 autograd 给出无偏梯度。
+学生中心的导数产生中心化 score；完整词表求和时，零均值 residual 将该项精确抵消。生产 Top-J 加尾部中心是显式近似，其误差须单独报告；完整词表中心与动作求和提供精确参照。
 
 \subsection{MDPO：直接优化 mirror objective}
 \label{sec:ch2-mdpo-generic}

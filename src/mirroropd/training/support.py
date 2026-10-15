@@ -15,7 +15,13 @@ def topk_pair_overlap(
     if left.shape != right.shape:
         raise ValueError("Top-J set shapes must match")
     j = left.shape[-1]
-    intersection = left.unsqueeze(-1).eq(right.unsqueeze(-2)).any(-1).float().sum(-1)
+    if j > 64:
+        # A full-vocabulary head must not allocate a (..., V, V) equality array.
+        ordered = right.sort(-1).values.contiguous()
+        locations = torch.searchsorted(ordered, left.contiguous()).clamp_max(j - 1)
+        intersection = ordered.gather(-1, locations).eq(left).float().sum(-1)
+    else:
+        intersection = left.unsqueeze(-1).eq(right.unsqueeze(-2)).any(-1).float().sum(-1)
     union = 2 * j - intersection
     return {
         f"mirror_overlap_{pair}_intersection_count": intersection,

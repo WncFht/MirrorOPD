@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-15",
+  "kappa": 0.5,
+  "eta": 0.3,
+  "physical_gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "methods": [
+    "bpo",
+    "mdpo"
+  ],
+  "center_modes": [
+    "topj_tail",
+    "full_vocab"
+  ],
+  "action_modes": [
+    "sampled",
+    "full_vocab"
+  ],
+  "topj": [
+    0,
+    16,
+    64,
+    256,
+    "vocab"
+  ],
+  "seed": 42,
+  "lr": 1e-06,
+  "weight_decay": 0.0,
+  "scope": "Implementation correctness and estimator comparison; no kappa/eta optimization",
+  "gates": [
+    "independent CPU objective/gradient identities",
+    "real cache exact versus grouped centers",
+    "four-GPU model forward/backward and short fitting",
+    "outer refresh and checkpoint resume"
+  ],
+  "retired": [
+    "sample_variance_bpo_loss",
+    "BPO U-statistic canaries",
+    "distinct-pair and pair-mixture training"
+  ]
+}

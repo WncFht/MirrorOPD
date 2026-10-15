@@ -1,0 +1,9 @@
+{
+  "parameters": 1777088000,
+  "student": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/DeepSeek-R1-Distill-Qwen-1.5B",
+  "vocabulary": 151665,
+  "master_dtype": "float32",
+  "forward_dtype": "bfloat16",
+  "gradient_reduction_dtype": "float32",
+  "deterministic_algorithms": true
+}

@@ -162,12 +162,12 @@ Mean 的情况不同：teacher 中心完全冻结，故 $\nabla_\theta\widehat A
 \begin{equation}
 \widehat\ell_{\mathrm{Part}}=\frac12\bigl[\eta(r_k(s,a)-b(s))-U_{k,n}(s,a)\bigr]^2,
 \end{equation}
-它只有在 $b(s)=\log Z_k(s)/\eta$ 时才等于 exact residual；任意其他 baseline 会留下一个 prefix-dependent constant，因而改变 PMD-Part 的有限参数投影。BPO 的中心化 residual 则可用同 prefix 的 $m$ 个 sampled tokens 构造，$m=1$ 时必须使用跨样本或 frozen center。
+它只有在 $b(s)=\log Z_k(s)/\eta$ 时才等于 exact residual；任意其他 baseline 会留下一个 prefix-dependent constant，因而改变 PMD-Part 的有限参数投影。BPO 使用同 prefix 的显式教师中心和当前学生中心。当前生产路线采用 Top-J 加尾部中心，完整词表中心及完整动作求和作为参照。
 
 \begin{algorithm}[ht]
 \caption{OPD sampled-token inner update\\{\small\textit{Semantics: 每个 prefix 只访问 rollout 的下一个 token}}}
 \begin{algorithmic}[1]
-\Require frozen anchor $q_k$, teacher $t$, rollout pairs $(s_i,a_i)$, method $M$, center size $m$, $\eta$
+\Require frozen anchor $q_k$, teacher $t$, rollout pairs $(s_i,a_i)$, method $M$, retained head size $J$, $\eta$
 \Ensure updated student parameters $\theta$
 \For{each prefix $s_i$}
     \State read $\log t(a_i\mid s_i)$ and $\log q_k(a_i\mid s_i)$
@@ -176,9 +176,9 @@ Mean 的情况不同：teacher 中心完全冻结，故 $\nabla_\theta\widehat A
         \State obtain independent auxiliary actions at the same prefix to estimate a frozen reward center $\widehat{\bar r}_i$
         \State $\ell_i\gets\frac12[U_{k,n}(s_i,a_i)-\eta\sg(r_i-\widehat{\bar r}_i)]^2$
     \ElsIf{$M=\mathrm{BPO}$}
-        \State estimate the reward center and current student log-ratio center at the same prefix
-        \State form a centered residual loss with the $1/(2\eta)$ factor; retain the student center's derivative
-        \State use the finite-sample correction specified in the BPO inner algorithm
+        \State compute frozen $K_T$ and current $K_S$ with Top-$J$ plus tail or complete-vocabulary centers
+        \State $c_i\gets[U_{k,n}(s_i,a_i)+K_S(s_i)]/\eta-r_i-K_T(s_i)$
+        \State $\ell_i\gets\sg(c_i)\log p_{k,n}(a_i\mid s_i)$
     \ElsIf{$M=\mathrm{MDPO}$}
         \State $w_i\gets\sg\!\left(p_{k,n}(a_i\mid s_i)/q_k(a_i\mid s_i)\right)$
         \State $\ell_i\gets\sg\!\left(w_i[\eta^{-1}\log(p_{k,n}(a_i\mid s_i)/q_k(a_i\mid s_i))-r_i]\right)\log p_{k,n}(a_i\mid s_i)$

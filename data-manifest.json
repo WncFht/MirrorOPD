@@ -917,6 +917,120 @@
             "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO标量调度实验总报告.md.gz",
             "sha256": "f77b242441bdd9a0000625fd8c5be118ee9bd5f0ae7ce8284f6d0538660fa810",
             "bytes": 83033
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/bpo-full-lifecycle.tar",
+            "archive": "data/power-implementation-20261015/bpo-full-lifecycle/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "ffb11c82872f81f82383dbc61c93eaac1d192a092e014e2cc9095e67ae9ef3bb"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/bpo-parameter-gradient.tar",
+            "archive": "data/power-implementation-20261015/bpo-parameter-gradient/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "643a4f2422ca8fb1975cbd6d84456df454279bdddbe7fe024f76654766c8b97f"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/bpo-parameter-gradient-fp32.tar",
+            "archive": "data/power-implementation-20261015/bpo-parameter-gradient-fp32/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "643a4f2422ca8fb1975cbd6d84456df454279bdddbe7fe024f76654766c8b97f"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/canary-bpo-full-actions.tar",
+            "archive": "data/power-implementation-20261015/canary-bpo-full-actions/source.tar.gz",
+            "bytes": 184320,
+            "sha256": "905f5ee6eb1eb7656c9a8e25f08e1f8f989b61806d2e60919119018be7c6c2d6"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/canary-bpo-full-center.tar",
+            "archive": "data/power-implementation-20261015/canary-bpo-full-center/source.tar.gz",
+            "bytes": 184320,
+            "sha256": "905f5ee6eb1eb7656c9a8e25f08e1f8f989b61806d2e60919119018be7c6c2d6"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/canary-bpo-topj16.tar",
+            "archive": "data/power-implementation-20261015/canary-bpo-topj16/source.tar.gz",
+            "bytes": 184320,
+            "sha256": "452394076a1a6cd7c24e9f576dca9a3cc339b3475bff173aecd0fef4bda7f38d"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/canary-mdpo-full-actions.tar",
+            "archive": "data/power-implementation-20261015/canary-mdpo-full-actions/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "9cdafe9bde1ddd3cd77699dca29e200291dd125de66e03d724f4e697c4db3c39"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/canary-mdpo-full-center.tar",
+            "archive": "data/power-implementation-20261015/canary-mdpo-full-center/source.tar.gz",
+            "bytes": 184320,
+            "sha256": "905f5ee6eb1eb7656c9a8e25f08e1f8f989b61806d2e60919119018be7c6c2d6"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/canary-mdpo-topj16.tar",
+            "archive": "data/power-implementation-20261015/canary-mdpo-topj16/source.tar.gz",
+            "bytes": 184320,
+            "sha256": "905f5ee6eb1eb7656c9a8e25f08e1f8f989b61806d2e60919119018be7c6c2d6"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/mdpo-parameter-gradient.tar",
+            "archive": "data/power-implementation-20261015/mdpo-parameter-gradient/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "643a4f2422ca8fb1975cbd6d84456df454279bdddbe7fe024f76654766c8b97f"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/mdpo-parameter-gradient-fp32.tar",
+            "archive": "data/power-implementation-20261015/mdpo-parameter-gradient-fp32/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "643a4f2422ca8fb1975cbd6d84456df454279bdddbe7fe024f76654766c8b97f"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/real-cache-audit.tar",
+            "archive": "data/power-implementation-20261015/real-cache-audit/source.tar.gz",
+            "bytes": 184320,
+            "sha256": "452394076a1a6cd7c24e9f576dca9a3cc339b3475bff173aecd0fef4bda7f38d"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/train-bpo-full-actions.tar",
+            "archive": "data/power-implementation-20261015/train-bpo-full-actions/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "044ce7cfc10cb016a291478f181a35a7921681fa49e7c423ca7dd4744056dbc0"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/train-bpo-full-center.tar",
+            "archive": "data/power-implementation-20261015/train-bpo-full-center/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "475735a9e8c2766c58b51f2992f53ba8348447739f8e6b299e593acb4e7729c7"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/train-bpo-topj16.tar",
+            "archive": "data/power-implementation-20261015/train-bpo-topj16/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "690a1d47ef1c17307a67f72ee336a2a0752a5a70ef3d8b88fcfd615f25e84002"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/train-mdpo-full-actions.tar",
+            "archive": "data/power-implementation-20261015/train-mdpo-full-actions/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "ffb11c82872f81f82383dbc61c93eaac1d192a092e014e2cc9095e67ae9ef3bb"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/train-mdpo-full-center.tar",
+            "archive": "data/power-implementation-20261015/train-mdpo-full-center/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "3272293eae0876e13f1a5aef42f7876c721e3ec06ddd78422e40550ef98bbd3b"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/train-mdpo-topj16.tar",
+            "archive": "data/power-implementation-20261015/train-mdpo-topj16/source.tar.gz",
+            "bytes": 194560,
+            "sha256": "044ce7cfc10cb016a291478f181a35a7921681fa49e7c423ca7dd4744056dbc0"
+        },
+        {
+            "path": "runs/power-implementation-20261015/source-archives/verl-bpo-full_vocab.tar",
+            "archive": "data/power-implementation-20261015/verl-bpo-full_vocab/source.tar.gz",
+            "bytes": 174080,
+            "sha256": "1abd522be2c8ccba0592b9b4afa3e3a0ebafd35cbc3a105ed9c7883dd9e04fb4"
         }
     ]
 }

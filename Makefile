@@ -12,7 +12,7 @@ data:
 	python3 scripts/restore-data.py
 
 test:
-	PYTHONPATH=.:src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_power_targets.py tests/test_power_suite.py -q
+	PYTHONPATH=.:src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_power_targets.py tests/test_power_suite.py tests/test_power_production.py -q
 	PYTHONPATH=src uv run --with numpy --with pandas --with scipy --with pytest python -m pytest tests/test_oneshot_lr_stability.py -q
 	PYTHONPATH=src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_scalar_schedule.py tests/test_scalar_large_analysis.py tests/test_scalar_full_pool_study.py -q
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_math_evaluation.py

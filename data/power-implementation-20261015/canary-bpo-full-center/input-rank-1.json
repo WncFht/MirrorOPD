@@ -1,0 +1,28 @@
+{
+  "rank": 1,
+  "cache": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/data/oneshot-effective-time-20261012/seed-42/rank-1.pt",
+  "responses": 1,
+  "vocabulary": 151665,
+  "train_prefixes": 4,
+  "heldout_prefixes": 4,
+  "response_lengths": [
+    4413
+  ],
+  "config": {
+    "seed": 42,
+    "kappa": 0.5,
+    "eta": 0.3,
+    "lr": 1e-06,
+    "topj": 16,
+    "method": "bpo",
+    "center_mode": "full_vocab",
+    "action_mode": "sampled",
+    "responses_per_rank": 1,
+    "train_prefixes": 4,
+    "heldout_prefixes": 4,
+    "updates": 2,
+    "measure_every": 1,
+    "retry_on_gpu_conflict": false,
+    "id": "canary-bpo-full-center"
+  }
+}
