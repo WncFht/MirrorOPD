@@ -204,11 +204,19 @@ class Projection:
 
 
 @contextmanager
-def project_head(model, data):
+def project_head(model, data, *, sequence_parallel_size=1):
     projected = Projection(data)
     if not projected.enabled:
         yield projected
         return
+    from verl.utils import tensordict_utils as tu
+
+    if sequence_parallel_size != 1:
+        raise NotImplementedError("Chunked MirrorOPD requires sequence parallel size 1")
+    if not tu.get_non_tensor_data(data, key="use_remove_padding", default=True):
+        raise NotImplementedError("Chunked MirrorOPD requires remove-padding")
+    if tu.get_non_tensor_data(data, key="use_fused_kernels", default=False):
+        raise NotImplementedError("Chunked MirrorOPD requires a standard unfused linear head")
     head = model.get_output_embeddings()
     config = model.config
     config = config.get_text_config() if hasattr(config, "get_text_config") else config

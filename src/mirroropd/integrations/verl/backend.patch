@@ -915,7 +915,7 @@ index 8162f8b..419fee5 100644
      nnodes: int = 0
      n_gpus_per_node: int = 8
 diff --git a/verl/verl/workers/engine/fsdp/transformer_impl.py b/verl/verl/workers/engine/fsdp/transformer_impl.py
-index afbf7ec..aea697d 100644
+index afbf7ec..5752ad8 100644
 --- a/verl/verl/workers/engine/fsdp/transformer_impl.py
 +++ b/verl/verl/workers/engine/fsdp/transformer_impl.py
 @@ -62,6 +62,7 @@ from verl.utils.fsdp_utils import (
@@ -1082,13 +1082,15 @@ index afbf7ec..aea697d 100644
          # actually, we should avoid assigning like this...
          micro_batch = micro_batch.to(get_device_id())
          model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
-@@ -1272,15 +1337,21 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1272,15 +1337,23 @@ class FSDPEngineWithLMHead(FSDPEngine):
              if autocast_dtype == torch.float32
              else torch.autocast(device_type=device_name, dtype=autocast_dtype)
          )
 -        with autocast_ctx:
 +        from mirroropd.integrations.verl.projection import project_head
-+        with autocast_ctx, project_head(self.module, micro_batch) as projected:
++        with autocast_ctx, project_head(
++            self.module, micro_batch, sequence_parallel_size=get_ulysses_sequence_parallel_world_size()
++        ) as projected:
              raw_output = self.module(
                  **model_inputs,
                  use_cache=False,

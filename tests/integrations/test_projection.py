@@ -224,3 +224,31 @@ def test_projected_anchor_teacher_loss_pipeline(native, algorithm, integration, 
     torch.testing.assert_close(
         result["distillation_losses"].values(), reference.loss.reshape(-1), atol=3e-12, rtol=4e-11
     )
+
+
+@pytest.mark.parametrize("option", ["sp", "padding", "fused"])
+def test_projection_rejects_unsupported_native_contract_before_forward(native, option):
+    from mirroropd.integrations.verl.projection import project_head
+
+    spec = Objective()
+    context = CacheContext(0, "t", "v", 19, 1.0, spec.signal, spec.estimator)
+    data = batch(
+        native,
+        spec,
+        context,
+        {
+            "mirror_cache_valid": torch.ones(1, 6, dtype=torch.bool),
+            "mirror_cache_actions": torch.zeros(1, 6, dtype=torch.long),
+        },
+        "anchor",
+    )
+    if option == "padding":
+        native.assign_non_tensor(data, use_remove_padding=False)
+    if option == "fused":
+        native.assign_non_tensor(data, use_fused_kernels=True)
+    # No model API is accessed when the native execution contract is invalid.
+    with (
+        pytest.raises(NotImplementedError),
+        project_head(object(), data, sequence_parallel_size=2 if option == "sp" else 1),
+    ):
+        raise AssertionError("Unsupported execution reached model forward")

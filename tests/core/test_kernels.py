@@ -202,3 +202,15 @@ def test_full_bpo_projection_under_bfloat16_autocast():
         # BF16 GEMM and tile accumulation differ most near zero. Compare
         # vector error and the largest coordinate against gradient scale.
         assert (left - right).abs().max() / right.abs().max() < 0.01
+
+
+def test_explicit_full_distribution_keeps_normalizer_gradient():
+    torch.manual_seed(230)
+    logits = torch.randn(3, 17, dtype=torch.float64, requires_grad=True)
+    upstream = torch.randn_like(logits)
+    actual = Distribution.from_logits(logits).full()
+    expected = logits.log_softmax(-1)
+    torch.testing.assert_close(actual, expected)
+    current = torch.autograd.grad((actual * upstream).sum(), logits)[0]
+    reference = torch.autograd.grad((expected * upstream).sum(), logits)[0]
+    torch.testing.assert_close(current, reference, atol=2e-13, rtol=2e-12)

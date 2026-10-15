@@ -1,8 +1,8 @@
 {
   "cpu_tests": {
     "command": "PYTHONPATH=<clean-backend>/verl:src MIRROR_TEST_BACKEND=<clean-backend> make test PYTHON=<opd-python>",
-    "passed": 481,
-    "log_sha256": "fe50f97117b4babfc98ed9becea67b50f8968e633437ede652b652d4da2a1c03"
+    "passed": 485,
+    "log_sha256": "a0e95dda4316b419abbd08b49b0ea782f14899c73423e86b4094f765cc451a28"
   },
   "implementation_files": {
     "src/mirroropd/__init__.py": "caa1c568dd18cc2ab7465d2d680aac722dc40bc176f7e72b27b7d1ce9816eddf",
@@ -12,7 +12,7 @@
     "src/mirroropd/core/cache.py": "53b8d32eb56431f92e7a9082e9aad701c2f504f1825d6a75ae33c738b4531af3",
     "src/mirroropd/core/config.py": "61c0b49d6acb7e5eeda85d000a9fdafcfc19c6824dc1bb86cb7dcdbed3854e55",
     "src/mirroropd/core/diagnostics.py": "8fce22836f338ed174a08b22b6d9e0f6c6ab9603c53d62e5763268b77e58de78",
-    "src/mirroropd/core/distributions.py": "9369cc11f47eefa6933486dbac2d4c00d63459ce659be2d3604090f2443cd062",
+    "src/mirroropd/core/distributions.py": "02a7f46fef603d5aa45d2d19eefefdc9ab8d056f36d5fd615022a67560bc6e50",
     "src/mirroropd/core/kernels.py": "07d62fab5a34d7b9dc6f3651add32f8ad344248dc0533dfd2a979a4b8f05d7c3",
     "src/mirroropd/core/linear_bpo.py": "594c60bc3e85198f78e47f2fc3f2ec740e0dd0d298aebc8a8b303ded6c6c4019",
     "src/mirroropd/core/objectives.py": "e6323f08eec8b0c42364aafd4f3d5066eeece9a8f9abe7ef63bcecaa3eeba762",
@@ -27,7 +27,7 @@
     "src/mirroropd/integrations/verl/compiler.py": "97be605a5424f6d390973b300a6c4e3595f1c01f0d6583bfa23eef7f62eeb6fe",
     "src/mirroropd/integrations/verl/evaluation.py": "fe9eb90cea92d7763eebef7e20d2fc3593911b75f967ff1e8f87e505a251564e",
     "src/mirroropd/integrations/verl/model.py": "ddabd0f4cf9bcba1299056a560243035f1b9eed3e86a36353c45e31fac52126e",
-    "src/mirroropd/integrations/verl/projection.py": "deb83a5c3c8e910f3684198008523672d6b2a105db1d915291e2398b9f9d14a5",
+    "src/mirroropd/integrations/verl/projection.py": "58a1134154039b2f525887be03bdedf5dbf4c3e974672fbaf9410cb7cafd4973",
     "src/mirroropd/integrations/verl/rendezvous.py": "d6113bf54c0a8cd3158e5fa8bc21c58f5ab6a209bd88279bdfd392132e243658",
     "src/mirroropd/integrations/verl/reward.py": "bda9f223d219302380c91a45affa03496d76874063eeb5763b5c8024f9114a2d",
     "src/mirroropd/integrations/verl/vllm_executor.py": "4f1120f13b8b7d9b72ccfbc2eebf8e76fcabd64de19deb3cde6c6249b4736214",
@@ -63,11 +63,11 @@
     "src/mirroropd/scoring/vendor/ttrl_math/__init__.py": "8a2313af03a36e808506c5ff0051f2f30de3691013adee40c87f6c6a030ac14b",
     "src/mirroropd/scoring/vendor/ttrl_math/math_utils.py": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822",
     "tests/core/test_cache.py": "3bb9edd1e5c6f3825c52461c1d0658787d1cab7c7d6a04eb8a5f5cb6b664c6f2",
-    "tests/core/test_kernels.py": "661f2132d4ff53e5dd74ad289391313251aa839450a3d72cd08c205fa1900437",
+    "tests/core/test_kernels.py": "8722cd749712c95ca633844b5db86b9570cf54b02a61b8d64b0cac3eec036c8a",
     "tests/core/test_objectives.py": "50815c513109732ac56ccb780eb1ee0949d2af4bf73743fec0bda4869d317724",
     "tests/integrations/test_experiment_config.py": "5cc17646eaf5e82af7b3db95797584bf2eee5b0552780237b06d04620c2f750c",
     "tests/integrations/test_native_contract.py": "19b5f815eb5a9d606c8d32e621c6b0bf877249383a721ca84ddfc4dc2e8f79c7",
-    "tests/integrations/test_projection.py": "07a8e0c4067cbb95e9136fe9ffdacb5ff6510f67647582c437fb799fcd49474b",
+    "tests/integrations/test_projection.py": "028f10394030e7640785b46ad455476f9f45261ded320f48be22cff7dfa80743",
     "tests/integrations/test_rendezvous.py": "f5c23d928319019651aa87faaeced5763d54f7869ddb330e830dfe1f59684d73",
     "tests/integrations/test_verl_adapter.py": "7a84fedadde66aefcfc64f007d51a474ca1028c161cc354c88decbb37db612f3",
     "tests/runtime/test_config.py": "0867e924068a36b91fc44e19e2bcc9bfa66ea6bfadecb434b0bccd9432f3705b",
@@ -92,7 +92,7 @@
   },
   "checks": {
     "make_check": "passed",
-    "log_sha256": "7d1340e3f9ed35dee353d077cc09d77766366309f5e651f5938c3984ccf75993",
-    "subsequent_change": "benchmark borrowed-slot plumbing only; help, ruff and commit contracts checked"
+    "log_sha256": "0567391db988fb40ef87ac3f78d775f7e7b9d96942c6c05d352eca69b2f9da0a",
+    "scope": "final implementation, including projection guards and explicit full-LP gradient regression"
   }
 }

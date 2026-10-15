@@ -78,6 +78,10 @@ class Distribution:
     def full(self):
         if self.log_probabilities is not None:
             return self.log_probabilities
+        if torch.is_grad_enabled() and self.logits.requires_grad:
+            # A caller explicitly requesting all LPs needs the normalizer
+            # derivative too. The streamed normalizer itself is detached.
+            return self.logits.to(probability_dtype(self.logits)).log_softmax(-1)
         return self.logits.to(probability_dtype(self.logits)) - self.log_normalizer.unsqueeze(-1)
 
     @torch.no_grad()
