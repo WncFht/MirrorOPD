@@ -2,7 +2,7 @@
 
 ## 当前接口与维护边界
 
-MirrorOPD 当前维护 0.2 接口。用户明确要求全面重构、清理旧内容，并尽量不提供兼容层。生产算法仅为 `on_policy`、`mdpo`、`bpo`；旧模式、旧缓存与实验专用 launcher 已退役。历史源码保存在 Git 标签 `archive/pre-refactor-20261015` 和可校验归档中，不恢复为当前入口。
+MirrorOPD 当前维护 0.2 接口。生产算法仅为 `on_policy`、`mdpo`、`bpo`，不提供旧模式、缓存或实验专用 launcher 的兼容层。历史源码保存在 Git 标签 `archive/pre-refactor-20261015` 和可校验归档中，不恢复为当前入口。
 
 目录职责：
 
@@ -43,8 +43,8 @@ GPU 列表、模型目录、数据路径、后端和运行目录显式配置。�
 
 维护接入、检查边界及来源见[维护指南](docs/maintenance.md)。`make check-docs` 检查当前文档与 Notes，`make test-maintenance` 验证维护工具，`make check-maintenance` 供 pre-push 与 CI 执行；产品测试仍由 `make test` 负责。pre-commit 对真正的 index 快照检查契约，不能用未暂存内容证明提交正确。
 
-旧文档和历史决策的重写、归类与转为 Notes 等待用户另行启动。维护规则从接入起适用于新增或修改内容；原样保留的旧文档只享有文件哈希限定的延期，不代表其中命令和结论已核验。理论资料的 `theory/Notes/` 与 `.agents/notes/` 的工程决策各有归属。
+当前工程入口见 [docs/README.md](docs/README.md)。旧文档与历史决策按主题核验；已整理的内容在同一变更修复引用并退出延期清单，其余原样文件的哈希限定延期不代表事实已核验。历史提案不能直接改写为已实施决定，缺失的理由和备选不得补造。理论资料的 `theory/Notes/` 与 `.agents/notes/` 的工程决策各有归属，理论正文 review/merge 仍由用户启动。
 
 使用英文 Conventional Commits，独立逻辑变更独立提交，不绕过 hook。保留用户已有的未提交工作。默认运行 `make test`；原生源码集成测试通过 `MIRROR_TEST_BACKEND` 指定已准备的固定后端。提交前执行 `make check`。理论或书稿图片变化执行 `make book`。
 
-按用户最新要求，全面重构只交付一份最终说明文档；不新增多个平行进展报告。过程记录放在忽略的运行目录。旧报告保留其历史语境，删除源码的链接指向精确历史归档。
+全面重构维护一份最终交付说明，不新增平行进展报告。过程记录放在忽略的运行目录。旧报告保留其历史语境，删除源码的链接指向精确历史归档。
