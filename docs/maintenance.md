@@ -2,6 +2,8 @@
 
 MirrorOPD 将文档、文字与长期决策维护接入现有工具链。三个技能、共享参考和模板保存在 `.agents/`。产品行为仍由数值、运行层和后端集成测试验证。
 
+`paper-search-reports/`、`paper-search-logs/`和`environments/`是本地检索与环境记录，均由 Git 忽略，不作为 checkout 所需文件。复现依赖以包配置、固定后端及已保存的运行证据核验。
+
 ## 本地准备
 
 需要 Python 3.12、Node 22 和 Git。使用独立的开发环境安装维护依赖，再配置当前仓库入口：

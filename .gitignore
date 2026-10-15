@@ -84,3 +84,8 @@ data/oneshot-lr-stability/*.csv
 # Python build products
 /build/
 /dist/
+
+# Machine-local literature searches and environment inventories
+/paper-search-reports/
+/paper-search-logs/
+/environments/
