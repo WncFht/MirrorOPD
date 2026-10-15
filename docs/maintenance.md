@@ -43,7 +43,7 @@ pre-push 执行 `make check-maintenance`。该检查适合本地推送前执行�
 
 [Agent Notes](../.agents/notes/README.md) 保存代码和当前文档不能充分解释的长期理由、真实替代方案、代价与验证。三个 skill 的调用范围见[根指令](../AGENTS.md)；不是每项机械修改都要创建记录。
 
-接入时只建立生命周期规则和目录入口，没有重写历史记录或将旧报告转换为 Notes。新记录依照 proposed、implemented、rejected 的状态维护；只对符合规则的已实施记录执行归档，归档正文和附件逐项封存。
+文档整理只将有长期指导价值且有依据的决策理由提取为 Notes，不把实施事实、实验进度或未执行建议批量转换为决策。新记录依照 proposed、implemented、rejected 的状态维护；只对符合规则的已实施记录执行归档，归档正文和附件逐项封存。
 
 封存哈希用于检测当前字节变化，可信 Git 基线用于拦截正文和当前哈希同时重写。本地基线是 HEAD；CI 使用 PR base 或 push before。PR 的 archive-history job 从目标分支取出检查器，避免仅用待审版本证明自身保护有效。
 
@@ -55,9 +55,47 @@ pre-push 执行 `make check-maintenance`。该检查适合本地推送前执行�
 
 理论来源、第三方材料、运行目录和冻结 Notes 退出工程文档扫描及自动格式化。原始数据、结果与文献检索证据不参与新增文档和间距检查；当前文档指向这些产物的链接仍须有效。Markdown 检查仍遍历自有隐藏规则目录，检查文件目标是否存在及是否越出仓库；不验证外部网站、锚点、HTML 链接、命令行为或自然语言正确性。
 
-旧工程文档正文与历史决策重写按用户要求延后。[延期清单](../scripts/maintenance-deferred-docs.json) 仅登记接入时 `docs/operations/`、`docs/experiments/`、`docs/earlier/` 中的既有 Markdown 及 SHA-256；必要的迁移链接修复完成后固定基线。仅字节相同的旧文件暂缓新增链接和间距检查，输出明确报告延期数量。新增文件或正文改变后进入检查；清单不能豁免根规则、skills 或新增维护文档。延期不表示旧文档已经核验，后续整理应修复问题并移除相应登记。
+历史工程文档已按主题重新整理，接入时的[延期清单](../scripts/maintenance-deferred-docs.json)清空。当前工程 Markdown 全部接受链接和间距检查；理论源稿与冻结第三方正文仍保留自己的审定边界。格式检查不能识别过时结论、错误归因或无信息段落，内容审核仍需阅读实现与证据。
 
-现有格式与 lint 配置继续运行；理论来源和冻结 Notes 被统一排除。旧文档中的旧接口、命令与结论不在接入任务中改写。
+## 实验报告的日常维护
+
+按[报告维护流程](../.agents/references/experiment-reports.md)确定问题、协议和证据，必要时使用[骨架](../.agents/templates/experiment-report.md)。同一问题更新原报告，执行流水留`runs/`；数据与图表分别在`data/`、`results/`，对应生成程序和校验信息必须可定位。
+
+报告修订同时核对实际样本数、版本、计量单位、统计权重和未完成条件。推翻旧解释时改正结论，保留纠正依据及必要负结果。当前操作、历史重跑和只读汇总复算分别标注，不把当前 CPU 测试写成历史 GPU 重跑。
+
+## 历史源码与证据恢复
+
+0.2 退役的 launcher 和分析脚本保存在[固定源码归档](../data/refactor-20261015/legacy-source.tar.gz)，另有 Git 标签`archive/pre-refactor-20261015`。标签是完整旧仓库入口，tar 仅保存 manifest 中列出的退役源码，两者不等同于某一历史 run 实际执行的全部字节。先核对 run 的 provenance，再选择对应 source 快照与后端。
+
+在仓库根执行下列只读检查和隔离恢复：
+
+```bash
+python - <<'PYCODE'
+from pathlib import Path
+import hashlib
+import gzip
+import json
+import tarfile
+
+root = Path.cwd()
+archive = root / "data/refactor-20261015/legacy-source.tar.gz"
+manifest = json.loads((root / "data-manifest.json").read_text())
+record = next(row for row in manifest["files"] if row["archive"] == str(archive.relative_to(root)))
+with gzip.open(archive, "rb") as stream:
+    restored = stream.read()
+assert len(restored) == record["bytes"]
+assert hashlib.sha256(restored).hexdigest() == record["sha256"]
+destination = root / "runs/legacy-source-review"
+destination.mkdir(parents=True, exist_ok=False)
+with tarfile.open(archive) as stream:
+    stream.extractall(destination, filter="data")
+print(destination)
+PYCODE
+```
+
+恢复目录必须尚不存在。`filter="data"`要求支持该安全解压过滤器的 Python；项目基线为 Python3.12。`make data`按 manifest 恢复压缩原始记录，并拒绝覆盖校验不一致的文件。tar 成员引用如`legacy-source.tar.gz#training/...`只是定位信息；先解压才能执行文件。
+
+恢复源码不等于恢复运行环境或输入。旧模型、缓存、checkpoint、后端修改和外部数据依各 run 记录提供；缺失时只能复算现有汇总，不宣称完整复现。旧程序可能依赖旧包与邻仓，将其放在独立历史环境，避免与当前可安装包混用。
 
 ## CI 与构建产物
 
