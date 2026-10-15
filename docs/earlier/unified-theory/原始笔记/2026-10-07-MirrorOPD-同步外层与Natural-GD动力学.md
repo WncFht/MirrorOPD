@@ -640,7 +640,7 @@ EMA anchor 版本的双状态动力学、Fisher 局部稳定性和延迟同步�
 
 [^mdpo]: Manan Tomar, Lior Shani, Yonathan Efroni, and Mohammad Ghavamzadeh. _Mirror Descent Policy Optimization_. arXiv 2005.09814, 2020. [论文](https://arxiv.org/abs/2005.09814)
 
-[^mirror]: Amir Beck and Marc Teboulle. _Mirror Descent and Nonlinear Projected Subgradient Methods for Convex Optimization_. Operations Research Letters 31(3), 2003. [DOI](<https://doi.org/10.1016/S0167-6377(02)00231-6>)
+[^mirror]: Amir Beck and Marc Teboulle. _Mirror Descent and Nonlinear Projected Subgradient Methods for Convex Optimization_. Operations Research Letters 31(3), 2003. [DOI](%3Chttps%3A/doi.org/10.1016/S0167-6377%2802)00231-6>)
 
 [^pmd]: Guanghui Lan. _Policy Mirror Descent for Reinforcement Learning: Linear Convergence, New Sampling Complexity, and Generalized Problem Classes_. arXiv 2102.00135, 2021. [论文](https://arxiv.org/abs/2102.00135)
 

@@ -19,4 +19,4 @@ uv run --with torch --with numpy python experiments/toy/book_reconstruction_audi
 uv run --with matplotlib --with numpy python experiments/plotting/book_reconstruction.py
 ```
 
-实验说明见 [数学核验报告](../experiments/2026-10-10-书稿重构数学核验.md)，机器可读结果见 [metadata](../../results/book-reconstruction/metadata.json)。这些实验检验有限词表数学，不承担神经网络训练效果比较。
+实验说明见 [数学核验报告](../../docs/experiments/2026-10-10-%E4%B9%A6%E7%A8%BF%E9%87%8D%E6%9E%84%E6%95%B0%E5%AD%A6%E6%A0%B8%E9%AA%8C.md)，机器可读结果见 [metadata](../../results/book-reconstruction/metadata.json)。这些实验检验有限词表数学，不承担神经网络训练效果比较。

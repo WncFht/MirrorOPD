@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BOOK = ROOT / "docs/book"
+BOOK = ROOT / "theory/book"
 ENTRY = BOOK / "2026-10-08-固定测度Token级MirrorOPD.tex"
 OUT = ROOT / "results/book-reconstruction/source-audit.json"
 
@@ -53,7 +53,7 @@ def main():
         baseline = subprocess.check_output(  # noqa: S603 -- validated path from ls-tree
             [git, "show", "3a89c77:" + original], cwd=ROOT
         )
-        archived = ROOT / original.replace("docs/book/", "docs/book-old/", 1)
+        archived = ROOT / original.replace("docs/book/", "theory/book-old/", 1)
         assert baseline == archived.read_bytes(), archived
         archive.append(
             {

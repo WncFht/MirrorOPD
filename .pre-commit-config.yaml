@@ -1,4 +1,5 @@
-exclude: ^(upstream/|archives/|node_modules/|docs/book-old/|experiments/plotting/vendor/|src/mirroropd/scoring/vendor/)
+default_stages: [pre-commit]
+exclude: ^(upstream/|archives/|node_modules/|theory/|docs/book/|docs/book-old/|docs/Notes/|docs/paper/|docs/papers/|experiments/plotting/vendor/|src/mirroropd/scoring/vendor/|\.agents/notes/archived/)
 repos:
   # 顺序即语义：原地改写型 fixer（markdownlint --fix）在前，改了就 fail 一次
   # 让你 re-add；git-format-staged 链式 formatter 只写 index 收尾——commit
@@ -78,3 +79,9 @@ repos:
         entry: gitleaks protect --staged --redact
         language: system
         pass_filenames: false
+      - id: staged-contracts
+        name: Staged documentation and Agent Notes contracts
+        entry: python3 scripts/staged_checks.py
+        language: system
+        pass_filenames: false
+        always_run: true

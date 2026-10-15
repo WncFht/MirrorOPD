@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NAME = "2026-10-14-MirrorOPD新旧书稿单文件合并版"
-DEST = ROOT / "docs/book-merged" / f"{NAME}.tex"
+DEST = ROOT / "theory/book-merged" / f"{NAME}.tex"
 
 
 def flatten(book, relative):
@@ -25,7 +25,7 @@ def flatten(book, relative):
 
 def main():
     entry = "2026-10-08-固定测度Token级MirrorOPD.tex"
-    current = flatten(ROOT / "docs/book", entry)
+    current = flatten(ROOT / "theory/book", entry)
     preface = r"""
 \chapter*{单文件合并版说明}
 \addcontentsline{toc}{chapter}{单文件合并版说明}

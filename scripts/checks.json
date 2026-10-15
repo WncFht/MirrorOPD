@@ -1,0 +1,109 @@
+{
+    "version": 1,
+    "checks": [
+        {
+            "id": "note-format",
+            "command": ["python3", "scripts/notes_guard.py", "--root", "."],
+            "modes": ["docs", "maintenance", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "docs",
+            "command": ["python3", "scripts/check_docs.py"],
+            "modes": ["docs", "maintenance", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "archive-history",
+            "command": ["python3", "scripts/check_archive.py"],
+            "modes": ["docs", "maintenance", "ci"],
+            "needs": ["note-format"],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "maintenance-tests",
+            "command": ["python3", "-m", "pytest", "-q", "tests/maintenance"],
+            "modes": ["test", "maintenance", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "format",
+            "command": ["npm", "run", "format:check"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "markdown-lint",
+            "command": ["npm", "run", "lint:md"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "python-lint",
+            "command": ["ruff", "check", "."],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "python-format",
+            "command": ["ruff", "format", "--check", "."],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "chinese-spacing",
+            "command": ["python3", "scripts/check_spacing.py"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "yaml-comments",
+            "command": ["python3", "scripts/check-yaml-comments.py"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "shell-lint",
+            "command": ["bash", "scripts/check-shell.sh"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "actions-lint",
+            "command": ["actionlint"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "toml-format",
+            "command": ["taplo", "fmt", "--check"],
+            "modes": ["lint", "ci"],
+            "needs": [],
+            "timeout": 120,
+            "allow_failure": false
+        }
+    ]
+}

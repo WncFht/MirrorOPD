@@ -1,10 +1,10 @@
 PYTHON ?= python
-BOOK_DIR := docs/book
+BOOK_DIR := theory/book
 BOOK := 2026-10-08-固定测度Token级MirrorOPD
 
-.PHONY: book test upstream data bootstrap check
+.PHONY: book test upstream data bootstrap check check-docs check-maintenance test-maintenance
 book:
-	cd $(BOOK_DIR) && latexmk -xelatex -interaction=nonstopmode -halt-on-error $(BOOK).tex
+	cd $(BOOK_DIR) && latexmk -bibtex- -xelatex -interaction=nonstopmode -halt-on-error $(BOOK).tex
 
 upstream:
 	PYTHONPATH=src $(PYTHON) -m mirroropd backend --output upstream/TA-OPD-v2
@@ -17,13 +17,21 @@ test:
 
 bootstrap:
 	npm ci
-	bash scripts/agent-links.sh
+	$(PYTHON) -m pip install -r requirements-dev.txt
+	$(PYTHON) scripts/setup.py
 	bash scripts/crossnote-links.sh
-	pre-commit install
-	git config blame.ignoreRevsFile .git-blame-ignore-revs
 	python3 scripts/restore-data.py
 
-check:
+check-docs:
+	$(PYTHON) scripts/run_checks.py --config scripts/checks.json --mode docs
+
+test-maintenance:
+	$(PYTHON) -m pytest -q tests/maintenance
+
+check-maintenance:
+	$(PYTHON) scripts/run_checks.py --config scripts/checks.json --mode maintenance
+
+check: check-docs
 	npm run format:check
 	npm run lint:md
 	python3 scripts/check-yaml-comments.py

@@ -9,6 +9,8 @@ extend-exclude = [
   "runs",
   "experiments/plotting/vendor",  # Unmodified third-party figure-viz style.
   "src/mirroropd/scoring/vendor", # Pinned mathematical graders retain upstream formatting.
+  ".agents/notes/archived",       # Frozen decision records and registered attachments.
+  "theory",                       # Theory sources await user review and merging.
 ]
 
 [lint]
@@ -46,6 +48,16 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
+# Imported standalone maintenance tools execute explicit command vectors.
+"scripts/check_docs.py" = ["TRY004", "TRY301"]
+"scripts/check_package.py" = ["S603"]
+"scripts/check_spacing.py" = ["S603", "S607"]
+"scripts/notes_guard.py" = ["S603", "S607", "TRY004", "FBT001"]
+"scripts/run_checks.py" = ["S603", "TRY004", "TRY301"]
+"scripts/setup.py" = ["S607"]
+"scripts/staged_checks.py" = ["S603", "S607"]
+# Preserve the imported unittest fixtures; pytest collects and executes them.
+"tests/maintenance/*.py" = ["S603", "S607", "PT009", "FBT002"]
 "tests/test_*.py" = [
   "SLF001",
   "S102",

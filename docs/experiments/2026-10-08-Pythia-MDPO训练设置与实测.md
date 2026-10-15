@@ -284,11 +284,11 @@ GPT-NeoX 接入修复了两个架构假设：普通多头注意力没有 `num_ke
 
 | 内容                           | 本机位置                                                                                                                         |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| 固定输入、source IDs、校验信息 | [data/pythia-wikitext](../../data/pythia-wikitext/)                                                                              |
-| 主实验生成文本                 | [rollouts](../../data/pythia-wikitext/rollouts/)                                                                                 |
-| 低学习率对照生成文本           | [rollouts-low-lr](../../data/pythia-wikitext/rollouts-low-lr/)                                                                   |
-| 主实验配置、全部指标与评分     | [results/training/pythia-mdpo](../../results/training/pythia-mdpo/)                                                              |
-| 对照配置、全部指标与评分       | [results/training/pythia-mdpo-low-lr](../../results/training/pythia-mdpo-low-lr/)                                                |
+| 固定输入、source IDs、校验信息 | [data/pythia-wikitext](../../data/pythia-wikitext)                                                                               |
+| 主实验生成文本                 | [rollouts](../../data/pythia-wikitext/rollouts)                                                                                  |
+| 低学习率对照生成文本           | [rollouts-low-lr](../../data/pythia-wikitext/rollouts-low-lr)                                                                    |
+| 主实验配置、全部指标与评分     | [results/training/pythia-mdpo](../../results/training/pythia-mdpo)                                                               |
+| 对照配置、全部指标与评分       | [results/training/pythia-mdpo-low-lr](../../results/training/pythia-mdpo-low-lr)                                                 |
 | 训练算法核心                   | [losses.py](../../data/refactor-20261015/legacy-source.tar.gz#src/mirroropd/training/losses.py)                                  |
 | 框架缓存与位置适配             | [fsdp.py](../../data/refactor-20261015/legacy-source.tar.gz#src/mirroropd/integrations/verl/fsdp.py)                             |
 | 精确前缀评价程序               | [checkpoint diagnostics](../../data/refactor-20261015/legacy-source.tar.gz#experiments/scoring/pythia_checkpoint_diagnostics.py) |

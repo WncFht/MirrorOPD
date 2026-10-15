@@ -11,5 +11,7 @@ data/**/*.json
 data/**/resolved-config.yaml
 runs/
 package-lock.json
-docs/book-old/
+theory/
+.agents/notes/archived/
+docs/papers/
 experiments/plotting/vendor/
