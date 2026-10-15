@@ -41,7 +41,9 @@
         "distillation.distillation_loss.mirror_center_mode=topj_tail",
         "distillation.distillation_loss.mirror_action_mode=sampled",
         "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.USE_LIBUV=\"0\"",
         "ray_kwargs.ray_init.object_store_memory=4294967296",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.DIST_INIT_METHOD=\"file:///root/.cache/mopd-avg-rdzv/math-avg-k05-e02-20261015-canary.store\"",
         "trainer.total_training_steps=2",
         "trainer.test_freq=2",
         "data.val_max_samples=4"
@@ -56,7 +58,9 @@
         "distillation.distillation_loss.mirror_center_mode=topj_tail",
         "distillation.distillation_loss.mirror_action_mode=sampled",
         "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
-        "ray_kwargs.ray_init.object_store_memory=4294967296"
+        "+ray_kwargs.ray_init.runtime_env.env_vars.USE_LIBUV=\"0\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.DIST_INIT_METHOD=\"file:///root/.cache/mopd-avg-rdzv/math-avg-k05-e02-20261015-onpolicy.store\""
       ]
     },
     {
@@ -68,7 +72,9 @@
         "distillation.distillation_loss.mirror_center_mode=topj_tail",
         "distillation.distillation_loss.mirror_action_mode=sampled",
         "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
-        "ray_kwargs.ray_init.object_store_memory=4294967296"
+        "+ray_kwargs.ray_init.runtime_env.env_vars.USE_LIBUV=\"0\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.DIST_INIT_METHOD=\"file:///root/.cache/mopd-avg-rdzv/math-avg-k05-e02-20261015-mdpo.store\""
       ]
     },
     {
@@ -80,8 +86,12 @@
         "distillation.distillation_loss.mirror_center_mode=topj_tail",
         "distillation.distillation_loss.mirror_action_mode=sampled",
         "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
-        "ray_kwargs.ray_init.object_store_memory=4294967296"
+        "+ray_kwargs.ray_init.runtime_env.env_vars.USE_LIBUV=\"0\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.DIST_INIT_METHOD=\"file:///root/.cache/mopd-avg-rdzv/math-avg-k05-e02-20261015-bpo.store\""
       ]
     }
-  ]
+  ],
+  "execution_order": "Only canary validation is authorized to run before the requested code review; formal training remains pending.",
+  "runtime": "Single-node FSDP file rendezvous on local disk; vLLM TCPStore uses USE_LIBUV=0. Training and evaluation distributions are unchanged."
 }

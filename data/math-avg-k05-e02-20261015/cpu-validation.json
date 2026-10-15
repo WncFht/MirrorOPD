@@ -1,0 +1,45 @@
+{
+  "implementation_commit": "481046f",
+  "test_isolation_commit": "cdeb5c6",
+  "new_onpolicy_cases": 43,
+  "related_cases": 71,
+  "all_collected_tests": 246,
+  "make_test_exit_code": 0,
+  "all_collected_exit_code": 0,
+  "make_check_exit_code": 0,
+  "logs": [
+    {
+      "path": "runs/power-onpolicy-test.log",
+      "sha256": "3517404ea87dfe5a7e173c51627ff8e53faacc56bcf1abde4ca01d395b505306"
+    },
+    {
+      "path": "runs/power-onpolicy-pytest-all.log",
+      "sha256": "1b1aa8f9aeb1c9bb38272475b52a5d33aab54950ea5f405cfb4b9b7479b980ee"
+    },
+    {
+      "path": "runs/power-onpolicy-kl-estimator.log",
+      "sha256": "5c48a8509c47b3084ef8f09f0536e8546c49a470a840e932e99397a5bfebc78c"
+    },
+    {
+      "path": "runs/power-onpolicy-check-final.log",
+      "sha256": "0297c947f128821d6629cf8c04536a5e797a05a185a695c79a85099839c25960"
+    },
+    {
+      "path": "runs/power-onpolicy-check-delivery.log",
+      "sha256": "0297c947f128821d6629cf8c04536a5e797a05a185a695c79a85099839c25960"
+    }
+  ],
+  "runtime_commit": "912ec72",
+  "rendezvous_probe": {
+    "world_size": 4,
+    "backend": "gloo",
+    "rendezvous": "file_on_local_disk",
+    "passed": true
+  },
+  "tcpstore_probe": {
+    "clients": 3,
+    "libuv_and_legacy_backends_passed": true,
+    "scope": "Direct TCPStore construction, not delayed port handoff."
+  },
+  "delivery_make_check_exit_code": 0
+}

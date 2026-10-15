@@ -907,14 +907,14 @@
             "sha256": "93414e6bde86afa270d57cbaad2ce2de62bd00377896241a282a892d90c3c615"
         },
         {
-            "path": "runs/report-merge-20261015/sources/2026-10-13-OneShot与镜像蒸馏实验报告.md",
-            "archive": "data/distillation-report-sources-20261015/2026-10-13-OneShot与镜像蒸馏实验报告.md.gz",
+            "path": "runs/report-merge-20261015/sources/2026-10-13-OneShot\u4e0e\u955c\u50cf\u84b8\u998f\u5b9e\u9a8c\u62a5\u544a.md",
+            "archive": "data/distillation-report-sources-20261015/2026-10-13-OneShot\u4e0e\u955c\u50cf\u84b8\u998f\u5b9e\u9a8c\u62a5\u544a.md.gz",
             "sha256": "8eb978f858224e62b8f0e95b05ea1b3f30a29d1c15355b985b6b3aecb4a4ff6c",
             "bytes": 103653
         },
         {
-            "path": "runs/report-merge-20261015/sources/2026-10-13-BPO标量调度实验总报告.md",
-            "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO标量调度实验总报告.md.gz",
+            "path": "runs/report-merge-20261015/sources/2026-10-13-BPO\u6807\u91cf\u8c03\u5ea6\u5b9e\u9a8c\u603b\u62a5\u544a.md",
+            "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO\u6807\u91cf\u8c03\u5ea6\u5b9e\u9a8c\u603b\u62a5\u544a.md.gz",
             "sha256": "f77b242441bdd9a0000625fd8c5be118ee9bd5f0ae7ce8284f6d0538660fa810",
             "bytes": 83033
         },
@@ -1061,6 +1061,30 @@
             "archive": "data/power-implementation-20261015/verl-mdpo-full_vocab/source.tar.gz",
             "bytes": 174080,
             "sha256": "1abd522be2c8ccba0592b9b4afa3e3a0ebafd35cbc3a105ed9c7883dd9e04fb4"
+        },
+        {
+            "path": "runs/math-avg-k05-e02-20261015-archives/cpu-evidence.tar",
+            "archive": "data/math-avg-k05-e02-20261015/cpu-evidence.tar.gz",
+            "bytes": 40960,
+            "sha256": "9e0ae9869bf1d508a2c64e7aad0aefcf5039e8f1b826b927ac7d6a9a254a05aa"
+        },
+        {
+            "path": "runs/math-avg-k05-e02-20261015-archives/startup-attempts.tar",
+            "archive": "data/math-avg-k05-e02-20261015/startup-attempts.tar.gz",
+            "bytes": 1064960,
+            "sha256": "0f022083c5e7735295c758da5ad983a05572af0a755b2bd311efa5ae4d07997c"
+        },
+        {
+            "path": "runs/math-avg-k05-e02-20261015-archives/native-canary.tar",
+            "archive": "data/math-avg-k05-e02-20261015/native-canary.tar.gz",
+            "bytes": 3563520,
+            "sha256": "7c6e46021d3a625f099341cd2f2aa6345f051ca0e081b2b4185915094e1e8fa0"
+        },
+        {
+            "path": "runs/power-onpolicy-check-delivery.log",
+            "archive": "data/math-avg-k05-e02-20261015/delivery-check.log.gz",
+            "bytes": 1953,
+            "sha256": "0297c947f128821d6629cf8c04536a5e797a05a185a695c79a85099839c25960"
         }
     ]
 }
