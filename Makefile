@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := help
+
 PYTHON ?= python
 BACKEND ?= upstream/TA-OPD-v2
 PACKAGE ?= transfers/code
@@ -5,6 +7,21 @@ RUN ?=
 DEST ?=
 MANIFEST ?=
 HOPE_FILE ?= hope/mirroropd.hope
+WANDB_RUN ?=
+
+.PHONY: help
+help:
+	@printf '%s\n' \
+	  '代码、日志与结果：' \
+	  '  make code-pack BACKEND=... PACKAGE=transfers/code-001' \
+	  '  make results-pack RUN=runs/... PACKAGE=transfers/result-001' \
+	  '  make wandb-pack RUN=runs/... PACKAGE=transfers/wandb-001' \
+	  '  make unpack MANIFEST=.../manifest.json DEST=imported/snapshot-001' \
+	  '  make wandb-sync WANDB_RUN=.../offline-run-...  （显式上传到 W&B）' \
+	  '集群与开发：' \
+	  '  make hope-submit HOPE_FILE=hope/mirroropd.hope' \
+	  '  make upstream | data | test | check | book' \
+	  '通过 PYTHON=/path/to/python 选择环境；每个包和解包目录使用新路径。'
 
 .PHONY: book theory-core test upstream data bootstrap check check-docs check-maintenance test-maintenance
 book: theory-core
@@ -13,7 +30,7 @@ theory-core:
 	$(MAKE) -C theory/core
 
 upstream:
-	PYTHONPATH=src $(PYTHON) -m mirroropd backend --output upstream/TA-OPD-v2
+	PYTHONPATH=src $(PYTHON) -m mirroropd backend --output "$(BACKEND)"
 
 data:
 	python3 scripts/restore-data.py
@@ -45,7 +62,7 @@ check: check-docs
 	ruff format --check .
 	pre-commit run --all-files
 
-.PHONY: code-pack results-pack wandb-pack unpack hope-submit
+.PHONY: code-pack results-pack wandb-pack wandb-sync unpack hope-submit
 code-pack:
 	$(PYTHON) -m mirroropd pack code --backend "$(BACKEND)" --output "$(PACKAGE)"
 
@@ -54,6 +71,10 @@ results-pack:
 
 wandb-pack:
 	$(PYTHON) -m mirroropd pack wandb --run "$(RUN)" --output "$(PACKAGE)"
+
+wandb-sync:
+	@test -n "$(WANDB_RUN)" && test -d "$(WANDB_RUN)" || { echo "Set WANDB_RUN to an unpacked offline-run directory" >&2; exit 1; }
+	$(PYTHON) -m wandb sync "$(WANDB_RUN)"
 
 unpack:
 	$(PYTHON) -m mirroropd unpack "$(MANIFEST)" --output "$(DEST)"

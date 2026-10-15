@@ -13,6 +13,8 @@ python -m mirroropd --version
 
 [运行与复现](docs/运行与复现.md)给出后端准备、模型/数据要求、CLI 配置、训练及审计步骤，也包含 `--detach` 后台启动、`stop`、W&B offline、离线代码与结果分片传输，以及 hope 集群模板。[算法与实现](docs/算法与实现.md)解释当前三算法和估计器；[日志与评测](docs/日志与评测.md)定义结果口径。完整导航见[文档入口](docs/README.md)。
 
+运行 `make` 查看打包、解包、W&B 上传与 hope 提交入口。Makefile 只提供命令快捷方式，配置校验、运行与传输逻辑统一由 CLI 维护。
+
 ## 开发与研究
 
 [架构](docs/架构.md)说明第一方包与后端边界，[开发维护](docs/maintenance.md)说明测试、skills、hooks 和 CI/CD。[0.2 交付说明](docs/2026-10-15-MirrorOPD全面重构说明.md)保存版本验证证据与限制。
