@@ -18,7 +18,7 @@ def validate_mirror_configuration(eta, kappa, center_mode, action_mode, method):
         raise ValueError("full-vocabulary actions require full-vocabulary caches")
     if method not in ("bpo", "mdpo", "pmd_mean", "opd_onpolicy", "opd_is", "opd_is_no_baseline"):
         raise ValueError("unknown mirror loss method")
-    if method.startswith("opd_") and (kappa != 0 or action_mode != "sampled"):
-        raise ValueError("OPD baselines require geometric shape and sampled actions")
+    if method.startswith("opd_") and action_mode != "sampled":
+        raise ValueError("OPD baselines require sampled actions")
     if math.isinf(eta) and method not in ("mdpo", "opd_onpolicy", "opd_is", "opd_is_no_baseline"):
         raise ValueError("infinite eta is supported only for MDPO and OPD baselines")

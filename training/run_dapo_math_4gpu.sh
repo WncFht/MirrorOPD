@@ -4,6 +4,8 @@ set -euo pipefail
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 workspace_root=$(cd -- "$repo_root/.." && pwd)
 requested_backend=${MIRROR_UPSTREAM_ROOT:-}
+requested_ray_tmpdir=${MIRROR_RAY_TMPDIR:-}
+requested_tmpdir=${MIRROR_TMPDIR:-}
 source "$workspace_root/.bashrc"
 # The workspace shell sets a default backend. Honor the caller's isolated checkout.
 if [[ -n "$requested_backend" ]]; then export MIRROR_UPSTREAM_ROOT="$requested_backend"; fi
@@ -15,8 +17,8 @@ export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export MIRROR_MONITOR_GPU_IDS=0,1,2,3
 export RAY_ADDRESS=local
-export MIRROR_RAY_TMPDIR="$repo_root/runs/math-4gpu-runtime/ray"
-export MIRROR_TMPDIR="$repo_root/runs/math-4gpu-runtime/tmp"
+export MIRROR_RAY_TMPDIR="${requested_ray_tmpdir:-$HOME/.cache/mopd-math-ray}"
+export MIRROR_TMPDIR="${requested_tmpdir:-$HOME/.cache/mopd-math-tmp}"
 mkdir -p "$MIRROR_RAY_TMPDIR" "$MIRROR_TMPDIR"
 # Ray invokes the engine from a background thread. vLLM 0.10 otherwise
 # auto-falls back to V0, whereas the deployed server uses V1 AsyncLLM.
@@ -29,7 +31,7 @@ export MIRROR_AUDIT_NATIVE_PAIR=1
 export MIRROR_INFERENCE_EXPLICIT_OFFLOAD=1
 export MIRROR_ENABLE_WANDB=1
 export WANDB_MODE=online
-export WANDB_RUN_GROUP=dapo-deepseek-4gpu-o50
+export WANDB_RUN_GROUP="${WANDB_RUN_GROUP:-dapo-deepseek-4gpu-o50}"
 unset WANDB_PROJECT
 method=${1:?Usage: run_dapo_math_4gpu.sh METHOD RUN_NAME [overrides...]}
 shift

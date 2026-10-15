@@ -89,8 +89,6 @@ def compute_mirror_opd_token_loss(
         raise ValueError("positive eta required; infinity is supported only for MDPO")
     if action_mode not in ("sampled", "full_vocab"):
         raise ValueError("action_mode must be sampled or full_vocab")
-    if kappa != 0 and method.startswith("opd_"):
-        raise ValueError("OPD baselines do not use power-shaped mirror signals")
     if action_mode == "full_vocab" and (
         full_anchor_log_probs is None or full_teacher_log_probs is None
     ):
@@ -127,7 +125,7 @@ def compute_mirror_opd_token_loss(
         # Bound diagnostic scratch space independently of response length.
         flat_lp = log_p.detach().reshape(-1, log_p.shape[-1])
         flat_ids = anchor_ids.reshape(flat_lp.shape[0], anchor_ids.shape[-1])
-        flat_tail = torch.empty(flat_lp.shape[0], device=log_p.device)
+        flat_tail = torch.empty(flat_lp.shape[0], device=log_p.device, dtype=dtype)
         flat_entropy = torch.empty_like(flat_tail)
         for start in range(0, flat_lp.shape[0], 64):
             stop = start + 64
@@ -167,12 +165,27 @@ def compute_mirror_opd_token_loss(
         else:
             if teacher_head_log_probs is None or teacher_tail_log_prob is None:
                 raise ValueError("OPD baseline needs teacher head and tail probabilities")
-            current_reward = teacher_action_log_prob.detach() - action_lp.detach()
-            baseline = (p_head.exp() * (p_head - teacher_head_log_probs.detach())).sum(-1)
-            tail_valid = torch.isfinite(p_tail_lp)
-            baseline[tail_valid] += p_tail_lp[tail_valid].exp() * (
-                p_tail_lp[tail_valid] - teacher_tail_log_prob.detach()[tail_valid]
+            # OPD refreshes the reward against the current policy. With one
+            # fresh-rollout update p=q, this is exactly the mirror reward A_q.
+            # Detach both the reward and the action-independent baseline.
+            current_reward = normalized_power_signal(
+                teacher_action_log_prob.detach() - action_lp.detach(), kappa, eta
             )
+            baseline = -(
+                p_head.exp()
+                * normalized_power_signal(teacher_head_log_probs.detach() - p_head, kappa, eta)
+            ).sum(-1)
+            tail_valid = torch.isfinite(p_tail_lp)
+            baseline[tail_valid] -= p_tail_lp[tail_valid].exp() * normalized_power_signal(
+                teacher_tail_log_prob.detach()[tail_valid] - p_tail_lp[tail_valid], kappa, eta
+            )
+            if full_teacher_log_probs is not None:
+                baseline = -(
+                    log_p.detach().exp()
+                    * normalized_power_signal(
+                        full_teacher_log_probs.detach().to(dtype) - log_p.detach(), kappa, eta
+                    )
+                ).sum(-1)
             if method == "opd_is_no_baseline":
                 baseline = torch.zeros_like(baseline)
             weight = torch.ones_like(u) if method == "opd_onpolicy" else u.exp()

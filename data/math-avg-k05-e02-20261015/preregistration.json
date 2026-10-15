@@ -1,0 +1,87 @@
+{
+  "question": "Compare fresh on-policy OPD, MDPO and BPO using the same power reward and avg@16 validation.",
+  "success": "Finite updates, correct anchor/cache lifecycle, all 11 complete 570-by-16 evaluations per formal run, complete local and online metrics.",
+  "failure": "Any nonfinite update, invalid cache, incomplete sample group or rollout-version mismatch stops the serial queue.",
+  "adjustable": "Operational scratch paths and Ray object-store capacity; model, optimizer, training budgets and evaluation protocol remain fixed.",
+  "setting": "Experiment 5 training recipe; eta=0.2, kappa=0.5 for all three methods; topj=16 plus tail; sampled actions.",
+  "outer_steps": 50,
+  "inner_epochs": {
+    "onpolicy": 1,
+    "mdpo": 16,
+    "bpo": 16
+  },
+  "evaluation": {
+    "questions": 570,
+    "samples_per_question": 16,
+    "primary": "mean@16",
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "max_response_tokens": 31744,
+    "steps": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50
+    ]
+  },
+  "stages": [
+    {
+      "name": "math-avg-k05-e02-20261015-canary",
+      "method": "mirror_opd_onpolicy",
+      "overrides": [
+        "distillation.distillation_loss.mirror_kappa=0.5",
+        "distillation.distillation_loss.mirror_eta=0.2",
+        "distillation.distillation_loss.mirror_center_mode=topj_tail",
+        "distillation.distillation_loss.mirror_action_mode=sampled",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296",
+        "trainer.total_training_steps=2",
+        "trainer.test_freq=2",
+        "data.val_max_samples=4"
+      ]
+    },
+    {
+      "name": "math-avg-k05-e02-20261015-onpolicy",
+      "method": "mirror_opd_onpolicy",
+      "overrides": [
+        "distillation.distillation_loss.mirror_kappa=0.5",
+        "distillation.distillation_loss.mirror_eta=0.2",
+        "distillation.distillation_loss.mirror_center_mode=topj_tail",
+        "distillation.distillation_loss.mirror_action_mode=sampled",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296"
+      ]
+    },
+    {
+      "name": "math-avg-k05-e02-20261015-mdpo",
+      "method": "mirror_mdpo",
+      "overrides": [
+        "distillation.distillation_loss.mirror_kappa=0.5",
+        "distillation.distillation_loss.mirror_eta=0.2",
+        "distillation.distillation_loss.mirror_center_mode=topj_tail",
+        "distillation.distillation_loss.mirror_action_mode=sampled",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296"
+      ]
+    },
+    {
+      "name": "math-avg-k05-e02-20261015-bpo",
+      "method": "mirror_bpo",
+      "overrides": [
+        "distillation.distillation_loss.mirror_kappa=0.5",
+        "distillation.distillation_loss.mirror_eta=0.2",
+        "distillation.distillation_loss.mirror_center_mode=topj_tail",
+        "distillation.distillation_loss.mirror_action_mode=sampled",
+        "+ray_kwargs.ray_init.runtime_env.env_vars.VLLM_USE_V1=\"1\"",
+        "ray_kwargs.ray_init.object_store_memory=4294967296"
+      ]
+    }
+  ]
+}

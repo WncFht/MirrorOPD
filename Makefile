@@ -12,7 +12,7 @@ data:
 	python3 scripts/restore-data.py
 
 test:
-	PYTHONPATH=.:src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_power_targets.py tests/test_power_suite.py tests/test_power_production.py -q
+	PYTHONPATH=.:src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_power_targets.py tests/test_power_suite.py tests/test_power_production.py tests/test_power_onpolicy.py -q
 	PYTHONPATH=src uv run --with numpy --with pandas --with scipy --with pytest python -m pytest tests/test_oneshot_lr_stability.py -q
 	PYTHONPATH=src uv run --with torch --with numpy --with pandas --with transformers --with pytest python -m pytest tests/test_scalar_schedule.py tests/test_scalar_large_analysis.py tests/test_scalar_full_pool_study.py -q
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_math_evaluation.py
@@ -22,6 +22,7 @@ test:
 	PYTHONPATH=src uv run --with pytest python -m pytest tests/test_live_wandb_logging.py -q
 	PYTHONPATH=src python3 tests/test_tracking_layout.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_mdpo_eta_limits.py
+	PYTHONPATH=src uv run --with torch --with numpy python tests/test_opd_baselines.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_checkpoint_diagnostics.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_topk_overlap.py
 	PYTHONPATH=src uv run --with torch --with numpy python tests/test_training_metrics.py
