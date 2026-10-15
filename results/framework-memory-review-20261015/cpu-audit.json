@@ -1,0 +1,1503 @@
+{
+  "scope": "CPU allocation-layout, saved-storage and exact gradient parity audit; no GPU peak or throughput measurement",
+  "torch": "2.7.1+cu126",
+  "seed": [
+    812,
+    813,
+    814
+  ],
+  "source_manifest": {
+    "head": "3048245ad3942cd5e2de2ece7900c59584f15293",
+    "scope": "Current worktree; includes pre-existing uncommitted changes",
+    "files": [
+      {
+        "path": "src/mirroropd/core/__init__.py",
+        "bytes": 80,
+        "sha256": "160644b046037fc75b23fb2bf0a414986c432bf1ae356b6edb7a2caec8b2189b"
+      },
+      {
+        "path": "src/mirroropd/core/cache.py",
+        "bytes": 7723,
+        "sha256": "bc3fc1200c4daea153518f55e9582a0d7061333c2dda4c154d6b357d53416351"
+      },
+      {
+        "path": "src/mirroropd/core/config.py",
+        "bytes": 5673,
+        "sha256": "92825b6543a59ff545ec4e22167a91a736b25e663cbb2ced606161ccf7edb541"
+      },
+      {
+        "path": "src/mirroropd/core/diagnostics.py",
+        "bytes": 2628,
+        "sha256": "8fce22836f338ed174a08b22b6d9e0f6c6ab9603c53d62e5763268b77e58de78"
+      },
+      {
+        "path": "src/mirroropd/core/distributions.py",
+        "bytes": 3108,
+        "sha256": "c2b045f22c3eca06c445a229d265ec8afe19034866dc3d3157938f3eb6e0d5e8"
+      },
+      {
+        "path": "src/mirroropd/core/objectives.py",
+        "bytes": 6502,
+        "sha256": "514db9c890da8a6d48478acb203bf9e921146c9db2dfde10e60ad2ddc7c870bb"
+      },
+      {
+        "path": "src/mirroropd/core/signal.py",
+        "bytes": 631,
+        "sha256": "e70d3d82a20e43a71db1e9751ba4ffd0affe0097f5e8a64a06637c0b74342563"
+      },
+      {
+        "path": "src/mirroropd/core/vocabulary.py",
+        "bytes": 1195,
+        "sha256": "c593f4f9b121729dab8a623dc6daebdaa71421ad4147946a81565b1bd147c6b7"
+      },
+      {
+        "path": "src/mirroropd/integrations/verl/adapter.py",
+        "bytes": 4554,
+        "sha256": "b79b874a06c1523c89001940ea8d9192b6ef1c87fb9d185b700308f9c5033cfe"
+      },
+      {
+        "path": "src/mirroropd/integrations/verl/bridge.py",
+        "bytes": 9589,
+        "sha256": "a27cf448ab68908b9f15eabf981a246cd5f99de4d70945c5b436a8ed44964fcf"
+      },
+      {
+        "path": "src/mirroropd/integrations/verl/compiler.py",
+        "bytes": 7402,
+        "sha256": "34cf4a1cc2d7b6adf51927c8face766a2413665d2a958ec1e2ae4dc8e2a765f6"
+      },
+      {
+        "path": "src/mirroropd/integrations/verl/backend.json",
+        "bytes": 197,
+        "sha256": "cfdb9a15168276e99e571ebeab2f516baf2d122e1b4a0f4b7b7101bfce56febb"
+      },
+      {
+        "path": "src/mirroropd/integrations/verl/backend.patch",
+        "bytes": 60758,
+        "sha256": "82e3a730fa04ce4c7200f21570c1e00670a7cc6d7822a4ebf1357783182f6b9e"
+      },
+      {
+        "path": "src/mirroropd/runtime/config.py",
+        "bytes": 14876,
+        "sha256": "72eda974332c9668f772571b6ef480cf86c27e7602c5b64034fad5140fbc4388"
+      },
+      {
+        "path": "src/mirroropd/runtime/runner.py",
+        "bytes": 9958,
+        "sha256": "895b41b86d114ca3b67635a21b6008b61dabb62ca8567be18d28ab9a9405faf3"
+      },
+      {
+        "path": "src/mirroropd/runtime/events.py",
+        "bytes": 5810,
+        "sha256": "83fc47a91cf9446a56ede240be47cdf31637cee1859a286ac22dae895426496f"
+      },
+      {
+        "path": "src/mirroropd/runtime/metrics.py",
+        "bytes": 6057,
+        "sha256": "b929fdf50e387101158b2649ec8d21b35e38c1ae4e16ad0029f3674ddae941cc"
+      }
+    ]
+  },
+  "changed_non_core_files": [
+    {
+      "path": "src/mirroropd/runtime/config.py",
+      "initial_sha256": "72eda974332c9668f772571b6ef480cf86c27e7602c5b64034fad5140fbc4388",
+      "observed_sha256": "6d5f75b2077b7d0a019ccc8b2e58b3e17ad9c4e4347f97f93fe79e411f777dd3"
+    },
+    {
+      "path": "src/mirroropd/runtime/runner.py",
+      "initial_sha256": "895b41b86d114ca3b67635a21b6008b61dabb62ca8567be18d28ab9a9405faf3",
+      "observed_sha256": "f176e9aac74e874a3dc24eb5acda5fc5592b8564130d445e965f1921dff0a729"
+    }
+  ],
+  "test_program": "\"\"\"Read-only CPU audit of the current cache and loss implementation.\"\"\"\nimport hashlib\nimport json\nfrom dataclasses import replace\nfrom pathlib import Path\nfrom unittest.mock import patch\n\nimport pytest\nimport torch\n\nimport mirroropd.core.cache as cache_module\nfrom mirroropd.core.cache import build_cache\nfrom mirroropd.core.config import CacheContext, Estimator, Objective\nfrom mirroropd.core.distributions import Distribution\nfrom mirroropd.core.objectives import compute_loss\n\nROOT = Path(__file__).resolve().parents[3]\nROWS = []\n\n\ndef tensor_bytes(values):\n    return sum(v.numel() * v.element_size() for v in values.values())\n\n\n@pytest.mark.parametrize('algorithm', ['on_policy', 'mdpo', 'bpo'])\n@pytest.mark.parametrize(('center', 'integration'), [('topj_tail', 'sampled'), ('full', 'sampled'), ('full', 'full')])\ndef test_diagnostics_preserve_gradients_and_record_saved_tensors(algorithm, center, integration):\n    torch.manual_seed(812)\n    n, vocab = 8, 1024\n    q = torch.randn(n, vocab, dtype=torch.float64)\n    teacher = torch.randn_like(q)\n    actions = torch.randint(vocab, (n,))\n    base = Objective(algorithm, estimator=Estimator(center, integration, 16))\n    context = CacheContext(0, 'fixed-teacher', 'fixed-vocabulary', vocab, 1., base.signal, base.estimator)\n    frozen = build_cache(q, teacher, actions, torch.ones(n, dtype=torch.bool), context)\n    initial = q if algorithm == 'on_policy' else q + .12 * torch.randn_like(q)\n    gradients = []\n    for level in ['none', 'basic', 'full']:\n        objective = replace(base, diagnostics=level)\n        z = initial.clone().requires_grad_()\n        saved = []\n        calls = []\n        original = Distribution.from_logits\n        def traced(logits, **kwargs):\n            calls.append({'shape':list(logits.shape), 'materialize':kwargs.get('materialize', False), 'grad_enabled':torch.is_grad_enabled()})\n            return original(logits, **kwargs)\n        def pack(tensor):\n            saved.append({'shape':list(tensor.shape), 'dtype':str(tensor.dtype), 'storage':tensor.untyped_storage().data_ptr(), 'storage_bytes':tensor.untyped_storage().nbytes()})\n            return tensor\n        with patch.object(Distribution, 'from_logits', side_effect=traced), torch.autograd.graph.saved_tensors_hooks(pack, lambda tensor:tensor):\n            result = compute_loss(z, frozen, objective, anchor_version=0)\n            result.loss.mean().backward()\n        gradients.append(z.grad.clone())\n        unique = {row['storage']:row['storage_bytes'] for row in saved}\n        ROWS.append({'kind':'loss', 'algorithm':algorithm, 'center':center, 'integration':integration, 'diagnostics':level, 'n':n, 'vocab':vocab, 'dtype':'float64', 'cache_bytes':tensor_bytes(frozen.tensors()), 'saved_unique_storage_bytes':sum(unique.values()), 'saved_tensor_count':len(saved), 'distribution_calls':calls, 'large_saved_shapes':[r['shape'] for r in saved if r['shape']==[n,vocab]]})\n    for gradient in gradients[1:]:\n        torch.testing.assert_close(gradient, gradients[0], atol=3e-15, rtol=3e-12)\n\n\n@pytest.mark.parametrize(('center', 'integration'), [('topj_tail', 'sampled'), ('full', 'sampled'), ('full', 'full')])\ndef test_full_cache_stores_dense_sequence_slots(center, integration):\n    torch.manual_seed(813)\n    q = torch.randn(2, 12, 128)\n    teacher = torch.randn_like(q)\n    actions = torch.randint(128, (2,12))\n    valid = torch.zeros(2,12,dtype=torch.bool)\n    valid[:,8:10] = True\n    obj = Objective('bpo', estimator=Estimator(center,integration,8))\n    context = CacheContext(0,'teacher','vocabulary',128,1.,obj.signal,obj.estimator)\n    frozen = build_cache(q,teacher,actions,valid,context)\n    fields = {key:{'shape':list(value.shape),'bytes':value.numel()*value.element_size()} for key,value in frozen.tensors().items()}\n    if center=='full':\n        assert fields['anchor_full']['bytes']==2*12*128*4\n        assert fields['anchor_full']['bytes']==6*int(valid.sum())*128*4\n    ROWS.append({'kind':'layout','center':center,'integration':integration,'valid_prefixes':int(valid.sum()),'sequence_slots':valid.numel(),'dtype':'float32','cache_bytes':tensor_bytes(frozen.tensors()),'fields':fields})\n\n\ndef test_sampled_mdpo_without_diagnostics_still_builds_unused_center():\n    torch.manual_seed(814)\n    q=torch.randn(4,128)\n    teacher=torch.randn_like(q)\n    obj=Objective('mdpo', diagnostics='none')\n    context=CacheContext(0,'teacher','vocabulary',128,1.,obj.signal,obj.estimator)\n    original=cache_module.power_reward\n    seen=[]\n    def record(value,signal):\n        seen.append(list(value.shape))\n        return original(value,signal)\n    with patch.object(cache_module,'power_reward',side_effect=record):\n        frozen=build_cache(q,teacher,torch.arange(4),torch.ones(4,dtype=torch.bool),context,diagnostics='none')\n    assert seen and frozen.reward_center is not None\n    ROWS.append({'kind':'unused_center_work','algorithm':'mdpo','diagnostics':'none','reward_input_shapes_during_cache':seen,'cache_bytes':tensor_bytes(frozen.tensors())})\n\n\n\ndef test_full_bpo_can_eliminate_student_log_normalizer():\n    torch.manual_seed(815)\n    qlog=torch.randn(3,17,dtype=torch.float64).log_softmax(-1)\n    target=torch.randn(3,17,dtype=torch.float64).log_softmax(-1)\n    q=qlog.exp()\n    maximum=0.0\n    for shift in [0.,10000.,-10000.]:\n        z=(torch.randn_like(qlog)+shift).requires_grad_()\n        logp=z.log_softmax(-1)\n        residual=logp-target\n        residual=residual-(q*residual).sum(-1,keepdim=True)\n        original=(q*residual.square()).sum(-1)/.4\n        raw=z-target\n        raw=raw-(q*raw).sum(-1,keepdim=True)\n        proposed=(q*raw.square()).sum(-1)/.4\n        g1=torch.autograd.grad(original.sum(),z,retain_graph=True)[0]\n        g2=torch.autograd.grad(proposed.sum(),z)[0]\n        torch.testing.assert_close(original,proposed,atol=2e-10,rtol=2e-11)\n        torch.testing.assert_close(g1,g2,atol=2e-11,rtol=2e-11)\n        maximum=max(maximum,float((g1-g2).abs().max()))\n    ROWS.append({'kind':'full_bpo_raw_logit_identity','dtype':'float64','shifts':[0.,10000.,-10000.],'max_gradient_difference':maximum,'scope':'Exact normalized anchor weights; direct full BPO only. Does not validate sampled substitution or a fused GPU kernel.'})\n\ndef test_serialize_audit_results():\n    assert len(ROWS)==32\n    manifest=json.loads((Path(__file__).parent/'source-manifest.json').read_text())\n    changed=[]\n    for item in manifest['files']:\n        digest=hashlib.sha256((ROOT/item['path']).read_bytes()).hexdigest()\n        if item['path'].startswith('src/mirroropd/core/'):\n            assert digest==item['sha256'], item['path']\n        elif digest!=item['sha256']:\n            changed.append({'path':item['path'],'initial_sha256':item['sha256'],'observed_sha256':digest})\n    benchmark=json.loads((ROOT/'results/refactor-20261015/kernel-benchmark.json').read_text())\n    historical=[r for r in benchmark['cases'] if r['prefixes']==56 and r['algorithm']=='bpo' and r['center']=='topj_tail' and r['integration']=='sampled']\n    summary={'scope':'CPU allocation-layout, saved-storage and exact gradient parity audit; no GPU peak or throughput measurement', 'torch':torch.__version__,'seed':[812,813,814],'source_manifest':manifest,'changed_non_core_files':changed,'test_program':Path(__file__).read_text(),'records':ROWS,'historical_gpu_scope':benchmark['metadata'],'historical_gpu_bpo_56':historical}\n    output=ROOT/'results/framework-memory-review-20261015/cpu-audit.json'\n    output.parent.mkdir(parents=True,exist_ok=True)\n    output.write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\\n')\n",
+  "records": [
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65664,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65664,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 3400,
+      "saved_unique_storage_bytes": 65664,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65664,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65664,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65728,
+      "saved_tensor_count": 5,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": false,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "full",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 68936,
+      "saved_unique_storage_bytes": 65664,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 131072,
+      "saved_tensor_count": 2,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 131072,
+      "saved_tensor_count": 2,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "on_policy",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 131072,
+      "saved_tensor_count": 2,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 196608,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 196608,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "mdpo",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 196608,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "none",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 196608,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "basic",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 196608,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "loss",
+      "algorithm": "bpo",
+      "center": "full",
+      "integration": "full",
+      "diagnostics": "full",
+      "n": 8,
+      "vocab": 1024,
+      "dtype": "float64",
+      "cache_bytes": 134472,
+      "saved_unique_storage_bytes": 196608,
+      "saved_tensor_count": 4,
+      "distribution_calls": [
+        {
+          "shape": [
+            8,
+            1024
+          ],
+          "materialize": true,
+          "grad_enabled": true
+        }
+      ],
+      "large_saved_shapes": [
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ],
+        [
+          8,
+          1024
+        ]
+      ]
+    },
+    {
+      "kind": "layout",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "valid_prefixes": 4,
+      "sequence_slots": 24,
+      "dtype": "float32",
+      "cache_bytes": 4440,
+      "fields": {
+        "valid": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 24
+        },
+        "actions": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 192
+        },
+        "head_ids": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 1536
+        },
+        "anchor_head": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 768
+        },
+        "anchor_tail": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "anchor_action": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "teacher_action": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "reward_center": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "teacher_ids": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 1536
+        }
+      }
+    },
+    {
+      "kind": "layout",
+      "center": "full",
+      "integration": "sampled",
+      "valid_prefixes": 4,
+      "sequence_slots": 24,
+      "dtype": "float32",
+      "cache_bytes": 16728,
+      "fields": {
+        "valid": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 24
+        },
+        "actions": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 192
+        },
+        "head_ids": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 1536
+        },
+        "anchor_head": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 768
+        },
+        "anchor_tail": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "anchor_action": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "anchor_full": {
+          "shape": [
+            2,
+            12,
+            128
+          ],
+          "bytes": 12288
+        },
+        "teacher_action": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "reward_center": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "teacher_ids": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 1536
+        }
+      }
+    },
+    {
+      "kind": "layout",
+      "center": "full",
+      "integration": "full",
+      "valid_prefixes": 4,
+      "sequence_slots": 24,
+      "dtype": "float32",
+      "cache_bytes": 29016,
+      "fields": {
+        "valid": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 24
+        },
+        "actions": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 192
+        },
+        "head_ids": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 1536
+        },
+        "anchor_head": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 768
+        },
+        "anchor_tail": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "anchor_action": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "anchor_full": {
+          "shape": [
+            2,
+            12,
+            128
+          ],
+          "bytes": 12288
+        },
+        "teacher_action": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "reward_center": {
+          "shape": [
+            2,
+            12
+          ],
+          "bytes": 96
+        },
+        "teacher_ids": {
+          "shape": [
+            2,
+            12,
+            8
+          ],
+          "bytes": 1536
+        },
+        "target_full": {
+          "shape": [
+            2,
+            12,
+            128
+          ],
+          "bytes": 12288
+        }
+      }
+    },
+    {
+      "kind": "unused_center_work",
+      "algorithm": "mdpo",
+      "diagnostics": "none",
+      "reward_input_shapes_during_cache": [
+        [
+          4,
+          16
+        ],
+        [
+          4
+        ]
+      ],
+      "cache_bytes": 868
+    },
+    {
+      "kind": "full_bpo_raw_logit_identity",
+      "dtype": "float64",
+      "shifts": [
+        0.0,
+        10000.0,
+        -10000.0
+      ],
+      "max_gradient_difference": 9.405809464624326e-13,
+      "scope": "Exact normalized anchor weights; direct full BPO only. Does not validate sampled substitution or a fused GPU kernel."
+    }
+  ],
+  "historical_gpu_scope": {
+    "schema_version": 2,
+    "scope": "Objective forward/backward including selected diagnostic level; not whole-model throughput",
+    "input_sha256": "aba3013407ba6edb7112cffc800f9090dabf3ab643ae1aa5da390161466fab29",
+    "warmup_iterations": 3,
+    "measured_iterations": 10,
+    "torch": "2.7.1+cu126",
+    "physical_gpu": 0,
+    "kappa": 0.5,
+    "eta": 0.2
+  },
+  "historical_gpu_bpo_56": [
+    {
+      "prefixes": 56,
+      "vocab": 151665,
+      "algorithm": "bpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "none",
+      "median_ms": 1.284767985343933,
+      "min_ms": 1.251039981842041,
+      "peak_allocated_bytes": 237830144,
+      "loss_kind": "score_surrogate",
+      "loss_mean": -0.3114359974861145,
+      "gradient_norm": 0.04574795067310333
+    },
+    {
+      "prefixes": 56,
+      "vocab": 151665,
+      "algorithm": "bpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "basic",
+      "median_ms": 1.3317279815673828,
+      "min_ms": 1.2785600423812866,
+      "peak_allocated_bytes": 237835264,
+      "loss_kind": "score_surrogate",
+      "loss_mean": -0.3114359974861145,
+      "gradient_norm": 0.04574795067310333
+    },
+    {
+      "prefixes": 56,
+      "vocab": 151665,
+      "algorithm": "bpo",
+      "center": "topj_tail",
+      "integration": "sampled",
+      "diagnostics": "full",
+      "median_ms": 1.6147519946098328,
+      "min_ms": 1.5745600461959839,
+      "peak_allocated_bytes": 203883520,
+      "loss_kind": "score_surrogate",
+      "loss_mean": -0.31143590807914734,
+      "gradient_norm": 0.045747946947813034,
+      "baseline_median_ms": 1.4738399982452393,
+      "baseline_peak_allocated_bytes": 203891712,
+      "speed_ratio": 0.9127345890669474,
+      "gradient_max_abs_difference": 1.7695128917694092e-08,
+      "gradient_relative_l2_difference": 6.115263390416698e-07
+    }
+  ],
+  "review_end_observations": [
+    {
+      "path": "src/mirroropd/core/__init__.py",
+      "sha256": "160644b046037fc75b23fb2bf0a414986c432bf1ae356b6edb7a2caec8b2189b"
+    },
+    {
+      "path": "src/mirroropd/core/cache.py",
+      "sha256": "bc3fc1200c4daea153518f55e9582a0d7061333c2dda4c154d6b357d53416351"
+    },
+    {
+      "path": "src/mirroropd/core/config.py",
+      "sha256": "92825b6543a59ff545ec4e22167a91a736b25e663cbb2ced606161ccf7edb541"
+    },
+    {
+      "path": "src/mirroropd/core/diagnostics.py",
+      "sha256": "8fce22836f338ed174a08b22b6d9e0f6c6ab9603c53d62e5763268b77e58de78"
+    },
+    {
+      "path": "src/mirroropd/core/distributions.py",
+      "sha256": "c2b045f22c3eca06c445a229d265ec8afe19034866dc3d3157938f3eb6e0d5e8"
+    },
+    {
+      "path": "src/mirroropd/core/objectives.py",
+      "sha256": "514db9c890da8a6d48478acb203bf9e921146c9db2dfde10e60ad2ddc7c870bb"
+    },
+    {
+      "path": "src/mirroropd/core/signal.py",
+      "sha256": "e70d3d82a20e43a71db1e9751ba4ffd0affe0097f5e8a64a06637c0b74342563"
+    },
+    {
+      "path": "src/mirroropd/core/vocabulary.py",
+      "sha256": "c593f4f9b121729dab8a623dc6daebdaa71421ad4147946a81565b1bd147c6b7"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/adapter.py",
+      "sha256": "b79b874a06c1523c89001940ea8d9192b6ef1c87fb9d185b700308f9c5033cfe"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/bridge.py",
+      "sha256": "a27cf448ab68908b9f15eabf981a246cd5f99de4d70945c5b436a8ed44964fcf"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/compiler.py",
+      "sha256": "34cf4a1cc2d7b6adf51927c8face766a2413665d2a958ec1e2ae4dc8e2a765f6"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/backend.json",
+      "sha256": "cfdb9a15168276e99e571ebeab2f516baf2d122e1b4a0f4b7b7101bfce56febb"
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/backend.patch",
+      "sha256": "82e3a730fa04ce4c7200f21570c1e00670a7cc6d7822a4ebf1357783182f6b9e"
+    },
+    {
+      "path": "src/mirroropd/runtime/config.py",
+      "sha256": "6d5f75b2077b7d0a019ccc8b2e58b3e17ad9c4e4347f97f93fe79e411f777dd3"
+    },
+    {
+      "path": "src/mirroropd/runtime/runner.py",
+      "sha256": "f176e9aac74e874a3dc24eb5acda5fc5592b8564130d445e965f1921dff0a729"
+    },
+    {
+      "path": "src/mirroropd/runtime/events.py",
+      "sha256": "83fc47a91cf9446a56ede240be47cdf31637cee1859a286ac22dae895426496f"
+    },
+    {
+      "path": "src/mirroropd/runtime/metrics.py",
+      "sha256": "b929fdf50e387101158b2649ec8d21b35e38c1ae4e16ad0029f3674ddae941cc"
+    }
+  ],
+  "external_references": {
+    "memory-slime": [
+      "THUDM/slime",
+      "05e3b017fed9e02de418c2fbac9d75602a534be5",
+      "slime/backends/megatron_utils/loss.py",
+      "Sampled OPD 与 LP 调用"
+    ],
+    "memory-miles": [
+      "radixark/miles",
+      "af4413b74f33f072883b6fbc760cccba3d56160d",
+      "miles/rollout/on_policy_distillation.py",
+      "逐位置 chosen-ID 评分与 top-k reward"
+    ],
+    "memory-trl-kernel": [
+      "huggingface/trl",
+      "cdfe756f3ea9d47c2a6c59d6ebb529986cad8a4e",
+      "trl/kernels/chunked_divergence.py",
+      "LM-head 分块散度与自定义反向"
+    ],
+    "memory-verl-loss": [
+      "verl-project/verl",
+      "5b550b0c3dad8c7bb7aab834a3fe195f8cdfc517",
+      "verl/trainer/distillation/losses.py",
+      "Distillation direct/PG 及 KL 估计器"
+    ],
+    "memory-verl-teacher": [
+      "verl-project/verl",
+      "5b550b0c3dad8c7bb7aab834a3fe195f8cdfc517",
+      "verl/experimental/teacher_loop/teacher_manager.py",
+      "教师评分请求接口"
+    ],
+    "memory-miles-offload": [
+      "radixark/miles",
+      "af4413b74f33f072883b6fbc760cccba3d56160d",
+      "docs/advanced/disk-offload.md",
+      "阶段 offload 与 optimizer streaming"
+    ]
+  }
+}
