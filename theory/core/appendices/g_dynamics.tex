@@ -1,6 +1,15 @@
 \chapter{外层动力学、扰动与序列边界}
 \label{app:dynamics}
 \section{幂均值的 escort 轨迹}
+\begin{proposition}[escort 坐标中的精确直线轨迹]
+设 $0<\kappa\le1$，$E_\kappa(q)_a=q_a^\kappa/S_\kappa(q)$、$S_\kappa(q)=\sum_aq_a^\kappa$。幂均值更新满足
+\begin{equation}
+E_\kappa(m)=(1-b)E_\kappa(q)+bE_\kappa(T),\quad
+b=\frac{\eta S_\kappa(T)}{(1-\eta)S_\kappa(q)+\eta S_\kappa(T)}.
+\end{equation}
+固定教师的全部精确外层迭代位于初始 escort 分布与教师 escort 分布的同一条直线上。
+\end{proposition}
+\begin{proof}
 对 $\kappa>0$，定义 $S_\kappa(q)=\sum_aq_a^\kappa$ 和 escort 分布 $E_\kappa(q)_a=q_a^\kappa/S_\kappa(q)$。它的逆为 $q_a\propto E_\kappa(q)_a^{1/\kappa}$。对幂均值目标取 $\kappa$ 次幂，公共归一化消去，得
 \begin{equation}
 E_\kappa(m)=(1-b)E_\kappa(q)+bE_\kappa(T),\quad
@@ -13,6 +22,18 @@ b=\frac{\eta S_\kappa(T)}
 E_\kappa(q_n)-E_\kappa(T)
 =\prod_{j<n}(1-b_j)[E_\kappa(q_0)-E_\kappa(T)].
 \end{equation}
+\end{proof}
+
+\begin{theorem}[escort 距离收缩与近似输出误差]
+固定正教师、有限词表及 $0<\kappa\le1,0<\eta<1$。令
+$c=(1-\eta)V^{1-\kappa}/[(1-\eta)V^{1-\kappa}+\eta S_\kappa(T)]<1$。
+令 $d_\kappa(P,Q)=\|E_\kappa(P)-E_\kappa(Q)\|_1$。若 $d_\kappa(q_{n+1},m(q_n,T))\le\epsilon_n$，则
+\begin{equation}
+d_\kappa(q_n,T)\le c^nd_\kappa(q_0,T)+\sum_{j<n}c^{n-1-j}\epsilon_j.
+\end{equation}
+若 $\limsup\epsilon_n\le\epsilon_\infty$，稳态距离不超过 $\epsilon_\infty/(1-c)$；精确更新收敛到 $T$。
+\end{theorem}
+\begin{proof}
 词表大小为 $V$，Jensen 给 $S_\kappa(q)\le V^{1-\kappa}$。令
 \begin{equation}
 c=\frac{(1-\eta)V^{1-\kappa}}
@@ -32,7 +53,17 @@ d_\kappa(q_n,T)\le c^nd_\kappa(q_0,T)+\sum_{j<n}c^{n-1-j}\epsilon_j.
 \label{eq:escort-errors}
 \end{equation}
 若 $\limsup\epsilon_n\le\epsilon_\infty$，拆开有限前缀与充分晚的尾和，得到 $\limsup d_\kappa(q_n,T)\le\epsilon_\infty/(1-c)$。这是到固定教师的定向收缩，不声称两任意锚点间有相同收缩常数。
+\end{proof}
 
+\begin{proposition}[自然梯度流的 escort 表达与几何极限]
+沿幂散度的自由自然梯度流，
+\begin{equation}
+\frac d{dt}E_\kappa(q)=\frac{S_\kappa(T)}{S_\kappa(q)}[E_\kappa(T)-E_\kappa(q)].
+\end{equation}
+因此正时间重参数化后是线性趋近教师的流。固定正 $q$ 时，
+$\frac V\kappa(E_\kappa(q)_a-1/V)\to\log q_a-V^{-1}\sum_b\log q_b$。
+\end{proposition}
+\begin{proof}
 连续流也有同一轨迹。令 $a_\kappa=\E_q(T/q)^\kappa$，由 $\dot q_a=q_a[(T_a/q_a)^\kappa-a_\kappa]/\kappa$ 得
 \begin{equation}
 \frac d{dt}q_a^\kappa=T_a^\kappa-a_\kappa q_a^\kappa,\qquad
@@ -44,10 +75,20 @@ d_\kappa(q_n,T)\le c^nd_\kappa(q_0,T)+\sum_{j<n}c^{n-1-j}\epsilon_j.
 \frac V\kappa\left(E_\kappa(q)_a-\frac1V\right)
 \longrightarrow\log q_a-\frac1V\sum_b\log q_b.
 \end{equation}
+\end{proof}
 
 \section{几何端点的完整稳定区间}
 这一节允许 $\eta>0$，但只讨论 $\kappa=0$ 的几何更新及后面相应的 Mean 更新。正形状的概率插值仍取 $0<\eta<1$。
 
+\begin{theorem}[几何端点的闭式轨迹与稳定分类]
+固定 $T>0$，几何更新为 $q^+\propto q^{1-\eta}T^\eta$。同一教师下，Hilbert 距离精确乘以 $|1-\eta|$。变步长轨迹满足
+\begin{equation}
+q_k(a)\propto T_a e^{\chi_k\log(q_{0,a}/T_a)},\qquad
+\chi_k=\prod_{j<k}(1-\eta_j).
+\end{equation}
+非教师初值收敛当且仅当 $\chi_k\to0$。常步长在 $0<\eta<2$ 收敛，$\eta=2$ 两周期，$\eta>2$ 跨度发散。
+\end{theorem}
+\begin{proof}
 固定正教师 $T$，令 $q^+\propto q^{1-\eta}T^\eta$。归一化常数在动作差中消失，所以
 \begin{equation}
 d_H(q^+,T)=|1-\eta|d_H(q,T),\qquad
@@ -58,9 +99,25 @@ d_H(q^+,\widetilde q^+)=|1-\eta|d_H(q,\widetilde q).
 q_k(a)=\frac{T_ae^{\chi_ku_a}}{\sum_bT_be^{\chi_ku_b}}.
 \end{equation}
 归纳步骤中上一轮的配分函数仅产生公共乘数，归一化后消去。非教师初值下，收敛当且仅当 $\chi_k\to0$。常步长 $0<\eta<2$ 收敛，$\eta=1$ 一步到教师，$\eta=2$ 为两周期，$\eta>2$ 的跨度发散。
+\end{proof}
 
+\begin{proposition}[几何变步长的充要收敛条件]
+若 $\eta_k\in(0,2)$ 且没有一步等于一，则非教师初值收敛到教师，当且仅当 $\sum_k\eta_k(2-\eta_k)=\infty$。若某一步等于一，此后精确保持教师。
+\end{proposition}
+\begin{proof}
 若所有 $\eta_k\in(0,2)$ 且没有一步等于一，令 $a_k=|1-\eta_k|\in(0,1)$。乘积趋零当且仅当 $\sum_k(1-a_k)=\infty$：一边由 $-\log a\ge1-a$，另一边在 $a$ 接近一时由 $-\log a\le2(1-a)$ 得到。再用 $1-a_k\le1-a_k^2\le2(1-a_k)$，得到等价判据 $\sum_k\eta_k(2-\eta_k)=\infty$。
+\end{proof}
 
+\begin{proposition}[几何路径的双向 KL 积分]
+令 $u=\log(q_0/T)$、$\Psi(\chi)=\log\E_Te^{\chi u}$、$q^{[\chi]}\propto Te^{\chi u}$。则
+\begin{align}
+\KL(q^{[\chi]}\Vert T)&=\int_0^\chi s\Psi''(s)\,ds,\\
+\KL(T\Vert q^{[\chi]})&=\int_0^\chi(\chi-s)\Psi''(s)\,ds,\qquad
+\Psi''(\chi)=\Var_{q^{[\chi]}}u.
+\end{align}
+非教师初值、$0<\eta<2$ 且 $\eta\ne1$ 时，几何迭代的局部 KL 比例为 $(1-\eta)^2$；全局有 $\KL(q_k\Vert T)\le\chi_k^2(\osc u)^2/8$。
+\end{proposition}
+\begin{proof}
 定义 $\Psi(\chi)=\log\sum_aT_ae^{\chi u_a}$。有限求和微分给 $\Psi'=\E_{q^{[\chi]}}u$、$\Psi''=\Var_{q^{[\chi]}}u$。于是
 \begin{align}
 \KL(q^{[\chi]}\Vert T)&=\chi\Psi'(\chi)-\Psi(\chi)
@@ -69,13 +126,28 @@ q_k(a)=\frac{T_ae^{\chi_ku_a}}{\sum_bT_be^{\chi_ku_b}}.
 =\int_0^\chi(\chi-s)\Psi''(s)\,ds.
 \end{align}
 正、负半轴上两种 KL 各自随离零距离增加而增加，但跨越两侧的值不能仅由 $|\chi|$ 比较。教师附近有 KL 比例极限 $(1-\eta)^2$；全局只有绝对界 $\KL(q_k\Vert T)\le\chi_k^2(\osc u)^2/8$，由 $\Psi''\le(\osc u)^2/4$ 积分得到。
+\end{proof}
 
-直接展开更新方程还得到
+\begin{proposition}[几何更新的三点恒等式]
+几何更新对任意 $\eta>0$ 满足
+\begin{equation}
+\eta\KL(q\Vert T)=\eta\KL(q^+\Vert T)+(1-\eta)\KL(q^+\Vert q)+\KL(q\Vert q^+).
+\end{equation}
+若 $0<\eta\le1$，教师逆向 KL 单步非增，且常步长下 $\sum_k\KL(q_k\Vert q_{k+1})\le\eta\KL(q_0\Vert T)$。稳定区间内的 $\eta>1$ 不一般保证 KL 单步下降。
+\end{proposition}
+\begin{proof}
+由 $q_a^+=q_a^{1-\eta}T_a^\eta/Z$，
+\begin{align}
+\log(q_a^+/q_a)&=-\eta\log(q_a/T_a)-\log Z,\\
+\log(q_a^+/T_a)&=(1-\eta)\log(q_a/T_a)-\log Z.
+\end{align}
+第一式在 $q$ 下取负期望，得到 $\KL(q\Vert q^+)=\eta\KL(q\Vert T)+\log Z$。两式在 $q^+$ 下取期望并按 $\eta,1-\eta$ 组合，得到 $\eta\KL(q^+\Vert T)+(1-\eta)\KL(q^+\Vert q)=-\log Z$。相加消去配分常数，即得
 \begin{equation}
 \eta\KL(q\Vert T)=\eta\KL(q^+\Vert T)
 +(1-\eta)\KL(q^+\Vert q)+\KL(q\Vert q^+).
 \end{equation}
 当 $0<\eta\le1$ 时，这给单步 KL 下降及 $\sum_k\KL(q_k\Vert q_{k+1})\le\eta\KL(q_0\Vert T)$。$\eta>1$ 时不能把跨度稳定性换成每步 KL 下降。例如 $q=(10^{-12},1-10^{-12})$、$T=(0.1,0.9)$、$\eta=1.1$，逆向 KL 从约 $0.10536$ 增至 $0.71385$。
+\end{proof}
 
 \section{Mean 的单轮界与精确外层}
 本节取 $r=\log(T/q)$、$d=\KL(q\Vert T)$、$G=\eta(r+d)$。Mean 的 KKT 为
@@ -84,6 +156,14 @@ q_k(a)=\frac{T_ae^{\chi_ku_a}}{\sum_bT_be^{\chi_ku_b}}.
 w_a=p_a^{\rm M}/q_a,\quad \E_qw=1,\quad
 \lambda=\KL(q\Vert p^{\rm M}).
 \end{equation}
+\begin{proposition}[Mean 归一化乘子的上下界]
+设 $G=\eta C_q\log(T/q)$，精确 Mean 乘子为 $\lambda$。令 $A_1=\E_qe^G,A_2=\E_qe^{2G}$，则
+\begin{equation}
+\frac{A_1(A_1-1)}{A_2}\le\lambda\le\log A_1.
+\end{equation}
+若 $q=T$，两界均为零；否则 $\lambda>0$。
+\end{proposition}
+\begin{proof}
 令 $X=e^G$、$A_1=\E_qX$、$A_2=\E_qX^2$。由 $\lambda=\E_qW_0(\lambda X)$，$W_0$ 的凹性给 $\lambda\le\log A_1$。其凹性可由 $W_0'(x)=e^{-W_0(x)}/(1+W_0(x))$ 再求导看出。
 
 下界使用 $W_0(z)\ge z/(1+z)$：写 $z=we^w$，等价于 $(1-w)e^w\le1$；该函数在 $w\ge0$ 非增。Cauchy--Schwarz 再给
@@ -94,7 +174,17 @@ w_a=p_a^{\rm M}/q_a,\quad \E_qw=1,\quad
 \frac{A_1(A_1-1)}{A_2}\le\lambda\le\log A_1.
 \end{equation}
 非恒定信号时 $\lambda>0$ 可以约去；恒定信号两边为零。代入 $A_1=e^{\eta d}Z_\eta,A_2=e^{2\eta d}Z_{2\eta}$，得到原稿的 Rényi 归一化界，其中 $Z_\nu=\sum q^{1-\nu}T^\nu$。
+\end{proof}
 
+\begin{proposition}[精确 Mean 的教师 KL 下降]
+固定 $q,T>0$，令 $d=\KL(q\Vert T)$，$p^{\rm M}$ 是信号 $f=\eta\log(T/q)$ 的精确 Mean 解。则
+\begin{equation}
+\KL(p^{\rm M}\Vert T)\le d-(\eta^{-1}-1)\KL(p^{\rm M}\Vert q)
+-\frac{\lambda}{2\eta}\chi^2(p^{\rm M}\Vert q).
+\end{equation}
+当 $0<\eta\le1$ 且 $q\ne T$ 时，教师 KL 严格下降。
+\end{proposition}
+\begin{proof}
 Mean 最大化式~\eqref{eq:mean-mixed}，将它与可行点 $q$ 比较，再除以 $\eta$，得到
 \begin{equation}
 \KL(p^{\rm M}\Vert T)
@@ -102,6 +192,7 @@ Mean 最大化式~\eqref{eq:mean-mixed}，将它与可行点 $q$ 比较，再除
 -\frac{\lambda}{2\eta}\chi^2(p^{\rm M}\Vert q).
 \end{equation}
 当 $0<\eta\le1,q\ne T$，最后一项严格为正，所以教师 KL 严格下降。
+\end{proof}
 
 \begin{theorem}[Mean 的跨度稳定性]
 固定正教师和正初值，逐轮精确 Mean 求解并同步。$0<\eta\le2$ 时跨度严格下降到零；$0<\eta<2$ 时
@@ -127,6 +218,15 @@ v'(r)=-1+\eta/(1+\lambda w(r)).
 \end{proof}
 
 \section{Mean 的三次项与边界率}
+\begin{theorem}[Mean 的三阶局部展开]
+固定正教师和 $\eta>0$。令 $y=C_T\log(q/T)$、$V=\E_Ty^2$，则当 $\|y\|_\infty\to0$，
+\begin{equation}
+y^+=(1-\eta)y+\tfrac12\eta^3Vy+O(\|y\|_\infty^4).
+\end{equation}
+$\eta=1$ 时，$V^+=V^3/4+O(V^{7/2})$，且非平凡趋近满足
+$\KL(p^{\rm M}\Vert T)/\KL(q\Vert T)^3\to1$。
+\end{theorem}
+\begin{proof}
 定义教师中心坐标 $y=C_T\log(q/T)$，$q=Te^y/\E_Te^y$，$V=\E_Ty^2$、$\delta=\|y\|_\infty$。固定正教师使 $T_{\min}\delta^2\le V\le\delta^2$。Taylor 展开给
 \begin{equation}
 \log\E_Te^y=V/2+O(\delta^3),\quad
@@ -155,29 +255,61 @@ y^+=(1-\eta)y+\frac{\eta^3}{2}Vy+O(\delta^4).
 \label{eq:mean-cubic}
 \end{equation}
 $\eta=1$ 时 $V^+=V^3/4+O(V^{7/2})$，两次使用 $\KL(q\Vert T)=V/2+O(V^{3/2})$，得到 $\KL(p^{\rm M}\Vert T)/\KL(q\Vert T)^3\to1$。
+\end{proof}
 
+\begin{proposition}[Mean 的全局三次跨度界]
+对 $\eta=1$ 的精确 Mean 更新，令 $b=d_H(q,T)$，则
+\begin{equation}
+d_H(p^{\rm M},T)\le \frac{e^bb^2}{8+e^bb^2}\,b.
+\end{equation}
+\end{proposition}
+\begin{proof}
 还可给出全局三次跨度上界。$\eta=1$ 时 $\lambda\le d$、$w_{\max}\le e^b$。令 $F(t)=\log\E_qe^{t(r-\E_qr)}$，有 $F(0)=F'(0)=0$、$F''(t)\le b^2/4$；两次积分得 $d=F(1)\le b^2/8$。因此
 \begin{equation}
 b^+\le\frac{\lambda w_{\max}}{1+\lambda w_{\max}}b
 \le\frac{e^bb^2}{8+e^bb^2}b.
 \end{equation}
+\end{proof}
 
+\begin{theorem}[Mean 边界步长的渐近率]
+固定正教师，在 $\eta=2$ 下精确 Mean 同步。若没有有限步到达教师，则 $kV_k\to1/8$、$k\KL(q_k\Vert T)\to1/16$；若某步已经到达教师，后续误差为零。
+\end{theorem}
+\begin{proof}
 在 $\eta=2$，式~\eqref{eq:mean-cubic} 给 $V^+=V-8V^2+O(V^{5/2})$。若不在有限步精确到达教师，则 $V_k>0$ 且由全局稳定性 $V_k\to0$，
 \begin{equation}
 V_{k+1}^{-1}-V_k^{-1}=8+O(\sqrt{V_k})\to8.
 \end{equation}
 累加并除以轮数得 $kV_k\to1/8$，进而 $k\KL(q_k\Vert T)\to1/16$。几何更新在相同步长是两周期，Mean 的三次阻尼改变了边界行为。
+\end{proof}
 
+\begin{proposition}[Mean 的固定锚点大步长极限]
+固定不同的正分布 $q,T$，令 $h=C_q\log(T/q)$、$c=\E_q[h]_+>0$。当 $\eta\to\infty$ 时，Mean 的归一化乘子满足 $\lambda/\eta\to c$，最优分布满足 $p_a^{\rm M}\to q_a[h_a]_+/c$。该极限不同于 Gibbs 的最高 reward 支持集极限。
+\end{proposition}
+\begin{proof}
 固定锚点令 $\eta\to\infty$ 时，Mean 还有不同于 Gibbs 的极限。令 $h=C_qr$、$c=\E_q[h]_+>0$，则 $\lambda/\eta\to c$、$p_a^{\rm M}\to q_a[h_a]_+/c$。证明如下：最大 $h_a=M>0$ 处 KKT 与 $p_a/q_a\le1/q_a$ 给 $\lambda\ge q_a\eta M-q_a\log(1/q_a)$；上界 $\lambda\le\log\E_qe^{\eta h}\le\eta M$。所以 $\lambda/\eta$ 有严格正常数界。沿任一收敛子列，$W_0(\lambda e^{\eta h_a})/\eta\to[h_a]_+$，正、零、负三种情形分别使用 $W+\log W=\log\lambda+\eta h_a$、$W_0(\lambda)=O(\log\eta)$、$W_0(z)\le z$。有限求和归一化强制子列极限为 $c$，从而整个序列收敛。Gibbs 则只保留最高 reward 动作；两个极限不能互换。
+\end{proof}
 
 \section{有限 inner 的误差接口}
+\begin{proposition}[四种内层损失到输出误差的接口]
+若 $q_a\ge q_{\min}>0$，Part 或 Mean 对各自正确目标的超额损失 $\delta$ 蕴含 $d_H(p,p^\star)\le2\sqrt{\delta/q_{\min}}$；BPO 蕴含 $d_H(p,m)\le2\sqrt{\eta L_{\rm BPO}/q_{\min}}$。MDPO 则有 $\KL(p\Vert m)=\eta\delta$ 和 $\TV(p,m)\le\sqrt{\eta\delta/2}$，但无额外概率下界时不能控制统一 log-ratio。
+\end{proposition}
+\begin{proof}
 由式~\eqref{eq:mean-excess}，Mean 超额损失 $\delta$ 控制 $\E_q\log^2(p/p^{\rm M})\le2\delta$；Part 超额损失正好等于该平方项（目标换成 $m$）。若 $q_a\ge q_{\min}$，附录~\ref{app:measure} 给
 \begin{equation}
 d_H(p,p^\star)\le2\sqrt{\delta/q_{\min}},\qquad
 d_H(p,m)\le2\sqrt{\eta L_{\rm BPO}/q_{\min}}.
 \end{equation}
 MDPO 给 $\KL(p\Vert m)=\eta\delta$ 和 TV 界，但没有统一 log-ratio 界。取 $m=(1-\epsilon,\epsilon)$、$p=(1-\epsilon^2,\epsilon^2)$，KL 趋零，第二坐标的 log-ratio 为 $\log\epsilon\to-\infty$。
+\end{proof}
 
+\begin{proposition}[有限拟合的教师 KL 证书]
+固定 $p,m,T>0$，令 $\varepsilon=\KL(p\Vert m)$、$H=\osc\log(m/T)$。则
+\begin{align}
+\KL(p\Vert T)&\le\KL(m\Vert T)+\varepsilon+H\sqrt{\varepsilon/2},\\
+\KL(p\Vert T)&\le(1+1/u)\varepsilon+D^{\rm R}_{1+u}(m\Vert T),\qquad u>0.
+\end{align}
+\end{proposition}
+\begin{proof}
 直接检查教师逆向 KL 时，记 $\varepsilon=\KL(p\Vert m)$、$\ell=\log(m/T)$、$H=\osc\ell$。恒等式
 \begin{equation}
 \KL(p\Vert T)=\varepsilon+\KL(m\Vert T)+\sum_a(p_a-m_a)\ell_a
@@ -188,21 +320,45 @@ MDPO 给 $\KL(p\Vert m)=\eta\delta$ 和 TV 界，但没有统一 log-ratio 界�
 \le(1+1/u)\KL(p\Vert m)+D^{\rm R}_{1+u}(m\Vert T).
 \end{equation}
 可在多个 $u$ 上取最小值；这里只用其精确有限 $u$ 形式作为保证。
+\end{proof}
 
+\begin{proposition}[条件无偏 SGD 的平均梯度范数界]
+设损失 $L_{\rm sm}$ 光滑、下界为 $L_\star$，随机梯度条件无偏且方差不超过 $\sigma^2/M$。若 $0<\alpha\le1/L_{\rm sm}$，则
+\begin{equation}
+\frac1N\sum_{n<N}\E\|\nabla L(\theta_n)\|^2
+\le\frac{2(L_0-L_\star)}{\alpha N}+\frac{L_{\rm sm}\alpha\sigma^2}{M}.
+\end{equation}
+该界本身不提供分布距离控制。
+\end{proposition}
+\begin{proof}
 梯度范数界还需额外条件才能连接到这些输出证书。若随机梯度条件无偏、方差不超过 $\sigma^2/M$，且损失 $L_{\rm sm}$ 光滑，SGD 步长 $\alpha\le1/L_{\rm sm}$ 满足
 \begin{equation}
 \frac1N\sum_{n<N}\E\|\nabla L(\theta_n)\|^2
 \le\frac{2(L_0-L_\star)}{\alpha N}+\frac{L_{\rm sm}\alpha\sigma^2}{M}.
 \end{equation}
 证明由光滑性、$\E\|g\|^2=\|\nabla L\|^2+\Var g$，每步下降至少 $\alpha\|\nabla L\|^2/2$，再求和。此式本身不控制超额损失或分布距离。
+\end{proof}
 
+\begin{proposition}[数据复用与平均覆盖的两个限制]
+固定候选参数下的估计无偏，不一般蕴含数据依赖迭代参数下的条件无偏。另一方面，$\E_d\delta_s\le\bar\delta$ 不一般控制逐前缀误差；若另有 $d(s)\ge d_{\min}>0$，才可推出 $\delta_s\le\bar\delta/d_{\min}$。
+\end{proposition}
+\begin{proof}
 复用数据还会破坏条件无偏前提。例如单个零均值样本 $X$，样本梯度 $\theta-X$ 在固定 $\theta$ 时无偏。从零更新得 $\theta_1=\alpha X$ 后，
 \begin{equation}
 \E[\theta_1-X\mid\theta_1]=(1-\alpha^{-1})\theta_1\ne\theta_1.
 \end{equation}
 因此独立动作的估计恒等式不能直接用于数据依赖的反复更新参数。平均前缀误差也不等于逐前缀误差；若另有 $d(s)\ge d_{\min}>0$ 才能由 $\E_d\delta_s\le\bar\delta$ 得 $\delta_s\le\bar\delta/d_{\min}$。
+\end{proof}
 
 \section{输出扰动、噪声与同步}
+\begin{theorem}[确定性输出扰动的跨度递推]
+令 $b_k=d_H(q_k,T_k)$。几何近似更新 $q_{k+1}\propto q_k^{1-\eta_k}T_k^{\eta_k}e^{e_k}$ 满足
+\begin{equation}
+b_{k+1}\le|1-\eta_k|b_k+\osc e_k+d_H(T_k,T_{k+1}).
+\end{equation}
+对 $0<\eta\le1$ 的 Mean 更新，若逐坐标输出 log 误差不超过 $\epsilon_k\le\bar\epsilon<1/2$，则 $b_{k+1}\le b_k-\eta b_k/(1+\eta b_k)+2\epsilon_k$，并有不变上界 $\max\{b_0,2\bar\epsilon/[\eta(1-2\bar\epsilon)]\}$。
+\end{theorem}
+\begin{proof}
 几何端点的近似输出写为 $q_{k+1}\propto q_k^{1-\eta_k}T_k^{\eta_k}e^{e_k}$。取相对 $T_{k+1}$ 的对数并用跨度三角不等式：
 \begin{equation}
 b_{k+1}\le|1-\eta_k|b_k+\osc e_k+d_H(T_k,T_{k+1}).
@@ -212,7 +368,16 @@ b_{k+1}\le|1-\eta_k|b_k+\osc e_k+d_H(T_k,T_{k+1}).
 b_{k+1}\le b_k-\frac{\eta b_k}{1+\eta b_k}+2\epsilon_k.
 \end{equation}
 当 $\epsilon_k\le\bar\epsilon<1/2$，映射 $F(b)=b-\eta b/(1+\eta b)+2\bar\epsilon$ 递增，不动点为 $b_\infty=2\bar\epsilon/[\eta(1-2\bar\epsilon)]$。从 $\max(b_0,b_\infty)$ 起的比较递推单调降到 $b_\infty$，给出不变跨度与稳态上界。
+\end{proof}
 
+\begin{theorem}[几何更新的随机协方差传播]
+固定正教师，$y_k=C_T\log(q_k/T)$、$\xi_k=C_Te_k$ 满足精确递推 $y_{k+1}=(1-\eta)y_k+\xi_k$。若初值确定，$\xi_k$ 为二阶可积鞅差且条件协方差为确定 $\Sigma_k$，则
+\begin{equation}
+\Cov(y_K)=\sum_{j<K}(1-\eta)^{2(K-1-j)}\Sigma_j.
+\end{equation}
+常协方差及 $0<\eta<2$ 时，极限为 $\Sigma/[\eta(2-\eta)]$；固定偏置 $\mu$ 的均值极限为 $\mu/\eta$。KL 噪声近似另需小噪声高阶矩条件。
+\end{theorem}
+\begin{proof}
 固定教师，定义 $y_k=C_T\log(q_k/T)$、$\xi_k=C_Te_k$，几何更新精确满足
 \begin{equation}
 y_{k+1}=(1-\eta)y_k+\xi_k.
@@ -229,30 +394,70 @@ y_{k+1}=(1-\eta)y_k+\xi_k.
 +O(\epsilon^3),
 \end{equation}
 其中例如高斯误差的均值与标准差同时按 $\epsilon$ 缩小即可。若注入的是 reward 误差，输出噪声多乘 $\eta$，协方差多乘 $\eta^2$；不能混用两种步长依赖。
+\end{proof}
 
+\begin{proposition}[概率 soft sync 的局部稳定性]
+固定正教师，几何、幂均值或相应 Mean 精确内层输出后执行概率混合 $q^+=(1-\zeta)q+\zeta p_{\rm out}$。其教师中心坐标的一阶系数为 $1-\zeta\eta$；若 $0<\zeta\eta<2$，教师局部渐近稳定。该命题不把参数 EMA 视作相同概率映射。
+\end{proposition}
+\begin{proof}
 概率 soft sync 定义为 $q^+=(1-\zeta)q+\zeta p_{\rm out}$。在教师附近，几何、幂均值与 Mean 的一阶输出均为 $T+(1-\eta)(q-T)$，因此中心坐标变为 $(1-\zeta\eta)y+O(\|y\|^2)$。$0<\zeta\eta<2$ 给局部稳定，边界需高阶分析。参数 EMA 通常不是这个概率混合。
+为给出稳定性的定量步骤，令 $a=|1-\zeta\eta|<1$。在充分小邻域内，二阶余项范数不超过 $(1-a)\|y\|/2$，故 $\|y^+\|\le(1+a)\|y\|/2$。该邻域不变，反复迭代几何趋零。
+\end{proof}
 
+\begin{proposition}[保持外层速率所需的内层精度]
+若内层输出误差不超过 $C\rho_{\rm in}^{N_k}$，其中 $0<\rho_{\rm in}<1$，则要保证其不超过 $B\rho_{\rm out}^k$，充分取
+\begin{equation}
+N_k\ge\max\{0,[\log(C/B)+k\log(1/\rho_{\rm out})]/\log(1/\rho_{\rm in})\}.
+\end{equation}
+Mean 在 $\eta=1$ 的三次局部率要求输出误差为 $O(b_k^3)$；基于平方损失证书，一个充分条件是超额损失 $O(q_{\min,k}b_k^6)$。
+\end{proposition}
+\begin{proof}
 若理想外层收缩因子为 $c$、内层输出误差 $\le C\rho_{\rm in}^{N_k}$，希望输出误差 $\le B\rho_{\rm out}^k$，充分条件是
 \begin{equation}
 N_k\ge\max\left\{0,\frac{\log(C/B)+k\log(1/\rho_{\rm out})}{\log(1/\rho_{\rm in})}\right\}.
 \end{equation}
 内层指数率必须先有独立依据。Mean 在 $\eta=1$ 的三次局部率需要输出跨度误差 $O(b_k^3)$；若使用损失证书，则充分要求超额损失为 $O(q_{\min,k}b_k^6)$。
+\end{proof}
 
 \section{共享参数的自然梯度投影}
+\begin{proposition}[共享参数自然梯度的正交投影]
+固定有限前缀和正权重，$B=\partial q_\theta/\partial\theta$、$W=\diag(d_s/q_{\theta,sa})$、$\mathcal I=B^\top WB$。若自由负自然梯度为 $v$，则参数自然梯度流诱导 $\dot q=Pv$，其中 $P=B\mathcal I^\dagger B^\top W$ 为 $W$ 正交投影。因此 $\|\dot q\|_W\le\|v\|_W$、$\dot L=-\|Pv\|_W^2\le0$。
+\end{proposition}
+\begin{proof}
 固定有限前缀及正权重 $d_s$，令 $B=\partial q_\theta/\partial\theta$、$W=\diag(d_s/q_{\theta,sa})$、$\mathcal I=B^\top WB$。逐前缀自由负自然梯度为 $v$，有 $\nabla_\theta L=-B^\top Wv$。参数自然梯度流诱导
 \begin{equation}
 \dot q=B\mathcal I^\dagger B^\top Wv=Pv.
 \end{equation}
 令 $C=W^{1/2}B$，则 $W^{1/2}PW^{-1/2}=C(C^\top C)^\dagger C^\top$ 是欧氏正交投影。因此 $\|\dot q\|_W\le\|v\|_W$、$\dot L=-\|Pv\|_W^2\le0$。平方根自由速度不超过二，投影后也不超过二；这控制分布的 Fisher 速度，不控制参数欧氏速度。还可能 $Pv=0$ 而 $q_\theta\ne T$，故不保证消除表示误差。
+\end{proof}
 
 \section{条件更新与完整序列}
+\begin{proposition}[条件改善不保证序列 KL 改善]
+对有限自回归序列，KL 等于生成策略访问测度下的条件 KL 之和。即使每个前缀都执行精确幂均值更新、条件教师 KL 均不增加，完整序列逆向 KL 仍可能增加。
+\end{proposition}
+\begin{proof}
 固定长度序列分布 $Q(y)=\prod_tq(y_t\mid y_{<t})$，教师序列分布为 $\mathsf T$。链式法则给
 \begin{equation}
 \KL(Q\Vert\mathsf T)=\sum_t\E_{s_t\sim Q}\KL(q(\cdot\mid s_t)\Vert T(\cdot\mid s_t)).
 \end{equation}
 更新条件策略同时改变访问权重。一个两步反例取根节点 $q_0=(0.99,0.01),T_0=(0.01,0.99)$；分支 A 中二者均为 $(1/2,1/2)$；分支 B 中 $q_B=(1-10^{-6},10^{-6})$、$T_B=(10^{-30},1-10^{-30})$。对全部条件分布同时做 $\eta=0.1$ 的精确更新，条件双向 KL 均不增加，但序列逆向 KL 由约 $5.19399$ 变为 $6.07445$（几何）、$7.09792$（平方根）或 $10.44581$（算术）。学生进入高误差分支的概率上升。
+\end{proof}
 
-完整序列的算术混合 $\mathsf M=(1-\eta)Q+\eta\mathsf T$ 的条件权重为
+\begin{proposition}[条件化与序列混合的差异]
+完整序列算术混合的条件教师权重为 $\eta_s=\eta\mathsf T(s)/[(1-\eta)Q(s)+\eta\mathsf T(s)]$，一般依赖前缀。完整序列几何混合的条件概率为
+\begin{equation}
+\mathsf M(a\mid s)=q(a\mid s)^{1-\eta}T(a\mid s)^\eta Z_\eta(sa)/Z_\eta(s).
+\end{equation}
+因此两种序列混合一般都不同于逐前缀直接使用固定权重的条件混合。
+\end{proposition}
+\begin{proof}
+对完整序列算术混合，先将前缀概率边缘化，再条件化：
+\begin{equation}
+\mathsf M(a\mid s)
+=\frac{(1-\eta)Q(s)q(a\mid s)+\eta\mathsf T(s)T(a\mid s)}
+{(1-\eta)Q(s)+\eta\mathsf T(s)}.
+\end{equation}
+分别提取两个条件分布的系数，教师权重为
 \begin{equation}
 \eta_s=\frac{\eta\mathsf T(s)}{(1-\eta)Q(s)+\eta\mathsf T(s)}.
 \end{equation}
@@ -262,10 +467,22 @@ N_k\ge\max\left\{0,\frac{\log(C/B)+k\log(1/\rho_{\rm out})}{\log(1/\rho_{\rm in}
 \frac{Z_\eta(sa)}{Z_\eta(s)},\quad
 Z_\eta(s)=\sum_zQ(z\mid s)^{1-\eta}\mathsf T(z\mid s)^\eta.
 \end{equation}
+具体地，未归一化的前缀 $sa$ 质量等于 $Q(s)^{1-\eta}\mathsf T(s)^\eta q(a\mid s)^{1-\eta}T(a\mid s)^\eta Z_\eta(sa)$；除以前缀 $s$ 的质量，公共前缀因子消去，即得到上式。
+\end{proof}
 
+\begin{proposition}[序列 KL 梯度中的后缀成本]
+在有限长度、正支持、可微策略下，固定教师序列分布 $\mathsf T$，有
+\begin{equation}
+\nabla\KL(Q\Vert\mathsf T)=
+\E_Q\sum_t\psi_t\sum_{j\ge t}\log[q(a_j\mid s_j)/T(a_j\mid s_j)].
+\end{equation}
+令后缀 KL 为 $V^q(s)$，对应条件负信号包含 $\log(T(a\mid s)/q(a\mid s))-V^q(sa)$，而不只有即时 log-ratio。
+\end{proposition}
+\begin{proof}
 直接对序列 KL 求导，先用 $\nabla\log Q=\sum_t\psi_t$，再用条件 score 均值为零消去过去成本，得到
 \begin{equation}
 \nabla\KL(Q\Vert\mathsf T)
 =\E_Q\sum_t\psi_t\sum_{j\ge t}\log\frac{q(a_j\mid s_j)}{T(a_j\mid s_j)}.
 \end{equation}
 记后缀值 $V^q(s)=\KL(Q(\cdot\mid s)\Vert\mathsf T(\cdot\mid s))$，即时负梯度信号应含 $\log(T(a\mid s)/q(a\mid s))-V^q(sa)$。固定测度的条件目标只保留即时项。若将幂均值问题直接定义在完整有限序列空间，前面的分布定理仍成立，但目标表达、采样和投影成本是另一问题。
+\end{proof}

@@ -1,6 +1,17 @@
 \chapter{内层投影与优化几何}
 \label{app:inner}
 \section{统一坐标中的四种目标}
+\begin{proposition}[四种内层损失的统一分解]
+固定 $m\propto qe^f$，令 $e=C_q\log(p/m)$、$\Lambda=\log\E_me^e$、$\Delta=\KL(q\Vert m)$。四种总体损失满足
+\begin{align}
+L_{\rm Part}&=\tfrac12\E_qe^2+\tfrac12\Lambda^2,&
+\eta L_{\rm BPO}&=\tfrac12\E_qe^2,\\
+L_{\rm Mean}&=\tfrac12\E_qe^2+\tfrac12(\Lambda+\Delta)^2,&
+L_{\rm MDPO}&=\eta^{-1}[\KL(p\Vert m)-\log Z].
+\end{align}
+因而 $L_{\rm Part}-\eta L_{\rm BPO}=(\Delta-K_S)^2/2$，$L_{\rm Mean}-\eta L_{\rm BPO}=K_S^2/2$。
+\end{proposition}
+\begin{proof}
 固定 $q,m,f$，其中 $m\propto qe^f$。令 $G=C_qf$、$\Delta=\log Z-\E_qf=\KL(q\Vert m)$，采用附录~\ref{app:measure} 的 $e=C_q\log(p/m)$ 与 $\Lambda(e)=\log\E_me^e$。则
 \begin{equation}
 U=G-\Delta+e-\Lambda(e),\qquad K_S=\Delta+\Lambda(e).
@@ -19,8 +30,16 @@ L_{\rm Part}=\eta L_{\rm BPO}+\tfrac12(\Delta-K_S)^2,\quad
 L_{\rm Mean}=\eta L_{\rm BPO}+\tfrac12K_S^2.
 \end{equation}
 求导后，额外项分别为 $(K_S-\Delta)\nabla K_S$ 与 $K_S\nabla K_S$。在锚点 $K_S=0$ 且 $\nabla K_S=0$，这些差异暂时消失。
+\end{proof}
 
 \section{Mean 的完整约束解}
+\begin{lemma}[Mean 的归一化 KKT 候选]
+设 $q>0$、$\E_qG=0$。Mean 的约束为 $\E_qe^U=1$。若归一化乘子 $\lambda\ge0$，其 KKT 方程唯一确定各坐标
+\begin{equation}
+U_a-G_a+\lambda e^{U_a}=0,\qquad U_a=G_a-W_0(\lambda e^{G_a}).
+\end{equation}
+\end{lemma}
+\begin{proof}
 Mean 优化 $\frac12\E_q(U-G)^2$，约束为 $\E_qe^U=1$。取拉格朗日函数
 \begin{equation}
 \mathscr L(U,\lambda)=\tfrac12\E_q(U-G)^2+\lambda(\E_qe^U-1).
@@ -31,6 +50,7 @@ U_a=G_a-W_0(\lambda e^{G_a}),
 \label{eq:mean-solution}
 \end{equation}
 其中 $W_0(x)e^{W_0(x)}=x$，取非负实主支。
+\end{proof}
 
 \begin{theorem}[Mean 全局解存在且唯一]
 函数
@@ -48,13 +68,30 @@ $W_0$ 在非负轴连续严格递增，所以每个求和项严格递减。Jense
 固定这个乘子，$\nabla_U^2\mathscr L=\diag[q_a(1+\lambda e^{U_a})]\succ0$，所以构造点唯一最小化整个欧氏空间上的 $\mathscr L$。在所有可行 $U$ 上，乘子项为零；构造点又可行，所以它唯一最小化原目标。这一论证不需要指数等式约束集合凸。对 KKT 取 $q$ 均值，$\E_qG=0$、$\E_qe^U=1$ 给出 $\E_qU+\lambda=0$，即所述 KL 恒等式。
 \end{proof}
 
+\begin{proposition}[Mean 的混合正则变分解释]
+固定由 Mean 全局解确定的 $\lambda=\KL(q\Vert p^{\rm M})$。同一 $p^{\rm M}$ 唯一最大化
+\begin{equation}
+\E_pf-\KL(p\Vert q)-\frac{\lambda}{2}\chi^2(p\Vert q).
+\end{equation}
+该命题断言最优分布相同，不断言两损失的梯度处处相同。
+\end{proposition}
+\begin{proof}
 这个最优分布还唯一最大化
 \begin{equation}
 \E_pf-\KL(p\Vert q)-\frac{\lambda}{2}\chi^2(p\Vert q).
 \label{eq:mean-mixed}
 \end{equation}
 证明是其概率梯度为 $f-U-1-\lambda(p/q-1)$，在 Mean 解处由 KKT 化为动作无关常数；Hessian 为 $-\diag(1/p+\lambda/q)\prec0$。这里 $\lambda$ 由 Mean 解决定，并非预先独立选择的正则系数。
+\end{proof}
 
+\begin{proposition}[Mean 超额损失的精确分解]
+设 $p^{\rm M}$ 是精确 Mean 解，$\lambda$ 是其归一化乘子。对任意正分布 $p$，
+\begin{equation}
+L_{\rm Mean}(p)-L_{\rm Mean}(p^{\rm M})
+=\tfrac12\E_q\log^2(p/p^{\rm M})+\lambda\KL(p^{\rm M}\Vert p).
+\end{equation}
+\end{proposition}
+\begin{proof}
 对任意正分布 $p$，还有精确超额损失分解
 \begin{equation}
 L_{\rm Mean}(p)-L_{\rm Mean}(p^{\rm M})
@@ -62,8 +99,17 @@ L_{\rm Mean}(p)-L_{\rm Mean}(p^{\rm M})
 \label{eq:mean-excess}
 \end{equation}
 令 $v=U-U^\star$，平方展开的交叉项为 $\E_qv(U^\star-G)$。KKT 将它变成 $-\lambda\E_{p^{\rm M}}v=\lambda\KL(p^{\rm M}\Vert p)$，即得结论。
+\end{proof}
 
 \section{精确曲率与唯一驻点}
+\begin{proposition}[平方回归曲率及锚点差异]
+固定 $q,m,f$，以独立 logits 表示当前 $p$，$Q_p=\diag(p)-pp^\top$。Part 或 Mean 的残差记为 $R$，则
+\begin{equation}
+\nabla_z^2\tfrac12\E_qR^2=\E_q[(\mathbf e_a-p)(\mathbf e_a-p)^\top]-(\E_qR)Q_p.
+\end{equation}
+在 $p=q$ 处，Mean、Part、BPO 的 Hessian 分别为 $Q_q,(1-\Delta)Q_q,Q_q/\eta$，其中 $\Delta=\KL(q\Vert m)$。
+\end{proposition}
+\begin{proof}
 以独立 logits $z$ 表示 $p$，令 $Q_p=\diag(p)-pp^\top$，以 $\mathbf e_a$ 表示第 $a$ 个坐标基向量，与中心化误差 $e$ 区分。于是
 \begin{equation}
 \nabla_z\log p_a=\mathbf e_a-p,\qquad \nabla_z^2\log p_a=-Q_p.
@@ -81,9 +127,24 @@ L_{\rm Mean}(p)-L_{\rm Mean}(p^{\rm M})
 \nabla_z^2L_{\rm BPO}=Q_q/\eta.
 \end{equation}
 例如 $q=(1/2,1/2)$、$f=(2,-2)$，则 $\Delta=\log\cosh2>1$，Part 在全部非常数方向有负曲率。
+\end{proof}
 
+\begin{theorem}[Part 的唯一内部驻点]
+若 $q,m>0$，则 Part 在独立有限 logits 参数化中的唯一概率内部驻点是 $p=m$。该结论允许 Part 在其他位置具有负曲率。
+\end{theorem}
+\begin{proof}
 Part 仍只有一个有限内部驻点。记 $R=\log(p/m)$、$c=\E_qR$，驻点条件为 $q_aR_a=cp_a$。若 $c>0$，每个 $R_a>0$，于是每个 $p_a>m_a$，与归一化矛盾；若 $c<0$，同理每个 $p_a<m_a$ 也矛盾。故 $c=0$，正 $q$ 强制 $R=0$。内部驻点唯一不等于任意优化器全局收敛。
+\end{proof}
 
+\begin{proposition}[MDPO 的精确方向 Hessian]
+固定正目标 $m$，沿任意 logit 方向 $v$，令 $p_t\propto pe^{tv}$、$h=\log(p/m)$。则
+\begin{equation}
+\frac{d^2}{dt^2}\KL(p_t\Vert m)\big|_0
+=\Var_pv+\Cov_p\!\left(h,(v-\E_pv)^2\right).
+\end{equation}
+MDPO 损失的对应导数为右侧除以 $\eta$；在 $p=m$ 时协方差项为零。
+\end{proposition}
+\begin{proof}
 MDPO 的完整二阶方向导数也可以写出，无需以未定义的残差项代替。固定 logit 方向 $v$，沿 $p_t\propto p e^{tv}$，令 $h=\log(p/m)$、$\bar v=\E_pv$。指数倾斜的微分恒等式为 $\frac d{dt}\E_{p_t}u=\Cov_{p_t}(u,v)$，若 $u$ 依赖 $t$ 再加 $\E_{p_t}\dot u$。因此
 \begin{align}
 \frac d{dt}\KL(p_t\Vert m)\big|_0&=\Cov_p(h,v),\\
@@ -92,15 +153,29 @@ MDPO 的完整二阶方向导数也可以写出，无需以未定义的残差项
 \label{eq:mdpo-hessian}
 \end{align}
 第二式中 $\dot h=v-\bar v$ 产生方差项；对协方差中的分布求导产生中心三阶混合矩。MDPO 的 Hessian 再除以 $\eta$。当 $p=m$ 时第二项为零；一般位置不能删除它。
+\end{proof}
 
+\begin{corollary}[中心化坐标中的回归曲率]
+设 $e=C_q\log(p/m)$、$\Lambda=\log\E_me^e$，对 $\E_qv=0$ 的方向有
+\begin{align}
+\nabla^2L_{\rm Part}[v,v]&=\E_qv^2+\Lambda\Var_pv+(\E_pv)^2,\\
+\nabla^2L_{\rm Mean}[v,v]&=\E_qv^2+(\Lambda+\Delta)\Var_pv+(\E_pv)^2.
+\end{align}
+\end{corollary}
+\begin{proof}
 在 $\E_qe=0$ 的坐标中，对 $\E_qv=0$ 的方向，
 \begin{align}
 \nabla^2 L_{\rm Part}[v,v]&=\E_qv^2+\Lambda\Var_pv+(\E_pv)^2,\\
 \nabla^2 L_{\rm Mean}[v,v]&=\E_qv^2+(\Lambda+\Delta)\Var_pv+(\E_pv)^2.
 \end{align}
 这是对 $\Lambda'=\E_pv$、$\Lambda''=\Var_pv$ 使用乘积法则的结果。
+\end{proof}
 
 \section{受限表示改变投影}
+\begin{proposition}[受限表示下 Part 与 BPO 可分离]
+存在完整正支持的三动作锚点、目标及一维共享 logit 学生族，使 BPO 的唯一最优点不是 Part 的驻点。
+\end{proposition}
+\begin{proof}
 取 $q=(1/3,1/3,1/3)$、$m=(0.1,0.7,0.2)$、$\eta=1$，学生族为 $p(z)=\operatorname{softmax}(z,0,0)$。令 $a=\log0.1,b=\log0.7,c=\log0.2$。BPO 为 $\frac12\Var_q(z-a,-b,-c)$，导数为 $\frac29[z-a+(b+c)/2]$，故最优 $z_B=a-(b+c)/2$。
 
 令 $u(z)=\E_q\log[p(z)/m]=z/3-\log(e^z+2)-(a+b+c)/3$，则 $L_{\rm Part}=L_{\rm BPO}+u^2/2$，所以
@@ -108,14 +183,29 @@ MDPO 的完整二阶方向导数也可以写出，无需以未定义的残差项
 L_{\rm Part}'(z_B)=u(z_B)[1/3-p_1(z_B)]\simeq0.03543884\ne0.
 \end{equation}
 两个目标在同一受限学生族中具有不同最优点。
+\end{proof}
 
+\begin{proposition}[跨前缀共享参数下 MDPO 与 BPO 可分离]
+存在两个等权前缀及一个共享相对 logit 参数，使 BPO 的最优参数不满足 MDPO 的驻点方程。
+\end{proposition}
+\begin{proof}
 BPO 与 MDPO 也可分离。取两个等权前缀，锚点第一动作概率分别为 $0.8,0.2$，共享相对 logit 位移 $\theta$；目标相对位移取 $g_1=1,g_2=3$。BPO 的权重均为 $0.16$，故 $\theta_B=2$。MDPO 的驻点方程为
 \begin{equation}
 \sum_{i=1}^2p_{\theta,i}(1-p_{\theta,i})(\theta-g_i)=0.
 \end{equation}
 在 $\theta=2$，第一项权重约为 $0.0316$，第二项约为 $0.2278$，和非零。该方程是必要驻点条件，不把任意根直接称为唯一全局解。
+\end{proof}
 
 \section{自由 logits 的收敛与理想路径}
+\begin{theorem}[BPO 二次结构与梯度下降的稳定区间]
+固定 $q,m>0$，独立 logits 中
+\begin{equation}
+L_{\rm BPO}=\frac{(z-\log m)^\top Q_q(z-\log m)}{2\eta},
+\quad\nabla_zL_{\rm BPO}=\eta^{-1}Q_q(z-\log m).
+\end{equation}
+在 $\mathbf1^\perp$ 上，$q_{\min}I\preceq Q_q\preceq I/2$。常步长梯度下降对所有有限初值收敛，当且仅当 $0<\alpha_{\rm opt}<2\eta/\lambda_{\max}(Q_q)$。
+\end{theorem}
+\begin{proof}
 令 $h=z-\log m$。中心化消去 softmax 配分函数，得到
 \begin{equation}
 L_{\rm BPO}=\frac{h^\top Q_qh}{2\eta},\quad
@@ -132,7 +222,16 @@ q_{\min}\|v\|^2\le v^\top Q_qv\le\tfrac12\|v\|^2.
 0<\alpha_{\rm opt}<2\eta/\lambda_{\max}(Q_q).
 \end{equation}
 其中 $\alpha_{\rm opt}<4\eta$ 是统一充分条件。
+\end{proof}
 
+\begin{proposition}[两种 Fisher 预条件步的相同概率轨迹]
+完整词表、独立 logits 下，MDPO 使用当前 $Q_p^\dagger$，BPO 使用冻结 $Q_q^\dagger$，均产生 $p^+\propto p^{1-\gamma}m^\gamma$，其中 $\gamma=\alpha_{\rm opt}/\eta$。从 $p_0=q$ 出发，若 $0<\gamma_j\le1$，则
+\begin{equation}
+p_n\propto qe^{\xi_nf},\quad \xi_n=1-\prod_{j<n}(1-\gamma_j),\quad
+L_{\rm BPO}(p_n)=(1-\xi_n)^2L_{\rm BPO}(q).
+\end{equation}
+\end{proposition}
+\begin{proof}
 MDPO 的 logit 梯度为 $Q_p(z-\log m)/\eta$。正支持下 $Q_p^\dagger Q_p=P_\perp$；BPO 使用 $Q_q^\dagger$ 也得到同一投影。因此两种对应的精确自然梯度步都满足
 \begin{equation}
 P_\perp h^+=(1-\gamma)P_\perp h,\quad
@@ -145,6 +244,7 @@ p_n\propto qe^{\xi_nf},\qquad
 \xi_n=1-\prod_{j<n}(1-\gamma_j),\qquad
 L_{\rm BPO}(p_n)=(1-\xi_n)^2L_{\rm BPO}(q).
 \end{equation}
+\end{proof}
 
 \begin{theorem}[理想内层路径的教师散度进展]
 对所有凸 $\varphi$、$\varphi(1)=0$，沿 $p_\xi\propto qe^{\xi f}$、$0\le\xi\le1$，$D_\varphi(p_\xi\Vert T)$ 非增。
@@ -165,14 +265,34 @@ f'(r)=\frac{\eta e^{\kappa r}}{1-\eta+\eta e^{\kappa r}}\le1
 \end{proof}
 
 \section{共享参数、拟合形状与条件 SGD}
-一般网络 $z=z_\theta$ 的 Hessian 为
+\begin{proposition}[共享参数的复合 Hessian]
+若 $z_\theta$ 二次可微，$B_\theta=\partial z/\partial\theta$、$h=z-\log m$，则
+\begin{equation}
+\nabla_\theta^2L_{\rm BPO}
+=\eta^{-1}\left[B_\theta^\top Q_qB_\theta+\sum_a(Q_qh)_a\nabla_\theta^2z_a\right].
+\end{equation}
+所以固定的 logit Hessian 不保证参数空间目标凸。
+\end{proposition}
+\begin{proof}
+链式法则先给 $\nabla_\theta L=B_\theta^\top\nabla_zL$。对第 $i,j$ 个参数再求导，
+\begin{equation}
+\partial_j\partial_iL
+=\sum_{a,b}(\partial_i z_a)(\partial_{z_b}\partial_{z_a}L)(\partial_jz_b)
++\sum_a(\partial_{z_a}L)\partial_j\partial_i z_a.
+\end{equation}
+代入 $\nabla_zL=Q_qh/\eta$ 与 $\nabla_z^2L=Q_q/\eta$，得到
 \begin{equation}
 \nabla_\theta^2L_{\rm BPO}
 =\eta^{-1}\left[B_\theta^\top Q_qB_\theta
 +\sum_a(Q_qh)_a\nabla_\theta^2z_a\right].
 \end{equation}
 这里 $B_\theta=\partial z/\partial\theta$，即使冻结 $Q_q$，两项仍可变化。自由 logit 的凸性不自动传到参数空间。
+\end{proof}
 
+\begin{proposition}[拟合形状与残差二阶矩]
+固定目标 $m$。若从当前 $p$ 采样，$x=m/p$、$a_\beta=\E_px^\beta$，则 $g_\beta=(a_\beta-x^\beta)\psi/\beta$ 对 $\nabla_\theta D_\beta(m\Vert p)$ 无偏。若 $0<\beta\le1/2$ 且 $\|\psi\|\le S$，有 $\E_p\|g_\beta\|^2\le S^2D_\beta/\beta$。精确 BPO 的锚点采样梯度则满足 $\E_q\|R_B\psi/\eta\|^2\le(2S^2/\eta)L_{\rm BPO}$。
+\end{proposition}
+\begin{proof}
 也可固定目标 $m_{\kappa,\eta}$ 后另选拟合形状 $\beta$，优化 $D_\beta(m\Vert p)$。从当前学生采样，令 $x=m/p$、$a_\beta=\E_px^\beta$，则
 \begin{equation}
 g_\beta(a)=\frac{a_\beta-x_a^\beta}{\beta}\psi_a,\qquad
@@ -182,7 +302,16 @@ g_\beta(a)=\frac{a_\beta-x_a^\beta}{\beta}\psi_a,\qquad
 \begin{equation}
 \E_q\|R_B\psi/\eta\|^2\le(2S^2/\eta)L_{\rm BPO}.
 \end{equation}
+\end{proof}
 
+\begin{theorem}[误差相关噪声下的条件 SGD 收敛]
+假设所有更新线段上 $L$ 为 $L_{\rm sm}$ 光滑，满足 $\|\nabla L\|^2\ge2\mu(L-L_\star)$，且随机梯度条件无偏、$\E[\|g\|^2\mid\theta]\le CL$。若 $0<\alpha\le\min\{1/\mu,2\mu/(L_{\rm sm}C)\}$，则
+\begin{equation}
+\E(L_N-L_\star)\le(1-\mu\alpha)^N(L_0-L_\star)
++\frac{L_{\rm sm}C\alpha L_\star}{2\mu}[1-(1-\mu\alpha)^N].
+\end{equation}
+\end{theorem}
+\begin{proof}
 设 $L$ 在所有更新线段上为 $L_{\rm sm}$ 光滑，满足 PL 条件 $\|\nabla L\|^2\ge2\mu(L-L_\star)$，随机梯度条件无偏且 $\E[\|g\|^2\mid\theta]\le CL$。对 $0<\alpha\le\min\{1/\mu,2\mu/(L_{\rm sm}C)\}$，光滑性给出
 \begin{align}
 \E[L(\theta-\alpha g)\mid\theta]
@@ -196,8 +325,17 @@ g_\beta(a)=\frac{a_\beta-x_a^\beta}{\beta}\psi_a,\qquad
 +\frac{L_{\rm sm}C\alpha L_\star}{2\mu}[1-(1-\mu\alpha)^N].
 \end{equation}
 这是明确假设下的 SGD 结论。模型可实现时 $L_\star=0$，该上界没有固定采样噪声底；数据复用、中心近似或其他优化器需要重新核对假设。
+\end{proof}
 
 \section{与条件 OPD 基线的关系}
+\begin{proposition}[几何镜像目标与条件 OPD 的关系]
+取 $\kappa=0$，$f=\eta\log(T/q)$。则
+\begin{equation}
+L_{\rm MDPO}=\KL(p\Vert T)+(\eta^{-1}-1)\KL(p\Vert q).
+\end{equation}
+因此 $\eta=1$ 时 MDPO 等于条件 OPD 目标。固定 $q,T$ 并令 $\eta\to\infty$ 时，其极限为冻结信号目标 $-\E_p\log(T/q)$，最优分布支持在最高信号动作上。
+\end{proposition}
+\begin{proof}
 对当前学生--教师目标 $\KL(p\Vert T)$，令 $r^{\rm cur}=\log(T/p)$。其精确梯度及冻结锚点下的表示为
 \begin{equation}
 \nabla_\theta\KL(p\Vert T)
@@ -213,8 +351,13 @@ L_{\rm MDPO}=\KL(p\Vert T)+(\eta^{-1}-1)\KL(p\Vert q).
 因此 $\eta=1$ 时 MDPO 的总体目标处处等于条件 OPD。BPO 在该点仍使用 $\Var_q\log(p/T)/2$，Mean 还包含学生中心平方，二者只在特定位置与 OPD 有相同梯度或共同目标分布。
 
 对固定几何 reward $r=\log(T/q)$，令 $\eta\to\infty$ 删除镜像正则，MDPO 目标趋于 $-\E_pr$，其最优分布支持在 $r$ 的最大值集合，通常不等于 $T$。如果保持当前 OPD 目标，则 reward 必须随学生改为 $r^{\rm cur}=r-U$。两者只在初始化 $p=q$ 处相同。这里的无穷步长讨论仅适用于几何端点，不将正形状的混合权重扩展到概率区间之外。
+\end{proof}
 
 \section{标量步长能改变的部分}
+\begin{proposition}[固定方向的最优步长与下降能力]
+设 $E(\theta)=e^\top He/2$、$H\succeq0$、$E>0$，方向 $d$ 固定。记 $A=\nabla E^\top d$、$B=d^\top Hd$。则 $E(\theta-\alpha d)=E-\alpha A+\alpha^2B/2$。若 $A,B>0$，最优步长为 $A/B$，最大相对下降为 $A^2/(2BE)\le1$；若 $A\le0$，正步长不能下降。
+\end{proposition}
+\begin{proof}
 固定二次超额损失 $E=\frac12e^\top He$，沿方向 $d$ 更新时，
 \begin{equation}
 E(\theta-\alpha d)=E-\alpha A+\tfrac12\alpha^2B,\quad
@@ -225,18 +368,50 @@ A=\nabla E^\top d,\quad B=d^\top Hd.
 \alpha_\rho=\frac{2\rho E}{A+\sqrt{A^2-2B\rho E}}.
 \end{equation}
 若 $A\le0$，任何正步长都不能降低这个二次目标；标量调度无法修复方向错误。
+\end{proof}
 
+\begin{proposition}[谱耗散与精确线搜索的速率]
+对固定正谱二次目标的梯度流，以损失谱分量占比为 $w_i$，有 $-d\log E/dt=2\E_w\lambda$，其导数为 $-4\Var_w\lambda$。若谱位于 $[l,u]$、$l>0$，精确最速下降线搜索满足 $E_{n+1}\le[(u-l)/(u+l)]^2E_n$。
+\end{proposition}
+\begin{proof}
 梯度流的谱表达为 $E(t)=\frac12\sum_i\lambda_ie_i(0)^2e^{-2\lambda_it}$。以各项在总损失中的占比为 $w_i$，求导得
 \begin{equation}
 -\frac d{dt}\log E=2\E_w\lambda,\qquad
 \frac d{dt}\left[-\frac d{dt}\log E\right]=-4\Var_w\lambda\le0.
 \end{equation}
 快方向先消失，使相对下降率变慢。精确线搜索在谱区间 $[l,u]$ 的最坏收缩因子仍为 $[(u-l)/(u+l)]^2$：由 $\lambda^2\le(l+u)\lambda-lu$，最小化 $\E_w\lambda^2$ 上界所对应的比例可得 $\rho_*\ge4lu/(l+u)^2$。
+\end{proof}
 
+\begin{proposition}[固定谱下的 Chebyshev 步序]
+对固定二次目标，非零谱位于 $0<l<u$。令 $c=(u+l)/2,d=(u-l)/2$，在 $N$ 步使用 $\alpha_j=[c-d\cos((2j-1)\pi/(2N))]^{-1}$，则
+\begin{equation}
+E_N\le4\left(\frac{\sqrt{u/l}-1}{\sqrt{u/l}+1}\right)^{2N}E_0.
+\end{equation}
+该结论允许中间误差放大，要求谱和线性更新固定。
+\end{proposition}
+\begin{proof}
 若固定谱端点已知，Chebyshev 步序 $\alpha_j=[c-d\cos((2j-1)\pi/(2N))]^{-1}$，其中 $c=(u+l)/2,d=(u-l)/2$，产生误差多项式 $T_N((c-\lambda)/d)/T_N(c/d)$，故
 \begin{equation}
 E_N\le4\left(\frac{\sqrt{u/l}-1}{\sqrt{u/l}+1}\right)^{2N}E_0.
 \end{equation}
 该恒等式由两侧多项式具有相同根和零点处归一化得到；$|T_N|\le1$ 在 $[-1,1]$ 上，再用 $T_N(x)=(v^N+v^{-N})/2$ 得到界。$u=l$ 时单步 $\alpha=1/l$ 即可。这个结论需要固定线性几何，且允许中间误差放大。
+\end{proof}
 
-对 Adam，恒定 loss 缩放 $s>0$ 在相同梯度历史和零初始状态下使一阶矩乘 $s$、二阶矩乘 $s^2$，故方向只把数值稳定项 $\epsilon$ 换为 $\epsilon/s$；学习率乘 $s$ 则直接改变参数步长。非恒定缩放还改变矩历史，不能用梯度流的时间重参数化解释。沿固定 Adam 方向作三点测量可由 $Q(0),Q(h),Q(2h)$ 恢复二次式的 $A,B$，但非线性网络中必须用实际目标值验收；一次试探不能重复更新优化器矩状态。
+\begin{proposition}[Adam 的常数损失缩放]
+在相同原始梯度历史、零初始矩状态下，将全部历史梯度乘以常数 $s>0$，使 Adam 一阶矩乘以 $s$、二阶矩乘以 $s^2$。带偏差修正的方向满足
+\begin{equation}
+\frac{\widehat m'}{\sqrt{\widehat v'}+\epsilon}
+=\frac{\widehat m}{\sqrt{\widehat v}+\epsilon/s}.
+\end{equation}
+因此常数 loss 缩放通常不同于将学习率乘以 $s$；时变缩放还会改变矩历史。
+\end{proposition}
+\begin{proof}
+记原始梯度历史为 $g_t$，矩初值为零。缩放后的递推为
+\begin{align}
+m_t'&=\beta_1m_{t-1}'+(1-\beta_1)sg_t,\\
+v_t'&=\beta_2v_{t-1}'+(1-\beta_2)s^2g_t^2.
+\end{align}
+从零初值归纳得到 $m_t'=sm_t$、$v_t'=s^2v_t$。偏差修正分母只依赖时间与 $\beta_1,\beta_2$，故 $\widehat m_t'=s\widehat m_t$、$\widehat v_t'=s^2\widehat v_t$。对更新方向的分子分母同除以正数 $s$，得到命题中的等式。若 $s_t$ 随时间改变，两个矩分别包含历史 $s_j$ 和 $s_j^2$ 的加权和，不能提出同一个常数。
+\end{proof}
+
+沿固定优化器方向作三点测量可由 $Q(0),Q(h),Q(2h)$ 恢复二次式的 $A,B$，但非线性网络中必须用实际目标值验收；一次试探不能重复更新优化器矩状态。

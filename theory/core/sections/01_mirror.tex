@@ -1,0 +1,65 @@
+\chapter{Mirror Descent 与冻结监督}
+\label{ch:mirror}
+\section{每轮外层的镜像下降问题}
+固定一个前缀，有限词表上的教师 $T$ 与本轮学生锚点 $q=q_k$ 严格为正且归一化。令 $\Delta$ 为概率单纯形，取形状参数 $\kappa\in[0,1]$、镜像步长 $\eta\in(0,1)$。这一轮先在分布空间求解
+\begin{equation}
+\boxed{
+m_k=\argmin_{p\in\Delta}
+\left\{\langle g_k,p-q_k\rangle
++\frac1\eta\KL(p\Vert q_k)\right\}.
+}
+\label{eq:MD}
+\end{equation}
+这是负熵几何下的镜像下降（Mirror Descent，MD）子问题。$g_k$ 是整轮冻结的梯度代表；下面通过教师信号指定它，再于第~\ref{ch:objective} 章推导产生这个梯度的教师目标 $J$。
+
+负熵势为 $\Phi(p)=\sum_ap_a\log p_a$。其 Bregman 散度逐项展开为
+\begin{align}
+D_\Phi(p,q)
+&=\Phi(p)-\Phi(q)-\langle\nabla\Phi(q),p-q\rangle\\
+&=\sum_ap_a\log(p_a/q_a)-\sum_a(p_a-q_a)
+=\KL(p\Vert q).
+\end{align}
+因此式~\eqref{eq:MD} 的第二项来自负熵镜像几何。$\kappa$ 将进入 $g_k$ 的教师信号；$\eta$ 同时出现在信号族与镜像正则中。它们都不同于后面参数优化器的学习率。
+
+\section{信号 \texorpdfstring{$f$}{f} 与 advantage}
+记冻结的教师--锚点概率比与对数比为
+\begin{equation}
+\rho_a=T_a/q_a,\qquad r_a=\log\rho_a.
+\end{equation}
+对给定的 $\kappa,\eta$，定义冻结信号
+\begin{equation}
+f_{\kappa,\eta}(r)=
+\begin{cases}
+\kappa^{-1}\log(1-\eta+\eta e^{\kappa r}),&\kappa>0,\\
+\eta r,&\kappa=0,
+\end{cases}
+\qquad f_a=f_{\kappa,\eta}(r_a).
+\label{eq:signal}
+\end{equation}
+这个定义指定了要学习的方向。镜像下降子问题规定更新几何，本身不唯一决定教师信号的形式。
+
+为了明确步长尺度，再定义标准化信号 $A_{\kappa,\eta}$、冻结中心 $K_T$，以及按锚点中心化的优势信号（advantage）$\mathcal A_k$：
+\begin{align}
+A_{\kappa,\eta}(x)&=\frac{f_{\kappa,\eta}(\log x)}{\eta},\qquad x>0,\\
+K_T(q,T)&=-\E_qA_{\kappa,\eta}(T/q),\\
+\mathcal A_k(a)&=A_{\kappa,\eta}(T_a/q_a)+K_T
+=\frac{f_a-\E_qf}{\eta}.
+\label{eq:advantage}
+\end{align}
+于是 $\E_q\mathcal A_k=0$。本文的 advantage 是固定前缀上的中心化教师信号；此处不额外引入序列价值函数。$f,A,\mathcal A_k,K_T$ 均由本轮冻结的 $q_k,T$ 计算，内层不随当前学生改变。
+
+现在令 $g_k=-\mathcal A_k$。去掉与候选 $p$ 无关的常数，镜像子问题等价于
+\begin{equation}
+\boxed{
+m_k=\argmax_{p\in\Delta}
+\left\{\E_p\mathcal A_k-\frac1\eta\KL(p\Vert q_k)\right\}.
+}
+\label{eq:MD-advantage}
+\end{equation}
+代入 $\mathcal A_k=(f-\E_qf)/\eta$，得到另一个完全等价的形式：
+\begin{equation}
+m_k=\argmin_{p\in\Delta}\frac1\eta
+\left\{\KL(p\Vert q_k)-\E_pf\right\}.
+\label{eq:MD-signal}
+\end{equation}
+因为 $\E_qf$ 与动作、候选分布都无关，中心化只改变目标值的常数。下一章从这个最优化问题求出 $m_k$ 的归一化表达式。

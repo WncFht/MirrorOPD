@@ -13,7 +13,7 @@
 因此 $D_\kappa(m\Vert p)\le D_\kappa(m\Vert q)$ 是教师散度非增的充分条件。精确更新 $p=m$ 在 $q\ne T$ 时严格改善。
 \end{theorem}
 \begin{proof}
-重心定义给出 $F(q)=\eta D_\kappa(T\Vert q)$。另一方面，定理~\ref{thm:target} 给出 $F(q)-F(p)=c_\kappa[D_\kappa(m\Vert q)-D_\kappa(m\Vert p)]$。代入 $F(p)$ 并移项得到恒等式。条件成立时右侧两项非负。若 $p=m$ 且 $q\ne T$，则 $m\ne q$，右侧第一项严格为正。
+重心定义给出 $F(q)=\eta D_\kappa(T\Vert q)$。另一方面，式~\eqref{eq:barycenter-gap} 及其端点给出 $F(q)-F(p)=c_\kappa[D_\kappa(m\Vert q)-D_\kappa(m\Vert p)]$。代入 $F(p)$ 并移项得到恒等式。条件成立时右侧两项非负。若 $p=m$ 且 $q\ne T$，则 $m\ne q$，右侧第一项严格为正。
 \end{proof}
 
 精确幂均值更新还有更强性质：它同时降低所有凸生成的教师 $f$-散度。证明使用概率比的共同交点，见\appref{app:shape}。有限 inner 降低某个拟合损失却不足以自动继承这一性质。

@@ -1,0 +1,77 @@
+\chapter{加权教师的显式解}
+\label{ch:target}
+\section{从镜像子问题到 Gibbs 分布}
+\begin{theorem}[镜像子问题的唯一目标教师]
+\label{thm:target}
+给定有限词表上的正锚点 $q$、有限冻结信号 $f$ 和 $\eta>0$，式~\eqref{eq:MD-signal} 的唯一解为
+\begin{equation}
+m_a=\frac{q_ae^{f_a}}{Z},\qquad
+Z=\sum_bq_be^{f_b},\qquad
+\log(m_a/q_a)=f_a-\log Z.
+\label{eq:gibbs-target}
+\end{equation}
+若 $\mathcal A=(f-\E_qf)/\eta$，则同一分布也写成
+\begin{equation}
+m_a=\frac{q_ae^{\eta\mathcal A_a}}{Z_{\mathcal A}},
+\qquad Z_{\mathcal A}=e^{-\E_qf}Z.
+\end{equation}
+对任意 $p\in\Delta$，镜像损失具有精确分解
+\begin{equation}
+\frac{\KL(p\Vert q)-\E_pf}{\eta}
+=\frac{\KL(p\Vert m)-\log Z}{\eta}.
+\label{eq:mirror-gap}
+\end{equation}
+\end{theorem}
+\begin{proof}
+对概率归一化加入乘子 $\nu$，内点一阶条件为
+\begin{equation}
+\frac{\log(p_a/q_a)+1-f_a}{\eta}+\nu=0.
+\end{equation}
+因此 $p_a=q_ae^{f_a}e^{-1-\eta\nu}$。求和等于一，便得到式~\eqref{eq:gibbs-target}。再利用
+\begin{equation}
+\log(p_a/m_a)=\log(p_a/q_a)-f_a+\log Z,
+\end{equation}
+按 $p$ 求和，即得式~\eqref{eq:mirror-gap}。KL 非负且仅在两分布相等时为零，所以该内点解也是闭单纯形上的唯一全局解。
+
+中心化后，$e^{\eta\mathcal A_a}=e^{f_a-\E_qf}$。分子与配分函数同乘 $e^{-\E_qf}$，因此归一化分布不变。
+\end{proof}
+
+\section{代入信号得到归一化幂均值}
+将第一章定义的 $f_{\kappa,\eta}$ 代入。对 $\kappa>0$，
+\begin{align}
+q_ae^{f_a}
+&=q_a\left[1-\eta+\eta(T_a/q_a)^\kappa\right]^{1/\kappa}\\
+&=\left[(1-\eta)q_a^\kappa+\eta T_a^\kappa\right]^{1/\kappa}.
+\end{align}
+因此每轮要拟合的加权教师是
+\begin{equation}
+\boxed{
+m_{\kappa,\eta}(a;q,T)
+=\frac{\left[(1-\eta)q_a^\kappa+\eta T_a^\kappa\right]^{1/\kappa}}
+{\displaystyle\sum_b\left[(1-\eta)q_b^\kappa+\eta T_b^\kappa\right]^{1/\kappa}}.
+}
+\label{eq:target}
+\end{equation}
+记分子为 $h_a$，则 $Z=\sum_ah_a$。这一步从镜像最优性条件推出显式目标；$m$ 在整轮内层中冻结，实际学生 $p_{k,n}$ 用有限次更新逼近它。
+
+在几何端点 $\kappa=0$，直接代入 $f_a=\eta\log(T_a/q_a)$，得到
+\begin{equation}
+m_{0,\eta}(a)
+=\frac{q_a^{1-\eta}T_a^\eta}{\sum_bq_b^{1-\eta}T_b^\eta}.
+\end{equation}
+它也是式~\eqref{eq:target} 的连续极限：对固定正分布，$q_a^\kappa=1+\kappa\log q_a+O(\kappa^2)$，同样展开 $T_a^\kappa$，再对加权和取对数、除以 $\kappa$，得到 $(1-\eta)\log q_a+\eta\log T_a+O(\kappa)$。
+
+\section{代表形状与归一化}
+\begin{equation}
+\begin{aligned}
+m_{0,\eta}&\propto q^{1-\eta}T^\eta,\\
+m_{1/2,\eta}(a)&=
+\frac{[(1-\eta)\sqrt{q_a}+\eta\sqrt{T_a}]^2}
+{(1-\eta)^2+\eta^2+2\eta(1-\eta)\sum_b\sqrt{q_bT_b}},\\
+m_{1,\eta}&=(1-\eta)q+\eta T.
+\end{aligned}
+\label{eq:three-targets}
+\end{equation}
+几何端点在 log-odds 坐标中作加权；平方根点先加权平方根概率再归一化；算术端点直接加权概率，且 $Z=1$。所有形状在 $\eta\downarrow0$ 时回到 $q$，在 $\eta\uparrow1$ 时到达 $T$。
+
+至此，镜像子问题、教师信号、advantage 和加权教师都有了明确表达式。下一章保留同一个信号，推导一个以 $T$ 为最优点的教师目标 $J_{\kappa,\eta}$，说明该镜像步究竟下降什么函数。

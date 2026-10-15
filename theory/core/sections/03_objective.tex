@@ -1,0 +1,103 @@
+\chapter{从教师信号反推出目标 \texorpdfstring{$J$}{J}}
+\label{ch:objective}
+\section{目标梯度需要满足的关系}
+第一章用 $g_k=-\mathcal A_k$ 指定了镜像方向。由于 $\mathcal A_k=A_{\kappa,\eta}(T/q_k)+K_T$，这个向量与 $-A_{\kappa,\eta}(T/q_k)$ 只相差公共常数。对任意可行概率差 $p-q_k$，常数项的内积为零。因此寻找教师目标时，只需满足
+\begin{equation}
+\partial_{p_a}J_{\kappa,\eta}(p;T)
+=-A_{\kappa,\eta}(T_a/p_a).
+\label{eq:J-gradient}
+\end{equation}
+现在的 $p$ 是定义全局条件目标的变量；它与只在本轮取值的锚点 $q_k$ 分开。目标一旦由 $\kappa,\eta,T$ 确定，就不再依赖本轮锚点。
+
+\section{积分构造与严格凸性}
+在可分离的散度形式中寻找
+\begin{equation}
+J_{\kappa,\eta}(p;T)=\sum_ap_a\omega_{\kappa,\eta}(T_a/p_a).
+\end{equation}
+令 $x=T_a/p_a$，链式法则给出
+\begin{equation}
+\partial_{p_a}[p_a\omega(x)]=\omega(x)-x\omega'(x).
+\end{equation}
+所以所需生成函数满足 $\omega-x\omega'=-A$，等价于 $(\omega/x)'=A(x)/x^2$。选取规范化条件 $\omega(1)=0$，积分得到
+\begin{equation}
+\boxed{
+\omega_{\kappa,\eta}(x)=x\int_1^x\frac{A_{\kappa,\eta}(u)}{u^2}\,du,
+\qquad J_{\kappa,\eta}(p;T)=\sum_ap_a\omega_{\kappa,\eta}(T_a/p_a).
+}
+\label{eq:J}
+\end{equation}
+
+\begin{theorem}[该镜像步对应的教师目标]
+\label{thm:J}
+对固定 $\kappa\in[0,1]$、$0<\eta<1$ 和正教师 $T$，式~\eqref{eq:J} 的生成函数满足 $\omega(1)=\omega'(1)=0$、$\omega''(x)>0$。目标 $J$ 非负、在正单纯形上的唯一最优点为 $T$，并满足式~\eqref{eq:J-gradient}。第一章的镜像子问题因而等价于
+\begin{equation}
+m_k=\argmin_{p\in\Delta}
+\left\{\langle\nabla J_{\kappa,\eta}(q_k;T),p-q_k\rangle
++\eta^{-1}\KL(p\Vert q_k)\right\},
+\end{equation}
+其精确解就是第二章的 $m_{\kappa,\eta}$。
+\end{theorem}
+\begin{proof}
+对积分式求导：
+\begin{align}
+\omega'(x)&=\int_1^xA(u)u^{-2}\,du+A(x)/x,\\
+\omega(x)-x\omega'(x)&=-A(x),\\
+\omega''(x)&=\frac{A'(x)}x
+=\frac{x^{\kappa-2}}{1-\eta+\eta x^\kappa}>0.
+\end{align}
+在 $\kappa=0$ 时最后一式取 $x^{-2}$。$A(1)=0$ 给出 $\omega'(1)=0$。严格凸性使 $\omega$ 在一处唯一取最小值零，所以正权重和 $J$ 仅在每个 $T_a/p_a=1$ 时为零。透视函数的 Hessian 对角元为 $x_aA'(x_a)/p_a>0$，故 $J$ 也严格凸。
+
+梯度由第二个等式与链式法则得到。在 $q_k$ 处，
+\begin{equation}
+g_k=-\mathcal A_k=\nabla J(q_k;T)-K_T\mathbf1.
+\end{equation}
+两梯度代表与 $p-q_k$ 的内积相同，因此产生同一个镜像问题；其解已由定理~\ref{thm:target} 求出。
+\end{proof}
+
+\section{下降保证与 \texorpdfstring{$J$}{J} 的端点}
+令 $\Phi(p)=\sum_ap_a\log p_a$、$x_a=T_a/p_a$。由上述 Hessian，
+\begin{equation}
+\nabla^2J(p;T)
+=\diag\left(\frac1{p_a}\frac{x_a^\kappa}{1-\eta+\eta x_a^\kappa}\right)
+\preceq\eta^{-1}\nabla^2\Phi(p).
+\label{eq:relative-smooth}
+\end{equation}
+沿线段积分并使用镜像最优性条件，得到
+\begin{equation}
+J(q;T)-J(m;T)\ge\eta^{-1}\KL(q\Vert m).
+\end{equation}
+对同一条件分布反复精确刷新锚点，进一步有
+\begin{equation}
+J(q_K;T)\le\frac{\KL(T\Vert q_0)}{\eta K}.
+\label{eq:J-rate}
+\end{equation}
+完整下降、三点恒等式和收敛证明见\appref{app:objective}。
+
+这组教师目标在端点满足
+\begin{align}
+J_{0,\eta}(p;T)&=\KL(p\Vert T),\\
+\lim_{\eta\downarrow0}J_{\kappa,\eta}(p;T)&=D_\kappa(T\Vert p),\\
+J_{1,\eta}(p;T)&=\frac{\JS_\eta(p,T)}{\eta(1-\eta)},
+\qquad \lim_{\eta\uparrow1}J_{\kappa,\eta}(p;T)=\KL(p\Vert T).
+\end{align}
+这里 $\JS_\eta(p,T)=(1-\eta)\KL(p\Vert M_p)+\eta\KL(T\Vert M_p)$，$M_p=(1-\eta)p+\eta T$。每个固定 $\kappa,\eta$ 定义一个 $J$；改变 $\eta$ 一般也改变目标。若在同一个 $J$ 上单独调整镜像步长，应另用 $\tau$，保留信号 $A_{\kappa,\eta}$ 并更新 $p^+\propto q e^{\tau A_{\kappa,\eta}(T/q)}$。
+
+\section{加权散度重心的等价解释}
+已经由镜像问题得到的 $m$，还具有一个用于误差分析的重心解释。定义幂散度\footfullcite{cichocki2010}
+\begin{equation}
+D_\kappa(P\Vert Q)=\frac{1-\sum_aP_a^\kappa Q_a^{1-\kappa}}{\kappa(1-\kappa)},
+\quad D_0(P\Vert Q)=\KL(Q\Vert P),\quad D_1(P\Vert Q)=\KL(P\Vert Q).
+\label{eq:power-divergence}
+\end{equation}
+该归一化幂均值也是加权散度问题的唯一解\footfullcite{amari2007}：
+\begin{equation}
+m=\argmin_{p\in\Delta}F_k(p),\qquad
+F_k(p)=(1-\eta)D_\kappa(q_k\Vert p)+\eta D_\kappa(T\Vert p).
+\label{eq:barycenter-problem}
+\end{equation}
+其超额损失为
+\begin{equation}
+F_k(p)-F_k(m)=Z^\kappa D_\kappa(m\Vert p),\qquad 0<\kappa<1.
+\label{eq:barycenter-gap}
+\end{equation}
+两个端点分别为 $\KL(p\Vert m)$ 与 $\KL(m\Vert p)$。完整定理及证明见\appref{app:objective}。$F_k$ 的最优点是本轮 $m_k$，$J_{\kappa,\eta}$ 的最优点是原教师 $T$；后面的 inner 损失用于将参数化学生拟合到已经确定的 $m_k$。

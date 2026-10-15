@@ -1,7 +1,11 @@
 \chapter{TOP-D 目标教师的退化与性质}
 \label{app:topd}
 \section{参数对应与精确可达性}
-本附录比较 TOP-D 的目标教师及相关分布性质，依据其 v1 第 3.1 节、定理 4.2、4.4 和附录 C.1、C.2\footfullcite{topd2026}。固定同一前缀，TOP-D 的教师混合权重记为 $\alpha$，教师为 $T$，构造混合时的学生记为 $q$。本文对应关系是
+本附录比较 TOP-D 的目标教师及相关分布性质，依据其 v1 第 3.1 节、定理 4.2、4.4 和附录 C.1、C.2\footfullcite{topd2026}。固定同一前缀，TOP-D 的教师混合权重记为 $\alpha$，教师为 $T$，构造混合时的学生记为 $q$。
+\begin{theorem}[TOP-D 目标教师的精确退化]
+固定同一条件分布空间的 $q,T>0$。取 $\kappa=1,\eta=\alpha\in(0,1)$ 时，镜像目标教师精确等于 TOP-D 的算术教师 $(1-\alpha)q+\alpha T$，且 $Z=1$。该分布唯一最小化加权正向 KL，超额损失为 $\KL(m\Vert p)$。
+\end{theorem}
+\begin{proof}
 \begin{equation}
 \boxed{\kappa=1,\qquad \eta=\alpha,\qquad
 m_{1,\eta}=(1-\eta)q+\eta T.}
@@ -18,11 +22,25 @@ m_{1,\eta}=\argmin_{p\in\Delta}
 \begin{equation}
 F(p)-F(m)=\KL(m\Vert p).
 \end{equation}
-因此原问题的最优分布与 TOP-D 目标教师完全重合。
+因此镜像解与该重心解都等于 TOP-D 的目标教师。
+\end{proof}
 
-在本文三个精确拟合目标中，MDPO、Part、BPO 都能在完整可实现条件下到达该分布。Mean 一般仍有 Lambert-$W$ 目标偏离。可达性指总体最优分布；有限参数更新是否到达，应由拟合误差证书判断。
+\begin{corollary}[算术教师的总体可达性]
+在完整支持、精确期望和目标可实现时，MDPO、Part、BPO 的总体最优分布都等于算术目标教师。Mean 对非恒定信号一般具有不同的最优分布。
+\end{corollary}
+\begin{proof}
+将上一退化定理的算术 $m$ 代入命题~\ref{prop:inner-roots}，MDPO 的 KL gap、Part 的零残差和 BPO 的常数残差条件分别唯一确定 $p=m$。同一命题的 Mean KKT 论证排除非恒定信号下的 Gibbs 解。可达性指总体最优分布；有限参数更新是否到达，应由拟合误差证书判断。
+\end{proof}
 
 \section{监督信号、中心与教师目标}
+\begin{proposition}[算术端点的信号、中心与教师目标]
+取 $\kappa=1$，则
+\begin{equation}
+f=\log(1-\eta+\eta T/q),\quad A=f/\eta,\quad K_T=\KL(q\Vert m)/\eta.
+\end{equation}
+本文反推的教师目标为 $J_{1,\eta}(p;T)=\JS_\eta(p,T)/[\eta(1-\eta)]$，其在 $q$ 处步长为 $\eta$ 的负熵镜像解等于算术教师。
+\end{proposition}
+\begin{proof}
 算术端点的配分函数恒为一，故
 \begin{equation}
 f_{1,\eta}=\log(m/q)=\log(1-\eta+\eta T/q),\qquad
@@ -39,8 +57,17 @@ J_{1,\eta}(p;T)=
 {\eta(1-\eta)},\qquad M_p=(1-\eta)p+\eta T.
 \end{equation}
 推导已在附录~\ref{app:objective} 给出。这里 $M_p$ 随候选学生 $p$ 变化，用于定义同一个教师目标；本轮目标 $m=M_q$ 在内层冻结。对 $J$ 在 $q$ 处执行步长 $\eta$ 的负熵镜像下降，恰好得到算术目标。这是本文对该目标教师的变分解释，不把它与其他同名目标混用。
+\end{proof}
 
 \section{覆盖与散度收缩}
+\begin{proposition}[算术教师的覆盖与信号下界]
+设 $m=(1-\eta)q+\eta T$、$0<\eta<1$，则 $m_a\ge(1-\eta)q_a$、$m_a\ge\eta T_a$，并有
+\begin{equation}
+f\ge\log(1-\eta),\quad
+\KL(q\Vert m)\le-\log(1-\eta),\quad \KL(T\Vert m)\le-\log\eta.
+\end{equation}
+\end{proposition}
+\begin{proof}
 由算术混合逐坐标有 $m_a\ge(1-\eta)q_a$、$m_a\ge\eta T_a$，因此
 \begin{equation}
 f_{1,\eta}\ge\log(1-\eta),\quad
@@ -48,13 +75,19 @@ f_{1,\eta}\ge\log(1-\eta),\quad
 \KL(T\Vert m)\le-\log\eta.
 \end{equation}
 前者控制教师极小概率造成的负监督尾部，后两者控制到两端分布的覆盖代价。
+\end{proof}
 
+\begin{proposition}[算术教师的精确收缩与闭式外层]
+固定正教师和 $0<\eta<1$，精确算术更新满足 $\|m-T\|_1=(1-\eta)\|q-T\|_1$。反复更新的闭式为 $q_k=T+(1-\eta)^k(q_0-T)$。
+\end{proposition}
+\begin{proof}
 对于精确更新，
 \begin{equation}
 m-T=(1-\eta)(q-T),\qquad
 \|m-T\|_1=(1-\eta)\|q-T\|_1.
 \end{equation}
 反复精确更新的闭式为 $q_k=T+(1-\eta)^k(q_0-T)$。所以原文定理 4.4 所用的算术收缩结构在这个条件分布空间直接恢复。
+\end{proof}
 
 \begin{proposition}[算术端点的凸散度收缩]
 对任意凸函数 $\varphi$、$\varphi(1)=0$，
@@ -75,6 +108,14 @@ D_\varphi(m\Vert T)\le(1-\eta)D_\varphi(q\Vert T).
 式~\eqref{eq:topd-all-f} 是算术映射自身的凸性结论。一般幂均值保留所有凸生成散度的非增性，但不自动具有同一个 $(1-\eta)$ 全局因子；平方根点的 Hellinger 因子由它的球面结构另行给出。
 
 \section{有限拟合的误差累积}
+\begin{theorem}[算术外层的拟合误差累积]
+若 $\epsilon_k=\|q_{k+1}-m(q_k,T)\|_1$，则
+\begin{equation}
+\|q_K-T\|_1\le(1-\eta)^K\|q_0-T\|_1+\sum_{k<K}(1-\eta)^{K-1-k}\epsilon_k.
+\end{equation}
+若 $\limsup\epsilon_k\le\epsilon_\infty$，则 $\limsup\|q_K-T\|_1\le\epsilon_\infty/\eta$。固定测度的条件距离平均满足同一界。
+\end{theorem}
+\begin{proof}
 令 $\epsilon_k=\|q_{k+1}-m(q_k,T)\|_1$。三角不等式给
 \begin{equation}
 \|q_{k+1}-T\|_1\le(1-\eta)\|q_k-T\|_1+\epsilon_k.
@@ -88,8 +129,17 @@ D_\varphi(m\Vert T)\le(1-\eta)D_\varphi(q\Vert T).
 若 $\limsup\epsilon_k\le\epsilon_\infty$，对任意 $\delta>0$ 取足够晚的 $k_0$ 使 $\epsilon_k\le\epsilon_\infty+\delta$。有限前缀和趋零，后段几何和不超过 $(\epsilon_\infty+\delta)/\eta$。令 $\delta\downarrow0$，得到 $\limsup\|q_K-T\|_1\le\epsilon_\infty/\eta$。这恢复原文误差累积与稳态上界的形式。
 
 固定前缀测度下可以逐条件取平均，再用同一个线性递推。如果用 MDPO 的超额损失 $\delta_k$，Pinsker 给 $\epsilon_k\le\sqrt{2\eta\delta_k}$；若用 BPO，则先应用附录~\ref{app:dynamics} 的跨度证书。本文在这里补上的是不同 inner loss 到外层输出误差的接口。
+\end{proof}
 
 \section{方差定理的尺度对应}
+\begin{theorem}[算术监督的方差界与小步尺度]
+固定 $0<\eta<1$，$f=\log(1-\eta+\eta T/q)$，且 $\|\psi\|\le S$。令 $C_\star=\sup_{u>0}\log^2(1+u)/u$，则
+\begin{equation}
+\Var_q(f\psi)\le S^2[\log^2(1-\eta)+C_\star\eta].
+\end{equation}
+对正分布类取上确界，$\sup\Var_qf=\Theta(\eta)$，而 $A=f/\eta$ 满足 $\sup\Var_qA=\Theta(\eta^{-1})$ 当 $\eta\downarrow0$。
+\end{theorem}
+\begin{proof}
 TOP-D 定理 4.2 在有限词表和 score 范数不超过 $S$ 的条件下，给未缩放信号的梯度方差上界
 \begin{equation}
 S^2|\mathcal V|\max\{\log^2(1-\eta),C_\star\eta\}.
@@ -114,6 +164,7 @@ S^2|\mathcal V|\max\{\log^2(1-\eta),C_\star\eta\}.
 \sup_{q,T}\Var_qA_{1,\eta}=\Theta(\eta^{-1}).
 \end{equation}
 这与未缩放信号随小 $\eta$ 衰减相容：两者相差 $\eta^2$。它也说明算术端点虽有固定强度方差界，却不属于统一小步标准化方差有界的 $0<\kappa\le1/2$ 区间。
+\end{proof}
 
 \section{比较结论的作用范围}
 \begin{center}

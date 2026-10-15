@@ -52,6 +52,19 @@ def test_integrated_teacher_objective_gradient_and_md_step(kappa, eta):
     md = (p.log() - eta * gradient).softmax(-1)
     target = power_log_target(p.log(), teacher.log(), kappa, eta).exp()
     torch.testing.assert_close(md, target, atol=1e-12, rtol=1e-12)
+    signal = -gradient
+    advantage = signal - p @ signal
+    centered_step = (p.log() + eta * advantage).softmax(-1)
+    torch.testing.assert_close(centered_step, target, atol=1e-12, rtol=1e-12)
+    candidate = torch.tensor([0.3, 0.4, 0.3], dtype=DTYPE)
+    mirror_candidate = kl(candidate, p) / eta - candidate @ advantage
+    mirror_optimum = kl(target, p) / eta - target @ advantage
+    torch.testing.assert_close(
+        mirror_candidate - mirror_optimum,
+        kl(candidate, target) / eta,
+        atol=1e-11,
+        rtol=1e-11,
+    )
     next_objective = teacher_objective_by_quadrature(target, teacher, kappa, eta)
     assert objective - next_objective >= kl(p, target) / eta - 1e-12
 

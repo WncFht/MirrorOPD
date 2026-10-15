@@ -1,9 +1,9 @@
 \chapter{固定目标教师的内层拟合}
 \label{ch:inner}
 \section{最优性方程与四种损失}
-本轮固定 $q,T,m$ 与 $f=\eta A(T/q)$，当前学生为 $p=p_\theta$。记
+前三章已从镜像子问题得到信号、advantage、目标教师 $m$ 及其教师目标 $J$。内层固定 $q,T,m$ 与 $f=\eta A(T/q)$，只优化当前学生 $p=p_\theta$。记
 \begin{equation}
-U_a=\log(p_a/q_a),\qquad G=C_qf,\qquad
+U_a=\log(p_a/q_a),\qquad G=C_qf=\eta\mathcal A_k,\qquad
 K_S=\KL(q\Vert p)=-\E_qU,\qquad K_T=-\E_qA.
 \end{equation}
 目标教师满足 $U^\star=f-\log Z$。将该方程转成可训练目标，有以下四种方式：
@@ -43,7 +43,8 @@ L_{\rm Mean}=\eta L_{\rm BPO}+\frac12K_S^2.
 令 $\psi_a=\nabla_\theta\log p_\theta(a)$、$\bar\psi_q=\E_q\psi$，则 $\E_p\psi=0$，但 $\bar\psi_q$ 通常不为零。定义
 \begin{equation}
 R_P=U-f+\log Z,\quad R_M=U-G,\quad
-R_B=C_q(U-f)=U+K_S-\eta(A+K_T).
+R_B=C_q(U-f)=U+K_S-\eta\mathcal A_k
+=U+K_S-\eta(A+K_T).
 \end{equation}
 直接求导得到
 \begin{align}
