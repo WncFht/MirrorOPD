@@ -18,6 +18,8 @@ checkpoints/
 logs/
 scratch/
 /runs/
+/transfers/
+/imported/
 
 # LaTeX build intermediates; released PDFs remain tracked
 *.aux

@@ -10,7 +10,7 @@ from mirroropd.core.config import ALGORITHMS
 from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.audit import audit_run
 from mirroropd.runtime.config import load_job, with_algorithm
-from mirroropd.runtime.reservation import process_identity
+from mirroropd.runtime.control import run_status, start_run, stop_run, wait_run
 
 
 def profile(value, category):
@@ -43,6 +43,7 @@ def job_arguments(parser):
     parser.add_argument("--set", dest="overrides", action="append", default=[])
     parser.add_argument("--algorithm", choices=sorted(ALGORITHMS))
     parser.add_argument("--name")
+    parser.add_argument("--wandb", choices=["online", "offline", "disabled"])
 
 
 def load_arguments(args):
@@ -59,10 +60,16 @@ def load_arguments(args):
         value = job.to_dict()
         value["name"] = args.name
         job = type(job).from_dict(value)
+    if args.wandb:
+        value = job.to_dict()
+        value["logging"]["wandb"]["enabled"] = args.wandb != "disabled"
+        if args.wandb != "disabled":
+            value["logging"]["wandb"]["mode"] = args.wandb
+        job = type(job).from_dict(value)
     return job
 
 
-def main(argv=None):
+def main(argv=None):  # noqa: PLR0911 -- each CLI subcommand returns its own exit status
     parser = argparse.ArgumentParser(prog="mirroropd", description=__doc__)
     parser.add_argument("--version", action="version", version=__version__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -80,6 +87,9 @@ def main(argv=None):
         run.add_argument("--lease-root", type=Path)
         run.add_argument("--borrowed-slot", type=Path)
         run.add_argument("--prepare-only", action="store_true")
+        run.add_argument(
+            "--detach", action="store_true", help="Run in background; write controller.log"
+        )
         if name == "suite":
             run.add_argument(
                 "--algorithms",
@@ -87,9 +97,22 @@ def main(argv=None):
                 choices=sorted(ALGORITHMS),
                 default=["on_policy", "mdpo", "bpo"],
             )
-    for name in ("status", "audit"):
+    for name in ("status", "audit", "stop"):
         command = commands.add_parser(name)
         command.add_argument("directory", type=Path)
+        if name == "stop":
+            command.add_argument("--timeout", type=float, default=30)
+    pack = commands.add_parser(
+        "pack", help="Create a checksummed, optionally split offline package"
+    )
+    pack.add_argument("kind", choices=["code", "results", "wandb"])
+    pack.add_argument("--backend", type=Path)
+    pack.add_argument("--run", type=Path)
+    pack.add_argument("--output", type=Path, required=True)
+    pack.add_argument("--chunk-bytes", type=int, default=10 * 1024**2)
+    unpack = commands.add_parser("unpack")
+    unpack.add_argument("manifest", type=Path)
+    unpack.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "backend":
@@ -98,13 +121,26 @@ def main(argv=None):
             print(json.dumps(prepare_backend(args.output), indent=2))
             return 0
         if args.command == "status":
-            value = json.loads((args.directory / "state.json").read_text())
-            if (
-                value["state"] in {"running", "preparing", "verifying"}
-                and process_identity(value["controller_pid"]) != value["process_identity"]
-            ):
-                value["state"] = "orphaned"
-            print(json.dumps(value, indent=2))
+            print(json.dumps(run_status(args.directory), indent=2))
+            return 0
+        if args.command == "stop":
+            print(json.dumps(stop_run(args.directory, timeout=args.timeout), indent=2))
+            return 0
+        if args.command in {"pack", "unpack"}:
+            from mirroropd.runtime.transfer import pack_transfer, unpack_transfer
+
+            result = (
+                pack_transfer(
+                    args.kind,
+                    output=args.output,
+                    backend=args.backend,
+                    run=args.run,
+                    chunk_bytes=args.chunk_bytes,
+                )
+                if args.command == "pack"
+                else unpack_transfer(args.manifest, args.output)
+            )
+            print(json.dumps(result, indent=2))
             return 0
         if args.command == "audit":
             result = audit_run(args.directory)
@@ -118,30 +154,20 @@ def main(argv=None):
                 atomic_json(args.output, value)
             print(json.dumps(value, indent=2))
             return 0
-        from mirroropd.runtime.runner import run_job
-
-        if args.command == "suite":
-            args.output.mkdir(parents=True, exist_ok=False)
-            for algorithm in args.algorithms:
-                run_job(
-                    with_algorithm(job, algorithm),
-                    backend=args.backend,
-                    directory=args.output / algorithm,
-                    python=args.python,
-                    lease_root=args.lease_root,
-                    borrowed_slot=args.borrowed_slot,
-                    prepare_only=args.prepare_only,
-                )
+        child, record = start_run(
+            job,
+            backend=args.backend,
+            directory=args.output,
+            python=args.python,
+            algorithms=args.algorithms if args.command == "suite" else None,
+            lease_root=args.lease_root,
+            borrowed_slot=args.borrowed_slot,
+            prepare_only=args.prepare_only,
+        )
+        if args.detach:
+            print(json.dumps(record, indent=2))
         else:
-            run_job(
-                job,
-                backend=args.backend,
-                directory=args.output,
-                python=args.python,
-                lease_root=args.lease_root,
-                borrowed_slot=args.borrowed_slot,
-                prepare_only=args.prepare_only,
-            )
+            return wait_run(child, args.output)
     except (ValueError, TypeError, RuntimeError, OSError) as error:
         print(f"mirroropd: {error}", file=sys.stderr)
         return 1

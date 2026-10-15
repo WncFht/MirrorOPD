@@ -11,11 +11,12 @@ from pathlib import Path
 from mirroropd.integrations.verl.compiler import compile_backend
 from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.audit import audit_run
+from mirroropd.runtime.control import controller_identity
 from mirroropd.runtime.events import EventReader, EventWriter
 from mirroropd.runtime.preflight import prepare_inputs
 from mirroropd.runtime.processes import launch
 from mirroropd.runtime.provenance import snapshot_sources, verify_backend
-from mirroropd.runtime.reservation import GpuReservation, process_identity
+from mirroropd.runtime.reservation import GpuReservation
 
 
 def public_environment(job, directory, scratch):
@@ -37,6 +38,10 @@ def public_environment(job, directory, scratch):
         "MKL_NUM_THREADS": "1",
         "PYTHONPATH": str(directory / "source"),
         "VERL_FILE_LOGGER_PATH": str(directory / "backend-metrics.jsonl"),
+        "WANDB_MODE": job.logging.wandb.effective_mode,
+        "WANDB_DIR": str(directory / "wandb"),
+        "WANDB_CACHE_DIR": str(directory / "wandb-cache"),
+        "WANDB_DATA_DIR": str(directory / "wandb-data"),
     }
 
 
@@ -75,9 +80,11 @@ def run_job(
     lease_root=None,
     borrowed_slot=None,
     prepare_only=False,
+    directory_created=False,
 ):
     directory = Path(directory).expanduser().resolve()
-    directory.mkdir(parents=True, exist_ok=False)
+    if not directory_created:
+        directory.mkdir(parents=True, exist_ok=False)
     backend = Path(backend).expanduser().resolve()
     package = Path(__file__).resolve().parents[1]
     integration = package / "integrations/verl"
@@ -95,8 +102,7 @@ def run_job(
                 "schema_version": 2,
                 "run_id": directory.name,
                 "state": name,
-                "controller_pid": os.getpid(),
-                "process_identity": process_identity(os.getpid()),
+                **controller_identity(),
                 "updated_unix": time.time(),
                 **details,
             },
@@ -123,6 +129,8 @@ def run_job(
         for name in ("r", "t"):
             (scratch / name).mkdir()
         environment = public_environment(job, directory, scratch)
+        for name in ("wandb", "wandb-cache", "wandb-data"):
+            (directory / name).mkdir()
         with writer.phase("backend.compile"):
             config = compile_backend(job, inputs, directory, directory / "source", environment)
         atomic_json(
@@ -147,7 +155,6 @@ def run_job(
             | {
                 "CUDA_VISIBLE_DEVICES": ",".join(map(str, job.resources.gpu_ids)),
                 "CUDA_DEVICE_ORDER": "PCI_BUS_ID",
-                "WANDB_MODE": "online" if job.logging.wandb.enabled else "disabled",
             }
         )
         if job.logging.wandb.entity:

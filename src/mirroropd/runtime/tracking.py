@@ -63,7 +63,8 @@ class RunTracker:
                 "entity": run.entity,
                 "project": run.project,
                 "id": run.id,
-                "url": run.url,
+                "mode": self.job.logging.wandb.effective_mode,
+                "url": run.url if self.job.logging.wandb.effective_mode != "offline" else None,
             },
         )
 

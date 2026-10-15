@@ -189,6 +189,17 @@ def test_completion_audit_proves_schedule_instead_of_only_exit_success(tmp_path)
         audit_run(tmp_path)
 
 
+def test_new_tracking_defaults_do_not_change_a_persisted_job_identity(tmp_path):
+    completed_run(tmp_path)
+    recorded = json.loads((tmp_path / "job.json").read_text())
+    recorded["logging"]["wandb"].pop("mode")
+    atomic_json(tmp_path / "job.json", recorded)
+    manifest = json.loads((tmp_path / "run.json").read_text())
+    manifest["config_id"] = content_id(recorded)
+    atomic_json(tmp_path / "run.json", manifest)
+    assert audit_run(tmp_path)["config_id"] == manifest["config_id"]
+
+
 def test_snapshot_preserves_non_python_runtime_files_and_detects_changes(tmp_path):
     package = tmp_path / "package"
     package.mkdir()

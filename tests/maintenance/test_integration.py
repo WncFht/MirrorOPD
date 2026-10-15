@@ -65,6 +65,8 @@ def test_theory_and_vendor_are_excluded_but_new_hidden_rules_are_checked(reposit
         "theory/core/source.md",
         "upstream/backend/source.md",
         "results/raw/history.md",
+        "transfers/code/history.md",
+        "imported/snapshot/history.md",
         "data/raw/source.md",
         ".agents/notes/archived/process/history.md",
     ):

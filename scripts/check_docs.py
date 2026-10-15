@@ -28,6 +28,8 @@ IGNORED = {
     ".crossnote",
     "upstream",
     "runs",
+    "transfers",
+    "imported",
     "build",
     "dist",
 }

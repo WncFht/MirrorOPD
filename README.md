@@ -7,11 +7,11 @@ MirrorOPD 0.2 提供 on-policy、MDPO、BPO 的幂均值蒸馏内核、严格配
 使用 Python3.12 独立环境安装本包；GPU 软件栈还需核对 PyTorch、vLLM 与驱动的兼容性：
 
 ```bash
-python -m pip install -e '.[data,test,math]'
+python -m pip install -e '.[data,backend,math,tracking,test]'
 python -m mirroropd --version
 ```
 
-[运行与复现](docs/运行与复现.md)给出后端准备、模型/数据要求、CLI 配置、训练及审计步骤。[算法与实现](docs/算法与实现.md)解释当前三算法和估计器；[日志与评测](docs/日志与评测.md)定义结果口径。完整导航见[文档入口](docs/README.md)。
+[运行与复现](docs/运行与复现.md)给出后端准备、模型/数据要求、CLI 配置、训练及审计步骤，也包含 `--detach` 后台启动、`stop`、W&B offline、离线代码与结果分片传输，以及 hope 集群模板。[算法与实现](docs/算法与实现.md)解释当前三算法和估计器；[日志与评测](docs/日志与评测.md)定义结果口径。完整导航见[文档入口](docs/README.md)。
 
 ## 开发与研究
 

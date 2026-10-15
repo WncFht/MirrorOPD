@@ -179,9 +179,18 @@ class Resources:
 @dataclass(frozen=True, slots=True)
 class Wandb:
     enabled: bool = False
+    mode: str = "online"
     project: str = "mirroropd"
     entity: str | None = None
     group: str | None = None
+
+    def __post_init__(self):
+        if self.mode not in {"online", "offline"}:
+            raise ValueError("W&B mode must be online or offline; enabled=false disables tracking")
+
+    @property
+    def effective_mode(self):
+        return self.mode if self.enabled else "disabled"
 
 
 @dataclass(frozen=True, slots=True)

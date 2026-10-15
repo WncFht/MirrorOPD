@@ -4,6 +4,7 @@ import json
 import math
 from pathlib import Path
 
+from mirroropd.identity import content_id
 from mirroropd.runtime.config import Job
 from mirroropd.runtime.evaluation import Protocol, audit_file
 from mirroropd.runtime.events import EventReader
@@ -12,14 +13,16 @@ from mirroropd.runtime.provenance import verify_snapshot
 
 def audit_run(directory):
     directory = Path(directory)
-    job = Job.from_dict(json.loads((directory / "job.json").read_text()))
+    recorded_job = json.loads((directory / "job.json").read_text())
+    job = Job.from_dict(recorded_job)
+    config_id = content_id(recorded_job)
     inputs = json.loads((directory / "inputs.json").read_text())
     manifest = json.loads((directory / "run.json").read_text())
     exit_state = json.loads((directory / "backend-exit.json").read_text())
     if exit_state["return_code"] != 0:
         raise ValueError("Native training did not exit successfully")
     snapshot = verify_snapshot(directory / "source")
-    if snapshot["source_id"] != manifest["source_id"] or job.config_id != manifest["config_id"]:
+    if snapshot["source_id"] != manifest["source_id"] or config_id != manifest["config_id"]:
         raise ValueError("Recorded job/source identity does not match the executed run")
     events = EventReader(directory / "events").read()
     if any(event["run_id"] != manifest["run_id"] for event in events):
@@ -88,7 +91,7 @@ def audit_run(directory):
         "passed": True,
         "run_id": manifest["run_id"],
         "source_id": manifest["source_id"],
-        "config_id": job.config_id,
+        "config_id": config_id,
         "algorithm": job.objective.algorithm,
         "loss_kind": job.objective.loss_kind,
         "outer_steps": len(outer),

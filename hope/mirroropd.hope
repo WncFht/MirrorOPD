@@ -1,0 +1,37 @@
+# Edit the shared checkout path, model/data paths and unique output for each job.
+[base]
+type = ml-easy-job
+
+[resource]
+usergroup = hadoop-hmart-poistar
+queue = root.zw05_training_cluster.hadoop-poistar.job_80g
+
+[roles]
+workers = 1
+worker.memory = 131072
+worker.vcore = 32
+worker.gcores80g = 4
+worker.script = bash -lc 'cd /mnt/dolphinfs/hdd_pool/docker/user/hadoop-hmart-poistar/fanghaotian/MirrorOPD && MIRROR_MODEL_ROOT=/REPLACE/models MIRROR_DATA_ROOT=/REPLACE/data MIRROR_RUN_DIR=runs/REPLACE-unique-run bash scripts/hope-run.sh'
+
+[am]
+afo.app.am.resource.mb = 4096
+
+[tensorboard]
+with.tensor.board = false
+
+[docker]
+# Reference image from MD-OPD; use a prepared PyTorch 2.7 environment inside it.
+afo.docker.image.name = registry-offlinebiz.sankuai.com/custom_prod/com.sankuai.data.hadoop.gpu/aipnlp/training_ubuntu22_cuda12.8_python3.12_torch2.8_verl_megatron_v2_6a048eb0:1.0.0
+
+[data]
+afo.data.prefetch = false
+
+[failover]
+afo.app.support.engine.failover = false
+afo.role.worker.task.attempt.max.retry = 1
+
+[others]
+afo.app.env.YARN_CONTAINER_RUNTIME_DOCKER_SHM_SIZE_BYTES = 137438953472
+afo.role.worker.env.YARN_CONTAINER_RUNTIME_DOCKER_SHM_SIZE_BYTES = 137438953472
+with_requirements = false
+afo.dolphinfs.otherusers = hadoop-hmart-poistar:false

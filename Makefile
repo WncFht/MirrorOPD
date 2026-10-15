@@ -1,4 +1,10 @@
 PYTHON ?= python
+BACKEND ?= upstream/TA-OPD-v2
+PACKAGE ?= transfers/code
+RUN ?=
+DEST ?=
+MANIFEST ?=
+HOPE_FILE ?= hope/mirroropd.hope
 
 .PHONY: book theory-core test upstream data bootstrap check check-docs check-maintenance test-maintenance
 book: theory-core
@@ -38,3 +44,21 @@ check: check-docs
 	ruff check .
 	ruff format --check .
 	pre-commit run --all-files
+
+.PHONY: code-pack results-pack wandb-pack unpack hope-submit
+code-pack:
+	$(PYTHON) -m mirroropd pack code --backend "$(BACKEND)" --output "$(PACKAGE)"
+
+results-pack:
+	$(PYTHON) -m mirroropd pack results --run "$(RUN)" --output "$(PACKAGE)"
+
+wandb-pack:
+	$(PYTHON) -m mirroropd pack wandb --run "$(RUN)" --output "$(PACKAGE)"
+
+unpack:
+	$(PYTHON) -m mirroropd unpack "$(MANIFEST)" --output "$(DEST)"
+
+hope-submit:
+	@test -f "$(HOPE_FILE)" || { echo "Hope file not found: $(HOPE_FILE)" >&2; exit 1; }
+	@! grep -q 'REPLACE' "$(HOPE_FILE)" || { echo "Edit all REPLACE paths in $(HOPE_FILE) before submitting" >&2; exit 1; }
+	cd "$(dir $(HOPE_FILE))" && hope run "$(notdir $(HOPE_FILE))"

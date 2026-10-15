@@ -10,6 +10,8 @@ results/**/resolved-config.yaml
 data/**/*.json
 data/**/resolved-config.yaml
 runs/
+transfers/
+imported/
 package-lock.json
 theory/
 .agents/notes/archived/
