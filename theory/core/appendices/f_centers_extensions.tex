@@ -1,0 +1,105 @@
+\section{平方根包络的定量收益}
+\begin{proposition}[小步平方根中心的半方差界]
+\label{prop:root-envelope}
+固定 $q,T$，取 $\kappa=1/2$ 并令 $\eta\downarrow0$。
+此时 $A_0(\rho)=2(\sqrt\rho-1)$，
+$\phi_0(\rho)=(\sqrt\rho-1)^2$，
+$K=H^2(q,T)=2-2\sum_a\sqrt{q_aT_a}$。
+包络采样分布趋于 $\mu=(q+T)/2$，其单样本中心估计为
+\begin{equation}
+Z_0(a)=\frac{2(\sqrt{T_a}-\sqrt{q_a})^2}{T_a+q_a},
+\qquad a\sim\mu.
+\end{equation}
+它满足
+\begin{equation}
+0\le Z_0\le2,\quad \E_\mu Z_0=K,\quad
+\Var_\mu Z_0\le K(2-K)\le\tfrac12 K(4-K).
+\end{equation}
+其中 $K(4-K)=\Var_q A_0$ 为有符号中心估计的方差。
+\end{proposition}
+\begin{proof}
+由 $c=-\log(1-\eta)/(\kappa\eta)\to2$，
+前文的 $\mu_c$ 趋于 $\mu$。将 $q\phi_0/\mu$ 展开得 $Z_0$。
+非负性和 $(\sqrt T-\sqrt q)^2\le T+q$ 给范围界，
+按 $\mu$ 求和给均值 $K$。
+由 $Z_0^2\le2Z_0$ 得方差不超过 $2K-K^2$。
+另外 $\E_q\sqrt\rho=a$、$\E_q\rho=1$ 给
+$\Var_q A_0=4(1-a^2)=K(4-K)$。
+$0\le K\le2$ 上 $2-K\le(4-K)/2$，故得到半方差界。
+\end{proof}
+
+\begin{corollary}[独立中心后的统一优势方差]
+\label{cor:root-center-budget}
+在上述小步极限下，以 $M\ge1$ 个独立包络样本的均值估计 $K$，
+并与主动作 $A\sim q$ 独立，则无偏优势估计满足
+\begin{equation}
+\Var[A_0(\rho_A)+\widehat K]
+\le K(4-K)+\frac{K(2-K)}M
+\le4+\frac1{M(M+1)}.
+\end{equation}
+$M=1$ 时上界为 $9/2$；使用独立有符号中心时相应统一界为 $8$。
+\end{corollary}
+\begin{proof}
+独立性使方差相加，$M$ 个独立样本的均值方差缩小 $M$ 倍。
+关于 $K$ 的二次式为
+$(4+2/M)K-(1+1/M)K^2$，
+在 $K_\star=(2M+1)/(M+1)\in[0,2]$ 达到最大值
+$4+1/[M(M+1)]$。
+有符号中心在 $M=1$ 时则为 $2K(4-K)\le8$。
+这里比较的是固定前缀的标量优势，不将其直接等同于参数梯度方差。
+\end{proof}
+
+\section{增加精确头部时的实际方差}
+\begin{proposition}[固定包络尾采样的方差单调性]
+\label{prop:head-monotone-variance}
+固定 $q,T,\kappa,\eta$，令 $c=-\log(1-\eta)/(\kappa\eta)$、
+$u_a=T_a+(c-1)q_a$、$\phi(\rho)=\rho-1-A(\rho)$。
+对头部 $S$ 和非空尾部 $C=S^c$，记
+$H_S=\sum_{a\in S}q_a\phi(\rho_a)$、$U_C=\sum_{a\in C}u_a$。
+取 $A\sim\nu_C$，$\nu_C(a)=u_a/U_C$，则
+\begin{equation}
+\widehat K_S=H_S+U_C\,\frac{q_A\phi(\rho_A)}{u_A}
+\end{equation}
+无偏。扩大精确头部时，其实际方差不增加；尾部为空时采用精确总和。
+\end{proposition}
+\begin{proof}
+期望中的 $u_A$ 与采样概率消去，得到尾部精确总和，故无偏。
+将新尾部记为 $C'\subset C$，若非空，令
+$p=U_{C'}/U_C$，并在旧尾分布下定义
+$Y=U_Cq_A\phi(\rho_A)/u_A$。
+新估计器的随机部分与 $pY$ 在事件 $A\in C'$ 下的条件分布相同。
+于是
+\begin{equation}
+\Var(\widehat K_{S'})
+=p^2\Var(Y\mid A\in C')
+\le p\Var(Y\mid A\in C')
+\le\Var(Y).
+\end{equation}
+最后一步用事件分割的全方差公式，其余条件方差和条件均值方差都非负。
+若 $p=0$，新估计精确，方差为零。
+此结论固定每个动作的包络权重 $u_a$；前文为收紧确定区间而重新构造的
+切线包络不自动具有这一方差单调性。
+\end{proof}
+
+\section{Part 与 Mean 的常数误差}
+\begin{proposition}[配分函数及信号中心误差的精确梯度偏差]
+\label{prop:part-mean-error}
+固定 $q,f$，令 $\psi_a=\nabla\log p_a$。
+Part 的残差为 $U_a-f_a+\log Z$，若冻结的
+$\widehat{\log Z}=\log Z+\delta_Z$，其平方损失梯度偏差为
+\begin{equation}
+\nabla\widehat L_{\rm Part}-\nabla L_{\rm Part}
+=\delta_Z\E_q\psi.
+\end{equation}
+Mean 的残差为 $U_a-f_a+\E_qf$，若冻结中心误差为 $\delta_f$，
+则偏差为 $\delta_f\E_q\psi$。在 $p=q$ 时二者为零。
+\end{proposition}
+\begin{proof}
+两个损失均为残差平方的 $q$ 均值除以二。
+冻结常数不参与求导，残差导数均为 $\psi$。
+误差项与原梯度相减，只剩相应常数乘 $\E_q\psi$。
+在 $p=q$ 时 score 恒等式给 $\E_q\psi=\E_p\psi=0$。
+若使用未缩放信号 $r$ 且 $f=\eta r$，其中心误差 $\delta_r$
+应先换算为 $\delta_f=\eta\delta_r$。若常数随参数反传或与动作相关，
+则分别还需保留常数导数或条件交叉项，不能直接套用上述冻结公式。
+\end{proof}

@@ -1,10 +1,7 @@
 PYTHON ?= python
-BOOK_DIR := theory/book
-BOOK := 2026-10-08-固定测度Token级MirrorOPD
 
 .PHONY: book theory-core test upstream data bootstrap check check-docs check-maintenance test-maintenance
-book:
-	cd $(BOOK_DIR) && latexmk -bibtex- -xelatex -interaction=nonstopmode -halt-on-error $(BOOK).tex
+book: theory-core
 
 theory-core:
 	$(MAKE) -C theory/core

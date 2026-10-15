@@ -62,7 +62,7 @@ def test_new_documents_in_legacy_directories_are_checked(repository):
 
 def test_theory_and_vendor_are_excluded_but_new_hidden_rules_are_checked(repository):
     for name in (
-        "theory/book/source.md",
+        "theory/core/source.md",
         "upstream/backend/source.md",
         "results/raw/history.md",
         "data/raw/source.md",

@@ -1,0 +1,163 @@
+\section{旧锚点与前缀测度漂移}
+\begin{proposition}[旧锚点引起的目标偏移]
+\label{prop:stale-anchor}
+固定正教师 $T$ 和几何目标 $m(q)\propto q^{1-\eta}T^\eta$，$\eta>0$。
+对两个正锚点 $q_j,q_k$，
+\begin{equation}
+d_H(m(q_j),m(q_k))=|1-\eta|d_H(q_j,q_k).
+\end{equation}
+若输出 $p$ 对旧目标的拟合误差不超过 $\epsilon$，
+则 $d_H(p,m(q_k))\le\epsilon+|1-\eta|d_H(q_j,q_k)$。
+\end{proposition}
+\begin{proof}
+两个目标的对数比等于
+$(1-\eta)\log(q_j/q_k)$ 加动作无关常数。
+跨度消去常数，并将标量乘法转换为绝对值，得到等式。
+再用 Hilbert 距离的三角不等式即得输出界。
+这里的误差来自目标构造所用锚点的改变；即使精确积分，仍会存在。
+采样分布与积分分布不一致导致的重要性加权问题需另行处理。
+\end{proof}
+
+\begin{proposition}[前缀测度改变的值与梯度代价]
+\label{prop:prefix-drift}
+设 $d,d'$ 为同一前缀空间上的概率测度，
+标量或向量函数 $h$ 满足 $\sup_s\|h(s)\|\le C$。
+则
+\begin{equation}
+\|\E_{d'}h-\E_dh\|\le2C\TV(d',d).
+\end{equation}
+对于条件目标 $J$，
+\begin{align}
+\E_{d'}J(q',T)-\E_dJ(q,T)
+={}&\E_d[J(q',T)-J(q,T)]\\
+&+(\E_{d'}-\E_d)J(q',T).
+\end{align}
+所以固定前缀测度下的进展，还需覆盖第二项才能推出总体进展。
+\end{proposition}
+\begin{proof}
+有限前缀时，对 $\sum_s[d'(s)-d(s)]h(s)$ 用三角不等式，
+得到 $C\sum_s|d'-d|=2C\TV(d',d)$；一般情形用总变差测度积分。
+目标差中加减 $\E_dJ(q',T)$ 得分解。
+若 $0\le J\le C$，标量项可用中心化 $J-C/2$ 将系数收紧为 $C$。
+同样的论证适用于梯度，但需要独立的逐前缀梯度范数界；
+目标值有界本身不提供梯度界。
+\end{proof}
+
+\section{有偏拟合与误差衰减速度}
+\begin{proposition}[固定对数偏差产生倾斜稳态]
+\label{prop:biased-fixed-point}
+考虑几何更新
+$q_{k+1,a}\propto q_{k,a}^{1-\eta}T_a^\eta e^{e_a}$，
+其中 $T>0$、$e$ 固定、$0<\eta<2$。
+其极限为
+\begin{equation}
+q_{\infty,a}=\frac{T_ae^{e_a/\eta}}{\sum_bT_be^{e_b/\eta}},
+\qquad d_H(q_\infty,T)=\frac{\osc e}{\eta}.
+\end{equation}
+若 $1<\eta<2$ 而误差允许逐轮交替，统一输入界
+$\limsup d_H(q_k,T)\le\sup_k\osc e_k/(2-\eta)$ 可以达到。
+\end{proposition}
+\begin{proof}
+令 $y_k=C_T\log(q_k/T)$，则归一化常数被中心化消去，递推为
+$y_{k+1}=(1-\eta)y_k+C_Te$。
+因 $|1-\eta|<1$，
+$y_k=(1-\eta)^ky_0+[1-(1-\eta)^k]C_Te/\eta$，
+取极限并归一化得所述稳态和跨度。
+为验证交替误差的界，取
+$e_k=(-1)^{k+1}e$ 和
+$y_k=(-1)^kC_Te/(2-\eta)$。
+直接代入递推，两侧相等，且每步跨度为 $\osc e/(2-\eta)$。
+任意初值与该特解之差按 $|1-\eta|^k$ 衰减。
+固定偏差与最坏时变偏差因此有不同稳态常数。
+\end{proof}
+
+\begin{proposition}[几何衰减误差的卷积与同速因子]
+\label{prop:equal-rate-errors}
+设 $b_{k+1}\le c b_k+E_k$，$0<c<1$，
+$0\le E_k\le B\rho^k$、$0<\rho<1$。则
+\begin{equation}
+b_K\le c^Kb_0+
+\begin{cases}
+B(c^K-\rho^K)/(c-\rho),&c\ne\rho,\\
+BKc^{K-1},&c=\rho.
+\end{cases}
+\end{equation}
+若 $c=0$，则直接有 $b_K\le E_{K-1}$，$K\ge1$。
+\end{proposition}
+\begin{proof}
+迭代不等式得
+$b_K\le c^Kb_0+B\sum_{j=0}^{K-1}c^{K-1-j}\rho^j$。
+当 $c\ne\rho$，乘以 $c-\rho$ 后相邻项抵消，
+得到 $c^K-\rho^K$；当 $c=\rho$，每一项均为 $c^{K-1}$，
+共有 $K$ 项。该式解释了误差与精确收缩同速时出现的额外线性因子。
+\end{proof}
+
+\begin{proposition}[Mean 的小噪声局部误差底]
+\label{prop:mean-noise-floor}
+取几何信号、Mean 更新及 $\eta=1$，令
+$b_k=d_H(q_k,T)$。若输出对精确 Mean 解的跨度误差至多为 $E$，
+前文局部界写成
+\begin{equation}
+b_{k+1}\le h(b_k)b_k+E,\qquad
+h(b)=\frac{e^bb^2}{8+e^bb^2}.
+\end{equation}
+若 $b_0\le2E$ 且 $h(2E)\le1/2$，则
+\begin{equation}
+\sup_k b_k\le2E,\qquad
+\limsup_k b_k\le\frac{E}{1-h(2E)}=E+O(E^3).
+\end{equation}
+对趋零的局部轨迹，误差 $E_k=o(b_k^3)$ 足以保留精确更新的三次首项。
+\end{proposition}
+\begin{proof}
+$h$ 在非负半轴非减。若 $b_k\le2E$，则
+$b_{k+1}\le h(2E)2E+E\le2E$，归纳得到不变邻域。
+在此邻域将 $h(b_k)$ 换为固定 $h(2E)<1$，迭代并取上极限，
+得到 $E/[1-h(2E)]$。由 $h(2E)=O(E^2)$ 得最后展开。
+若近似输出与精确输出的 Hilbert 距离为 $E_k$，
+三角不等式的两个方向给其到教师距离之差的绝对值至多为 $E_k$，
+故 $o(b_k^3)$ 不改变存在的三次首项。
+以 Mean 超额损失 $\delta_k$ 提供残差证书时，
+$E_k\le2\sqrt{\delta_k/q_{\min,k}}$，
+所以 $\delta_k=o(q_{\min,k}b_k^6)$ 是一个充分条件。
+该条件依赖原有局部轨迹与精确解证书，不声称对任意共享参数更新成立。
+\end{proof}
+
+\section{局部收缩率与全局边界}
+\begin{proposition}[几何更新在稳定区间之外的两个极限]
+\label{prop:geometric-unstable-limit}
+固定 $q_0\ne T$、$T>0$、$\eta>2$，
+令 $u_a=\log(q_{0,a}/T_a)$，最大与最小值集合分别为
+$I_+$、$I_-$。精确几何迭代的偶数子列趋于 $T$ 在 $I_+$ 上的条件分布，
+奇数子列趋于 $T$ 在 $I_-$ 上的条件分布。
+此时 $\KL(T\Vert q_k)\to\infty$，但
+$\KL(q_k\Vert T)\le\log(1/T_{\min})$ 始终有限。
+\end{proposition}
+\begin{proof}
+闭式轨迹为 $q_k(a)\propto T_ae^{(1-\eta)^ku_a}$。
+偶数时指数系数趋正无穷，除以最大指数项后，
+集合外的指数趋零，集合内的比例仍为 $T_a/T_b$。
+奇数时同理保留最小值集合。
+$u$ 非常数，两个集合均为真子集，因此每个子列都有正教师质量被学生压到零；
+$-\sum_aT_a\log q_k(a)$ 发散，而 $\sum_aT_a\log T_a$ 固定。
+反向 KL 则满足
+$\sum_aq_a\log q_a-\sum_aq_a\log T_a\le\log(1/T_{\min})$，
+因为第一项非正。跨度发散与两个方向的 KL 有不同关系。
+\end{proof}
+
+\begin{proposition}[几何逆向 KL 没有统一严格乘法收缩]
+\label{prop:no-global-kl-factor}
+固定正二元教师 $T$ 与 $0<\eta<1$。
+不存在仅依赖 $T,\eta$ 的 $c<1$，使所有正 $q$ 都满足
+$\KL(m(q)\Vert T)\le c\KL(q\Vert T)$。
+\end{proposition}
+\begin{proof}
+取 $q_\epsilon=(1-\epsilon,\epsilon)$。
+几何目标的第二坐标与第一坐标之比为
+$(\epsilon/(1-\epsilon))^{1-\eta}(T_2/T_1)^\eta\to0$，
+所以 $q_\epsilon$ 与 $m(q_\epsilon)$ 都趋于 $(1,0)$。
+对固定正教师，逆向 KL 在闭单纯形上连续，约定 $0\log0=0$。
+两者 KL 均趋于 $\log(1/T_1)>0$，比值趋一，
+与任意统一 $c<1$ 矛盾。
+该反例不影响教师附近的局部比例 $(1-\eta)^2$，
+也不影响全局 Hilbert 收缩。
+\end{proof}

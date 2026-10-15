@@ -1,0 +1,141 @@
+\section{截断、归一化与尾部匹配的差别}
+\begin{proposition}[截断与 Tail-aware 的平方误差比较]
+\label{prop:truncation-mse}
+固定正分布 $P,Q$ 和非空真子集 $S$，令
+$H=\sum_{a\in S}P_a\log(P_a/Q_a)$，
+$\tau_P=P(S^c)$、$\tau_Q=Q(S^c)$，
+$M=\tau_P\log(\tau_P/\tau_Q)$、
+$B=\tau_P\KL(P^{S^c}\Vert Q^{S^c})\ge0$。
+则完整 KL 为 $K=H+M+B$，截断值 $H$ 与 Tail-aware 值 $H+M$ 满足
+\begin{equation}
+(H-K)^2-(H+M-K)^2=M(M+2B).
+\end{equation}
+因此 Tail-aware 的下界性质不保证其平方误差小于截断值。
+\end{proposition}
+\begin{proof}
+在尾部逐点分解
+$\log(P_a/Q_a)=\log(\tau_P/\tau_Q)+
+\log(P_a^{S^c}/Q_a^{S^c})$，求和得 $K=H+M+B$。
+两个误差分别为 $-(M+B)$ 和 $-B$，平方相减即得公式。
+$M$ 可正可负。例如取 $P=(0.4,0.2,0.4)$、
+$Q=(0.2,0.4,0.4)$、$S=\{1\}$，
+有 $M=0.6\log(3/4)<0$、
+$B=0.2\log(2/3)+0.4\log(4/3)>0$，
+且 $M+2B<0$，此时差值为正。
+再保持头尾质量不变并令一个 $Q$ 尾概率趋零，$B$ 无界增长，
+最终 $M+2B>0$，差值转负。两种排序均可发生。
+\end{proof}
+
+\begin{proposition}[归一化头部 KL 对尾 logit 的不敏感性]
+\label{prop:tail-logit}
+令 $P=\operatorname{softmax}(z)$，$Q,S$ 固定，
+$P_S=\sum_{a\in S}P_a$。
+归一化头部 KL $K_{\rm norm}=\KL(P^S\Vert Q^S)$ 与截断值 $H$ 满足
+\begin{equation}
+\frac{\partial K_{\rm norm}}{\partial z_j}=0,\qquad
+\frac{\partial H}{\partial z_j}=-P_j(H+P_S),\qquad j\notin S.
+\end{equation}
+\end{proposition}
+\begin{proof}
+$P_a^S=e^{z_a}/\sum_{i\in S}e^{z_i}$ 不含尾 logit，故第一式成立。
+对 $a\in S,j\notin S$，
+$\partial P_a/\partial z_j=-P_aP_j$、
+$\partial\log(P_a/Q_a)/\partial z_j=-P_j$。
+对 $H$ 使用乘积法则并求和得第二式。
+归一化会消去头部总质量，而截断求和仍通过 softmax 分母依赖尾部。
+\end{proof}
+
+\begin{proposition}[尾形状匹配时的残差梯度噪声]
+\label{prop:tailmatch-noise}
+设 $P^{S^c}=Q^{S^c}$，$\ell=\log(\tau_P/\tau_Q)$，
+$\psi_a=\nabla\log P_a$、
+$\bar\psi_C=\E_{P^{S^c}}\psi$。
+前文标量桶残差修正（取 $c=\ell$）与 SC-TA 的尾形状残差在此点逐样本为零。
+ResOPD 的零均值残差为
+$J_A\ell(\psi_A-\bar\psi_C)$，$A\sim P$，
+其协方差为
+\begin{equation}
+\tau_P\ell^2\Cov_{P^{S^c}}(\psi).
+\end{equation}
+该量可严格为正，即使 Tail-aware 的值和梯度已精确。
+\end{proposition}
+\begin{proof}
+尾形状匹配给尾 log-ratio 恒为 $\ell$，所以
+标量桶残差修正的值残差及 SC-TA 的形状残差因子均为零。
+ResOPD 保留 $\ell$ 乘中心化尾 score；其尾条件均值为零。
+对二阶矩按 $J_A=\mathbf1\{A\notin S\}$ 条件化，即得协方差。
+例取 $P=(0.4,0.2,0.4)$、$Q=(0.7,0.1,0.2)$、
+$S=\{1\}$。两者尾条件分布均为 $(1/3,2/3)$，
+$\tau_P=3/5$、$\ell=\log2$。分类 softmax 的
+$\psi_a=e_a-P$ 给尾协方差迹 $1-(1/3)^2-(2/3)^2=4/9$，
+故残差协方差迹为 $4(\log2)^2/15>0$。
+\end{proof}
+
+\section{异分布采样与自动微分语义}
+\begin{proposition}[异分布下的双控制项一般耦合]
+\label{prop:offpolicy-control}
+令 $A\sim\beta$，$\beta$ 为正分布，$w=P/\beta$，
+$J_a=\mathbf1\{a\notin S\}$。取尾向量 $\chi_a$ 满足
+$\sum_{a\notin S}P_a\chi_a=0$，定义零均值控制项
+$U_{0,j}=(J_Aw_A-\tau_P)e_j$、$U_1=J_Aw_A\chi_A$。
+则其 Gram 交叉项为
+\begin{equation}
+\E_\beta\langle U_{0,j},U_1\rangle
+=\sum_{a\notin S}\frac{P_a^2}{\beta_a}\langle e_j,\chi_a\rangle.
+\end{equation}
+在 $\beta=P$ 时该项为零，一般 $\beta$ 下不为零。
+\end{proposition}
+\begin{proof}
+$\E_\beta J_Aw_A=\tau_P$、
+$\E_\beta J_Aw_A\chi_A=0$ 保证两个控制项均值为零。
+展开内积，常数 $-\tau_P$ 对应项因后一等式消去，
+其余项中的 $\beta_aw_a^2=P_a^2/\beta_a$ 给所述结果。
+例如在两点全尾集合上，取 $P=(1/2,1/2)$、
+$\beta=(1/4,3/4)$ 和一维 $\chi=(1,-1)$，
+交叉项为 $1-1/3=2/3$。因此两个系数的联合最优值
+应解完整 Gram 线性系统，不能分别按正交控制项优化。
+\end{proof}
+
+\begin{proposition}[停止梯度的双参数表示]
+\label{prop:stopgrad-diagonal}
+设样本 $a$ 固定，$S(\theta,\bar\theta,a)$ 对两参数可微。
+冻结第二参数后在对角线取值的反传场定义为
+\begin{equation}
+B(\theta,a)=\partial_1S(\theta,\bar\theta,a)|_{\bar\theta=\theta}.
+\end{equation}
+而前向数值函数 $s(\theta,a)=S(\theta,\theta,a)$ 的普通导数为
+\begin{equation}
+\nabla s(\theta,a)=B(\theta,a)
++\partial_2S(\theta,\bar\theta,a)|_{\bar\theta=\theta}.
+\end{equation}
+若动作分布 $P_\theta$ 也随参数变化，则
+\begin{equation}
+\nabla\E_{P_\theta}s
+=\E_{P_\theta}[\nabla s+s\nabla\log P_\theta].
+\end{equation}
+\end{proposition}
+\begin{proof}
+第一式是复合映射 $\theta\mapsto(\theta,\theta)$ 的链式法则。
+第二式在有限词表上直接对 $\sum_aP_\theta(a)s(\theta,a)$ 使用乘积法则。
+这两个额外项分别来自被停止的参数路径和采样测度。
+因此前向数值相同、固定样本反传相同、总体梯度相同是三个需要分别核对的命题。
+即使 $B$ 连续，也需满足相应可积条件才能将它称为某个标量目标的梯度。
+\end{proof}
+
+\begin{proposition}[前缀混合下的误差与方差口径]
+\label{prop:prefix-mse}
+设前缀 $s\sim d$，估计器 $\widehat K$ 的条件偏差为
+$c(s)=\E[\widehat K\mid s]-K(s)$，条件方差为 $V(s)$。
+只要二阶矩有限，
+\begin{align}
+\E[\widehat K-K(s)]&=\E_dc(s),\\
+\E[(\widehat K-K(s))^2]&=\E_d[V(s)+c(s)^2],\\
+\Var(\widehat K)&=\E_dV(s)+\Var_d(K(s)+c(s)).
+\end{align}
+\end{proposition}
+\begin{proof}
+条件化后误差均值为 $c(s)$，其平方均值为 $V(s)+c(s)^2$，
+对 $d$ 平均得前两式。对估计器本身使用全方差公式得第三式。
+跨前缀原始数值方差包含真实目标 $K(s)$ 的变化，
+不能用它替代估计误差的均方值或条件采样方差。
+\end{proof}

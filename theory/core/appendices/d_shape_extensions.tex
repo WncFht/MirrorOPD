@@ -1,0 +1,127 @@
+\section{固定 Fisher 速度下的比较}
+\begin{proposition}[共同损失下的最陡形状]
+\label{prop:fisher-shape}
+固定有限正分布 $q\ne T$，令 $\rho=T/q$、$r=\log\rho$，
+$w_\kappa=C_q(\rho^\kappa)/\kappa$，并以连续延拓定义 $w_0=C_qr$。
+向量 $v_\kappa=q w_\kappa$ 是小步目标的切向量。将其按 Fisher 范数
+$\|v\|_q^2=\sum_a v_a^2/q_a$ 归一化为 $u_\kappa$，则
+\begin{align}
+-D\KL(q\Vert T)[u_\kappa]
+ &=\frac{\E_q[rw_\kappa]}{\sqrt{\E_qw_\kappa^2}}
+ \le\sqrt{\Var_qr},\\
+-D\KL(T\Vert q)[u_\kappa]
+ &=\frac{\E_q[\rho w_\kappa]}{\sqrt{\E_qw_\kappa^2}}
+ \le\sqrt{\Var_q\rho}.
+\end{align}
+第一项由 $\kappa=0$ 达到，第二项由 $\kappa=1$ 达到；不声称达到者唯一。
+\end{proposition}
+\begin{proof}
+切向量满足 $\sum_a v_a=0$。逐坐标微分两个 KL，
+其负方向导数分别为 $\sum_a r_av_a$ 与 $\sum_a\rho_av_a$。
+代入 $u_\kappa=q w_\kappa/\sqrt{\E_qw_\kappa^2}$ 得等式。
+由于 $\E_qw_\kappa=0$，分子可分别写成
+$\E_q[(C_qr)w_\kappa]$ 和 $\E_q[(C_q\rho)w_\kappa]$。
+Cauchy--Schwarz 不等式给上界；在两个所述端点，相应中心化向量正比例，故取等。
+这里统一的是 Fisher 速度和被比较的损失，与统一原始步长、最小化监督方差是不同的比较条件。
+\end{proof}
+
+\section{平方根目标与平方根拟合的联合界}
+\begin{proposition}[初始拟合系数的统一二阶矩]
+\label{prop:root-joint}
+取 $\kappa=1/2$ 的目标 $m$，$0<\eta\le1$，并使用平方根散度拟合。
+在初始点 $p=q$，令 $a=\sum_i\sqrt{q_iT_i}$、
+$b=\sum_i\sqrt{q_im_i}$。若归一化拟合系数为
+$G_i=2(b-\sqrt{m_i/q_i})/\eta$，则
+\begin{equation}
+\E_qG^2=\frac{4(1-a^2)}{Z}
+\le\frac4{(1-\eta)^2+\eta^2}\le8,\qquad
+Z=(1-\eta)^2+\eta^2+2\eta(1-\eta)a.
+\end{equation}
+若 score 范数至多为 $S$，相应单动作梯度的二阶矩至多为 $8S^2$。
+\end{proposition}
+\begin{proof}
+由 $\sqrt{m_i}=[(1-\eta)\sqrt{q_i}+\eta\sqrt{T_i}]/\sqrt Z$，
+有 $b=(1-\eta+\eta a)/\sqrt Z$。
+又 $\E_q(m/q)=1$，所以 $\E_qG^2=4(1-b^2)/\eta^2$。
+直接相减得到 $Z-(1-\eta+\eta a)^2=\eta^2(1-a^2)$。
+因 $0<a\le1$，丢弃 $Z$ 的非负交叉项并用
+$(1-\eta)^2+\eta^2\ge1/2$ 得界。最后逐点使用
+$\|G_i\psi_i\|^2\le S^2G_i^2$。
+此处拟合形状也是平方根；该系数不是 BPO 的对数残差。
+\end{proof}
+
+\begin{proposition}[有限步最坏方差的小步极限]
+\label{prop:finite-variance-limit}
+设 $0<\kappa\le1/2$，$V_{\kappa,\eta}(q,T)=\Var_q A_{\kappa,\eta}(T/q)$。
+以前文的锐常数
+$C_{\rm vel}(\kappa)=\sup_{q,T}\Var_q(\rho^\kappa)/\kappa^2$ 记最坏速度方差，则
+\begin{equation}
+\sup_{q,T}V_{\kappa,\eta}(q,T)
+\le\frac{C_{\rm vel}(\kappa)}{(1-\eta)^2},\qquad
+\lim_{\eta\downarrow0}\sup_{q,T}V_{\kappa,\eta}(q,T)
+=C_{\rm vel}(\kappa).
+\end{equation}
+固定 $q,T$ 时，平方根端点的极限为
+$4(1-a^2)=H^2(q,T)[4-H^2(q,T)]$，其中 $H^2=2-2a$。
+\end{proposition}
+\begin{proof}
+将 $A$ 看成 $x=\rho^\kappa$ 的函数，其导数为
+$1/[\kappa(1-\eta+\eta x)]\le1/[\kappa(1-\eta)]$。
+对独立同分布的 $X,X'$，恒等式
+$\Var h(X)=\E(h(X)-h(X'))^2/2$ 将 Lipschitz 界转为方差界。
+固定正分布时逐点 Taylor 展开给
+$A_{\kappa,\eta}(\rho)\to(\rho^\kappa-1)/\kappa$。
+对任意 $\epsilon>0$，先选择一个速度方差超过
+$C_{\rm vel}-\epsilon$ 的固定分布对，再令 $\eta\downarrow0$，
+得到下极限至少为 $C_{\rm vel}-\epsilon$；上界给上极限不超过
+$C_{\rm vel}$。最后令 $\epsilon\downarrow0$。
+平方根公式由 $\E_q\rho=1$ 和 $\E_q\sqrt\rho=a$ 得到。
+\end{proof}
+
+\section{小 KL 与标准化不能替代矩分析}
+\begin{proposition}[KL 趋零而监督方差发散]
+\label{prop:small-kl-large-variance}
+存在二元正分布族使 $\KL(q\Vert T)\to0$，但
+$\Var_q\log(T/q)\to\infty$。也存在 KL 趋零而非负 KL 估计器
+$\phi(\rho)=\rho-1-\log\rho$ 方差发散的族。
+\end{proposition}
+\begin{proof}
+第一族取 $q=(\epsilon,1-\epsilon)$，
+$T_1=\exp(-\epsilon^{-3/4})$、$T_2=1-T_1$。
+第一坐标的 $r=\log(T/q)$ 为
+$-\epsilon^{-3/4}-\log\epsilon$，第二坐标为 $O(\epsilon)$。
+所以 $-\E_qr\sim\epsilon^{1/4}\to0$，
+而二点方差公式给
+$\Var_qr=\epsilon(1-\epsilon)(r_1-r_2)^2\sim\epsilon^{-1/2}$。
+对固定正 $\kappa$ 和 $\eta<1$，同一族的 $A(\rho_1)$ 趋于有限下界，
+$A(\rho_2)=O(\epsilon)$，方差为 $O(\epsilon)$。
+
+第二族仍取 $q_1=\epsilon$，改为 $T_1=\epsilon^{1/4}$。
+第一坐标对 KL 的贡献为 $O(\epsilon|\log\epsilon|)$，
+第二坐标贡献渐近为 $\epsilon^{1/4}$。
+此时 $\rho_1=\epsilon^{-3/4}$、
+$\phi(\rho_1)\sim\epsilon^{-3/4}$，
+而 $\rho_2=1-O(\epsilon^{1/4})$ 给 $\phi(\rho_2)=O(\epsilon^{1/2})$。
+同一二点方差公式再次给 $\Var_q\phi\sim\epsilon^{-1/2}$。
+两族说明，均值散度小不能单独控制单动作估计的二阶矩。
+\end{proof}
+
+\begin{proposition}[二元总体标准化消去信号形状]
+\label{prop:binary-standardization}
+设 $q=(v,1-v)$，$0<v<1$，两点信号差 $D=f_1-f_2\ne0$。
+令 $\sigma^2=\Var_qf$，取第一 logit 的 score
+$\psi=(1-v,-v)$。则
+\begin{equation}
+\Var_q\!\left[\psi\,\frac{C_qf}{\sigma}\right]=(1-2v)^2.
+\end{equation}
+任何严格递增的信号变换均保留逐点标准化值。
+\end{proposition}
+\begin{proof}
+有 $C_qf=((1-v)D,-vD)$、
+$\sigma=|D|\sqrt{v(1-v)}$。除以 $\sigma$ 后只剩
+$\operatorname{sign}(D)$ 和 $v$。两个梯度取值之差为
+$\operatorname{sign}(D)(1-2v)/\sqrt{v(1-v)}$，
+乘以二点方差系数 $v(1-v)$ 得结论。
+严格递增变换保留 $D$ 的符号。本命题使用总体方差、二元动作和单个 logit；
+多动作、有限组经验标准化或共享参数不由此式涵盖。
+\end{proof}

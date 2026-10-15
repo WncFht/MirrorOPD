@@ -1,0 +1,186 @@
+\section{小步一致性与 BPO 的分布度量}
+\begin{proposition}[Mean 与 Gibbs 的二阶目标一致性]
+\label{prop:small-step-mean}
+固定 $q>0$ 和有限原始信号 $r$，取本文的指数信号 $f=\eta r$，令 $h=C_qr$、$\sigma^2=\E_qh^2$。当 $\eta\downarrow0$ 时，Mean 与 Gibbs 的最优 log-ratio 均满足
+\begin{equation}
+U_a^\star=\eta h_a-\frac{\eta^2\sigma^2}{2}+O(\eta^3).
+\end{equation}
+余项对有限词表一致，故 $\TV(p^{\rm M},m)=O(\eta^3)$。这是固定原始信号的小步结论，有限 $\eta$ 下两个目标仍可分离。
+\end{proposition}
+\begin{proof}
+Gibbs 解为 $U^{\rm G}=\eta h-\log\E_qe^{\eta h}$。由 $\E_qh=0$，配分函数对数为 $\eta^2\sigma^2/2+O(\eta^3)$。Mean 的 KKT 为 $U=\eta h-\lambda e^U$，归一化为 $\E_qe^U=1$。归一化方程在 $(\lambda,\eta)=(0,0)$ 对 $\lambda$ 的导数为 $-1$，隐函数定理保证局部光滑根。设
+\begin{equation}
+U=\eta u_1+\eta^2u_2+O(\eta^3),\qquad
+\lambda=\eta l_1+\eta^2l_2+O(\eta^3).
+\end{equation}
+一阶 KKT 给 $u_1=h-l_1$，一阶归一化给 $\E_qu_1=0$，所以 $l_1=0,u_1=h$。二阶 KKT 给 $u_2=-l_2$，二阶归一化给 $0=\E_q(u_2+u_1^2/2)$，所以 $l_2=\sigma^2/2$。两解的 $U$ 之差为 $O(\eta^3)$；指数映射在该有限邻域导数有界，乘以 $q$ 后求和即得 TV 阶数。
+\end{proof}
+
+\begin{proposition}[BPO 的第三分布依赖与局部度量]
+\label{prop:bpo-three-distributions}
+固定 $\eta>0$，BPO 一般不能写成仅依赖 $(p,m)$ 的固定生成函数散度 $D_g(p\Vert m)$。对 $p=m+v$、$\sum_av_a=0$，其局部展开为
+\begin{equation}
+L_{\rm BPO}(m+v;m,q)=\frac1{2\eta}
+\left[\sum_aq_a\frac{v_a^2}{m_a^2}
+-\left(\sum_aq_a\frac{v_a}{m_a}\right)^2\right]
++O\!\left(\max_a|v_a/m_a|^3\right).
+\end{equation}
+只有在 $q=m$ 等特殊条件下，这个二次项恢复目标点上的 Fisher 度量。
+\end{proposition}
+\begin{proof}
+二动作下令 $\ell_a=\log(p_a/m_a)$，则 $L_{\rm BPO}=q_1(1-q_1)(\ell_1-\ell_2)^2/(2\eta)$。固定 $p,m$ 且 $\ell_1\ne\ell_2$，改变 $q_1$ 会改变损失，而固定 $D_g(p\Vert m)$ 不会改变，故不能一般表示。局部展开对 $\log(1+v_a/m_a)$ 使用 Taylor 公式，方差的二次首项为 $\Var_q(v/m)$。若 $q=m$，其均值为 $\sum_av_a=0$，二次项成为 $\sum_av_a^2/m_a$。
+\end{proof}
+
+\section{对角预条件与成对随机梯度}
+\begin{proposition}[对角预条件恢复同一概率更新]
+\label{prop:bpo-diagonal}
+完整词表的独立 logits 中，令 $D_q=\diag(q)$、$h=z-\log m$。更新
+\begin{equation}
+z^+=z-\gamma\eta D_q^{-1}\nabla_zL_{\rm BPO}
+\end{equation}
+产生 $p^+\propto p^{1-\gamma}m^\gamma$。因此它与使用 $Q_q^\dagger$ 的锚点 Fisher 步具有相同概率轨迹，但两个矩阵并不相等。
+\end{proposition}
+\begin{proof}
+因为 $Q_qh=q\odot C_qh$，有 $\eta D_q^{-1}\nabla L=C_qh=h-(q^\top h)\mathbf1$。所以 $z^+=(1-\gamma)z+\gamma\log m+\gamma(q^\top h)\mathbf1$。softmax 消去最后的公共常数，得到所述分布。$Q_q^\dagger Q_qh=P_\perp h$ 与 $C_qh$ 也只差常数，故概率更新相同。这个论证不把 $q$ 中心化子空间当作欧氏正交子空间。
+\end{proof}
+
+\begin{theorem}[成对 BPO 的精确矩与自由 logits 收敛]
+\label{thm:pair-sgd}
+固定 $q,m>0$，每步独立重采样 $a,b\sim q$。令 $R=C_q\log(p/m)$，采用
+\begin{equation}
+\widehat g=\frac{(R_a-R_b)(\mathbf e_a-\mathbf e_b)}{2\eta}.
+\end{equation}
+则 $\E\widehat g=\nabla_zL_{\rm BPO}$，并且
+\begin{equation}
+\E\|\widehat g\|^2=\frac{2}{\eta}L_{\rm BPO}.
+\end{equation}
+若 SGD 的固定参数步长满足 $0<\alpha_{\rm opt}\le\eta q_{\min}$，则
+\begin{equation}
+\E L_{\rm BPO}(z_N)\le
+\left(1-\frac{\alpha_{\rm opt}q_{\min}}{\eta}\right)^N L_{\rm BPO}(z_0).
+\end{equation}
+该结论要求每步条件独立抽样，不适用于任意固定动作池复用。
+\end{theorem}
+\begin{proof}
+无偏性由成对梯度恒等式给出。由于 $\|\mathbf e_a-\mathbf e_b\|^2=2\mathbf1_{a\ne b}$，而 $a=b$ 时 residual 差为零，
+\begin{equation}
+\E\|\widehat g\|^2
+=\frac{\E(R_a-R_b)^2}{2\eta^2}
+=\frac{\E_qR^2}{\eta^2}=\frac{2L}{\eta}.
+\end{equation}
+真实梯度为 $q\odot R/\eta$，故 $\|\nabla L\|^2\ge2q_{\min}L/\eta$。使用足够的光滑常数 $1/\eta$，有
+\begin{equation}
+\E[L(z-\alpha\widehat g)\mid z]
+\le L-\alpha\|\nabla L\|^2+\frac{\alpha^2}{2\eta}\E\|\widehat g\|^2
+\le[1-2\alpha q_{\min}/\eta+\alpha^2/\eta^2]L.
+\end{equation}
+由 $\alpha\le\eta q_{\min}$，最后系数不超过 $1-\alpha q_{\min}/\eta$。逐步取条件期望并递推得到结论。本文损失含 $1/\eta$，所以矩与步长常数均保留这个尺度。
+\end{proof}
+
+\section{到目标教师与原教师的两种进展}
+\begin{theorem}[任意冻结目标的全凸散度拟合进展]
+\label{thm:any-target-progress}
+固定正 $q,m$，令 $p_\xi\propto q^{1-\xi}m^\xi$、$0\le\xi\le1$。对任何凸生成函数 $\varphi$、$\varphi(1)=0$，$D_\varphi(p_\xi\Vert m)$ 随 $\xi$ 非增。无需假设 $m$ 来自幂均值族。
+\end{theorem}
+\begin{proof}
+令 $r=\log(m/q)$，则 $p_\xi/m=e^{-(1-\xi)r}/Z_\xi$。对可微凸函数，归一化密度求导给
+\begin{equation}
+\frac d{d\xi}D_\varphi(p_\xi\Vert m)
+=\Cov_{p_\xi}(\varphi'(p_\xi/m),r).
+\end{equation}
+对 $\xi<1$，$p_\xi/m$ 随 $r$ 非增，$\varphi'$ 非减，故协方差由成对差乘积表示为非正。一般凸函数在有限正区间上用光滑凸函数一致逼近，结论保留。非严格凸函数可含线性段，因此一般只断言非增。
+\end{proof}
+
+\begin{corollary}[一般单调信号的教师散度进展]
+\label{cor:general-signal-progress}
+设 $S(1)=0,S'>0$ 且 $L_S=\sup_{x>0}xS'(x)<\infty$。若 $0<\tau\le1/L_S$，则沿 $p_\xi\propto q\exp[\xi\tau S(T/q)]$、$0\le\xi\le1$，任意凸生成散度 $D_\varphi(p_\xi\Vert T)$ 非增。
+\end{corollary}
+\begin{proof}
+令 $r=\log(T/q)$、$b(r)=\tau S(e^r)$，有 $0<b'(r)=\tau e^rS'(e^r)\le1$。因此 $p_\xi/T\propto e^{-r+\xi b(r)}$ 随 $r$ 非增，$b(r)$ 递增。与上一证明相同的求导给 $\Cov_{p_\xi}(\varphi'(p_\xi/T),b)\le0$。这个条件同时连接附录 B 中的相对光滑步长和其他教师散度的进展。
+\end{proof}
+
+\section{固定动作池的经验目标与更新}
+\begin{proposition}[精确中心也不消除经验梯度差]
+\label{prop:empirical-score-gap}
+固定样本 $(s_i,a_i)$，每个前缀的总体 BPO residual 均满足 $\E_{q_s}R_s=0$。令 $\widehat L=M^{-1}\sum_iR_i^2/(2\eta)$、$\widehat g=M^{-1}\sum_iR_i\psi_i/\eta$、$\bar\psi_s=\E_{q_s}\psi$，则
+\begin{equation}
+\nabla\widehat L-\widehat g
+=-\frac1{\eta M}\sum_iR_i\bar\psi_{s_i}.
+\end{equation}
+MDPO 的原始重要性加权损失反传与删除常数 score 项后的 PG 估计之差为
+\begin{equation}
+\frac1{\eta M}\sum_i\frac{p_i}{q_i}\psi_i.
+\end{equation}
+两差在固定参数的正确动作期望下为零，在给定有限样本上不必为零。
+\end{proposition}
+\begin{proof}
+BPO 的 $\nabla R_i=\psi_i-\bar\psi_{s_i}$，平方求导并取样本平均即得第一式。MDPO 单样本原始被积项为 $e^{U_i}(U_i-f_i)/\eta$。对权重与 $U_i$ 同时求导，得到 $e^{U_i}(U_i-f_i+1)\psi_i/\eta$，与 PG 形式相减即得第二式。总体抵消分别使用 $\E_qR=0$ 和 $\E_q[(p/q)\psi]=\E_p\psi=0$；经验均值没有这些恒等约束。
+\end{proof}
+
+\section{冻结信号下大步长的两种极限}
+\begin{proposition}[固定候选梯度极限与充分拟合极限]
+\label{prop:large-step-orders}
+固定 $q,T>0$ 且 $q\ne T$，取几何信号 $f=\eta r$、$r=\log(T/q)$。在固定当前学生 $p>0$ 下，
+\begin{equation}
+-\nabla L_{\rm BPO}\longrightarrow\E_q[(C_qr)\psi_p],
+\qquad
+-\eta^{-1}\nabla L_{\rm Mean}\longrightarrow\E_q[(C_qr)\psi_p].
+\end{equation}
+若先对每个有限 $\eta$ 充分拟合 BPO，再令 $\eta\to\infty$，则其最优分布趋于 $q$ 在 $\argmax r$ 上的归一化限制；Mean 则趋于 $q_a[C_qr_a]_+/\E_q[C_qr]_+$。
+\end{proposition}
+\begin{proof}
+BPO 的下降系数为 $C_qr-C_qU/\eta$；固定 $p$ 时 $U$ 有限，第二项消失。Mean 梯度除以 $\eta$ 后的下降系数为 $C_qr-U/\eta$，得到同一极限。充分拟合的 BPO 解为 $q_ae^{\eta r_a}/Z$；从指数中减去 $\eta\max r$ 后，非最大动作权重趋零，最大动作的相对 $q$ 权重保留。Mean 的结论由其 Lambert-$W$ 大步长定理给出。充分拟合时 $U$ 随 $\eta$ 变化，故不能用固定 $U$ 的极限替代。
+\end{proof}
+
+\section{优化器状态与步长诊断}
+\begin{proposition}[逆向 KL 的 logit 饱和与标量调度边界]
+\label{prop:saturation-scalar}
+二动作教师 $T=(1/2,1/2)$、学生 $p=(1-\epsilon,\epsilon)$ 时，逆向 KL 趋于 $\log2$，其独立 logit 差梯度却为 $\epsilon(1-\epsilon)\log[(1-\epsilon)/\epsilon]\to0$。另外，对任意更新场 $\widehat g(\theta)$ 和处处有限严格正的标量 $s(\theta)$，$s(\theta)\widehat g(\theta)$ 与 $\widehat g(\theta)$ 的零点集合相同。
+\end{proposition}
+\begin{proof}
+将二动作概率代入 KL 并取极限，得到 $\log2$。softmax 导数为 $p_1(1-p_1)$，乘以概率目标的两坐标梯度之差 $\log(p_1/p_2)$ 即得所列梯度。第二个结论由非零标量乘法可逆立即得到。因此只调正标量步长不能消除有偏更新场的错误驻点；饱和、小曲率、数据误差与数值分辨率需要分别诊断。
+\end{proof}
+
+\begin{proposition}[固定预条件器动量系统的稳定区间]
+\label{prop:momentum-stability}
+考虑单个二次模式，曲率 $\lambda>0$、固定预条件系数 $p_0>0$、动量 $\beta\in[0,1)$，忽略随时间变化的偏差修正，更新为
+$m_{n+1}=\beta m_n+(1-\beta)\lambda e_n$、
+$e_{n+1}=e_n-\alpha p_0m_{n+1}$。
+该线性系统渐近稳定，当且仅当
+\begin{equation}
+0<\alpha p_0\lambda<\frac{2(1+\beta)}{1-\beta}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+状态矩阵的行分别为 $(1-\alpha p_0(1-\beta)\lambda,-\alpha p_0\beta)$ 和 $((1-\beta)\lambda,\beta)$。特征多项式为 $u^2-tu+\beta$，其中 $t=1+\beta-\alpha p_0(1-\beta)\lambda$。若根为共轭复数，其模为 $\sqrt\beta<1$；若根为实数，结合根之积 $\beta<1$，两根都在 $(-1,1)$ 等价于多项式在 $1,-1$ 处均正。两个条件分别为 $\alpha p_0(1-\beta)\lambda>0$ 和 $2(1+\beta)-\alpha p_0(1-\beta)\lambda>0$。边界具有单位模根，故不渐近稳定。完整 Adam 的预条件器变化时，不能直接套用这个固定状态模型。
+\end{proof}
+
+\begin{proposition}[损失变换与单模式方向步长]
+\label{prop:loss-transform}
+对连续梯度流，若 $\phi'(E)>0$，优化 $\phi(E)$ 与优化 $E$ 有相同的空间轨迹，时间满足 $d\tau/ds=\phi'(E)$。若单模式 $E=\lambda e^2/2$，当前固定方向为 $d=\operatorname{sign}(e)$，则沿方向最优步长为 $|e|$，达到相对下降 $\rho\in(0,1]$ 的较小步长为
+\begin{equation}
+\alpha_\rho=(1-\sqrt{1-\rho})\sqrt{2E/\lambda}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+链式法则给 $\dot\theta=-\phi'(E)\nabla E$，正系数只改变流的时间参数。单模式候选误差为 $e-\alpha\operatorname{sign}(e)$，故损失比为 $(1-\alpha/|e|)^2$；解等于 $1-\rho$ 的较小根即得公式。该方向是矩状态已追随当前梯度时的一种理想化；若方向为 $d\approx ce$，最优步长改为约 $1/c$。因此后期学习率增减不能只由当前 loss 决定。
+\end{proof}
+
+\begin{proposition}[三点函数值恢复方向二次式]
+\label{prop:three-point}
+固定方向 $d$，假设 $Q(\alpha)=Q_0-\alpha A+\alpha^2B/2$。对任意探测尺度 $h>0$，令 $Q_1=Q(h),Q_2=Q(2h)$，则
+\begin{equation}
+B=\frac{Q_2-2Q_1+Q_0}{h^2},\qquad
+A=\frac{Q_0-Q_1}{h}+\frac h2B.
+\end{equation}
+\end{proposition}
+\begin{proof}
+分别写出 $Q_1-Q_0=-hA+h^2B/2$ 与 $Q_2-Q_0=-2hA+2h^2B$。第二式减去第一式的两倍消去 $A$，随后代回得到 $A$。非线性目标只给局部拟合，接受步长仍需检查真实目标值。
+\end{proof}
+
+一种低成本反馈规则可用上一步的正 log 下降率 $r_n=\log(E_{n-1}/E_n)$ 调整下一步：
+\begin{equation}
+\alpha_n=\min\{\alpha_{\max},\alpha_{n-1}
+\operatorname{clip}(r_{\rm target}/r_n,1/2,5/4)\}.
+\end{equation}
+该式只在 $0<E_n<E_{n-1}$ 时使用；没有下降时取步长减半。$E$ 应是减去已核验误差底的超额损失。它定义的是反馈启发式，不提供当前方向曲率的上界。三点方案则固定一次更新后的矩状态及方向，比较零步、探测步和拟合步，必要时作有限次回退；每次试探只评估候选参数，不能重复更新 moments。若有解耦权重衰减，固定方向必须包含该项。计算代价按实际前向、反向与候选安装成本分别记录。

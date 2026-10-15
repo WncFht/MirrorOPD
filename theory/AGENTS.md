@@ -1,7 +1,7 @@
-# AGENTS.md — 理论推导来源
+# AGENTS.md — 理论推导
 
-本目录保存用户的理论推导来源，多个版本尚待 review 和合并。现有 `book/`、`book-old/`、`Notes/`、`paper/` 保留来源与原有层级；目录名不表示内容已经审定，`Notes/` 不是工程 Agent Notes。
+长期维护稿在 `core/`，使用本目录内的 ElegantBook 模板。正文保持 Mirror Descent 子问题、信号与 advantage、加权教师 m、目标 J、inner 拟合、参数性质的推导顺序。附录按数学主题组织，每项独立结论先写完整条件与命题，再写证明；来源重复时合并，不直接复制旧稿。
 
-理论正文、定义、假设、推导和附件继续纳入 Git。未经用户启动正文整理，不做去重、改写、稿件合并或按工程文档模板重组。引用结论前核对当前稿件、适用条件和证明，标明待核验内容；不能由排版或测试通过推断数学结论成立。
+用户已授权提取数学内容后删除 `book/`、`book-old/`、`Notes/`、`paper/`。历史数学来源由 `core/source-map.csv` 的固定 Git 版本和校验和追溯，不恢复为并行维护稿。核心稿不纳入历史模型实验内容和配置。`alpha-divergence/` 与 `alpha-beta-gamma-zh/` 保留为独立文献材料。
 
-本轮只迁移路径并修复引用，后续 review/merge 单独进行。格式工具和工程文档扫描跳过理论正文。显式修改理论内容时遵守根指令的数学验证要求；书稿构建使用 `make book`。新理论材料仍应版本化，构建中间产物继续忽略。
+理论正文不适用工程 Markdown 自动格式化。修改推导时核实条件、尺度、积分测度和停止梯度语义，数值测试不能替代证明。运行 `make book` 同步两个 PDF；有限单纯形检查由 `tests/reference/test_core_monograph.py` 和 `tests/reference/test_core_extensions.py` 收集。单个 TeX 文件不超过 1000 行，按主题通过 input 组装。

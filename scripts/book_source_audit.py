@@ -1,84 +1,72 @@
 #!/usr/bin/env python3
-"""Verify source assembly and preserve the pre-reconstruction archive bytewise."""
+"""Audit the core book's literal input graph, references, and proof structure.
+
+This scanner supports the manuscript's literal input/label syntax only; it is
+not a TeX parser. XeLaTeX remains the authoritative build check.
+"""
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
-import shutil
-import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BOOK = ROOT / "theory/book"
-ENTRY = BOOK / "2026-10-08-固定测度Token级MirrorOPD.tex"
-OUT = ROOT / "results/book-reconstruction/source-audit.json"
+BOOK = ROOT / "theory/core"
+ENTRY = "2026-10-15-MirrorOPD核心推导.tex"
 
 
-def main():
-    assembled = []
+def audit(book: Path, entry: str) -> dict:
+    """Reject empty, missing, duplicate, or incomplete manuscript sources."""
+    assembled: dict[Path, str] = {}
 
-    def visit(path):
-        assert path not in assembled, f"Duplicate source inclusion: {path}"
-        assembled.append(path)
-        text = path.read_text()
-        assert r"\[" not in text, path
-        assert r"\]" not in text, path
-        assert len(text.splitlines()) < 1000, path
-        for include in re.findall(r"\\input\{([^}]+)\}", text):
-            visit(BOOK / (include + ".tex"))
+    def visit(path: Path) -> None:
+        path = path.resolve()
+        if not path.is_relative_to(book.resolve()):
+            raise ValueError(f"Source outside book: {path}")
+        if path in assembled:
+            raise ValueError(f"Duplicate source inclusion: {path}")
+        source = path.read_text()
+        if not source.strip() or len(source.splitlines()) > 1000:
+            raise ValueError(f"Empty or oversized source: {path}")
+        # The maintained sources do not use verbatim environments or commented
+        # inputs. Strip ordinary comments; escaped percent signs remain text.
+        source = re.sub(r"(?<!\\)%[^\n]*", "", source)
+        assembled[path] = source
+        for include in re.findall(r"\\input\{([^}]+)\}", source):
+            visit(book / (include + ".tex"))
 
-    visit(ENTRY)
-    all_text = "\n".join(p.read_text() for p in assembled)
-    labels = re.findall(r"\\label\{([^}]+)\}", all_text)
-    assert len(labels) == len(set(labels)), "Duplicate labels"
-    refs = re.findall(r"\\(?:eqref|ref|cref|Cref)\{([^}]+)\}", all_text)
-    missing = sorted(set(refs) - set(labels))
-    assert not missing, missing
-    orphan = sorted(str(p.relative_to(BOOK)) for p in BOOK.rglob("*.tex") if p not in assembled)
-    assert not orphan, orphan
-    images = re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", all_text)
-    assert all((BOOK / p).exists() for p in images), images
-    git = shutil.which("git")
-    tracked = (
-        subprocess.check_output(  # noqa: S603 -- fixed read-only repository queries
-            [git, "ls-tree", "-rz", "--name-only", "3a89c77", "docs/book"], cwd=ROOT, text=True
-        )
-        .strip("\0")
-        .split("\0")
-    )
-    archive = []
-    for original in tracked:
-        baseline = subprocess.check_output(  # noqa: S603 -- validated path from ls-tree
-            [git, "show", "3a89c77:" + original], cwd=ROOT
-        )
-        archived = ROOT / original.replace("docs/book/", "theory/book-old/", 1)
-        assert baseline == archived.read_bytes(), archived
-        archive.append(
-            {
-                "path": str(archived.relative_to(ROOT)),
-                "sha256": hashlib.sha256(baseline).hexdigest(),
-            }
-        )
-    result = {
-        "entry": str(ENTRY.relative_to(ROOT)),
+    visit(book / entry)
+    text = "\n".join(assembled.values())
+    labels = re.findall(r"\\label\{([^}]+)\}", text)
+    if len(labels) != len(set(labels)):
+        raise ValueError("Duplicate labels")
+    refs = re.findall(r"\\(?:eqref|ref\*?|cref|Cref|appref)\{([^}]+)\}", text)
+    # appref's macro body uses #1; concrete calls are checked above.
+    missing = sorted({r for r in refs if "#" not in r} - set(labels))
+    if missing:
+        raise ValueError(f"Missing references: {missing}")
+    statements = 0
+    for path, source in assembled.items():
+        if "appendices" not in path.parts:
+            continue
+        for match in re.finditer(r"\\end\{(theorem|proposition|lemma|corollary)\}", source):
+            if not source[match.end() :].lstrip().startswith(r"\begin{proof}"):
+                raise ValueError(f"Statement without following proof: {path}")
+            statements += 1
+    if statements == 0:
+        raise ValueError("No appendix statements were assembled")
+    return {
+        "entry": entry,
         "assembled_files": len(assembled),
-        "body_lines": sum(len(p.read_text().splitlines()) for p in assembled),
         "labels": len(labels),
-        "references": len(refs),
-        "images": images,
+        "appendix_statements_with_proofs": statements,
         "missing_references": missing,
-        "orphan_sources": orphan,
-        "archive_baseline": "3a89c77",
-        "archive": archive,
     }
-    OUT.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n")
-    print(
-        json.dumps(
-            {k: v for k, v in result.items() if k != "archive"}, indent=2, ensure_ascii=False
-        )
-    )
+
+
+def main() -> None:
+    print(json.dumps(audit(BOOK, ENTRY), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

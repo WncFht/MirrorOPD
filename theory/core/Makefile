@@ -1,4 +1,3 @@
-export TEXINPUTS := .:../book:$(TEXINPUTS):
 NAME := 2026-10-15-MirrorOPD核心推导
 
 .PHONY: all full core clean

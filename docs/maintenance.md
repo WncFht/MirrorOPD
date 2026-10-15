@@ -27,7 +27,7 @@ setup 复用 `.githooks` 并创建忽略的 `.claude/skills` 链接，重复运�
 | `make check-maintenance` | 文档契约与维护测试，供 pre-push 与 CI 复用                 |
 | `make check`             | 文档契约和现有格式、lint、secrets、全文件 pre-commit 检查  |
 | `make test`              | pytest 收集的维护、数学、运行层与集成测试                  |
-| `make book`              | 构建 `theory/book/` 中保留的分章书稿                       |
+| `make book`              | 构建 `theory/core/` 的完整稿与正文阅读版                   |
 
 通过 `PYTHON=/path/to/python make …` 指定解释器。调度器中的 `python`、`python3` 命令使用同一解释器；其他命令从当前 PATH 查找。原生集成测试需要准备固定后端，再执行 `MIRROR_TEST_BACKEND=upstream/TA-OPD-v2 make test`；工具接入不启动 GPU 训练。
 
@@ -53,7 +53,7 @@ pre-push 执行 `make check-maintenance`。该检查适合本地推送前执行�
 
 ## 理论来源与旧文档边界
 
-[theory](../theory/README.md) 保存从 `docs/book/`、`docs/book-old/`、`docs/Notes/`、`docs/paper/` 迁出的推导来源。正文、PDF 和内部层级继续纳入 Git；目录迁移只调整路径引用与构建入口。用户的 review 与稿件合并仍待后续启动。`theory/Notes/` 与工程 `.agents/notes/` 分开维护。
+[theory](../theory/README.md) 的长期维护稿位于 `core/`。旧书稿、理论笔记和论文稿已按用户要求提取数学内容、合并并删除；核心稿的来源表记录固定 Git 版本、原路径及校验和。理论推导与工程 `.agents/notes/` 分开维护，历史实验不作为核心稿的内容或配置来源。
 
 理论来源、第三方材料、运行目录和冻结 Notes 退出工程文档扫描及自动格式化。原始数据、结果与文献检索证据不参与新增文档和间距检查；当前文档指向这些产物的链接仍须有效。Markdown 检查仍遍历自有隐藏规则目录，检查文件目标是否存在及是否越出仓库；不验证外部网站、锚点、HTML 链接、命令行为或自然语言正确性。
 

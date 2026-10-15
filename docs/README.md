@@ -30,6 +30,6 @@
 
 ## 理论、决策与原始证据
 
-[theory](../theory/README.md)保存当前核心推导、书稿及[论文材料](../theory/papers)。算法推导与工程说明各有归属，当前实现的唯一说明入口是[算法与实现](算法与实现.md)。
+[theory](../theory/README.md)保存[核心推导与证明附录](../theory/core/README.md)及独立散度文献材料。算法推导与工程说明各有归属，当前实现的唯一说明入口是[算法与实现](算法与实现.md)。
 
 [Agent Notes](../.agents/notes/README.md)保存长期决策理由；[data](../data)与[results](../results)保存研究证据和统计图表，恢复入口为[data manifest](../data-manifest.json)。运行流水和大缓存留忽略的 runs 目录，不设平行历史文章目录。

@@ -1,0 +1,21 @@
+topic,source_revision,source_path_at_revision,source_line,destination_labels,status
+Mean 与 Gibbs 的小步二阶一致性,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/geometry_optimizer.tex,83,prop:small-step-mean,已重写命题与证明
+BPO 的第三分布依赖与目标处局部度量,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_bpo_algorithm.tex,66,prop:bpo-three-distributions,已重写命题与证明
+BPO 对角预条件的等价更新,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/paper/mirroropd_paper_story.tex,1073,prop:bpo-diagonal,已重写命题与证明
+成对 BPO 的精确二阶矩与具体 SGD 率,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/paper/mirroropd_paper_story.tex,1164,thm:pair-sgd,已重写命题与证明
+任意目标 m 的理想内层全散度进展,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/paper/mirroropd_paper_story.tex,1118,thm:any-target-progress,已重写命题与证明
+通用单调信号的全 f 散度进展,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_bpo_algorithm.tex,170,cor:general-signal-progress,已重写命题与证明
+固定 Fisher 速度下共同评价目标的最陡形状,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_shape_criteria.tex,1,prop:fisher-shape,已重写命题与证明
+平方根目标配平方根拟合的联合初始矩界,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_self_bounding.tex,55,prop:root-joint,已重写命题与证明
+平方根中心包络的量化收益,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_center_estimators.tex,72,prop:root-envelope|cor:root-center-budget,已重写命题与证明
+扩大头部时实际方差非增的备选估计,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_center_extensions.tex,75,prop:head-monotone-variance,已重写命题与证明
+过期锚点目标与访问测度漂移的定量界,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/dyn_sync.tex,62,prop:stale-anchor|prop:prefix-drift,已重写命题与证明
+固定动作池的经验损失梯度与 PG 差异,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/geometry_optimizer.tex,121,prop:empirical-score-gap,已重写命题与证明
+Part 与 Mean 冻结中心误差的显式传递,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/est_inner.tex,75,prop:part-mean-error,已重写命题与证明
+非 on-policy 双控制的耦合与实际尾部行为,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/est_controls.tex,140,prop:offpolicy-control|prop:tailmatch-noise,已重写命题与证明
+Normalized/Truncated 尾部 logit 及标量 MSE 比较,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/est_roles.tex,152,prop:truncation-mse|prop:tail-logit,已重写命题与证明
+有限 eta 最坏方差极限等于 C_vel,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_teacher_center.tex,177,prop:finite-variance-limit,已重写命题与证明
+小 KL 仍大方差与标准差归一化反例,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/proximal_teacher_center.tex,184,prop:small-kl-large-variance|prop:binary-standardization,已重写命题与证明
+常偏差稳态、误差同速累积与 Mean 局部噪声底,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/dyn_noise.tex,40,prop:biased-fixed-point|prop:equal-rate-errors|prop:mean-noise-floor,已重写命题与证明
+BPO/Mean 大 eta 的取极限顺序,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/opd_algorithms.tex,147,prop:large-step-orders,已重写命题与证明
+标量调度与 Adam 动量系统的完整分析,8b1e1af7ab8eabece683c6800d7c84a81c93be29,theory/book/sections/dyn_scalar_schedule.tex,84,prop:momentum-stability|prop:loss-transform|prop:three-point,已重写命题与证明
