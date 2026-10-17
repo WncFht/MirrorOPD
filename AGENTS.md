@@ -41,10 +41,10 @@ GPU 列表、模型目录、数据路径、后端和运行目录显式配置。�
 
 文档维护使用 [maintain-docs](.agents/skills/maintain-docs/SKILL.md)，文字与注释使用 [maintain-prose](.agents/skills/maintain-prose/SKILL.md)，长期决策使用 [maintain-decision-notes](.agents/skills/maintain-decision-notes/SKILL.md)。先读对应区域指令：[文档](docs/AGENTS.md)、[理论来源](theory/AGENTS.md)、[脚本](scripts/AGENTS.md)、[CI](.github/AGENTS.md)、[Agent Notes](.agents/notes/AGENTS.md)。技能和引用材料以 `.agents/` 为事实源，本机链接不入库。
 
-维护接入、检查边界及来源见[维护指南](docs/maintenance.md)。`make check-docs` 检查当前文档与 Notes，`make test-maintenance` 验证维护工具，`make check-maintenance` 供 pre-push 与 CI 执行；产品测试仍由 `make test` 负责。pre-commit 对真正的 index 快照检查契约，不能用未暂存内容证明提交正确。
+维护接入、检查边界及来源见[维护指南](docs/maintenance.md)。`make check-docs` 检查当前文档与 Notes，`make test-maintenance` 验证维护工具，`make check-maintenance` 供 pre-push 与 CI 执行；产品测试仍由 `make test` 负责。pre-commit 在框架保护未暂存内容之前先格式化 index，再检查真实暂存快照；不能用未暂存修复证明提交正确。使用 `scripts/setup.py` 保留两阶段顺序及所选维护 Python，不用普通 `pre-commit install` 覆盖 `.githooks`。
 
 用户已启动旧文档与历史决策整理。实验报告按研究问题维护，规范见 docs/AGENTS.md；提取独有有效内容后删除被替代正文，不建立平行历史汇编。理论推导维护在 `theory/core/`，工程决策维护在 `.agents/notes/`。
 
-使用英文 Conventional Commits，独立逻辑变更独立提交，不绕过 hook。保留用户已有的未提交工作。默认运行 `make test`；原生源码集成测试通过 `MIRROR_TEST_BACKEND` 指定已准备的固定后端。提交前执行 `make check`。理论或书稿图片变化执行 `make book`。
+使用英文 Conventional Commits，独立逻辑变更独立提交，不绕过 hook。保留用户已有的未提交工作。每项维护抽象与配置都需有当前消费者；失败后明确状态与清理责任，停止新工作并等待已启动工作结束后再释放依赖。默认运行 `make test`；原生源码集成测试通过 `MIRROR_TEST_BACKEND` 指定已准备的固定后端。提交前执行 `make check`。理论或书稿图片变化执行 `make book`。
 
 按用户最新要求，全面重构只交付一份最终说明文档；不新增多个平行进展报告。过程记录放在忽略的运行目录。旧报告保留其历史语境，删除源码的链接指向精确历史归档。

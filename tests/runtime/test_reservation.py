@@ -30,7 +30,7 @@ def test_live_owner_and_unknown_namespaces_cannot_be_reclaimed(tmp_path):
 
 
 def test_dead_process_identity_can_be_reclaimed_without_age_expiry(tmp_path):
-    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])  # noqa: S603 -- fixed local interpreter and source
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
     try:
         identity = process_identity(child.pid)
         lease = DirectoryLease(tmp_path / "lock", "old")

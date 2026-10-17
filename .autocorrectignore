@@ -1,0 +1,19 @@
+.agents/notes/archived/
+assets/.crossnote/
+upstream/
+archives/
+node_modules/
+theory/
+data/
+results/
+runs/
+transfers/
+imported/
+paper-search-logs/
+paper-search-reports/
+experiments/plotting/vendor/
+src/mirroropd/scoring/vendor/
+.venv-maintenance/
+
+# Content-addressed evidence paths are literals; restore-data validates their hashes.
+data-manifest.json

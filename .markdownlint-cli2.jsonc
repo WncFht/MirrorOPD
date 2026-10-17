@@ -1,6 +1,8 @@
 {
     "ignores": [
         "node_modules/**",
+        "assets/.crossnote/**",
+        ".venv-maintenance/**",
         "upstream/**",
         "archives/**",
         "theory/**",

@@ -135,7 +135,7 @@ def backend_values(job, evidence, run_dir, source_root, environment):
         "nnodes": 1,
         "val_before_train": evaluation.before_training,
         "test_freq": evaluation.every,
-        "save_freq": job.checkpoints.every if job.checkpoints.every else -1,
+        "save_freq": job.checkpoints.every or -1,
         "resume_mode": "disable",
         "default_local_dir": str(run_dir / "checkpoints"),
         "validation_data_dir": str(run_dir / "validation"),

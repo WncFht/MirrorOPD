@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -29,6 +30,11 @@ def setup(root: Path) -> None:
             raise ValueError("缺少可执行 hook：" + str(hook))
     subprocess.run(["bash", "scripts/agent-links.sh"], cwd=root, check=True)
     subprocess.run(["git", "config", "core.hooksPath", ".githooks"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "config", "--local", "mirroropd.maintenancePython", sys.executable],
+        cwd=root,
+        check=True,
+    )
     subprocess.run(
         ["git", "config", "blame.ignoreRevsFile", ".git-blame-ignore-revs"],
         cwd=root,

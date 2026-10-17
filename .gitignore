@@ -91,3 +91,10 @@ data/oneshot-lr-stability/*.csv
 /paper-search-reports/
 /paper-search-logs/
 /environments/
+
+# Project-local maintenance environment and tool binaries
+/.venv-maintenance/
+/.tools/
+
+# Restore the immutable memory-audit tar with make data.
+/data/memory-audit-20261017/phase-evidence.tar

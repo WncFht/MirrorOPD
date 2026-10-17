@@ -77,7 +77,7 @@ print(json.dumps(record))
     record = json.loads(result.stdout)
     pid = record["controller_pid"]
     try:
-        eventually(lambda: (directory / "state.json").exists())
+        eventually((directory / "state.json").exists)
         assert control.run_status(directory)["state"] == "running"
         assert os.getsid(pid) == pid
         os.kill(pid, signal.SIGHUP)
@@ -131,7 +131,7 @@ def test_cli_records_real_preparation_failure_and_exit_code(tmp_path, detach, ca
         "--prepare-only",
     ]
     assert main([*args, "--detach"] if detach else args) == (0 if detach else 1)
-    eventually(lambda: (directory / "controller-exit.json").exists())
+    eventually((directory / "controller-exit.json").exists)
     assert control.run_status(directory)["state"] == "failed"
     assert json.loads((directory / "controller-exit.json").read_text())["return_code"] == 1
     assert "Traceback" in (directory / "controller.log").read_text()

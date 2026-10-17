@@ -1,6 +1,13 @@
 {
     // prettier 版本以 package.json/node_modules 为唯一事实源；
     // 缺 node_modules 时直接报错，而不是静默回落到扩展内置版本
+    "autocorrect.enable": true,
+    "autocorrect.enableLint": true,
+    "autocorrect.formatOnSave": false,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true
+    },
     "prettier.prettierPath": "./node_modules/prettier",
     // Markdown Preview Enhanced：预览环境本体在 /.crossnote/（gitignore 的本机
     // 目录，由 setup-toolchain 部署）。enablePreviewScripts 是 theme-toggle.js /

@@ -17,3 +17,6 @@ theory/
 .agents/notes/archived/
 docs/papers/
 experiments/plotting/vendor/
+
+assets/.crossnote/
+.venv-maintenance/

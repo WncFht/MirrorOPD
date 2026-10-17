@@ -13,7 +13,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOOK = ROOT / "theory/core"
+# The basename is a versioned literal; spacing changes would break file lookup.
+# autocorrect-disable
 ENTRY = "2026-10-15-MirrorOPD核心推导.tex"
+# autocorrect-enable
 
 
 def audit(book: Path, entry: str) -> dict:

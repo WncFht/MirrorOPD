@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-while IFS= read -r -d '' file; do
-  size=$(git cat-file -s ":$file")
-  if ((size > 20 * 1024 * 1024)); then
-    printf 'Artifact exceeds 20 MiB: %s; store raw training data outside Git.\n' "$file" >&2
-    exit 1
-  fi
-done < <(git diff --cached --name-only --diff-filter=ACM -z)
-if [[ -f .crossnote/scripts/check-pseudocode.cjs ]]; then
-  node .crossnote/scripts/check-pseudocode.cjs --staged
-fi
-exec pre-commit run --hook-stage pre-commit
+project_root=$(git rev-parse --show-toplevel)
+maintenance_python=$(git config --local --get mirroropd.maintenancePython || command -v python3)
+maintenance_bin=$(dirname "$maintenance_python")
+PATH="$project_root/.tools/bin:$maintenance_bin:$PATH"
+export PATH
+exec "$maintenance_python" "$project_root/scripts/hook_entry.py" pre-commit

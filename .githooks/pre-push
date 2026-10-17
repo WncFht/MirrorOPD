@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec make check-maintenance
+project_root=$(git rev-parse --show-toplevel)
+maintenance_python=$(git config --local --get mirroropd.maintenancePython || command -v python3)
+maintenance_bin=$(dirname "$maintenance_python")
+PATH="$project_root/.tools/bin:$maintenance_bin:$PATH"
+export PATH
+exec "$maintenance_python" "$project_root/scripts/hook_entry.py" pre-push

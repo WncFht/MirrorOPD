@@ -1,6 +1,8 @@
 .DEFAULT_GOAL := help
 
 PYTHON ?= python
+MAINTENANCE_PYTHON ?= $(if $(wildcard .venv-maintenance/bin/python),$(CURDIR)/.venv-maintenance/bin/python,$(PYTHON))
+MAINTENANCE_PATH = $(CURDIR)/.tools/bin:$(dir $(MAINTENANCE_PYTHON)):$(PATH)
 BACKEND ?= upstream/TA-OPD-v2
 PACKAGE ?= transfers/code
 RUN ?=
@@ -39,28 +41,26 @@ test:
 	$(PYTHON) -m pytest -q
 
 bootstrap:
+	$(PYTHON) -c 'import sys; assert sys.version_info >= (3, 12), "Python 3.12+ is required"'
+	$(PYTHON) -m venv .venv-maintenance
 	npm ci
-	$(PYTHON) -m pip install -r requirements-dev.txt
-	$(PYTHON) scripts/setup.py
-	bash scripts/crossnote-links.sh
+	.venv-maintenance/bin/python -m pip install --require-hashes -r requirements-dev.lock
+	.venv-maintenance/bin/python scripts/setup.py
+	CROSSNOTE_SRC="$(CURDIR)/assets/.crossnote" bash scripts/crossnote-links.sh
 	python3 scripts/restore-data.py
 
 check-docs:
-	$(PYTHON) scripts/run_checks.py --config scripts/checks.json --mode docs
+	PATH="$(MAINTENANCE_PATH)" $(MAINTENANCE_PYTHON) scripts/run_checks.py --config scripts/checks.json --mode docs
 
 test-maintenance:
-	$(PYTHON) -m pytest -q tests/maintenance
+	PATH="$(MAINTENANCE_PATH)" $(MAINTENANCE_PYTHON) -m pytest -q tests/maintenance
 
 check-maintenance:
-	$(PYTHON) scripts/run_checks.py --config scripts/checks.json --mode maintenance
+	PATH="$(MAINTENANCE_PATH)" $(MAINTENANCE_PYTHON) scripts/run_checks.py --config scripts/checks.json --mode maintenance
 
-check: check-docs
-	npm run format:check
-	npm run lint:md
-	python3 scripts/check-yaml-comments.py
-	ruff check .
-	ruff format --check .
-	pre-commit run --all-files
+check:
+	PATH="$(MAINTENANCE_PATH)" $(MAINTENANCE_PYTHON) scripts/run_checks.py --config scripts/checks.json --mode ci
+	PATH="$(MAINTENANCE_PATH)" $(MAINTENANCE_PYTHON) -m pre_commit run --all-files --hook-stage pre-commit
 
 .PHONY: code-pack results-pack wandb-pack wandb-sync unpack hope-submit
 code-pack:

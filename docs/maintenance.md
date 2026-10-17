@@ -6,40 +6,69 @@ MirrorOPD 将文档、文字与长期决策维护接入现有工具链。三个�
 
 ## 本地准备
 
-需要 Python 3.12、Node 22 和 Git。使用独立的开发环境安装维护依赖，再配置当前仓库入口：
+需要 Python 3.12 或以上、Node 22 或以上和 Git。从已选择的 Python 3.12 环境创建独立的维护环境：
 
 ```bash
-python -m pip install -r requirements-dev.txt
+python -m venv .venv-maintenance
+.venv-maintenance/bin/python -m pip install --require-hashes -r requirements-dev.lock
 npm ci
-python scripts/setup.py
+.venv-maintenance/bin/python scripts/setup.py
+CROSSNOTE_SRC="$PWD/assets/.crossnote" bash scripts/crossnote-links.sh
+npx playwright install chromium
 ```
 
-此外需要 AutoCorrect、Gitleaks、shfmt、ShellCheck、actionlint 和 Taplo。现有系统包管理器可提供这些工具；CI 的安装方式见[工作流](../.github/workflows/ci.yml)。维护环境不代替训练所需的 PyTorch、CUDA、vLLM、Ray 和 FlashAttention。
+本机可选解释器为 `../envs/opd/bin/python`。维护依赖由 `requirements-dev.txt` 与跨平台哈希锁 `requirements-dev.lock` 管理，npm 工具由 package-lock 固定。系统需要 AutoCorrect、Gitleaks、shfmt、ShellCheck、actionlint、Taplo；存在 zsh 输入时也需 zsh。Linux 浏览器缺少系统库时，使用 Playwright 的 `install-deps chromium` 安装所需依赖。CI 先安装 Homebrew，再安装这些工具和浏览器依赖。
 
-setup 复用 `.githooks` 并创建忽略的 `.claude/skills` 链接，重复运行不会改写已有 hook。外来 hooksPath 或技能入口会导致失败，保留原内容。它不调用 `pre-commit install`，因为该命令与已配置的 hooksPath 冲突。可选的预览链接仍由 `scripts/crossnote-links.sh` 配置，需要本机存在相应事实源；基本维护检查不依赖该预览环境。
+`make bootstrap PYTHON=/path/to/python3.12` 将创建维护环境、安装锁定依赖、接入本机链接并恢复研究证据；单独接入工具链可用上面的命令。维护环境不代替 PyTorch、CUDA、vLLM、Ray 和 FlashAttention 的训练环境。
 
-## 使用入口
+setup 保留 `.githooks`、20 MiB 文件限制、伪代码检查和 `.claude/skills`。它把所选 Python 写入本仓 Git 配置，commit/push hook 将该解释器目录和可选的本仓 `.tools/bin` 放在 PATH 前面；新终端无需再次激活维护环境。外来 hooksPath 或技能目录被拒绝且不覆盖。维护环境移动或重建后应重跑 setup，普通 `pre-commit install` 不适用于本仓已管理的入口。
 
-| 命令                     | 验证范围                                                   |
-| ------------------------ | ---------------------------------------------------------- |
-| `make check-docs`        | 当前 Markdown 本地链接、skill 元数据、Notes 结构和归档历史 |
-| `make test-maintenance`  | 维护检查的有效与违规输入、暂存隔离、安装边界               |
-| `make check-maintenance` | 文档契约与维护测试，供 pre-push 与 CI 复用                 |
-| `make check`             | 文档契约和现有格式、lint、secrets、全文件 pre-commit 检查  |
-| `make test`              | pytest 收集的维护、数学、运行层与集成测试                  |
-| `make book`              | 构建 `theory/core/` 的完整稿与正文阅读版                   |
+## 使用入口与扫描范围
 
-通过 `PYTHON=/path/to/python make …` 指定解释器。调度器中的 `python`、`python3` 命令使用同一解释器；其他命令从当前 PATH 查找。原生集成测试需要准备固定后端，再执行 `MIRROR_TEST_BACKEND=upstream/TA-OPD-v2 make test`；工具接入不启动 GPU 训练。
+| 命令                                   | 验证范围                                                   |
+| -------------------------------------- | ---------------------------------------------------------- |
+| `make check-docs`                      | 当前 Markdown 链接、skill 元数据、Notes 结构与可信归档历史 |
+| `make test-maintenance`                | 正常/违规输入、真实部分暂存、失败传播、hook 环境与链接迁移 |
+| `make check-maintenance`               | pre-push 使用的文档、维护行为、严格间距与预览检查          |
+| `make check`                           | 完整维护图、格式/lint、预览及全文件 pre-commit 检查        |
+| `make test PYTHON=/path/to/opd-python` | pytest 收集的维护、数学、运行层与集成测试                  |
+| `make book`                            | 核心推导的完整 PDF 与正文阅读版                            |
+| `npm run test:preview`                 | Node、QuickJS 与 Chromium 的预览资源测试                   |
 
-`python scripts/run_checks.py --config scripts/checks.json --mode ci` 运行完整维护检查，包括间距、Shell 和 Actions 检查；它不代替产品测试。命令使用参数数组，不经 shell；依赖失败使后代 skipped，阻断项 skipped 同样失败。调度器只限制直接子进程的数量与超时，后台进程由所属测试负责清理。
+维护命令优先使用本仓 `.venv-maintenance`，可通过 `MAINTENANCE_PYTHON` 显式指定；产品测试继续使用 `PYTHON`。调度器的 `python/python3` 由当前解释器执行，其他工具从 PATH 查找。原生集成测试通过 `MIRROR_TEST_BACKEND` 指定固定后端；维护接入不自动启动 GPU 训练。
 
-## 提交与推送
+AutoCorrect 覆盖自有 Markdown、代码注释和字符串、YAML/JSON/JSONC、TOML 与 Shell，也发现隐藏和无扩展名脚本。`--strict` 保证真实诊断返回非零；空扫描、缺失的显式输入、早期批次失败均不能被后续成功掩盖。先用 `scripts/check_spacing.py --list` 核对范围，`--fix` 只整理 Markdown；协议、文件名、正则和测试输入逐字保留时，用带理由的局部 disable/enable，代码不自动修复。
 
-pre-commit 保留原有 20 MiB 文件限制及本机可用时的伪代码检查，再运行格式、lint、secrets 和暂存契约。Markdown fixer 可能要求重新暂存；其他 formatter 通过 git-format-staged 操作暂存内容。全文件 pre-commit 检查可能修复格式，应审阅差异后再提交。
+Shell 按 shebang 分派：sh/bash 使用 shfmt 与 ShellCheck，zsh 使用 `zsh -n`；YAML 注释用语法扫描排除多行标量。Ruff 0.17 的规则与 Python 3.12 基线固定在配置和锁文件中。理论、冻结历史、证据、上游后端和 preview 载荷保留自己的检查边界；当前文档指向证据的文件链接仍检查存在性。
 
-暂存契约将完整 index 导出到 `runs/maintenance-index-*` 隔离目录，检查实际提交的链接和 Notes，再与本地 HEAD 中的封存历史比较。工作区中未暂存的修复不能掩盖提交错误。快照使用项目磁盘目录，退出后清理，不将版本化研究材料复制到受限 `/tmp`。
+## 两阶段提交与推送
 
-pre-push 执行 `make check-maintenance`。该检查适合本地推送前执行；完整产品测试和格式检查由开发者按变更选择，并在 CI 全量运行。setup 只配置本仓库，未安装全局 hooks。
+```mermaid
+flowchart TB
+    Commit["git commit"] --> Format["阶段一：format_staged<br/>直接格式化实际 index"]
+    Format --> Limits["文件大小与暂存伪代码检查"]
+    Limits --> Protect["阶段二：pre-commit<br/>保护未暂存改动"]
+    Protect --> Checks["lint、严格间距、凭据与 index 契约"]
+    Checks --> Restore["恢复未暂存改动并返回检查结果"]
+    Push["git push"] --> Maintenance["复用所选 Python<br/>运行 maintenance 检查图"]
+```
+
+manual 阶段专用于本地 git-format-staged formatter。它必须在 pre-commit 隐藏未暂存内容之前执行；不能在框架隐藏改动后改写 index。Markdown formatter 用 pipefail，前一项失败不会被后一项成功隐藏。格式合并冲突保留工作区原文并报告，需审阅 `git diff` 与 `git diff --cached`；Markdownlint 修改后仍需重新暂存。
+
+`staged_checks.py` 在项目磁盘目录 `runs/maintenance-index-*` 导出完整 index，验证将提交的链接、Notes 和归档字节。快照退出后清理，避免把较大的研究材料写入受限 `/tmp`。工作区中未暂存的修复不能掩盖 index 中的错误。
+
+pre-push 复用同一维护环境并运行 maintenance 模式；完整格式、lint、预览与产品验证由 CI 的相应 lane 运行。数值 lane 只运行产品测试，维护 lane 运行维护行为与预览，覆盖边界不重复。远端 required checks 和分支保护仍须在托管平台核验，workflow 文件本身不证明已启用。
+
+## MPE 预览资源
+
+`assets/.crossnote` 保存项目内的预览事实源、生成器、测试与第三方许可；被忽略的 `.crossnote` 是本机链接层。配置和目录使用软链，两个注入脚本使用同文件系统硬链；原子保存替换源 inode 后应重跑链接脚本。实体定制不会被覆盖，全局样式只诊断，不替换已有用户配置。
+
+```bash
+npm run test:preview
+node assets/.crossnote/scripts/build-parser.cjs --check
+```
+
+QuickJS 与 Playwright 为锁定的 npm 开发依赖，浏览器测试覆盖主题切换、伪代码运行时和解析器，生成段与 vendor hash 也有检查。MPE 仍要求 VS Code 安装扩展、信任工作区并允许预览脚本；浏览器测试不等于 VS Code 扩展或导出 PDF 的视觉验收。设置保留项目已有主题与禁用 wiki 索引的选择，同时接入 AutoCorrect、Ruff 和项目 Prettier 的编辑器入口。
 
 ## Agent Notes
 
@@ -107,7 +136,7 @@ CI 保留 CPU 数学及运行层测试，新增维护行为测试、文档契约
 
 ## 来源与许可
 
-维护材料引自 `agent-maintenance` 提交 `20bb1e5`，原始方法来自 DeepSeek Harness 固定提交 `571902028a75c64c1d767f4ae5fd099485f0ddf0`[^harness]。中文规则经过提取、裁剪与重组，Python 检查工具由维护包新增；原始版权与许可保存在 [.agents/LICENSE](../.agents/LICENSE)。MirrorOPD 的适配方式与执行边界在本指南维护，不另设维护体系介绍目录。
+维护材料更新到本机 `agent-maintenance` 提交 `f2b7cdf`，原始方法来自 DeepSeek Harness 固定提交 `571902028a75c64c1d767f4ae5fd099485f0ddf0`[^harness]。中文规则经过提取、裁剪与重组，Python 检查工具由维护包新增；原始版权与许可保存在 [.agents/LICENSE](../.agents/LICENSE)。MirrorOPD 保留研究报告规则、既有检查器增强、固定后端和产品测试。[来源清单](../scripts/maintenance-source.json)记录采用范围、固定来源与适配理由，本指南维护实际操作入口。
 
 ### 参考文献
 

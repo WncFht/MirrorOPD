@@ -30,7 +30,7 @@
             "command": ["python3", "-m", "pytest", "-q", "tests/maintenance"],
             "modes": ["test", "maintenance", "ci"],
             "needs": [],
-            "timeout": 120,
+            "timeout": 360,
             "allow_failure": false
         },
         {
@@ -68,7 +68,7 @@
         {
             "id": "chinese-spacing",
             "command": ["python3", "scripts/check_spacing.py"],
-            "modes": ["lint", "ci"],
+            "modes": ["lint", "ci", "maintenance"],
             "needs": [],
             "timeout": 120,
             "allow_failure": false
@@ -83,7 +83,7 @@
         },
         {
             "id": "shell-lint",
-            "command": ["bash", "scripts/check-shell.sh"],
+            "command": ["python3", "scripts/check_shell.py"],
             "modes": ["lint", "ci"],
             "needs": [],
             "timeout": 120,
@@ -103,6 +103,26 @@
             "modes": ["lint", "ci"],
             "needs": [],
             "timeout": 120,
+            "allow_failure": false
+        },
+        {
+            "id": "preview",
+            "command": ["npm", "run", "test:preview"],
+            "modes": ["test", "maintenance", "ci"],
+            "needs": [],
+            "timeout": 180,
+            "allow_failure": false
+        },
+        {
+            "id": "preview-generated",
+            "command": [
+                "node",
+                "assets/.crossnote/scripts/build-parser.cjs",
+                "--check"
+            ],
+            "modes": ["test", "maintenance", "ci"],
+            "needs": [],
+            "timeout": 60,
             "allow_failure": false
         }
     ]

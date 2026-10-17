@@ -8,7 +8,7 @@ import sys
 import threading
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 
@@ -71,7 +71,7 @@ class EventWriter:
             "producer_id": self.producer_id,
             "sequence": sequence,
             "event_id": f"{self.producer_id}:{sequence}",
-            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "time_utc": datetime.now(UTC).isoformat(),
             "monotonic_ns": time.monotonic_ns(),
             "event": event,
             "context": self.context,

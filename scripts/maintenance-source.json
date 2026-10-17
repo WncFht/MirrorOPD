@@ -1,0 +1,766 @@
+{
+    "source_project": "agent-maintenance",
+    "source_commit": "f2b7cdfe4c6ab96ed779f42c878e84b7042edf43",
+    "source_hint": "../agent-maintenance",
+    "runtime_dependency": "None: adopted skills, tools and preview assets are inside this repository.",
+    "project_extensions": [
+        "Experimental-report rules and templates",
+        "Fixed backend and numerical tests",
+        "Disk-backed index snapshot",
+        "20 MiB artifact limit and staged pseudocode check",
+        "Existing .githooks ownership and project Python selection"
+    ],
+    "files": [
+        {
+            "source": ".agents/notes/AGENTS.md",
+            "target": ".agents/notes/AGENTS.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "d92857c421e4a2409d358e1e7b0edbcd97c44d0a3ee4a1f267106f2979db5ced",
+            "target_sha256": "d92857c421e4a2409d358e1e7b0edbcd97c44d0a3ee4a1f267106f2979db5ced"
+        },
+        {
+            "source": ".agents/notes/README.md",
+            "target": ".agents/notes/README.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "92ead5ec2df3b0a5730728bd34a3d11f0ebc691e8fbe50666a1a483e0d219bba",
+            "target_sha256": "92ead5ec2df3b0a5730728bd34a3d11f0ebc691e8fbe50666a1a483e0d219bba"
+        },
+        {
+            "source": ".agents/notes/archived/AGENTS.md",
+            "target": ".agents/notes/archived/AGENTS.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "b744324ad226dcb6c7673f8aba1607d8b0f30938a2aa00abf9166b620b9ec702",
+            "target_sha256": "b744324ad226dcb6c7673f8aba1607d8b0f30938a2aa00abf9166b620b9ec702"
+        },
+        {
+            "source": ".agents/notes/implemented/AGENTS.md",
+            "target": ".agents/notes/implemented/AGENTS.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "1f7d67842c46f3d27d1cdc1e9bcde4ee9c9a61458df6c614d4aef36612ce6618",
+            "target_sha256": "1f7d67842c46f3d27d1cdc1e9bcde4ee9c9a61458df6c614d4aef36612ce6618"
+        },
+        {
+            "source": ".agents/notes/implemented/process/2026-10-15-documentation-only-scope.md",
+            "status": "not-copied",
+            "reason": "Upstream project history is not a consumer requirement."
+        },
+        {
+            "source": ".agents/notes/implemented/process/2026-10-15-portable-maintenance-pipeline.md",
+            "status": "not-copied",
+            "reason": "Upstream project history is not a consumer requirement."
+        },
+        {
+            "source": ".agents/notes/implemented/process/2026-10-17-\u5de5\u5177\u94fe\u63a5\u5165\u4e0e\u6682\u5b58\u683c\u5f0f\u5316.md",
+            "status": "not-copied",
+            "reason": "Upstream project history is not a consumer requirement."
+        },
+        {
+            "source": ".agents/references/automation.md",
+            "target": ".agents/references/automation.md",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "20c1a655d647cb1eff483fb8aaec4133555d20378f860964ca7a19a79c646a2f",
+            "target_sha256": "5854a81943a993146e1023e5b854f4153c55714505189031ecffb0eb8937045c"
+        },
+        {
+            "source": ".agents/references/decision-notes.md",
+            "target": ".agents/references/decision-notes.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "be501cf37c92cbdcabb376e1b3ab77a15ba5647e32aa7b5c09422dd649509c80",
+            "target_sha256": "be501cf37c92cbdcabb376e1b3ab77a15ba5647e32aa7b5c09422dd649509c80"
+        },
+        {
+            "source": ".agents/references/documentation.md",
+            "target": ".agents/references/documentation.md",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "1efc0afa2d656edd8ac56ec27eb9daac93a021a271438903903cca9558b4e0e7",
+            "target_sha256": "420ed69725cf3ee7c08b0b427b7e0a1e3f9fe8cd36d161ddfb7986806bbc32ca"
+        },
+        {
+            "source": ".agents/references/prose-examples.md",
+            "target": ".agents/references/prose-examples.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "c453a4401dd3b91f38e2125b893b3bf2dab6ff043f79a162085f1c8e03c49dbc",
+            "target_sha256": "c453a4401dd3b91f38e2125b893b3bf2dab6ff043f79a162085f1c8e03c49dbc"
+        },
+        {
+            "source": ".agents/references/reasoning-residue.md",
+            "target": ".agents/references/reasoning-residue.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "c66d253582d86a7f72bc3ad6b1465af399890745d6c23b49871854692d4e0fbc",
+            "target_sha256": "c66d253582d86a7f72bc3ad6b1465af399890745d6c23b49871854692d4e0fbc"
+        },
+        {
+            "source": ".agents/references/upgrade-guides.md",
+            "target": ".agents/references/upgrade-guides.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "55854c14de9442b9fa71e54f91ca65b1a0e9b4635224b3c0aecc7bb86c81b0ca",
+            "target_sha256": "55854c14de9442b9fa71e54f91ca65b1a0e9b4635224b3c0aecc7bb86c81b0ca"
+        },
+        {
+            "source": ".agents/skills/maintain-decision-notes/SKILL.md",
+            "target": ".agents/skills/maintain-decision-notes/SKILL.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "ef97ddba260bec2a6a7338c027f755d46ca2770dca2b8666e3a5f1f38723643a",
+            "target_sha256": "ef97ddba260bec2a6a7338c027f755d46ca2770dca2b8666e3a5f1f38723643a"
+        },
+        {
+            "source": ".agents/skills/maintain-decision-notes/agents/openai.yaml",
+            "target": ".agents/skills/maintain-decision-notes/agents/openai.yaml",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "ab70af8fb63461748e9745105aeb994f04b6f09b3743b3074835a78c4b1645e5",
+            "target_sha256": "ab70af8fb63461748e9745105aeb994f04b6f09b3743b3074835a78c4b1645e5"
+        },
+        {
+            "source": ".agents/skills/maintain-docs/SKILL.md",
+            "target": ".agents/skills/maintain-docs/SKILL.md",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "98d8299bc784466c37e57a57a1d76dea9812ddd013877dac1eb5c1a0748d9201",
+            "target_sha256": "8ca2715077a013c024d15e74a0b7fbd7ed8b00af8a21307fe11716797e25fa4c"
+        },
+        {
+            "source": ".agents/skills/maintain-docs/agents/openai.yaml",
+            "target": ".agents/skills/maintain-docs/agents/openai.yaml",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "fea9d2f7190370cc557632e539a5f673623ed24aa2b5160170fe4cd15ea814cc",
+            "target_sha256": "c4af978133b6fe72e4f4b294ef058621cbdac0ba099e5be4f4b01e319cd2c7be"
+        },
+        {
+            "source": ".agents/skills/maintain-prose/SKILL.md",
+            "target": ".agents/skills/maintain-prose/SKILL.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "adbb618846666b46ee9f28841b46dd21360952da6d29b67ca1231f60e5ce8205",
+            "target_sha256": "adbb618846666b46ee9f28841b46dd21360952da6d29b67ca1231f60e5ce8205"
+        },
+        {
+            "source": ".agents/skills/maintain-prose/agents/openai.yaml",
+            "target": ".agents/skills/maintain-prose/agents/openai.yaml",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "7d5b188889015328d25b14c3162f101134e23dde3a6c54f88d218c18dc127679",
+            "target_sha256": "7d5b188889015328d25b14c3162f101134e23dde3a6c54f88d218c18dc127679"
+        },
+        {
+            "source": ".agents/templates/implemented.md",
+            "target": ".agents/templates/implemented.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "3563a2bbc0fedaa3616c7b450895d405e03e1917f83a4ffc3ca7819305777027",
+            "target_sha256": "3563a2bbc0fedaa3616c7b450895d405e03e1917f83a4ffc3ca7819305777027"
+        },
+        {
+            "source": ".agents/templates/module-readme.md",
+            "target": ".agents/templates/module-readme.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "dae36278a80f3db0a095f99b63d8ceb3f0f42ec36eae4b21a46fd39a09ed7931",
+            "target_sha256": "dae36278a80f3db0a095f99b63d8ceb3f0f42ec36eae4b21a46fd39a09ed7931"
+        },
+        {
+            "source": ".agents/templates/postmortem.md",
+            "target": ".agents/templates/postmortem.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "f182ce5713050dc7e3a009ff6988c0e227ce392b883d6599018066eefa3dab1e",
+            "target_sha256": "f182ce5713050dc7e3a009ff6988c0e227ce392b883d6599018066eefa3dab1e"
+        },
+        {
+            "source": ".agents/templates/proposed.md",
+            "target": ".agents/templates/proposed.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "1d11ed33e3841beda2f390d265e1e98f23fb87889ed5942f0c3441fac6fa7a13",
+            "target_sha256": "1d11ed33e3841beda2f390d265e1e98f23fb87889ed5942f0c3441fac6fa7a13"
+        },
+        {
+            "source": ".agents/templates/reference.md",
+            "target": ".agents/templates/reference.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "2473570080f1cabe40839815c751e3456e1062ccabc793cd7c91c65fe25752b6",
+            "target_sha256": "2473570080f1cabe40839815c751e3456e1062ccabc793cd7c91c65fe25752b6"
+        },
+        {
+            "source": ".agents/templates/tutorial.md",
+            "target": ".agents/templates/tutorial.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "184795268782193e9fe891bf40533d069a9faec74724bd60574f00d966488f07",
+            "target_sha256": "184795268782193e9fe891bf40533d069a9faec74724bd60574f00d966488f07"
+        },
+        {
+            "source": ".agents/templates/upgrade-guide.md",
+            "target": ".agents/templates/upgrade-guide.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "e373000c0af9a0e9b93127d2845662409fabe82364b36fbe35f0efe9dbaa8d29",
+            "target_sha256": "e373000c0af9a0e9b93127d2845662409fabe82364b36fbe35f0efe9dbaa8d29"
+        },
+        {
+            "source": ".autocorrectignore",
+            "target": ".autocorrectignore",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "06ce3fc5626dad48e2c38af17faf88b34d5f2ea48d1e393f8a6ad1a908ca35f2",
+            "target_sha256": "f3dad0114396449e430d08ae02e01d14c6cc05281f1f3fb70cf18ffc213b42a2"
+        },
+        {
+            "source": ".autocorrectrc",
+            "target": ".autocorrectrc",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "6f847c7e09fdf2eb1734a858706ed59d5bb468b15b3ecb184bc5b5cbfda12b0c",
+            "target_sha256": "6f847c7e09fdf2eb1734a858706ed59d5bb468b15b3ecb184bc5b5cbfda12b0c"
+        },
+        {
+            "source": ".editorconfig",
+            "target": ".editorconfig",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "fb29f3d9e3cf1dea509c38bf1716cf17cae698ee74616dac7284dd983e452246",
+            "target_sha256": "045da7f733b697d69da8d4302f2271e2bb5194aea83a73120970ce5bccc02e43"
+        },
+        {
+            "source": ".gitattributes",
+            "target": ".gitattributes",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+            "target_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+        },
+        {
+            "source": ".github/AGENTS.md",
+            "target": ".github/AGENTS.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "2aee96bd4a528c5216fc9167dd89089d3330f53873c70d20131345d9b3c74fa6",
+            "target_sha256": "2aee96bd4a528c5216fc9167dd89089d3330f53873c70d20131345d9b3c74fa6"
+        },
+        {
+            "source": ".github/workflows/ci.yml",
+            "target": ".github/workflows/ci.yml",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "2418e2d54e53967c72b64003ecb9a42d5f2ff345c629e8a7295c2d50cdcda115",
+            "target_sha256": "aa21dbc7e27e05a515354ccc6657749f5561c2e4b0298544117e741eaa523183"
+        },
+        {
+            "source": ".gitignore",
+            "target": ".gitignore",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "005740946626c6adcba7727c4714406b0d54af4635731fc944ed1ca55f90cd9e",
+            "target_sha256": "0aee8aa2ce1661d84184d8e4ddf29bb4cfc9abf62371ca476c3eecd5e2e3a759"
+        },
+        {
+            "source": ".markdownlint-cli2.jsonc",
+            "target": ".markdownlint-cli2.jsonc",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "352880ef70c84a887201816bc1943e0abcd6d87f8487f71e87b539b09a898c22",
+            "target_sha256": "e839091b06bc00204601c6b025cc168850b9d048262366b547e14ce62aefc8ef"
+        },
+        {
+            "source": ".pre-commit-config.yaml",
+            "target": ".pre-commit-config.yaml",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "6aac52b1197820b9344c8f197366056fe046e6aff6097ac9df85441d28dde07d",
+            "target_sha256": "ec34d7ee30493c7952b1ce2de5a2dde589e1b8c71c1a664e90028e015e5af1b8"
+        },
+        {
+            "source": ".prettierignore",
+            "target": ".prettierignore",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "e7da3e65cdaf799843ad83f84314c9a0a238ee6fec39274858d819b5106b6f76",
+            "target_sha256": "396a48d380f28061aa6c509362330d8b5efa4b249a6baa1455a7009ae3023869"
+        },
+        {
+            "source": ".prettierrc.json",
+            "target": ".prettierrc.json",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "7f2b36cf7091c4e4912cc630ff4e7fab8c3ad0682674e90ea8e0e66f5f1df893",
+            "target_sha256": "f4ed8e9b8ccae412a4a26d0e853c12e86c72a75852e8d9b7cc92f8c703b39789"
+        },
+        {
+            "source": ".vscode/settings.json",
+            "target": ".vscode/settings.json",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "5eb9f937158be4126a49601978a114f065e03313ba32bf081a5a90cd64e580d0",
+            "target_sha256": "dd0b73c1981c30e923ed69955b8757c81b1c167f614f8b00e70df36b4ab2c577"
+        },
+        {
+            "source": "AGENTS.md",
+            "target": "AGENTS.md",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "a9a5ed1ed0b242eb7527c54bf2a7d05b2fd41ff6acc9923a5108a624c8bb2e66",
+            "target_sha256": "3f7f584200b267e37df8618008624afc5eb45fe35e1bfa12bc7c1119eb10c0c8"
+        },
+        {
+            "source": "LICENSE",
+            "target": ".agents/LICENSE",
+            "status": "verbatim",
+            "reason": "Fold consumer instructions and attribution into the existing maintenance guide; retain the license.",
+            "source_sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be",
+            "target_sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be"
+        },
+        {
+            "source": "README.md",
+            "target": "docs/maintenance.md",
+            "status": "adapted",
+            "reason": "Fold consumer instructions and attribution into the existing maintenance guide; retain the license.",
+            "source_sha256": "871e5a384a73d6888223acba18b67c13bb830328e3b46a769d7a89fa4ed9300d",
+            "target_sha256": "62ae0ea675e43af86e0c39fe44554b2a735dd6a1e66a2a610b0a5e9892bd3c8d"
+        },
+        {
+            "source": "assets/.crossnote/README.md",
+            "target": "assets/.crossnote/README.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "e8869afde1787e66af7deff025904ba56239891595b0483df98dc206ad2edaf0",
+            "target_sha256": "e8869afde1787e66af7deff025904ba56239891595b0483df98dc206ad2edaf0"
+        },
+        {
+            "source": "assets/.crossnote/config.js",
+            "target": "assets/.crossnote/config.js",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "0126ffb1dcfbd1c3a91561330046b460e1f1e650f911d4b319d962d0a6309151",
+            "target_sha256": "0126ffb1dcfbd1c3a91561330046b460e1f1e650f911d4b319d962d0a6309151"
+        },
+        {
+            "source": "assets/.crossnote/head.html",
+            "target": "assets/.crossnote/head.html",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "41f9dc2810d600e37b0fdff77a52d822b78b2dacfbbaef121c11bc7753ab6e14",
+            "target_sha256": "41f9dc2810d600e37b0fdff77a52d822b78b2dacfbbaef121c11bc7753ab6e14"
+        },
+        {
+            "source": "assets/.crossnote/parser.js",
+            "target": "assets/.crossnote/parser.js",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "de379cf07345a89ea8c271e23fc279cbfee996d4096cf0c31224c80f8be032f5",
+            "target_sha256": "de379cf07345a89ea8c271e23fc279cbfee996d4096cf0c31224c80f8be032f5"
+        },
+        {
+            "source": "assets/.crossnote/pseudocode-runtime.js",
+            "target": "assets/.crossnote/pseudocode-runtime.js",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "1c81768523fdd85f079114d6fdc1edc76c8dbc2266f402804f98395e2ef95093",
+            "target_sha256": "1c81768523fdd85f079114d6fdc1edc76c8dbc2266f402804f98395e2ef95093"
+        },
+        {
+            "source": "assets/.crossnote/scripts/build-parser.cjs",
+            "target": "assets/.crossnote/scripts/build-parser.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "5aa2fa55e2350dd10b48742a40830417058772b1df04688f81d32a83c91ee281",
+            "target_sha256": "5aa2fa55e2350dd10b48742a40830417058772b1df04688f81d32a83c91ee281"
+        },
+        {
+            "source": "assets/.crossnote/scripts/check-pseudocode.cjs",
+            "target": "assets/.crossnote/scripts/check-pseudocode.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "99b4d1a49364b7055885603759dc318cf681635cfd95a4860f7cd6cbe141277a",
+            "target_sha256": "99b4d1a49364b7055885603759dc318cf681635cfd95a4860f7cd6cbe141277a"
+        },
+        {
+            "source": "assets/.crossnote/scripts/patch-mpe-globalcss-dedupe.cjs",
+            "target": "assets/.crossnote/scripts/patch-mpe-globalcss-dedupe.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "7ffcc62b092f100fe3e2507c372d95395e3dd6321941b4de7f1496a1664da3c5",
+            "target_sha256": "7ffcc62b092f100fe3e2507c372d95395e3dd6321941b4de7f1496a1664da3c5"
+        },
+        {
+            "source": "assets/.crossnote/style.less",
+            "target": "assets/.crossnote/style.less",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "c6e9f8b8e980b6e09777f600b9701ae3026e76fa6a44ad532b2c1a84de98d35c",
+            "target_sha256": "c6e9f8b8e980b6e09777f600b9701ae3026e76fa6a44ad532b2c1a84de98d35c"
+        },
+        {
+            "source": "assets/.crossnote/tests/README.md",
+            "target": "assets/.crossnote/tests/README.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "a4925d1c21c9de8446db8d75ab7acc6a0f5aaf567836b9001ba79815218a90e8",
+            "target_sha256": "a4925d1c21c9de8446db8d75ab7acc6a0f5aaf567836b9001ba79815218a90e8"
+        },
+        {
+            "source": "assets/.crossnote/tests/bench-profile.cjs",
+            "target": "assets/.crossnote/tests/bench-profile.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "e0af1521acdd2beae664bcce4a8261507da0a6040887326c4e696c5383432835",
+            "target_sha256": "e0af1521acdd2beae664bcce4a8261507da0a6040887326c4e696c5383432835"
+        },
+        {
+            "source": "assets/.crossnote/tests/check-pseudocode.test.cjs",
+            "target": "assets/.crossnote/tests/check-pseudocode.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "886fe248c141620cfadc3f20cb0ac93ba5fdf9b92d1007f73b4181a1bd4c5392",
+            "target_sha256": "886fe248c141620cfadc3f20cb0ac93ba5fdf9b92d1007f73b4181a1bd4c5392"
+        },
+        {
+            "source": "assets/.crossnote/tests/fixtures/kitchen-sink.md",
+            "target": "assets/.crossnote/tests/fixtures/kitchen-sink.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "ec35bbe66643b40362ec5351ba69fe1791db13b109149360df44285af83586ff",
+            "target_sha256": "ec35bbe66643b40362ec5351ba69fe1791db13b109149360df44285af83586ff"
+        },
+        {
+            "source": "assets/.crossnote/tests/parser-build.test.cjs",
+            "target": "assets/.crossnote/tests/parser-build.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "ecf502a066d4ece4d0df7e02f023b0e518603770fa3882d920ab7c91bebfc645",
+            "target_sha256": "ecf502a066d4ece4d0df7e02f023b0e518603770fa3882d920ab7c91bebfc645"
+        },
+        {
+            "source": "assets/.crossnote/tests/parser-prerender.test.cjs",
+            "target": "assets/.crossnote/tests/parser-prerender.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "585c7df9ad08d0e7bbb19194bd2ad600c109cbe68f8c2788a2c46ea17a411244",
+            "target_sha256": "585c7df9ad08d0e7bbb19194bd2ad600c109cbe68f8c2788a2c46ea17a411244"
+        },
+        {
+            "source": "assets/.crossnote/tests/parser-quickjs.test.cjs",
+            "target": "assets/.crossnote/tests/parser-quickjs.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "55c632e5013e59f14b4aabbf978cfe908acc43da9663caf0c1c1fa01793a429e",
+            "target_sha256": "55c632e5013e59f14b4aabbf978cfe908acc43da9663caf0c1c1fa01793a429e"
+        },
+        {
+            "source": "assets/.crossnote/tests/parser.test.cjs",
+            "target": "assets/.crossnote/tests/parser.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "81f122ecc9e43d94c22e59d9363777f0adab3bb60675be47f3c7e9a6fb28b24e",
+            "target_sha256": "81f122ecc9e43d94c22e59d9363777f0adab3bb60675be47f3c7e9a6fb28b24e"
+        },
+        {
+            "source": "assets/.crossnote/tests/pseudocode-options.test.cjs",
+            "target": "assets/.crossnote/tests/pseudocode-options.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "5bbba3a75c02d14151549a28b9bfe84d75366989290a8d1da0f7b9a25399fab7",
+            "target_sha256": "5bbba3a75c02d14151549a28b9bfe84d75366989290a8d1da0f7b9a25399fab7"
+        },
+        {
+            "source": "assets/.crossnote/tests/pseudocode-runtime.test.cjs",
+            "target": "assets/.crossnote/tests/pseudocode-runtime.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "6761bdf2be25ac35ed171719e53d36a144ccbd2a8564cd8fd8de4b2c996352c9",
+            "target_sha256": "6761bdf2be25ac35ed171719e53d36a144ccbd2a8564cd8fd8de4b2c996352c9"
+        },
+        {
+            "source": "assets/.crossnote/tests/pseudocode-source.test.cjs",
+            "target": "assets/.crossnote/tests/pseudocode-source.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "5662b42cd12f8a47798b5a350cb54aa904d8d095574b385d2272a40c2d34fbb5",
+            "target_sha256": "5662b42cd12f8a47798b5a350cb54aa904d8d095574b385d2272a40c2d34fbb5"
+        },
+        {
+            "source": "assets/.crossnote/tests/theme-toggle.test.cjs",
+            "target": "assets/.crossnote/tests/theme-toggle.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "70a8fccd836af3019cf21242c39c965cf70d9590d529cb444c90bb2cb13675dc",
+            "target_sha256": "70a8fccd836af3019cf21242c39c965cf70d9590d529cb444c90bb2cb13675dc"
+        },
+        {
+            "source": "assets/.crossnote/tests/vendor-integrity.test.cjs",
+            "target": "assets/.crossnote/tests/vendor-integrity.test.cjs",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "a7d748657b5a22250ff862a93751858d8326afd68a7a4ba679bd1868d795abf5",
+            "target_sha256": "a7d748657b5a22250ff862a93751858d8326afd68a7a4ba679bd1868d795abf5"
+        },
+        {
+            "source": "assets/.crossnote/theme-toggle.js",
+            "target": "assets/.crossnote/theme-toggle.js",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "a8a6a35674a0241a5dcc37bd380ce293463db8bfd37d0342e1d23915435c5da6",
+            "target_sha256": "a8a6a35674a0241a5dcc37bd380ce293463db8bfd37d0342e1d23915435c5da6"
+        },
+        {
+            "source": "assets/.crossnote/vendor/README.md",
+            "target": "assets/.crossnote/vendor/README.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "e468e24b2e0ff10401ef377a18c6bed540a09d95d5c61bb753d66a3e9009b36f",
+            "target_sha256": "e468e24b2e0ff10401ef377a18c6bed540a09d95d5c61bb753d66a3e9009b36f"
+        },
+        {
+            "source": "assets/.crossnote/vendor/katex-0.16.47.LICENSE",
+            "target": "assets/.crossnote/vendor/katex-0.16.47.LICENSE",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3",
+            "target_sha256": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3"
+        },
+        {
+            "source": "assets/.crossnote/vendor/katex-0.16.47.min.js",
+            "target": "assets/.crossnote/vendor/katex-0.16.47.min.js",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "a29d2961d3146de5949d78ac7c1a9d93ae54955bad22a6db4fbe836e88e8bf48",
+            "target_sha256": "a29d2961d3146de5949d78ac7c1a9d93ae54955bad22a6db4fbe836e88e8bf48"
+        },
+        {
+            "source": "assets/.crossnote/vendor/pseudocode-2.4.1.LICENSE",
+            "target": "assets/.crossnote/vendor/pseudocode-2.4.1.LICENSE",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "4400deeefb20426bb20531303e02805f0f0678747b39cdbef5bbdf6a8aef8106",
+            "target_sha256": "4400deeefb20426bb20531303e02805f0f0678747b39cdbef5bbdf6a8aef8106"
+        },
+        {
+            "source": "assets/.crossnote/vendor/pseudocode-2.4.1.min.js",
+            "target": "assets/.crossnote/vendor/pseudocode-2.4.1.min.js",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "695903c6acb3ac1f84c54b0e63d3ddc9e9640e19ff0dfae35aed3c695a6a365a",
+            "target_sha256": "695903c6acb3ac1f84c54b0e63d3ddc9e9640e19ff0dfae35aed3c695a6a365a"
+        },
+        {
+            "source": "docs/pipeline.md",
+            "target": "docs/maintenance.md",
+            "status": "adapted",
+            "reason": "Fold consumer instructions and attribution into the existing maintenance guide; retain the license.",
+            "source_sha256": "fb82bbda577115185722669b1f58c7f2ecd10f9e46b7f47a8e0a65b433fbff80",
+            "target_sha256": "62ae0ea675e43af86e0c39fe44554b2a735dd6a1e66a2a610b0a5e9892bd3c8d"
+        },
+        {
+            "source": "docs/toolchain.md",
+            "target": "docs/maintenance.md",
+            "status": "adapted",
+            "reason": "Fold consumer instructions and attribution into the existing maintenance guide; retain the license.",
+            "source_sha256": "a3d3d101fb21b0b7a703f0e13f731cc4ec35a6389016133e4e42e37a5a47f510",
+            "target_sha256": "62ae0ea675e43af86e0c39fe44554b2a735dd6a1e66a2a610b0a5e9892bd3c8d"
+        },
+        {
+            "source": "package-lock.json",
+            "target": "package-lock.json",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "e7d104cd31101195afb491eee84b7da56f14ae519c54b172dd61fab4885e3e63",
+            "target_sha256": "ee06d035987ad924ec2cff18edd226315e0d8ae9ed88faefe703325c81f58dec"
+        },
+        {
+            "source": "package.json",
+            "target": "package.json",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "5c0487f0cb3a8a8b18393364c4d45a424929546e3628e692d50b7556332432ed",
+            "target_sha256": "5d23c1519bd148a056780d29cf61197e90036c6f0a8206a6772b697b1c7ce8c5"
+        },
+        {
+            "source": "requirements-dev.lock",
+            "target": "requirements-dev.lock",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "40b7628ff08a98920384e0d91d1a06555d9f64eaa5a779c23e0493f86c97dc0f",
+            "target_sha256": "9623b8f71b3163dbe85212da7a22861430e3438dfdf5ce0c7ea89f06b3b7a319"
+        },
+        {
+            "source": "requirements-dev.txt",
+            "target": "requirements-dev.txt",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "60bf72246388201f6d696c1d51917a07ef40d115a5ff1853ad9bc17c185fae9c",
+            "target_sha256": "82bb230a9821c8a347e9cdb4bcf5dab8d702fccc1678735560da0da9293afd9d"
+        },
+        {
+            "source": "ruff.toml",
+            "target": "ruff.toml",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "78d90381e47b374173b71569b9f3219bfece5c96c7c08c13bc950c189823b207",
+            "target_sha256": "6801145c13ecd8b77d27a2f241a6a1f19f7407321f466b166d542d2ecf84703a"
+        },
+        {
+            "source": "scripts/AGENTS.md",
+            "target": "scripts/AGENTS.md",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "5b15d2a32f30b661625526cd6411370599d1e523d51f4a80fe1a793d8f600835",
+            "target_sha256": "5b15d2a32f30b661625526cd6411370599d1e523d51f4a80fe1a793d8f600835"
+        },
+        {
+            "source": "scripts/check-yaml-comments.py",
+            "target": "scripts/check-yaml-comments.py",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "82b16f64d5fa5d23d38bf8f75ca3ba31cc204a49d5c654eaa9ad17fa134d7b1d",
+            "target_sha256": "f651655b9f63bbab4cd1a27409ac9bd8052505fc6a24f0048422d642cf503db2"
+        },
+        {
+            "source": "scripts/check_archive.py",
+            "target": "scripts/check_archive.py",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "6a5f85b5af1a4d3abbb0cc5ca0ad1a0b5db4d9efbefcb5b13f07439bb1656c52",
+            "target_sha256": "44960cf3ee15df8cfdeb48b3f5949b893e51c60ee24792b45210a14e76efdfbb"
+        },
+        {
+            "source": "scripts/check_docs.py",
+            "target": "scripts/check_docs.py",
+            "status": "adapted",
+            "reason": "Keep research/vendor exclusions, symlink checks and historical-document guards.",
+            "source_sha256": "674b49d2adc02fcad4529d4fc3d8e8daf8e6622ab9a6c0f6e26808e59c8bffbb",
+            "target_sha256": "1fcede2402f931b03a41ea44cf5b1f76bc7f999a1dd2d6ff7919cee31a22488c"
+        },
+        {
+            "source": "scripts/check_shell.py",
+            "target": "scripts/check_shell.py",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "abac43259d7abdc36feba97ef4a3b814b421259fa1dfd7bb9a0d427e507b6e1d",
+            "target_sha256": "abac43259d7abdc36feba97ef4a3b814b421259fa1dfd7bb9a0d427e507b6e1d"
+        },
+        {
+            "source": "scripts/check_spacing.py",
+            "target": "scripts/check_spacing.py",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "db488e13a4b964d4b008f33632a9196822adb43c5a4e15c46ff075efccae6a6e",
+            "target_sha256": "efd58d52b66206f6a6e2222cce8763879c12da0d192eb7d6da0ab408edb551e5"
+        },
+        {
+            "source": "scripts/checks.json",
+            "target": "scripts/checks.json",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "484af0940d373ec22b4797f23df7e197fbf759d71470f3cc5dd78a357cbe76dd",
+            "target_sha256": "2a02d352d5062fbe12ec07cd10c8b47cf9f6a16e93100796e2f37a215bf59f2d"
+        },
+        {
+            "source": "scripts/crossnote-links.sh",
+            "target": "scripts/crossnote-links.sh",
+            "status": "adapted",
+            "reason": "Use project-local preview assets by default; preserve explicit source override and foreign-content protection.",
+            "source_sha256": "090bd29cd872596708d7a7991da7ad4706c0f45e7e97de9b4d8ab31c494a7ca1",
+            "target_sha256": "d38dae4c1219a3227d4df4b3100e961d3206f326cb3ef7e1af27c3e90d96838c"
+        },
+        {
+            "source": "scripts/fmt-markdown.sh",
+            "target": "scripts/fmt-markdown.sh",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "c8b81046b6359809edb8870ffe0f796dde6e3356a52a0fed4b9b7f322e3b243a",
+            "target_sha256": "c8b81046b6359809edb8870ffe0f796dde6e3356a52a0fed4b9b7f322e3b243a"
+        },
+        {
+            "source": "scripts/fmt-shell.sh",
+            "target": "scripts/fmt-shell.sh",
+            "status": "verbatim",
+            "reason": "Verbatim fixed source.",
+            "source_sha256": "a1f31f2d46b4c4158c3626a4a42dd9404941c6db7b32233b5ec26d5f6c8457e2",
+            "target_sha256": "a1f31f2d46b4c4158c3626a4a42dd9404941c6db7b32233b5ec26d5f6c8457e2"
+        },
+        {
+            "source": "scripts/install_hooks.py",
+            "target": "scripts/install_hooks.py",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "3bccf774542da2bc3d3d9d6783f07c10b394517ae4309a728a0edd021967d85f",
+            "target_sha256": "e920780084ea787d1ab7aeedd5fdbece0119b2d457601d40f0e728b1a9619b1e"
+        },
+        {
+            "source": "scripts/notes_guard.py",
+            "target": "scripts/notes_guard.py",
+            "status": "adapted",
+            "reason": "Adapted to existing MirrorOPD scope, formatting, or project-owned entrypoints.",
+            "source_sha256": "df226afa5c0882d2bac11b0cda9660e78c84d823aa58e7facb7c00f7938aafd0",
+            "target_sha256": "ebc07853da07eb1bc091b34832e95892daba83192b013e056de4c0d6e380b7e0"
+        },
+        {
+            "source": "scripts/run_checks.py",
+            "target": "scripts/run_checks.py",
+            "status": "adapted",
+            "reason": "Keep explicit interpreter inheritance for scheduled Python commands.",
+            "source_sha256": "fc45c7430eb4af05f24e98f963fc463f8ac8084c8be782b609b7a9be788416bc",
+            "target_sha256": "4570cb384b6acbbd6f4d516d5638b5e4c96fd0d28e5095984e8ad7a4b8bf37f3"
+        },
+        {
+            "source": "scripts/setup.py",
+            "target": "scripts/setup.py",
+            "status": "adapted",
+            "reason": "Preserve owned .githooks and record the selected project Python.",
+            "source_sha256": "780ceafab10436276df663325d638c05499bee705a799e3adc125dd535f8dca6",
+            "target_sha256": "398ce8b12079ee0881fc8737ed148e44eb3f865b6c3ecc2628b86ea11429f5c1"
+        },
+        {
+            "source": "scripts/staged_checks.py",
+            "target": "scripts/staged_checks.py",
+            "status": "adapted",
+            "reason": "Keep the project-disk index snapshot instead of tmpfs.",
+            "source_sha256": "07c504bd2f1cee31fce6e4c21f111edae8df810a13f09db87d22ac2e35449def",
+            "target_sha256": "0024441646f93d68fb6179aa06192b7256f1cf3379a61d61eae62656ab344282"
+        },
+        {
+            "source": "scripts/tests/test_maintenance.py",
+            "target": "tests/maintenance/test_maintenance.py",
+            "status": "adapted",
+            "reason": "Collect through pytest; use project script paths and same-filesystem preview fixtures.",
+            "source_sha256": "9e1e25ff26465067fe14fd4a196fefe37abf24d41f079da926d677506ac33436",
+            "target_sha256": "c96c017c18f9dcd3206cbda9bcd8d47246aa3f5147d729345cd8a3f96bea90df"
+        },
+        {
+            "source": "scripts/tests/test_pipeline.py",
+            "target": "tests/maintenance/test_pipeline.py",
+            "status": "adapted",
+            "reason": "Collect through pytest; use project script paths and same-filesystem preview fixtures.",
+            "source_sha256": "39301fb8c64d64cb14d10c7f0955cb4c76ba35eae92c5b12f67c15811ce1bc68",
+            "target_sha256": "a319f5f2095d4cc40b3eff88bf8d127c17ee50a5d3c344e34b242724e792b8ad"
+        },
+        {
+            "source": "scripts/tests/test_toolchain.py",
+            "target": "tests/maintenance/test_toolchain.py",
+            "status": "adapted",
+            "reason": "Collect through pytest; use project script paths and same-filesystem preview fixtures.",
+            "source_sha256": "016bf06eb4c0a16975e4798292836e83aa5ba6bc36443d2496d874fafce06419",
+            "target_sha256": "9548d92cca8f4a9e9c8a267c96153593e1c312acfa9c301c052b3fbf75c9a77b"
+        },
+        {
+            "source": "\u6765\u6e90\u4e0e\u53d6\u820d.md",
+            "target": "docs/maintenance.md",
+            "status": "adapted",
+            "reason": "Fold consumer instructions and attribution into the existing maintenance guide; retain the license.",
+            "source_sha256": "fcb1dcbd2c6c718b5423062d839cc373c8cd5118526859db0b6ede3469e2fce3",
+            "target_sha256": "62ae0ea675e43af86e0c39fe44554b2a735dd6a1e66a2a610b0a5e9892bd3c8d"
+        }
+    ]
+}

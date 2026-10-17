@@ -35,6 +35,9 @@ IGNORED = {
 }
 # 理论来源尚待 review/merge；第三方材料与冻结历史不参与当前文档检查。
 IGNORED_PATHS = {
+    "assets/.crossnote",
+    ".venv-maintenance",
+    ".tools",
     "data",
     "results",
     "paper-search-logs",
@@ -98,6 +101,25 @@ def check(root: Path) -> list[str]:
         deferred = deferred_documents(root)
     except (ValueError, TypeError, OSError) as exc:
         return [str(exc)]
+    adoption = root / "scripts/maintenance-source.json"
+    if adoption.is_file():
+        try:
+            adopted = json.loads(adoption.read_text())["files"]
+            if not isinstance(adopted, list):
+                raise ValueError("维护来源 files 必须是数组")
+            for item in adopted:
+                if item.get("status") == "not-copied":
+                    continue
+                name = item["target"]
+                target = root / name
+                if (
+                    Path(name).is_absolute()
+                    or not target.resolve().is_relative_to(root.resolve())
+                    or not target.is_file()
+                ):
+                    errors.append(f"维护来源目标缺失或越界：{name}")
+        except (ValueError, TypeError, KeyError, OSError) as exc:
+            errors.append(f"维护来源清单无效：{exc}")
     skills = root / ".agents/skills"
     found = {p.parent.name for p in skills.glob("*/SKILL.md")}
     if found != SKILLS:

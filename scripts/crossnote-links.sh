@@ -9,8 +9,8 @@
 # theme-toggle）要过 isPathInsideProjectDirectory 的 realpathSync 校验——
 # 指到 workspace 外的软链会被拒，硬链同 inode 才算"仓内实体文件"。
 #
-# $CROSSNOTE_SRC 是唯一事实源（默认 setup-toolchain skill 的载荷目录，
-# ~/.agents 仓跟踪——改任一仓的软链文件 = 直接改它，各仓即时同步）。
+# $CROSSNOTE_SRC 是唯一事实源（默认本仓 assets/.crossnote，
+# 本仓跟踪资源；本机链接层不复制预览配置）。
 # 已知软肋：编辑器原子保存与 pre-commit 格式化回写（gfs 写临时再 rename）
 # 都换 inode → 硬链变陈旧——内容分歧时重跑本脚本重建即可。clone 后或链接
 # 损坏同样跑一遍。
@@ -24,20 +24,20 @@ cd "$(dirname "$0")/.."
   exit 1
 }
 
-SRC="${CROSSNOTE_SRC:-$HOME/.agents/skills/setup-toolchain/assets/.crossnote}"
+SRC="${CROSSNOTE_SRC:-$PWD/assets/.crossnote}"
 [[ -d $SRC ]] || {
-  echo "error: crossnote 事实源不存在: $SRC（可用 CROSSNOTE_SRC= 改指）" >&2
+  echo "error: crossnote 事实源不存在：$SRC（可用 CROSSNOTE_SRC= 改指）" >&2
   exit 1
 }
 for f in parser.js style.less config.js head.html README.md pseudocode-runtime.js theme-toggle.js; do
   [[ -f $SRC/$f ]] || {
-    echo "error: 事实源缺文件: $SRC/$f" >&2
+    echo "error: 事实源缺文件：$SRC/$f" >&2
     exit 1
   }
 done
 for d in scripts tests vendor; do
   [[ -d $SRC/$d ]] || {
-    echo "error: 事实源缺目录: $SRC/$d" >&2
+    echo "error: 事实源缺目录：$SRC/$d" >&2
     exit 1
   }
 done
@@ -171,7 +171,7 @@ if [[ -L $GLOBAL_STYLE ]]; then
   if [[ $GLOBAL_STYLE -ef $SRC/style.less ]]; then
     echo "global: $GLOBAL_STYLE -> 事实源（活链，globalCss 单份）"
   else
-    echo "error: $GLOBAL_STYLE 软链未指向事实源（$(readlink "$GLOBAL_STYLE" || echo '?')）——" >&2
+    echo "error: $GLOBAL_STYLE 软链未指向事实源 ($(readlink "$GLOBAL_STYLE" || echo '?'))——" >&2
     echo "       若已 dangling，MPE 下次读失败会写穿覆盖事实源；" >&2
     echo "       修复：ln -sfn '$SRC/style.less' '$GLOBAL_STYLE'" >&2
     exit 1

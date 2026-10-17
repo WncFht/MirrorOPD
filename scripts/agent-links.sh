@@ -1,6 +1,6 @@
 #!/bin/bash
 # 重建 Claude Code 的本机入口软链：
-#   .claude/skills -> ../.agents/skills        （目录级软链：一条覆盖全部仓库
+#   .claude/skills -> ../.agents/skills（目录级软链：一条覆盖全部仓库
 #   skill，与全局 ~/.claude/skills 同一约定，新增 skill 零维护）
 # AGENTS.md 与 .agents/ 是入库的唯一事实源（Claude Code 原生读 AGENTS.md，
 # 不再需要 CLAUDE.md 软链）；/.claude/ 整体 gitignore，属本机便利层。

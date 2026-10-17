@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import shlex
 import shutil
 import subprocess
 import sys
@@ -82,6 +83,19 @@ def test_current_links_to_evidence_still_require_a_target(repository):
     page = repository / "AGENTS.md"
     page.write_text("# 当前\n\n[数据](results/missing.json)\n")
     assert any("missing.json" in error for error in check(repository))
+
+
+def test_adopted_source_targets_must_exist_inside_the_snapshot(repository):
+    manifest = repository / "scripts/maintenance-source.json"
+    data = {"files": [{"target": ".autocorrectrc", "status": "verbatim"}]}
+    manifest.write_text(json.dumps(data))
+    assert any(".autocorrectrc" in error for error in check(repository))
+    target = repository / ".autocorrectrc"
+    target.write_text("context:\n  codeblock: 0\n")
+    assert check(repository) == []
+    data["files"][0]["target"] = str(target)
+    manifest.write_text(json.dumps(data))
+    assert any("越界" in error for error in check(repository))
 
 
 def test_scheduler_preserves_its_python_environment(repository, monkeypatch):
@@ -178,3 +192,110 @@ def test_setup_preserves_foreign_skill_entries(repository):
     (repository / ".claude/skills").symlink_to(external, target_is_directory=True)
     assert call_setup(repository).returncode != 0
     assert (repository / ".claude/skills").resolve() == external
+
+
+def test_owned_hooks_preserve_partial_staging_and_push_environment(repository):
+    import os
+
+    import yaml
+
+    install_fixture(repository)
+    project = SCRIPTS.parent
+    for name in ("hook_entry.py", "install_hooks.py"):
+        shutil.copy2(SCRIPTS / name, repository / "scripts" / name)
+    for name in ("pre-commit", "pre-push"):
+        shutil.copy2(project / ".githooks" / name, repository / ".githooks" / name)
+    formatter = f"{project}/node_modules/.bin/git-format-staged"
+    config = {
+        "repos": [
+            {
+                "repo": "local",
+                "hooks": [
+                    {
+                        "id": "format",
+                        "name": "format",
+                        "stages": ["manual"],
+                        "entry": formatter + ' --formatter "ruff format --stdin-filename {} -"',
+                        "language": "system",
+                        "types": ["python"],
+                    },
+                    {
+                        "id": "environment",
+                        "name": "environment",
+                        "stages": ["pre-commit"],
+                        "entry": "python3 -c " + shlex.quote("import identify, markdown_it"),
+                        "language": "system",
+                        "always_run": True,
+                        "pass_filenames": False,
+                    },
+                    {
+                        "id": "push",
+                        "name": "push",
+                        "stages": ["pre-push"],
+                        "entry": "python3 -c "
+                        + shlex.quote(
+                            "import identify, markdown_it; from pathlib import Path; "
+                            "raise SystemExit(int(Path('reject-push').exists()))"
+                        ),
+                        "language": "system",
+                        "always_run": True,
+                        "pass_filenames": False,
+                    },
+                ],
+            }
+        ],
+    }
+    (repository / ".pre-commit-config.yaml").write_text(yaml.safe_dump(config))
+
+    def git(*args, check=True, environment=None):
+        return subprocess.run(
+            ["git", *args],
+            cwd=repository,
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=check,
+        )
+
+    git("config", "user.name", "Fixture")
+    git("config", "user.email", "fixture@example.invalid")
+    code = repository / "source.py"
+    code.write_text("value = 0\n")
+    git("add", ".")
+    git("commit", "-qm", "baseline")
+    assert call_setup(repository).returncode == 0
+    poison = repository / "poison-bin"
+    poison.mkdir()
+    (poison / "python3").write_text("#!/bin/sh\nexit 41\n")
+    (poison / "python3").chmod(0o755)
+    environment = os.environ | {"PATH": str(poison) + os.pathsep + os.environ["PATH"]}
+    code.write_text("value=1\n")
+    git("add", "source.py")
+    code.write_text("value=1\n\n# unstaged note\n")
+    git("commit", "-qm", "partial", environment=environment)
+    assert git("show", "HEAD:source.py").stdout == "value = 1\n"
+    assert "# unstaged note" in code.read_text()
+    code.write_text("value = (\n")
+    git("add", "source.py")
+    repair = "value = 2\n# unstaged repair\n"
+    code.write_text(repair)
+    assert git("commit", "-qm", "invalid", check=False, environment=environment).returncode != 0
+    assert code.read_text() == repair
+    assert git("show", ":source.py").stdout == "value = (\n"
+    git("add", "source.py")
+    git("commit", "-qm", "repair", environment=environment)
+    remote = repository / "remote.git"
+    git("init", "--bare", "-q", str(remote))
+    git("push", str(remote), "HEAD:refs/heads/main", environment=environment)
+    git("commit", "--allow-empty", "-qm", "next", environment=environment)
+    (repository / "reject-push").touch()
+    assert (
+        git(
+            "push", str(remote), "HEAD:refs/heads/main", check=False, environment=environment
+        ).returncode
+        != 0
+    )
+    assert (
+        git("rev-parse", "HEAD").stdout.strip()
+        not in git("ls-remote", str(remote), "refs/heads/main").stdout
+    )
