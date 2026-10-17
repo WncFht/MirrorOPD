@@ -177,6 +177,34 @@ index 7a5d6f0..26527fd 100644
  
      assert num_attention_heads % ulysses_sp_size == 0, (
          f"num_attention_heads {num_attention_heads} must be divisible by ulysses_sp_size {ulysses_sp_size}"
+diff --git a/verl/verl/protocol.py b/verl/verl/protocol.py
+index 59f91d8..20b986b 100644
+--- a/verl/verl/protocol.py
++++ b/verl/verl/protocol.py
+@@ -658,11 +658,8 @@ class DataProto:
+ 
+         if self.batch is not None:
+             # Use TensorDict's built-in indexing capabilities
+-            selected_batch = TensorDict(
+-                source={key: tensor[idxs_torch] for key, tensor in self.batch.items()},
+-                batch_size=(batch_size,),
+-                device=self.batch.device,
+-            )
++            from verl.utils.tensordict_utils import index_select_tensor_dict
++            selected_batch = index_select_tensor_dict(self.batch, idxs_torch)
+         else:
+             selected_batch = None
+ 
+@@ -965,7 +962,8 @@ class DataProto:
+         Note that this operation is in-place
+         """
+         indices_np = indices.detach().numpy()
+-        self.batch = self.batch[indices]
++        from verl.utils.tensordict_utils import index_select_tensor_dict
++        self.batch = index_select_tensor_dict(self.batch, indices)
+         self.non_tensor_batch = {key: val[indices_np] for key, val in self.non_tensor_batch.items()}
+ 
+     def repeat(self, repeat_times=2, interleave=True):
 diff --git a/verl/verl/trainer/config/distillation/distillation.yaml b/verl/verl/trainer/config/distillation/distillation.yaml
 index a2f1871..5a65225 100644
 --- a/verl/verl/trainer/config/distillation/distillation.yaml
@@ -887,7 +915,7 @@ index 8162f8b..419fee5 100644
      nnodes: int = 0
      n_gpus_per_node: int = 8
 diff --git a/verl/verl/workers/engine/fsdp/transformer_impl.py b/verl/verl/workers/engine/fsdp/transformer_impl.py
-index afbf7ec..7bda16d 100644
+index afbf7ec..5752ad8 100644
 --- a/verl/verl/workers/engine/fsdp/transformer_impl.py
 +++ b/verl/verl/workers/engine/fsdp/transformer_impl.py
 @@ -62,6 +62,7 @@ from verl.utils.fsdp_utils import (
@@ -959,7 +987,16 @@ index afbf7ec..7bda16d 100644
          # Apply LoRA adapters if low-rank adaptation is enabled
          if self._is_lora:
              module = self._build_lora_module(module)
-@@ -731,7 +760,10 @@ class FSDPEngine(BaseEngine):
+@@ -648,6 +677,8 @@ class FSDPEngine(BaseEngine):
+                     else:
+                         loss.backward()
+ 
++            if forward_only and tu.get_non_tensor_data(data=micro_batch, key="mirror_stage", default=None) is not None:
++                meta_info["model_output"] = {k: v.detach().cpu() for k, v in meta_info.get("model_output", {}).items()}
+             if not forward_only:
+                 mo = meta_info.get("model_output")
+                 if mo:
+@@ -731,7 +762,10 @@ class FSDPEngine(BaseEngine):
          """
          super().to(device=device, model=model, optimizer=optimizer, grad=grad)
  
@@ -971,7 +1008,7 @@ index afbf7ec..7bda16d 100644
              # force cpu_offload
              return
  
-@@ -1079,6 +1111,11 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1079,6 +1113,11 @@ class FSDPEngineWithLMHead(FSDPEngine):
              data=micro_batch, key="calculate_sum_pi_squared", default=False
          )
          distillation_use_topk = tu.get_non_tensor_data(data=micro_batch, key="distillation_use_topk", default=False)
@@ -983,7 +1020,7 @@ index afbf7ec..7bda16d 100644
  
          if calculate_sum_pi_squared and use_fused_kernels:
              raise NotImplementedError(
-@@ -1086,6 +1123,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1086,6 +1125,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
                  "fused kernels do not materialize the full logits tensor needed for Σπ²."
              )
  
@@ -997,7 +1034,7 @@ index afbf7ec..7bda16d 100644
          model_output = {}
  
          input_ids = micro_batch["input_ids"]
-@@ -1119,13 +1163,20 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1119,13 +1165,21 @@ class FSDPEngineWithLMHead(FSDPEngine):
  
                  # if use_sp: ((total_nnz / sp) + pad) ; if not use_sp: (batch, seqlen)
                  inplace_backward = True
@@ -1015,11 +1052,12 @@ index afbf7ec..7bda16d 100644
 +                    outputs = cache_callback(logits_rmpad, micro_batch, mirror_stage,
 +                                             sequence_parallel_size=get_ulysses_sequence_parallel_world_size())
 +                    for key, value in outputs.items():
-+                        model_output[key] = torch.nested.nested_tensor_from_jagged(value, input_ids.offsets())
++                        from mirroropd.integrations.verl.adapter import nested_cache_output
++                        model_output[key] = nested_cache_output(key, value, micro_batch["mirror_cache_valid"], input_ids.offsets())
  
                  # compute entropy
                  if calculate_entropy:
-@@ -1218,6 +1269,13 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1218,6 +1272,14 @@ class FSDPEngineWithLMHead(FSDPEngine):
                      logits_rmpad = torch.cat([t for t in logits.unbind()])
                      input_ids_rmpad_rolled = output_args["input_ids_rmpad_rolled"]
                      log_probs = logprobs_from_logits(logits=logits_rmpad, labels=input_ids_rmpad_rolled)
@@ -1029,11 +1067,12 @@ index afbf7ec..7bda16d 100644
 +                    outputs = cache_callback(logits_rmpad, micro_batch, mirror_stage,
 +                                             sequence_parallel_size=get_ulysses_sequence_parallel_world_size())
 +                    for key, value in outputs.items():
-+                            model_output[key] = torch.nested.nested_tensor_from_jagged(value, cu_seqlens)
++                            from mirroropd.integrations.verl.adapter import nested_cache_output
++                            model_output[key] = nested_cache_output(key, value, micro_batch["mirror_cache_valid"], cu_seqlens)
  
                      # Mirror the use_remove_padding=True branch (see verl#6293).
                      # No Ulysses SP gather here: this branch is the no-SP path
-@@ -1258,6 +1316,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
+@@ -1258,6 +1320,9 @@ class FSDPEngineWithLMHead(FSDPEngine):
  
      def forward_step(self, micro_batch: TensorDict, loss_function, forward_only):
          device_name = get_device_name()
@@ -1043,11 +1082,47 @@ index afbf7ec..7bda16d 100644
          # actually, we should avoid assigning like this...
          micro_batch = micro_batch.to(get_device_id())
          model_inputs, output_args = self.prepare_model_inputs(micro_batch=micro_batch)
+@@ -1272,15 +1337,23 @@ class FSDPEngineWithLMHead(FSDPEngine):
+             if autocast_dtype == torch.float32
+             else torch.autocast(device_type=device_name, dtype=autocast_dtype)
+         )
+-        with autocast_ctx:
++        from mirroropd.integrations.verl.projection import project_head
++        with autocast_ctx, project_head(
++            self.module, micro_batch, sequence_parallel_size=get_ulysses_sequence_parallel_world_size()
++        ) as projected:
+             raw_output = self.module(
+                 **model_inputs,
+                 use_cache=False,
+             )  # prevent model thinks we are generating
+ 
+-            model_output = self.prepare_model_outputs(
+-                output=raw_output, output_args=output_args, micro_batch=micro_batch, logits_processor_func=loss_function
+-            )
++            if projected.enabled:
++                if not tu.get_non_tensor_data(data=micro_batch, key="use_remove_padding", default=True):
++                    raise NotImplementedError("Projected MirrorOPD requires remove-padding")
++                model_output = projected.outputs(raw_output.logits, micro_batch["input_ids"])
++            else:
++                model_output = self.prepare_model_outputs(
++                    output=raw_output, output_args=output_args, micro_batch=micro_batch, logits_processor_func=loss_function
++                )
+ 
+             if loss_function is not None:
+                 loss, metrics = loss_function(
 diff --git a/verl/verl/workers/engine_workers.py b/verl/verl/workers/engine_workers.py
-index c4c7d8f..73a7987 100644
+index c4c7d8f..c3a65ce 100644
 --- a/verl/verl/workers/engine_workers.py
 +++ b/verl/verl/workers/engine_workers.py
-@@ -304,7 +304,8 @@ class TrainingWorker(Worker, DistProfilerExtension):
+@@ -38,6 +38,7 @@ from verl.utils.distributed import initialize_global_process_group_ray, set_numa
+ from verl.utils.flops_counter import FlopsCounter
+ from verl.utils.import_utils import import_external_libs
+ from verl.utils.memory_utils import aggressive_empty_cache
++from mirroropd.integrations.verl.bridge import worker_memory_phase
+ from verl.utils.metric.utils import Metric
+ from verl.utils.profiler import DistProfiler, DistProfilerExtension, ProfilerConfig, log_gpu_memory_usage
+ from verl.utils.py_functional import append_to_dict
+@@ -304,7 +305,8 @@ class TrainingWorker(Worker, DistProfilerExtension):
              if self.engine.is_mp_src_rank_with_outputs():
                  actor_output = [tu.get(output, "metrics") for output in output_lst]
                  metrics = {}
@@ -1057,7 +1132,7 @@ index c4c7d8f..73a7987 100644
                      for key, val in output.items():
                          # flattn dp and micro batch
                          if isinstance(val, list):
-@@ -313,6 +314,12 @@ class TrainingWorker(Worker, DistProfilerExtension):
+@@ -313,6 +315,12 @@ class TrainingWorker(Worker, DistProfilerExtension):
                                  if isinstance(val[0], Metric)
                                  else list(chain.from_iterable(val))
                              )
@@ -1070,7 +1145,23 @@ index c4c7d8f..73a7987 100644
                      append_to_dict(metrics, output)
  
                  output = tu.get_tensordict(tensor_dict={}, non_tensor_dict={"metrics": metrics}).cpu()
-@@ -514,7 +521,28 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
+@@ -322,6 +330,7 @@ class TrainingWorker(Worker, DistProfilerExtension):
+ 
+     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="train"), blocking=False)
+     @DistProfiler.annotate(color="red", role="train_batch")
++    @worker_memory_phase("worker.train")
+     def train_batch(self, data: TensorDict) -> TensorDict:
+         assert self.loss_fn is not None, "loss function can't be None when calling train_batch"
+         assert not self.engine_config.forward_only, "Can't run `train_batch` when forward_only is in the engine config."
+@@ -377,6 +386,7 @@ class TrainingWorker(Worker, DistProfilerExtension):
+         return final_output
+ 
+     @register(dispatch_mode=make_nd_compute_dataproto_dispatch_fn(mesh_name="train"), blocking=False)
++    @worker_memory_phase("worker.infer")
+     def infer_batch(self, data: TensorDict) -> TensorDict:
+         # add mfu calculator
+         global_token_num = tu.get(data, key="global_token_num")
+@@ -514,7 +524,28 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
              ref_config: ActorConfig = omega_conf_to_dataclass(self.config.ref)
  
              # The ref model does not need to enable MTP; force it to false.

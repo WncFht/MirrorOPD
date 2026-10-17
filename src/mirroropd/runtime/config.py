@@ -10,6 +10,7 @@ from pathlib import Path
 
 from mirroropd.core.config import API_VERSION, Objective, decode, strict_fields
 from mirroropd.identity import content_id
+from mirroropd.runtime.memory import Memory
 
 
 @dataclass(frozen=True, slots=True)
@@ -276,6 +277,7 @@ class Job:
     models: Models
     data: Dataset
     objective: Objective = field(default_factory=Objective)
+    memory: Memory = field(default_factory=Memory)
     training: Training = field(default_factory=Training)
     evaluation: Evaluation = field(default_factory=Evaluation)
     precision: Precision = field(default_factory=Precision)

@@ -1,0 +1,100 @@
+"""Exercise chunked projection and compact cache in the pinned four-GPU trainer.
+
+This is a bounded synthetic canary, not a task-quality evaluation. The caller
+must wait for existing jobs; run_job acquires the standard GPU reservations.
+"""
+
+import argparse
+from pathlib import Path
+
+from mirroropd.runtime.artifacts import atomic_json
+from mirroropd.runtime.config import Job
+from mirroropd.runtime.runner import run_job
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--backend", type=Path, required=True)
+    parser.add_argument("--lease-root", type=Path, required=True)
+    parser.add_argument("--borrowed-slot", type=Path)
+    args = parser.parse_args()
+    args.output = args.output.resolve()
+    args.output.mkdir(parents=True, exist_ok=False)
+    from native_validation import tiny_inputs
+
+    models = tiny_inputs(args.output / "inputs")
+    completed = []
+    for algorithm, integration, diagnostics in (
+        ("bpo", "sampled", "full"),
+        ("bpo", "full", "full"),
+        ("bpo", "full", "none"),
+        ("mdpo", "sampled", "none"),
+        ("on_policy", "full", "full"),
+    ):
+        name = f"{algorithm}-{integration}-{diagnostics}"
+        job = Job.from_dict(
+            {
+                "schema_version": 2,
+                "name": name,
+                "models": models,
+                "data": {
+                    "train": [str(args.output / "inputs/train.jsonl")],
+                    "validation": [str(args.output / "inputs/test.jsonl")],
+                    "source_name": "synthetic-qa",
+                    "columns": {"prompt": "question", "answer": "answer"},
+                    "scorer": {"name": "exact"},
+                },
+                "objective": {
+                    "algorithm": algorithm,
+                    "estimator": {
+                        "center": "full" if integration == "full" else "topj_tail",
+                        "integration": integration,
+                        "topj": 16,
+                    },
+                    "diagnostics": diagnostics,
+                },
+                "memory": {
+                    "projection": "chunked",
+                    "token_chunk_size": 3,
+                    "vocab_chunk_size": 7,
+                    "profile_phases": True,
+                },
+                "training": {
+                    "outer_steps": 2,
+                    "inner_steps": 1 if algorithm == "on_policy" else 2,
+                    "batch_size": 4,
+                    "prompt_tokens": 64,
+                    "response_tokens": 16,
+                    "temperature": 0.7,
+                },
+                "evaluation": {
+                    "every": 2,
+                    "samples_per_question": 2,
+                    "prompt_tokens": 64,
+                    "response_tokens": 32,
+                    "question_limit": 4,
+                },
+                "resources": {
+                    "gpu_ids": [0, 1, 2, 3],
+                    "cpus": 16,
+                    "rollout_memory_fraction": 0.05,
+                    "max_sequences": 4,
+                    "max_batch_tokens": 256,
+                },
+            }
+        )
+        atomic_json(args.output / "status.json", {"stage": name, "completed": completed})
+        result = run_job(
+            job,
+            backend=args.backend,
+            directory=args.output / name,
+            lease_root=args.lease_root,
+            borrowed_slot=args.borrowed_slot,
+        )
+        completed.append({"name": name, "verification": result})
+    atomic_json(args.output / "status.json", {"state": "completed", "completed": completed})
+
+
+if __name__ == "__main__":
+    main()

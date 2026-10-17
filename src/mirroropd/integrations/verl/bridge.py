@@ -1,8 +1,8 @@
 """Narrow verl binding; framework imports occur only inside native callbacks."""
 
 import json
-from dataclasses import dataclass
-from functools import lru_cache
+from dataclasses import asdict, dataclass, field
+from functools import lru_cache, wraps
 
 from mirroropd.core.cache import ANCHOR_FIELDS, TEACHER_FIELDS, WIRE_PREFIX
 from mirroropd.core.config import API_VERSION, CacheContext, Objective, decode
@@ -12,9 +12,10 @@ from mirroropd.integrations.verl.adapter import (
     cache_outputs,
     loss_outputs,
     prediction_fields,
-    restore_predictions,
+    restore_cache_output,
 )
 from mirroropd.runtime.events import environment_writer, phase
+from mirroropd.runtime.memory import Memory
 from mirroropd.runtime.metrics import finalize_moments, record_update, token_moments
 
 
@@ -25,6 +26,7 @@ class Settings:
     tokenizer_id: str
     vocab_size: int
     objective: Objective
+    memory: Memory = field(default_factory=Memory)
     schema_version: int = API_VERSION
 
     def __post_init__(self):
@@ -59,6 +61,11 @@ def window_context(config, anchor_version, temperature):
         temperature,
         value.objective.signal,
         value.objective.estimator,
+        action_only=(
+            value.objective.algorithm == "mdpo"
+            and value.objective.estimator.integration == "sampled"
+            and value.objective.diagnostics == "none"
+        ),
     )
 
 
@@ -184,6 +191,7 @@ def anchor_pass(trainer, batch):
         mirror_context=context.to_dict(),
         mirror_anchor_version=context.anchor_version,
         mirror_objective=settings(trainer.distillation_config).objective.to_dict(),
+        mirror_memory=asdict(settings(trainer.distillation_config).memory),
     )
     data = batch.to_tensordict()
     for key, value in prediction_fields(
@@ -199,8 +207,8 @@ def anchor_pass(trainer, batch):
     for name in ANCHOR_FIELDS:
         key = WIRE_PREFIX + name
         if tu.get(output, key) is not None:
-            values[key] = restore_predictions(
-                tu.get(output, key), data["attention_mask"].shape, indices
+            values[key] = restore_cache_output(
+                key, tu.get(output, key), data["attention_mask"].shape, indices
             )
     writer = environment_writer("driver")
     if writer:
@@ -232,8 +240,8 @@ def teacher_pass(trainer, batch):
     for name in TEACHER_FIELDS:
         key = WIRE_PREFIX + name
         if tu.get(output, key) is not None:
-            values[key] = restore_predictions(
-                tu.get(output, key), data["attention_mask"].shape, indices
+            values[key] = restore_cache_output(
+                key, tu.get(output, key), data["attention_mask"].shape, indices
             )
     return DataProto.from_tensordict(tu.get_tensordict(values))
 
@@ -260,3 +268,32 @@ def batch_metrics(batch):
         scores = batch.batch["token_level_scores"].sum(-1)
         result["task/score_mean"] = scores[references].float().mean().item()
     return result
+
+
+def worker_memory_phase(name):
+    """Observe the whole native worker operation; nested projections never reset peaks."""
+
+    def decorate(function):
+        @wraps(function)
+        def wrapped(self, data, *args, **kwargs):
+            import torch
+            from verl.utils import tensordict_utils as tu
+
+            context = tu.get_non_tensor_data(data, key="mirror_context", default=None)
+            if context is None:
+                return function(self, data, *args, **kwargs)
+            memory = Memory(**tu.get_non_tensor_data(data, key="mirror_memory", default={}))
+            rank = torch.distributed.get_rank() if torch.distributed.is_initialized() else 0
+            stage = tu.get_non_tensor_data(data, key="mirror_stage", default=None)
+            label = name + ("." + stage if stage else "")
+            with phase(
+                label,
+                source="worker-" + str(rank),
+                profile_memory=memory.profile_phases,
+                outer=context["anchor_version"],
+            ):
+                return function(self, data, *args, **kwargs)
+
+        return wrapped
+
+    return decorate

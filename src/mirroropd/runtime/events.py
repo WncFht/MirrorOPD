@@ -4,6 +4,7 @@ import contextlib
 import json
 import os
 import re
+import sys
 import threading
 import time
 import uuid
@@ -88,9 +89,25 @@ class EventWriter:
         return record
 
     @contextlib.contextmanager
-    def phase(self, name, **coordinates):
+    def phase(self, name, *, profile_memory=False, **coordinates):
+        from mirroropd.runtime.memory import memory_snapshot
+
+        # Profiling is opt-in and applies only to this producer's initialized
+        # CUDA context. Normal execution neither resets peaks nor synchronizes.
+        torch = sys.modules.get("torch")
+        profiling = bool(profile_memory and torch is not None and torch.cuda.is_initialized())
+        if profiling:
+            torch.cuda.synchronize()
+            torch.cuda.reset_peak_memory_stats()
         start = time.monotonic()
-        self.emit("phase.started", phase=name, rss_bytes=process_rss_bytes(), **coordinates)
+        initial = memory_snapshot()
+        self.emit(
+            "phase.started",
+            phase=name,
+            memory=initial,
+            rss_bytes=process_rss_bytes(),
+            **coordinates,
+        )
         try:
             yield
         except BaseException as error:
@@ -104,11 +121,19 @@ class EventWriter:
             )
             raise
         else:
+            if profiling:
+                torch.cuda.synchronize()
+            final = memory_snapshot()
             self.emit(
                 "phase.completed",
                 phase=name,
                 duration_seconds=time.monotonic() - start,
                 rss_bytes=process_rss_bytes(),
+                memory=final,
+                memory_scope="phase_peak" if profiling else "process_peak",
+                allocated_delta_bytes=(
+                    final.get("allocated_bytes", 0) - initial.get("allocated_bytes", 0)
+                ),
                 **coordinates,
             )
 
@@ -127,12 +152,12 @@ def _environment_writer(directory, run_id, source, config_id):
 
 
 @contextlib.contextmanager
-def phase(name, **coordinates):
-    writer = environment_writer("driver")
+def phase(name, *, source="driver", profile_memory=False, **coordinates):
+    writer = environment_writer(source)
     if writer is None:
         yield
     else:
-        with writer.phase(name, **coordinates):
+        with writer.phase(name, profile_memory=profile_memory, **coordinates):
             yield
 
 

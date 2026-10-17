@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import torch
 
+from mirroropd.core.cache import FULL_FIELDS
 from mirroropd.core.diagnostics import diagnostic_names, full_diagnostics, student_statistics
 from mirroropd.core.distributions import Distribution, probability_dtype
 from mirroropd.core.signal import power_reward
@@ -43,7 +44,7 @@ def integrated_loss(logp, anchor_logp, target_logp, algorithm, eta):
     raise ValueError(f"Unknown algorithm: {algorithm}")
 
 
-def compute_loss(student_logits, cache, objective, *, anchor_version):
+def compute_loss(student_logits, cache, objective, *, anchor_version, vocab_chunk_size=4096):
     """One loss per prefix. Prefix sampling remains the frozen rollout measure.
 
     On-policy is one full-batch update per fresh window; the runtime enforces
@@ -68,14 +69,41 @@ def compute_loss(student_logits, cache, objective, *, anchor_version):
         )
     values = {}
     for name, tensor in cache.tensors().items():
+        if name in FULL_FIELDS:
+            values[name] = tensor
+            continue
         trailing = tensor.shape[cache.valid.ndim :]
         value = tensor.reshape(flat_valid.numel(), *trailing)
         values[name] = value if all_valid else value[flat_valid]
+    raw_bpo = objective.algorithm == "bpo" and objective.estimator.integration == "full"
+    if raw_bpo and objective.diagnostics == "none":
+        from mirroropd.core.kernels import full_bpo
+
+        loss = full_bpo(
+            logits,
+            values["anchor_full"],
+            values["target_full"],
+            objective.signal.eta,
+            token_chunk=objective.estimator.chunk_size,
+            vocab_chunk=vocab_chunk_size,
+        )
+        if not torch.isfinite(loss).all():
+            raise FloatingPointError("Nonfinite conditional BPO objective")
+        output = (
+            loss.reshape(cache.valid.shape)
+            if all_valid
+            else loss.new_zeros(flat_valid.shape)
+            .index_copy(0, flat_valid.nonzero().squeeze(-1), loss)
+            .reshape(cache.valid.shape)
+        )
+        return LossResult(output, {}, kind)
     distribution = Distribution.from_logits(
         logits,
-        materialize=(objective.estimator.integration == "full" or objective.diagnostics == "full"),
+        materialize=objective.estimator.integration == "full" and not raw_bpo,
     )
-    logp = distribution.full() if objective.estimator.integration == "full" else None
+    logp = (
+        distribution.full() if objective.estimator.integration == "full" and not raw_bpo else None
+    )
     center = head = tail = None
     if objective.diagnostics != "none" or (
         objective.algorithm == "bpo" and objective.estimator.integration == "sampled"
@@ -88,7 +116,18 @@ def compute_loss(student_logits, cache, objective, *, anchor_version):
             include_support=objective.diagnostics == "full",
         )
     coefficient = reward = u = None
-    if logp is not None:
+    if raw_bpo:
+        from mirroropd.core.kernels import full_bpo
+
+        loss = full_bpo(
+            logits,
+            values["anchor_full"],
+            values["target_full"],
+            objective.signal.eta,
+            token_chunk=objective.estimator.chunk_size,
+            vocab_chunk=vocab_chunk_size,
+        )
+    elif logp is not None:
         loss = integrated_loss(
             logp,
             values["anchor_full"],
@@ -107,7 +146,7 @@ def compute_loss(student_logits, cache, objective, *, anchor_version):
                 objective.algorithm,
                 u,
                 reward,
-                values["reward_center"],
+                values.get("reward_center"),
                 center,
                 objective.signal.eta,
             )
