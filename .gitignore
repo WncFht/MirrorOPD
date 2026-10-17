@@ -101,3 +101,6 @@ data/oneshot-lr-stability/*.csv
 
 # Raw audit tar files restore from versioned gzip archives.
 /data/integration-audit-20261017/*.tar
+
+# Frozen open-source OPD research inputs restore from gzip.
+/data/deepseek-opd-research-20261018/source-evidence.tar

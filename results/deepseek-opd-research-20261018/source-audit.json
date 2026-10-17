@@ -1,0 +1,258 @@
+{
+  "retrieved_date": "2026-10-18",
+  "report": "https://arxiv.org/html/2606.19348v1#S5.SS2.SSS2",
+  "official_scope": {
+    "model_revision": "b5968e9190ef611bbf34a7229255be88a0e937c1",
+    "published_non_weight_files": [
+      ".gitattributes",
+      "LICENSE",
+      "README.md",
+      "assets/dsv4_performance.png",
+      "config.json",
+      "encoding/README.md",
+      "encoding/encoding_dsv4.py",
+      "encoding/test_encoding_dsv4.py",
+      "encoding/tests/test_input_1.json",
+      "encoding/tests/test_input_2.json",
+      "encoding/tests/test_input_3.json",
+      "encoding/tests/test_input_4.json",
+      "encoding/tests/test_output_1.txt",
+      "encoding/tests/test_output_2.txt",
+      "encoding/tests/test_output_3.txt",
+      "encoding/tests/test_output_4.txt",
+      "generation_config.json",
+      "inference/README.md",
+      "inference/config.json",
+      "inference/convert.py",
+      "inference/generate.py",
+      "inference/kernel.py",
+      "inference/model.py",
+      "inference/requirements.txt",
+      "model.safetensors.index.json",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "tilekernels_commit": "c1cf914a82e6901c679445f872051ce44ac2cc63",
+    "tilelang_commit": "fe6d319c78c0738186fc6e83eb8436ddef65204d",
+    "negative_scope": "Published model files and checked public source trees contain inference/encoding and other kernels; no complete 5.2.2 training scheduler or matching OPD KL kernel identified. This is not proof of absence in every external repository."
+  },
+  "candidates": [
+    {
+      "name": "Nitrobrew",
+      "repository": "tilde-research/nitrobrew-release",
+      "commit": "17f6f16b7451929209ac495c6b0ea0fcc4d0cedc",
+      "license": "Apache-2.0",
+      "scope": "Independent hidden+head, vocab-chunked forward/reverse KL; no distributed teacher scheduler."
+    },
+    {
+      "name": "Liger",
+      "repository": "linkedin/Liger-Kernel",
+      "commit": "ff8ce5857420cee06865f40ffa8a60309bf2b458",
+      "license": "BSD-2-Clause",
+      "scope": "Fused linear distillation, token-chunked CxV temporaries; not a whole teacher system."
+    },
+    {
+      "name": "TRL chunked divergence",
+      "repository": "huggingface/trl",
+      "commit": "cdfe756f3ea9d47c2a6c59d6ebb529986cad8a4e",
+      "license": "Apache-2.0",
+      "scope": "Token/vocab tiles, online normalization, head gathering and recomputed backward."
+    }
+  ],
+  "verl_integration": {
+    "pr": 6194,
+    "state": "open",
+    "draft": true,
+    "merged_at": null,
+    "head_commit": "8650c6f845a2dcdd866bb9645768a66b8e552446",
+    "head_repository": "tilde-research/nitrobrew-verl",
+    "updated_at": "2026-09-21T11:35:01Z",
+    "finding": "FSDP entry accepts and saves student_logits; teacher manager uses configurable truncated SVD; PR body contains end-to-end result placeholders."
+  },
+  "teacher_pool_rfc": {
+    "issue": 6705,
+    "state": "open",
+    "updated_at": "2026-06-12T09:20:44Z",
+    "scope": "Design proposal; no first-version fused kernel or prefix cache."
+  },
+  "cpu_validation": {
+    "scope": "CPU FP32 source semantics only; compile decorators disabled; no CUDA, performance or distributed integration claim",
+    "source_commit": "17f6f16b7451929209ac495c6b0ea0fcc4d0cedc",
+    "cases": [
+      {
+        "direction": "forward",
+        "temperature": 0.7,
+        "vocab_chunk": 1,
+        "loss_max_abs": 5.811452865600586e-07,
+        "gradient_max_abs": 6.332993507385254e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 0.7,
+        "vocab_chunk": 7,
+        "loss_max_abs": 2.980232238769531e-07,
+        "gradient_max_abs": 5.21540641784668e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 0.7,
+        "vocab_chunk": 64,
+        "loss_max_abs": 2.980232238769531e-07,
+        "gradient_max_abs": 5.960464477539063e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 1.0,
+        "vocab_chunk": 1,
+        "loss_max_abs": 5.885958671569824e-07,
+        "gradient_max_abs": 3.3527612686157227e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 1.0,
+        "vocab_chunk": 7,
+        "loss_max_abs": 3.2782554626464844e-07,
+        "gradient_max_abs": 2.60770320892334e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 1.0,
+        "vocab_chunk": 64,
+        "loss_max_abs": 5.364418029785156e-07,
+        "gradient_max_abs": 2.60770320892334e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 2.0,
+        "vocab_chunk": 1,
+        "loss_max_abs": 4.6566128730773926e-07,
+        "gradient_max_abs": 1.5366822481155396e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 2.0,
+        "vocab_chunk": 7,
+        "loss_max_abs": 3.5762786865234375e-07,
+        "gradient_max_abs": 1.6065314412117004e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "forward",
+        "temperature": 2.0,
+        "vocab_chunk": 64,
+        "loss_max_abs": 2.2724270820617676e-07,
+        "gradient_max_abs": 1.0011717677116394e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 0.7,
+        "vocab_chunk": 1,
+        "loss_max_abs": 4.76837158203125e-07,
+        "gradient_max_abs": 5.960464477539063e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 0.7,
+        "vocab_chunk": 7,
+        "loss_max_abs": 4.172325134277344e-07,
+        "gradient_max_abs": 5.960464477539063e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 0.7,
+        "vocab_chunk": 64,
+        "loss_max_abs": 4.023313522338867e-07,
+        "gradient_max_abs": 5.21540641784668e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 1.0,
+        "vocab_chunk": 1,
+        "loss_max_abs": 4.023313522338867e-07,
+        "gradient_max_abs": 1.4901161193847656e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 1.0,
+        "vocab_chunk": 7,
+        "loss_max_abs": 3.725290298461914e-07,
+        "gradient_max_abs": 2.2351741790771484e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 1.0,
+        "vocab_chunk": 64,
+        "loss_max_abs": 4.023313522338867e-07,
+        "gradient_max_abs": 2.2351741790771484e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 2.0,
+        "vocab_chunk": 1,
+        "loss_max_abs": 4.6938657760620117e-07,
+        "gradient_max_abs": 1.955777406692505e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 2.0,
+        "vocab_chunk": 7,
+        "loss_max_abs": 4.302710294723511e-07,
+        "gradient_max_abs": 1.3504177331924438e-08,
+        "teacher_gradients": false
+      },
+      {
+        "direction": "reverse",
+        "temperature": 2.0,
+        "vocab_chunk": 64,
+        "loss_max_abs": 2.5331974029541016e-07,
+        "gradient_max_abs": 1.3504177331924438e-08,
+        "teacher_gradients": false
+      }
+    ],
+    "passed": 18,
+    "max_loss_absolute_error": 5.885958671569824e-07,
+    "max_gradient_absolute_error": 6.332993507385254e-08,
+    "power_center_example": {
+      "q": [
+        0.5,
+        0.3,
+        0.2
+      ],
+      "teacher": [
+        0.4,
+        0.1,
+        0.5
+      ],
+      "kappa": 0.5,
+      "eta": 0.2,
+      "K_T": 0.15174632013689476,
+      "ordinary_KL_q_teacher": 0.25789731588270665
+    },
+    "cuda_initialized": false
+  },
+  "production_runtime_modified": false,
+  "reuse_priority": "Hidden anchor representation and streamed scalar centers for sampled BPO; retain action-only MDPO; do not replace power centers with an ordinary KL loss.",
+  "evidence": {
+    "archive": "data/deepseek-opd-research-20261018/source-evidence.tar.gz",
+    "restored_path": "data/deepseek-opd-research-20261018/source-evidence.tar",
+    "bytes": 276480,
+    "sha256": "b426963fe210df4a6e4113c4efc40ab51c4f7ecc01e941dcb732d7e1c026d63e",
+    "compressed_bytes": 60888
+  },
+  "pytest_collection": "tests/research/test_nitrobrew_reference.py"
+}

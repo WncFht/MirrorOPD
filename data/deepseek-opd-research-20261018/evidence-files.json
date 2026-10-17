@@ -1,0 +1,129 @@
+{
+  "archive": "data/deepseek-opd-research-20261018/source-evidence.tar.gz",
+  "restored_path": "data/deepseek-opd-research-20261018/source-evidence.tar",
+  "bytes": 276480,
+  "sha256": "b426963fe210df4a6e4113c4efc40ab51c4f7ecc01e941dcb732d7e1c026d63e",
+  "compressed_bytes": 60888,
+  "files": [
+    {
+      "path": "sources/liger/LICENSE",
+      "bytes": 1312,
+      "sha256": "3a1ccb0c7274b68e1af2ca1d54b10b662085ca56753400182ecf87ae33f2d1a8"
+    },
+    {
+      "path": "sources/liger/src/liger_kernel/chunked_loss/fused_linear_distillation.py",
+      "bytes": 13367,
+      "sha256": "47af4a1b775387fafd90c14542494a7376c14162f932efe1585a0db1f92069d8"
+    },
+    {
+      "path": "sources/liger/src/liger_kernel/chunked_loss/jsd_loss.py",
+      "bytes": 8761,
+      "sha256": "3492a627bebffa423cef96640b88507c2e2702f3cd0a3e19b0dc8336c7c3ef89"
+    },
+    {
+      "path": "sources/liger/src/liger_kernel/ops/fused_linear_jsd.py",
+      "bytes": 18424,
+      "sha256": "83f03211db89ddef1f4b3a1eb70217a38aea8995bdddb3005ea88d95b087da33"
+    },
+    {
+      "path": "sources/liger/src/liger_kernel/ops/jsd.py",
+      "bytes": 7153,
+      "sha256": "6e74fa29e7c616ad267b3a8913c1ea582aaeda06d06e6cfa27e44be54fb70f6f"
+    },
+    {
+      "path": "sources/liger/test/chunked_loss/test_jsd_loss.py",
+      "bytes": 16263,
+      "sha256": "9de6cda1f735535262d48448f3ed9eec977d4e828c747679ddc2e1098955f311"
+    },
+    {
+      "path": "sources/liger/test/transformers/test_fused_linear_jsd.py",
+      "bytes": 20525,
+      "sha256": "23792bc1a9bf766ca389cf0f8805ada28a2e471e503844effb0578fd0e04fa0a"
+    },
+    {
+      "path": "sources/nitrobrew/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "sources/nitrobrew/README.md",
+      "bytes": 3096,
+      "sha256": "b82003c332b1a4e56073330f10f1b0ba7e9239c55486d41452082b62b2b2e6b5"
+    },
+    {
+      "path": "sources/nitrobrew/benchmark.py",
+      "bytes": 8974,
+      "sha256": "9d22aca3d45cc2fbebc426a70f7a048f8042a88a7a1d3fcceef38fa9ace94f2e"
+    },
+    {
+      "path": "sources/nitrobrew/nitrobrew.py",
+      "bytes": 17085,
+      "sha256": "17297e0ac24c8f85a4448504bbdf0abb5951e12af509847ef7a07a2e9e003380"
+    },
+    {
+      "path": "sources/nitrobrew/pyproject.toml",
+      "bytes": 684,
+      "sha256": "2899c096b496f87f014739a87c62624d576dce5b574939095f2481ddd18e8400"
+    },
+    {
+      "path": "check-nitrobrew.py",
+      "bytes": 3876,
+      "sha256": "a3a9658e6992fc4cea7b2205acb32694a9d22f3cd825aac9e175309b0e0bd09b"
+    },
+    {
+      "path": "cpu-semantic-check.json",
+      "bytes": 4595,
+      "sha256": "679be5fe48bfd9d219ed8aadbb1e7b351d9a868ceaca6610d170ba1af1cba3a5"
+    },
+    {
+      "path": "source-files.json",
+      "bytes": 4708,
+      "sha256": "b6ab211802b97d1459db95f3bf9797b61192a59a08938d441a0ae55a7dbd204a"
+    },
+    {
+      "path": "trl-chunked-divergence.py",
+      "bytes": 22251,
+      "sha256": "362fa783aeda8799582bfa88db8d24157b7f25084fe10cc88f170ffb3095706c"
+    },
+    {
+      "path": "trl-license.txt",
+      "bytes": 11355,
+      "sha256": "1bf614b1fdc40fbd344aa58d00d17d5fd0d252ea333a05be018a38959c8b2998"
+    },
+    {
+      "path": "pr-nitrobrew_teacher.py.txt",
+      "bytes": 13965,
+      "sha256": "3cab1cdff368feca567b3f7cb0a1ec68d180c8cdbc4eff6ca6d5f2424bdc61fc"
+    },
+    {
+      "path": "pr-nitrobrew_loss.py.txt",
+      "bytes": 13157,
+      "sha256": "b35481aed2e928139e04149952e38ef550398dac8421a0c9f110d8eedfedf97c"
+    },
+    {
+      "path": "pr-test_nitrobrew_kernel_on_cpu.py.txt",
+      "bytes": 4497,
+      "sha256": "d597549298e96c93868059ee9b28a9c3bebba81bf7c00de76555e98083828d2a"
+    },
+    {
+      "path": "pr-license.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "hf-readme.txt",
+      "bytes": 13149,
+      "sha256": "c4d714818a4d3333542edc7d38ea065825a0cf7aa8fea3605bbd1d1c18e4a610"
+    },
+    {
+      "path": "hf-kernel.txt",
+      "bytes": 22198,
+      "sha256": "59b325083d7103975cba025bd0d60ea343bb82d8fff53088afb7c04bd380c0c2"
+    },
+    {
+      "path": "hf-inference.txt",
+      "bytes": 951,
+      "sha256": "68dba94f8676578cddff2b0e8861586ef89d1857c6ad29e40bf5f17610b03bdf"
+    }
+  ]
+}

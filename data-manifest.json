@@ -1163,6 +1163,12 @@
             "archive": "data/integration-audit-20261017/historical-math-memory.tar.gz",
             "sha256": "f72e4fcb571d115bac956e60c4e370acbcf6c4fedabf98984e30ff3ad53468dc",
             "bytes": 50513920
+        },
+        {
+            "path": "data/deepseek-opd-research-20261018/source-evidence.tar",
+            "archive": "data/deepseek-opd-research-20261018/source-evidence.tar.gz",
+            "sha256": "b426963fe210df4a6e4113c4efc40ab51c4f7ecc01e941dcb732d7e1c026d63e",
+            "bytes": 276480
         }
     ]
 }

@@ -1,0 +1,170 @@
+{
+  "scope": "CPU FP32 source semantics only; compile decorators disabled; no CUDA, performance or distributed integration claim",
+  "source_commit": "17f6f16b7451929209ac495c6b0ea0fcc4d0cedc",
+  "cases": [
+    {
+      "direction": "forward",
+      "temperature": 0.7,
+      "vocab_chunk": 1,
+      "loss_max_abs": 5.811452865600586e-07,
+      "gradient_max_abs": 6.332993507385254e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 0.7,
+      "vocab_chunk": 7,
+      "loss_max_abs": 2.980232238769531e-07,
+      "gradient_max_abs": 5.21540641784668e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 0.7,
+      "vocab_chunk": 64,
+      "loss_max_abs": 2.980232238769531e-07,
+      "gradient_max_abs": 5.960464477539063e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 1.0,
+      "vocab_chunk": 1,
+      "loss_max_abs": 5.885958671569824e-07,
+      "gradient_max_abs": 3.3527612686157227e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 1.0,
+      "vocab_chunk": 7,
+      "loss_max_abs": 3.2782554626464844e-07,
+      "gradient_max_abs": 2.60770320892334e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 1.0,
+      "vocab_chunk": 64,
+      "loss_max_abs": 5.364418029785156e-07,
+      "gradient_max_abs": 2.60770320892334e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 2.0,
+      "vocab_chunk": 1,
+      "loss_max_abs": 4.6566128730773926e-07,
+      "gradient_max_abs": 1.5366822481155396e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 2.0,
+      "vocab_chunk": 7,
+      "loss_max_abs": 3.5762786865234375e-07,
+      "gradient_max_abs": 1.6065314412117004e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "forward",
+      "temperature": 2.0,
+      "vocab_chunk": 64,
+      "loss_max_abs": 2.2724270820617676e-07,
+      "gradient_max_abs": 1.0011717677116394e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 0.7,
+      "vocab_chunk": 1,
+      "loss_max_abs": 4.76837158203125e-07,
+      "gradient_max_abs": 5.960464477539063e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 0.7,
+      "vocab_chunk": 7,
+      "loss_max_abs": 4.172325134277344e-07,
+      "gradient_max_abs": 5.960464477539063e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 0.7,
+      "vocab_chunk": 64,
+      "loss_max_abs": 4.023313522338867e-07,
+      "gradient_max_abs": 5.21540641784668e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 1.0,
+      "vocab_chunk": 1,
+      "loss_max_abs": 4.023313522338867e-07,
+      "gradient_max_abs": 1.4901161193847656e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 1.0,
+      "vocab_chunk": 7,
+      "loss_max_abs": 3.725290298461914e-07,
+      "gradient_max_abs": 2.2351741790771484e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 1.0,
+      "vocab_chunk": 64,
+      "loss_max_abs": 4.023313522338867e-07,
+      "gradient_max_abs": 2.2351741790771484e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 2.0,
+      "vocab_chunk": 1,
+      "loss_max_abs": 4.6938657760620117e-07,
+      "gradient_max_abs": 1.955777406692505e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 2.0,
+      "vocab_chunk": 7,
+      "loss_max_abs": 4.302710294723511e-07,
+      "gradient_max_abs": 1.3504177331924438e-08,
+      "teacher_gradients": false
+    },
+    {
+      "direction": "reverse",
+      "temperature": 2.0,
+      "vocab_chunk": 64,
+      "loss_max_abs": 2.5331974029541016e-07,
+      "gradient_max_abs": 1.3504177331924438e-08,
+      "teacher_gradients": false
+    }
+  ],
+  "passed": 18,
+  "max_loss_absolute_error": 5.885958671569824e-07,
+  "max_gradient_absolute_error": 6.332993507385254e-08,
+  "power_center_example": {
+    "q": [
+      0.5,
+      0.3,
+      0.2
+    ],
+    "teacher": [
+      0.4,
+      0.1,
+      0.5
+    ],
+    "kappa": 0.5,
+    "eta": 0.2,
+    "K_T": 0.15174632013689476,
+    "ordinary_KL_q_teacher": 0.25789731588270665
+  },
+  "cuda_initialized": false
+}
