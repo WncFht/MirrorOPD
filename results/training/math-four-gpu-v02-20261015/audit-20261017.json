@@ -1,0 +1,550 @@
+{
+  "audited_at": "2026-10-17T21:04:25.756454+08:00",
+  "interpretation": "Interrupted/incomplete suite: local controller absent; on_policy 50 updates but evaluation 50 has no completed artifact. No mdpo/bpo execution directories or results. Raw running status is historical and not a completion claim.",
+  "suite_directory": "runs/math-four-gpu-v02-20261015-attempt-02",
+  "source_id": "sha256:5fb1d9b83b23c6f46d592a10cdd0623ca9be876130cd53a777b9a9f7e1e5a63a",
+  "job": {
+    "name": "math-four-gpu-v02-20261015-on_policy",
+    "models": {
+      "student": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/DeepSeek-R1-Distill-Qwen-1.5B",
+      "teacher": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/JustRL-DeepSeek-1.5B",
+      "chat_template": null,
+      "trust_remote_code": false
+    },
+    "data": {
+      "train": [
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/DAPO/train.parquet"
+      ],
+      "validation": [
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/MATH-500/test.parquet",
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AMC23/test.parquet",
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AIME25/test.parquet"
+      ],
+      "scorer": {
+        "name": "math",
+        "kind": "binary",
+        "parameters": {}
+      },
+      "columns": {
+        "prompt": "prompt",
+        "answer": "reward_model.ground_truth",
+        "source": "data_source"
+      },
+      "source_name": null,
+      "ability": "general",
+      "requires_validation_reference": true
+    },
+    "objective": {
+      "algorithm": "on_policy",
+      "signal": {
+        "kappa": 0.5,
+        "eta": 0.2
+      },
+      "estimator": {
+        "center": "topj_tail",
+        "integration": "sampled",
+        "topj": 16,
+        "chunk_size": 64
+      },
+      "diagnostics": "full"
+    },
+    "training": {
+      "outer_steps": 50,
+      "inner_steps": 1,
+      "batch_size": 64,
+      "micro_batch_size": 1,
+      "responses_per_prompt": 1,
+      "learning_rate": 1e-06,
+      "weight_decay": 0.0,
+      "clip_grad": 2.0,
+      "prompt_tokens": 2048,
+      "response_tokens": 7168,
+      "temperature": 1.0,
+      "seed": 42,
+      "gradient_checkpointing": true,
+      "parameter_offload": true,
+      "optimizer_offload": true
+    },
+    "evaluation": {
+      "every": 5,
+      "before_training": true,
+      "samples_per_question": 16,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": -1,
+      "prompt_tokens": 4096,
+      "response_tokens": 31744,
+      "question_limit": null,
+      "seed": 42
+    },
+    "precision": {
+      "parameters": "fp32",
+      "teacher": "bf16",
+      "forward": "bf16",
+      "reduction": "fp32",
+      "buffers": "fp32"
+    },
+    "resources": {
+      "gpu_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "cpus": 24,
+      "rollout_memory_fraction": 0.25,
+      "max_sequences": 32,
+      "max_batch_tokens": 9216,
+      "object_store_bytes": 4294967296
+    },
+    "logging": {
+      "console": true,
+      "wandb": {
+        "enabled": true,
+        "project": "mirroropd-v2",
+        "entity": null,
+        "group": "math-four-gpu-v02-20261015"
+      }
+    },
+    "checkpoints": {
+      "every": 0
+    },
+    "schema_version": 2
+  },
+  "observed_status": {
+    "time_unix": 1792242117.0723264,
+    "suite": {
+      "state": "running",
+      "algorithm": "on_policy",
+      "completed": [],
+      "updated_unix": 1792044662.7772353
+    },
+    "runs": {
+      "on_policy": {
+        "state": "running",
+        "controller_alive": false,
+        "updates_completed": 50,
+        "expected_updates": 50,
+        "completed_evaluations": [
+          0,
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45
+        ],
+        "source_id": "sha256:5fb1d9b83b23c6f46d592a10cdd0623ca9be876130cd53a777b9a9f7e1e5a63a",
+        "file_store_events": 4,
+        "latest_phase": {
+          "name": "evaluation",
+          "event": "phase.started",
+          "time_utc": "2026-10-15T20:02:24.099284+00:00"
+        },
+        "gpu_sampling_age_seconds": 146058.1361117363,
+        "gpu_utilization": {
+          "0": 54,
+          "1": 55,
+          "2": 59,
+          "3": 58
+        }
+      },
+      "mdpo": {
+        "state": "queued",
+        "controller_alive": null,
+        "updates_completed": 0,
+        "expected_updates": 800,
+        "completed_evaluations": [],
+        "source_id": null,
+        "file_store_events": 0,
+        "latest_phase": null,
+        "gpu_sampling_age_seconds": null,
+        "gpu_utilization": {}
+      },
+      "bpo": {
+        "state": "queued",
+        "controller_alive": null,
+        "updates_completed": 0,
+        "expected_updates": 800,
+        "completed_evaluations": [],
+        "source_id": null,
+        "file_store_events": 0,
+        "latest_phase": null,
+        "gpu_sampling_age_seconds": null,
+        "gpu_utilization": {}
+      }
+    }
+  },
+  "audited_updates": {
+    "count": 50,
+    "first": 0,
+    "last": 49,
+    "all_gradients_finite": true
+  },
+  "completed_evaluations": [
+    {
+      "model_version": 0,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.8335,
+        "evaluation/MATH-500/pass@16": 0.954,
+        "evaluation/AMC23/mean@16": 0.6984375,
+        "evaluation/AMC23/pass@16": 0.975,
+        "evaluation/AIME25/mean@16": 0.23333333333333334,
+        "evaluation/AIME25/pass@16": 0.4666666666666667,
+        "evaluation/MATH-500/response_tokens/mean": 5275.74375,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.023875,
+        "evaluation/MATH-500/eos_fraction": 0.976125,
+        "evaluation/AMC23/response_tokens/mean": 9704.434375,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.0625,
+        "evaluation/AMC23/eos_fraction": 0.9375,
+        "evaluation/AIME25/response_tokens/mean": 16034.19375,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.10625,
+        "evaluation/AIME25/eos_fraction": 0.89375
+      }
+    },
+    {
+      "model_version": 5,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.832375,
+        "evaluation/MATH-500/pass@16": 0.958,
+        "evaluation/AMC23/mean@16": 0.696875,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.22291666666666668,
+        "evaluation/AIME25/pass@16": 0.5,
+        "evaluation/MATH-500/response_tokens/mean": 5310.85125,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.02325,
+        "evaluation/MATH-500/eos_fraction": 0.97675,
+        "evaluation/AMC23/response_tokens/mean": 9935.4640625,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.0546875,
+        "evaluation/AMC23/eos_fraction": 0.9453125,
+        "evaluation/AIME25/response_tokens/mean": 16173.839583333332,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.125,
+        "evaluation/AIME25/eos_fraction": 0.875
+      }
+    },
+    {
+      "model_version": 10,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.835875,
+        "evaluation/MATH-500/pass@16": 0.96,
+        "evaluation/AMC23/mean@16": 0.7265625,
+        "evaluation/AMC23/pass@16": 0.975,
+        "evaluation/AIME25/mean@16": 0.22916666666666666,
+        "evaluation/AIME25/pass@16": 0.4,
+        "evaluation/MATH-500/response_tokens/mean": 5253.063375,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.020875,
+        "evaluation/MATH-500/eos_fraction": 0.979125,
+        "evaluation/AMC23/response_tokens/mean": 9335.259375,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.071875,
+        "evaluation/AMC23/eos_fraction": 0.928125,
+        "evaluation/AIME25/response_tokens/mean": 15319.402083333332,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.10208333333333333,
+        "evaluation/AIME25/eos_fraction": 0.8979166666666667
+      }
+    },
+    {
+      "model_version": 15,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.834625,
+        "evaluation/MATH-500/pass@16": 0.96,
+        "evaluation/AMC23/mean@16": 0.7265625,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.23333333333333334,
+        "evaluation/AIME25/pass@16": 0.5,
+        "evaluation/MATH-500/response_tokens/mean": 5167.71825,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.021375,
+        "evaluation/MATH-500/eos_fraction": 0.978625,
+        "evaluation/AMC23/response_tokens/mean": 9314.746875,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.05,
+        "evaluation/AMC23/eos_fraction": 0.95,
+        "evaluation/AIME25/response_tokens/mean": 15079.414583333333,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.10208333333333333,
+        "evaluation/AIME25/eos_fraction": 0.8979166666666667
+      }
+    },
+    {
+      "model_version": 20,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.845,
+        "evaluation/MATH-500/pass@16": 0.962,
+        "evaluation/AMC23/mean@16": 0.74375,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.23333333333333334,
+        "evaluation/AIME25/pass@16": 0.5333333333333333,
+        "evaluation/MATH-500/response_tokens/mean": 4937.68475,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.01475,
+        "evaluation/MATH-500/eos_fraction": 0.98525,
+        "evaluation/AMC23/response_tokens/mean": 8691.990625,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.040625,
+        "evaluation/AMC23/eos_fraction": 0.959375,
+        "evaluation/AIME25/response_tokens/mean": 15124.097916666668,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.09375,
+        "evaluation/AIME25/eos_fraction": 0.90625
+      }
+    },
+    {
+      "model_version": 25,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.847375,
+        "evaluation/MATH-500/pass@16": 0.964,
+        "evaluation/AMC23/mean@16": 0.74375,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.2520833333333333,
+        "evaluation/AIME25/pass@16": 0.4666666666666667,
+        "evaluation/MATH-500/response_tokens/mean": 4842.002875,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.015625,
+        "evaluation/MATH-500/eos_fraction": 0.984375,
+        "evaluation/AMC23/response_tokens/mean": 8609.7140625,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.040625,
+        "evaluation/AMC23/eos_fraction": 0.959375,
+        "evaluation/AIME25/response_tokens/mean": 14267.627083333333,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.07916666666666666,
+        "evaluation/AIME25/eos_fraction": 0.9208333333333333
+      }
+    },
+    {
+      "model_version": 30,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.85175,
+        "evaluation/MATH-500/pass@16": 0.952,
+        "evaluation/AMC23/mean@16": 0.740625,
+        "evaluation/AMC23/pass@16": 0.975,
+        "evaluation/AIME25/mean@16": 0.2520833333333333,
+        "evaluation/AIME25/pass@16": 0.43333333333333335,
+        "evaluation/MATH-500/response_tokens/mean": 4710.3985,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.013375,
+        "evaluation/MATH-500/eos_fraction": 0.986625,
+        "evaluation/AMC23/response_tokens/mean": 8575.90625,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.0453125,
+        "evaluation/AMC23/eos_fraction": 0.9546875,
+        "evaluation/AIME25/response_tokens/mean": 14052.74375,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.08125,
+        "evaluation/AIME25/eos_fraction": 0.91875
+      }
+    },
+    {
+      "model_version": 35,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.856,
+        "evaluation/MATH-500/pass@16": 0.96,
+        "evaluation/AMC23/mean@16": 0.78125,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.25625,
+        "evaluation/AIME25/pass@16": 0.43333333333333335,
+        "evaluation/MATH-500/response_tokens/mean": 4306.458125,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.00875,
+        "evaluation/MATH-500/eos_fraction": 0.99125,
+        "evaluation/AMC23/response_tokens/mean": 7918.0359375,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.025,
+        "evaluation/AMC23/eos_fraction": 0.975,
+        "evaluation/AIME25/response_tokens/mean": 12597.004166666668,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.04375,
+        "evaluation/AIME25/eos_fraction": 0.95625
+      }
+    },
+    {
+      "model_version": 40,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.86275,
+        "evaluation/MATH-500/pass@16": 0.958,
+        "evaluation/AMC23/mean@16": 0.7953125,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.2833333333333333,
+        "evaluation/AIME25/pass@16": 0.5333333333333333,
+        "evaluation/MATH-500/response_tokens/mean": 4131.8585,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.006625,
+        "evaluation/MATH-500/eos_fraction": 0.993375,
+        "evaluation/AMC23/response_tokens/mean": 7037.0953125,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.021875,
+        "evaluation/AMC23/eos_fraction": 0.978125,
+        "evaluation/AIME25/response_tokens/mean": 12194.375,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.05625,
+        "evaluation/AIME25/eos_fraction": 0.94375
+      }
+    },
+    {
+      "model_version": 45,
+      "metrics": {
+        "evaluation/generated_examples": 9120,
+        "evaluation/unique_questions": 570,
+        "evaluation/samples_per_question": 16,
+        "evaluation/MATH-500/mean@16": 0.864375,
+        "evaluation/MATH-500/pass@16": 0.954,
+        "evaluation/AMC23/mean@16": 0.809375,
+        "evaluation/AMC23/pass@16": 0.95,
+        "evaluation/AIME25/mean@16": 0.2791666666666667,
+        "evaluation/AIME25/pass@16": 0.5333333333333333,
+        "evaluation/MATH-500/response_tokens/mean": 4075.7745,
+        "evaluation/MATH-500/budget_exhausted_fraction": 0.006875,
+        "evaluation/MATH-500/eos_fraction": 0.993125,
+        "evaluation/AMC23/response_tokens/mean": 7148.18125,
+        "evaluation/AMC23/budget_exhausted_fraction": 0.025,
+        "evaluation/AMC23/eos_fraction": 0.975,
+        "evaluation/AIME25/response_tokens/mean": 11536.016666666666,
+        "evaluation/AIME25/budget_exhausted_fraction": 0.029166666666666667,
+        "evaluation/AIME25/eos_fraction": 0.9708333333333333
+      }
+    }
+  ],
+  "raw_artifacts": [
+    {
+      "model_version": 0,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/0.jsonl",
+      "sha256": "1fdd34e5a848638a709627d87eaa36eb8104dcf4d9215c0b3bb97672e480eee3",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 5,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/5.jsonl",
+      "sha256": "0d6020704cb69dd13bc1c6059d7e314232b375d8515ec9570072249069c670b0",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 10,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/10.jsonl",
+      "sha256": "0ccdc707c8db851982e0d2a4baf653bc3a94d3772fe8a7427dc535776c8496e9",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 15,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/15.jsonl",
+      "sha256": "320ab989fca7044fe59a9b0f10ac49fce0f5a1b0023a1c2491d8989526a642ee",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 20,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/20.jsonl",
+      "sha256": "65c5904bda63cc195fcd022df835761948a10fe9cd78fefa4e91138f0d2879a4",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 25,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/25.jsonl",
+      "sha256": "26394f09f75c116646a3985f12f14030f63992f99189d9d1e7a3ca0c03e25ea6",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 30,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/30.jsonl",
+      "sha256": "105d401fea87777d6df7338e757a5975f8e12551f74de04e7aed0d0925b56553",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 35,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/35.jsonl",
+      "sha256": "282fd3bbafeb0a15f2b779e06a9fa2ce7510ca736c51593f454972b6753a17d4",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 40,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/40.jsonl",
+      "sha256": "b15c0ce3403e5c73bdcbe424de70802bfbb9f5601993b1f564b718dad839a90c",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    },
+    {
+      "model_version": 45,
+      "file": "runs/math-four-gpu-v02-20261015-attempt-02/on_policy/validation/45.jsonl",
+      "sha256": "e489ecf94082f53c9638ebcef9e61cd7abf55a611f7a3f510c5493027e5b7905",
+      "protocol_id": "sha256:89aa89e43d167932c5289e45a02736c8c86ba3781b190d7e4098e15f63cb186b"
+    }
+  ],
+  "evaluation_protocol": {
+    "questions": 570,
+    "samples_each": 16,
+    "completed_versions": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45
+    ],
+    "audited_responses": 91200,
+    "metric": "mean@16 averages binary correctness over the 16 responses per question; pass@16 counts questions with at least one success"
+  },
+  "incomplete_evaluation": {
+    "version": 50,
+    "summary_present": false,
+    "artifact_present": false,
+    "partial_files": [
+      {
+        "name": "50._m30jofm.partial",
+        "bytes": 0
+      }
+    ]
+  },
+  "phase_costs": {
+    "evaluation": {
+      "count": 10,
+      "total_seconds": 45082.894786460325,
+      "mean_seconds": 4508.289478646033
+    },
+    "rollout": {
+      "count": 50,
+      "total_seconds": 3356.303071213886,
+      "mean_seconds": 67.12606142427772
+    },
+    "cache.anchor": {
+      "count": 50,
+      "total_seconds": 230.00229491200298,
+      "mean_seconds": 4.60004589824006
+    },
+    "cache.teacher": {
+      "count": 50,
+      "total_seconds": 187.13447880279273,
+      "mean_seconds": 3.7426895760558545
+    },
+    "optimization": {
+      "count": 50,
+      "total_seconds": 508.00916527956724,
+      "mean_seconds": 10.160183305591344
+    }
+  },
+  "training_seconds": 4281.449010208249,
+  "completed_evaluation_seconds": 45082.894786460325,
+  "evaluation_fraction_of_recorded_train_and_eval": 0.9132683900784033,
+  "recompute_script": {
+    "path": "runs/worktree-merge-20261017/recompute_pass_at_k.py",
+    "sha256": "cf2c2a79a8f9f26b251495d1f09b8b1eb049abb6b506e59b0fdadfbda41de2d0"
+  },
+  "limits": [
+    "Single training seed, no repeated training runs.",
+    "Sampled R16 and longer response budget differ from historical greedy results.",
+    "Missing final evaluation and completion verification; no checkpoint recovery claim.",
+    "Cause of final interruption is not established by retained records."
+  ]
+}
