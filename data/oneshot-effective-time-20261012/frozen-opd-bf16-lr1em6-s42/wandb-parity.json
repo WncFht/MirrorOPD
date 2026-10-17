@@ -1,0 +1,9 @@
+{
+  "run": "7476b461",
+  "server_state": "finished",
+  "online_rows": 300,
+  "local_rows": 300,
+  "matched_rows": 300,
+  "max_numeric_error": 0.0,
+  "local_sha256_at_read": "febc1540400d644b32064b1230a3d62c1ccc69d5434c3283d6be1907c6682f09"
+}

@@ -1,0 +1,20 @@
+{
+  "MATH-500": {
+    "questions": 500,
+    "correct": 395,
+    "accuracy": 0.79,
+    "budget_exhausted_fraction": 0.23
+  },
+  "AMC23": {
+    "questions": 40,
+    "correct": 27,
+    "accuracy": 0.675,
+    "budget_exhausted_fraction": 0.475
+  },
+  "AIME25": {
+    "questions": 30,
+    "correct": 4,
+    "accuracy": 0.13333333333333333,
+    "budget_exhausted_fraction": 0.7666666666666667
+  }
+}

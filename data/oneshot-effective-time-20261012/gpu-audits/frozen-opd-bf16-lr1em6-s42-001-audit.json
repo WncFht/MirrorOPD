@@ -1,0 +1,17 @@
+{
+  "observations": 520,
+  "driver_pids": [
+    130713,
+    130714,
+    130715,
+    130716
+  ],
+  "raw_sha256": "2f1560d90e20347ca01bb63af4db57925e3ca92dc4ce3ced3af06df9bc6fb0a8",
+  "cards": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "only_registered_driver_pids": true
+}
