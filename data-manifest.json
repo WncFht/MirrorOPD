@@ -907,14 +907,14 @@
             "sha256": "93414e6bde86afa270d57cbaad2ce2de62bd00377896241a282a892d90c3c615"
         },
         {
-            "path": "runs/report-merge-20261015/sources/2026-10-13-OneShot\u4e0e\u955c\u50cf\u84b8\u998f\u5b9e\u9a8c\u62a5\u544a.md",
-            "archive": "data/distillation-report-sources-20261015/2026-10-13-OneShot\u4e0e\u955c\u50cf\u84b8\u998f\u5b9e\u9a8c\u62a5\u544a.md.gz",
+            "path": "runs/report-merge-20261015/sources/2026-10-13-OneShot与镜像蒸馏实验报告.md",
+            "archive": "data/distillation-report-sources-20261015/2026-10-13-OneShot与镜像蒸馏实验报告.md.gz",
             "sha256": "8eb978f858224e62b8f0e95b05ea1b3f30a29d1c15355b985b6b3aecb4a4ff6c",
             "bytes": 103653
         },
         {
-            "path": "runs/report-merge-20261015/sources/2026-10-13-BPO\u6807\u91cf\u8c03\u5ea6\u5b9e\u9a8c\u603b\u62a5\u544a.md",
-            "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO\u6807\u91cf\u8c03\u5ea6\u5b9e\u9a8c\u603b\u62a5\u544a.md.gz",
+            "path": "runs/report-merge-20261015/sources/2026-10-13-BPO标量调度实验总报告.md",
+            "archive": "data/distillation-report-sources-20261015/2026-10-13-BPO标量调度实验总报告.md.gz",
             "sha256": "f77b242441bdd9a0000625fd8c5be118ee9bd5f0ae7ce8284f6d0538660fa810",
             "bytes": 83033
         },
@@ -1145,6 +1145,12 @@
             "archive": "data/refactor-20261015/portfix-evidence.tar.gz",
             "bytes": 16998400,
             "sha256": "0f1e0a02622e655d9daf07d3c8b4870e60bbf11c429823c392aa490e8440b570"
+        },
+        {
+            "path": "data/memory-audit-20261017/phase-evidence.tar",
+            "archive": "data/memory-audit-20261017/phase-evidence.tar.gz",
+            "bytes": 11601920,
+            "sha256": "2aeefae287a7967a9b07dc0f40447c85d4bd77323c986913167201d55b29cd6e"
         }
     ]
 }

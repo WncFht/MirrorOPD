@@ -27,7 +27,7 @@ from mirroropd.integrations.verl.adapter import (
     nested_cache_output,
 )
 from mirroropd.runtime.events import environment_writer, phase
-from mirroropd.runtime.memory import Memory, check_cache_capacity, tensor_bytes
+from mirroropd.runtime.memory import Memory, check_cache_capacity, scoring_tile_size, tensor_bytes
 
 
 class Projection:
@@ -110,7 +110,7 @@ class Projection:
         actions = self.data[WIRE_PREFIX + "actions"]
         actions = actions.values() if actions.is_nested else actions.reshape(-1)
         count = int(valid.sum())
-        capacity = check_cache_capacity(
+        check_cache_capacity(
             self.objective,
             self.memory,
             prefixes=count,
@@ -124,11 +124,7 @@ class Projection:
         chosen_actions = actions[valid]
         records = {}
         # Bound *output staging* independently from projection workspace.
-        full_fields = capacity["full_fields"]
-        per_prefix = max(1, full_fields * self.context.vocab_size * 4 + 512)
-        tile = min(self.memory.token_chunk_size, self.memory.scoring_buffer_bytes // per_prefix)
-        if tile < 1:
-            raise MemoryError("memory.scoring_buffer_bytes cannot hold one full-cache predictor")
+        tile = scoring_tile_size(self.objective, self.memory, vocab_size=self.context.vocab_size)
         for start in range(0, count, tile):
             stop = min(start + tile, count)
             logits = F.linear(packed[start:stop], weight, bias) / self.context.temperature

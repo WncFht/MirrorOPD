@@ -88,6 +88,16 @@ def check_cache_capacity(objective, memory, *, prefixes, vocab_size, sequence_sl
     return estimate
 
 
+def scoring_tile_size(objective, memory, *, vocab_size):
+    """Bound one scoring tile including Top-J IDs, probabilities and diagnostics."""
+    single = cache_capacity(objective, prefixes=1, vocab_size=vocab_size)
+    per_prefix = single["full_bytes"] + max(512, single["sparse_bytes"])
+    tile = min(memory.token_chunk_size, memory.scoring_buffer_bytes // per_prefix)
+    if tile < 1:
+        raise MemoryError("memory.scoring_buffer_bytes cannot hold one scoring predictor")
+    return tile
+
+
 def tensor_bytes(values):
     """Unique retained storage bytes, including jagged values and offsets."""
     seen = set()

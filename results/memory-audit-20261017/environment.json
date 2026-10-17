@@ -1,0 +1,20 @@
+{
+  "python": "3.12.15 (main, Oct  6 2026, 23:50:18) [GCC 15.3.0]",
+  "platform": "Linux-5.15.0-124-generic-x86_64-with-glibc2.35",
+  "packages": {
+    "torch": "2.7.1+cu126",
+    "transformers": "4.57.6",
+    "vllm": "0.10.0+cu126",
+    "ray": "2.59.0",
+    "tensordict": "0.10.0",
+    "numpy": "1.26.4",
+    "pandas": "3.0.6",
+    "pyarrow": "21.0.0"
+  },
+  "gpus": [
+    "0, NVIDIA H800, GPU-cb48e54c-5152-b595-cd31-bde2562e143e, 81559 MiB, 550.163.01",
+    "1, NVIDIA H800, GPU-563e2493-6610-81f0-59fd-20324f42e71f, 81559 MiB, 550.163.01",
+    "2, NVIDIA H800, GPU-ecc2a4cb-762d-1079-e78f-08790fec88ce, 81559 MiB, 550.163.01",
+    "3, NVIDIA H800, GPU-8059084a-ff75-6775-1834-4f2c79cbfb7d, 81559 MiB, 550.163.01"
+  ]
+}

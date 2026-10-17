@@ -1,0 +1,37 @@
+{
+  "measurement_source_commit": "ad52997ec19a66f8a1a7cae66476219bcde1342d",
+  "maintenance_commit": "760bc5b7491f48b82bfe9f2a61613781927e02a5",
+  "pytest_full_run": {
+    "passed": 564,
+    "log_sha256": "b7fb1875e4f43e736821b53f0ee7cdf5f3f0dd269acc5df8a5255a72c2378cc2"
+  },
+  "maintenance_with_new_source_guard": {
+    "passed": 45,
+    "log_sha256": "c1bc8467aaaeeb77199780c2c73a46cc879c0801f703807537023f57a605fcfe",
+    "scope": "Includes one new source-target snapshot test beyond the full 564-test run."
+  },
+  "unique_pytest_tests_validated": 565,
+  "preview": {
+    "passed": 88,
+    "skipped": 0,
+    "log_sha256": "5a040b15ba5888765ef5cec45ffcec7cd1d6f22e98fffcf243352ecaa4cf28fe"
+  },
+  "cuda_head": {
+    "paired_conditions": 18,
+    "max_relative_l2_error": 4.549946166341679e-07
+  },
+  "native": {
+    "audited_cases": 2,
+    "source_id": "sha256:6258d548feadaacfb32148aee31d1279c118972954e511beb9929cb8799376bd",
+    "all_passed": true
+  },
+  "scoring_budget": {
+    "focused_tests_passed": 35,
+    "default_full_vocabulary_tile": 55,
+    "scope": "Additional conservative support metadata; measured J=16 behavior is unchanged."
+  },
+  "unverified": [
+    "Remote GitHub workflow execution and required-check settings.",
+    "VS Code MPE UI and PDF visual export."
+  ]
+}
