@@ -1,0 +1,520 @@
+{
+  "base_commit": "11504621356d904fc856f0a5c4a9945b24705543",
+  "files": [
+    {
+      "path": "src/mirroropd/__init__.py",
+      "sha256": "caa1c568dd18cc2ab7465d2d680aac722dc40bc176f7e72b27b7d1ce9816eddf",
+      "bytes": 113
+    },
+    {
+      "path": "src/mirroropd/__main__.py",
+      "sha256": "631d54010491b0f20e4ab12b82dfb573a1a683030b6eafe3eda74c73fa85325a",
+      "bytes": 128
+    },
+    {
+      "path": "src/mirroropd/cli.py",
+      "sha256": "d36ba06d57bb806ea54b9b9b3aeafc1e689fb3960a150b8697815af30c43786a",
+      "bytes": 8365
+    },
+    {
+      "path": "src/mirroropd/core/__init__.py",
+      "sha256": "160644b046037fc75b23fb2bf0a414986c432bf1ae356b6edb7a2caec8b2189b",
+      "bytes": 80
+    },
+    {
+      "path": "src/mirroropd/core/cache.py",
+      "sha256": "5089f03ee15e7641e6ab7ed2107b0a423c64c9cd2719f8911541fd010f35206b",
+      "bytes": 10806
+    },
+    {
+      "path": "src/mirroropd/core/config.py",
+      "sha256": "1be08865d8519eef98e1efcedbe8b4f09770f9a6b6b49ba563053b04cba229bd",
+      "bytes": 6935
+    },
+    {
+      "path": "src/mirroropd/core/diagnostics.py",
+      "sha256": "8fce22836f338ed174a08b22b6d9e0f6c6ab9603c53d62e5763268b77e58de78",
+      "bytes": 2628
+    },
+    {
+      "path": "src/mirroropd/core/distributions.py",
+      "sha256": "02a7f46fef603d5aa45d2d19eefefdc9ab8d056f36d5fd615022a67560bc6e50",
+      "bytes": 5788
+    },
+    {
+      "path": "src/mirroropd/core/hidden.py",
+      "sha256": "638288f09a3a0b314213e9449fca93963a8cea5513928642de248a4f8e2f0cf1",
+      "bytes": 13134
+    },
+    {
+      "path": "src/mirroropd/core/kernels.py",
+      "sha256": "07d62fab5a34d7b9dc6f3651add32f8ad344248dc0533dfd2a979a4b8f05d7c3",
+      "bytes": 6686
+    },
+    {
+      "path": "src/mirroropd/core/linear_bpo.py",
+      "sha256": "594c60bc3e85198f78e47f2fc3f2ec740e0dd0d298aebc8a8b303ded6c6c4019",
+      "bytes": 5681
+    },
+    {
+      "path": "src/mirroropd/core/objectives.py",
+      "sha256": "dadfb2ba4953189efb8c86a8c3754c3c750681af5e33382e20c551aee083e82a",
+      "bytes": 8023
+    },
+    {
+      "path": "src/mirroropd/core/signal.py",
+      "sha256": "e70d3d82a20e43a71db1e9751ba4ffd0affe0097f5e8a64a06637c0b74342563",
+      "bytes": 631
+    },
+    {
+      "path": "src/mirroropd/core/vocabulary.py",
+      "sha256": "c593f4f9b121729dab8a623dc6daebdaa71421ad4147946a81565b1bd147c6b7",
+      "bytes": 1195
+    },
+    {
+      "path": "src/mirroropd/identity.py",
+      "sha256": "2821de8d14203b29c8e6fe7be2c5e0bf65aecb3fd5fff33040e5339934801d0e",
+      "bytes": 367
+    },
+    {
+      "path": "src/mirroropd/integrations/__init__.py",
+      "sha256": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+      "bytes": 75
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/__init__.py",
+      "sha256": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+      "bytes": 75
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/adapter.py",
+      "sha256": "8f43b63f0dd8e3222488c5bed87e4b7819b99ee30d95ecb356ceb0e0d3fe91b9",
+      "bytes": 6700
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/backend.json",
+      "sha256": "cfdb9a15168276e99e571ebeab2f516baf2d122e1b4a0f4b7b7101bfce56febb",
+      "bytes": 197
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/backend.patch",
+      "sha256": "8729fefc88f591ec498e57d49a06f96386484dce6aebc8cfe4feec212072fbbc",
+      "bytes": 65659
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/bootstrap.py",
+      "sha256": "56af0b3285b85117092f6dfedab69af1f29480cfe16a564de796e900db9a3e9e",
+      "bytes": 1552
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/bridge.py",
+      "sha256": "2f1a47b9b2951063fe2e430b996e44ebcf6df1ac45ae36d874657d0327a84c60",
+      "bytes": 11963
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/compiler.py",
+      "sha256": "bfb93ff553418880f00f578823373f722308550e6ade04be387fbbe61681200e",
+      "bytes": 7527
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/evaluation.py",
+      "sha256": "fe9eb90cea92d7763eebef7e20d2fc3593911b75f967ff1e8f87e505a251564e",
+      "bytes": 7253
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/model.py",
+      "sha256": "ddabd0f4cf9bcba1299056a560243035f1b9eed3e86a36353c45e31fac52126e",
+      "bytes": 1269
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/projection.py",
+      "sha256": "3b2719583ddd85078c12c6ba8e86f7c5a3a55da2a90743e54998dc66c011047e",
+      "bytes": 13979
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/rendezvous.py",
+      "sha256": "d6113bf54c0a8cd3158e5fa8bc21c58f5ab6a209bd88279bdfd392132e243658",
+      "bytes": 1852
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/reward.py",
+      "sha256": "bda9f223d219302380c91a45affa03496d76874063eeb5763b5c8024f9114a2d",
+      "bytes": 1400
+    },
+    {
+      "path": "src/mirroropd/integrations/verl/vllm_executor.py",
+      "sha256": "4f1120f13b8b7d9b72ccfbc2eebf8e76fcabd64de19deb3cde6c6249b4736214",
+      "bytes": 725
+    },
+    {
+      "path": "src/mirroropd/profiles/datasets/dapo-math.json",
+      "sha256": "a79060e7805482f3db4466b304f31e0cdd811fe020fda60698964d682254a1a0",
+      "bytes": 284
+    },
+    {
+      "path": "src/mirroropd/profiles/datasets/gsm8k.json",
+      "sha256": "4f76a67609dbca80ea03ed265b6252b8e0607b43b40b83a91c27d56c445e14ab",
+      "bytes": 150
+    },
+    {
+      "path": "src/mirroropd/profiles/evaluations/math-r16.json",
+      "sha256": "9513adad122ec0f63f2855cb17af02e024a0d150a0d48f1d8daa7100c7b98e54",
+      "bytes": 195
+    },
+    {
+      "path": "src/mirroropd/profiles/evaluations/smoke.json",
+      "sha256": "44f4b494b04116fa370ad0b53b8d01787489417e2f33f003e77e2b5f2bbe01f5",
+      "bytes": 159
+    },
+    {
+      "path": "src/mirroropd/profiles/models/deepseek-justrl.json",
+      "sha256": "fbfc3581f2bc7459db4098a0106d9c2712faf734e5ed10880e07f4c0e94a7fa9",
+      "bytes": 118
+    },
+    {
+      "path": "src/mirroropd/profiles/recipes/math-four-gpu.json",
+      "sha256": "4042c444fd9cabae8dfb18be019650f7d1162afff609d242e2dd3a6b17f301e6",
+      "bytes": 925
+    },
+    {
+      "path": "src/mirroropd/profiles/recipes/smoke.json",
+      "sha256": "c122569bb3153fe71e2bad40480588d88ee98c98522e0289af9963fa5a9288eb",
+      "bytes": 471
+    },
+    {
+      "path": "src/mirroropd/profiles/studies/math-lr.json",
+      "sha256": "4c4d1c6c13338c276c50ba6f9f8b1f5abe4be1af082dd0d535cade0edd5918bc",
+      "bytes": 341
+    },
+    {
+      "path": "src/mirroropd/profiles/studies/smoke-grid.json",
+      "sha256": "6de0974e5c88648a440318edc82392345aeb1956a106c3962092483fc081c19c",
+      "bytes": 254
+    },
+    {
+      "path": "src/mirroropd/profiles/tasks/math-four-gpu.json",
+      "sha256": "c07e7ed5c344372717ba7e7a241eca8dfe72108451a8adc50554111321be05ac",
+      "bytes": 150
+    },
+    {
+      "path": "src/mirroropd/profiles/tasks/math-smoke.json",
+      "sha256": "3602dc942601d0c873bb9fa0cbd4219edb8001bd1177eb9df3ee797f204adc8b",
+      "bytes": 139
+    },
+    {
+      "path": "src/mirroropd/reference/__init__.py",
+      "sha256": "2c6de95cd7ca507d0dcdbc4f69e5d148252a09cc5038b5fae2b0b57fb873b8e6",
+      "bytes": 77
+    },
+    {
+      "path": "src/mirroropd/reference/categorical.py",
+      "sha256": "5deb1b44f71309b3f16ce41ed2919d5b3606a50ba98f4161bdabdd46f2abb981",
+      "bytes": 3119
+    },
+    {
+      "path": "src/mirroropd/reference/targets.py",
+      "sha256": "c063af23852743af079e5fb8b93c749bfd7cf65de12b41b4b44ff7d18709f033",
+      "bytes": 6774
+    },
+    {
+      "path": "src/mirroropd/runtime/__init__.py",
+      "sha256": "1ee641e1f89a446af3bc45312c51453826f80626f76ea9ea2ed5dc8f37615057",
+      "bytes": 78
+    },
+    {
+      "path": "src/mirroropd/runtime/artifacts.py",
+      "sha256": "786eddcb85add52839e90aaf8d7e13098b03f3c06157d87259eba78061cdb4bf",
+      "bytes": 1118
+    },
+    {
+      "path": "src/mirroropd/runtime/audit.py",
+      "sha256": "50d2af5874703a67d3f432b3fae506467cdacc4501f77d96b7d2bebc698c774b",
+      "bytes": 5329
+    },
+    {
+      "path": "src/mirroropd/runtime/config.py",
+      "sha256": "aa42303547df87e9ecccabc6da4864ea57149bf99f7d29c32f16d1cc0e0680ed",
+      "bytes": 15649
+    },
+    {
+      "path": "src/mirroropd/runtime/control.py",
+      "sha256": "6769a5b32e7cf058157296632403b6153bb94965b9cc21a58b947f7497dbfcdb",
+      "bytes": 11065
+    },
+    {
+      "path": "src/mirroropd/runtime/data.py",
+      "sha256": "0bfa970d00e34c5e73eecaefc96e5fa6143fbe01601492b3b386d95a0c84efc1",
+      "bytes": 5853
+    },
+    {
+      "path": "src/mirroropd/runtime/evaluation.py",
+      "sha256": "98ace0f219601adb20d798d0dd81418ed52cb8de3c2fdce44484c56fe3866230",
+      "bytes": 9334
+    },
+    {
+      "path": "src/mirroropd/runtime/events.py",
+      "sha256": "fcd5f000cd1a6819cf8e467076a707032c68938a2f09295f2eff17c8dcf8be32",
+      "bytes": 6848
+    },
+    {
+      "path": "src/mirroropd/runtime/experiments.py",
+      "sha256": "2be5073333240001d7aa5e21d554b10c1f57011c3d84b3a74252a9c6142702f0",
+      "bytes": 2708
+    },
+    {
+      "path": "src/mirroropd/runtime/frozen_head.py",
+      "sha256": "587fdb091c074198bdd3061b10ddff3fa56b155e8cd4027ef1451ecc48930222",
+      "bytes": 1986
+    },
+    {
+      "path": "src/mirroropd/runtime/memory.py",
+      "sha256": "2fd4319c15b831b40213a63a91f4ad90fcc405b77d574a5f1077a1546bd8e6ae",
+      "bytes": 7226
+    },
+    {
+      "path": "src/mirroropd/runtime/metrics.py",
+      "sha256": "b929fdf50e387101158b2649ec8d21b35e38c1ae4e16ad0029f3674ddae941cc",
+      "bytes": 6057
+    },
+    {
+      "path": "src/mirroropd/runtime/preflight.py",
+      "sha256": "6a49dfac9cbd84f709adef2116932195aafb66c0feb2ee2d093a59e0fba15532",
+      "bytes": 6207
+    },
+    {
+      "path": "src/mirroropd/runtime/processes.py",
+      "sha256": "d18616e77793c9156865b21e58da836a79d13cfd7be14c509d1eb46bb46c3075",
+      "bytes": 2330
+    },
+    {
+      "path": "src/mirroropd/runtime/profiles.py",
+      "sha256": "459adc97933947df96db1e9ee3f5b1de3e9bed641477c0f0308c8a816a8e2ede",
+      "bytes": 2661
+    },
+    {
+      "path": "src/mirroropd/runtime/provenance.py",
+      "sha256": "c762cadea417ab01480781d697f72fcb02afa651d8592c3d7180ab399b735826",
+      "bytes": 5801
+    },
+    {
+      "path": "src/mirroropd/runtime/reservation.py",
+      "sha256": "173a1ecb6c3fa6f46bc8294ebed9aa3a48779df37a21a23fa17eb407601aac4f",
+      "bytes": 8374
+    },
+    {
+      "path": "src/mirroropd/runtime/runner.py",
+      "sha256": "80aaea1d5c67c2491dd9791ecc7469a770022d9b3de8907be0813dd44baf15f9",
+      "bytes": 10147
+    },
+    {
+      "path": "src/mirroropd/runtime/study.py",
+      "sha256": "4dc1751facd9dc5ab049292149819bef8dec1af008db04752a444c23455f00c3",
+      "bytes": 7242
+    },
+    {
+      "path": "src/mirroropd/runtime/tracking.py",
+      "sha256": "bd58913774401b3d43043f8b51a9d52230f18e3c2feb94702eaa3491422c36f3",
+      "bytes": 6035
+    },
+    {
+      "path": "src/mirroropd/runtime/transfer.py",
+      "sha256": "77090497d4fd23cbd3a954a25bae7160c1766cd5ccc8c47d767b383388024d75",
+      "bytes": 12024
+    },
+    {
+      "path": "src/mirroropd/scoring/__init__.py",
+      "sha256": "f7f9fd70fc613f47a0291befb626c37dee38af49d84b1d48643feb5ee27247d0",
+      "bytes": 2777
+    },
+    {
+      "path": "src/mirroropd/scoring/mathematics.py",
+      "sha256": "5b1dbc74453a961b3437a28c2ba6ff02e1aae40c86ec28ad48674f8e9e988923",
+      "bytes": 1071
+    },
+    {
+      "path": "src/mirroropd/scoring/numeric.py",
+      "sha256": "9890a2195bfcfdb855de6280d01e424a0b44fdcd17206652389803c2a990100a",
+      "bytes": 1436
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/NOTICE",
+      "sha256": "1e9b3d1f61b1e2c6397449f68b84f098a3efe312b76883bcae8872032ef2cb5c",
+      "bytes": 6711
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/__init__.py",
+      "sha256": "2a2f498c7b7232fb5bc33f418d1bd6a228575f64d9e4cce0cc723d46b22acad7",
+      "bytes": 78
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/_timeout.py",
+      "sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5",
+      "bytes": 4640
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/math_verify.py",
+      "sha256": "1242011cddc041ea6cb19fc9a1872ebab742d8ae7e8ebd3342f6b3b8b6e2ba15",
+      "bytes": 2479
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/origin.json",
+      "sha256": "620a5765977f0813a866faa60d09896c0c824686a27fa45f1547d4f9d773378d",
+      "bytes": 1835
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/ttrl_math/__init__.py",
+      "sha256": "8a2313af03a36e808506c5ff0051f2f30de3691013adee40c87f6c6a030ac14b",
+      "bytes": 3556
+    },
+    {
+      "path": "src/mirroropd/scoring/vendor/ttrl_math/math_utils.py",
+      "sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822",
+      "bytes": 26398
+    },
+    {
+      "path": "tests/core/test_cache.py",
+      "sha256": "3bb9edd1e5c6f3825c52461c1d0658787d1cab7c7d6a04eb8a5f5cb6b664c6f2",
+      "bytes": 3835
+    },
+    {
+      "path": "tests/core/test_hidden.py",
+      "sha256": "e3e3b81266650d491d7717c18913bd2cad2ecfb708494adf4702db0bd5496cd5",
+      "bytes": 6700
+    },
+    {
+      "path": "tests/core/test_kernels.py",
+      "sha256": "8722cd749712c95ca633844b5db86b9570cf54b02a61b8d64b0cac3eec036c8a",
+      "bytes": 9299
+    },
+    {
+      "path": "tests/core/test_objectives.py",
+      "sha256": "50815c513109732ac56ccb780eb1ee0949d2af4bf73743fec0bda4869d317724",
+      "bytes": 7522
+    },
+    {
+      "path": "tests/integrations/test_experiment_config.py",
+      "sha256": "5cc17646eaf5e82af7b3db95797584bf2eee5b0552780237b06d04620c2f750c",
+      "bytes": 3852
+    },
+    {
+      "path": "tests/integrations/test_native_contract.py",
+      "sha256": "19b5f815eb5a9d606c8d32e621c6b0bf877249383a721ca84ddfc4dc2e8f79c7",
+      "bytes": 5236
+    },
+    {
+      "path": "tests/integrations/test_projection.py",
+      "sha256": "75a1aa3ceb1cd3d33f7e45655cbba987c3704465d854bca529e9e10713dc3c89",
+      "bytes": 13571
+    },
+    {
+      "path": "tests/integrations/test_rendezvous.py",
+      "sha256": "f5c23d928319019651aa87faaeced5763d54f7869ddb330e830dfe1f59684d73",
+      "bytes": 3583
+    },
+    {
+      "path": "tests/integrations/test_verl_adapter.py",
+      "sha256": "7a84fedadde66aefcfc64f007d51a474ca1028c161cc354c88decbb37db612f3",
+      "bytes": 7729
+    },
+    {
+      "path": "tests/runtime/test_config.py",
+      "sha256": "0867e924068a36b91fc44e19e2bcc9bfa66ea6bfadecb434b0bccd9432f3705b",
+      "bytes": 3550
+    },
+    {
+      "path": "tests/runtime/test_control.py",
+      "sha256": "62c2592614e777dafd4ad2e8f3504e6362eb639b991bf508587303b6717be481",
+      "bytes": 5805
+    },
+    {
+      "path": "tests/runtime/test_data_scoring.py",
+      "sha256": "031518d59bc3dc86098ab8467d32939ba272d91be1eb1b236aa1a0513d33d4c5",
+      "bytes": 4119
+    },
+    {
+      "path": "tests/runtime/test_evaluation.py",
+      "sha256": "a41340056d7bd8d90bc9f3b506578f6c94b502c51681b1a0b00c1006c3455fb5",
+      "bytes": 3722
+    },
+    {
+      "path": "tests/runtime/test_experiments.py",
+      "sha256": "e2f934b8bded17e9ff5291654da0fa54125078584e273cde2041dc6017a6002d",
+      "bytes": 11041
+    },
+    {
+      "path": "tests/runtime/test_frozen_head.py",
+      "sha256": "6ac8b66299f8c33a01985bff0043425766e508d7be103e5a92b48a431939e025",
+      "bytes": 3910
+    },
+    {
+      "path": "tests/runtime/test_lifecycle.py",
+      "sha256": "d74c2f9d83f3a42e0a0c559a00b78dc258d3ecc11977c8a7fdd6db507d40f0e4",
+      "bytes": 10898
+    },
+    {
+      "path": "tests/runtime/test_memory.py",
+      "sha256": "85cc02b0100aa041d2f5eab7d98222591ae663640b4cd1af5ff2e67e7a83a9cd",
+      "bytes": 4587
+    },
+    {
+      "path": "tests/runtime/test_memory_report.py",
+      "sha256": "be4cc5f285c1ea73a614d8bc084f9c13e8f54a5a524029fa60c07bd3d78c36de",
+      "bytes": 2093
+    },
+    {
+      "path": "tests/runtime/test_observability.py",
+      "sha256": "97f3afb4a77de783901dcad741bb09ca880d899e1a968cd35fe97b07468aa30f",
+      "bytes": 6160
+    },
+    {
+      "path": "tests/runtime/test_offline_tracking.py",
+      "sha256": "759179a086a12aca10b9428e9af37a387397097096ce94083b3a75896894d8f1",
+      "bytes": 4139
+    },
+    {
+      "path": "tests/runtime/test_reservation.py",
+      "sha256": "c5d3cd6e22d24d9ca9f6a97302053b7016f9e1d4743e8e21d326919e1f9d73b3",
+      "bytes": 4616
+    },
+    {
+      "path": "tests/runtime/test_scoring_budget.py",
+      "sha256": "7320228d23560a0a7e408d35591016378c2152859d7ef4de941d358c4ace84ca",
+      "bytes": 1029
+    },
+    {
+      "path": "tests/runtime/test_transfer.py",
+      "sha256": "a6d58ff85ed4e2b03fa4f516ce254c4bfdc2bf10bc9fcf33bd55d2138b2a2aca",
+      "bytes": 4993
+    },
+    {
+      "path": "benchmarks/hidden_anchor.py",
+      "sha256": "2c451120902dc3f215923d16abe686222ca6dda20818fc0f30ef6e8dcacc22c5",
+      "bytes": 12339
+    },
+    {
+      "path": "benchmarks/memory_native.py",
+      "sha256": "fbae7b6043dff3bac38d5a5c89c6c3c4b99c09f6ea5e1ffd9a74d8ac11cc779c",
+      "bytes": 4476
+    },
+    {
+      "path": "benchmarks/native_validation.py",
+      "sha256": "59ccdf4aae031aa69c9d2790763203e517d35d212bda3824ac2f65324984f973",
+      "bytes": 6950
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "8d449453b185d57604c7f16ca0223729404fcd9ee4cf291dd23a26bf3f199731",
+      "bytes": 1361
+    }
+  ],
+  "archive": {
+    "path": "data/hidden-anchor-20261018/source.tar.gz",
+    "sha256": "360ec8621d6a2ee4994ed42800a854a93c098e330418ab4d0dc0ac79fbfbdd88",
+    "bytes": 149168
+  }
+}

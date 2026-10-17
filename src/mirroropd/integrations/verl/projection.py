@@ -20,6 +20,7 @@ from mirroropd.core.cache import (
     select_valid,
 )
 from mirroropd.core.config import CacheContext, Objective
+from mirroropd.core.hidden import build_hidden_anchor, sampled_loss, score_hidden_teacher
 from mirroropd.core.kernels import projected_loss
 from mirroropd.integrations.verl.adapter import (
     DIAGNOSTIC_PREFIX,
@@ -27,6 +28,7 @@ from mirroropd.integrations.verl.adapter import (
     nested_cache_output,
 )
 from mirroropd.runtime.events import environment_writer, phase
+from mirroropd.runtime.frozen_head import load_head, publish_head
 from mirroropd.runtime.memory import Memory, check_cache_capacity, scoring_tile_size, tensor_bytes
 
 
@@ -47,6 +49,8 @@ class Projection:
         self.context = CacheContext.from_dict(
             tu.get_non_tensor_data(data, key="mirror_context", default=None)
         )
+        if self.memory.anchor_storage != self.context.anchor_storage:
+            raise ValueError("Memory storage differs from the frozen cache context")
         self.context.validate(
             self.objective,
             anchor_version=tu.get_non_tensor_data(data, key="mirror_anchor_version", default=None),
@@ -80,17 +84,31 @@ class Projection:
         with observation:
             if self.stage is None:
                 frozen = cache_from_data(self.data, self.context)
-                result = projected_loss(
-                    hidden,
-                    weight,
-                    bias,
-                    frozen,
-                    self.objective,
-                    anchor_version=self.context.anchor_version,
-                    token_chunk=self.memory.token_chunk_size,
-                    vocab_chunk=self.memory.vocab_chunk_size,
-                    temperature=self.context.temperature,
-                )
+                if self.context.anchor_storage == "hidden":
+                    frozen_weight, frozen_bias = load_head(self.context, hidden.device)
+                    result = sampled_loss(
+                        hidden,
+                        weight,
+                        bias,
+                        frozen,
+                        self.objective,
+                        frozen_weight,
+                        frozen_bias,
+                        token_chunk=self.memory.token_chunk_size,
+                        vocab_chunk=self.memory.vocab_chunk_size,
+                    )
+                else:
+                    result = projected_loss(
+                        hidden,
+                        weight,
+                        bias,
+                        frozen,
+                        self.objective,
+                        anchor_version=self.context.anchor_version,
+                        token_chunk=self.memory.token_chunk_size,
+                        vocab_chunk=self.memory.vocab_chunk_size,
+                        temperature=self.context.temperature,
+                    )
                 self.result = {DIAGNOSTIC_PREFIX + k: v for k, v in result.diagnostics.items()}
                 # This exact edge must be returned by the wrapped causal LM.
                 return result.loss.reshape(*hidden.shape[:-1], 1)
@@ -116,19 +134,66 @@ class Projection:
             prefixes=count,
             vocab_size=self.context.vocab_size,
             sequence_slots=valid.numel(),
+            hidden_size=hidden.shape[-1]
+            if self.stage == "anchor"
+            else (
+                cache_from_data(self.data, self.context, anchor_only=True).anchor_hidden.shape[-1]
+                if self.context.anchor_storage == "hidden"
+                else None
+            ),
+            bytes_per_hidden=2
+            if torch.is_autocast_enabled(hidden.device.type)
+            and torch.get_autocast_dtype(hidden.device.type) == torch.bfloat16
+            else hidden.element_size(),
         )
         packed = hidden.reshape(-1, hidden.shape[-1])[valid]
         anchor = None
         if self.stage == "teacher":
             anchor = cache_from_data(self.data, self.context, anchor_only=True)
+        frozen_weight = frozen_bias = None
+        if self.context.anchor_storage == "hidden":
+            if self.stage == "anchor":
+                publish_head(self.context, weight, bias, hidden)
+            else:
+                frozen_weight, frozen_bias = load_head(self.context, hidden.device)
         chosen_actions = actions[valid]
         records = {}
         # Bound *output staging* independently from projection workspace.
-        tile = scoring_tile_size(self.objective, self.memory, vocab_size=self.context.vocab_size)
+        tile = scoring_tile_size(
+            self.objective,
+            self.memory,
+            vocab_size=self.context.vocab_size,
+            hidden_size=hidden.shape[-1],
+            bytes_per_hidden=hidden.element_size(),
+        )
         for start in range(0, count, tile):
             stop = min(start + tile, count)
-            logits = F.linear(packed[start:stop], weight, bias) / self.context.temperature
-            if self.stage == "anchor":
+            logits = None
+            if self.context.anchor_storage == "hidden":
+                if self.stage == "anchor":
+                    result = build_hidden_anchor(
+                        packed[start:stop],
+                        weight,
+                        bias,
+                        chosen_actions[start:stop],
+                        self.context,
+                        vocab_chunk=self.memory.vocab_chunk_size,
+                    )
+                    names = ANCHOR_FIELDS
+                else:
+                    result = score_hidden_teacher(
+                        packed[start:stop],
+                        weight,
+                        bias,
+                        select_valid(anchor, start, stop),
+                        frozen_weight,
+                        frozen_bias,
+                        diagnostics=self.objective.diagnostics,
+                        vocab_chunk=self.memory.vocab_chunk_size,
+                    )
+                    names = TEACHER_FIELDS
+            elif self.stage == "anchor":
+                logits = F.linear(packed[start:stop], weight, bias) / self.context.temperature
                 result = build_anchor(
                     logits,
                     chosen_actions[start:stop],
@@ -137,6 +202,7 @@ class Projection:
                 )
                 names = ANCHOR_FIELDS
             elif self.stage == "teacher":
+                logits = F.linear(packed[start:stop], weight, bias) / self.context.temperature
                 result = score_teacher(
                     logits,
                     select_valid(anchor, start, stop),
@@ -152,7 +218,30 @@ class Projection:
         # Empty responses are permitted for an individual dispatch row.
         if count == 0:
             logits = packed.new_empty((0, self.context.vocab_size))
-            if self.stage == "anchor":
+            if self.context.anchor_storage == "hidden":
+                if self.stage == "anchor":
+                    empty = build_hidden_anchor(
+                        packed,
+                        weight,
+                        bias,
+                        actions[valid],
+                        self.context,
+                        vocab_chunk=self.memory.vocab_chunk_size,
+                    )
+                    names = ANCHOR_FIELDS
+                else:
+                    empty = score_hidden_teacher(
+                        packed,
+                        weight,
+                        bias,
+                        select_valid(anchor, 0, 0),
+                        frozen_weight,
+                        frozen_bias,
+                        diagnostics=self.objective.diagnostics,
+                        vocab_chunk=self.memory.vocab_chunk_size,
+                    )
+                    names = TEACHER_FIELDS
+            elif self.stage == "anchor":
                 empty = build_anchor(logits, actions[valid], valid[valid], self.context)
                 names = ANCHOR_FIELDS
             else:
@@ -163,13 +252,13 @@ class Projection:
             records = {
                 name: [value.cpu()] for name, value in empty.tensors().items() if name in names
             }
-        from mirroropd.core.cache import FULL_FIELDS
+        from mirroropd.core.cache import RESPONSE_FIELDS
 
         output = {}
         cpu_valid = valid.cpu()
         for name, parts in records.items():
             value = torch.cat(parts)
-            if name not in FULL_FIELDS:
+            if name not in RESPONSE_FIELDS:
                 dense = value.new_zeros((len(valid), *value.shape[1:]))
                 dense[cpu_valid] = value
                 value = dense

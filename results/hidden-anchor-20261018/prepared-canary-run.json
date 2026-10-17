@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "run_id": "6e860cbd9a084959ab3b6d638e35c506",
+  "identity": {
+    "schema_version": 2,
+    "run_id": "6e860cbd9a084959ab3b6d638e35c506",
+    "name": "bpo-hidden-canary-bpo-s42-6e860cbd",
+    "group": "bpo-hidden-canary",
+    "algorithm": "bpo",
+    "seed": 42,
+    "job_name": "bpo-hidden-canary"
+  },
+  "requested_config_id": "sha256:53c6d76fd86b20ad6ed2f6954335862eb69fe86ed8e02ba2ce53334e1669cab9",
+  "config_id": "sha256:53c6d76fd86b20ad6ed2f6954335862eb69fe86ed8e02ba2ce53334e1669cab9",
+  "source_id": "sha256:4118edcd3463c506f320490565eabfd5a14e118c9d66ebab6cdf53b3aabac12e",
+  "backend": {
+    "base_commit": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+    "patch_sha256": "8729fefc88f591ec498e57d49a06f96386484dce6aebc8cfe4feec212072fbbc"
+  },
+  "scratch": "/root/.cache/mopd/jc0d3ec43"
+}

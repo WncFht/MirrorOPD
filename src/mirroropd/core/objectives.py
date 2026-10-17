@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import torch
 
-from mirroropd.core.cache import FULL_FIELDS
+from mirroropd.core.cache import RESPONSE_FIELDS
 from mirroropd.core.diagnostics import diagnostic_names, full_diagnostics, student_statistics
 from mirroropd.core.distributions import Distribution, probability_dtype
 from mirroropd.core.signal import power_reward
@@ -52,6 +52,8 @@ def compute_loss(student_logits, cache, objective, *, anchor_version, vocab_chun
     Padding never enters probability arithmetic, including nonfinite padding.
     """
     cache.context.validate(objective, anchor_version=anchor_version)
+    if cache.context.anchor_storage == "hidden":
+        raise ValueError("Hidden anchor objectives require the projected hidden/head interface")
     if student_logits.shape != (*cache.valid.shape, cache.context.vocab_size):
         raise ValueError("Student logits do not match the cache prefix/vocabulary shape")
     if student_logits.device != cache.valid.device:
@@ -69,7 +71,7 @@ def compute_loss(student_logits, cache, objective, *, anchor_version, vocab_chun
         )
     values = {}
     for name, tensor in cache.tensors().items():
-        if name in FULL_FIELDS:
+        if name in RESPONSE_FIELDS:
             values[name] = tensor
             continue
         trailing = tensor.shape[cache.valid.ndim :]

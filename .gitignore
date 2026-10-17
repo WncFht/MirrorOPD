@@ -104,3 +104,5 @@ data/oneshot-lr-stability/*.csv
 
 # Frozen open-source OPD research inputs restore from gzip.
 /data/deepseek-opd-research-20261018/source-evidence.tar
+
+/data/hidden-anchor-20261018/source.tar

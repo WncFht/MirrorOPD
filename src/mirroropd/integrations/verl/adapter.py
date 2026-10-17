@@ -4,7 +4,7 @@ import torch
 
 from mirroropd.core.cache import (
     ANCHOR_FIELDS,
-    FULL_FIELDS,
+    RESPONSE_FIELDS,
     TEACHER_FIELDS,
     WIRE_PREFIX,
     AnchorCache,
@@ -24,7 +24,7 @@ def cache_from_data(data, context, *, anchor_only=False):
         if key in data:
             value = data[key]
             fields[key] = (
-                (value.values() if name in FULL_FIELDS else value.values().unsqueeze(0))
+                (value.values() if name in RESPONSE_FIELDS else value.values().unsqueeze(0))
                 if value.is_nested
                 else value
             )
@@ -72,7 +72,7 @@ def loss_outputs(
         if key in data:
             value = data[key]
             fields[key] = (
-                (value.values() if name in FULL_FIELDS else value.values().unsqueeze(0))
+                (value.values() if name in RESPONSE_FIELDS else value.values().unsqueeze(0))
                 if value.is_nested
                 else value
             )
@@ -114,8 +114,8 @@ def restore_predictions(tensor, attention_shape, indices):
 
 
 def nested_cache_output(name, value, valid, offsets):
-    """Dense vocabulary fields use response offsets, never prompt/padding slots."""
-    if name.removeprefix(WIRE_PREFIX) in FULL_FIELDS:
+    """Response evidence uses action offsets, including hidden inputs and scalar logZ."""
+    if name.removeprefix(WIRE_PREFIX) in RESPONSE_FIELDS:
         flat_valid = valid.values() if valid.is_nested else valid.reshape(-1)
         prefix = torch.cat(
             (flat_valid.new_zeros(1, dtype=torch.int64), flat_valid.long().cumsum(0))
@@ -125,9 +125,9 @@ def nested_cache_output(name, value, valid, offsets):
 
 
 def restore_cache_output(name, tensor, attention_shape, indices):
-    if name.removeprefix(WIRE_PREFIX) in FULL_FIELDS:
+    if name.removeprefix(WIRE_PREFIX) in RESPONSE_FIELDS:
         if not tensor.is_nested:
-            raise ValueError("Full cache transport requires jagged response offsets")
+            raise ValueError("Response cache transport requires jagged response offsets")
         return tensor
     return restore_predictions(tensor, attention_shape, indices)
 
@@ -140,11 +140,11 @@ def unpad_cache_fields(data, indices, offsets):
         if key not in data:
             continue
         tensor = data[key]
-        if name in FULL_FIELDS:
+        if name in RESPONSE_FIELDS:
             if not tensor.is_nested:
                 valid = data[WIRE_PREFIX + "valid"]
                 if valid.is_nested:
-                    raise ValueError("Bind full cache offsets before unpadding scalar fields")
+                    raise ValueError("Bind response cache offsets before unpadding sequence fields")
                 counts = valid.long().sum(-1)
                 response_offsets = torch.cat((counts.new_zeros(1), counts.cumsum(0)))
                 tensor = torch.nested.nested_tensor_from_jagged(

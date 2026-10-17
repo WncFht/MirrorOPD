@@ -17,6 +17,7 @@ class Memory:
     token_chunk_size: int = 64
     vocab_chunk_size: int = 4096
     projection: str = "chunked"
+    anchor_storage: str = "log_probs"
     profile_phases: bool = False
     teacher_parameter_offload: bool | None = None
 
@@ -24,6 +25,10 @@ class Memory:
         for name in ("cache_bytes", "scoring_buffer_bytes", "token_chunk_size", "vocab_chunk_size"):
             if type(getattr(self, name)) is not int or getattr(self, name) < 1:
                 raise ValueError(f"memory.{name} must be a positive integer")
+        if self.anchor_storage not in {"log_probs", "hidden"}:
+            raise ValueError("memory.anchor_storage must be log_probs or hidden")
+        if self.anchor_storage == "hidden" and self.projection != "chunked":
+            raise ValueError("Hidden anchors require memory.projection=chunked")
         if self.projection not in {"eager", "chunked"}:
             raise ValueError("memory.projection must be eager or chunked")
         if (
@@ -36,7 +41,15 @@ class Memory:
 
 
 def cache_capacity(
-    objective, *, prefixes, vocab_size, bytes_per_probability=4, sequence_slots=None
+    objective,
+    *,
+    prefixes,
+    vocab_size,
+    bytes_per_probability=4,
+    sequence_slots=None,
+    anchor_storage="log_probs",
+    hidden_size=None,
+    bytes_per_hidden=2,
 ):
     """Upper bound for compact evidence; includes optional diagnostics fields."""
     if prefixes < 0 or vocab_size < 1:
@@ -55,6 +68,13 @@ def cache_capacity(
     )
     if minimal:
         full, j = 0, 0
+    hidden_bytes = head_bytes = 0
+    if anchor_storage == "hidden":
+        if not hidden_size or hidden_size < 1:
+            raise ValueError("Hidden cache budgeting requires the student hidden size")
+        full = 0
+        hidden_bytes = prefixes * (hidden_size * bytes_per_hidden + bytes_per_probability)
+        head_bytes = vocab_size * (hidden_size + 1) * bytes_per_hidden
     # bool valid, int64 action, head IDs/LP, four scalar LP/center fields,
     # optional teacher support. Conservative even for the MDPO minimal path.
     sparse = 1 + 8 + j * (8 + bytes_per_probability) + 4 * bytes_per_probability
@@ -69,14 +89,34 @@ def cache_capacity(
         "sequence_slots": slots,
         "sparse_bytes": slots * sparse,
         "full_bytes": prefixes * vocab_size * bytes_per_probability * full,
-        "total_bytes": slots * sparse + prefixes * vocab_size * bytes_per_probability * full,
+        "hidden_bytes": hidden_bytes,
+        "head_bytes": head_bytes,
+        "total_bytes": slots * sparse
+        + prefixes * vocab_size * bytes_per_probability * full
+        + hidden_bytes
+        + head_bytes,
         "layout": "response_predictors",
     }
 
 
-def check_cache_capacity(objective, memory, *, prefixes, vocab_size, sequence_slots=None):
+def check_cache_capacity(
+    objective,
+    memory,
+    *,
+    prefixes,
+    vocab_size,
+    sequence_slots=None,
+    hidden_size=None,
+    bytes_per_hidden=2,
+):
     estimate = cache_capacity(
-        objective, prefixes=prefixes, vocab_size=vocab_size, sequence_slots=sequence_slots
+        objective,
+        prefixes=prefixes,
+        vocab_size=vocab_size,
+        sequence_slots=sequence_slots,
+        anchor_storage=memory.anchor_storage,
+        hidden_size=hidden_size,
+        bytes_per_hidden=bytes_per_hidden,
     )
     if estimate["total_bytes"] > memory.cache_bytes:
         raise MemoryError(
@@ -88,10 +128,17 @@ def check_cache_capacity(objective, memory, *, prefixes, vocab_size, sequence_sl
     return estimate
 
 
-def scoring_tile_size(objective, memory, *, vocab_size):
+def scoring_tile_size(objective, memory, *, vocab_size, hidden_size=None, bytes_per_hidden=2):
     """Bound one scoring tile including Top-J IDs, probabilities and diagnostics."""
-    single = cache_capacity(objective, prefixes=1, vocab_size=vocab_size)
-    per_prefix = single["full_bytes"] + max(512, single["sparse_bytes"])
+    single = cache_capacity(
+        objective,
+        prefixes=1,
+        vocab_size=vocab_size,
+        anchor_storage=memory.anchor_storage,
+        hidden_size=hidden_size,
+        bytes_per_hidden=bytes_per_hidden,
+    )
+    per_prefix = single["full_bytes"] + single["hidden_bytes"] + max(512, single["sparse_bytes"])
     tile = min(memory.token_chunk_size, memory.scoring_buffer_bytes // per_prefix)
     if tile < 1:
         raise MemoryError("memory.scoring_buffer_bytes cannot hold one scoring predictor")

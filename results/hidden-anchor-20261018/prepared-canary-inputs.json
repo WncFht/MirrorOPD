@@ -1,0 +1,165 @@
+{
+  "schema_version": 2,
+  "models": {
+    "student": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/student",
+      "identity": "sha256:ddce8f701d52997f0b462195ffb8ef0cf526221deb23d9d15c08d90298cedf49",
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 722,
+          "sha256": "5de08fe92a259c4cdcc2d80c5210ac38b663c2da2421426f09172a6d254ff29c"
+        },
+        {
+          "path": "generation_config.json",
+          "bytes": 132,
+          "sha256": "83c41244d156220bfebdfa0ba2b9b8e649f8f26aca7842238dd45259662d3176"
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 659448,
+          "sha256": "cf8aef692097e5137ac8f1964eb899092d70bc3a925ffddb2221b8b68a4bc0dd"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 99,
+          "sha256": "1ecac9ec78cf97057d231453f726132712ed3360b71d39869b23f7c205cf67b4"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 1534,
+          "sha256": "b8d362873100e01a497fcadb4eeea0ce048a80f03464269832bd4946264a72bb"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 973,
+          "sha256": "024b56fce9f4fa1439b73bdbe9670e224bf4c0c21c04d40aff078442bd4a2f42"
+        }
+      ]
+    },
+    "teacher": {
+      "path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/teacher",
+      "identity": "sha256:3ffbe962eeef81ded0b93eb76ba26da61a06431eb918d5faa4de0d9a9ef2690a",
+      "files": [
+        {
+          "path": "config.json",
+          "bytes": 722,
+          "sha256": "ec984c0b1fc4ed0116c7dd296865a33485d66b7eda0ff340a58fc8e9ee09348d"
+        },
+        {
+          "path": "generation_config.json",
+          "bytes": 132,
+          "sha256": "83c41244d156220bfebdfa0ba2b9b8e649f8f26aca7842238dd45259662d3176"
+        },
+        {
+          "path": "model.safetensors",
+          "bytes": 2562576,
+          "sha256": "0e1cffc7a3db3fd1f219ddd52e9198c99a812804257ff82f683e10bfe096cc45"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 99,
+          "sha256": "1ecac9ec78cf97057d231453f726132712ed3360b71d39869b23f7c205cf67b4"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 1534,
+          "sha256": "b8d362873100e01a497fcadb4eeea0ce048a80f03464269832bd4946264a72bb"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 973,
+          "sha256": "024b56fce9f4fa1439b73bdbe9670e224bf4c0c21c04d40aff078442bd4a2f42"
+        }
+      ]
+    }
+  },
+  "vocabulary_id": "sha256:eed5219be862836f3f2b37fff0535b2ef64877f2ba27d1b47b65b27891123722",
+  "vocab_size": 32,
+  "memory_plan": {
+    "prefixes": 64,
+    "vocab_size": 32,
+    "full_fields": 0,
+    "sequence_slots": 320,
+    "sparse_bytes": 110400,
+    "full_bytes": 0,
+    "hidden_bytes": 16640,
+    "head_bytes": 8256,
+    "total_bytes": 135296,
+    "layout": "response_predictors"
+  },
+  "dataset": {
+    "schema_version": 2,
+    "splits": {
+      "train": {
+        "paths": [
+          "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/prepared-canary/data/train-000-cc240bf42073.parquet"
+        ],
+        "rows": 16,
+        "labeled_rows": 16,
+        "sources": {
+          "synthetic-qa": 16
+        }
+      },
+      "validation": {
+        "paths": [
+          "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/prepared-canary/data/validation-000-63a970ab0d78.parquet"
+        ],
+        "rows": 4,
+        "labeled_rows": 4,
+        "sources": {
+          "synthetic-qa": 4
+        }
+      }
+    },
+    "files": [
+      {
+        "split": "train",
+        "source_path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/train.jsonl",
+        "source_sha256": "cc240bf42073709656bdd949fceef4a967459f4c01000f9f85121f5a3c137542",
+        "prepared_path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/prepared-canary/data/train-000-cc240bf42073.parquet",
+        "prepared_sha256": "16118e15046e457e999e0e00ea17ecfbe4ad2b246ebbcb8777cbda50e50dec49",
+        "rows": 16
+      },
+      {
+        "split": "validation",
+        "source_path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/test.jsonl",
+        "source_sha256": "63a970ab0d7876883f3f2dd23f3daa7fadb34e5cfb5b67a3f2d03124d8a87c3f",
+        "prepared_path": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/prepared-canary/data/validation-000-63a970ab0d78.parquet",
+        "prepared_sha256": "0cef48e1f182b8dd5a9063a5f9f85137bd7e2abdb1c2c1044e99c2e412b25ce1",
+        "rows": 4
+      }
+    ],
+    "dataset_id": "sha256:06764e134b7b606345c5c4e36913f53948693a8a8320aec3a84184ee82c68bf7"
+  },
+  "prompt_lengths": {
+    "train": {
+      "questions": 16,
+      "min_tokens": 3,
+      "max_tokens": 3,
+      "mean_tokens": 3.0
+    },
+    "validation": {
+      "questions": 4,
+      "min_tokens": 3,
+      "max_tokens": 3,
+      "mean_tokens": 3.0
+    }
+  },
+  "scorer_id": "sha256:1d74a8af65daa975efdf786607877a1098e989e992a2181ad7a9f3d7c55e3d0c",
+  "protocol": {
+    "samples_per_question": 2,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": -1,
+    "prompt_tokens": 64,
+    "response_tokens": 32,
+    "max_context_tokens": 96,
+    "seed": 42,
+    "scorer_id": "sha256:1d74a8af65daa975efdf786607877a1098e989e992a2181ad7a9f3d7c55e3d0c",
+    "score_kind": "binary",
+    "schema_version": 2
+  },
+  "protocol_id": "sha256:24f47d62273a961cb8a7bd426a62a3a07effac50387edf4c374dd505a0cd0afb",
+  "evaluation_questions": 4
+}

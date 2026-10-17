@@ -1,0 +1,137 @@
+{
+  "name": "bpo-hidden-canary",
+  "models": {
+    "student": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/student",
+    "teacher": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/teacher",
+    "chat_template": null,
+    "trust_remote_code": false
+  },
+  "data": {
+    "train": [
+      "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/train.jsonl"
+    ],
+    "validation": [
+      "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MirrorOPD/runs/hidden-anchor-20261018/native-inputs/test.jsonl"
+    ],
+    "scorer": {
+      "name": "exact",
+      "kind": "binary",
+      "parameters": {}
+    },
+    "columns": {
+      "prompt": "question",
+      "answer": "answer",
+      "source": "data_source"
+    },
+    "source_name": "synthetic-qa",
+    "ability": "general",
+    "requires_validation_reference": true
+  },
+  "objective": {
+    "algorithm": "bpo",
+    "signal": {
+      "kappa": 0.5,
+      "eta": 0.2
+    },
+    "estimator": {
+      "center": "full",
+      "integration": "sampled",
+      "topj": 16,
+      "chunk_size": 64
+    },
+    "diagnostics": "full"
+  },
+  "memory": {
+    "cache_bytes": 2147483648,
+    "scoring_buffer_bytes": 67108864,
+    "token_chunk_size": 3,
+    "vocab_chunk_size": 7,
+    "projection": "chunked",
+    "anchor_storage": "hidden",
+    "profile_phases": true,
+    "teacher_parameter_offload": null
+  },
+  "training": {
+    "outer_steps": 2,
+    "inner_steps": 2,
+    "batch_size": 4,
+    "micro_batch_size": 1,
+    "responses_per_prompt": 1,
+    "learning_rate": 1e-06,
+    "weight_decay": 0.0,
+    "clip_grad": 2.0,
+    "prompt_tokens": 64,
+    "response_tokens": 16,
+    "temperature": 0.7,
+    "seed": 42,
+    "gradient_checkpointing": true,
+    "parameter_offload": true,
+    "optimizer_offload": true,
+    "optim": {
+      "optimizer": "AdamW",
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "eps": 1e-08,
+      "lr_scheduler_type": "constant",
+      "lr_warmup_steps": -1,
+      "lr_warmup_steps_ratio": 0.0,
+      "min_lr_ratio": 0.0,
+      "num_cycles": 0.5
+    }
+  },
+  "evaluation": {
+    "every": 2,
+    "before_training": true,
+    "samples_per_question": 2,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": -1,
+    "prompt_tokens": 64,
+    "response_tokens": 32,
+    "question_limit": 4,
+    "seed": 42
+  },
+  "precision": {
+    "parameters": "fp32",
+    "teacher": "bf16",
+    "forward": "bf16",
+    "reduction": "fp32",
+    "buffers": "fp32"
+  },
+  "resources": {
+    "gpu_ids": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "cpus": 16,
+    "rollout_memory_fraction": 0.05,
+    "max_sequences": 4,
+    "max_batch_tokens": 256,
+    "object_store_bytes": 4294967296
+  },
+  "logging": {
+    "console": true,
+    "wandb": {
+      "enabled": false,
+      "mode": "online",
+      "project": "mirroropd",
+      "entity": null,
+      "group": null,
+      "tags": []
+    }
+  },
+  "checkpoints": {
+    "every": 0,
+    "max_to_keep": 2,
+    "save_contents": [
+      "model",
+      "optimizer",
+      "extra"
+    ]
+  },
+  "schema_version": 2
+}

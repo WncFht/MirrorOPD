@@ -28,7 +28,11 @@ def main():
     parser.add_argument("--lease-root", type=Path, required=True)
     parser.add_argument("--borrowed-slot", type=Path)
     parser.add_argument("--case", choices=["-".join(case) for case in CASES])
+    parser.add_argument("--anchor-storage", choices=["log_probs", "hidden"], default="log_probs")
+    parser.add_argument("--center", choices=["full", "topj_tail"])
     args = parser.parse_args()
+    if args.anchor_storage == "hidden" and args.case != "bpo-sampled-full":
+        parser.error("Hidden canary requires --case bpo-sampled-full")
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=False)
     from native_validation import tiny_inputs
@@ -54,7 +58,12 @@ def main():
                 "objective": {
                     "algorithm": algorithm,
                     "estimator": {
-                        "center": "full" if integration == "full" else "topj_tail",
+                        "center": args.center
+                        or (
+                            "full"
+                            if integration == "full" or args.anchor_storage == "hidden"
+                            else "topj_tail"
+                        ),
                         "integration": integration,
                         "topj": 16,
                     },
@@ -62,6 +71,7 @@ def main():
                 },
                 "memory": {
                     "projection": "chunked",
+                    "anchor_storage": args.anchor_storage,
                     "token_chunk_size": 3,
                     "vocab_chunk_size": 7,
                     "profile_phases": True,

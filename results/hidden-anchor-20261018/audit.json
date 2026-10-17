@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "source_manifest": "data/hidden-anchor-20261018/source-files.json",
+  "source_archive": "data/hidden-anchor-20261018/source.tar.gz",
+  "inputs": "Seed1810 independent synthetic hidden and heads, no task data; CPU error seed18",
+  "runtime": {
+    "torch": "2.7.1+cu126",
+    "python": "3.12",
+    "threads_per_child": 2,
+    "worker_processes_per_storage": 3,
+    "shared_machine": true,
+    "prepared_source_runtime": {
+      "python": "3.12.15 (main, Oct  6 2026, 23:50:18) [GCC 15.3.0]",
+      "platform": "Linux-5.15.0-124-generic-x86_64-with-glibc2.35",
+      "torch": "2.7.1+cu126",
+      "transformers": "4.57.6",
+      "vllm": "0.10.0+cu126",
+      "ray": "2.59.0",
+      "tensordict": "0.10.0",
+      "numpy": "1.26.4",
+      "pandas": "3.0.6",
+      "pyarrow": "21.0.0",
+      "omegaconf": "2.3.1",
+      "hydra-core": "1.3.7"
+    }
+  },
+  "conditions": {
+    "tokens": 512,
+    "vocab": 8192,
+    "hidden": 128,
+    "topj": 16,
+    "diagnostics": "basic",
+    "temperature": 0.7,
+    "kappa": 0.5,
+    "eta": 0.2,
+    "token_chunk": 32,
+    "vocab_chunk": 1024,
+    "warmup": "both storage paths once on 8x64x16 in each fresh child process",
+    "cpu_rss_scope": "process lifetime high-water including interpreter and warmup",
+    "gpu_validation": "not_run_active_external_contexts",
+    "cuda_peak_allocated_bytes": null,
+    "cuda_peak_reserved_bytes": null,
+    "update_seconds_scope": "output projection, centers, score loss and backward; excludes optimizer.step, backbone, shared head file, Ray and FSDP"
+  },
+  "results": {
+    "fp32": {
+      "summary": {
+        "log_probs": {
+          "cache_storage_bytes": {
+            "median": 16888320,
+            "min": 16888320,
+            "max": 16888320
+          },
+          "shared_head_bytes": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "build_seconds": {
+            "median": 0.1443604826927185,
+            "min": 0.13983550667762756,
+            "max": 0.17694149166345596
+          },
+          "update_seconds": {
+            "median": 0.09915240854024887,
+            "min": 0.08586569875478745,
+            "max": 0.10269615054130554
+          },
+          "peak_rss_bytes": {
+            "median": 668860416,
+            "min": 657616896,
+            "max": 678805504
+          }
+        },
+        "hidden": {
+          "cache_storage_bytes": {
+            "median": 375296,
+            "min": 375296,
+            "max": 375296
+          },
+          "shared_head_bytes": {
+            "median": 4194304,
+            "min": 4194304,
+            "max": 4194304
+          },
+          "build_seconds": {
+            "median": 0.2162516638636589,
+            "min": 0.19904807955026627,
+            "max": 0.24377242475748062
+          },
+          "update_seconds": {
+            "median": 0.14634200185537338,
+            "min": 0.14156027883291245,
+            "max": 0.1510453075170517
+          },
+          "peak_rss_bytes": {
+            "median": 622927872,
+            "min": 621330432,
+            "max": 626216960
+          }
+        }
+      },
+      "precision_check": {
+        "precision": "fp32",
+        "loss_max_abs": 1.9073486328125e-06,
+        "teacher_center_max_abs": 9.238719940185547e-07,
+        "student_kl_max_abs": 9.98377799987793e-07,
+        "gradient_max_abs": [
+          5.960464477539062e-07,
+          4.76837158203125e-07
+        ],
+        "gradient_relative_l2": [
+          2.2281797384948732e-07,
+          1.3148184052624856e-07
+        ]
+      }
+    },
+    "bf16": {
+      "summary": {
+        "log_probs": {
+          "cache_storage_bytes": {
+            "median": 16888320,
+            "min": 16888320,
+            "max": 16888320
+          },
+          "shared_head_bytes": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "build_seconds": {
+            "median": 0.08812477439641953,
+            "min": 0.0856555849313736,
+            "max": 0.0947514995932579
+          },
+          "update_seconds": {
+            "median": 0.07318980246782303,
+            "min": 0.07274921983480453,
+            "max": 0.07545244693756104
+          },
+          "peak_rss_bytes": {
+            "median": 653713408,
+            "min": 651317248,
+            "max": 656621568
+          }
+        },
+        "hidden": {
+          "cache_storage_bytes": {
+            "median": 244224,
+            "min": 244224,
+            "max": 244224
+          },
+          "shared_head_bytes": {
+            "median": 2097152,
+            "min": 2097152,
+            "max": 2097152
+          },
+          "build_seconds": {
+            "median": 0.22347349673509598,
+            "min": 0.22206786274909973,
+            "max": 0.23104272782802582
+          },
+          "update_seconds": {
+            "median": 0.1526680365204811,
+            "min": 0.15051007270812988,
+            "max": 0.16404012590646744
+          },
+          "peak_rss_bytes": {
+            "median": 634277888,
+            "min": 632082432,
+            "max": 636141568
+          }
+        }
+      },
+      "precision_check": {
+        "precision": "bf16",
+        "loss_max_abs": 1.9073486328125e-06,
+        "teacher_center_max_abs": 9.57399606704712e-07,
+        "student_kl_max_abs": 5.364418029785156e-07,
+        "gradient_max_abs": [
+          0.0,
+          0.01393890380859375
+        ],
+        "gradient_relative_l2": [
+          0.0,
+          0.0027177047450095415
+        ]
+      }
+    }
+  },
+  "native_preparation": {
+    "state": "prepared",
+    "source_id": "sha256:4118edcd3463c506f320490565eabfd5a14e118c9d66ebab6cdf53b3aabac12e",
+    "config_id": "sha256:53c6d76fd86b20ad6ed2f6954335862eb69fe86ed8e02ba2ce53334e1669cab9",
+    "gpu_executed": false,
+    "scope": [
+      "fixed_backend_verification",
+      "model_data_preflight",
+      "source_snapshot",
+      "configuration_compilation"
+    ]
+  },
+  "verification": {
+    "product_tests": {
+      "passed": 630,
+      "duration_seconds": 127.45,
+      "command": "MIRROR_TEST_BACKEND=upstream/TA-OPD-v2-20261017 make test PYTHON=../envs/opd/bin/python"
+    },
+    "new_core_fp64_conditions": 27,
+    "native_gpu": "not_run",
+    "documentation_checks": "passed",
+    "repository_checks": "make check passed; documentation measurement-scope clarification checked again before commit"
+  }
+}

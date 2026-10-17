@@ -109,14 +109,15 @@ def test_real_causal_lm_projected_forward_returns_the_actual_loss_edge(
     assert not actual[-1][19:].any()
 
 
-def test_full_fields_remain_jagged_through_dataproto_reorder_and_chunks(native):
+@pytest.mark.parametrize("name", ["anchor_full", "anchor_hidden", "anchor_logz"])
+def test_full_fields_remain_jagged_through_dataproto_reorder_and_chunks(native, name):
     from verl import DataProto
 
     valid = torch.tensor([[False, True, True, False], [False, False, True, False]])
     offsets = torch.tensor([0, 4, 8])
-    packed = torch.arange(21.0).reshape(3, 7)
-    full = nested_cache_output("mirror_cache_anchor_full", packed, valid, offsets)
-    assert full.values().numel() == 3 * 7
+    packed = torch.arange(3.0) if name == "anchor_logz" else torch.arange(21.0).reshape(3, 7)
+    full = nested_cache_output("mirror_cache_" + name, packed, valid, offsets)
+    assert full.values().numel() == packed.numel()
     td = native.get_tensordict({"mirror_cache_anchor_full": full, "label": torch.tensor([5, 9])})
     proto = DataProto.from_tensordict(td)
     changed = proto[[1, 0]]
@@ -252,3 +253,94 @@ def test_projection_rejects_unsupported_native_contract_before_forward(native, o
         project_head(object(), data, sequence_parallel_size=2 if option == "sp" else 1),
     ):
         raise AssertionError("Unsupported execution reached model forward")
+
+
+@pytest.mark.parametrize("diagnostics", ["none", "basic", "full"])
+@pytest.mark.parametrize("empty", [False, True])
+def test_hidden_head_pipeline_stays_frozen_across_student_updates(
+    native, tmp_path, diagnostics, empty
+):
+    from dataclasses import replace
+
+    from transformers import Qwen2Config, Qwen2ForCausalLM
+
+    from mirroropd.integrations.verl.adapter import cache_from_data
+    from mirroropd.integrations.verl.projection import project_head
+
+    torch.manual_seed(911)
+
+    def model(width):
+        return (
+            Qwen2ForCausalLM(
+                Qwen2Config(
+                    vocab_size=32,
+                    hidden_size=width,
+                    intermediate_size=width * 2,
+                    num_hidden_layers=1,
+                    num_attention_heads=2,
+                    num_key_value_heads=1,
+                    attention_dropout=0.0,
+                )
+            )
+            .double()
+            .eval()
+        )
+
+    student, teacher = model(16), model(24)
+    spec = Objective(estimator=Estimator("full", "sampled", 4), diagnostics=diagnostics)
+    context = CacheContext(0, "t", "v", 19, 0.7, spec.signal, spec.estimator)
+    hidden_context = replace(
+        context, anchor_storage="hidden", anchor_head_path=str(tmp_path / "0.pt")
+    )
+    valid = torch.tensor([[False, False, not empty, not empty, not empty, False]])
+    actions = torch.tensor([[0, 0, 6, 7, 8, 0]])
+    ids = torch.tensor([[2, 4, 5, 6, 7, 8]])
+    direct = build_cache(
+        student(ids).logits[..., :19] / 0.7,
+        teacher(ids).logits[..., :19] / 0.7,
+        actions,
+        valid,
+        context,
+        diagnostics=diagnostics,
+    )
+    data = batch(
+        native,
+        spec,
+        hidden_context,
+        {"mirror_cache_valid": valid, "mirror_cache_actions": actions},
+        "anchor",
+    )
+    native.assign_non_tensor(
+        data,
+        mirror_memory=asdict(
+            Memory(anchor_storage="hidden", token_chunk_size=2, vocab_chunk_size=5)
+        ),
+    )
+    for stage, active in (("anchor", student), ("teacher", teacher)):
+        native.assign_non_tensor(data, mirror_stage=stage)
+        with torch.no_grad(), project_head(active, data) as operation:
+            raw = operation.outputs(active(ids).logits, data["input_ids"])
+        for key, value in raw.items():
+            if key != "log_probs":
+                data[key] = value
+    cache = cache_from_data(data, hidden_context)
+    assert cache.anchor_full is None
+    frozen_bytes = (tmp_path / "0.pt").read_bytes()
+    native.assign_non_tensor(data, mirror_stage=None)
+    for update in range(2):
+        if update:
+            with torch.no_grad():
+                for parameter in student.parameters():
+                    parameter.add_(torch.randn_like(parameter) * 0.01)
+        reference = compute_loss(
+            student(ids).logits[..., :19] / 0.7, direct, spec, anchor_version=0
+        )
+        ref_grads = torch.autograd.grad(reference.loss.sum(), tuple(student.parameters()))
+        with project_head(student, data) as operation:
+            raw = operation.outputs(student(ids).logits, data["input_ids"])
+        loss = raw["distillation_losses"].values().sum()
+        torch.testing.assert_close(loss, reference.loss.sum(), atol=2e-10, rtol=2e-10)
+        grads = torch.autograd.grad(loss, tuple(student.parameters()))
+        for g, r in zip(grads, ref_grads, strict=True):
+            torch.testing.assert_close(g, r, atol=2e-10, rtol=2e-10)
+        assert (tmp_path / "0.pt").read_bytes() == frozen_bytes

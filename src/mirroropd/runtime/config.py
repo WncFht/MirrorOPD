@@ -293,6 +293,12 @@ class Job:
             raise ValueError("Job name must be a simple path-safe label")
         if self.objective.algorithm == "on_policy" and self.training.inner_steps != 1:
             raise ValueError("On-policy requires exactly one update per fresh full batch")
+        if self.memory.anchor_storage == "hidden" and not (
+            self.objective.algorithm == "bpo"
+            and self.objective.estimator.center == "full"
+            and self.objective.estimator.integration == "sampled"
+        ):
+            raise ValueError("Hidden anchor storage requires BPO full centers with sampled actions")
         sequences = self.training.batch_size * self.training.responses_per_prompt
         if sequences % (self.training.micro_batch_size * len(self.resources.gpu_ids)):
             raise ValueError("Global sequence batch must divide GPU count times micro batch")

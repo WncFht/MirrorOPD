@@ -128,8 +128,20 @@ class CacheContext:
     estimator: Estimator
     schema_version: int = API_VERSION
     action_only: bool = False
+    anchor_storage: str = "log_probs"
+    anchor_head_path: str | None = None
 
     def __post_init__(self):
+        if self.anchor_storage not in {"log_probs", "hidden"}:
+            raise ValueError("anchor_storage must be log_probs or hidden")
+        if (self.anchor_storage == "hidden") != bool(self.anchor_head_path):
+            raise ValueError("Hidden anchor requires an explicit frozen head path")
+        if self.anchor_storage == "hidden" and (
+            self.action_only
+            or self.estimator.center != "full"
+            or self.estimator.integration != "sampled"
+        ):
+            raise ValueError("Hidden anchor requires full centers and sampled integration")
         if self.schema_version != API_VERSION:
             raise ValueError(f"Cache schema must be {API_VERSION}")
         if type(self.action_only) is not bool:
@@ -148,6 +160,8 @@ class CacheContext:
             raise ValueError("Objective does not match the frozen cache signal/estimator")
         if anchor_version is not None and anchor_version != self.anchor_version:
             raise ValueError("Stale anchor version")
+        if self.anchor_storage == "hidden" and objective.algorithm != "bpo":
+            raise ValueError("Hidden anchor currently supports sampled BPO only")
         if self.action_only and not (
             objective.algorithm == "mdpo"
             and objective.estimator.integration == "sampled"

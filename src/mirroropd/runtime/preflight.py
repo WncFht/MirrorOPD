@@ -69,6 +69,11 @@ def prepare_inputs(job, directory, *, fingerprint_cache):
         raise ValueError("Shared vocabulary IDs must form the dense legal output prefix")
     if job.objective.estimator.topj > vocab_size:
         raise ValueError("Configured topj exceeds the shared vocabulary")
+    student_config = AutoConfig.from_pretrained(
+        models["student"]["path"],
+        local_files_only=True,
+        trust_remote_code=job.models.trust_remote_code,
+    )
     memory_plan = check_cache_capacity(
         job.objective,
         job.memory,
@@ -78,6 +83,8 @@ def prepare_inputs(job, directory, *, fingerprint_cache):
             * job.training.response_tokens
         ),
         vocab_size=vocab_size,
+        hidden_size=getattr(student_config, "hidden_size", None),
+        bytes_per_hidden=2 if job.precision.forward == "bf16" else 4,
         sequence_slots=job.training.batch_size
         * job.training.responses_per_prompt
         * (job.training.prompt_tokens + job.training.response_tokens),

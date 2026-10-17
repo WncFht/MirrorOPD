@@ -16,10 +16,12 @@ ANCHOR_FIELDS = (
     "anchor_tail",
     "anchor_action",
     "anchor_full",
+    "anchor_hidden",
+    "anchor_logz",
 )
 TEACHER_FIELDS = ("teacher_action", "reward_center", "teacher_ids", "target_full")
 WIRE_PREFIX = "mirror_cache_"
-FULL_FIELDS = ("anchor_full", "target_full")
+RESPONSE_FIELDS = ("anchor_full", "target_full", "anchor_hidden", "anchor_logz")
 
 
 def scatter_valid(value, valid, trailing=()):
@@ -38,6 +40,8 @@ class AnchorCache:
     anchor_tail: torch.Tensor | None
     anchor_action: torch.Tensor
     anchor_full: torch.Tensor | None = None
+    anchor_hidden: torch.Tensor | None = None
+    anchor_logz: torch.Tensor | None = None
 
     def __post_init__(self):
         shape = self.valid.shape
@@ -61,7 +65,20 @@ class AnchorCache:
         expected = (*shape, self.context.estimator.topj)
         if self.head_ids.shape != expected or self.anchor_head.shape != expected:
             raise ValueError("Cache head fields do not align with declared topj")
-        full = self.context.estimator.center == "full"
+        hidden = self.context.anchor_storage == "hidden"
+        if hidden:
+            if self.anchor_hidden is None or self.anchor_logz is None:
+                raise ValueError("Hidden cache requires frozen head inputs and normalizers")
+            count = int(self.valid.sum())
+            if (
+                self.anchor_hidden.ndim != 2
+                or self.anchor_hidden.shape[0] != count
+                or self.anchor_logz.shape != (count,)
+            ):
+                raise ValueError("Hidden cache does not align with valid response predictors")
+        elif self.anchor_hidden is not None or self.anchor_logz is not None:
+            raise ValueError("Log-probability cache cannot carry hidden evidence")
+        full = self.context.estimator.center == "full" and not hidden
         if full != (self.anchor_full is not None):
             raise ValueError("Cache full anchor does not match estimator")
         if full and self.anchor_full.shape != (int(self.valid.sum()), self.context.vocab_size):
@@ -145,7 +162,7 @@ def select_valid(cache, start, stop):
     selected = {}
     for name, value in cache.tensors().items():
         selected[name] = (
-            value[start:stop] if name in FULL_FIELDS else value[cache.valid][start:stop]
+            value[start:stop] if name in RESPONSE_FIELDS else value[cache.valid][start:stop]
         )
     return replace(cache, **selected)
 
@@ -158,6 +175,8 @@ def build_anchor(logits, actions, valid, context):
         raise TypeError("Anchor actions/valid must be int64/bool")
     if ((actions[valid] < 0) | (actions[valid] >= context.vocab_size)).any():
         raise ValueError("Anchor action is outside the legal vocabulary")
+    if context.anchor_storage == "hidden":
+        raise ValueError("Hidden anchor must be built from projected head inputs")
     distribution = Distribution.from_logits(logits[valid].detach())
     estimator = context.estimator
     ids = None if context.action_only else distribution.logits.topk(estimator.topj, -1).indices

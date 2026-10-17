@@ -1,8 +1,10 @@
 """Narrow verl binding; framework imports occur only inside native callbacks."""
 
 import json
+import os
 from dataclasses import asdict, dataclass, field
 from functools import lru_cache, wraps
+from pathlib import Path
 
 from mirroropd.core.cache import ANCHOR_FIELDS, TEACHER_FIELDS, WIRE_PREFIX
 from mirroropd.core.config import API_VERSION, CacheContext, Objective, decode
@@ -61,6 +63,17 @@ def window_context(config, anchor_version, temperature):
         temperature,
         value.objective.signal,
         value.objective.estimator,
+        anchor_storage=value.memory.anchor_storage,
+        anchor_head_path=(
+            str(
+                Path(os.environ["MIRROR_RUN_DIR"])
+                / "cache"
+                / "anchor-heads"
+                / f"{anchor_version}.pt"
+            )
+            if value.memory.anchor_storage == "hidden"
+            else None
+        ),
         action_only=(
             value.objective.algorithm == "mdpo"
             and value.objective.estimator.integration == "sampled"
@@ -187,6 +200,14 @@ def anchor_pass(trainer, batch):
         trainer.global_steps - 1,
         trainer.config.actor_rollout_ref.rollout.temperature,
     )
+    if context.anchor_storage == "hidden":
+        directory = Path(context.anchor_head_path).parent
+        directory.mkdir(parents=True, exist_ok=True)
+        if Path(context.anchor_head_path).exists():
+            raise FileExistsError("Anchor head already exists; equivalent resume is unsupported")
+        # No old-window consumer remains after the blocking train update.
+        for old in directory.glob("*.pt"):
+            old.unlink()
     batch.meta_info.update(
         mirror_context=context.to_dict(),
         mirror_anchor_version=context.anchor_version,

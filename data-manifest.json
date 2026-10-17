@@ -1169,6 +1169,12 @@
             "archive": "data/deepseek-opd-research-20261018/source-evidence.tar.gz",
             "sha256": "b426963fe210df4a6e4113c4efc40ab51c4f7ecc01e941dcb732d7e1c026d63e",
             "bytes": 276480
+        },
+        {
+            "path": "data/hidden-anchor-20261018/source.tar",
+            "archive": "data/hidden-anchor-20261018/source.tar.gz",
+            "sha256": "4c4cf0ff426242412922a1b7183ff28906971ee57ba066a7a88879b5669c053b",
+            "bytes": 768000
         }
     ]
 }
