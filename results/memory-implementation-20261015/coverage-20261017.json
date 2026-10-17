@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-17",
+  "source_commit": "5b1460596c8a29720a664a531655637af91f5e1c",
+  "core_source": {
+    "src/mirroropd/core/__init__.py": "160644b046037fc75b23fb2bf0a414986c432bf1ae356b6edb7a2caec8b2189b",
+    "src/mirroropd/core/cache.py": "53b8d32eb56431f92e7a9082e9aad701c2f504f1825d6a75ae33c738b4531af3",
+    "src/mirroropd/core/config.py": "61c0b49d6acb7e5eeda85d000a9fdafcfc19c6824dc1bb86cb7dcdbed3854e55",
+    "src/mirroropd/core/diagnostics.py": "8fce22836f338ed174a08b22b6d9e0f6c6ab9603c53d62e5763268b77e58de78",
+    "src/mirroropd/core/distributions.py": "02a7f46fef603d5aa45d2d19eefefdc9ab8d056f36d5fd615022a67560bc6e50",
+    "src/mirroropd/core/kernels.py": "07d62fab5a34d7b9dc6f3651add32f8ad344248dc0533dfd2a979a4b8f05d7c3",
+    "src/mirroropd/core/linear_bpo.py": "594c60bc3e85198f78e47f2fc3f2ec740e0dd0d298aebc8a8b303ded6c6c4019",
+    "src/mirroropd/core/objectives.py": "e6323f08eec8b0c42364aafd4f3d5066eeece9a8f9abe7ef63bcecaa3eeba762",
+    "src/mirroropd/core/signal.py": "e70d3d82a20e43a71db1e9751ba4ffd0affe0097f5e8a64a06637c0b74342563",
+    "src/mirroropd/core/vocabulary.py": "c593f4f9b121729dab8a623dc6daebdaa71421ad4147946a81565b1bd147c6b7",
+    "src/mirroropd/integrations/__init__.py": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+    "src/mirroropd/integrations/verl/__init__.py": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+    "src/mirroropd/integrations/verl/adapter.py": "ccad6c5a1247766460696402e8753047e8c20b21453f119b046d74a0c6a514b0",
+    "src/mirroropd/integrations/verl/bootstrap.py": "56af0b3285b85117092f6dfedab69af1f29480cfe16a564de796e900db9a3e9e",
+    "src/mirroropd/integrations/verl/bridge.py": "db7655f2ba4cb51d86940aa1abd73070d2a1155b244a0af049404ccfee78c5ca",
+    "src/mirroropd/integrations/verl/compiler.py": "bfb93ff553418880f00f578823373f722308550e6ade04be387fbbe61681200e",
+    "src/mirroropd/integrations/verl/evaluation.py": "fe9eb90cea92d7763eebef7e20d2fc3593911b75f967ff1e8f87e505a251564e",
+    "src/mirroropd/integrations/verl/model.py": "ddabd0f4cf9bcba1299056a560243035f1b9eed3e86a36353c45e31fac52126e",
+    "src/mirroropd/integrations/verl/projection.py": "41af63ef1f3624d64fed0f798310685ca42cde7dd19639d6224bd2aa4067d021",
+    "src/mirroropd/integrations/verl/rendezvous.py": "d6113bf54c0a8cd3158e5fa8bc21c58f5ab6a209bd88279bdfd392132e243658",
+    "src/mirroropd/integrations/verl/reward.py": "bda9f223d219302380c91a45affa03496d76874063eeb5763b5c8024f9114a2d",
+    "src/mirroropd/integrations/verl/vllm_executor.py": "4f1120f13b8b7d9b72ccfbc2eebf8e76fcabd64de19deb3cde6c6249b4736214"
+  },
+  "cpu_validation": {
+    "passed": 565,
+    "seconds": 134.05,
+    "backend": "TA-OPD 62669afb5101bfdf57dc5ddf81e78f000c5ce2fc + versioned backend.patch",
+    "full_independent_gradient_cases": 54,
+    "parameterized_space": {
+      "algorithm": [
+        "on_policy",
+        "mdpo",
+        "bpo"
+      ],
+      "kappa": [
+        0,
+        0.5,
+        1
+      ],
+      "eta": [
+        0.03,
+        0.2,
+        1
+      ],
+      "integration": [
+        "sampled",
+        "full"
+      ]
+    },
+    "scope": "All currently collected product and maintenance tests with explicit maintenance binaries on PATH."
+  },
+  "current_real_model_gpu_evidence": "results/memory-audit-20261017/native-summary.json",
+  "new_native_cases": [
+    {
+      "name": "bpo-sampled-full",
+      "verification": {
+        "schema_version": 2,
+        "passed": true,
+        "run_id": "7691c39260ff49e9941bb8034de607ce",
+        "source_id": "sha256:4f42d35c6e9576f01e5d1246d664d1b8b699ee2e59f0454fd82782293caec3c7",
+        "config_id": "sha256:3edaf1bfc718a81699d6fa30f7864352699c29617b8ec36be613c587488f712a",
+        "requested_config_id": "sha256:3edaf1bfc718a81699d6fa30f7864352699c29617b8ec36be613c587488f712a",
+        "algorithm": "bpo",
+        "loss_kind": "score_surrogate",
+        "outer_steps": 2,
+        "optimizer_updates": 4,
+        "evaluations": [
+          {
+            "model_version": 0,
+            "metrics": {
+              "evaluation/generated_examples": 8,
+              "evaluation/unique_questions": 4,
+              "evaluation/samples_per_question": 2,
+              "evaluation/synthetic-qa/mean@2": 0.0,
+              "evaluation/synthetic-qa/pass@2": 0.0,
+              "evaluation/synthetic-qa/response_tokens/mean": 23.125,
+              "evaluation/synthetic-qa/budget_exhausted_fraction": 0.625,
+              "evaluation/synthetic-qa/eos_fraction": 0.375
+            }
+          },
+          {
+            "model_version": 2,
+            "metrics": {
+              "evaluation/generated_examples": 8,
+              "evaluation/unique_questions": 4,
+              "evaluation/samples_per_question": 2,
+              "evaluation/synthetic-qa/mean@2": 0.0,
+              "evaluation/synthetic-qa/pass@2": 0.0,
+              "evaluation/synthetic-qa/response_tokens/mean": 22.875,
+              "evaluation/synthetic-qa/budget_exhausted_fraction": 0.5,
+              "evaluation/synthetic-qa/eos_fraction": 0.5
+            }
+          }
+        ],
+        "expected_questions": 4,
+        "protocol": {
+          "samples_per_question": 2,
+          "temperature": 0.7,
+          "top_p": 0.9,
+          "top_k": -1,
+          "prompt_tokens": 64,
+          "response_tokens": 32,
+          "max_context_tokens": 96,
+          "seed": 42,
+          "scorer_id": "sha256:1d74a8af65daa975efdf786607877a1098e989e992a2181ad7a9f3d7c55e3d0c",
+          "score_kind": "binary",
+          "schema_version": 2
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Default Top-J+tail sampled is approximate; BPO off-anchor center bias is explicit.",
+    "Sampled action correction assumes proposal q; no beta-to-q correction for vLLM/FSDP numeric differences.",
+    "No production equivalent-resume protocol; checkpoints alone do not restore frozen window and observation cursors.",
+    "Single-node FSDP, SP1 and rollout TP1; bounded projection supports standard linear heads and first-order derivatives.",
+    "Formal current-protocol MDPO/BPO math comparison remains incomplete."
+  ],
+  "raw_evidence": {
+    "archive": "data/integration-audit-20261017/native-evidence.tar.gz",
+    "restored_path": "data/integration-audit-20261017/native-evidence.tar",
+    "bytes": 9246720,
+    "sha256": "c9def1758b12d49667ccfb566cd44e710a6d9803bc6fb1bb40cc55f8362e26b9",
+    "compressed_bytes": 4057303,
+    "file_count": 513
+  },
+  "additional_gpu_attempts": {
+    "normal_length": "interrupted_owned_controller_after_OPD_State_started_on_same_GPUs",
+    "new_remaining_matrix": "not_executed",
+    "reason": "preserve other jobs and reject contaminated whole-device peaks"
+  }
+}

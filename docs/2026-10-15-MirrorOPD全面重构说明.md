@@ -41,11 +41,11 @@ GPU kernel 基准使用同一真实模型缓存、V=151665、16 与 56 个前缀
 基准输入按块压缩保存，`make data` 恢复后可以重组并校验完整 SHA-256；旧基准程序与精确源码放在验证归档中。新基准与原生矩阵的复现入口为：
 
 ```bash
-PYTHONPATH=src python experiments/benchmarks/kernel.py \
+PYTHONPATH=src python benchmarks/kernel.py \
   --inputs data/refactor-20261015/benchmark-inputs.json \
   --output runs/reproduced-kernel.json --gpu 0 --lease-root /gpu-leases
 
-PYTHONPATH=src python experiments/benchmarks/native_validation.py \
+PYTHONPATH=src python benchmarks/native_validation.py \
   --output runs/reproduced-native --backend upstream/TA-OPD-v2 \
   --model-root /models --data-root /data --lease-root /gpu-leases
 ```

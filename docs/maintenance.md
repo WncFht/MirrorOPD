@@ -141,3 +141,9 @@ CI 保留 CPU 数学及运行层测试，新增维护行为测试、文档契约
 ### 参考文献
 
 [^harness]: DeepSeek AI. DeepSeek Harness. GitHub 2026. [固定版本源码与许可证](https://github.com/deepseek-ai/deepseek-harness/tree/571902028a75c64c1d767f4ae5fd099485f0ddf0).
+
+## 基准与本机生成目录
+
+[benchmarks](../benchmarks/README.md) 保存当前可复现的数值、GPU 链路和显存基准；训练运行目录与 checkpoint 放在忽略的 `runs/`。根目录原 `experiments/benchmarks/` 已迁入此处，未使用的绘图样式已删除，历史程序仍按各报告绑定的 Git 源码或归档恢复。`docs/experiments/` 继续保存正式报告。
+
+`node_modules/` 已被根 `.gitignore` 排除，当前没有被 Git 跟踪的文件；它由 `npm ci` 安装，为格式检查、提交 hook 和预览测试提供本机依赖，保留目录不表示纳入提交。`transfers/` 同样被忽略，是 `pack` 或 `make code-pack` 创建的分片包副本，可在完成传输后删除；打包功能仍会在下次显式执行时重新创建指定输出目录。源码、模型、checkpoint 和正式证据不以该目录作为唯一存储。

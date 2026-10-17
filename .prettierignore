@@ -3,8 +3,6 @@ upstream/
 archives/
 .crossnote/
 .claude/
-experiments/**/raw/
-experiments/**/cache/
 results/**/*.json
 results/**/resolved-config.yaml
 data/**/*.json
@@ -16,7 +14,6 @@ package-lock.json
 theory/
 .agents/notes/archived/
 docs/papers/
-experiments/plotting/vendor/
 
 assets/.crossnote/
 .venv-maintenance/

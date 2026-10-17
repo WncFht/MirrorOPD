@@ -98,3 +98,6 @@ data/oneshot-lr-stability/*.csv
 
 # Restore the immutable memory-audit tar with make data.
 /data/memory-audit-20261017/phase-evidence.tar
+
+# Raw audit tar files restore from versioned gzip archives.
+/data/integration-audit-20261017/*.tar

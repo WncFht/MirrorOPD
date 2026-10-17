@@ -41,7 +41,6 @@ EXCLUDED = (
     "imported/",
     "paper-search-logs/",
     "paper-search-reports/",
-    "experiments/plotting/vendor/",
     "src/mirroropd/scoring/vendor/",
     ".venv-maintenance/",
 )

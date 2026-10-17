@@ -1,0 +1,15 @@
+{
+  "status": "interrupted",
+  "valid_exclusive_normal_length_peak": false,
+  "planned_batch": 64,
+  "planned_training_response_cap": 7168,
+  "planned_evaluation_response_cap": 31744,
+  "planned_evaluation_questions": 4,
+  "planned_samples_per_question": 16,
+  "planned_outer_steps": 1,
+  "planned_inner_steps": 2,
+  "dataset": "DAPO t22, repeated 64 times",
+  "source_id": "sha256:4f42d35c6e9576f01e5d1246d664d1b8b699ee2e59f0454fd82782293caec3c7",
+  "interpretation": "Another OPD-State run began using GPU 0\u20133 after initial idle acquisition; controller was interrupted and its process tree cleaned. NVML is not an isolated measurement. Remaining native cases were not started. Earlier isolated short measurements remain valid.",
+  "evidence": "data/integration-audit-20261017/native-evidence.tar.gz"
+}

@@ -13,7 +13,7 @@ MirrorOPD 当前维护 0.2 接口。用户明确要求全面重构、清理旧�
 - `src/mirroropd/reference/`：独立数学参照，不复制为生产接口或兼容别名。
 - `src/mirroropd/profiles/`：可组合的模型、数据集、训练配方。
 - `tests/`：所有验证均需被 pytest 收集，不把断言只放在脚本 main 中。
-- `experiments/benchmarks/`：可复现的性能及实现验证程序。
+- `benchmarks/`：可复现的性能及实现验证程序。
 - `data/`、`results/`：原始证据与统计；`data-manifest.json` 记录压缩恢复及 SHA-256。
 - `runs/`：忽略的运行目录、快照、checkpoint 和 scratch。
 

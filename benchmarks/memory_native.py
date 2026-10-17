@@ -11,6 +11,15 @@ from mirroropd.runtime.artifacts import atomic_json
 from mirroropd.runtime.config import Job
 from mirroropd.runtime.runner import run_job
 
+CASES = (
+    ("bpo", "sampled", "full"),
+    ("bpo", "full", "full"),
+    ("bpo", "full", "none"),
+    ("mdpo", "sampled", "none"),
+    ("mdpo", "full", "full"),
+    ("on_policy", "full", "full"),
+)
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -18,6 +27,7 @@ def main():
     parser.add_argument("--backend", type=Path, required=True)
     parser.add_argument("--lease-root", type=Path, required=True)
     parser.add_argument("--borrowed-slot", type=Path)
+    parser.add_argument("--case", choices=["-".join(case) for case in CASES])
     args = parser.parse_args()
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=False)
@@ -25,14 +35,10 @@ def main():
 
     models = tiny_inputs(args.output / "inputs")
     completed = []
-    for algorithm, integration, diagnostics in (
-        ("bpo", "sampled", "full"),
-        ("bpo", "full", "full"),
-        ("bpo", "full", "none"),
-        ("mdpo", "sampled", "none"),
-        ("on_policy", "full", "full"),
-    ):
+    for algorithm, integration, diagnostics in CASES:
         name = f"{algorithm}-{integration}-{diagnostics}"
+        if args.case is not None and args.case != name:
+            continue
         job = Job.from_dict(
             {
                 "schema_version": 2,

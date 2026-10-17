@@ -5,9 +5,7 @@ from pathlib import Path
 
 import pytest
 
-REPORT = runpy.run_path(
-    str(Path(__file__).resolve().parents[2] / "experiments/benchmarks/memory_report.py")
-)
+REPORT = runpy.run_path(str(Path(__file__).resolve().parents[2] / "benchmarks/memory_report.py"))
 
 
 def event(kind, sequence, *, scope="phase_peak"):

@@ -1,0 +1,191 @@
+{
+  "assumptions": {
+    "parameters_each": 1777088000,
+    "legal_vocab": 151665,
+    "padded_vocab": 151936,
+    "global_batch": 64,
+    "dp": 4,
+    "train_response_cap": 7168,
+    "current_train_prompt_cap": 2048,
+    "paper_train_prompt_cap": 1024,
+    "bf16_bytes": 2,
+    "fp32_bytes": 4,
+    "teacher_default_microbatch": 24,
+    "effective_teacher_microbatch_4gpu": 16,
+    "original_precision_commit": "6b6b1782cc3f04749dd077de19353f839f6bc048",
+    "board_mib": 81559
+  },
+  "terms": {
+    "student_master": {
+      "bytes": 1777088000,
+      "GiB": 1.6550421714782715,
+      "MiB": 1694.76318359375
+    },
+    "student_gradient": {
+      "bytes": 1777088000,
+      "GiB": 1.6550421714782715,
+      "MiB": 1694.76318359375
+    },
+    "adam_moments": {
+      "bytes": 3554176000,
+      "GiB": 3.310084342956543,
+      "MiB": 3389.5263671875
+    },
+    "actor_states_total": {
+      "bytes": 7108352000,
+      "GiB": 6.620168685913086,
+      "MiB": 6779.052734375
+    },
+    "teacher_shard": {
+      "bytes": 888544000,
+      "GiB": 0.8275210857391357,
+      "MiB": 847.381591796875
+    },
+    "rollout_replica": {
+      "bytes": 3554176000,
+      "GiB": 3.310084342956543,
+      "MiB": 3389.5263671875
+    },
+    "head_gradient_fp32": {
+      "bytes": 933494784,
+      "GiB": 0.869384765625,
+      "MiB": 890.25
+    },
+    "current_micro_logits_bf16": {
+      "bytes": 2174269440,
+      "GiB": 2.0249462127685547,
+      "MiB": 2073.544921875
+    },
+    "current_micro_fp32_distribution": {
+      "bytes": 4348538880,
+      "GiB": 4.049892425537109,
+      "MiB": 4147.08984375
+    },
+    "token_tile_logits_bf16": {
+      "bytes": 19413120,
+      "GiB": 0.01807987689971924,
+      "MiB": 18.5137939453125
+    },
+    "token_tile_fp32_distribution": {
+      "bytes": 38826240,
+      "GiB": 0.03615975379943848,
+      "MiB": 37.027587890625
+    },
+    "original_teacher_logits_bf16_4gpu": {
+      "bytes": 39829110784,
+      "GiB": 37.09375,
+      "MiB": 37984.0
+    },
+    "original_teacher_fp32_upcast_4gpu": {
+      "bytes": 69700943872,
+      "GiB": 64.9140625,
+      "MiB": 66472.0
+    },
+    "original_dynamic_actor_logits_bf16": {
+      "bytes": 9957277696,
+      "GiB": 9.2734375,
+      "MiB": 9496.0
+    },
+    "original_dynamic_actor_fp32_upcast": {
+      "bytes": 19914555392,
+      "GiB": 18.546875,
+      "MiB": 18992.0
+    },
+    "original_teacher_micro1_logits_bf16": {
+      "bytes": 2489319424,
+      "GiB": 2.318359375,
+      "MiB": 2374.0
+    },
+    "original_teacher_micro1_fp32_upcast": {
+      "bytes": 4356308992,
+      "GiB": 4.05712890625,
+      "MiB": 4154.5
+    },
+    "kv_per_token": {
+      "bytes": 28672,
+      "GiB": 2.6702880859375e-05,
+      "MiB": 0.02734375
+    },
+    "kv_one_train_paper": {
+      "bytes": 234881024,
+      "GiB": 0.21875,
+      "MiB": 224.0
+    },
+    "kv_one_train_current": {
+      "bytes": 264241152,
+      "GiB": 0.24609375,
+      "MiB": 252.0
+    },
+    "kv_one_eval_paper": {
+      "bytes": 939524096,
+      "GiB": 0.875,
+      "MiB": 896.0
+    },
+    "kv_one_eval_current": {
+      "bytes": 1027604480,
+      "GiB": 0.95703125,
+      "MiB": 980.0
+    },
+    "kv_16_eval_current": {
+      "bytes": 16441671680,
+      "GiB": 15.3125,
+      "MiB": 15680.0
+    },
+    "kv_32_eval_current": {
+      "bytes": 32883343360,
+      "GiB": 30.625,
+      "MiB": 31360.0
+    },
+    "original_teacher_logit_and_upcast_lower_bound": {
+      "bytes": 109530054656,
+      "GiB": 102.0078125,
+      "MiB": 104456.0
+    }
+  },
+  "cache_capacities": {
+    "bpo-topj_tail-sampled-full": {
+      "prefixes": 458752,
+      "vocab_size": 151665,
+      "full_fields": 0,
+      "sequence_slots": 589824,
+      "sparse_bytes": 203489280,
+      "full_bytes": 0,
+      "total_bytes": 203489280,
+      "layout": "response_predictors"
+    },
+    "mdpo-topj_tail-sampled-none": {
+      "prefixes": 458752,
+      "vocab_size": 151665,
+      "full_fields": 0,
+      "sequence_slots": 589824,
+      "sparse_bytes": 10027008,
+      "full_bytes": 0,
+      "total_bytes": 10027008,
+      "layout": "response_predictors"
+    },
+    "bpo-full-full-none": {
+      "prefixes": 458752,
+      "vocab_size": 151665,
+      "full_fields": 2,
+      "sequence_slots": 589824,
+      "sparse_bytes": 127991808,
+      "full_bytes": 556612976640,
+      "total_bytes": 556740968448,
+      "layout": "response_predictors"
+    },
+    "mdpo-full-full-none": {
+      "prefixes": 458752,
+      "vocab_size": 151665,
+      "full_fields": 2,
+      "sequence_slots": 589824,
+      "sparse_bytes": 127991808,
+      "full_bytes": 556612976640,
+      "total_bytes": 556740968448,
+      "layout": "response_predictors"
+    }
+  },
+  "rollout_engine_budget_GiB": {
+    "current_fraction_0.25": 19.911865234375,
+    "original_fraction_0.75": 59.735595703125
+  }
+}

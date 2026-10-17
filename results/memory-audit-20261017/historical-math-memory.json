@@ -1,0 +1,233 @@
+{
+  "source": {
+    "schema_version": 2,
+    "run_id": "on_policy",
+    "config_id": "sha256:f26f828c8d15fc131277b8deb5ec92ed18bafdff8c2e49d7cf4e4349f5ca4ddd",
+    "source_id": "sha256:5fb1d9b83b23c6f46d592a10cdd0623ca9be876130cd53a777b9a9f7e1e5a63a",
+    "backend": {
+      "base_commit": "62669afb5101bfdf57dc5ddf81e78f000c5ce2fc",
+      "patch_sha256": "82e3a730fa04ce4c7200f21570c1e00670a7cc6d7822a4ebf1357783182f6b9e"
+    },
+    "scratch": "/root/.cache/mopd/j76673f5a"
+  },
+  "job": {
+    "name": "math-four-gpu-v02-20261015-on_policy",
+    "models": {
+      "student": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/DeepSeek-R1-Distill-Qwen-1.5B",
+      "teacher": "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/models/JustRL-DeepSeek-1.5B",
+      "chat_template": null,
+      "trust_remote_code": false
+    },
+    "data": {
+      "train": [
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/DAPO/train.parquet"
+      ],
+      "validation": [
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/MATH-500/test.parquet",
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AMC23/test.parquet",
+        "/mnt/tidalfs-bdsz01/dataset/llm_dataset/zkn_data/fht_data/MD-OPD/data/math/AIME25/test.parquet"
+      ],
+      "scorer": {
+        "name": "math",
+        "kind": "binary",
+        "parameters": {}
+      },
+      "columns": {
+        "prompt": "prompt",
+        "answer": "reward_model.ground_truth",
+        "source": "data_source"
+      },
+      "source_name": null,
+      "ability": "general",
+      "requires_validation_reference": true
+    },
+    "objective": {
+      "algorithm": "on_policy",
+      "signal": {
+        "kappa": 0.5,
+        "eta": 0.2
+      },
+      "estimator": {
+        "center": "topj_tail",
+        "integration": "sampled",
+        "topj": 16,
+        "chunk_size": 64
+      },
+      "diagnostics": "full"
+    },
+    "training": {
+      "outer_steps": 50,
+      "inner_steps": 1,
+      "batch_size": 64,
+      "micro_batch_size": 1,
+      "responses_per_prompt": 1,
+      "learning_rate": 1e-06,
+      "weight_decay": 0.0,
+      "clip_grad": 2.0,
+      "prompt_tokens": 2048,
+      "response_tokens": 7168,
+      "temperature": 1.0,
+      "seed": 42,
+      "gradient_checkpointing": true,
+      "parameter_offload": true,
+      "optimizer_offload": true
+    },
+    "evaluation": {
+      "every": 5,
+      "before_training": true,
+      "samples_per_question": 16,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": -1,
+      "prompt_tokens": 4096,
+      "response_tokens": 31744,
+      "question_limit": null,
+      "seed": 42
+    },
+    "precision": {
+      "parameters": "fp32",
+      "teacher": "bf16",
+      "forward": "bf16",
+      "reduction": "fp32",
+      "buffers": "fp32"
+    },
+    "resources": {
+      "gpu_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "cpus": 24,
+      "rollout_memory_fraction": 0.25,
+      "max_sequences": 32,
+      "max_batch_tokens": 9216,
+      "object_store_bytes": 4294967296
+    },
+    "logging": {
+      "console": true,
+      "wandb": {
+        "enabled": true,
+        "project": "mirroropd-v2",
+        "entity": null,
+        "group": "math-four-gpu-v02-20261015"
+      }
+    },
+    "checkpoints": {
+      "every": 0
+    },
+    "schema_version": 2
+  },
+  "source_bytes_verified": true,
+  "completed_training_phases": 50,
+  "run_completion": "orphaned during final evaluation; 50 completed optimization spans, ten completed evaluation spans used here",
+  "measurement": "per-device NVML samples; phase maxima over completed driver spans, not worker CUDA allocated peaks; sampling may miss instantaneous peaks",
+  "sample_count": 22651,
+  "phases": [
+    {
+      "phase": "evaluation",
+      "completed_spans": 10,
+      "samples": 19826,
+      "per_gpu_max_mib": {
+        "0": 36333,
+        "1": 34471,
+        "2": 23699,
+        "3": 23737
+      },
+      "per_gpu_max_GiB": {
+        "0": 35.4814453125,
+        "1": 33.6630859375,
+        "2": 23.1435546875,
+        "3": 23.1806640625
+      },
+      "sampled_max_any_gpu_GiB": 35.4814453125,
+      "sampled_max_simultaneous_four_gpu_sum_GiB": 105.328125
+    },
+    {
+      "phase": "rollout",
+      "completed_spans": 50,
+      "samples": 1518,
+      "per_gpu_max_mib": {
+        "0": 23729,
+        "1": 23737,
+        "2": 23737,
+        "3": 23737
+      },
+      "per_gpu_max_GiB": {
+        "0": 23.1728515625,
+        "1": 23.1806640625,
+        "2": 23.1806640625,
+        "3": 23.1806640625
+      },
+      "sampled_max_any_gpu_GiB": 23.1806640625,
+      "sampled_max_simultaneous_four_gpu_sum_GiB": 92.59765625
+    },
+    {
+      "phase": "cache.anchor",
+      "completed_spans": 50,
+      "samples": 98,
+      "per_gpu_max_mib": {
+        "0": 21141,
+        "1": 20997,
+        "2": 21083,
+        "3": 20925
+      },
+      "per_gpu_max_GiB": {
+        "0": 20.6455078125,
+        "1": 20.5048828125,
+        "2": 20.5888671875,
+        "3": 20.4345703125
+      },
+      "sampled_max_any_gpu_GiB": 20.6455078125,
+      "sampled_max_simultaneous_four_gpu_sum_GiB": 81.0859375
+    },
+    {
+      "phase": "cache.teacher",
+      "completed_spans": 50,
+      "samples": 89,
+      "per_gpu_max_mib": {
+        "0": 20737,
+        "1": 20637,
+        "2": 20763,
+        "3": 20639
+      },
+      "per_gpu_max_GiB": {
+        "0": 20.2509765625,
+        "1": 20.1533203125,
+        "2": 20.2763671875,
+        "3": 20.1552734375
+      },
+      "sampled_max_any_gpu_GiB": 20.2763671875,
+      "sampled_max_simultaneous_four_gpu_sum_GiB": 79.763671875
+    },
+    {
+      "phase": "optimization",
+      "completed_spans": 50,
+      "samples": 208,
+      "per_gpu_max_mib": {
+        "0": 36803,
+        "1": 36841,
+        "2": 36959,
+        "3": 36843
+      },
+      "per_gpu_max_GiB": {
+        "0": 35.9404296875,
+        "1": 35.9775390625,
+        "2": 36.0927734375,
+        "3": 35.9794921875
+      },
+      "sampled_max_any_gpu_GiB": 36.0927734375,
+      "sampled_max_simultaneous_four_gpu_sum_GiB": 143.30078125
+    }
+  ],
+  "unclosed_driver_spans": [
+    "evaluation"
+  ],
+  "evidence": {
+    "archive": "data/integration-audit-20261017/historical-math-memory.tar.gz",
+    "restored_path": "data/integration-audit-20261017/historical-math-memory.tar",
+    "bytes": 50513920,
+    "sha256": "f72e4fcb571d115bac956e60c4e370acbcf6c4fedabf98984e30ff3ad53468dc",
+    "compressed_bytes": 5633556
+  }
+}

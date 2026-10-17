@@ -49,7 +49,6 @@ IGNORED_PATHS = {
     "docs/paper",
     "docs/papers",
     ".agents/notes/archived",
-    "experiments/plotting/vendor",
     "src/mirroropd/scoring/vendor",
 }
 

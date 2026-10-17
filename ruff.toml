@@ -7,7 +7,6 @@ extend-exclude = [
   ".claude",
   "node_modules",
   "runs",
-  "experiments/plotting/vendor",  # Unmodified third-party figure-viz style.
   "src/mirroropd/scoring/vendor", # Pinned mathematical graders retain upstream formatting.
   ".agents/notes/archived",       # Frozen decision records and registered attachments.
   "assets/.crossnote",            # Vendored preview payload has its own test suite.

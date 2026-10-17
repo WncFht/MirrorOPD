@@ -1151,6 +1151,18 @@
             "archive": "data/memory-audit-20261017/phase-evidence.tar.gz",
             "bytes": 11601920,
             "sha256": "2aeefae287a7967a9b07dc0f40447c85d4bd77323c986913167201d55b29cd6e"
+        },
+        {
+            "path": "data/integration-audit-20261017/native-evidence.tar",
+            "archive": "data/integration-audit-20261017/native-evidence.tar.gz",
+            "sha256": "c9def1758b12d49667ccfb566cd44e710a6d9803bc6fb1bb40cc55f8362e26b9",
+            "bytes": 9246720
+        },
+        {
+            "path": "data/integration-audit-20261017/historical-math-memory.tar",
+            "archive": "data/integration-audit-20261017/historical-math-memory.tar.gz",
+            "sha256": "f72e4fcb571d115bac956e60c4e370acbcf6c4fedabf98984e30ff3ad53468dc",
+            "bytes": 50513920
         }
     ]
 }

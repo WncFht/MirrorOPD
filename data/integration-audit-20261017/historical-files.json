@@ -1,0 +1,2314 @@
+{
+  "archive": "data/integration-audit-20261017/historical-math-memory.tar.gz",
+  "restored_path": "data/integration-audit-20261017/historical-math-memory.tar",
+  "bytes": 50513920,
+  "sha256": "f72e4fcb571d115bac956e60c4e370acbcf6c4fedabf98984e30ff3ad53468dc",
+  "compressed_bytes": 5633556,
+  "files": [
+    {
+      "path": "job.json",
+      "sha256": "7c7384d6f8fe4529dc2978d803d11092670a0faa90c1d7bce2a8a7145fbdc2a3",
+      "bytes": 2689
+    },
+    {
+      "path": "run.json",
+      "sha256": "b488c607a495036f1922dc1087189614e153f6bf2223fa6ef04c6ac00a8b741c",
+      "bytes": 445
+    },
+    {
+      "path": "inputs.json",
+      "sha256": "e867e2eaa080449cba2ae23eb8cb89f3308b4c66a6874a50a793cbd90c5dc5b8",
+      "bytes": 6781
+    },
+    {
+      "path": "backend.yaml",
+      "sha256": "0b73ab218eb479202d0271fb4aab8823f3e084e878aace5b65c5382a51fba57a",
+      "bytes": 28614
+    },
+    {
+      "path": "gpu.jsonl",
+      "sha256": "fed80de3988041375698fb8438c69af665c7bb3e4fec8511153fbefaa64e06aa",
+      "bytes": 15818791
+    },
+    {
+      "path": "events/controller-329160-dc3f353d.jsonl",
+      "sha256": "da21070e4f419bfd32f1dc4e0132b79711cdde47948375f9eb8f3c7d104010a9",
+      "bytes": 5220
+    },
+    {
+      "path": "events/controller-recovery-78701-1cd00b9d.jsonl",
+      "sha256": "cadb4b4d984a4c9c3915c69911969de1d6f32631f858d727e74efc60ea2490bb",
+      "bytes": 2705
+    },
+    {
+      "path": "events/driver-335219-9e2f61b3.jsonl",
+      "sha256": "3f0e13484dd962f48c8b7ad5554e823a84be1a32762752bc319b2225cbbc2fa7",
+      "bytes": 368774
+    },
+    {
+      "path": "events/vllm-bootstrap-342226-40ed3cc8.jsonl",
+      "sha256": "0dd7c0d4f94de3256bd5dc6319519388020cf1046d862cda6d5296644ca64325",
+      "bytes": 571
+    },
+    {
+      "path": "events/vllm-bootstrap-342230-76598b14.jsonl",
+      "sha256": "e7ba36859cc6bf6049b0c472af78ce588c1a9cfa36c44ac0202e7aeaa7944f25",
+      "bytes": 571
+    },
+    {
+      "path": "events/vllm-bootstrap-342234-3a353204.jsonl",
+      "sha256": "3bf9d4a3b2f0de86368b670522406daaad6ab1699a21f7f0fd29b08df16a9d3d",
+      "bytes": 571
+    },
+    {
+      "path": "events/vllm-bootstrap-342238-7476604e.jsonl",
+      "sha256": "0f5684ee9832d101ec9555c029869a8b044c09b6fe70a4f0d68591279ed7aaac",
+      "bytes": 571
+    },
+    {
+      "path": "events/worker-0-336519-2502cad1.jsonl",
+      "sha256": "60928f302cfde6547a37c117dcf0b0282d377d58f8a1758fb48de6985412ad4b",
+      "bytes": 227950
+    },
+    {
+      "path": "source/manifest.json",
+      "sha256": "48f7ccf4328495c9d4bb09512d078ba1f0c115674108f60e8b783352cfff635a",
+      "bytes": 75508
+    },
+    {
+      "path": "source/mirroropd/__init__.py",
+      "sha256": "caa1c568dd18cc2ab7465d2d680aac722dc40bc176f7e72b27b7d1ce9816eddf",
+      "bytes": 113
+    },
+    {
+      "path": "source/mirroropd/__main__.py",
+      "sha256": "631d54010491b0f20e4ab12b82dfb573a1a683030b6eafe3eda74c73fa85325a",
+      "bytes": 128
+    },
+    {
+      "path": "source/mirroropd/cli.py",
+      "sha256": "9310e3518a37a89ffbc27ce3204c55b0437eeddcc1896ba3ba25f341e911273c",
+      "bytes": 5572
+    },
+    {
+      "path": "source/mirroropd/core/__init__.py",
+      "sha256": "160644b046037fc75b23fb2bf0a414986c432bf1ae356b6edb7a2caec8b2189b",
+      "bytes": 80
+    },
+    {
+      "path": "source/mirroropd/core/cache.py",
+      "sha256": "bc3fc1200c4daea153518f55e9582a0d7061333c2dda4c154d6b357d53416351",
+      "bytes": 7723
+    },
+    {
+      "path": "source/mirroropd/core/config.py",
+      "sha256": "92825b6543a59ff545ec4e22167a91a736b25e663cbb2ced606161ccf7edb541",
+      "bytes": 5673
+    },
+    {
+      "path": "source/mirroropd/core/diagnostics.py",
+      "sha256": "8fce22836f338ed174a08b22b6d9e0f6c6ab9603c53d62e5763268b77e58de78",
+      "bytes": 2628
+    },
+    {
+      "path": "source/mirroropd/core/distributions.py",
+      "sha256": "c2b045f22c3eca06c445a229d265ec8afe19034866dc3d3157938f3eb6e0d5e8",
+      "bytes": 3108
+    },
+    {
+      "path": "source/mirroropd/core/objectives.py",
+      "sha256": "514db9c890da8a6d48478acb203bf9e921146c9db2dfde10e60ad2ddc7c870bb",
+      "bytes": 6502
+    },
+    {
+      "path": "source/mirroropd/core/signal.py",
+      "sha256": "e70d3d82a20e43a71db1e9751ba4ffd0affe0097f5e8a64a06637c0b74342563",
+      "bytes": 631
+    },
+    {
+      "path": "source/mirroropd/core/vocabulary.py",
+      "sha256": "c593f4f9b121729dab8a623dc6daebdaa71421ad4147946a81565b1bd147c6b7",
+      "bytes": 1195
+    },
+    {
+      "path": "source/mirroropd/identity.py",
+      "sha256": "2821de8d14203b29c8e6fe7be2c5e0bf65aecb3fd5fff33040e5339934801d0e",
+      "bytes": 367
+    },
+    {
+      "path": "source/mirroropd/integrations/__init__.py",
+      "sha256": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+      "bytes": 75
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/__init__.py",
+      "sha256": "55f3eb11aeed57b58e000da4c83edd8cc6fbb2a75010914975370173bfa57cb3",
+      "bytes": 75
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/adapter.py",
+      "sha256": "b79b874a06c1523c89001940ea8d9192b6ef1c87fb9d185b700308f9c5033cfe",
+      "bytes": 4554
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/backend.json",
+      "sha256": "cfdb9a15168276e99e571ebeab2f516baf2d122e1b4a0f4b7b7101bfce56febb",
+      "bytes": 197
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/bootstrap.py",
+      "sha256": "56af0b3285b85117092f6dfedab69af1f29480cfe16a564de796e900db9a3e9e",
+      "bytes": 1552
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/bridge.py",
+      "sha256": "a27cf448ab68908b9f15eabf981a246cd5f99de4d70945c5b436a8ed44964fcf",
+      "bytes": 9589
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/compiler.py",
+      "sha256": "719b231d9a25e3159bc69b9ff21f7fb45c09f920e57fd1483c82a1100dfc6c7b",
+      "bytes": 7153
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/evaluation.py",
+      "sha256": "fe9eb90cea92d7763eebef7e20d2fc3593911b75f967ff1e8f87e505a251564e",
+      "bytes": 7253
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/model.py",
+      "sha256": "ddabd0f4cf9bcba1299056a560243035f1b9eed3e86a36353c45e31fac52126e",
+      "bytes": 1269
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/rendezvous.py",
+      "sha256": "d6113bf54c0a8cd3158e5fa8bc21c58f5ab6a209bd88279bdfd392132e243658",
+      "bytes": 1852
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/reward.py",
+      "sha256": "bda9f223d219302380c91a45affa03496d76874063eeb5763b5c8024f9114a2d",
+      "bytes": 1400
+    },
+    {
+      "path": "source/mirroropd/integrations/verl/vllm_executor.py",
+      "sha256": "4f1120f13b8b7d9b72ccfbc2eebf8e76fcabd64de19deb3cde6c6249b4736214",
+      "bytes": 725
+    },
+    {
+      "path": "source/mirroropd/profiles/datasets/dapo-math.json",
+      "sha256": "a79060e7805482f3db4466b304f31e0cdd811fe020fda60698964d682254a1a0",
+      "bytes": 284
+    },
+    {
+      "path": "source/mirroropd/profiles/datasets/gsm8k.json",
+      "sha256": "4f76a67609dbca80ea03ed265b6252b8e0607b43b40b83a91c27d56c445e14ab",
+      "bytes": 150
+    },
+    {
+      "path": "source/mirroropd/profiles/models/deepseek-justrl.json",
+      "sha256": "fbfc3581f2bc7459db4098a0106d9c2712faf734e5ed10880e07f4c0e94a7fa9",
+      "bytes": 118
+    },
+    {
+      "path": "source/mirroropd/profiles/recipes/math-four-gpu.json",
+      "sha256": "4042c444fd9cabae8dfb18be019650f7d1162afff609d242e2dd3a6b17f301e6",
+      "bytes": 925
+    },
+    {
+      "path": "source/mirroropd/profiles/recipes/smoke.json",
+      "sha256": "c122569bb3153fe71e2bad40480588d88ee98c98522e0289af9963fa5a9288eb",
+      "bytes": 471
+    },
+    {
+      "path": "source/mirroropd/reference/__init__.py",
+      "sha256": "2c6de95cd7ca507d0dcdbc4f69e5d148252a09cc5038b5fae2b0b57fb873b8e6",
+      "bytes": 77
+    },
+    {
+      "path": "source/mirroropd/reference/categorical.py",
+      "sha256": "5deb1b44f71309b3f16ce41ed2919d5b3606a50ba98f4161bdabdd46f2abb981",
+      "bytes": 3119
+    },
+    {
+      "path": "source/mirroropd/reference/targets.py",
+      "sha256": "c063af23852743af079e5fb8b93c749bfd7cf65de12b41b4b44ff7d18709f033",
+      "bytes": 6774
+    },
+    {
+      "path": "source/mirroropd/runtime/__init__.py",
+      "sha256": "1ee641e1f89a446af3bc45312c51453826f80626f76ea9ea2ed5dc8f37615057",
+      "bytes": 78
+    },
+    {
+      "path": "source/mirroropd/runtime/artifacts.py",
+      "sha256": "786eddcb85add52839e90aaf8d7e13098b03f3c06157d87259eba78061cdb4bf",
+      "bytes": 1118
+    },
+    {
+      "path": "source/mirroropd/runtime/audit.py",
+      "sha256": "6447830c01cc4cf34b7456c83459e75c6f5d151a06d4def13da0a6b365f6bf91",
+      "bytes": 4638
+    },
+    {
+      "path": "source/mirroropd/runtime/config.py",
+      "sha256": "281be275ca75e1e3fb2c9e0c32ebad64ecf18f25e3360c41037f2380e90beeea",
+      "bytes": 11348
+    },
+    {
+      "path": "source/mirroropd/runtime/data.py",
+      "sha256": "0bfa970d00e34c5e73eecaefc96e5fa6143fbe01601492b3b386d95a0c84efc1",
+      "bytes": 5853
+    },
+    {
+      "path": "source/mirroropd/runtime/evaluation.py",
+      "sha256": "98ace0f219601adb20d798d0dd81418ed52cb8de3c2fdce44484c56fe3866230",
+      "bytes": 9334
+    },
+    {
+      "path": "source/mirroropd/runtime/events.py",
+      "sha256": "83fc47a91cf9446a56ede240be47cdf31637cee1859a286ac22dae895426496f",
+      "bytes": 5810
+    },
+    {
+      "path": "source/mirroropd/runtime/metrics.py",
+      "sha256": "b929fdf50e387101158b2649ec8d21b35e38c1ae4e16ad0029f3674ddae941cc",
+      "bytes": 6057
+    },
+    {
+      "path": "source/mirroropd/runtime/preflight.py",
+      "sha256": "669b8418c45d633ffd3b15d3bc5bcde65ff3e54f335e0547eee9fa2554bb001a",
+      "bytes": 5361
+    },
+    {
+      "path": "source/mirroropd/runtime/processes.py",
+      "sha256": "d18616e77793c9156865b21e58da836a79d13cfd7be14c509d1eb46bb46c3075",
+      "bytes": 2330
+    },
+    {
+      "path": "source/mirroropd/runtime/provenance.py",
+      "sha256": "c762cadea417ab01480781d697f72fcb02afa651d8592c3d7180ab399b735826",
+      "bytes": 5801
+    },
+    {
+      "path": "source/mirroropd/runtime/reservation.py",
+      "sha256": "173a1ecb6c3fa6f46bc8294ebed9aa3a48779df37a21a23fa17eb407601aac4f",
+      "bytes": 8374
+    },
+    {
+      "path": "source/mirroropd/runtime/runner.py",
+      "sha256": "b728664b6786f3f6b19e812b62c1a6d672c6b60412f974174e4d86d783fdb9bb",
+      "bytes": 9173
+    },
+    {
+      "path": "source/mirroropd/runtime/tracking.py",
+      "sha256": "9a2a84517e3ec2135609a4d52e916481cff7701548f483308b1fea4a3c8958ef",
+      "bytes": 5549
+    },
+    {
+      "path": "source/mirroropd/scoring/__init__.py",
+      "sha256": "f7f9fd70fc613f47a0291befb626c37dee38af49d84b1d48643feb5ee27247d0",
+      "bytes": 2777
+    },
+    {
+      "path": "source/mirroropd/scoring/mathematics.py",
+      "sha256": "5b1dbc74453a961b3437a28c2ba6ff02e1aae40c86ec28ad48674f8e9e988923",
+      "bytes": 1071
+    },
+    {
+      "path": "source/mirroropd/scoring/numeric.py",
+      "sha256": "9890a2195bfcfdb855de6280d01e424a0b44fdcd17206652389803c2a990100a",
+      "bytes": 1436
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/NOTICE",
+      "sha256": "1e9b3d1f61b1e2c6397449f68b84f098a3efe312b76883bcae8872032ef2cb5c",
+      "bytes": 6711
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/__init__.py",
+      "sha256": "2a2f498c7b7232fb5bc33f418d1bd6a228575f64d9e4cce0cc723d46b22acad7",
+      "bytes": 78
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/_timeout.py",
+      "sha256": "0ce07384a9309b35a33b4626ce5b8fd41cde3d72110a76029d4c6e10ce3fc4f5",
+      "bytes": 4640
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/math_verify.py",
+      "sha256": "1242011cddc041ea6cb19fc9a1872ebab742d8ae7e8ebd3342f6b3b8b6e2ba15",
+      "bytes": 2479
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/origin.json",
+      "sha256": "620a5765977f0813a866faa60d09896c0c824686a27fa45f1547d4f9d773378d",
+      "bytes": 1835
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/ttrl_math/__init__.py",
+      "sha256": "8a2313af03a36e808506c5ff0051f2f30de3691013adee40c87f6c6a030ac14b",
+      "bytes": 3556
+    },
+    {
+      "path": "source/mirroropd/scoring/vendor/ttrl_math/math_utils.py",
+      "sha256": "80de9c2bedb79836b707b3acaf8499bdffc30968978b56bdf6639e68d625e822",
+      "bytes": 26398
+    },
+    {
+      "path": "source/outputs/2026-10-15/14-12-32/.hydra/config.yaml",
+      "sha256": "0b73ab218eb479202d0271fb4aab8823f3e084e878aace5b65c5382a51fba57a",
+      "bytes": 28614
+    },
+    {
+      "path": "source/outputs/2026-10-15/14-12-32/.hydra/hydra.yaml",
+      "sha256": "c9b538f60fd22d47dc043d1e4e42ac1f9bbc729b7fb97b62f141b833ca4321bf",
+      "bytes": 3543
+    },
+    {
+      "path": "source/outputs/2026-10-15/14-12-32/.hydra/overrides.yaml",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "source/outputs/2026-10-15/14-12-32/main_ppo.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "source/verl/__init__.py",
+      "sha256": "442a2483226f4a64bd77265c9b121213be7b6fc25154941864ed54cb9afc4fb7",
+      "bytes": 3913
+    },
+    {
+      "path": "source/verl/base_config.py",
+      "sha256": "a313fdc081a3983193980a475b9b572b125fe95da92c459f05db810a14f62050",
+      "bytes": 3171
+    },
+    {
+      "path": "source/verl/checkpoint_engine/__init__.py",
+      "sha256": "1c39f309cf5b08b63359743ef904dcf1dd22ddb03d80727feef0b853377386b8",
+      "bytes": 1778
+    },
+    {
+      "path": "source/verl/checkpoint_engine/base.py",
+      "sha256": "3640690f0a01464620ddb6c3926d15d4476cbbfc8191a2da0f0904aaed2ae382",
+      "bytes": 23456
+    },
+    {
+      "path": "source/verl/checkpoint_engine/hccl_checkpoint_engine.py",
+      "sha256": "19741f934b4890dd1a525b2b1ec1ba04efae336cee696ad232fa454251459d52",
+      "bytes": 13886
+    },
+    {
+      "path": "source/verl/checkpoint_engine/kimi_checkpoint_engine.py",
+      "sha256": "b3918046fb9080b3ec3b94b1bfb4335a8c65b9325755971d9638a9f957f75ea3",
+      "bytes": 15230
+    },
+    {
+      "path": "source/verl/checkpoint_engine/mooncake_checkpoint_engine.py",
+      "sha256": "76159f9793102f219d460ce14a1d9b393ea99daca6c2d1c2148929750cf8c3a6",
+      "bytes": 10436
+    },
+    {
+      "path": "source/verl/checkpoint_engine/nccl_checkpoint_engine.py",
+      "sha256": "e7ddee47ed07c28e5518bc326438122804d4a7c4a6bd1f2a887f8b2babf2d57c",
+      "bytes": 13970
+    },
+    {
+      "path": "source/verl/checkpoint_engine/nixl_checkpoint_engine.py",
+      "sha256": "3eb9ba74c698ad6ca385781646a0a50134669528483778d7dc3c23d9db66ebdc",
+      "bytes": 21044
+    },
+    {
+      "path": "source/verl/experimental/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/experimental/agent_loop/__init__.py",
+      "sha256": "b2f7bc7ff2c5c435c78f32758791ed4bfbefec3edbbd699b02994cffb96565c4",
+      "bytes": 1011
+    },
+    {
+      "path": "source/verl/experimental/agent_loop/agent_loop.py",
+      "sha256": "60bfe9b01ee5e794fcc40d5f800a189c03dd494242cfa2fceec2530295aae540",
+      "bytes": 55521
+    },
+    {
+      "path": "source/verl/experimental/agent_loop/single_turn_agent_loop.py",
+      "sha256": "d24432e1199c854188ab8c806987b468397f80cea9b849cb9185bdd6bf86333f",
+      "bytes": 3854
+    },
+    {
+      "path": "source/verl/experimental/agent_loop/tool_agent_loop.py",
+      "sha256": "0cc1ccb7327ecb1f71a85739f1fea71953a0ce414bbc6bfa1830f1ad5a6bbd33",
+      "bytes": 22366
+    },
+    {
+      "path": "source/verl/experimental/agent_loop/tool_parser.py",
+      "sha256": "a9e3149fd354423149497f7e2b50ad32d19f661c8e91cb248e2ba3c76205f5f4",
+      "bytes": 18251
+    },
+    {
+      "path": "source/verl/experimental/agent_loop/utils.py",
+      "sha256": "390125d2f7c03d9a42096d96fddba99a3236bcd669d119e13d6154cd85d6a3e9",
+      "bytes": 4333
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/__init__.py",
+      "sha256": "9cd31bfb80bfcc5923b79ec8db5ad231b1a02707c508198d30e867a7122ab650",
+      "bytes": 598
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/config/fully_async_ppo_megatron_trainer.yaml",
+      "sha256": "e53d8422aceb11ee7283bca273bcd7a8289062b68cd9435a9591c3f92c35c907",
+      "bytes": 1674
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/config/fully_async_ppo_trainer.yaml",
+      "sha256": "2bd5bd767fb8499dfb4b91a53e51fed1212928408b245e56d9411b71ebc585ca",
+      "bytes": 1666
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/detach_utils.py",
+      "sha256": "59c0c687929c8b6d2696ea797761b6e1aa4402b15592b6b3e41a1a400b2f6b7f",
+      "bytes": 14031
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/fully_async_main.py",
+      "sha256": "e24db84e75f2bbc5a0e978e28631d3a9d201de9b10985df662dff96b4feb8cb9",
+      "bytes": 10043
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/fully_async_rollouter.py",
+      "sha256": "c7b0a1735d262401e386becf0d078299d075c4dfa605b7cdbef19fe5b5ddce45",
+      "bytes": 51791
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/fully_async_trainer.py",
+      "sha256": "9f4d3688aabb6feb82e953baadef66953ea321d6ae0f03451c5592a77c974df0",
+      "bytes": 34829
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/message_queue.py",
+      "sha256": "5954351516315a2d589318a501b70114560901b572acb6c8f58cfd93632aa4be",
+      "bytes": 8610
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/shell/runtime_env.yaml",
+      "sha256": "19e48f7c02d2d074434bed70417018939ae912df12746a93058b63945b4ffd7c",
+      "bytes": 73
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/unittest/__init__.py",
+      "sha256": "9c3d3d9d4fe67fa9476bab44af946182b6aa1322aae82ad7c3aa784c1f393c8c",
+      "bytes": 652
+    },
+    {
+      "path": "source/verl/experimental/fully_async_policy/unittest/simple_streaming_demo.py",
+      "sha256": "49ad92771a02a1b1eb457444df86f4d148d37a70c7a67866a07242f3ced85877",
+      "bytes": 6310
+    },
+    {
+      "path": "source/verl/experimental/one_step_off_policy/__init__.py",
+      "sha256": "b730338b7729dae67ec339fca162cc69136badbcdcbfa023cb0a3e0105f36fbe",
+      "bytes": 740
+    },
+    {
+      "path": "source/verl/experimental/one_step_off_policy/config/one_step_off_ppo_megatron_trainer.yaml",
+      "sha256": "ab2d823237d9b29329398ff91bb0b3de4eccf1865164c1a39db9f801062425fa",
+      "bytes": 788
+    },
+    {
+      "path": "source/verl/experimental/one_step_off_policy/config/one_step_off_ppo_trainer.yaml",
+      "sha256": "642631f81fee16d1aeeb3a9419cb2f8cc03a184acd423a136309e96d97f66a41",
+      "bytes": 779
+    },
+    {
+      "path": "source/verl/experimental/one_step_off_policy/main_ppo.py",
+      "sha256": "c93ea07c09d86c58dc45eeb175f5984b53bbc811106760fb9a134575771aa894",
+      "bytes": 4892
+    },
+    {
+      "path": "source/verl/experimental/one_step_off_policy/ray_trainer.py",
+      "sha256": "23ee575bdfd5b51a0415c76cf53bbfc81a9e3a0d00da302c97fc47e71c2ef97a",
+      "bytes": 17457
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/__init__.py",
+      "sha256": "35f3c5f27b19e7624c247c1ef7d47be7703ea21d594750df49348f8eeb69e36e",
+      "bytes": 840
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_loop.py",
+      "sha256": "7416143389bc5cbcab03fd261c25662bf135731acfe75300a2ae34318061f1bf",
+      "bytes": 15706
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/__init__.py",
+      "sha256": "2200a9920f02c8d4791a6dae7c8cf38abd419d8bb14ceecdf25a051e58b94ff3",
+      "bytes": 1062
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/base.py",
+      "sha256": "ebe8873b3a3c891cc01f5fb0f256f543b7939449780dd18afd65d3c44c6f0023",
+      "bytes": 2984
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/dapo.py",
+      "sha256": "b0d10f73e8e060f690d08c9c582ea43eff0116a49a9ece4b8f05b3211de5d017",
+      "bytes": 5271
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/gdpo.py",
+      "sha256": "2b5a6f658c7a7b6f5b7a08151c11159f6692d8bbddf5dc7d128d8086b4b734da",
+      "bytes": 3688
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/limited.py",
+      "sha256": "62ea50e918f2ea1bd2df250ef3cd02564bc02fe8d567f53727f4c538d3751d65",
+      "bytes": 23999
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/naive.py",
+      "sha256": "85a7a6872e2c9684c1252393755c8fe39d8fdf9393608c98cacd025821ba1d51",
+      "bytes": 4069
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/registry.py",
+      "sha256": "42d6d971676f38f123ac5ac8ce645e2309f36150141fb01bd59c55215ef9f6f8",
+      "bytes": 1793
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_manager/remote.py",
+      "sha256": "f45cbaa2a25a402e557ec6c2f1a50a3ae0e67eaa8977944dbe8aa1ba2cb6a2e9",
+      "bytes": 5325
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/reward_model.py",
+      "sha256": "50a9b919b1633157eb60c4e013cdfeaaf31e4e909c642764236bddba758e7e7f",
+      "bytes": 4919
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/router/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/router/inner_sglang_router.py",
+      "sha256": "88612c85b974c4859fe5ed1deb7032a2f33088b7e1c3280071b3decfdfac4abb",
+      "bytes": 2467
+    },
+    {
+      "path": "source/verl/experimental/reward_loop/router/naive_router.py",
+      "sha256": "4e40c4ffb4139fc8296669db924c8b1a5de3effd26eb9b5bd2c9d61a0d779455",
+      "bytes": 6804
+    },
+    {
+      "path": "source/verl/experimental/separation/__init__.py",
+      "sha256": "9cd31bfb80bfcc5923b79ec8db5ad231b1a02707c508198d30e867a7122ab650",
+      "bytes": 598
+    },
+    {
+      "path": "source/verl/experimental/separation/engine_workers.py",
+      "sha256": "ff4cbd544a994853c8252218e051be31ad17b519168405f20dc1426b67176b03",
+      "bytes": 6206
+    },
+    {
+      "path": "source/verl/experimental/separation/ray_trainer.py",
+      "sha256": "f6496af1d8949013aae5817cb22ce1e0a93a70ed084054e2898287eade536472",
+      "bytes": 35032
+    },
+    {
+      "path": "source/verl/experimental/separation/utils.py",
+      "sha256": "0d19a7ece8c55d682b051b0154db7691f0dba111e29aef34f26545aeb0c60288",
+      "bytes": 3367
+    },
+    {
+      "path": "source/verl/experimental/teacher_loop/__init__.py",
+      "sha256": "2938299e163da0b9a46995aed981f0622f4e9708d17476f6f53ed9a69cb480eb",
+      "bytes": 693
+    },
+    {
+      "path": "source/verl/experimental/teacher_loop/teacher_manager.py",
+      "sha256": "2d3d497c84cc6303130f74f7726f68e3f6d27cfc70c43f1d871dd79f0a842fca",
+      "bytes": 10114
+    },
+    {
+      "path": "source/verl/experimental/teacher_loop/teacher_model.py",
+      "sha256": "71a4ed2f9c4e65fee0a053dc2145be27f15597d7f04152dc245274ab214c33cd",
+      "bytes": 9069
+    },
+    {
+      "path": "source/verl/model_merger/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/model_merger/__main__.py",
+      "sha256": "bbeaa19d4993c1c6c6d5552e8d1eaf1f56e5e737661acc0d750f0d41c2d4bce0",
+      "bytes": 2325
+    },
+    {
+      "path": "source/verl/model_merger/base_model_merger.py",
+      "sha256": "f1f81e1df85eed3d2aeff33c62a19f2f9150beb43f1a3407d4ea77c1438d5db9",
+      "bytes": 19789
+    },
+    {
+      "path": "source/verl/model_merger/fsdp_model_merger.py",
+      "sha256": "2ae5f3f7fc95871b08a2e185def4f1a5cec09164579cd15eeb2314cb73ef1f0f",
+      "bytes": 10860
+    },
+    {
+      "path": "source/verl/model_merger/megatron_model_merger.py",
+      "sha256": "098155fce4e274aeff4085219e0e47a46d4a95ac35bdb6bf66e44b05b58eb9cc",
+      "bytes": 23907
+    },
+    {
+      "path": "source/verl/models/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/models/mcore/__init__.py",
+      "sha256": "50b2eaeb3a2e38bbaec2f8243420c2a38cd3779f463cee2df090be773f4e05b5",
+      "bytes": 1277
+    },
+    {
+      "path": "source/verl/models/mcore/bridge.py",
+      "sha256": "66d725447aa9a5d4dbcc7d99e1596cbc069abfbdea7c860232a5ad1bbb11cb54",
+      "bytes": 1114
+    },
+    {
+      "path": "source/verl/models/mcore/config_converter.py",
+      "sha256": "49328ec131aeb35d04a66746b367782f0a6fdfc3de779b997998cbe6eb0ea66e",
+      "bytes": 17030
+    },
+    {
+      "path": "source/verl/models/mcore/loader.py",
+      "sha256": "d07736ae2a75b5eb4944e5a28c3cc48a2f0459dd950903fb047c343225b8778e",
+      "bytes": 22451
+    },
+    {
+      "path": "source/verl/models/mcore/mbridge.py",
+      "sha256": "271e483de7145b86fac40e4bea2f9473b2bcd571cf52179ba7052c32cdcd6e12",
+      "bytes": 1115
+    },
+    {
+      "path": "source/verl/models/mcore/model_forward.py",
+      "sha256": "e60c38fc9c4f04d8643fc8ef476a676f4ff4ffaa74f34afbfc889ac6f57cb559",
+      "bytes": 19922
+    },
+    {
+      "path": "source/verl/models/mcore/model_forward_1f1b_overlap.py",
+      "sha256": "96ec9f3867282a18a95d2e7d48c04cb635c16a2d6b2bd1f7525dd0740b9a5ad3",
+      "bytes": 11723
+    },
+    {
+      "path": "source/verl/models/mcore/model_forward_fused.py",
+      "sha256": "4c2257c38ea910b95b5c939c5d247c354299dc2a4549a956f270bea15425bab9",
+      "bytes": 12191
+    },
+    {
+      "path": "source/verl/models/mcore/model_initializer.py",
+      "sha256": "f37c00c79b4e3060ce910309ee96a7ea4938f87cf7bbdf03e94542aac75472aa",
+      "bytes": 8784
+    },
+    {
+      "path": "source/verl/models/mcore/mtp_patch.py",
+      "sha256": "3eb1d6900c6b481ba09097a10315fa5431dc0201395d75fe6734a0b24edc17fa",
+      "bytes": 18443
+    },
+    {
+      "path": "source/verl/models/mcore/patch.py",
+      "sha256": "c224ac4dfd2168365fab8d64b68d49c4bc2feb20113d09e0a53d3de73127e9e0",
+      "bytes": 24411
+    },
+    {
+      "path": "source/verl/models/mcore/registry.py",
+      "sha256": "e072a36fd8b2702e590dbd7e87ebb8e4a1307177ead943c0b591bbe71ce893c5",
+      "bytes": 11643
+    },
+    {
+      "path": "source/verl/models/mcore/saver.py",
+      "sha256": "a82703fade74e67efe7e65dac451d25b0f1489ccd4dc689a618399ef051858b4",
+      "bytes": 21166
+    },
+    {
+      "path": "source/verl/models/mcore/util.py",
+      "sha256": "560b8a31cfc58c15c646d0c35e36f068285cb63b3c8775175f1ce56fe9dce1d3",
+      "bytes": 34532
+    },
+    {
+      "path": "source/verl/models/mcore/weight_converter.py",
+      "sha256": "2d6cf1ed29cf6cf0468dac4767fe450a98bba32495a35e80feb15713bdf403ce",
+      "bytes": 25740
+    },
+    {
+      "path": "source/verl/models/registry.py",
+      "sha256": "7c1523431efbf1977b583c7f8359ff2f2cfbb9d3c4af6cdc9f492f6c9d0370f0",
+      "bytes": 2139
+    },
+    {
+      "path": "source/verl/models/transformers/__init__.py",
+      "sha256": "f641be8f58d51770d492ea5d2dd21f1854f4441bd15a89246b136121d9327949",
+      "bytes": 823
+    },
+    {
+      "path": "source/verl/models/transformers/apertus.py",
+      "sha256": "f8af594815550ce344b390133da1eb97ee9b4a6225d3b08642e10b9156d6d946",
+      "bytes": 4748
+    },
+    {
+      "path": "source/verl/models/transformers/dense_common.py",
+      "sha256": "40d57b22dcb44b7db95395e92e3d79c8ef7843cd7c51753536cb4184c115ce08",
+      "bytes": 7349
+    },
+    {
+      "path": "source/verl/models/transformers/glm4v.py",
+      "sha256": "638929c93f440c40d7f3bbb3160a6c97bc5efa8206ea384a4604da60a8771957",
+      "bytes": 22735
+    },
+    {
+      "path": "source/verl/models/transformers/kimi_vl.py",
+      "sha256": "e38545c7093d68cf7100b63ddb9c70daf63bf5b1b61ba6ff1dd8fc330e393efc",
+      "bytes": 8571
+    },
+    {
+      "path": "source/verl/models/transformers/llama.py",
+      "sha256": "f64a63a7e8f5b3c96d569acc5518c8296160e2e2a9ab1422436821ed9c9d98fa",
+      "bytes": 10498
+    },
+    {
+      "path": "source/verl/models/transformers/monkey_patch.py",
+      "sha256": "20bd7701f8fc9f5a4b86e7c389ceda912c09fe49ad8a3171aad6cd8e6c115a11",
+      "bytes": 25390
+    },
+    {
+      "path": "source/verl/models/transformers/npu_patch.py",
+      "sha256": "1919d01c1fb3b03d3414363fcf34b110f85d7efba15d493b146f7b888ad89d1e",
+      "bytes": 16538
+    },
+    {
+      "path": "source/verl/models/transformers/qwen2.py",
+      "sha256": "e718af36c4b443e2bf4f98e4dcd4c61cc236caad709a3f92d170ad90194e495c",
+      "bytes": 10429
+    },
+    {
+      "path": "source/verl/models/transformers/qwen2_vl.py",
+      "sha256": "5f4611afc3f3df8919a7b30f8dbe08453b6766139206768ec8bde0df940b0bd2",
+      "bytes": 24324
+    },
+    {
+      "path": "source/verl/models/transformers/qwen3_5.py",
+      "sha256": "088a773b93c8b561248a61501da5dd37124d534d9826fe1b67507b123b4d97c1",
+      "bytes": 11738
+    },
+    {
+      "path": "source/verl/models/transformers/qwen3_vl.py",
+      "sha256": "bf3a8c5e1d30b53ea431e2e8b312ecfb9729ea64c59d6e41a7228c36844c8a8a",
+      "bytes": 19428
+    },
+    {
+      "path": "source/verl/models/transformers/tiled_mlp.py",
+      "sha256": "5993c82aef95bff5b06ffdb2b45da266886d004e067a5d0aa80d56298c76c09b",
+      "bytes": 8634
+    },
+    {
+      "path": "source/verl/models/weight_loader_registry.py",
+      "sha256": "22514c6fbf53af91aa425d02228086c0355af123d7b64c104d7b2d7cc5fc1806",
+      "bytes": 2535
+    },
+    {
+      "path": "source/verl/protocol.py",
+      "sha256": "adcd1a21cce859793043de918e8c11cf2e288db90d6ac339aabde0ba5d42382f",
+      "bytes": 52187
+    },
+    {
+      "path": "source/verl/single_controller/__init__.py",
+      "sha256": "bc8a469c28cee85f4c7e7bcf75733a03316a56adfb8254abd33b368253b07fe3",
+      "bytes": 940
+    },
+    {
+      "path": "source/verl/single_controller/base/__init__.py",
+      "sha256": "90b679f1bb261ca69ccc0ec2bec1fdae7372c3403521d82a420c3a6634e9b31b",
+      "bytes": 773
+    },
+    {
+      "path": "source/verl/single_controller/base/decorator.py",
+      "sha256": "718876c4c59e9f3cdb0339185be156aeb7b6d8eb42a2a6f919a3163961634ace",
+      "bytes": 16236
+    },
+    {
+      "path": "source/verl/single_controller/base/worker.py",
+      "sha256": "0c0729187b9c9e5f42897869691f505c91b1e5c46b1958311a2d1b0d432869e3",
+      "bytes": 13067
+    },
+    {
+      "path": "source/verl/single_controller/base/worker_group.py",
+      "sha256": "3723ad4ba93afc8b715287a1e9f8754e4915af6fd93a44e57646beb28a8591ab",
+      "bytes": 9816
+    },
+    {
+      "path": "source/verl/single_controller/ray/__init__.py",
+      "sha256": "b27efba504a3f8fc05f02d1f8145f6f00627e6e4540e1279814fbaaba154d758",
+      "bytes": 1028
+    },
+    {
+      "path": "source/verl/single_controller/ray/base.py",
+      "sha256": "4942963a638c11f5512a6c45bed5b3a47854a8c50a80e851745a3a149353dc3d",
+      "bytes": 46626
+    },
+    {
+      "path": "source/verl/third_party/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/third_party/torch/__init__.py",
+      "sha256": "0f05da82d47d83fc7f345b28278a44d925994b4357044c58cdf585229d3f8ad7",
+      "bytes": 3722
+    },
+    {
+      "path": "source/verl/third_party/torch/distributed/__init__.py",
+      "sha256": "0f05da82d47d83fc7f345b28278a44d925994b4357044c58cdf585229d3f8ad7",
+      "bytes": 3722
+    },
+    {
+      "path": "source/verl/third_party/torch/distributed/_state_dict_utils.py",
+      "sha256": "12276a59817e5f3020db3a2820ef0d5cbab7ff8a026bb3eab4741fca1beca8e9",
+      "bytes": 31253
+    },
+    {
+      "path": "source/verl/third_party/torch/distributed/checkpoint/__init__.py",
+      "sha256": "0f05da82d47d83fc7f345b28278a44d925994b4357044c58cdf585229d3f8ad7",
+      "bytes": 3722
+    },
+    {
+      "path": "source/verl/third_party/torch/distributed/checkpoint/state_dict.py",
+      "sha256": "7cf9abf992237d5dd99a2b5cb3845137a447ce802154fa3abba71cef0d1033a5",
+      "bytes": 58938
+    },
+    {
+      "path": "source/verl/third_party/vllm/__init__.py",
+      "sha256": "4e357b02aaa319b2373c46d79d5675ea1c62e2f17786af72b12834f8b81b7a9a",
+      "bytes": 2295
+    },
+    {
+      "path": "source/verl/tools/__init__.py",
+      "sha256": "0bae18fab65cb4028732b91a1215baf8e02f9fdf8b4762a523662a34374e7432",
+      "bytes": 634
+    },
+    {
+      "path": "source/verl/tools/base_tool.py",
+      "sha256": "2a6ab14f689b9f44b8aa96f0bb881a2013a6c656bcb8ec088930bf8a4d2fc739",
+      "bytes": 3350
+    },
+    {
+      "path": "source/verl/tools/function_tool.py",
+      "sha256": "a77ecd2f940b3987c0c9b442d4f88acdf6b0e3d1dfbe9942116987a22ec55f8d",
+      "bytes": 9803
+    },
+    {
+      "path": "source/verl/tools/schemas.py",
+      "sha256": "b5c3a38a44015c27da2dcf1a1f5204f038b895bbf3678c4b1575f62fe1ba5c08",
+      "bytes": 4317
+    },
+    {
+      "path": "source/verl/tools/tool_registry.py",
+      "sha256": "980faf7955015c055c8d30a355d8221709770d3d6582f2ca13faf76f1e660609",
+      "bytes": 3693
+    },
+    {
+      "path": "source/verl/trainer/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/trainer/config/__init__.py",
+      "sha256": "8275f76e6ef284606a4f32c89e0563d93cb152801fbbc5716d260601b81d4ced",
+      "bytes": 754
+    },
+    {
+      "path": "source/verl/trainer/config/_generated_ppo_megatron_trainer.yaml",
+      "sha256": "9903c96fc8764b9df8fc602c8b0be3446054dac9f12ecf76279073618454357b",
+      "bytes": 31595
+    },
+    {
+      "path": "source/verl/trainer/config/_generated_ppo_torchtitan_trainer.yaml",
+      "sha256": "d7ac9c420c343b1c165430dbb0ddaf5ca1ba673018dcf8b64f4fc9d3273785b1",
+      "bytes": 28995
+    },
+    {
+      "path": "source/verl/trainer/config/_generated_ppo_trainer.yaml",
+      "sha256": "7e8c0e6ffcbbfac81453fdb4670cab4e2cb10af97fb729db84536a21f486d3ea",
+      "bytes": 29121
+    },
+    {
+      "path": "source/verl/trainer/config/_generated_ppo_veomni_trainer.yaml",
+      "sha256": "7455740619e3214abf022ba9698366149b043c5a9bcea548d33a660ce7a7ec57",
+      "bytes": 29696
+    },
+    {
+      "path": "source/verl/trainer/config/actor/actor.yaml",
+      "sha256": "35a22c0e6427597fa0bd1933951ed245b47c6d9bc36392d8b5dc4bbfaf21ca34",
+      "bytes": 10234
+    },
+    {
+      "path": "source/verl/trainer/config/actor/dp_actor.yaml",
+      "sha256": "ce30a3094fb161bd29c9b8b092cc8f151158870307274ed9281a916b2db72b5b",
+      "bytes": 1352
+    },
+    {
+      "path": "source/verl/trainer/config/actor/megatron_actor.yaml",
+      "sha256": "137eb0d5c9afddf060bfe7714dd8ff2e776f3c16bb92d5e8a281b17727a44730",
+      "bytes": 996
+    },
+    {
+      "path": "source/verl/trainer/config/actor/mindspeed_actor.yaml",
+      "sha256": "09cf8154acae0ae48e97a5a03ef80dbe0eef6b3cc3b29de655a6243d75f39bd6",
+      "bytes": 731
+    },
+    {
+      "path": "source/verl/trainer/config/actor/torchtitan_actor.yaml",
+      "sha256": "590054064fc74f09171b96b12fda734dbdfe6134b0249ee52f6b111027556d96",
+      "bytes": 394
+    },
+    {
+      "path": "source/verl/trainer/config/actor/veomni_actor.yaml",
+      "sha256": "36ddd2ed42b74fb861fc306f9aa17b718a027e05db19bc24e7172e497db518eb",
+      "bytes": 445
+    },
+    {
+      "path": "source/verl/trainer/config/algorithm/rollout_correction.yaml",
+      "sha256": "25e3a347847f2272582b6faacdf59eb9463360313654115bf2fea00bbb257158",
+      "bytes": 1059
+    },
+    {
+      "path": "source/verl/trainer/config/algorithm.py",
+      "sha256": "d8deaed4961590cbdd8bdeb1cc7566a649572e239fa35a9924f88709e1efc81e",
+      "bytes": 28298
+    },
+    {
+      "path": "source/verl/trainer/config/config.py",
+      "sha256": "1283d66d9865819a8f239f2a089550c985d8bc1af9ff710eda3ae9f972b84433",
+      "bytes": 3995
+    },
+    {
+      "path": "source/verl/trainer/config/critic/critic.yaml",
+      "sha256": "15b61263f213cea2800f884a3f91924832f295172b8283bd9b53672378ebda0f",
+      "bytes": 6062
+    },
+    {
+      "path": "source/verl/trainer/config/critic/dp_critic.yaml",
+      "sha256": "bdd697565041c42604b1c9916b8a2ebb3831039a29acc8a2d74ad4711e5ec973",
+      "bytes": 1293
+    },
+    {
+      "path": "source/verl/trainer/config/critic/megatron_critic.yaml",
+      "sha256": "b2f816ec21dcd6e180058c4048ee55c0ffda7b25491edb17a55b5d7acb68cc01",
+      "bytes": 1095
+    },
+    {
+      "path": "source/verl/trainer/config/critic/mindspeed_critic.yaml",
+      "sha256": "22810ae6ac68d610962797f0c84be72ef96d05fe4fcf34bf2c73b681755d872d",
+      "bytes": 1208
+    },
+    {
+      "path": "source/verl/trainer/config/critic/torchtitan_critic.yaml",
+      "sha256": "318f8e1cfba8debcdb0c273ab05bed404f83b282aecf2e4d64b6bdd2b00889cf",
+      "bytes": 640
+    },
+    {
+      "path": "source/verl/trainer/config/critic/veomni_critic.yaml",
+      "sha256": "7cc956562ca3796b8bb74517801ab78f1efab6e5e92e7e27cf06876fe3f8e71b",
+      "bytes": 613
+    },
+    {
+      "path": "source/verl/trainer/config/data/legacy_data.yaml",
+      "sha256": "ced555a320168e08f4edc84ea39b6793b62baf4b6c1f5fdf333facb91b6ab894",
+      "bytes": 4129
+    },
+    {
+      "path": "source/verl/trainer/config/distillation/distillation.yaml",
+      "sha256": "e8f6543e2f129c0e6ad213914bff1d894be0702fb30e8b94e9d4d5ede68f06b7",
+      "bytes": 4012
+    },
+    {
+      "path": "source/verl/trainer/config/engine/automodel.yaml",
+      "sha256": "1351c0ac8b75c66efde3987fbcb91cae97d5871cfcbc294b002e00959a0a9dea",
+      "bytes": 2141
+    },
+    {
+      "path": "source/verl/trainer/config/engine/fsdp.yaml",
+      "sha256": "de1a0a79db70504fa0e5bd0c60af071450c89be6c763a5eadd6a2d243f8f590a",
+      "bytes": 2430
+    },
+    {
+      "path": "source/verl/trainer/config/engine/megatron.yaml",
+      "sha256": "56a2f3e17ad7ff4c4ecaee427e73e8a122efdcc486bb3990f6ae9de3b381e2e9",
+      "bytes": 4686
+    },
+    {
+      "path": "source/verl/trainer/config/engine/mindspeed.yaml",
+      "sha256": "0972d50d2244779cd991dceed3cac1aeb9163015bb6d53aad18d412a8a08b0d7",
+      "bytes": 1179
+    },
+    {
+      "path": "source/verl/trainer/config/engine/torchtitan.yaml",
+      "sha256": "0029b0ea3f0a457beaafff1eccc02803290f518df8cc6174f89b57a689545e57",
+      "bytes": 1848
+    },
+    {
+      "path": "source/verl/trainer/config/engine/veomni.yaml",
+      "sha256": "af3df4a8ddaa0f3f6da1084c5e95e98a2408247b6bc20d930346d4a893b5f834",
+      "bytes": 2579
+    },
+    {
+      "path": "source/verl/trainer/config/evaluation.yaml",
+      "sha256": "2fd0dfd7cd4ce3eb9017f3c2985ca2a560b9a479837531816fb59d93e32c8cd1",
+      "bytes": 417
+    },
+    {
+      "path": "source/verl/trainer/config/legacy_reward_impl.yaml",
+      "sha256": "be1fc9e281de1fc52c5b3f0d714d6fd5ffb829d7d9092e4d16b84c5b816efc7d",
+      "bytes": 1013
+    },
+    {
+      "path": "source/verl/trainer/config/model/hf_model.yaml",
+      "sha256": "0dc5f388ab74cbb3b5dcf5a7fc85ec8a292c35eb1b4c47ee3722b3afd1618e66",
+      "bytes": 5723
+    },
+    {
+      "path": "source/verl/trainer/config/model_engine/dp.yaml",
+      "sha256": "34951d97bb4d0bb39b92bb9dc853bc36677f86ba58d82d0b3b93186b19170370",
+      "bytes": 37
+    },
+    {
+      "path": "source/verl/trainer/config/model_engine/megatron.yaml",
+      "sha256": "f4f74e2e79c65061c372eaf4bd1b80ac7f95b608c64e9827054937522a2ae876",
+      "bytes": 42
+    },
+    {
+      "path": "source/verl/trainer/config/model_engine/mindspeed.yaml",
+      "sha256": "e1c88fa8c11424245f151fae6f621a00741c64202bf933d3b9197a0b86eda444",
+      "bytes": 43
+    },
+    {
+      "path": "source/verl/trainer/config/model_engine/torchtitan.yaml",
+      "sha256": "cf2ca215001a84e8431261bb17a85e3fd44a4f1c7947396af96bffa780ef110f",
+      "bytes": 45
+    },
+    {
+      "path": "source/verl/trainer/config/model_engine/veomni.yaml",
+      "sha256": "68a87faa9845e9d2ecf560df8def550c6a50e9f2175bc31df8da6434dd96a4a8",
+      "bytes": 41
+    },
+    {
+      "path": "source/verl/trainer/config/npu_profile/npu_profile.yaml",
+      "sha256": "47d1d6b18d626975f652b7b24c05cbf8a48fae629f984bc6039232cfbe4d6f18",
+      "bytes": 912
+    },
+    {
+      "path": "source/verl/trainer/config/optim/automodel.yaml",
+      "sha256": "c91a36c9066dfaff9daf971674cb29930e3fe2f399f6b752efc61beb05b3abe1",
+      "bytes": 1457
+    },
+    {
+      "path": "source/verl/trainer/config/optim/fsdp.yaml",
+      "sha256": "a6f1dd55acd5f34a723ce664c74e53d497beba51c9dc65e4f6d5c445f571f7b4",
+      "bytes": 1128
+    },
+    {
+      "path": "source/verl/trainer/config/optim/megatron.yaml",
+      "sha256": "7e2e8cbed63557fb4b505fb0de6fac5470093289e3978009ebb0a1afa3d3bd9d",
+      "bytes": 890
+    },
+    {
+      "path": "source/verl/trainer/config/optim/torchtitan.yaml",
+      "sha256": "6b2c64ab2136f577f1844b8ef2f954da78674aa6f117e79af22d2228666fae4b",
+      "bytes": 569
+    },
+    {
+      "path": "source/verl/trainer/config/optim/veomni.yaml",
+      "sha256": "4a7971f354174685133e5e31014f5a24cd63c39e2ee26715029781569e4348b1",
+      "bytes": 623
+    },
+    {
+      "path": "source/verl/trainer/config/ppo_megatron_trainer.yaml",
+      "sha256": "dbf4dae545ba216e6e36747280e96aef0d82b915c1f8919877a7746d6d527d0e",
+      "bytes": 227
+    },
+    {
+      "path": "source/verl/trainer/config/ppo_trainer.yaml",
+      "sha256": "4190c39245427a0a4d19c39ef2070f6cc48c790d81f1c9991b66d76575152cab",
+      "bytes": 12391
+    },
+    {
+      "path": "source/verl/trainer/config/profiler/profiler.yaml",
+      "sha256": "b45f44867c311cfcf9b529f27f0bc32560fc85c3f9958e91f62d3f13c5ba1705",
+      "bytes": 2899
+    },
+    {
+      "path": "source/verl/trainer/config/ref/dp_ref.yaml",
+      "sha256": "195d1b6974a58f9bfa6a09ce0f00a4c2ce10140f557738caf3a06d3cdeb784f3",
+      "bytes": 823
+    },
+    {
+      "path": "source/verl/trainer/config/ref/megatron_ref.yaml",
+      "sha256": "01f7661dd2d35155a8d806dd760903a2d6c6e2a9539cfd3d8c97e2cbea946dcf",
+      "bytes": 1501
+    },
+    {
+      "path": "source/verl/trainer/config/ref/mindspeed_ref.yaml",
+      "sha256": "43d9e553ffb22390759ed8957aff2e8733519c96f1b7fc100fa18198e3d50c10",
+      "bytes": 1805
+    },
+    {
+      "path": "source/verl/trainer/config/ref/ref.yaml",
+      "sha256": "d87f3963b1124c1fa658c6e0218117f011394cddf92380f38b0e62684acfac85",
+      "bytes": 5285
+    },
+    {
+      "path": "source/verl/trainer/config/ref/torchtitan_ref.yaml",
+      "sha256": "1ebdd225f8d9933f8dce5d4effebc74456fb19ce0d6b4a6536bfed342cf72ca8",
+      "bytes": 1251
+    },
+    {
+      "path": "source/verl/trainer/config/ref/veomni_ref.yaml",
+      "sha256": "5c95fead8b61046b1b7fe8042bcde97a872bdb90a0e472ca338993ad5840304a",
+      "bytes": 1483
+    },
+    {
+      "path": "source/verl/trainer/config/reward/reward.yaml",
+      "sha256": "b2b8e8637786d4047c8f9000d0dedf75d709c597c5661f723e989e7c7946b61a",
+      "bytes": 2669
+    },
+    {
+      "path": "source/verl/trainer/config/rollout/rollout.yaml",
+      "sha256": "c49cbf9ebc0327d25db6bf0d2fb3b6465f1ca5e3874f57b3d78bc4c4d2aac859",
+      "bytes": 18873
+    },
+    {
+      "path": "source/verl/trainer/config/sft_trainer_engine.yaml",
+      "sha256": "7006eb20f0e1b49294b76799502f3a49108a21ed7ab4378b1475dfe2381313be",
+      "bytes": 3067
+    },
+    {
+      "path": "source/verl/trainer/constants_ppo.py",
+      "sha256": "c1da0ce4cddfc89c4be2f7488570fc3cd1ccf47256db84eaa8bf795c5019b831",
+      "bytes": 2631
+    },
+    {
+      "path": "source/verl/trainer/distillation/__init__.py",
+      "sha256": "1a5a57ba88b4e462812632063c5cb911b44109008351a1d4c6ff2272cac030e8",
+      "bytes": 642
+    },
+    {
+      "path": "source/verl/trainer/distillation/fsdp/__init__.py",
+      "sha256": "ced14be479d27e864cf3557c37d8abe00d2204ba6c030620bf48ea85e25a5921",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/trainer/distillation/fsdp/losses.py",
+      "sha256": "60cb79330085e8560274a99f6681cadeec5e74e59c6106a7e29ddb98c939f6ee",
+      "bytes": 28286
+    },
+    {
+      "path": "source/verl/trainer/distillation/losses.py",
+      "sha256": "f29909436fc9f699ec5f9cf86de3b5aeadea43d7e2c0f7b37a3112278088d57d",
+      "bytes": 25564
+    },
+    {
+      "path": "source/verl/trainer/distillation/megatron/__init__.py",
+      "sha256": "ced14be479d27e864cf3557c37d8abe00d2204ba6c030620bf48ea85e25a5921",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/trainer/distillation/megatron/losses.py",
+      "sha256": "62542e90ef2ac77f3ca4c1100bc99e265bf2c82600bb11ee1551e119df8882d4",
+      "bytes": 14657
+    },
+    {
+      "path": "source/verl/trainer/main_eval.py",
+      "sha256": "f437f3e57e6d801ef832989ddb20218e283b82b0c7e76042373c84fd1c7c490d",
+      "bytes": 2796
+    },
+    {
+      "path": "source/verl/trainer/main_generation_server.py",
+      "sha256": "8c4cfe2462207e860f5fd7822ca613c0c49ba5add42732baaf2752948f2ae6bb",
+      "bytes": 6672
+    },
+    {
+      "path": "source/verl/trainer/main_ppo.py",
+      "sha256": "af52b6da21b76049d016de2c22b1d9c1634b846567023b7d7b50d975eba4fe5a",
+      "bytes": 15921
+    },
+    {
+      "path": "source/verl/trainer/main_ppo_sync.py",
+      "sha256": "0cc6a1427253c962e7aa4ac88d634ee349325387dda32c3270d6012300730370",
+      "bytes": 85858
+    },
+    {
+      "path": "source/verl/trainer/ppo/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/trainer/ppo/core_algos.py",
+      "sha256": "37fa248bdeeef4311dfa40b799786fd8bd6cd6013319223d2540685fce80f843",
+      "bytes": 101757
+    },
+    {
+      "path": "source/verl/trainer/ppo/metric_utils.py",
+      "sha256": "f1199c24d6673716fd79bbd0857db594b44ca457d0bf595f21ccda6894dbdaa0",
+      "bytes": 30510
+    },
+    {
+      "path": "source/verl/trainer/ppo/padding_utils.py",
+      "sha256": "685f0eab93eb7436a7ee8418bc65b6ed085662388103ceff4b981d93f6c2abeb",
+      "bytes": 7711
+    },
+    {
+      "path": "source/verl/trainer/ppo/prefix_grouper_utils.py",
+      "sha256": "22f66f26c8c918f7ecf5e8522ed434f40e94660733b1f3dadfd31ff8b7699db0",
+      "bytes": 7216
+    },
+    {
+      "path": "source/verl/trainer/ppo/ray_trainer.py",
+      "sha256": "c8c3107a0471c9770d985b4b849a33bfd408551f1ead60c1eb47b4f22af9ffa2",
+      "bytes": 92016
+    },
+    {
+      "path": "source/verl/trainer/ppo/reward.py",
+      "sha256": "10d99d93f2525148a74ca5260c51b8d945eda20f656219f02f112a0f75882e85",
+      "bytes": 6889
+    },
+    {
+      "path": "source/verl/trainer/ppo/rollout_corr_helper.py",
+      "sha256": "b5b09c8361d587e7f8078fb873766abc2cbf7ce231b9c449450928413ed11ff4",
+      "bytes": 54775
+    },
+    {
+      "path": "source/verl/trainer/ppo/utils.py",
+      "sha256": "48b8028936bb0c7346e55d510239feebc79a6846b9890c4655e7b2e3e4923e92",
+      "bytes": 3406
+    },
+    {
+      "path": "source/verl/trainer/runtime_env.yaml",
+      "sha256": "6f2cb555377e3d40f7213d4faad45dd71c39be75d2fc9fdc62ac1461fdf89a52",
+      "bytes": 195
+    },
+    {
+      "path": "source/verl/trainer/sft_trainer.py",
+      "sha256": "22e21f4a69ec473116454a6e97cd3462ad63a47c580740d7b5b9a31c00587e84",
+      "bytes": 18939
+    },
+    {
+      "path": "source/verl/trainer/sft_trainer_ray.py",
+      "sha256": "b7c36844ad9ee6cd046f8ec25eae73034b51d091302a285ce7d6cd5d5b480a38",
+      "bytes": 16876
+    },
+    {
+      "path": "source/verl/utils/__init__.py",
+      "sha256": "10f3e8ffb7ad87adc19803effd5ee4abc9c6769622a7e66d26de86db319dffea",
+      "bytes": 1238
+    },
+    {
+      "path": "source/verl/utils/activation_offload.py",
+      "sha256": "fadc0f0911af4f17bab6748659e6193dfb5826b491db8dda8d4814ba2101e8d9",
+      "bytes": 22610
+    },
+    {
+      "path": "source/verl/utils/attention_utils.py",
+      "sha256": "8da49fde853e5b5748db887bf2602fc290bb2a514041c9589482bb0d846d2ec0",
+      "bytes": 3986
+    },
+    {
+      "path": "source/verl/utils/chat_template.py",
+      "sha256": "ef12ae6ddac0d9f7d1dbc178459f7290ca736e8a5b598279120b094507a7a7da",
+      "bytes": 5090
+    },
+    {
+      "path": "source/verl/utils/checkpoint/__init__.py",
+      "sha256": "05095d2f0364172b6db45253807cae0e1f73ca9e1dcf0c85b3fb804e0db45c4b",
+      "bytes": 724
+    },
+    {
+      "path": "source/verl/utils/checkpoint/checkpoint_handler.py",
+      "sha256": "3b547c2b97e01b7587866053b4aa624d81b8cdd9d75fff20a97420690206a896",
+      "bytes": 9092
+    },
+    {
+      "path": "source/verl/utils/checkpoint/checkpoint_manager.py",
+      "sha256": "b4bf321cdcb2329a1d14ecde4aa3e77d2456e2d36ba6294d0dddef917d5d31f8",
+      "bytes": 10706
+    },
+    {
+      "path": "source/verl/utils/checkpoint/fsdp_checkpoint_manager.py",
+      "sha256": "87036a65beac76806817362da8c58ae14131fa8dcb082f95568eaaa47eb37d10",
+      "bytes": 18075
+    },
+    {
+      "path": "source/verl/utils/checkpoint/megatron_checkpoint_manager.py",
+      "sha256": "9c96fafa0b3a6a10ade08a1fc5abd5eceec0a927ee551222a0d4aff89953e80a",
+      "bytes": 60594
+    },
+    {
+      "path": "source/verl/utils/config.py",
+      "sha256": "92210b0bd4f97d5d27bbeeb5e23f15688b9bd425fa66806a95b3f1d58aec97a1",
+      "bytes": 8712
+    },
+    {
+      "path": "source/verl/utils/dataset/__init__.py",
+      "sha256": "cec02a3cb275b92d1ba70c95623daef6d25efa8c94d5179dd996f2f8fa901e88",
+      "bytes": 711
+    },
+    {
+      "path": "source/verl/utils/dataset/dataset_utils.py",
+      "sha256": "da10fe0552ec17af1e3a44ba53cfdb1f02103c786257222fc1b4a8de34e95913",
+      "bytes": 2819
+    },
+    {
+      "path": "source/verl/utils/dataset/multiturn_sft_dataset.py",
+      "sha256": "ac63d8fa3cd8459f0ef9a34ee9ec2bfc78a80948bb81d2a45c07ceb2d2c785cc",
+      "bytes": 20347
+    },
+    {
+      "path": "source/verl/utils/dataset/rl_dataset.py",
+      "sha256": "7463b89114625d736e376a10622253be120bfe8c3f6b7d7b54b49beb790525b8",
+      "bytes": 24506
+    },
+    {
+      "path": "source/verl/utils/dataset/rm_dataset.py",
+      "sha256": "f7735d42105a4b2be4ab1ea0c064614b4d65ec71b8749188becf8d16fc0a60d7",
+      "bytes": 6212
+    },
+    {
+      "path": "source/verl/utils/dataset/vision_utils.py",
+      "sha256": "206c1d3601aa86c40718e337a07390e61360ca7699e6adbdbc3bea44460a5700",
+      "bytes": 4390
+    },
+    {
+      "path": "source/verl/utils/debug/__init__.py",
+      "sha256": "bfd72ae3a337352475f925c6f592d6a1a3a9426997267d7483d637fd94e1ff56",
+      "bytes": 745
+    },
+    {
+      "path": "source/verl/utils/debug/metrics.py",
+      "sha256": "f192f7be05a855eea16900a6d3f01f51a1a78e8e1acc4278388fa673df9b7c47",
+      "bytes": 5378
+    },
+    {
+      "path": "source/verl/utils/debug/performance.py",
+      "sha256": "8d098eaba0968b242e0bb79ed266cdccae77fbb20520a0664e9d2e8b99c74b40",
+      "bytes": 820
+    },
+    {
+      "path": "source/verl/utils/debug/trajectory_tracker.py",
+      "sha256": "2600fcdfca5a59fdc1a7ab63e41b8278d89ff47459bad1a78fdcebc348b3a72f",
+      "bytes": 3146
+    },
+    {
+      "path": "source/verl/utils/device.py",
+      "sha256": "52c5dd8dc3e4afc3e0d67756d3d4995282246b98b767be080c28448353c1ad11",
+      "bytes": 12747
+    },
+    {
+      "path": "source/verl/utils/distributed.py",
+      "sha256": "be0e0c122bd385903dc0400cc81799a0d9b9a6b4aafe7a7b46a7d7628c83761f",
+      "bytes": 6190
+    },
+    {
+      "path": "source/verl/utils/experimental/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/utils/experimental/torch_functional.py",
+      "sha256": "09f93ac5f28784d85f7f16e7160e697be256de67ba36f8a36a3e5e4bcac24a8f",
+      "bytes": 8499
+    },
+    {
+      "path": "source/verl/utils/flops_counter.py",
+      "sha256": "4228f71c114d847f7b559ed79f7dd0517bedafd2c3501226362177dd092c55f2",
+      "bytes": 24410
+    },
+    {
+      "path": "source/verl/utils/fp8_utils.py",
+      "sha256": "be1dd8df12e5d1bd2e233687df9d17b3003077fe49116668b2bdf748a06e4a3e",
+      "bytes": 4670
+    },
+    {
+      "path": "source/verl/utils/fs.py",
+      "sha256": "fcc6443d2e42b44c510ad9f25979d08a3373927e3660518bae6711790cdc8c51",
+      "bytes": 10942
+    },
+    {
+      "path": "source/verl/utils/fsdp_utils.py",
+      "sha256": "b3e05f870dc86fc9e4e6482c76a37994f743f0b6e5a905bcc322089034f98a17",
+      "bytes": 47900
+    },
+    {
+      "path": "source/verl/utils/groupwise.py",
+      "sha256": "409403d0002ff0d1fd1c41812163b1cfa52a52248677aab00e6ffcf3b937b442",
+      "bytes": 7689
+    },
+    {
+      "path": "source/verl/utils/hdfs_io.py",
+      "sha256": "14ea05cfdf000666899109a417d8d8bd23cb02afc43e06c16a861a3020590bd8",
+      "bytes": 4645
+    },
+    {
+      "path": "source/verl/utils/import_utils.py",
+      "sha256": "afb325b517e854157104d9c9fc61f6afbe55c47ee64dd6a56d4dfab88136041c",
+      "bytes": 8040
+    },
+    {
+      "path": "source/verl/utils/kernel/__init__.py",
+      "sha256": "db5168f476482dee94850c08859bc403f08f8eb0673d32a918b89b3ce9a430ef",
+      "bytes": 1285
+    },
+    {
+      "path": "source/verl/utils/kernel/fp8_kernel.py",
+      "sha256": "bc04247611fcbb9a0943d6e31bca6d1d765a6b1e2cf82f44bf4d3748a368dd10",
+      "bytes": 12526
+    },
+    {
+      "path": "source/verl/utils/kernel/kernels.py",
+      "sha256": "6d8dda8032ffd3caeb8fb2b6c3307126e0892135aee719f69dd26febc76c012b",
+      "bytes": 65290
+    },
+    {
+      "path": "source/verl/utils/kernel/linear_cross_entropy.py",
+      "sha256": "b608f75336e18faef233c3d37fe4763a6b08605d92cd977a130bee013ed2e12a",
+      "bytes": 4798
+    },
+    {
+      "path": "source/verl/utils/logger/__init__.py",
+      "sha256": "d4e7601565ea3c5126abd8e8b60751f62fdd3bdabf55f80eb9589abe7b342867",
+      "bytes": 925
+    },
+    {
+      "path": "source/verl/utils/logger/aggregate_logger.py",
+      "sha256": "64d8556b0d6acc667a5be2dd43908111c9e58aae58d779ee9b02f0f28e2b42f7",
+      "bytes": 4808
+    },
+    {
+      "path": "source/verl/utils/logging_utils.py",
+      "sha256": "72f6abe76274ecee5812c90879dc8f0b40e68d105c91da32a8923b8862320294",
+      "bytes": 1051
+    },
+    {
+      "path": "source/verl/utils/megatron/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/utils/megatron/dist_checkpointing.py",
+      "sha256": "3c306ee073082853ce7a8d22a9b7b874d013a705dde87c5f384b638196acdf1f",
+      "bytes": 2778
+    },
+    {
+      "path": "source/verl/utils/megatron/memory.py",
+      "sha256": "b5e9dd018ea85a9d99ac80bc6bf7820b3d75cecd61fab4cfdfb9f78f5a992fdd",
+      "bytes": 1456
+    },
+    {
+      "path": "source/verl/utils/megatron/optimizer.py",
+      "sha256": "e9b6c1cb7d0ae7fa25135e387ee850730329ae1f74a707813bd43f01dbbe39f0",
+      "bytes": 4070
+    },
+    {
+      "path": "source/verl/utils/megatron/pipeline_parallel.py",
+      "sha256": "b1bcc5ed48abd97f520b95f2c650d93e3a5f2c0c3518eb7baa4984c069f74781",
+      "bytes": 2732
+    },
+    {
+      "path": "source/verl/utils/megatron/router_replay_patch.py",
+      "sha256": "48073eb6c979a76111f9823a2d3f098fd7edc4d4397a3bc57b30cc9eb508333d",
+      "bytes": 19074
+    },
+    {
+      "path": "source/verl/utils/megatron/router_replay_utils.py",
+      "sha256": "81bf9eeac1c1ea99083fdd0a007e22124d5e87e677967343b313f99ebeb03a8b",
+      "bytes": 25901
+    },
+    {
+      "path": "source/verl/utils/megatron/sequence_parallel.py",
+      "sha256": "8acb3406dd403eeab34a972e172982001c451e5e804ba0cf833a511a43f2a915",
+      "bytes": 1820
+    },
+    {
+      "path": "source/verl/utils/megatron/tensor_parallel.py",
+      "sha256": "c16638f9516f2bddb2f03a299af128a567e97406220c8171a2e06d92f341cae7",
+      "bytes": 8342
+    },
+    {
+      "path": "source/verl/utils/megatron_peft_utils.py",
+      "sha256": "6977580da8ba5cae276beeed712ab7759daa58526dbe0e347136d1a38be43209",
+      "bytes": 6215
+    },
+    {
+      "path": "source/verl/utils/megatron_utils.py",
+      "sha256": "1911e742b5b067715eac5789636f2448e6dc516e861dbd34dc1f5c4aa956d372",
+      "bytes": 80994
+    },
+    {
+      "path": "source/verl/utils/memory_utils.py",
+      "sha256": "2c356ff43c37d18f29dd0713cb60cb080209fff2e964f993b8d27f176669c111",
+      "bytes": 11270
+    },
+    {
+      "path": "source/verl/utils/metric/__init__.py",
+      "sha256": "5bf1e099a2931ba8727c8cf4256fc3d155f6cb92c89a1b747dcbdc98e804385e",
+      "bytes": 719
+    },
+    {
+      "path": "source/verl/utils/metric/utils.py",
+      "sha256": "b17a4ce737d154a2b7ccbf2dc238be48b0d580203133082d3f98e72e70e0e3bd",
+      "bytes": 6168
+    },
+    {
+      "path": "source/verl/utils/model.py",
+      "sha256": "860bf8e488d2f59141e65261c254935ccab90e90bf96ecfd2c534bcaf9b68b71",
+      "bytes": 32108
+    },
+    {
+      "path": "source/verl/utils/modelopt/__init__.py",
+      "sha256": "afa38578cfc3f98c245ba36323828d7cd1a8f7220492b22870041efb3e7a9f75",
+      "bytes": 1427
+    },
+    {
+      "path": "source/verl/utils/modelopt/qat_utils.py",
+      "sha256": "fa64f065c68fc118aca86d144a0f39e48bebda4f79a6eae7e5255dce6327591b",
+      "bytes": 1913
+    },
+    {
+      "path": "source/verl/utils/modelopt/qat_weight_exporter.py",
+      "sha256": "0b2b0efeb41f5cb33ba3878d31eb452608535e50e10d862ed7acd1abb4accad1",
+      "bytes": 10463
+    },
+    {
+      "path": "source/verl/utils/modelopt/quantize.py",
+      "sha256": "5386afdde581f286a1fa8289c3072e632e94bcc2676924ba8ebda5dedd156258",
+      "bytes": 2649
+    },
+    {
+      "path": "source/verl/utils/modelopt/vllm_modelopt_patch.py",
+      "sha256": "5f4e1c524f5272e2da70f56d72f207e6ded791d4fa86a6c24ae3cd7aa0c561e4",
+      "bytes": 22733
+    },
+    {
+      "path": "source/verl/utils/net_utils.py",
+      "sha256": "ff4a4374b53f818cf59fc50af77f7dbc0f1e7677a23187340f2c36317117b7a4",
+      "bytes": 3052
+    },
+    {
+      "path": "source/verl/utils/npu_flash_attn_utils.py",
+      "sha256": "395678be930c95bb43a47e4ee2286e729099cbb515290c87c0c8dc1c3a450c1e",
+      "bytes": 6075
+    },
+    {
+      "path": "source/verl/utils/profiler/__init__.py",
+      "sha256": "5dae238e58dff2d85731af37a342a66fb9b407033cbbd12eeb7d9cea602bb435",
+      "bytes": 1659
+    },
+    {
+      "path": "source/verl/utils/profiler/config.py",
+      "sha256": "b783205288cb382b386a706c15bc69e3d5b1f0b7639e4631f4303fae48d5affa",
+      "bytes": 10632
+    },
+    {
+      "path": "source/verl/utils/profiler/empty_annotations.py",
+      "sha256": "19d56f53436bdd181b79a5dbee0dca77a232131a382883c302de30eaa2a80c30",
+      "bytes": 1116
+    },
+    {
+      "path": "source/verl/utils/profiler/mstx_profile.py",
+      "sha256": "f4b7afb0567e435d02036e3061627e624df72a6cf462837009df8e36c5b250b3",
+      "bytes": 9250
+    },
+    {
+      "path": "source/verl/utils/profiler/nvtx_profile.py",
+      "sha256": "1e17cc940745b7b54c4099c20c23ef8c702873a726303a710c2763952c1300a7",
+      "bytes": 6323
+    },
+    {
+      "path": "source/verl/utils/profiler/performance.py",
+      "sha256": "4cac930bbbe75df039fe8201ef0c9bca6e473060ac06f12146a348436395f332",
+      "bytes": 9980
+    },
+    {
+      "path": "source/verl/utils/profiler/precision_debugger_profile.py",
+      "sha256": "a3d92b45780bb9ccef5a2a72b5fd06bb1a53ba18ca88884ce94e3da340a7219d",
+      "bytes": 9862
+    },
+    {
+      "path": "source/verl/utils/profiler/profile.py",
+      "sha256": "88a5e3a88c1c1d23a8b527d5ca8750f9829578aec7b7ced15e7d4d0e8525d59f",
+      "bytes": 11157
+    },
+    {
+      "path": "source/verl/utils/profiler/torch_profile.py",
+      "sha256": "c94478b7010dae0b1671b79fad97676743bb3223e5d35c0a1e86adc287a10a76",
+      "bytes": 6053
+    },
+    {
+      "path": "source/verl/utils/py_functional.py",
+      "sha256": "e3f6bef93108c87ac07c2bf814f06d912d770fdaae267de2934bc49e3e0c6ecc",
+      "bytes": 13715
+    },
+    {
+      "path": "source/verl/utils/qat/__init__.py",
+      "sha256": "1b2540ff1a1dc77119f9e60867d99aff50e59ff192dc8c447b7845b3a3f9aa60",
+      "bytes": 1749
+    },
+    {
+      "path": "source/verl/utils/qat/core.py",
+      "sha256": "2d486eff92cfc62b60524c96fb964edbc9fd1ee13137f45748de010b601196ad",
+      "bytes": 6565
+    },
+    {
+      "path": "source/verl/utils/qat/linear.py",
+      "sha256": "fe9cafc7450ac1989940826893842fd638b81026344bea9a6809b2bdc91e8935",
+      "bytes": 13658
+    },
+    {
+      "path": "source/verl/utils/qat/quantizer.py",
+      "sha256": "fd6c8b7bea85bc8aeeae56a4b63ab7989c12c15e2a8b9ab8e4e4e2ae0b302453",
+      "bytes": 11512
+    },
+    {
+      "path": "source/verl/utils/qat/vllm_patch.py",
+      "sha256": "5e2b80a02d087b0a3b3238152da0b69eae8a3b94da1d29680ef74ab217fcf53a",
+      "bytes": 32531
+    },
+    {
+      "path": "source/verl/utils/ray_utils.py",
+      "sha256": "1f70a9ac05b4a6f92a3ad2486bee17ac9721a9568e7e72b17e76172a60a7751b",
+      "bytes": 5644
+    },
+    {
+      "path": "source/verl/utils/rendezvous/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/utils/rendezvous/ray_backend.py",
+      "sha256": "ae45c1c6e1a204b8c4d99849b03f1a571ce05a0e143a3b1dcc27522c7aee0ff9",
+      "bytes": 2591
+    },
+    {
+      "path": "source/verl/utils/reward_score/__init__.py",
+      "sha256": "421d1190899ff8c64fc63bf720c87f664ae98e9a9ce880e09b463de407fb85bf",
+      "bytes": 2796
+    },
+    {
+      "path": "source/verl/utils/reward_score/geo3k.py",
+      "sha256": "7e2821b85e2e07bf03e36f8fcd5f27faf2506e6f287098154b518c0a128b1e6c",
+      "bytes": 1411
+    },
+    {
+      "path": "source/verl/utils/reward_score/gsm8k.py",
+      "sha256": "497c6e32b708d0bc8803b5a048ca5983de7756eb9c146abdc56e6f5d28767189",
+      "bytes": 2751
+    },
+    {
+      "path": "source/verl/utils/reward_score/math_batch.py",
+      "sha256": "a98fae3cd0d177c325019a5a6cdc69e60360fcf9156e2c849f89a5215b80f691",
+      "bytes": 1070
+    },
+    {
+      "path": "source/verl/utils/reward_score/math_dapo.py",
+      "sha256": "26294bd6b9f64fd47215ce8598c13c6cc7bba48e8cc44be50b0f8e9c735893f0",
+      "bytes": 7785
+    },
+    {
+      "path": "source/verl/utils/reward_score/math_reward.py",
+      "sha256": "085eb67055c6976fea529d5ed9c8f0c63a989e85295d532db0d41fde8db50974",
+      "bytes": 6668
+    },
+    {
+      "path": "source/verl/utils/reward_score/math_verify.py",
+      "sha256": "1242011cddc041ea6cb19fc9a1872ebab742d8ae7e8ebd3342f6b3b8b6e2ba15",
+      "bytes": 2479
+    },
+    {
+      "path": "source/verl/utils/reward_score/math_verify_reward.py",
+      "sha256": "8a27c4307b20eb9801ad85f769cdc03a0bfa8b424ac74827f314942eb78dd4d9",
+      "bytes": 7512
+    },
+    {
+      "path": "source/verl/utils/reward_score/prime_code/__init__.py",
+      "sha256": "139690b83b2b21c0797696e07a36f24a206808183793d29fb15a5d49b8e58efc",
+      "bytes": 3128
+    },
+    {
+      "path": "source/verl/utils/reward_score/prime_code/testing_util.py",
+      "sha256": "953c97e7fcdda429a27ab45eb2a5246fb40b8ed98fe42375f876e8a4ed8c28dc",
+      "bytes": 26704
+    },
+    {
+      "path": "source/verl/utils/reward_score/prime_code/utils.py",
+      "sha256": "a85e7d0cb7f5caf2615c6d0861e695102f3c0e0a19ddae29efb1e726297aa67c",
+      "bytes": 2213
+    },
+    {
+      "path": "source/verl/utils/reward_score/prime_math/__init__.py",
+      "sha256": "59515c65270d20a56de5ad08e18368b799c89616af2eb3412fa4753ce238f1b9",
+      "bytes": 12523
+    },
+    {
+      "path": "source/verl/utils/reward_score/prime_math/grader.py",
+      "sha256": "7a188b372e94a87791cf3727034eb38f795f513d882f9aaa8f09a2401d1d67b6",
+      "bytes": 14568
+    },
+    {
+      "path": "source/verl/utils/reward_score/prime_math/math_normalize.py",
+      "sha256": "cf84ffc205098e8f7ed3c8c2c55016a73cc1afb059325b9566442521937f639a",
+      "bytes": 6299
+    },
+    {
+      "path": "source/verl/utils/reward_score/rlla.py",
+      "sha256": "4b437fdbc4a834953b640f59c0b966b1838dd771a0d86da89e2398c7fe37046c",
+      "bytes": 9072
+    },
+    {
+      "path": "source/verl/utils/reward_score/sandbox_fusion/__init__.py",
+      "sha256": "0cdc74091cb1b151edea9cf9710606d0b4093a649eb4fd6c366c5ed70032f55e",
+      "bytes": 5255
+    },
+    {
+      "path": "source/verl/utils/reward_score/sandbox_fusion/utils.py",
+      "sha256": "9e048a4a471ae200dd594836d39c869ff0224207fc58ef0820937b59f67a2930",
+      "bytes": 24546
+    },
+    {
+      "path": "source/verl/utils/reward_score/search_r1_like_qa_em.py",
+      "sha256": "aea401d7386398a5465256a6b7b816d0d0a088359fd8c840699b1bf83d837701",
+      "bytes": 5182
+    },
+    {
+      "path": "source/verl/utils/rollout_skip.py",
+      "sha256": "c50cf522b248979739cf8b8ee51e28027af4d5150e690c42e3deee354cede221",
+      "bytes": 18252
+    },
+    {
+      "path": "source/verl/utils/rollout_trace.py",
+      "sha256": "2d44bc48457f0b0d126b6e1fa6eb9343e24c36c9b4ca713f6fb35b4724ee7a7d",
+      "bytes": 15684
+    },
+    {
+      "path": "source/verl/utils/seqlen_balancing.py",
+      "sha256": "c114cd1a2908292763fbcae34788a1b010c262ded33712d3f035bc25ff8c2a06",
+      "bytes": 24643
+    },
+    {
+      "path": "source/verl/utils/sglang/__init__.py",
+      "sha256": "d43194916e00d1a6a38f12af3f6755f73d9597fc1eb48e1280a3f9f360806bfa",
+      "bytes": 663
+    },
+    {
+      "path": "source/verl/utils/sglang/sglang_fp8_utils.py",
+      "sha256": "c919a3efc1465a5226055f8a6b01190d75c93213cce8ad74b73637e9d0e631b6",
+      "bytes": 847
+    },
+    {
+      "path": "source/verl/utils/tensordict_utils.py",
+      "sha256": "4dc4c321a51e256232751ddb5cb2a2be129076e7f02f36a685fcad6d0d98f5f1",
+      "bytes": 36485
+    },
+    {
+      "path": "source/verl/utils/tokenizer.py",
+      "sha256": "ef3c7c9b5f58906360fef288483b869e3a4caf6d27e6aaf75409a8bb14fb4593",
+      "bytes": 9340
+    },
+    {
+      "path": "source/verl/utils/torch_dtypes.py",
+      "sha256": "d189134cac9dcd237823d60fcfe52459ca6ea7e42117621f3c7f9a8c5be302e9",
+      "bytes": 2223
+    },
+    {
+      "path": "source/verl/utils/torch_functional.py",
+      "sha256": "cb37d045dec2161d637e2633032cc97c97334e5547cea62dace42630c9683259",
+      "bytes": 40136
+    },
+    {
+      "path": "source/verl/utils/tracking.py",
+      "sha256": "c1a8679a236c122637ca1ab27e579a197e2a83bea488533da388e43896686afc",
+      "bytes": 22784
+    },
+    {
+      "path": "source/verl/utils/transferqueue_utils.py",
+      "sha256": "19f3248947ba362bf1e94a2fac271cffb63f0f9785271678f967c774c7bf6745",
+      "bytes": 16455
+    },
+    {
+      "path": "source/verl/utils/transformers_compat.py",
+      "sha256": "a275293fd133cbc09646b7027dbf40ff6fd3fa62dbc3f88203c58a21c749b251",
+      "bytes": 4821
+    },
+    {
+      "path": "source/verl/utils/trtllm/__init__.py",
+      "sha256": "d43194916e00d1a6a38f12af3f6755f73d9597fc1eb48e1280a3f9f360806bfa",
+      "bytes": 663
+    },
+    {
+      "path": "source/verl/utils/trtllm/trtllm_fp8_utils.py",
+      "sha256": "e3297c939a3087c8fecd003b7694baa9e35e1df64d1c1c1fa67103782feddff5",
+      "bytes": 847
+    },
+    {
+      "path": "source/verl/utils/ulysses.py",
+      "sha256": "e6df6bcf1889b79beb9566e01dde0c274a498276314e966231500b219d13104a",
+      "bytes": 14554
+    },
+    {
+      "path": "source/verl/utils/veomni/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/utils/veomni/router_replay.py",
+      "sha256": "ebded9cbdb14498b4032490a1ba2025447d0e1da32232fd64f211ae790cdb63c",
+      "bytes": 25275
+    },
+    {
+      "path": "source/verl/utils/vllm/__init__.py",
+      "sha256": "4b269e601e7c2738ec2446ce945df0967e54f7875c66904130b9210c5d53628f",
+      "bytes": 1121
+    },
+    {
+      "path": "source/verl/utils/vllm/npu_vllm_patch.py",
+      "sha256": "eb4100121962ad434e3f96bc1f4c863c0941b4947adaa66712b047447b67c3f7",
+      "bytes": 8896
+    },
+    {
+      "path": "source/verl/utils/vllm/patch.py",
+      "sha256": "43121cf96b79db3eb1d2d9c3d0235772a50bad1da5976f65a2af6a7096804a0c",
+      "bytes": 5458
+    },
+    {
+      "path": "source/verl/utils/vllm/utils.py",
+      "sha256": "8e2577fd0c1e9f3c44c91256573fc13cf0657c5f6ef715c0bbdbd94da812ee4c",
+      "bytes": 5723
+    },
+    {
+      "path": "source/verl/utils/vllm/vllm_fp8_utils.py",
+      "sha256": "530f8f9c90840cab671393968c54841daaeb5a97039cae65bd68414c977bba36",
+      "bytes": 31132
+    },
+    {
+      "path": "source/verl/version/version",
+      "sha256": "9a61402776a66624a093b487f18660f97f3f67a17af81efaec528355d25af756",
+      "bytes": 10
+    },
+    {
+      "path": "source/verl/workers/__init__.py",
+      "sha256": "e65abd77db034b4f29eb1268c24867f84919dbce22e28d1997e563ed1d94179c",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/workers/config/__init__.py",
+      "sha256": "9b93ad3cd84371db3a8bf351663a69fb4d9103dbe4c8e7abcfb568cd39bb83b0",
+      "bytes": 1323
+    },
+    {
+      "path": "source/verl/workers/config/actor.py",
+      "sha256": "857638cd1ee55ccbc9ba4dda5771cd7bc252fe8fea56308ccbce7f49c847a473",
+      "bytes": 18580
+    },
+    {
+      "path": "source/verl/workers/config/checkpoint.py",
+      "sha256": "f98c17c598e12dd84b8d697b5427fc6bd9e7b17ad2a553407ecb8e0af458ece6",
+      "bytes": 2490
+    },
+    {
+      "path": "source/verl/workers/config/critic.py",
+      "sha256": "6d50e8b24adab5a8a24fafe7cb3eadc6168a583cd20ed49045daf938dec636b1",
+      "bytes": 13992
+    },
+    {
+      "path": "source/verl/workers/config/disaggregation.py",
+      "sha256": "5a4c005e31fb10c50d07a33683b9ad8581fea4c8661ab50654a560b98c492545",
+      "bytes": 2294
+    },
+    {
+      "path": "source/verl/workers/config/distillation.py",
+      "sha256": "db0c5b50906ce85950c2a31cff33aa1ccb8fc397853795e6c0439b08cb4ccb7b",
+      "bytes": 14727
+    },
+    {
+      "path": "source/verl/workers/config/engine.py",
+      "sha256": "28fde4c2bc09dc7f7bc7d7b23167de25187f046caf4163b4c24ff45b890a279c",
+      "bytes": 29826
+    },
+    {
+      "path": "source/verl/workers/config/megatron_peft.py",
+      "sha256": "63dda95f2330f3b738c5c2d8cf40120ea129868e64ece83f59b5abcb69897d24",
+      "bytes": 1393
+    },
+    {
+      "path": "source/verl/workers/config/model.py",
+      "sha256": "5853c2a0cfc089ad7663155f3813695d6b61a700dc4acfb897ef25d5d3cec9f9",
+      "bytes": 9550
+    },
+    {
+      "path": "source/verl/workers/config/optimizer.py",
+      "sha256": "d64c68e87b031e7d841d36a1d7ea1f6ee607c73e8d6b6b26511cd0b3497326ff",
+      "bytes": 10499
+    },
+    {
+      "path": "source/verl/workers/config/reward.py",
+      "sha256": "0f6b8873dd9dee5344d266a781af9b50228683237627658eb432c36866d98ac3",
+      "bytes": 3840
+    },
+    {
+      "path": "source/verl/workers/config/rollout.py",
+      "sha256": "fd9a8cd24d59c6f919c4b139b03072d6ab36a3a392d87e4bae9d0b67fb3604b3",
+      "bytes": 12962
+    },
+    {
+      "path": "source/verl/workers/engine/__init__.py",
+      "sha256": "5625e72f431948b5f640d33089b37c7709ceb0528482478c3e94f05b67628eca",
+      "bytes": 2223
+    },
+    {
+      "path": "source/verl/workers/engine/automodel/__init__.py",
+      "sha256": "c255f19ac5482da8446c3ebcefe59150d657c6eebb1da504b2a49404b9c98bf5",
+      "bytes": 754
+    },
+    {
+      "path": "source/verl/workers/engine/automodel/transformer_impl.py",
+      "sha256": "1527d4194327bd0a59c23bc0a3aa0fb920af73aedd5de19b4fe1fde2da6bbe3e",
+      "bytes": 30068
+    },
+    {
+      "path": "source/verl/workers/engine/automodel/utils.py",
+      "sha256": "689eb04dfb6a30007f63bd25c1ac85d001763bd08a90e358fdce4bc0401d1864",
+      "bytes": 9236
+    },
+    {
+      "path": "source/verl/workers/engine/base.py",
+      "sha256": "11e0a338f5220021dab2b1b22213c42bd090e869f3b16fb6ee6f754ccf4462a3",
+      "bytes": 12324
+    },
+    {
+      "path": "source/verl/workers/engine/fsdp/__init__.py",
+      "sha256": "2879ac3976f7cb994c5a45e85458076a7e4f6e1e346aa8acc3d53503b30bbcd8",
+      "bytes": 713
+    },
+    {
+      "path": "source/verl/workers/engine/fsdp/transformer_impl.py",
+      "sha256": "a19ed52f6ece7ca0d500e0aa7297334224907970be8990433b6cb7dd1e7e7fa6",
+      "bytes": 64328
+    },
+    {
+      "path": "source/verl/workers/engine/fsdp/utils.py",
+      "sha256": "69e5aaaaed2a6725125d0fc0202985d9f222b9262dbc9cdfaa964b5743da4ea1",
+      "bytes": 3462
+    },
+    {
+      "path": "source/verl/workers/engine/megatron/__init__.py",
+      "sha256": "c7e3cc98ae6773aad8e2023d0359c2059968eae080497f6aec9bf020e18507ad",
+      "bytes": 1101
+    },
+    {
+      "path": "source/verl/workers/engine/megatron/transformer_impl.py",
+      "sha256": "808fe538342268f6ee5d98f5ec7e94d318f1fd0907660cc6c041426c72c8036d",
+      "bytes": 46507
+    },
+    {
+      "path": "source/verl/workers/engine/megatron/utils.py",
+      "sha256": "3083b5bcd3d8460cb645a7a6629a98aef083887501582318c663cb2da49791f9",
+      "bytes": 1221
+    },
+    {
+      "path": "source/verl/workers/engine/mindspeed/__init__.py",
+      "sha256": "219ce5511b4f5c2ab32beae52c696e3f92285811b2e64a059046af71b289b9bb",
+      "bytes": 832
+    },
+    {
+      "path": "source/verl/workers/engine/mindspeed/transformer_impl.py",
+      "sha256": "10a0732cc06d4ef8485d5e3bd729cc8588a236e71ad672d6aa09fbd60f5da7be",
+      "bytes": 5507
+    },
+    {
+      "path": "source/verl/workers/engine/mindspeed/utils.py",
+      "sha256": "25b0332936d4b5000604e7938d92caed0af4a960ce72831adc4543ec04ee8858",
+      "bytes": 8460
+    },
+    {
+      "path": "source/verl/workers/engine/torchtitan/__init__.py",
+      "sha256": "ef97ff5ac13df9e97e346850930fafc86bc650b924101c1e822f38bb34344f13",
+      "bytes": 737
+    },
+    {
+      "path": "source/verl/workers/engine/torchtitan/transformer_impl.py",
+      "sha256": "61f707d4f9d635a0b5df24ec527e14a2a238ecbc640ba7f87125b4b1847d0c64",
+      "bytes": 30865
+    },
+    {
+      "path": "source/verl/workers/engine/torchtitan/utils.py",
+      "sha256": "e94b3cbbe7a196f3b78a71d4983ff35682fcd75c21c5ba026dd916453824b3da",
+      "bytes": 13161
+    },
+    {
+      "path": "source/verl/workers/engine/utils.py",
+      "sha256": "58a8b790b1958b3a933050822cca418928719065072c562a537167c819f41f14",
+      "bytes": 6001
+    },
+    {
+      "path": "source/verl/workers/engine/veomni/__init__.py",
+      "sha256": "ed62e7973a486c4a121ddb206d7cff5256712081f9d50e7015951b3d4959a0b1",
+      "bytes": 778
+    },
+    {
+      "path": "source/verl/workers/engine/veomni/transformer_impl.py",
+      "sha256": "44c1e1d89d3ba0ebe6e30e41300846260259cfc671fdd07eefba6111c6422c8d",
+      "bytes": 50465
+    },
+    {
+      "path": "source/verl/workers/engine/veomni/utils.py",
+      "sha256": "5cb15958f4fd7443613ca14e10cac33714938220db0cec958b2191514b16088d",
+      "bytes": 3832
+    },
+    {
+      "path": "source/verl/workers/engine_workers.py",
+      "sha256": "1879afb171eb0501ccc0c0a4f868d213f4c48cbaf0848cd9eb9f0f22cb33c9fe",
+      "bytes": 37870
+    },
+    {
+      "path": "source/verl/workers/reward_manager/__init__.py",
+      "sha256": "efacfedb523dc02d5f73d9b5fd273370ed6f74ad4c0b18c25205a55cc3135e09",
+      "bytes": 1384
+    },
+    {
+      "path": "source/verl/workers/reward_manager/abstract.py",
+      "sha256": "04dc770c5a47670e71e5c635574df07f7625a9876d943a4700ab9756d22499a3",
+      "bytes": 2395
+    },
+    {
+      "path": "source/verl/workers/reward_manager/batch.py",
+      "sha256": "120516b953a36db51f8b988902839c0dd03e664f0ff978dd30bd9149ff1ae433",
+      "bytes": 5359
+    },
+    {
+      "path": "source/verl/workers/reward_manager/dapo.py",
+      "sha256": "f611f7c1627acc129c78acbe761046ca3f9a9b7c2a68c84464a3f565c0366973",
+      "bytes": 6379
+    },
+    {
+      "path": "source/verl/workers/reward_manager/naive.py",
+      "sha256": "f936d5fb1589cd8b1a0a1c31b58bea092886ec4e00493fb40483a9af4ac685a6",
+      "bytes": 5315
+    },
+    {
+      "path": "source/verl/workers/reward_manager/prime.py",
+      "sha256": "e30e34ca239ddb629b009eb30eee017c55ca4fdf37f9f797da1d4611239371a4",
+      "bytes": 7734
+    },
+    {
+      "path": "source/verl/workers/reward_manager/registry.py",
+      "sha256": "a5475a07bfa44ca933e0d9611cadb68a78e0c55a82705f98c2aca0eab8565834",
+      "bytes": 1901
+    },
+    {
+      "path": "source/verl/workers/rollout/__init__.py",
+      "sha256": "73fe554828154bbc9f2491bbdd969a84cd94c5f44da3a5b4b6cab0ff82c185c0",
+      "bytes": 847
+    },
+    {
+      "path": "source/verl/workers/rollout/base.py",
+      "sha256": "ed29f8686dd429ae34ff383837d8dd32a9d8f17a521c662dc4809abbd697ea82",
+      "bytes": 3161
+    },
+    {
+      "path": "source/verl/workers/rollout/hf_rollout.py",
+      "sha256": "de5a42d352bb96a3352ebdcc8a9ec1e7c1dd47924ec21e540015d74b7cf1909f",
+      "bytes": 7529
+    },
+    {
+      "path": "source/verl/workers/rollout/llm_server.py",
+      "sha256": "48479a8ee7a322b5c326bc3166e7c8af28d962376a352028c24c5424abd9b495",
+      "bytes": 15783
+    },
+    {
+      "path": "source/verl/workers/rollout/naive/__init__.py",
+      "sha256": "68176cf43c79bc96d5549d1950e402f391f39ddd62582ffaac62d649015af785",
+      "bytes": 669
+    },
+    {
+      "path": "source/verl/workers/rollout/naive/naive_rollout.py",
+      "sha256": "f243226fbb0db0cf2d2e2c3c96730da81994ef358c2c06921c98564164356edc",
+      "bytes": 4837
+    },
+    {
+      "path": "source/verl/workers/rollout/replica.py",
+      "sha256": "07796ad3a93a870c763f97a6ca65e2c4e9c8a059de1daf96674d1e889a19a7a7",
+      "bytes": 16263
+    },
+    {
+      "path": "source/verl/workers/rollout/schemas.py",
+      "sha256": "0a13a2b3987a47e76f83f3f616c147429fc9e814d9ebdf2ec7e22bf2a6e5ad70",
+      "bytes": 32504
+    },
+    {
+      "path": "source/verl/workers/rollout/sglang_rollout/__init__.py",
+      "sha256": "13b565361b06091549aa80e8b5c1c2cadb20778589192f0148aaaa7b217019bd",
+      "bytes": 567
+    },
+    {
+      "path": "source/verl/workers/rollout/sglang_rollout/async_sglang_server.py",
+      "sha256": "b230f0af10f889cba1b6582a089f34b62bac5a7eb9cbf7dcf7987a0bd5ee8bd3",
+      "bytes": 39341
+    },
+    {
+      "path": "source/verl/workers/rollout/sglang_rollout/http_server_engine.py",
+      "sha256": "35951733ee00adf8a9097b02bf394ca96f1a06e331d8f09ab4a1214640f5126d",
+      "bytes": 40316
+    },
+    {
+      "path": "source/verl/workers/rollout/sglang_rollout/sglang_pd_replica.py",
+      "sha256": "28f1c673c154e800cc450780762fbd2d8d2316ef928c7d92ad9a75c91261ed0d",
+      "bytes": 8977
+    },
+    {
+      "path": "source/verl/workers/rollout/sglang_rollout/sglang_rollout.py",
+      "sha256": "270b70edbb77ecb2d62cef1d888f43d35093feb3e4bb234d4d0bc26c6b7ea656",
+      "bytes": 17001
+    },
+    {
+      "path": "source/verl/workers/rollout/sglang_rollout/utils.py",
+      "sha256": "84139d92c6f6ebb3c2da11738e7c0f637bda5acbaffbf8f90631261a45083688",
+      "bytes": 4063
+    },
+    {
+      "path": "source/verl/workers/rollout/tokenizer.py",
+      "sha256": "021bb6a1e8a2efe9266a6b2b3f6f894ccc228ae3e28f617da0f5bf70e5625e86",
+      "bytes": 5640
+    },
+    {
+      "path": "source/verl/workers/rollout/trtllm_rollout/__init__.py",
+      "sha256": "83f9d3d022d03ee5ca422338b9153cc2a80b2c38dd92ea3108eb12613087bd54",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/workers/rollout/trtllm_rollout/trtllm_async_server.py",
+      "sha256": "3b97aa16f9c86da5cbe08a519e853c03c78b106ad1e95edb5b52eebab91f5b20",
+      "bytes": 28149
+    },
+    {
+      "path": "source/verl/workers/rollout/trtllm_rollout/trtllm_rollout.py",
+      "sha256": "f6e1587549f019a8207db6cf7b7820f387fa9dde9a50c3adfe6ad87dffc5643e",
+      "bytes": 22327
+    },
+    {
+      "path": "source/verl/workers/rollout/trtllm_rollout/trtllm_worker_extension.py",
+      "sha256": "776c819c9deb5592ea9c47eb58c65c7442117f4c7e53c0cebfb186c0c9320ecd",
+      "bytes": 9148
+    },
+    {
+      "path": "source/verl/workers/rollout/utils.py",
+      "sha256": "f990a7b179375afea3a61826dbb0b7227651c07a26b09d0b8d940ad3bac6ac4f",
+      "bytes": 7357
+    },
+    {
+      "path": "source/verl/workers/rollout/vllm_rollout/__init__.py",
+      "sha256": "11c57676b01ee7c95d8a1625908818fcd1ba698231737e619e1e5ea726d2fbfa",
+      "bytes": 1443
+    },
+    {
+      "path": "source/verl/workers/rollout/vllm_rollout/bucketed_weight_transfer.py",
+      "sha256": "83cb67d6911206d6456e8581828882ff622a254b6ba78ad82b9802d876083c86",
+      "bytes": 12105
+    },
+    {
+      "path": "source/verl/workers/rollout/vllm_rollout/utils.py",
+      "sha256": "5f25034821c76dcc3d1843df491d0b88cb007111626dcf734afb9517c275ed1d",
+      "bytes": 20086
+    },
+    {
+      "path": "source/verl/workers/rollout/vllm_rollout/vllm_async_server.py",
+      "sha256": "872d1a552f7b8eea81092a7395bb94e0e96405e84fb8f89e41afacdda7c9df12",
+      "bytes": 51661
+    },
+    {
+      "path": "source/verl/workers/rollout/vllm_rollout/vllm_rollout.py",
+      "sha256": "a5ada49197a0a5d46b3d37c735357e6c2c388a28dbac88445304863d659b4b78",
+      "bytes": 9514
+    },
+    {
+      "path": "source/verl/workers/utils/__init__.py",
+      "sha256": "ced14be479d27e864cf3557c37d8abe00d2204ba6c030620bf48ea85e25a5921",
+      "bytes": 600
+    },
+    {
+      "path": "source/verl/workers/utils/losses.py",
+      "sha256": "701a0bf7cd7c0fa3cde670379d44cce5755bcd44222e8866716e69d27a400b5d",
+      "bytes": 7264
+    },
+    {
+      "path": "source/verl/workers/utils/padding.py",
+      "sha256": "661c452b5b6e69c595aa4e0fb4255384ab864ab3ea6f4816feab004fb11bf97b",
+      "bytes": 10945
+    },
+    {
+      "path": "source/wandb/debug-internal.log",
+      "sha256": "a96a02347038cb74952d8a6c8bdb91878ba2c8cdf49f5f5dcb369c752a3fe9cb",
+      "bytes": 905289
+    },
+    {
+      "path": "source/wandb/debug.log",
+      "sha256": "6a41f7c1ad181d85b28b138fcb87443c44cb9e7847957fd9f0135cfbd6bec32a",
+      "bytes": 28318
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/files/output.log",
+      "sha256": "72c08bf7f2d3788b72167a43ef48667bddef1d6154ff0ff8e365b74cbb3eb73a",
+      "bytes": 1434
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/files/requirements.txt",
+      "sha256": "44fd312c45151fa1d6ef0bda113de08a2d6fac451d4fc50882aae2e6acd6b565",
+      "bytes": 4582
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/files/wandb-metadata.json",
+      "sha256": "5572f1c7a24898e01f7eedc37b81b589b9d8b243a9b733a3dd7b50103a87467e",
+      "bytes": 3576
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/logs/debug-internal.log",
+      "sha256": "a96a02347038cb74952d8a6c8bdb91878ba2c8cdf49f5f5dcb369c752a3fe9cb",
+      "bytes": 905289
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/logs/debug.log",
+      "sha256": "6a41f7c1ad181d85b28b138fcb87443c44cb9e7847957fd9f0135cfbd6bec32a",
+      "bytes": 28318
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/run-e2cowdmo.wandb",
+      "sha256": "367ce7702875287c1919d2c2da00edb9feb239c345cd80bcff13d2a06e1c1cf1",
+      "bytes": 27295744
+    },
+    {
+      "path": "source/wandb/run-20261015_141714-e2cowdmo/run-e2cowdmo.wandb.syncstate",
+      "sha256": "ccde3d753579b6034fe0294561ad95a6d90f8b7c7c905d88f65cc8ee2976dc69",
+      "bytes": 40
+    },
+    {
+      "path": "recompute.py",
+      "sha256": "321f50c45335f409ee1e6d7225efe7429632b07b955ce9981a9b6540e6d7b293",
+      "bytes": 3853
+    }
+  ]
+}
